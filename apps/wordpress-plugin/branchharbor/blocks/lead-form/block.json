@@ -1,0 +1,82 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "branchharbor/lead-form",
+	"version": "1.0.0",
+	"title": "Enquiry form",
+	"category": "branchharbor",
+	"icon": "email-alt",
+	"description": "Sends enquiries to the right location, or demo requests to BranchHarbor.",
+	"keywords": [
+		"form",
+		"lead",
+		"enquiry",
+		"contact",
+		"demo"
+	],
+	"textdomain": "branchharbor",
+	"attributes": {
+		"locationId": {
+			"type": "string",
+			"default": ""
+		},
+		"target": {
+			"type": "string",
+			"default": "lead",
+			"enum": [
+				"lead",
+				"demo_request"
+			]
+		},
+		"formId": {
+			"type": "string",
+			"default": "enquiry"
+		},
+		"fields": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "string"
+			}
+		},
+		"industry": {
+			"type": "string",
+			"default": "studios",
+			"enum": [
+				"studios",
+				"sports",
+				"wellness",
+				"commerce",
+				"foods",
+				"realty"
+			]
+		},
+		"submitLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"successMessage": {
+			"type": "string",
+			"default": ""
+		},
+		"consentText": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"left",
+			"center",
+			"right",
+			"wide"
+		],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "branchharbor-blocks-editor",
+	"style": "branchharbor-blocks"
+}

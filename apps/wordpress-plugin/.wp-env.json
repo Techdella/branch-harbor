@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
+	"phpVersion": "8.1",
+	"plugins": [ "./branchharbor", "https://downloads.wordpress.org/plugin/woocommerce.zip" ],
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"BRANCHHARBOR_API_URL": "http://host.docker.internal:4000",
+		"BRANCHHARBOR_APP_URL": "http://host.docker.internal:3000"
+	},
+	"mappings": {
+		"wp-content/plugins/branchharbor-tests": "./tests"
+	}
+}

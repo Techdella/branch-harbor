@@ -1,0 +1,6 @@
+dist/
+branchharbor.zip
+*.zip
+vendor/
+composer.lock
+.wp-env.override.json

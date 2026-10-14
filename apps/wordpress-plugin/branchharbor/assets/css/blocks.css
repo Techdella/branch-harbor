@@ -1,0 +1,63 @@
+/*
+ * BranchHarbor blocks — deliberately light so the site's theme stays in charge of typography and
+ * colours. Override the custom properties in your theme to restyle.
+ */
+.bh-block {
+	--bh-accent: #087f82;
+	--bh-accent-contrast: #fff;
+	--bh-muted: #52636d;
+	--bh-border: #dce4e5;
+	--bh-surface: rgba(127, 127, 127, .06);
+	--bh-radius: 12px;
+	margin-block: 1em;
+}
+
+.bh-block .bh-muted { color: var(--bh-muted); margin: .25em 0 0; }
+.bh-block .bh-small { font-size: .85em; }
+.bh-block .bh-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.bh-block .bh-card,
+.bh-block .bh-row { background: var(--bh-surface); border-radius: var(--bh-radius); padding: 12px 16px; }
+.bh-block .bh-card-title { margin: 0; font-size: 1.05em; }
+.bh-block .bh-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bh-block .bh-row-main { flex: 1 1 200px; display: flex; flex-direction: column; }
+.bh-block .bh-time { min-width: 5.5em; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bh-block .bh-price { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bh-block .bh-day { margin: 1.2em 0 .5em; font-size: 1em; }
+.bh-block .bh-cancelled { opacity: .6; }
+.bh-block .bh-cancelled strong { text-decoration: line-through; }
+.bh-block .bh-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.bh-block .bh-tag,
+.bh-block .bh-badge { display: inline-block; border: 1px solid var(--bh-border); border-radius: 999px; padding: 0 8px; font-size: .8em; }
+
+.bh-block .bh-label { display: block; font-weight: 600; margin-bottom: 4px; }
+.bh-block .bh-input { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--bh-border); border-radius: 8px; box-sizing: border-box; font: inherit; }
+.bh-block textarea.bh-input { min-height: 120px; }
+.bh-block .bh-input:focus-visible { outline: 2px solid var(--bh-accent); outline-offset: 1px; }
+.bh-block .bh-input[aria-invalid="true"] { border-color: #b3261e; }
+.bh-block .bh-field { margin: 0 0 12px; }
+.bh-block .bh-check { display: flex; gap: 8px; align-items: flex-start; }
+.bh-block .bh-check input { margin-top: .3em; width: 18px; height: 18px; }
+.bh-block .bh-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
+.bh-block .bh-button {
+	display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px;
+	border-radius: 999px; border: 2px solid var(--bh-accent); background: var(--bh-accent); color: var(--bh-accent-contrast);
+	font-weight: 700; text-decoration: none; cursor: pointer; font: inherit; font-weight: 700;
+}
+.bh-block .bh-button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.bh-block .bh-button-outline { background: transparent; color: var(--bh-accent); }
+.bh-block .bh-button-small { min-height: 36px; padding: 0 14px; font-size: .9em; }
+
+.bh-block .bh-notice { padding: 12px 16px; border-radius: 8px; margin: 0 0 12px; border-left: 4px solid; }
+.bh-block .bh-notice-success { background: #e6f4ea; border-color: #2f8a46; color: #1e5b2e; }
+.bh-block .bh-notice-error { background: #fdecec; border-color: #b3261e; color: #8a1c14; }
+.bh-block .bh-admin-hint { font-size: .85em; border: 1px dashed var(--bh-border); padding: 6px 10px; border-radius: 8px; }
+.bh-is-loading { min-height: 3em; }
+
+.bh-credit { font-size: .75em; color: #52636d; margin: .25em 0 1em; }
+
+.bh-block .screen-reader-text {
+	border: 0; clip: rect(1px, 1px, 1px, 1px); clip-path: inset(50%); height: 1px; margin: -1px;
+	overflow: hidden; padding: 0; position: absolute; width: 1px; word-wrap: normal !important;
+}
+

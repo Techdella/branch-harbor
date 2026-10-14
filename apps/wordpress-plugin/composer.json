@@ -1,0 +1,20 @@
+{
+	"name": "branchharbor/wordpress-plugin",
+	"description": "Development tooling for the BranchHarbor WordPress connector (not shipped in the plugin zip).",
+	"type": "project",
+	"license": "GPL-2.0-or-later",
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^3.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"lint": "bash bin/lint.sh",
+		"test": "php tests/run.php",
+		"build": "bash bin/build-zip.sh"
+	}
+}

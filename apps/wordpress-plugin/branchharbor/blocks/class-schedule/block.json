@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "branchharbor/class-schedule",
+	"version": "1.0.0",
+	"title": "Class schedule",
+	"category": "branchharbor",
+	"icon": "calendar-alt",
+	"description": "Upcoming classes for a location, with booking links.",
+	"keywords": [
+		"classes",
+		"timetable",
+		"studio"
+	],
+	"textdomain": "branchharbor",
+	"attributes": {
+		"locationId": {
+			"type": "string",
+			"default": ""
+		},
+		"days": {
+			"type": "integer",
+			"default": 7
+		},
+		"showInstructor": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSpots": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "branchharbor-blocks-editor",
+	"style": "branchharbor-blocks",
+	"viewScript": "branchharbor-blocks-view"
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<ruleset name="BranchHarbor">
+	<description>WordPress coding standards for the BranchHarbor connector.</description>
+
+	<file>./branchharbor</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+	<arg name="colors"/>
+
+	<config name="testVersion" value="8.1-"/>
+	<config name="minimum_wp_version" value="6.4"/>
+
+	<rule ref="WordPress-Extra"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="branchharbor"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="branchharbor"/>
+				<element value="BranchHarbor"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Class files are named class-<name>.php but use a namespace; file names follow WordPress style. -->
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="is_theme" value="false"/>
+		</properties>
+		<exclude-pattern>*/includes/autoload.php</exclude-pattern>
+	</rule>
+</ruleset>

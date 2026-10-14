@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "branchharbor/pickup-order-button",
+	"version": "1.0.0",
+	"title": "Pickup order button",
+	"category": "branchharbor",
+	"icon": "cart",
+	"description": "Links to the location's pickup ordering page.",
+	"keywords": [
+		"order",
+		"pickup",
+		"takeaway"
+	],
+	"textdomain": "branchharbor",
+	"attributes": {
+		"locationId": {
+			"type": "string",
+			"default": ""
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"variant": {
+			"type": "string",
+			"default": "fill",
+			"enum": [
+				"fill",
+				"outline"
+			]
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"left",
+			"center",
+			"right",
+			"wide"
+		],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "branchharbor-blocks-editor",
+	"style": "branchharbor-blocks",
+	"viewScript": "branchharbor-blocks-view"
+}

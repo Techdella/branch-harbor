@@ -1,0 +1,44 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "branchharbor/location-finder",
+	"version": "1.0.0",
+	"title": "Location finder",
+	"category": "branchharbor",
+	"icon": "location-alt",
+	"description": "Searchable list of your BranchHarbor locations.",
+	"keywords": [
+		"locations",
+		"map",
+		"finder"
+	],
+	"textdomain": "branchharbor",
+	"attributes": {
+		"orgSlug": {
+			"type": "string",
+			"default": ""
+		},
+		"country": {
+			"type": "string",
+			"default": ""
+		},
+		"showSearch": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "branchharbor-blocks-editor",
+	"style": "branchharbor-blocks",
+	"viewScript": "branchharbor-blocks-view"
+}

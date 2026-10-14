@@ -1,0 +1,131 @@
+/* BranchHarbor admin — small layer on top of WordPress admin styles, using BranchHarbor tokens. */
+.bh-wrap {
+	--bh-navy: #142d3b;
+	--bh-teal: #087f82;
+	--bh-canvas: #f7f8f5;
+	--bh-surface: #fff;
+	--bh-text-2: #52636d;
+	--bh-border: #dce4e5;
+	--bh-success-bg: #e6f4ea;
+	--bh-success-fg: #1e5b2e;
+	--bh-warning-bg: #fbf1c7;
+	--bh-warning-fg: #6b4a00;
+	--bh-error-bg: #fdecec;
+	--bh-error-fg: #8a1c14;
+	--bh-info-bg: #dff2f2;
+	--bh-info-fg: #0c4f51;
+	--bh-neutral-bg: #eef0ee;
+	--bh-neutral-fg: #3e4a50;
+	color: var(--bh-navy);
+	max-width: 1100px;
+}
+
+.bh-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bh-mark {
+	width: 22px; height: 22px; border-radius: 6px; background: var(--bh-teal);
+	box-shadow: inset 0 0 0 4px var(--bh-navy);
+}
+.bh-body { margin-top: 16px; }
+.bh-lead { font-size: 14px; max-width: 70ch; color: var(--bh-text-2); }
+.bh-muted { color: var(--bh-text-2); margin: 4px 0 0; }
+.bh-small { font-size: 12px; }
+
+.bh-card {
+	background: var(--bh-surface); border: 1px solid var(--bh-border); border-radius: 12px;
+	padding: 16px 24px; margin: 0 0 16px;
+}
+.bh-card h2 { margin-top: 8px; }
+.bh-danger { border-color: #f3c7c3; }
+
+.bh-status { border-left-width: 6px; }
+.bh-tone-success { border-left-color: #2f8a46; }
+.bh-tone-info { border-left-color: var(--bh-teal); }
+.bh-tone-warning { border-left-color: #c48a00; }
+.bh-tone-error { border-left-color: #b3261e; }
+.bh-tone-neutral { border-left-color: #8a9499; }
+
+.bh-banner { padding: 12px 16px; border-radius: 8px; margin: 0 0 12px; border-left: 4px solid; background: var(--bh-error-bg); color: var(--bh-error-fg); }
+
+.bh-pill {
+	display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+	line-height: 1.6; vertical-align: middle; white-space: nowrap;
+}
+.bh-pill-success { background: var(--bh-success-bg); color: var(--bh-success-fg); }
+.bh-pill-warning { background: var(--bh-warning-bg); color: var(--bh-warning-fg); }
+.bh-pill-error { background: var(--bh-error-bg); color: var(--bh-error-fg); }
+.bh-pill-info { background: var(--bh-info-bg); color: var(--bh-info-fg); }
+.bh-pill-neutral { background: var(--bh-neutral-bg); color: var(--bh-neutral-fg); }
+
+.bh-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 0 0 16px; }
+.bh-stat { background: var(--bh-surface); border: 1px solid var(--bh-border); border-radius: 12px; padding: 12px 16px; }
+.bh-stat-label { display: block; color: var(--bh-text-2); font-size: 12px; }
+.bh-stat-value { display: block; font-size: 18px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.bh-steps { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0 0 16px; padding: 0; }
+.bh-steps li { margin: 0; }
+.bh-steps a, .bh-steps li > span {
+	display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px;
+	border: 1px solid var(--bh-border); background: var(--bh-surface); color: var(--bh-navy); text-decoration: none; min-height: 32px;
+}
+.bh-steps li > span { opacity: .55; }
+.bh-steps li.is-current > span { opacity: 1; background: var(--bh-navy); color: #fff; border-color: var(--bh-navy); }
+.bh-step-n {
+	display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%;
+	background: var(--bh-canvas); color: var(--bh-navy); font-weight: 700; font-size: 12px;
+}
+.is-current .bh-step-n { background: var(--bh-teal); color: #fff; }
+
+.bh-bullets { list-style: disc; padding-left: 20px; }
+.bh-ok { color: var(--bh-success-fg); font-weight: 600; }
+.bh-note { background: var(--bh-info-bg); color: var(--bh-info-fg); padding: 8px 12px; border-radius: 8px; }
+.bh-error { color: var(--bh-error-fg); font-weight: 600; margin: 6px 0 0; }
+.bh-warning { color: var(--bh-warning-fg); margin: 6px 0 0; }
+.bh-fix { background: var(--bh-canvas); border-radius: 8px; padding: 6px 10px; margin: 6px 0 0; }
+
+.bh-scopes { list-style: none; padding: 0; }
+.bh-scopes li { padding-left: 24px; position: relative; margin: 6px 0; }
+.bh-scopes li::before { position: absolute; left: 0; font-weight: 700; }
+.bh-scopes .bh-yes::before { content: "\2713"; color: var(--bh-success-fg); }
+.bh-scopes .bh-no::before { content: "\2715"; color: var(--bh-error-fg); }
+
+.bh-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+.bh-option { border: 1px solid var(--bh-border); border-radius: 12px; padding: 12px 16px; background: var(--bh-canvas); }
+.bh-option h3 { margin: 4px 0 6px; }
+.bh-option input.regular-text { max-width: 100%; }
+.bh-details { margin: 16px 0; }
+.bh-details summary { cursor: pointer; font-weight: 600; }
+
+.bh-map select { min-width: 240px; max-width: 100%; }
+.bh-map select[aria-invalid="true"] { border-color: #b3261e; box-shadow: 0 0 0 1px #b3261e; }
+.bh-row-error > td { background: var(--bh-error-bg); }
+.bh-row-error-detail > td { background: #fff7f6; }
+
+.bh-dirs th { width: 40%; }
+.bh-radio { display: block; margin: 4px 0; min-height: 24px; }
+.bh-radio.is-disabled { opacity: .6; }
+
+.bh-tests { list-style: none; padding: 0; }
+.bh-test { padding: 10px 12px; border-radius: 8px; margin: 0 0 8px; background: var(--bh-canvas); }
+.bh-test-pass { background: var(--bh-success-bg); }
+.bh-test-fail { background: var(--bh-error-bg); }
+
+.bh-activity { list-style: none; padding: 0; margin: 0; }
+.bh-activity li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--bh-border); }
+.bh-activity time { color: var(--bh-text-2); white-space: nowrap; }
+.bh-activity-warning span { color: var(--bh-warning-fg); }
+.bh-activity-error span { color: var(--bh-error-fg); }
+
+.bh-inline { display: inline-block; margin-right: 8px; }
+.bh-copy { cursor: copy; }
+.bh-copy.is-copied { background: var(--bh-success-bg); }
+
+@media (max-width: 782px) {
+	.bh-card { padding: 12px 16px; }
+	.bh-dirs th { width: auto; display: block; }
+	.bh-dirs td { display: block; }
+	.bh-map select { min-width: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bh-wrap * { transition: none !important; }
+}

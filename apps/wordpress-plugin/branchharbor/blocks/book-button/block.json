@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "branchharbor/book-button",
+	"version": "1.0.0",
+	"title": "Book button",
+	"category": "branchharbor",
+	"icon": "button",
+	"description": "Links to the location's BranchHarbor booking page.",
+	"keywords": [
+		"book",
+		"booking",
+		"cta"
+	],
+	"textdomain": "branchharbor",
+	"attributes": {
+		"locationId": {
+			"type": "string",
+			"default": ""
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"variant": {
+			"type": "string",
+			"default": "fill",
+			"enum": [
+				"fill",
+				"outline"
+			]
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"left",
+			"center",
+			"right",
+			"wide"
+		],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "branchharbor-blocks-editor",
+	"style": "branchharbor-blocks",
+	"viewScript": "branchharbor-blocks-view"
+}
