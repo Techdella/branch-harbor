@@ -11,6 +11,7 @@ import { addDays, cityOfZone, dateInZone, fmtDay, fmtTime, fmtYmd, weekStart, zo
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, Empty, LoadingBlock } from '../../ui/States';
+import { ClassPanel } from './ClassPanel';
 
 type View = 'week' | 'list';
 
@@ -29,6 +30,7 @@ export function ClassesScreen() {
   const [ws, setWs] = useState(() => weekStart(dateInZone(new Date(), tz)));
   const [editScope, setEditScope] = useState<'one' | 'series'>('one');
   const openId = params.get('open');
+  const [notice, setNotice] = useState<{ id: string; text: string } | null>(null);
 
   useEffect(() => {
     if (!locs.some((l) => l.id === locId) && locs[0]) setLocId(locs[0].id);
@@ -50,8 +52,7 @@ export function ClassesScreen() {
 
   return (
     <>
-      <PageHeader icon="calendar" title={tOps('title')} description={tOps('description')} actions={<Button icon="plus" onClick={() => router.push('?planned=1')}>{t('newClass')}</Button>} />
-      {params.get('planned') && <Banner tone="info">{t('newClassPlanned')}</Banner>}
+      <PageHeader icon="calendar" title={tOps('title')} description={tOps('description')} actions={app.can('operations.write') ? <Link href="/ops/schedule" className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-bold text-white"><Icon name="plus" size={16} />{t('newClass')}</Link> : undefined} />
       <section className="rounded-xl bg-surface p-3.5">
         <div className="flex flex-wrap items-center gap-2 px-1 pb-3">
           <label className="flex h-10 items-center gap-2 rounded-full border border-line-soft px-3 text-[13px] font-semibold">
@@ -138,9 +139,6 @@ export function ClassesScreen() {
         title={open ? `${open.name} · ${fmtDay(open.start, tz, locale)} ${fmtTime(open.start, tz, locale)}` : ''}
         footer={
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" icon="edit" onClick={() => setOpen(null)}>
-              {t('saveEdit')}
-            </Button>
             {open?.coverRequested && (
               <Link href="/ops/cover" className="inline-flex h-9 items-center rounded-full border border-line px-4 text-[13px] font-bold">
                 {t('viewCover')}
@@ -155,38 +153,19 @@ export function ClassesScreen() {
               <Info label={t('capacity')} value={t('booked', { booked: open.booked, capacity: open.capacity })} pastel="#E9DDF8" />
               <Info label={t('waitlist')} value={String(open.waitlist)} />
               <Info label={t('instructor')} value={open.instructor} />
-              <Info label={t('room')} value={open.room} />
+              <Info label={t('room')} value={open.room || '—'} />
               <Info label={t('bookingSource')} value={open.source} />
               <Info label={t('timeZone')} value={`${cityOfZone(tz)} · ${zoneLabel(tz, locale, new Date(open.start))}`} />
             </div>
             {open.booked >= open.capacity && <Banner tone="info">{t('fullWaitlist')}</Banner>}
-            <div>
-              <h3 className="mb-1.5 text-[13px] font-bold">{t('attendees')}</h3>
-              {[['Ava Chen', 'Unlimited'], ['Liam Ortiz', 'Pack · 3 left'], ['Noor Haddad', 'Intro offer']].map(([n, s]) => (
-                <div key={n} className="flex items-center gap-2.5 border-b border-canvas py-1.5 text-[13px]">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-canvas text-[10px] font-extrabold">{n!.split(' ').map((x) => x[0]).join('')}</span>
-                  <span className="flex-1">{n}</span>
-                  <span className="text-[11px] text-stone">{s}</span>
-                </div>
-              ))}
-              <p className="pt-1.5 text-xs text-stone">{t('more', { count: Math.max(0, open.booked - 3) })}</p>
-            </div>
-            <div>
-              <h3 className="mb-1.5 text-[13px] font-bold">{t('editTime')}</h3>
-              <div role="radiogroup" aria-label={t('editTime')} className="flex gap-1.5">
-                {(['one', 'series'] as const).map((k) => (
-                  <button key={k} type="button" role="radio" aria-checked={editScope === k} onClick={() => setEditScope(k)} className={cx('flex-1 rounded-md border-[1.5px] p-2.5 text-left text-xs', editScope === k ? 'border-ink bg-canvas' : 'border-line-soft bg-surface')}>
-                    <strong className="block text-[13px]">{t(`editScope.${k}`)}</strong>
-                    {k === 'one' ? fmtDay(open.start, tz, locale) : t('editScope.seriesDetail', { day: fmtDay(open.start, tz, locale, { weekday: 'long' }) })}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-2">
-                <Banner tone="warning" icon="info">
-                  {editScope === 'one' ? t('impactOne', { count: open.booked }) : t('impactSeries', { occurrences: 9, bookings: 112 })}
-                </Banner>
-              </div>
-            </div>
+            {open.source === 'Booking connection' ? (
+              <Banner tone="info">{t('externalNote')}</Banner>
+            ) : (
+              <>
+                {notice?.id === open.id && <Banner tone="success" live="polite">{notice.text}</Banner>}
+                <ClassPanel key={open.id} occurrenceId={open.id} locationId={open.locationId} start={open.start} tz={tz} inSeries onChanged={(m) => { if (m) setNotice({ id: open.id, text: m }); res.reload(); }} />
+              </>
+            )}
           </div>
         )}
       </Drawer>

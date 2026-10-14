@@ -30,6 +30,11 @@ export default async function LocationLayout({ children, params }: { children: R
               <Icon name="gift" size={15} />{t('wellnessPro.navPackages')}
             </a>
           )}
+          {kind === 'studios' && data.module.mode !== 'external' && (['pricing', 'online', 'account'] as const).map((k) => (
+            <a key={k} href={links.location(location, `/${k}`)} className="flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 hover:bg-white">
+              <Icon name={k === 'pricing' ? 'tag' : k === 'online' ? 'play' : 'user'} size={15} />{t(`studio.nav.${k}` as 'studio.nav.pricing')}
+            </a>
+          ))}
           {extraPages.map((p) => (
             <a key={p.slug} href={links.location(location, `/${p.slug}`)} className="flex h-10 shrink-0 items-center rounded-full px-3 hover:bg-white">{p.title}</a>
           ))}

@@ -141,8 +141,8 @@ export const mobileRoutes: FastifyPluginAsyncZod = async (app) => {
       const [b] = await s.db.select().from(classBookings).where(eq(classBookings.id, req.params.id));
       if (!b || !custIds.includes(b.customerId)) throw notFound('Booking');
       const out = await cancelBooking(s, b.id, { actorUserId: u.id });
-      const payment = out.booking.status === 'confirmed' ? await reverseTargetPayment(s, out.booking.paymentId, u.id, 'Customer cancelled booking') : { action: 'none' };
-      return { id: b.id, status: 'cancelled', payment, waitlistPromoted: !!out.promoted };
+      const payment = out.refundEligible ? await reverseTargetPayment(s, out.booking.paymentId, u.id, 'Customer cancelled booking') : { action: 'none' };
+      return { id: b.id, status: 'cancelled', payment, waitlistPromoted: !!out.promoted, lateCancel: out.lateCancel, creditReturned: out.creditReturned, fee: out.fee ? { amount: out.fee.amountMinor, currency: out.fee.currency } : null };
     });
 
     priv.post('/me/waitlist/:id/leave', {

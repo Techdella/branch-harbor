@@ -195,6 +195,21 @@
       },
       "online": {
         "title": "Cours en ligne"
+      },
+      "schedule": {
+        "title": "Planification"
+      },
+      "members": {
+        "title": "Membres"
+      },
+      "pricing": {
+        "title": "Forfaits et abonnements"
+      },
+      "rooms": {
+        "title": "Salles"
+      },
+      "insights": {
+        "title": "Rapports du studio"
       }
     },
     "sports": {

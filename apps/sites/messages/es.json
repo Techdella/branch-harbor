@@ -501,5 +501,12 @@
       "stop": "Dejar de recibir alertas",
       "question": "¿Dejar de recibir novedades de esta búsqueda?"
     }
+  },
+  "studio": {
+    "nav": {
+      "pricing": "Precios",
+      "online": "En línea",
+      "account": "Mi cuenta"
+    }
   }
 }

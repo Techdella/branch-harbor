@@ -18,6 +18,11 @@ export const classTypes = pgTable('class_types', {
   durationMinutes: integer('duration_minutes').notNull(),
   defaultCapacity: integer('default_capacity').notNull(),
   creditCost: integer('credit_cost').notNull().default(1),
+  /** yoga | pilates | dance | barre | cycling | strength | meditation | other — used for schedule filters. */
+  category: text('category'),
+  /** all_levels | beginner | intermediate | advanced */
+  level: text('level'),
+  archivedAt: ts('archived_at'),
   createdAt: createdAt(),
 });
 
@@ -37,8 +42,22 @@ export const classOccurrences = pgTable('class_occurrences', {
   currency: currencyCol().notNull(),
   status: text('status').notNull().default('scheduled'), // scheduled | cancelled
   online: boolean('online').notNull().default(false),
+  /** Room record (studio_rooms); `room` keeps the customer-facing name. */
+  roomId: uuid('room_id'),
+  /** Credits one booking consumes; null = the class type's credit cost. */
+  creditCost: integer('credit_cost'),
+  /** Local wall-clock slot this occurrence was generated for (series key). */
+  seriesSlotAt: ts('series_slot_at'),
+  /** Edited individually ("this occurrence only"). */
+  detached: boolean('detached').notNull().default(false),
+  cancelReason: text('cancel_reason'),
+  updatedAt: ts('updated_at'),
   createdAt: createdAt(),
-}, (t) => [index('class_occ_loc_start_idx').on(t.locationId, t.startsAt)]);
+}, (t) => [
+  index('class_occ_loc_start_idx').on(t.locationId, t.startsAt),
+  index('class_occ_series_idx').on(t.seriesId),
+  uniqueIndex('class_occ_series_slot_uq').on(t.seriesId, t.seriesSlotAt),
+]);
 
 export const classBookings = pgTable('class_bookings', {
   id: pk(),
@@ -55,6 +74,17 @@ export const classBookings = pgTable('class_bookings', {
   manageTokenHash: text('manage_token_hash'),
   confirmedAt: ts('confirmed_at'),
   cancelledAt: ts('cancelled_at'),
+  /** How the place is paid: pay_per_class | credit | membership | free | comp */
+  paymentMethod: text('payment_method').notNull().default('pay_per_class'),
+  membershipId: uuid('membership_id'),
+  creditsUsed: integer('credits_used').notNull().default(0),
+  /** Credit returned to the pack on cancellation (false = forfeited by the late-cancel policy). */
+  creditReturned: boolean('credit_returned'),
+  lateCancel: boolean('late_cancel').notNull().default(false),
+  checkedInAt: ts('checked_in_at'),
+  checkedInBy: uuid('checked_in_by'),
+  /** desk | instructor | self */
+  checkInSource: text('check_in_source'),
   createdAt: createdAt(),
 }, (t) => [
   index('class_bookings_occ_idx').on(t.occurrenceId),
@@ -88,8 +118,18 @@ export const packs = pgTable('packs', {
   crossLocation: boolean('cross_location').notNull().default(false),
   priceMinor: minor('price_minor'),
   currency: currencyCol(),
+  productId: uuid('product_id'),
+  offerId: uuid('offer_id'),
+  /** active | exhausted | expired | refunded | void */
+  status: text('status').notNull().default('active'),
+  /** home_only | any_location | same_currency | listed */
+  transferPolicy: text('transfer_policy').notNull().default('home_only'),
+  allowedLocationIds: jsonb('allowed_location_ids').$type<string[]>().notNull().default([]),
+  purchaseId: uuid('purchase_id'),
+  source: text('source').notNull().default('purchase'), // purchase | offer | comp | import
+  updatedAt: ts('updated_at'),
   createdAt: createdAt(),
-});
+}, (t) => [index('packs_customer_idx').on(t.customerId)]);
 
 export const memberships = pgTable('memberships', {
   id: pk(),
@@ -97,14 +137,39 @@ export const memberships = pgTable('memberships', {
   locationId: uuid('location_id'),
   customerId: uuid('customer_id').notNull().references(() => customers.id, { onDelete: 'cascade' }),
   plan: text('plan').notNull(),
-  status: text('status').notNull().default('active'), // active | paused | past_due | cancelled
+  /** pending | active | paused | grace (renewal failed, still usable) | suspended (grace elapsed) | cancelled */
+  status: text('status').notNull().default('active'),
   crossLocation: boolean('cross_location').notNull().default(false),
   priceMinor: minor('price_minor'),
   currency: currencyCol(),
   startsAt: ts('starts_at').notNull(),
   endsAt: ts('ends_at'),
+  planId: uuid('plan_id'),
+  offerId: uuid('offer_id'),
+  /** null = unlimited, otherwise classes per billing period. */
+  classesPerPeriod: integer('classes_per_period'),
+  /** home_only | any_location | same_currency | listed */
+  accessPolicy: text('access_policy').notNull().default('home_only'),
+  allowedLocationIds: jsonb('allowed_location_ids').$type<string[]>().notNull().default([]),
+  /** Recurring billing; false for fixed-term trials. */
+  recurring: boolean('recurring').notNull().default(true),
+  currentPeriodStart: ts('current_period_start'),
+  currentPeriodEnd: ts('current_period_end'),
+  pausedFrom: ts('paused_from'),
+  pausedUntil: ts('paused_until'),
+  pauseReason: text('pause_reason'),
+  /** Cancellation requested: access and billing continue until this date (notice period). */
+  cancelAt: ts('cancel_at'),
+  cancelRequestedAt: ts('cancel_requested_at'),
+  graceUntil: ts('grace_until'),
+  failedPaymentAt: ts('failed_payment_at'),
+  failedAttempts: integer('failed_attempts').notNull().default(0),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  purchaseId: uuid('purchase_id'),
+  updatedAt: ts('updated_at'),
   createdAt: createdAt(),
-});
+}, (t) => [index('memberships_customer_idx').on(t.customerId)]);
 
 export const coverRequests = pgTable('cover_requests', {
   id: pk(),
@@ -119,6 +184,8 @@ export const coverRequests = pgTable('cover_requests', {
   substituteName: text('substitute_name'),
   requiresApproval: boolean('requires_approval').notNull().default(true),
   approvedBy: uuid('approved_by'),
+  /** Customers notified of the instructor change (set atomically with the schedule update). */
+  customersNotified: integer('customers_notified'),
   history: jsonb('history').$type<Array<{ at: string; by: string | null; action: string; note?: string }>>().notNull().default([]),
   createdAt: createdAt(),
   updatedAt: updatedAt(),

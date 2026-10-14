@@ -501,5 +501,12 @@
       "stop": "Benachrichtigungen beenden",
       "question": "Keine neuen Treffer für diese Suche mehr senden?"
     }
+  },
+  "studio": {
+    "nav": {
+      "pricing": "Preise",
+      "online": "Online",
+      "account": "Mein Konto"
+    }
   }
 }

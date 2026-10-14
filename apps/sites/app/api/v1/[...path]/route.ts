@@ -14,6 +14,9 @@ async function forward(req: NextRequest, { params }: { params: Promise<{ path: s
   const headers: Record<string, string> = { accept: 'application/json' };
   const ct = req.headers.get('content-type');
   if (ct) headers['content-type'] = ct;
+  // Studio customer portal session (magic-link sign-in on hosted sites).
+  const portal = req.headers.get('x-bh-customer-session');
+  if (portal) headers['x-bh-customer-session'] = portal;
   // Forward one visitor IP so per-visitor rate limits keep working. Take it from the right of the
   // chain (entries appended by our own load balancers), never the client-controlled left side.
   headers['x-forwarded-for'] = clientIp(req.headers.get('x-forwarded-for'));

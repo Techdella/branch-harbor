@@ -195,6 +195,21 @@
       },
       "online": {
         "title": "Aulas online"
+      },
+      "schedule": {
+        "title": "Grade de aulas"
+      },
+      "members": {
+        "title": "Membros"
+      },
+      "pricing": {
+        "title": "Pacotes e planos"
+      },
+      "rooms": {
+        "title": "Salas"
+      },
+      "insights": {
+        "title": "Relatórios do estúdio"
       }
     },
     "sports": {

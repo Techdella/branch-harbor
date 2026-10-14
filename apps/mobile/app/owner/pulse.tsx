@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Badge, Card, DataStatus, ListItem, MoneyText, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, type Tone } from '@/components';
 import { RealtyEntry } from '@/features/realty/RealtyEntry';
 import { ExperienceSwitch } from '@/features/shared/ExperienceSwitch';
+import { StudioOccupancy } from '@/features/studios/components';
 import { regionName } from '@/features/customer/useLocationScope';
 import { useI18n } from '@/i18n';
 import { api } from '@/lib/api';
@@ -62,6 +63,7 @@ export default function Pulse() {
       )}
       <Text variant="small" tone="muted">{t('owner.notCombined')}</Text>
 
+      <StudioOccupancy />
       <SectionHeader title={t('owner.locationsTitle')} />
       {q.loading ? <><SkeletonCard /><SkeletonCard /></> : null}
       {(p?.locations ?? []).map((l) => <LocationPulse key={l.locationId} l={l} />)}

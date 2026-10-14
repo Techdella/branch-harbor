@@ -5,7 +5,7 @@ import type { Exec } from '../db/client.ts';
 import { consentRecords, customers, locations, pushNotifications, pushTokens, roleAssignments, users } from '../db/schema/index.ts';
 import { hasPermissionInScope, type Assignment, type ScopeChain } from '../domain/scope.ts';
 
-export type PushCategory = 'order_status' | 'approval_request' | 'cover_request' | 'waitlist_promotion';
+export type PushCategory = 'order_status' | 'approval_request' | 'cover_request' | 'waitlist_promotion' | 'class_update';
 
 /**
  * Preference purposes (append-only consent records, `POST /v1/me/consents`). Push is transactional,
@@ -16,6 +16,7 @@ export const PUSH_PURPOSE: Record<PushCategory, 'push_updates' | 'push_work'> = 
   waitlist_promotion: 'push_updates',
   approval_request: 'push_work',
   cover_request: 'push_work',
+  class_update: 'push_updates',
 };
 
 export interface NotifyInput {

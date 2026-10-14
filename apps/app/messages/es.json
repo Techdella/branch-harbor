@@ -195,6 +195,21 @@
       },
       "online": {
         "title": "Clases en línea"
+      },
+      "schedule": {
+        "title": "Planificador"
+      },
+      "members": {
+        "title": "Miembros"
+      },
+      "pricing": {
+        "title": "Bonos y membresías"
+      },
+      "rooms": {
+        "title": "Salas"
+      },
+      "insights": {
+        "title": "Informes del estudio"
       }
     },
     "sports": {

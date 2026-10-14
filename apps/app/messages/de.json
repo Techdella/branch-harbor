@@ -195,6 +195,21 @@
       },
       "online": {
         "title": "Online-Kurse"
+      },
+      "schedule": {
+        "title": "Kursplanung"
+      },
+      "members": {
+        "title": "Mitglieder"
+      },
+      "pricing": {
+        "title": "Pakete & Mitgliedschaften"
+      },
+      "rooms": {
+        "title": "Räume"
+      },
+      "insights": {
+        "title": "Studio-Berichte"
       }
     },
     "sports": {

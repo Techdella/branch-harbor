@@ -9,6 +9,7 @@ import { ApiError } from '@/lib/errors';
 import { fmtDateTime, fmtMoney, fmtZone } from '@/lib/format';
 import { announce } from '@/lib/motion';
 import { useApi } from '@/lib/useApi';
+import { MemberBookCard } from '@/features/studios/components';
 import type { Booking } from '@/lib/types';
 import { color, pastel, radius } from '@/theme';
 
@@ -176,6 +177,10 @@ export default function ClassBooking() {
         <ListItem icon="user" iconBg={pastel.butter} title={t('book.instructor')} subtitle={`${c.instructor} · ${c.room}`} />
         <ListItem icon="tag" iconBg={pastel.aqua} title={t('book.price')} subtitle={loc.tax ? `${loc.tax.inclusive ? t('order.taxIncluded', { label: loc.tax.label }) : loc.tax.label} · ${t('order.taxNote')}` : undefined} trailing={<MoneyText value={c.price} variant="h3" />} />
       </View>
+
+      {phase !== 'contact' ? (
+        <MemberBookCard occurrenceId={c.id} full={phase === 'full'} beforeBook={async () => { if (booking && phase === 'held') await api.cancelBooking(booking.id).catch(() => undefined); }} onBooked={() => setPhase(phase === 'full' ? 'waitlisted' : 'done')} />
+      ) : null}
 
       <Card bg={pastel.sand}>
         <Text variant="h3">{t('book.policy')}</Text>

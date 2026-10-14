@@ -501,5 +501,12 @@
       "stop": "Arrêter les alertes",
       "question": "Ne plus recevoir les nouveaux biens pour cette recherche ?"
     }
+  },
+  "studio": {
+    "nav": {
+      "pricing": "Tarifs",
+      "online": "En ligne",
+      "account": "Mon compte"
+    }
   }
 }

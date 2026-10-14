@@ -210,6 +210,7 @@ async function main() {
   await (await import('./seed-sports.ts')).seedSports({ db, today, upsertUser, orgId: ops.orgs.northShore }).then((r) => console.log(`[seed] Sports: coach ${r.users[0]}, guardian app account ${r.guardianLogin} (same password)`));
   const realty = await (await import('./seed-realty.ts')).seedRealty({ db, today, upsertUser, demo, sitesBaseUrl: cfg.SITES_BASE_URL });
   ops.users.push(...(await (await import('./seed-wellness.ts')).seedWellness({ db, today, orgId: ops.orgs.harbourline, demo, upsertUser })).users);
+  console.log('Studios:', await (await import('./seed-studios.ts')).seedStudios({ db, today, swId, demo, maya }));
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');

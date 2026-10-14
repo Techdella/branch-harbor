@@ -57,6 +57,13 @@
       "when": 1792012343099,
       "tag": "0007_wellness_reservations",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792012513958,
+      "tag": "0008_studios_full",
+      "breakpoints": true
     }
   ]
 }
