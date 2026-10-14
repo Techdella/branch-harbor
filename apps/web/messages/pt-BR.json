@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "BranchHarbor — Uma casa para cada unidade",
+    "description": "O BranchHarbor conecta sites, atividade de clientes e fluxos de trabalho de empresas com várias unidades e redes de franquias. A matriz tem visibilidade; as equipes locais têm o controle de que precisam."
+  },
+  "common": {
+    "skipToContent": "Pular para o conteúdo principal",
+    "requestDemo": "Solicitar uma demonstração",
+    "signIn": "Entrar",
+    "sampleData": "Dados de exemplo",
+    "conceptualPreview": "Prévia conceitual · Dados de exemplo",
+    "learnMore": "Saiba mais",
+    "home": "Início",
+    "breadcrumb": "Trilha de navegação",
+    "language": "Idioma",
+    "availability": { "pilot": "Piloto", "next": "Próximo previsto", "planned": "Previsto" },
+    "status": { "tested": "Testado", "limited": "Suporte limitado", "setup": "Requer configuração", "planned": "Previsto" },
+    "locationStatus": { "operating": "Em operação", "openingSoon": "Inauguração em breve", "onboarding": "Em implantação" },
+    "optional": "opcional"
+  },
+  "nav": {
+    "main": "Principal",
+    "industries": "Segmentos",
+    "franchises": "Para franquias",
+    "wordpressIntegrations": "WordPress e integrações",
+    "wordpress": "Conector WordPress",
+    "integrations": "Integrações",
+    "pricing": "Preços",
+    "resources": "Recursos",
+    "support": "Suporte",
+    "independent": "Empresas com uma unidade",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "mobileMenu": "Menu"
+  },
+  "footer": {
+    "tagline": "Uma casa para cada unidade.",
+    "industries": "Segmentos",
+    "product": "Produto",
+    "company": "Empresa",
+    "policies": "Políticas",
+    "franchises": "Para franquias",
+    "independent": "Empresas independentes",
+    "wordpress": "WordPress",
+    "integrations": "Integrações",
+    "pricing": "Preços",
+    "demo": "Solicitar uma demonstração",
+    "resources": "Recursos",
+    "docs": "Documentação",
+    "support": "Suporte",
+    "about": "Sobre",
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "security": "Segurança",
+    "note": "Produto em pré-lançamento. Os recursos são identificados pela disponibilidade; dados de exemplo são marcados como exemplo.",
+    "credits": "Fotos: colaboradores do Unsplash"
+  },
+  "industryMeta": {
+    "studios": { "name": "Estúdios", "who": "Yoga, Pilates, dança, barre, ciclismo e academias boutique", "flow": "Contato → aula experimental → aula → plano", "cta": "Solicitar demonstração para estúdios" },
+    "sports": { "name": "Esportes", "who": "Academias esportivas, clubes, programas de treino e acampamentos", "flow": "Inscrição → definição de turma → presença", "cta": "Solicitar demonstração para esportes" },
+    "wellness": { "name": "Saúde e bem-estar", "who": "Spas, massagem, centros de bem-estar e serviços com agendamento", "flow": "Serviço → profissional → agendamento", "cta": "Solicitar demonstração para bem-estar" },
+    "commerce": { "name": "Varejo", "who": "Grupos varejistas e lojas franqueadas", "flow": "Descoberta → pedido → entrega", "cta": "Solicitar demonstração para varejo" },
+    "foods": { "name": "Alimentação", "who": "Restaurantes, cafés, padarias, refeições prontas e franquias de alimentação", "flow": "Unidade → cardápio → pedido → retirada", "cta": "Solicitar demonstração para alimentação" },
+    "realty": { "name": "Imobiliário", "who": "Imobiliárias e redes de corretores" }
+  },
+  "home": {
+    "hero": {
+      "badge": "Piloto de Estúdios em formação · Alimentação em seguida",
+      "titleLead": "Uma casa para",
+      "titleAccent": "cada unidade.",
+      "body": "Conecte seus sites, a atividade dos clientes e os fluxos de trabalho do seu segmento. Dê visibilidade à matriz e às equipes locais o controle de que precisam.",
+      "primary": "Explore seu segmento",
+      "secondary": "Veja como funciona"
+    },
+    "preview": {
+      "heading": "Prévia do produto: visão geral da matriz",
+      "imageAlt": "Alunos praticando em um estúdio de yoga ensolarado",
+      "imageSub": "Estúdio · 9 aulas hoje",
+      "overview": "Visão geral",
+      "scope": "Todas as unidades autorizadas ({count})",
+      "locations": "Unidades",
+      "selectHint": "Selecione uma unidade para abrir o resumo.",
+      "enquiries": "Contatos · 7 dias",
+      "classesToday": "Aulas hoje",
+      "occupancy": "Ocupação · esta semana",
+      "unavailable": "Indisponível",
+      "notConnected": "Não conectado",
+      "connected": "Conectado · há {minutes} min",
+      "degraded": "Instável · última sincronização há {hours} h",
+      "bookingNotConnected": "Sistema de agendamento não conectado",
+      "localTime": "Fuso horário local: {tz}",
+      "sourceNote": "Os contatos vêm dos formulários do site. As aulas vêm do sistema de agendamento conectado.",
+      "closeDrawer": "Fechar resumo da unidade",
+      "drawerLabel": "Resumo da unidade"
+    },
+    "industries": {
+      "title": "Escolha seu segmento",
+      "body": "Uma plataforma compartilhada, adaptada ao jeito como sua empresa funciona. Estúdios está em piloto; os demais estão desenhados e no roteiro.",
+      "explore": "Explorar {name}",
+      "independent": "Só uma unidade? Veja a configuração simplificada",
+      "realty": "Imobiliário · Previsto"
+    },
+    "hqLocal": {
+      "title": "Matriz e unidades, cada uma com os controles certos",
+      "hq": {
+        "eyebrow": "Matriz",
+        "title": "Controles compartilhados",
+        "body": "Bloqueie conteúdo da marca, publique modelos nas unidades escolhidas e acompanhe relatórios da rede. Os dados dos clientes ficam na unidade, a menos que sua política permita o compartilhamento.",
+        "chips": ["Conteúdo da marca bloqueado", "Publicação em grupo", "Relatórios da rede"]
+      },
+      "local": {
+        "eyebrow": "Unidades",
+        "title": "Autonomia local",
+        "body": "Atualize horários, preços e ofertas locais onde a matriz permitir. Cada campo mostra se é compartilhado, local ou se precisa de aprovação.",
+        "chips": ["Editável localmente", "Requer aprovação", "Restaurar padrão da matriz"]
+      }
+    },
+    "steps": {
+      "title": "Comece em três passos",
+      "body": "Comece com uma unidade e adicione as outras quando estiver pronto.",
+      "items": [
+        { "title": "Escolha seu segmento", "desc": "Comece com fluxos criados para estúdios, esportes, bem-estar, varejo ou alimentação." },
+        { "title": "Conecte ou lance", "desc": "Lance um site hospedado, ou mantenha seu site WordPress e conecte as ferramentas compatíveis." },
+        { "title": "Coordene as unidades", "desc": "Compartilhe o que deve ser consistente e deixe cada equipe cuidar do resto." }
+      ]
+    },
+    "capabilities": {
+      "title": "O que está incluído",
+      "body": "Cada recurso indica sua disponibilidade no lançamento.",
+      "legendLabel": "Legenda de disponibilidade",
+      "tags": { "launch": "No lançamento", "preview": "Prévia", "setup": "Requer configuração", "selected": "Sistemas selecionados" },
+      "items": [
+        { "name": "Sites", "desc": "Sites hospedados ou blocos WordPress, modelos compartilhados e páginas locais." },
+        { "name": "Clientes", "desc": "Contatos, alunos e participantes, vinculados à unidade certa." },
+        { "name": "Marketing", "desc": "Páginas de campanha, formulários e encaminhamento de leads para cada unidade." },
+        { "name": "Pagamentos", "desc": "Por meio de uma conta de pagamentos conectada para cada empresa ou unidade." },
+        { "name": "BranchHarbor AI", "desc": "Rascunhos e resumos dentro das suas permissões. Alterações precisam de aprovação." },
+        { "name": "Conexões", "desc": "Ferramentas de agendamento e vendas compatíveis, cada uma com status claro." }
+      ]
+    },
+    "delivery": {
+      "title": "Duas formas de começar",
+      "hosted": { "title": "Comece com um site BranchHarbor", "body": "Hospedamos seu site e seu painel. Use um endereço incluído ou conecte seu próprio domínio quando quiser.", "cta": "Ver planos hospedados" },
+      "wordpress": { "title": "Mantenha seu site WordPress", "body": "Adicione formulários, agendas e conexões do BranchHarbor ao site que você já tem. Sua hospedagem continua a mesma.", "cta": "Como o conector funciona" }
+    },
+    "integrations": { "title": "Funciona com o que você já usa", "body": "Cada conexão mostra um status. “Previsto” significa que ainda não está disponível.", "cta": "Todas as integrações" },
+    "evidence": {
+      "eyebrow": "Evidências",
+      "title": "Os resultados do piloto serão publicados aqui",
+      "body": "Não mostramos logotipos de clientes nem números de desempenho antes de tê-los. Enquanto as empresas do piloto não trazem resultados, explore os próprios fluxos de trabalho.",
+      "workflow": "Fluxo de {name}"
+    },
+    "pricing": {
+      "eyebrow": "Prévia de preços",
+      "title": "Cobrança por unidade",
+      "body": "Pague pelas unidades que você autorizar, na sua moeda. Mantenha seu software de agendamento ou vendas quando nos conectamos a ele. Redes recebem apoio na implantação.",
+      "cta": "Ver preços"
+    },
+    "faq": {
+      "title": "Perguntas",
+      "items": [
+        { "q": "Como funciona a cobrança por unidade?", "a": "Você paga por cada unidade autorizada no BranchHarbor. Adicionar uma unidade não publica o site dela automaticamente, e remover uma encerra a cobrança a partir do período seguinte." },
+        { "q": "Preciso substituir meus sistemas atuais?", "a": "Não. Quando oferecemos uma conexão, seu sistema de agendamento ou de vendas continua sendo a referência e o BranchHarbor funciona junto com ele. Cada módulo informa se substitui, incorpora ou apenas acompanha um fluxo." },
+        { "q": "Quanto controle as unidades mantêm?", "a": "A matriz decide quais campos ficam bloqueados, editáveis ou exigem aprovação. As unidades veem essa origem em cada campo e podem solicitar alterações." },
+        { "q": "O que inclui a implantação?", "a": "Uma lista de tarefas que salva o progresso, ajuda para importar unidades e, para redes, uma implantação guiada com sua equipe." },
+        { "q": "Funciona no meu país e no meu idioma?", "a": "O BranchHarbor foi feito para empresas da América do Norte, Reino Unido e Europa, Austrália e Nova Zelândia, Ásia, Oriente Médio e América Latina. Cada unidade mantém seu fuso horário e sua moeda, e a interface está disponível em vários idiomas. A disponibilidade de pagamentos depende do seu provedor e do seu país." }
+      ]
+    },
+    "closing": {
+      "title": "Reúna todas as suas unidades.",
+      "body": "Conte sobre sua empresa e mostraremos o fluxo de trabalho certo, com o seu segmento e as suas unidades.",
+      "primary": "Solicitar uma demonstração",
+      "secondary": "Ver preços"
+    }
+  },
+  "demo": {
+    "metaTitle": "Solicitar uma demonstração",
+    "kicker": "Solicitar uma demonstração",
+    "headline": "Veja o BranchHarbor com a sua empresa.",
+    "intro": "Conte um pouco sobre suas unidades e o que você quer resolver. Vamos preparar uma apresentação do fluxo de trabalho adequado.",
+    "imageAlt": "Instrutora alongando em um estúdio tranquilo",
+    "asideTitle": "O que acontece depois",
+    "aside": ["Analisamos sua solicitação e verificamos se seu segmento e seus sistemas são compatíveis.", "Enviamos um e-mail para combinar um horário no seu fuso.", "Você vê o fluxo de trabalho com dados de exemplo parecidos com a sua empresa."],
+    "privacyNote": "Usamos esses dados para responder à sua solicitação. Consulte nossa página de privacidade para saber como tratamos dados pessoais.",
+    "form": {
+      "title": "Seus dados",
+      "sizeLegend": "O que descreve melhor sua empresa?",
+      "single": "Empresa única",
+      "singleDesc": "Uma unidade",
+      "network": "Rede",
+      "networkDesc": "Várias unidades ou franquias",
+      "name": "Seu nome",
+      "email": "E-mail corporativo",
+      "emailHint": "Usaremos apenas para agendar sua demonstração.",
+      "business": "Nome da empresa",
+      "industry": "Segmento",
+      "industryPlaceholder": "Escolha um segmento",
+      "realtyOption": "Imobiliário (previsto)",
+      "locationCount": "Número de unidades",
+      "country": "País",
+      "countryPlaceholder": "Escolha um país",
+      "countryGroupLaunch": "Países de lançamento",
+      "countryGroupOther": "Outros países",
+      "website": "Site atual",
+      "websiteHint": "Deixe em branco se ainda não tiver um.",
+      "difficulty": "Qual é a principal dificuldade que você quer resolver?",
+      "difficultyHint": "Por exemplo: contatos indo para o estúdio errado ou cardápios desatualizados.",
+      "phone": "Telefone",
+      "systems": "Sistemas que você usa hoje",
+      "systemsHint": "Por exemplo: WordPress, WooCommerce, Mindbody, Square.",
+      "consent": "Quero receber novidades do produto por e-mail ocasionalmente. Posso cancelar a qualquer momento.",
+      "submit": "Solicitar demonstração",
+      "sending": "Enviando…"
+    },
+    "errors": {
+      "summaryTitle": "{count, plural, one {Há # problema neste formulário} other {Há # problemas neste formulário}}",
+      "name": "Informe seu nome.",
+      "email": "Informe um e-mail corporativo, como nome@empresa.com.br.",
+      "business": "Informe o nome da sua empresa.",
+      "industry": "Escolha seu segmento.",
+      "locationCount": "Informe quantas unidades você tem (1 ou mais).",
+      "country": "Escolha seu país.",
+      "existingWebsite": "Informe um endereço completo, como https://suaempresa.com.br, ou deixe em branco.",
+      "primaryDifficulty": "Conte qual é a principal dificuldade que você quer resolver.",
+      "phone": "Informe um telefone mais curto.",
+      "existingSystems": "Reduza esta lista para até 500 caracteres.",
+      "generic": "Verifique este campo.",
+      "network": "Não foi possível enviar sua solicitação. Verifique sua conexão e tente novamente — suas respostas continuam aqui.",
+      "server": "Algo deu errado do nosso lado. Suas respostas continuam aqui; tente novamente em instantes.",
+      "retry": "Tentar novamente"
+    },
+    "success": {
+      "title": "Obrigado, {name}. Recebemos sua solicitação.",
+      "body": "Recebemos sua solicitação para {business}. Uma pessoa da nossa equipe vai escrever para {email} para combinar um horário para sua demonstração.",
+      "next": "Enquanto isso, você pode explorar os fluxos de trabalho do seu segmento.",
+      "explore": "Explorar {industry}",
+      "home": "Voltar ao início"
+    }
+  }
+}

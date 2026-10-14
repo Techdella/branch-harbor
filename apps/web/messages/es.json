@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "BranchHarbor — Un hogar para cada sede",
+    "description": "BranchHarbor conecta sitios web, actividad de clientes y flujos de trabajo de negocios con varias sedes y redes de franquicias. La central tiene visibilidad; los equipos locales, el control que necesitan."
+  },
+  "common": {
+    "skipToContent": "Ir al contenido principal",
+    "requestDemo": "Solicitar una demo",
+    "signIn": "Iniciar sesión",
+    "sampleData": "Datos de ejemplo",
+    "conceptualPreview": "Vista conceptual · Datos de ejemplo",
+    "learnMore": "Más información",
+    "home": "Inicio",
+    "breadcrumb": "Ruta de navegación",
+    "language": "Idioma",
+    "availability": { "pilot": "Piloto", "next": "Próximamente", "planned": "Planificado" },
+    "status": { "tested": "Probado", "limited": "Compatibilidad limitada", "setup": "Requiere configuración", "planned": "Planificado" },
+    "locationStatus": { "operating": "En funcionamiento", "openingSoon": "Apertura próxima", "onboarding": "En incorporación" },
+    "optional": "opcional"
+  },
+  "nav": {
+    "main": "Principal",
+    "industries": "Sectores",
+    "franchises": "Para franquicias",
+    "wordpressIntegrations": "WordPress e integraciones",
+    "wordpress": "Conector de WordPress",
+    "integrations": "Integraciones",
+    "pricing": "Precios",
+    "resources": "Recursos",
+    "support": "Soporte",
+    "independent": "Negocios con una sola sede",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "mobileMenu": "Menú"
+  },
+  "footer": {
+    "tagline": "Un hogar para cada sede.",
+    "industries": "Sectores",
+    "product": "Producto",
+    "company": "Empresa",
+    "policies": "Políticas",
+    "franchises": "Para franquicias",
+    "independent": "Negocios independientes",
+    "wordpress": "WordPress",
+    "integrations": "Integraciones",
+    "pricing": "Precios",
+    "demo": "Solicitar una demo",
+    "resources": "Recursos",
+    "docs": "Documentación",
+    "support": "Soporte",
+    "about": "Acerca de",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "security": "Seguridad",
+    "note": "Producto en versión preliminar. Las funciones se etiquetan según su disponibilidad; los datos de ejemplo se marcan como tales.",
+    "credits": "Fotos: colaboradores de Unsplash"
+  },
+  "industryMeta": {
+    "studios": { "name": "Estudios", "who": "Yoga, Pilates, danza, barre, ciclismo y fitness boutique", "flow": "Consulta → prueba → clase → membresía", "cta": "Solicitar una demo para estudios" },
+    "sports": { "name": "Deportes", "who": "Academias, clubes, programas de entrenamiento y campamentos", "flow": "Inscripción → asignación de grupo → asistencia", "cta": "Solicitar una demo deportiva" },
+    "wellness": { "name": "Salud y bienestar", "who": "Spas, masajes, centros de bienestar y servicios con cita", "flow": "Servicio → profesional → cita", "cta": "Solicitar una demo de bienestar" },
+    "commerce": { "name": "Comercio", "who": "Grupos minoristas y tiendas franquiciadas", "flow": "Descubrimiento → pedido → entrega", "cta": "Solicitar una demo de comercio" },
+    "foods": { "name": "Restauración", "who": "Restaurantes, cafeterías, panaderías, comida preparada y franquicias de alimentación", "flow": "Sede → menú → pedido → recogida", "cta": "Solicitar una demo de restauración" },
+    "realty": { "name": "Inmobiliaria", "who": "Agencias y redes de agentes" }
+  },
+  "home": {
+    "hero": {
+      "badge": "Piloto de Estudios en formación · Restauración después",
+      "titleLead": "Un hogar para",
+      "titleAccent": "cada sede.",
+      "body": "Conecta tus sitios web, la actividad de tus clientes y los flujos de trabajo de tu sector. Da a la central visibilidad y a los equipos locales el control que necesitan.",
+      "primary": "Explora tu sector",
+      "secondary": "Cómo funciona"
+    },
+    "preview": {
+      "heading": "Vista del producto: resumen de la central",
+      "imageAlt": "Alumnos practicando en un estudio de yoga luminoso",
+      "imageSub": "Estudio · 9 clases hoy",
+      "overview": "Resumen",
+      "scope": "Todas las sedes autorizadas ({count})",
+      "locations": "Sedes",
+      "selectHint": "Selecciona una sede para abrir su resumen.",
+      "enquiries": "Consultas · 7 días",
+      "classesToday": "Clases hoy",
+      "occupancy": "Ocupación · esta semana",
+      "unavailable": "No disponible",
+      "notConnected": "No conectado",
+      "connected": "Conectado · hace {minutes} min",
+      "degraded": "Degradado · última sincronización hace {hours} h",
+      "bookingNotConnected": "Sistema de reservas no conectado",
+      "localTime": "Zona horaria local: {tz}",
+      "sourceNote": "Las consultas llegan de los formularios web. Las clases provienen del sistema de reservas conectado.",
+      "closeDrawer": "Cerrar el resumen de la sede",
+      "drawerLabel": "Resumen de la sede"
+    },
+    "industries": {
+      "title": "Elige tu sector",
+      "body": "Una plataforma compartida, adaptada a cómo funciona tu negocio. Estudios está en piloto; los demás están diseñados y en la hoja de ruta.",
+      "explore": "Explorar {name}",
+      "independent": "¿Una sola sede? Descubre la configuración simplificada",
+      "realty": "Inmobiliaria · Planificado"
+    },
+    "hqLocal": {
+      "title": "Central y sedes, cada una con los controles adecuados",
+      "hq": {
+        "eyebrow": "Central",
+        "title": "Controles compartidos",
+        "body": "Bloquea el contenido de marca, publica plantillas en las sedes elegidas y consulta los informes de la red. Los datos de clientes se quedan en la sede, salvo que tu política permita compartirlos.",
+        "chips": ["Contenido de marca bloqueado", "Publicación en grupo", "Informes de la red"]
+      },
+      "local": {
+        "eyebrow": "Sedes",
+        "title": "Autonomía local",
+        "body": "Actualiza horarios, precios y ofertas locales donde la central lo permita. Cada campo indica si es compartido, local o requiere aprobación.",
+        "chips": ["Editable localmente", "Requiere aprobación", "Restablecer valor de la central"]
+      }
+    },
+    "steps": {
+      "title": "Empieza en tres pasos",
+      "body": "Empieza con una sede y añade el resto cuando estés listo.",
+      "items": [
+        { "title": "Elige tu sector", "desc": "Parte de flujos creados para estudios, deportes, bienestar, comercio o restauración." },
+        { "title": "Conecta o lanza", "desc": "Lanza un sitio alojado, o conserva tu sitio de WordPress y conecta las herramientas compatibles." },
+        { "title": "Coordina tus sedes", "desc": "Comparte lo que debe ser coherente y deja que cada equipo gestione el resto." }
+      ]
+    },
+    "capabilities": {
+      "title": "Qué incluye",
+      "body": "Cada función indica su disponibilidad en el lanzamiento.",
+      "legendLabel": "Leyenda de disponibilidad",
+      "tags": { "launch": "En el lanzamiento", "preview": "Vista previa", "setup": "Requiere configuración", "selected": "Sistemas seleccionados" },
+      "items": [
+        { "name": "Sitios web", "desc": "Sitios alojados o bloques de WordPress, plantillas compartidas y páginas locales." },
+        { "name": "Clientes", "desc": "Consultas, miembros y participantes, asociados a la sede correcta." },
+        { "name": "Marketing", "desc": "Páginas de campaña, formularios y envío de contactos a cada sede." },
+        { "name": "Pagos", "desc": "A través de una cuenta de pagos conectada para cada negocio o sede." },
+        { "name": "BranchHarbor AI", "desc": "Borradores y resúmenes dentro de tus permisos. Los cambios requieren aprobación." },
+        { "name": "Conexiones", "desc": "Herramientas de reservas y comercio compatibles, cada una con un estado claro." }
+      ]
+    },
+    "delivery": {
+      "title": "Dos formas de empezar",
+      "hosted": { "title": "Empieza con un sitio de BranchHarbor", "body": "Alojamos tu sitio web y tu panel. Usa una dirección incluida o conecta tu propio dominio cuando quieras.", "cta": "Ver planes alojados" },
+      "wordpress": { "title": "Conserva tu sitio de WordPress", "body": "Añade formularios, horarios y conexiones de BranchHarbor al sitio que ya tienes. Tu alojamiento no cambia.", "cta": "Cómo funciona el conector" }
+    },
+    "integrations": { "title": "Funciona con lo que ya usas", "body": "Cada conexión muestra un estado. «Planificado» significa que aún no está disponible.", "cta": "Todas las integraciones" },
+    "evidence": {
+      "eyebrow": "Resultados",
+      "title": "Los resultados del piloto se publicarán aquí",
+      "body": "No mostramos logotipos de clientes ni cifras de rendimiento antes de tenerlos. Mientras los negocios piloto nos informan, explora los flujos de trabajo directamente.",
+      "workflow": "Flujo de {name}"
+    },
+    "pricing": {
+      "eyebrow": "Precios",
+      "title": "Se factura por sede",
+      "body": "Paga por las sedes que autorices, en tu moneda. Conserva tu software de reservas o comercio cuando nos conectamos a él. Las redes reciben ayuda con la puesta en marcha.",
+      "cta": "Ver precios"
+    },
+    "faq": {
+      "title": "Preguntas",
+      "items": [
+        { "q": "¿Cómo funciona la facturación por sede?", "a": "Pagas por cada sede que autorizas en BranchHarbor. Añadir una sede no publica su sitio automáticamente y eliminarla detiene la facturación a partir del siguiente periodo." },
+        { "q": "¿Tengo que sustituir mi software actual?", "a": "No. Cuando admitimos una conexión, tu sistema de reservas o de comercio sigue siendo la referencia y BranchHarbor trabaja junto a él. Cada módulo indica si sustituye, integra o solo informa sobre un flujo de trabajo." },
+        { "q": "¿Cuánto control conservan las sedes?", "a": "La central decide qué campos están bloqueados, son editables o requieren aprobación. Las sedes ven ese origen en cada campo y pueden solicitar cambios." },
+        { "q": "¿Qué incluye la puesta en marcha?", "a": "Una lista de tareas que se guarda sobre la marcha, ayuda para importar sedes y, para las redes, un despliegue guiado con tu equipo." },
+        { "q": "¿Funciona en mi país y en mi idioma?", "a": "BranchHarbor está pensado para negocios de Norteamérica, Reino Unido y Europa, Australia y Nueva Zelanda, Asia, Oriente Medio y Latinoamérica. Cada sede conserva su zona horaria y su moneda, y la interfaz está disponible en varios idiomas. La disponibilidad de pagos depende de tu proveedor y de tu país." }
+      ]
+    },
+    "closing": {
+      "title": "Reúne todas tus sedes.",
+      "body": "Cuéntanos sobre tu negocio y te mostraremos el flujo de trabajo adecuado, con tu sector y tus sedes.",
+      "primary": "Solicitar una demo",
+      "secondary": "Ver precios"
+    }
+  },
+  "demo": {
+    "metaTitle": "Solicitar una demo",
+    "kicker": "Solicitar una demo",
+    "headline": "Descubre BranchHarbor con tu negocio.",
+    "intro": "Cuéntanos un poco sobre tus sedes y lo que quieres resolver. Prepararemos una demostración del flujo de trabajo adecuado.",
+    "imageAlt": "Instructora estirando en un estudio tranquilo",
+    "asideTitle": "Qué pasa después",
+    "aside": ["Revisamos tu solicitud y comprobamos que tu sector y tus sistemas son compatibles.", "Te escribimos para acordar un horario que encaje con tu zona horaria.", "Ves el flujo de trabajo con datos de ejemplo parecidos a tu negocio."],
+    "privacyNote": "Usamos estos datos para responder a tu solicitud. Consulta nuestra página de privacidad para saber cómo tratamos los datos personales.",
+    "form": {
+      "title": "Tus datos",
+      "sizeLegend": "¿Qué te describe mejor?",
+      "single": "Negocio único",
+      "singleDesc": "Una sede",
+      "network": "Red",
+      "networkDesc": "Varias sedes o franquicias",
+      "name": "Tu nombre",
+      "email": "Correo electrónico de trabajo",
+      "emailHint": "Solo lo usaremos para organizar tu demo.",
+      "business": "Nombre del negocio",
+      "industry": "Sector",
+      "industryPlaceholder": "Elige un sector",
+      "realtyOption": "Inmobiliaria (planificado)",
+      "locationCount": "Número de sedes",
+      "country": "País",
+      "countryPlaceholder": "Elige un país",
+      "countryGroupLaunch": "Países de lanzamiento",
+      "countryGroupOther": "Otros países",
+      "website": "Sitio web actual",
+      "websiteHint": "Déjalo en blanco si aún no tienes uno.",
+      "difficulty": "¿Cuál es la principal dificultad que quieres resolver?",
+      "difficultyHint": "Por ejemplo: consultas que llegan al estudio equivocado o menús desincronizados.",
+      "phone": "Teléfono",
+      "systems": "Sistemas que usas hoy",
+      "systemsHint": "Por ejemplo: WordPress, WooCommerce, Mindbody, Square.",
+      "consent": "Envíame novedades del producto por correo de vez en cuando. Puedes darte de baja en cualquier momento.",
+      "submit": "Solicitar demo",
+      "sending": "Enviando…"
+    },
+    "errors": {
+      "summaryTitle": "{count, plural, one {Hay # problema en este formulario} other {Hay # problemas en este formulario}}",
+      "name": "Escribe tu nombre.",
+      "email": "Escribe un correo de trabajo, como nombre@negocio.com.",
+      "business": "Escribe el nombre de tu negocio.",
+      "industry": "Elige tu sector.",
+      "locationCount": "Indica cuántas sedes tienes (1 o más).",
+      "country": "Elige tu país.",
+      "existingWebsite": "Escribe una dirección web completa, como https://tunegocio.com, o déjalo en blanco.",
+      "primaryDifficulty": "Cuéntanos la principal dificultad que quieres resolver.",
+      "phone": "Escribe un número de teléfono más corto.",
+      "existingSystems": "Acorta esta lista a 500 caracteres o menos.",
+      "generic": "Revisa este campo.",
+      "network": "No pudimos enviar tu solicitud. Comprueba tu conexión e inténtalo de nuevo; tus respuestas siguen aquí.",
+      "server": "Algo ha fallado por nuestra parte. Tus respuestas siguen aquí; inténtalo de nuevo en un momento.",
+      "retry": "Intentar de nuevo"
+    },
+    "success": {
+      "title": "Gracias, {name}. Hemos recibido tu solicitud.",
+      "body": "Hemos recibido tu solicitud para {business}. Una persona de nuestro equipo escribirá a {email} para acordar un horario para tu demo.",
+      "next": "Mientras tanto, puedes explorar los flujos de trabajo de tu sector.",
+      "explore": "Explorar {industry}",
+      "home": "Volver al inicio"
+    }
+  }
+}

@@ -1,3 +1,5 @@
+'use client';
+
 import { cx } from '../cx';
 
 export interface TabItem<K extends string> {

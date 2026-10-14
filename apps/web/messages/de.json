@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "BranchHarbor — Ein Zuhause für jeden Standort",
+    "description": "BranchHarbor verbindet Websites, Kundenaktivität und Branchenabläufe für Unternehmen mit mehreren Standorten und Franchise-Netzwerke. Die Zentrale behält den Überblick; lokale Teams behalten die Kontrolle."
+  },
+  "common": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "requestDemo": "Demo anfragen",
+    "signIn": "Anmelden",
+    "sampleData": "Beispieldaten",
+    "conceptualPreview": "Konzeptvorschau · Beispieldaten",
+    "learnMore": "Mehr erfahren",
+    "home": "Startseite",
+    "breadcrumb": "Brotkrumennavigation",
+    "language": "Sprache",
+    "availability": { "pilot": "Pilot", "next": "Als Nächstes geplant", "planned": "Geplant" },
+    "status": { "tested": "Getestet", "limited": "Eingeschränkt unterstützt", "setup": "Einrichtung erforderlich", "planned": "Geplant" },
+    "locationStatus": { "operating": "In Betrieb", "openingSoon": "Eröffnet bald", "onboarding": "Im Onboarding" },
+    "optional": "optional"
+  },
+  "nav": {
+    "main": "Hauptnavigation",
+    "industries": "Branchen",
+    "franchises": "Für Franchise-Systeme",
+    "wordpressIntegrations": "WordPress & Integrationen",
+    "wordpress": "WordPress-Connector",
+    "integrations": "Integrationen",
+    "pricing": "Preise",
+    "resources": "Ressourcen",
+    "support": "Support",
+    "independent": "Unternehmen mit einem Standort",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "mobileMenu": "Menü"
+  },
+  "footer": {
+    "tagline": "Ein Zuhause für jeden Standort.",
+    "industries": "Branchen",
+    "product": "Produkt",
+    "company": "Unternehmen",
+    "policies": "Richtlinien",
+    "franchises": "Für Franchise-Systeme",
+    "independent": "Unabhängige Unternehmen",
+    "wordpress": "WordPress",
+    "integrations": "Integrationen",
+    "pricing": "Preise",
+    "demo": "Demo anfragen",
+    "resources": "Ressourcen",
+    "docs": "Dokumentation",
+    "support": "Support",
+    "about": "Über uns",
+    "privacy": "Datenschutz",
+    "terms": "Bedingungen",
+    "security": "Sicherheit",
+    "note": "Vorabversion. Funktionen sind nach Verfügbarkeit gekennzeichnet; Beispieldaten sind als solche markiert.",
+    "credits": "Fotos: Unsplash-Fotografen"
+  },
+  "industryMeta": {
+    "studios": { "name": "Studios", "who": "Yoga, Pilates, Tanz, Barre, Indoor-Cycling und Boutique-Fitness", "flow": "Anfrage → Probestunde → Kurs → Mitgliedschaft", "cta": "Studio-Demo anfragen" },
+    "sports": { "name": "Sport", "who": "Akademien, Vereine, Trainingsprogramme und Camps", "flow": "Anmeldung → Gruppenzuteilung → Anwesenheit", "cta": "Sport-Demo anfragen" },
+    "wellness": { "name": "Gesundheit & Wellness", "who": "Spas, Massage, Wellnesszentren und terminbasierte Dienstleistungen", "flow": "Leistung → Behandler → Termin", "cta": "Wellness-Demo anfragen" },
+    "commerce": { "name": "Handel", "who": "Handelsgruppen und Franchise-Filialen", "flow": "Produktsuche → Bestellung → Auslieferung", "cta": "Handels-Demo anfragen" },
+    "foods": { "name": "Gastronomie", "who": "Restaurants, Cafés, Bäckereien, Fertiggerichte und Gastro-Franchises", "flow": "Standort → Speisekarte → Bestellung → Abholung", "cta": "Gastronomie-Demo anfragen" },
+    "realty": { "name": "Immobilien", "who": "Maklerbüros und Maklernetzwerke" }
+  },
+  "home": {
+    "hero": {
+      "badge": "Studios-Pilot startet · Gastronomie folgt",
+      "titleLead": "Ein Zuhause für",
+      "titleAccent": "jeden Standort.",
+      "body": "Verbinden Sie Ihre Websites, Kundenaktivität und Branchenabläufe. Geben Sie der Zentrale Überblick und den lokalen Teams die Kontrolle, die sie brauchen.",
+      "primary": "Ihre Branche entdecken",
+      "secondary": "So funktioniert es"
+    },
+    "preview": {
+      "heading": "Produktvorschau: Übersicht der Zentrale",
+      "imageAlt": "Teilnehmende üben in einem sonnigen Yogastudio",
+      "imageSub": "Studio · 9 Kurse heute",
+      "overview": "Übersicht",
+      "scope": "Alle freigegebenen Standorte ({count})",
+      "locations": "Standorte",
+      "selectHint": "Wählen Sie einen Standort, um seine Zusammenfassung zu öffnen.",
+      "enquiries": "Anfragen · 7 Tage",
+      "classesToday": "Kurse heute",
+      "occupancy": "Auslastung · diese Woche",
+      "unavailable": "Nicht verfügbar",
+      "notConnected": "Nicht verbunden",
+      "connected": "Verbunden · vor {minutes} Min.",
+      "degraded": "Eingeschränkt · letzte Synchronisierung vor {hours} Std.",
+      "bookingNotConnected": "Buchungssystem nicht verbunden",
+      "localTime": "Lokale Zeitzone: {tz}",
+      "sourceNote": "Anfragen stammen aus Website-Formularen. Kurse stammen aus dem verbundenen Buchungssystem.",
+      "closeDrawer": "Standortzusammenfassung schließen",
+      "drawerLabel": "Standortzusammenfassung"
+    },
+    "industries": {
+      "title": "Wählen Sie Ihre Branche",
+      "body": "Eine gemeinsame Plattform, zugeschnitten auf die Arbeitsweise Ihres Unternehmens. Studios ist in der Pilotphase; die anderen Branchen sind entworfen und auf der Roadmap.",
+      "explore": "{name} entdecken",
+      "independent": "Nur ein Standort? Zur einfacheren Einrichtung",
+      "realty": "Immobilien · Geplant"
+    },
+    "hqLocal": {
+      "title": "Zentrale und Standorte, jeweils mit den passenden Kontrollen",
+      "hq": {
+        "eyebrow": "Zentrale",
+        "title": "Gemeinsame Vorgaben",
+        "body": "Sperren Sie Markeninhalte, veröffentlichen Sie Vorlagen an ausgewählte Standorte und sehen Sie Netzwerkberichte. Kundendaten bleiben beim Standort, sofern Ihre Richtlinie keine Weitergabe erlaubt.",
+        "chips": ["Gesperrte Markeninhalte", "Gruppenveröffentlichung", "Netzwerkberichte"]
+      },
+      "local": {
+        "eyebrow": "Standorte",
+        "title": "Lokale Eigenständigkeit",
+        "body": "Aktualisieren Sie Öffnungszeiten, Preise und lokale Angebote, wo die Zentrale es erlaubt. Jedes Feld zeigt, ob es gemeinsam, lokal oder freigabepflichtig ist.",
+        "chips": ["Lokal bearbeitbar", "Freigabe erforderlich", "Auf Vorgabe der Zentrale zurücksetzen"]
+      }
+    },
+    "steps": {
+      "title": "In drei Schritten starten",
+      "body": "Beginnen Sie mit einem Standort und fügen Sie die übrigen hinzu, wenn Sie bereit sind.",
+      "items": [
+        { "title": "Branche wählen", "desc": "Starten Sie mit Abläufen für Studios, Sport, Wellness, Handel oder Gastronomie." },
+        { "title": "Verbinden oder starten", "desc": "Starten Sie eine gehostete Website oder behalten Sie Ihre WordPress-Website und verbinden Sie unterstützte Tools." },
+        { "title": "Standorte koordinieren", "desc": "Teilen Sie, was einheitlich sein soll, und lassen Sie jedes Team den Rest selbst verwalten." }
+      ]
+    },
+    "capabilities": {
+      "title": "Was enthalten ist",
+      "body": "Jede Funktion ist mit ihrer Verfügbarkeit zum Start gekennzeichnet.",
+      "legendLabel": "Legende zur Verfügbarkeit",
+      "tags": { "launch": "Zum Start", "preview": "Vorschau", "setup": "Einrichtung erforderlich", "selected": "Ausgewählte Systeme" },
+      "items": [
+        { "name": "Websites", "desc": "Gehostete Websites oder WordPress-Blöcke, gemeinsame Vorlagen und lokale Seiten." },
+        { "name": "Kunden", "desc": "Anfragen, Mitglieder und Teilnehmende, dem richtigen Standort zugeordnet." },
+        { "name": "Marketing", "desc": "Kampagnenseiten, Formulare und Lead-Weiterleitung an jeden Standort." },
+        { "name": "Zahlungen", "desc": "Über ein verbundenes Zahlungskonto pro Unternehmen oder Standort." },
+        { "name": "BranchHarbor AI", "desc": "Entwürfe und Zusammenfassungen im Rahmen Ihrer Berechtigungen. Änderungen erfordern eine Freigabe." },
+        { "name": "Verbindungen", "desc": "Unterstützte Buchungs- und Handelstools, jeweils mit klarem Status." }
+      ]
+    },
+    "delivery": {
+      "title": "Zwei Wege zum Start",
+      "hosted": { "title": "Mit einer BranchHarbor-Website starten", "body": "Wir hosten Ihre Website und Ihr Dashboard. Nutzen Sie eine enthaltene Adresse oder verbinden Sie Ihre eigene Domain, wann immer Sie möchten.", "cta": "Gehostete Pläne ansehen" },
+      "wordpress": { "title": "Ihre WordPress-Website behalten", "body": "Ergänzen Sie Ihre bestehende Website um BranchHarbor-Formulare, Kurspläne und Verbindungen. Ihr Hosting bleibt unverändert.", "cta": "So funktioniert der Connector" }
+    },
+    "integrations": { "title": "Funktioniert mit Ihren Tools", "body": "Jede Verbindung hat einen Status. „Geplant“ bedeutet: noch nicht verfügbar.", "cta": "Alle Integrationen" },
+    "evidence": {
+      "eyebrow": "Nachweise",
+      "title": "Ergebnisse aus dem Pilot erscheinen hier",
+      "body": "Wir zeigen keine Kundenlogos oder Leistungsversprechen, bevor wir sie belegen können. Bis die Pilotunternehmen berichten, können Sie die Abläufe selbst erkunden.",
+      "workflow": "Ablauf {name}"
+    },
+    "pricing": {
+      "eyebrow": "Preisübersicht",
+      "title": "Abrechnung pro Standort",
+      "body": "Sie zahlen für die Standorte, die Sie freigeben, in Ihrer Währung. Behalten Sie Ihre Buchungs- oder Handelssoftware, wo wir sie anbinden. Netzwerke erhalten Unterstützung beim Onboarding.",
+      "cta": "Preise ansehen"
+    },
+    "faq": {
+      "title": "Fragen",
+      "items": [
+        { "q": "Wie funktioniert die Abrechnung pro Standort?", "a": "Sie zahlen für jeden Standort, den Sie in BranchHarbor freigeben. Ein neuer Standort veröffentlicht seine Website nicht automatisch, und das Entfernen eines Standorts beendet die Abrechnung ab dem nächsten Zeitraum." },
+        { "q": "Muss ich meine bestehende Software ersetzen?", "a": "Nein. Wo wir eine Verbindung unterstützen, bleibt Ihr Buchungs- oder Handelssystem maßgeblich und BranchHarbor arbeitet daneben. Jedes Modul gibt an, ob es einen Ablauf ersetzt, einbettet oder nur darüber berichtet." },
+        { "q": "Wie viel Kontrolle behalten die Standorte?", "a": "Die Zentrale legt fest, welche Felder gesperrt, bearbeitbar oder freigabepflichtig sind. Standorte sehen diese Herkunft bei jedem Feld und können Änderungen anfragen." },
+        { "q": "Was umfasst das Onboarding?", "a": "Eine Checkliste, die laufend speichert, Hilfe beim Import von Standorten und für Netzwerke ein begleiteter Rollout mit Ihrem Team." },
+        { "q": "Funktioniert es in meinem Land und meiner Sprache?", "a": "BranchHarbor ist für Unternehmen in Nordamerika, Großbritannien und Europa, Australien und Neuseeland, Asien, dem Nahen Osten und Lateinamerika gebaut. Jeder Standort behält seine eigene Zeitzone und Währung, und die Oberfläche ist in mehreren Sprachen verfügbar. Die Verfügbarkeit von Zahlungen hängt von Ihrem Anbieter und Land ab." }
+      ]
+    },
+    "closing": {
+      "title": "Bringen Sie alle Standorte zusammen.",
+      "body": "Erzählen Sie uns von Ihrem Unternehmen, und wir zeigen Ihnen den passenden Ablauf – mit Ihrer Branche und Ihren Standorten.",
+      "primary": "Demo anfragen",
+      "secondary": "Preise ansehen"
+    }
+  },
+  "demo": {
+    "metaTitle": "Demo anfragen",
+    "kicker": "Demo anfragen",
+    "headline": "Erleben Sie BranchHarbor mit Ihrem Unternehmen.",
+    "intro": "Erzählen Sie uns kurz von Ihren Standorten und davon, was Sie lösen möchten. Wir bereiten eine Vorführung des passenden Ablaufs vor.",
+    "imageAlt": "Trainerin beim Dehnen in einem ruhigen Studio",
+    "asideTitle": "Wie es weitergeht",
+    "aside": ["Wir prüfen Ihre Anfrage und ob Ihre Branche und Systeme unterstützt werden.", "Wir schreiben Ihnen, um einen Termin in Ihrer Zeitzone zu vereinbaren.", "Sie sehen den Ablauf mit Beispieldaten, die Ihrem Unternehmen ähneln."],
+    "privacyNote": "Wir verwenden diese Angaben, um Ihre Anfrage zu beantworten. Wie wir personenbezogene Daten verarbeiten, erfahren Sie auf unserer Datenschutzseite.",
+    "form": {
+      "title": "Ihre Angaben",
+      "sizeLegend": "Was beschreibt Sie am besten?",
+      "single": "Einzelunternehmen",
+      "singleDesc": "Ein Standort",
+      "network": "Netzwerk",
+      "networkDesc": "Mehrere Standorte oder Franchises",
+      "name": "Ihr Name",
+      "email": "Geschäftliche E-Mail",
+      "emailHint": "Wir nutzen sie nur, um Ihre Demo zu vereinbaren.",
+      "business": "Name des Unternehmens",
+      "industry": "Branche",
+      "industryPlaceholder": "Branche wählen",
+      "realtyOption": "Immobilien (geplant)",
+      "locationCount": "Anzahl der Standorte",
+      "country": "Land",
+      "countryPlaceholder": "Land wählen",
+      "countryGroupLaunch": "Startländer",
+      "countryGroupOther": "Weitere Länder",
+      "website": "Bestehende Website",
+      "websiteHint": "Leer lassen, wenn Sie noch keine haben.",
+      "difficulty": "Welches Hauptproblem möchten Sie lösen?",
+      "difficultyHint": "Zum Beispiel: Anfragen landen beim falschen Studio, oder Speisekarten sind nicht synchron.",
+      "phone": "Telefon",
+      "systems": "Systeme, die Sie heute nutzen",
+      "systemsHint": "Zum Beispiel: WordPress, WooCommerce, Mindbody, Square.",
+      "consent": "Senden Sie mir gelegentlich Produktneuigkeiten per E-Mail. Abmeldung jederzeit möglich.",
+      "submit": "Demo anfragen",
+      "sending": "Wird gesendet …"
+    },
+    "errors": {
+      "summaryTitle": "{count, plural, one {Dieses Formular enthält # Problem} other {Dieses Formular enthält # Probleme}}",
+      "name": "Geben Sie Ihren Namen ein.",
+      "email": "Geben Sie eine geschäftliche E-Mail ein, z. B. name@unternehmen.de.",
+      "business": "Geben Sie den Namen Ihres Unternehmens ein.",
+      "industry": "Wählen Sie Ihre Branche.",
+      "locationCount": "Geben Sie die Anzahl Ihrer Standorte ein (1 oder mehr).",
+      "country": "Wählen Sie Ihr Land.",
+      "existingWebsite": "Geben Sie eine vollständige Webadresse ein, z. B. https://ihrunternehmen.de, oder lassen Sie das Feld leer.",
+      "primaryDifficulty": "Beschreiben Sie das Hauptproblem, das Sie lösen möchten.",
+      "phone": "Geben Sie eine kürzere Telefonnummer ein.",
+      "existingSystems": "Kürzen Sie diese Liste auf höchstens 500 Zeichen.",
+      "generic": "Prüfen Sie dieses Feld.",
+      "network": "Ihre Anfrage konnte nicht gesendet werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut – Ihre Angaben bleiben erhalten.",
+      "server": "Bei uns ist ein Fehler aufgetreten. Ihre Angaben bleiben erhalten; bitte versuchen Sie es gleich noch einmal.",
+      "retry": "Erneut versuchen"
+    },
+    "success": {
+      "title": "Danke, {name}. Ihre Anfrage ist eingegangen.",
+      "body": "Wir haben Ihre Anfrage für {business} erhalten. Jemand aus unserem Team schreibt an {email}, um einen Termin für Ihre Demo zu vereinbaren.",
+      "next": "In der Zwischenzeit können Sie die Abläufe Ihrer Branche erkunden.",
+      "explore": "{industry} entdecken",
+      "home": "Zur Startseite"
+    }
+  }
+}

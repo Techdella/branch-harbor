@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "title": "BranchHarbor — Un seul foyer pour chaque établissement",
+    "description": "BranchHarbor relie sites web, activité client et processus métier des entreprises multi-sites et des réseaux de franchise. Le siège garde la vue d’ensemble ; les équipes locales gardent la main."
+  },
+  "common": {
+    "skipToContent": "Aller au contenu principal",
+    "requestDemo": "Demander une démo",
+    "signIn": "Se connecter",
+    "sampleData": "Données d’exemple",
+    "conceptualPreview": "Aperçu conceptuel · Données d’exemple",
+    "learnMore": "En savoir plus",
+    "home": "Accueil",
+    "breadcrumb": "Fil d’Ariane",
+    "language": "Langue",
+    "availability": { "pilot": "Pilote", "next": "Prévu ensuite", "planned": "Prévu" },
+    "status": { "tested": "Testé", "limited": "Prise en charge limitée", "setup": "Configuration requise", "planned": "Prévu" },
+    "locationStatus": { "operating": "En activité", "openingSoon": "Ouverture prochaine", "onboarding": "En intégration" },
+    "optional": "facultatif"
+  },
+  "nav": {
+    "main": "Principal",
+    "industries": "Secteurs",
+    "franchises": "Pour les franchises",
+    "wordpressIntegrations": "WordPress et intégrations",
+    "wordpress": "Connecteur WordPress",
+    "integrations": "Intégrations",
+    "pricing": "Tarifs",
+    "resources": "Ressources",
+    "support": "Assistance",
+    "independent": "Entreprises à un seul site",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "mobileMenu": "Menu"
+  },
+  "footer": {
+    "tagline": "Un seul foyer pour chaque établissement.",
+    "industries": "Secteurs",
+    "product": "Produit",
+    "company": "Entreprise",
+    "policies": "Politiques",
+    "franchises": "Pour les franchises",
+    "independent": "Entreprises indépendantes",
+    "wordpress": "WordPress",
+    "integrations": "Intégrations",
+    "pricing": "Tarifs",
+    "demo": "Demander une démo",
+    "resources": "Ressources",
+    "docs": "Documentation",
+    "support": "Assistance",
+    "about": "À propos",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "security": "Sécurité",
+    "note": "Produit en préversion. Les fonctionnalités sont étiquetées selon leur disponibilité ; les données d’exemple sont signalées comme telles.",
+    "credits": "Photos : contributeurs Unsplash"
+  },
+  "industryMeta": {
+    "studios": { "name": "Studios", "who": "Yoga, Pilates, danse, barre, cycling et fitness boutique", "flow": "Demande → essai → cours → abonnement", "cta": "Demander une démo Studios" },
+    "sports": { "name": "Sports", "who": "Académies, clubs, programmes d’entraînement et stages", "flow": "Inscription → affectation au groupe → présence", "cta": "Demander une démo Sports" },
+    "wellness": { "name": "Santé et bien-être", "who": "Spas, massages, centres de bien-être et services sur rendez-vous", "flow": "Prestation → praticien → rendez-vous", "cta": "Demander une démo Bien-être" },
+    "commerce": { "name": "Commerce", "who": "Groupes de distribution et magasins franchisés", "flow": "Découverte produit → commande → expédition", "cta": "Demander une démo Commerce" },
+    "foods": { "name": "Restauration", "who": "Restaurants, cafés, boulangeries, plats préparés et franchises alimentaires", "flow": "Établissement → menu → commande → retrait", "cta": "Demander une démo Restauration" },
+    "realty": { "name": "Immobilier", "who": "Agences et réseaux d’agents" }
+  },
+  "home": {
+    "hero": {
+      "badge": "Pilote Studios en cours de constitution · Restauration ensuite",
+      "titleLead": "Un seul foyer pour",
+      "titleAccent": "chaque établissement.",
+      "body": "Reliez vos sites web, l’activité de vos clients et vos processus métier. Donnez au siège une vue d’ensemble et aux équipes locales le contrôle dont elles ont besoin.",
+      "primary": "Explorer votre secteur",
+      "secondary": "Voir comment ça marche"
+    },
+    "preview": {
+      "heading": "Aperçu du produit : vue d’ensemble du siège",
+      "imageAlt": "Élèves pratiquant dans un studio de yoga lumineux",
+      "imageSub": "Studio · 9 cours aujourd’hui",
+      "overview": "Vue d’ensemble",
+      "scope": "Tous les établissements autorisés ({count})",
+      "locations": "Établissements",
+      "selectHint": "Sélectionnez un établissement pour ouvrir son résumé.",
+      "enquiries": "Demandes · 7 jours",
+      "classesToday": "Cours aujourd’hui",
+      "occupancy": "Taux de remplissage · cette semaine",
+      "unavailable": "Indisponible",
+      "notConnected": "Non connecté",
+      "connected": "Connecté · il y a {minutes} min",
+      "degraded": "Dégradé · dernière synchro il y a {hours} h",
+      "bookingNotConnected": "Système de réservation non connecté",
+      "localTime": "Fuseau horaire local : {tz}",
+      "sourceNote": "Les demandes proviennent des formulaires du site. Les cours proviennent du système de réservation connecté.",
+      "closeDrawer": "Fermer le résumé de l’établissement",
+      "drawerLabel": "Résumé de l’établissement"
+    },
+    "industries": {
+      "title": "Choisissez votre secteur",
+      "body": "Une plateforme commune, façonnée selon votre façon de travailler. Studios est en pilote ; les autres secteurs sont conçus et inscrits à la feuille de route.",
+      "explore": "Explorer {name}",
+      "independent": "Un seul établissement ? Découvrez la configuration simplifiée",
+      "realty": "Immobilier · Prévu"
+    },
+    "hqLocal": {
+      "title": "Le siège et les établissements, chacun avec les bons contrôles",
+      "hq": {
+        "eyebrow": "Siège",
+        "title": "Contrôles partagés",
+        "body": "Verrouillez le contenu de marque, publiez des modèles vers les établissements choisis et consultez les rapports du réseau. Les données clients restent à l’établissement, sauf si votre politique autorise le partage.",
+        "chips": ["Contenu de marque verrouillé", "Publication groupée", "Rapports du réseau"]
+      },
+      "local": {
+        "eyebrow": "Établissements",
+        "title": "Autonomie locale",
+        "body": "Mettez à jour horaires, prix et offres locales là où le siège l’autorise. Chaque champ indique s’il est partagé, local ou soumis à approbation.",
+        "chips": ["Modifiable localement", "Approbation requise", "Rétablir la valeur du siège"]
+      }
+    },
+    "steps": {
+      "title": "Démarrez en trois étapes",
+      "body": "Commencez avec un établissement et ajoutez les autres quand vous êtes prêt.",
+      "items": [
+        { "title": "Choisissez votre secteur", "desc": "Partez de processus conçus pour les studios, le sport, le bien-être, le commerce ou la restauration." },
+        { "title": "Connectez ou lancez", "desc": "Lancez un site hébergé, ou gardez votre site WordPress et connectez les outils pris en charge." },
+        { "title": "Coordonnez vos établissements", "desc": "Partagez ce qui doit être cohérent et laissez chaque équipe gérer le reste." }
+      ]
+    },
+    "capabilities": {
+      "title": "Ce qui est inclus",
+      "body": "Chaque fonctionnalité indique sa disponibilité au lancement.",
+      "legendLabel": "Légende de disponibilité",
+      "tags": { "launch": "Au lancement", "preview": "Aperçu", "setup": "Configuration requise", "selected": "Systèmes sélectionnés" },
+      "items": [
+        { "name": "Sites web", "desc": "Sites hébergés ou blocs WordPress, modèles partagés et pages locales." },
+        { "name": "Clients", "desc": "Demandes, membres et participants, rattachés au bon établissement." },
+        { "name": "Marketing", "desc": "Pages de campagne, formulaires et routage des prospects vers chaque établissement." },
+        { "name": "Paiements", "desc": "Via un compte de paiement connecté pour chaque entreprise ou établissement." },
+        { "name": "BranchHarbor AI", "desc": "Brouillons et résumés dans la limite de vos autorisations. Les modifications nécessitent une approbation." },
+        { "name": "Connexions", "desc": "Outils de réservation et de commerce pris en charge, chacun avec un statut clair." }
+      ]
+    },
+    "delivery": {
+      "title": "Deux façons de commencer",
+      "hosted": { "title": "Démarrer avec un site BranchHarbor", "body": "Nous hébergeons votre site et votre tableau de bord. Utilisez une adresse incluse ou connectez votre propre domaine quand vous le souhaitez.", "cta": "Voir les offres hébergées" },
+      "wordpress": { "title": "Garder votre site WordPress", "body": "Ajoutez formulaires, plannings et connexions BranchHarbor au site que vous avez déjà. Votre hébergement ne change pas.", "cta": "Comment fonctionne le connecteur" }
+    },
+    "integrations": { "title": "Compatible avec vos outils", "body": "Chaque connexion affiche un statut. « Prévu » signifie pas encore disponible.", "cta": "Toutes les intégrations" },
+    "evidence": {
+      "eyebrow": "Preuves",
+      "title": "Les résultats du pilote seront publiés ici",
+      "body": "Nous n’affichons ni logos clients ni chiffres de performance avant de les avoir. En attendant les retours des entreprises pilotes, explorez directement les processus.",
+      "workflow": "Processus {name}"
+    },
+    "pricing": {
+      "eyebrow": "Aperçu des tarifs",
+      "title": "Facturé par établissement",
+      "body": "Payez pour les établissements que vous autorisez, dans votre devise. Gardez votre logiciel de réservation ou de commerce lorsque nous nous y connectons. Les réseaux bénéficient d’un accompagnement.",
+      "cta": "Voir les tarifs"
+    },
+    "faq": {
+      "title": "Questions",
+      "items": [
+        { "q": "Comment fonctionne la facturation par établissement ?", "a": "Vous payez pour chaque établissement autorisé dans BranchHarbor. Ajouter un établissement ne publie pas automatiquement son site, et en retirer un arrête la facturation à partir de la période suivante." },
+        { "q": "Dois-je remplacer mes logiciels actuels ?", "a": "Non. Lorsque nous prenons en charge une connexion, votre système de réservation ou de commerce reste la référence et BranchHarbor fonctionne à ses côtés. Chaque module indique s’il remplace, intègre ou se contente de rendre compte d’un processus." },
+        { "q": "Quel contrôle les établissements conservent-ils ?", "a": "Le siège décide quels champs sont verrouillés, modifiables ou soumis à approbation. Les établissements voient cette origine sur chaque champ et peuvent demander des modifications." },
+        { "q": "Que comprend la mise en route ?", "a": "Une liste de contrôle qui s’enregistre au fur et à mesure, de l’aide pour importer vos établissements et, pour les réseaux, un déploiement accompagné avec votre équipe." },
+        { "q": "Est-ce disponible dans mon pays et ma langue ?", "a": "BranchHarbor est conçu pour les entreprises d’Amérique du Nord, du Royaume-Uni et d’Europe, d’Australie et de Nouvelle-Zélande, d’Asie, du Moyen-Orient et d’Amérique latine. Chaque établissement garde son fuseau horaire et sa devise, et l’interface est disponible en plusieurs langues. La disponibilité des paiements dépend de votre prestataire et de votre pays." }
+      ]
+    },
+    "closing": {
+      "title": "Réunissez tous vos établissements.",
+      "body": "Parlez-nous de votre entreprise et nous vous montrerons le processus adapté, avec votre secteur et vos établissements.",
+      "primary": "Demander une démo",
+      "secondary": "Voir les tarifs"
+    }
+  },
+  "demo": {
+    "metaTitle": "Demander une démo",
+    "kicker": "Demander une démo",
+    "headline": "Découvrez BranchHarbor avec votre entreprise.",
+    "intro": "Parlez-nous un peu de vos établissements et de ce que vous cherchez à résoudre. Nous préparerons une présentation du processus adapté.",
+    "imageAlt": "Instructrice s’étirant dans un studio calme",
+    "asideTitle": "Et ensuite ?",
+    "aside": ["Nous examinons votre demande et vérifions que votre secteur et vos systèmes sont pris en charge.", "Nous vous écrivons pour convenir d’un horaire adapté à votre fuseau horaire.", "Vous découvrez le processus avec des données d’exemple à l’image de votre entreprise."],
+    "privacyNote": "Nous utilisons ces informations pour répondre à votre demande. Consultez notre page Confidentialité pour savoir comment nous traitons les données personnelles.",
+    "form": {
+      "title": "Vos coordonnées",
+      "sizeLegend": "Qu’est-ce qui vous décrit le mieux ?",
+      "single": "Entreprise unique",
+      "singleDesc": "Un établissement",
+      "network": "Réseau",
+      "networkDesc": "Plusieurs établissements ou franchises",
+      "name": "Votre nom",
+      "email": "E-mail professionnel",
+      "emailHint": "Nous l’utiliserons uniquement pour organiser votre démo.",
+      "business": "Nom de l’entreprise",
+      "industry": "Secteur",
+      "industryPlaceholder": "Choisissez un secteur",
+      "realtyOption": "Immobilier (prévu)",
+      "locationCount": "Nombre d’établissements",
+      "country": "Pays",
+      "countryPlaceholder": "Choisissez un pays",
+      "countryGroupLaunch": "Pays de lancement",
+      "countryGroupOther": "Autres pays",
+      "website": "Site web existant",
+      "websiteHint": "Laissez vide si vous n’en avez pas encore.",
+      "difficulty": "Quelle est la principale difficulté que vous voulez résoudre ?",
+      "difficultyHint": "Par exemple : des demandes envoyées au mauvais studio, ou des menus désynchronisés.",
+      "phone": "Téléphone",
+      "systems": "Systèmes que vous utilisez aujourd’hui",
+      "systemsHint": "Par exemple : WordPress, WooCommerce, Mindbody, Square.",
+      "consent": "Envoyez-moi occasionnellement des nouveautés produit par e-mail. Vous pouvez vous désabonner à tout moment.",
+      "submit": "Demander la démo",
+      "sending": "Envoi…"
+    },
+    "errors": {
+      "summaryTitle": "{count, plural, one {Ce formulaire contient # problème} other {Ce formulaire contient # problèmes}}",
+      "name": "Saisissez votre nom.",
+      "email": "Saisissez un e-mail professionnel, par exemple nom@entreprise.com.",
+      "business": "Saisissez le nom de votre entreprise.",
+      "industry": "Choisissez votre secteur.",
+      "locationCount": "Indiquez combien d’établissements vous avez (1 ou plus).",
+      "country": "Choisissez votre pays.",
+      "existingWebsite": "Saisissez une adresse web complète, par exemple https://votreentreprise.com, ou laissez vide.",
+      "primaryDifficulty": "Indiquez la principale difficulté que vous voulez résoudre.",
+      "phone": "Saisissez un numéro de téléphone plus court.",
+      "existingSystems": "Raccourcissez cette liste à 500 caractères maximum.",
+      "generic": "Vérifiez ce champ.",
+      "network": "Nous n’avons pas pu envoyer votre demande. Vérifiez votre connexion et réessayez — vos réponses sont conservées.",
+      "server": "Un problème est survenu de notre côté. Vos réponses sont conservées ; réessayez dans un instant.",
+      "retry": "Réessayer"
+    },
+    "success": {
+      "title": "Merci, {name}. Votre demande est bien reçue.",
+      "body": "Nous avons reçu votre demande pour {business}. Un membre de notre équipe écrira à {email} pour convenir d’un horaire pour votre démo.",
+      "next": "En attendant, vous pouvez explorer les processus de votre secteur.",
+      "explore": "Explorer {industry}",
+      "home": "Retour à l’accueil"
+    }
+  }
+}
