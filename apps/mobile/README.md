@@ -12,6 +12,8 @@ Against the real API the available experiences come from `GET /v1/auth/me`: ever
 `operations.read`; **Owner / HQ** when a role grants `reports.read` or `website.approve` (roles → permissions from `@bh/shared`).
 The mock lets any signed-in user switch between all three.
 
+**Sports** (`app/sports/*`, `src/features/sports/`): guardian portal (schedule + absence reporting, balances + instalment payment, messages) from Profile; coach roster & attendance from Staff → Today; enrolment pulse from Owner → Pulse. Live: `/v1/me/sports*`, `/v1/orgs/:orgId/sports/*`.
+
 ## Stack
 
 Expo SDK 57 (`expo@57.0.28`, React Native 0.86.3, React 19.2.3), Expo Router 57 (file-based routes in `app/`), TypeScript 5.9.3 (strict),

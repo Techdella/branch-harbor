@@ -115,4 +115,12 @@ export interface Programme {
   refundPolicy: string | null;
   registrationOpensAt: string | null;
   registrationClosesAt: string | null;
+  kind?: string;
+  eligibilityNotes?: string | null;
+  siblingDiscountPercent?: number;
+  age?: { rule: 'age_on_date' | 'birth_year'; cutoffDate: string; birthDates: { from: string | null; to: string | null } };
+  season?: { id: string; name: string; startsOn: string; endsOn: string } | null;
+  venues?: { id: string; name: string; kind: string }[];
+  paymentOptions?: { id: string; name: string; kind: 'full' | 'instalments'; instalments: { seq: number; dueOn: string; amountMinor: number }[] }[];
+  questions?: { key: string; label: string; type: string; required: boolean; options: string[] | null; category: string; help: string | null; restricted: boolean }[];
 }

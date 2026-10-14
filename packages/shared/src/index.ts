@@ -6,3 +6,4 @@ export * from './permissions.ts';
 export * from './schemas.ts';
 export * from './api-contracts.ts';
 export * from './business-mode.ts';
+export * from './sports.ts';

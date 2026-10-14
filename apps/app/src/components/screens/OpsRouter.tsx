@@ -12,6 +12,7 @@ import { ClassesScreen } from './studios/ClassesScreen';
 import { CoverScreen } from './studios/CoverScreen';
 import { RegistrationsScreen } from './sports/RegistrationsScreen';
 import { AttendanceScreen } from './sports/AttendanceScreen';
+import { SportsScreen } from './sports/SportsScreens';
 import { CalendarScreen } from './wellness/CalendarScreen';
 import { CommerceOrdersScreen } from './commerce/OrdersScreen';
 import { MenuScreen } from './foods/MenuScreen';
@@ -54,6 +55,15 @@ export function OpsRouter({ screen }: { screen: string }) {
       return <RegistrationsScreen />;
     case 'sports:attendance':
       return <AttendanceScreen />;
+    case 'sports:overview':
+    case 'sports:programmes':
+    case 'sports:teams':
+    case 'sports:schedule':
+    case 'sports:balances':
+    case 'sports:announcements':
+    case 'sports:guardians':
+    case 'sports:reports':
+      return <SportsScreen screen={def.key} />;
     case 'wellness:calendar':
       return <CalendarScreen />;
     case 'commerce:orders':

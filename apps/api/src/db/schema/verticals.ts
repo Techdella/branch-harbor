@@ -143,16 +143,36 @@ export const programmes = pgTable('programmes', {
   registrationOpensAt: ts('registration_opens_at'),
   registrationClosesAt: ts('registration_closes_at'),
   status: text('status').notNull().default('draft'), // draft | published | closed | archived
+  /** Season this programme belongs to (season → programmes). Legacy programmes may have none. */
+  seasonId: uuid('season_id'),
+  kind: text('kind').notNull().default('programme'), // programme | camp | academy | league
+  /** age_on_date: age measured on ageCutoffDate. birth_year: U-age = year(ageCutoffDate) − birth year. */
+  ageRule: text('age_rule').notNull().default('age_on_date'),
+  /** Free-text eligibility criteria shown before registration (never inferred ability). */
+  eligibilityNotes: text('eligibility_notes'),
+  venueIds: jsonb('venue_ids').$type<string[]>().notNull().default([]),
+  /** Discount for the 2nd+ child of the same guardian in the same season, basis points. */
+  siblingDiscountBps: integer('sibling_discount_bps').notNull().default(0),
+  registrationFormId: uuid('registration_form_id'),
+  refundPolicyVersion: text('refund_policy_version'),
+  /** Minutes a place is held while the first payment completes. */
+  holdMinutes: integer('hold_minutes').notNull().default(30),
   createdAt: createdAt(),
 });
 
 export const seasons = pgTable('seasons', {
   id: pk(),
   organizationId: org(),
-  programmeId: uuid('programme_id').notNull().references(() => programmes.id, { onDelete: 'cascade' }),
+  /** Legacy per-programme season. New seasons are location-level parents of programmes. */
+  programmeId: uuid('programme_id').references(() => programmes.id, { onDelete: 'cascade' }),
+  locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   startsOn: date('starts_on').notNull(),
   endsOn: date('ends_on').notNull(),
+  /** Default age rule + cutoff for the season's programmes (country convention, configurable). */
+  ageRule: text('age_rule'),
+  ageCutoffDate: date('age_cutoff_date'),
+  status: text('status').notNull().default('draft'), // draft | published | archived
   createdAt: createdAt(),
 });
 
@@ -165,6 +185,9 @@ export const teams = pgTable('teams', {
   name: text('name').notNull(),
   coachUserId: uuid('coach_user_id'),
   capacity: integer('capacity'),
+  kind: text('kind').notNull().default('team'), // team | group | squad
+  homeVenueId: uuid('home_venue_id'),
+  archivedAt: ts('archived_at'),
   createdAt: createdAt(),
 });
 
@@ -182,6 +205,21 @@ export const registrations = pgTable('registrations', {
   forms: jsonb('forms').$type<Record<string, unknown>>().notNull().default({}),
   reviewedBy: uuid('reviewed_by'),
   reviewNote: text('review_note'),
+  /** full | instalments */
+  paymentPlan: text('payment_plan').notNull().default('full'),
+  feePlanId: uuid('fee_plan_id'),
+  /** Programme fee at registration, discounts/aid/waivers (sports_fee_adjustments) and the resulting total. */
+  listFeeMinor: minor('list_fee_minor').notNull().default(0),
+  totalFeeMinor: minor('total_fee_minor').notNull().default(0),
+  currency: currencyCol(),
+  /** While `submitted`, the place is held until this time for the first payment. */
+  holdExpiresAt: ts('hold_expires_at'),
+  refundPolicyAcceptedAt: ts('refund_policy_accepted_at'),
+  refundPolicyVersion: text('refund_policy_version'),
+  /** Guardian manage token (hash) for retrying payment from the confirmation page. */
+  manageTokenHash: text('manage_token_hash'),
+  withdrawnAt: ts('withdrawn_at'),
+  withdrawalReason: text('withdrawal_reason'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [uniqueIndex('registrations_active_uq').on(t.programmeId, t.participantCustomerId).where(sql`status not in ('withdrawn','rejected')`)]);
@@ -195,7 +233,17 @@ export const trainingSessions = pgTable('training_sessions', {
   endsAt: ts('ends_at').notNull(),
   venue: text('venue'),
   kind: text('kind').notNull().default('training'), // training | fixture
-  status: text('status').notNull().default('scheduled'),
+  status: text('status').notNull().default('scheduled'), // scheduled | cancelled
+  /** Venue resource (pitch/court). `venue` keeps the display name (away grounds have no resource). */
+  venueId: uuid('venue_id'),
+  /** Recurring series this session was generated from. */
+  seriesId: uuid('series_id'),
+  opponent: text('opponent'),
+  homeAway: text('home_away'), // home | away | neutral
+  competition: text('competition'),
+  notes: text('notes'),
+  cancelledAt: ts('cancelled_at'),
+  cancelReason: text('cancel_reason'),
   createdAt: createdAt(),
 });
 
@@ -207,6 +255,11 @@ export const attendance = pgTable('attendance', {
   participantCustomerId: uuid('participant_customer_id').notNull().references(() => customers.id),
   status: text('status').notNull(), // present | absent | late | excused
   note: text('note'),
+  /** illness | injury | family | school | travel | other */
+  absenceReason: text('absence_reason'),
+  /** coach | guardian */
+  reportedBy: text('reported_by').notNull().default('coach'),
+  guardianNotifiedAt: ts('guardian_notified_at'),
   recordedBy: uuid('recorded_by'),
   recordedAt: ts('recorded_at').notNull().defaultNow(),
 }, (t) => [uniqueIndex('attendance_uq').on(t.sessionId, t.participantCustomerId)]);
