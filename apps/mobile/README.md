@@ -8,7 +8,9 @@ One Expo app for iOS and Android (plus a web preview) with three role-based expe
 | **Staff** | Instructors, coaches, kitchen leads, associates | Today · Check-in · Kitchen · Messages · Cover |
 | **Owner / HQ** | Franchise owners, HQ admins | Pulse · Approvals · Locations · Alerts |
 
-In production the experience comes from `GET /v1/auth/me` (`experiences`). The demo lets a signed-in user switch.
+Against the real API the available experiences come from `GET /v1/auth/me`: every account gets **Customer**; **Staff** when a role grants
+`operations.read`; **Owner / HQ** when a role grants `reports.read` or `website.approve` (roles → permissions from `@bh/shared`).
+The mock lets any signed-in user switch between all three.
 
 ## Stack
 
@@ -31,12 +33,35 @@ cd apps/mobile && npx expo export --platform web      # static web build in dist
 
 Demo sign-in (mock mode): any email + any 6+ character password (`wrongpass` shows the invalid-credentials error). "Continue as guest" gives the customer experience only.
 
+### Against the real API (`apps/api`)
+
+```bash
+# 1. backend (see apps/api/README.md): Postgres 16, then
+pnpm --filter @bh/api db:migrate && pnpm --filter @bh/api db:seed   # prints the demo password
+pnpm --filter @bh/api dev                                            # http://localhost:4000
+# 2. app
+EXPO_PUBLIC_USE_MOCKS=false EXPO_PUBLIC_API_URL=http://localhost:4000 pnpm --filter @bh/mobile start
+```
+
+Sign in as `demo@branchharbor.com` (org owner of both demo brands → Customer, Staff and Owner) with the seeded password, or
+`carlos.ortega@demo.branchharbor.com` (staff, Ballard kitchen). "Continue as guest" uses only public endpoints.
+
+- **Physical device / Android emulator:** `localhost` is the phone itself. Use your machine's LAN IP —
+  `EXPO_PUBLIC_API_URL=http://192.168.1.20:4000` — (the API listens on `HOST=0.0.0.0`). The Android emulator can also use `http://10.0.2.2:4000`.
+- **Web preview / CORS:** the API allows `http://localhost:8081` and `http://localhost:19006` (Expo dev server) by default. If you
+  serve a static `expo export` build from another origin, add it to `CORS_ORIGINS` in `apps/api/.env`. Native apps send no `Origin` and are not affected.
+- **Payments:** with no Stripe keys the API runs payments in **sandbox** mode (`/health` → `stripe: "sandbox"`). The app detects this and offers
+  "Simulate successful payment", which calls `POST /v1/public/payments/:id/sandbox-confirm` so the booking/order is confirmed through the
+  same webhook processor as a real payment (and a paid order then appears in the kitchen).
+- `EXPO_PUBLIC_*` values are inlined at bundle time: restart Metro with `--clear` (or `expo export --clear`) after changing them.
+
 ### Environment
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `EXPO_PUBLIC_API_URL` | `http://localhost:4000` | BranchHarbor API base; routes are under `/v1` |
-| `EXPO_PUBLIC_USE_MOCKS` | `true` | In-app mock API so the app runs without `apps/api` |
+| `EXPO_PUBLIC_USE_MOCKS` | `true` | In-app mock API so the app runs without `apps/api`. `false` = live API |
+| `EXPO_PUBLIC_BRAND_SLUGS` | `stillwater-yoga,maple-and-ember` | Live mode: organisation slugs whose public locations form the customer catalogue (white-label brands) |
 | `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` | *(empty)* | Enables Stripe PaymentSheet on iOS/Android. Empty → "Payments not configured" banner; dev/mock builds can simulate payment |
 | `STRIPE_MERCHANT_IDENTIFIER` | `merchant.com.branchharbor.app` | Apple Pay merchant id for the Stripe config plugin |
 | `APP_VARIANT` | `development` | Set by `eas.json` profiles; non-production builds get `.development` / `.preview` bundle-id suffixes |
@@ -56,7 +81,9 @@ src/
   components/                Text, Icon, Button/IconButton, Card, Badge, Tag, Avatar, ListItem, SectionHeader,
                              EmptyState/ErrorState, Skeleton, MoneyText, ScreenHeader + ScopeChip, Banner, ToggleRow,
                              TextField, ConfirmSheet, Screen, TabBar, Toast, DataStatus, PaymentStep(.native)
-  lib/api.ts                 typed /v1 client (bearer token, Idempotency-Key, { error: { code, message, fields } })
+  lib/api.ts                 typed client used by screens: mock client or live client (same signatures)
+  lib/http.ts                live transport: bearer + refresh token (secure store), single-flight refresh on 401, X-BH-Client: mobile
+  lib/live.ts                live adapters: real /v1 routes → app types (see mapping below)
   lib/errors.ts, useApi.ts   ApiError + fetch hook that keeps last-good data (stale banners)
   lib/session.tsx            auth, experience, brand + per-brand location
   lib/storage.ts             expo-secure-store (native) / localStorage (web preview)
@@ -67,20 +94,71 @@ src/
   features/                  customer catalog/cart/order-status helpers, shared hooks
 ```
 
-## API contract used (`/v1`)
+## API mapping (`EXPO_PUBLIC_USE_MOCKS=false`)
 
-`POST /auth/sign-in`, `POST /auth/guest`, `GET /auth/me`, `POST /auth/sign-out` ·
-`GET /brands`, `GET /locations?brandId=`, `GET /locations/:id/classes?date=`, `GET /class-occurrences/:id`,
-`POST /bookings` (hold), `POST /bookings/:id/confirm`, `POST /bookings/:id/cancel`, `POST /waitlist`, `GET /me/bookings` ·
-`GET /locations/:id/menu`, `GET /locations/:id/pickup-slots?date=`, `POST /locations/:id/orders/quote`, `POST /orders`, `GET /orders/:id`, `GET /me/orders` ·
-`POST /payments/intents` → `{ clientSecret, merchantDisplayName, customerId?, ephemeralKey? }` ·
-`GET|POST /me/messages`, `GET|PUT /me/preferences`, `POST /me/data-requests` ·
-`GET /staff/shifts`, `POST /staff/shifts/:id/clock-in`, `GET /staff/sessions`, `GET /staff/sessions/:id/roster`, `PUT /staff/sessions/:id/attendance/:entryId`,
-`GET /kitchen/orders?locationId=`, `POST /kitchen/orders/:id/status`, `GET /staff/messages`, `GET|POST /staff/cover-requests`, `POST /staff/cover-requests/:id/accept` ·
-`GET /hq/pulse`, `GET /approvals`, `POST /approvals/:id/decision`, `GET /notifications`.
+`src/lib/live.ts` maps every screen-level call to the real routes and adapts the responses into the app's types (`src/lib/types.ts`),
+so screens are the same in both modes. The mock (`src/mock/server.ts`) keeps the original flat paths and still documents the shapes the
+screens consume. Errors are always `{ error: { code, message, fields } }` → `ApiError`.
+
+**Auth & session**
+
+| App call | Real endpoint(s) |
+|---|---|
+| `signIn` | `POST /v1/auth/login` with `X-BH-Client: mobile` → access token + refresh token in the body, both stored in expo-secure-store (localStorage on web) |
+| (any 401) | `POST /v1/auth/refresh` `{ refreshToken }` once, single-flight (parallel 401s share one rotation — reuse of a rotated token revokes the session family), then retry. A rejected refresh signs the user out |
+| `me` | `GET /v1/auth/me` → `organizations[].roles` → assignments + experiences |
+| `signOut` | `DELETE /v1/me/push-tokens` (if registered) + `POST /v1/auth/logout` `{ refreshToken }` |
+| `guest` | no call — guests use public endpoints only; a `guest` marker replaces the token |
+| `registerPushToken(token)` | `POST /v1/me/push-tokens` `{ token, platform, appVersion }` (call it once `expo-notifications` is added; sending is not implemented server-side) |
+
+**Customer**
+
+| App call | Real endpoint(s) |
+|---|---|
+| `brands`, `locations` | `GET /v1/public/locations/:orgSlug` for each `EXPO_PUBLIC_BRAND_SLUGS` entry, plus `GET /v1/orgs/:orgId/locations` for the signed-in user's organisations (brand id = org slug) |
+| `classes(locationId, date)` | `GET /v1/public/studios/:locationId/schedule?from&to` (the local day in the location's time zone) |
+| `occurrence(id)` | same schedule, id = `locationId~occurrenceId` |
+| `holdBooking` / `joinWaitlist` | `POST /v1/public/studios/occurrences/:id/bookings` `{ contact, joinWaitlist }` — paid classes return a timed hold + sandbox/Stripe payment; full → `409 class_full` → waitlist. Contact = account name/email, or a guest name + email asked once |
+| `createPaymentIntent` | client secret returned by the booking/order call (no separate intent endpoint) |
+| `confirmBooking` | real Stripe: confirmed by the signed webhook. Sandbox: `POST /v1/public/payments/:paymentId/sandbox-confirm`. Expired hold → `hold_expired` |
+| `myBookings` | signed in: `GET /v1/me/bookings` (bookings + waitlist places, matched by account or email). Guest: bookings made on this device (with manage tokens) |
+| `cancelBooking` | signed in: `POST /v1/me/bookings/:id/cancel`. Guest: `POST /v1/public/studios/bookings/:id/cancel` `{ manageToken }` |
+| `menu` | `GET /v1/public/foods/:locationId/menu` (categories flattened; unavailable → sold out) |
+| `pickupSlots` | `GET /v1/public/foods/:locationId/pickup-slots?from&to` (remaining slots of the day, past cut-off hidden) |
+| `quoteOrder` | `POST /v1/public/foods/:locationId/quote` — same server checks as ordering; tax only when the business configured a rate |
+| `placeOrder` | `POST /v1/public/foods/:locationId/orders` `{ pickupSlotId, lines, contact, notes }` (guests enter an email for the receipt) |
+| `confirmOrderPayment` | sandbox: `POST /v1/public/payments/:paymentId/sandbox-confirm` (Stripe: webhook) |
+| `order(id)`, `myOrders` | `GET /v1/public/foods/orders/:id?token=` (manage token kept on the device) / signed in: `GET /v1/me/food-orders` |
+| `messages`, `sendMessage` | `GET /v1/me/messages?locationId=`, `POST /v1/me/messages` (signed-in customers; staff reply via `POST /v1/orgs/:orgId/messages`) |
+| `preferences`, `savePreferences` | `GET`/`POST /v1/me/consents` (`marketing_email`, `marketing_sms`) + `PATCH /v1/me` (locale). Reminder/push toggles are kept on the device |
+| `dataRequest('export')` | `GET /v1/me/export` |
+
+**Staff**
+
+| App call | Real endpoint(s) |
+|---|---|
+| `mySessions` | `GET /v1/orgs/:orgId/studios/occurrences?from&to` (today, device time zone) for studio orgs where the user has `operations.read`; own classes if they instruct, else their assigned locations. Id = `orgId~occurrenceId` |
+| `roster`, `markAttendance` | `GET /v1/orgs/:orgId/studios/occurrences/:id` (attendees, display names only) / `POST /v1/orgs/:orgId/studios/bookings/:bookingId/attendance` `{ status: attended \| no_show }` |
+| `kitchenLocationId` | first Foods location the user is assigned to (role scope), else the org's first operating location |
+| `kitchenOrders` | `GET /v1/orgs/:orgId/foods/orders?locationId=` (paid / pay-at-pickup orders only) |
+| `setKitchenStatus` | `POST /v1/orgs/:orgId/foods/orders/:id/transition` `{ to, note }` (rejection sends a reason; the server refunds/voids) |
+| `coverRequests`, `requestCover`, `acceptCover` | `GET /v1/orgs/:orgId/studios/cover-requests`, `POST …/occurrences/:id/cover-requests`, `POST …/cover-requests/:id/accept` |
+
+**Owner / HQ**
+
+| App call | Real endpoint(s) |
+|---|---|
+| `pulse` | `GET /v1/orgs/:orgId/reports/overview?scopeKind=location&scopeId=…&from=` per location (last 7 days): net revenue in the location currency, bookings/occupancy or order counts, `null` → "Unavailable" |
+| `approvals` | `GET /v1/orgs/:orgId/approvals?status=pending` (website changes) + `GET …/studios/cover-requests?status=accepted` (cover swaps awaiting a manager); names from `GET /v1/orgs/:orgId/members` |
+| `decide` | `POST /v1/orgs/:orgId/approvals/:id/decision` (reject needs a reason) / `POST …/studios/cover-requests/:id/decision` |
+| `notifications` | derived: connections that are not `connected` from `GET /v1/orgs/:orgId/reports/overview` + pending approvals |
+
+**Not available from the API yet (live mode shows an empty state or a clear message, never sample data):** staff shifts and
+clock-in, staff team messages, leaving a waitlist, refund/ad-spend approval requests (refunds are direct `payments.refund` actions in the web
+app), account deletion from the app (needs the password — use the web app), location tax labels/cancellation windows in the catalogue
+(the server quote applies the business-configured tax; the class cancellation window shown is a 12-hour default).
 
 Money is always `{ amount: <integer minor units>, currency }`; times are UTC ISO strings rendered in the location's IANA timezone.
-The mock in `src/mock/server.ts` is the reference for request/response shapes until `apps/api` publishes them.
 
 ## Product rules implemented
 
@@ -95,7 +173,7 @@ The mock in `src/mock/server.ts` is the reference for request/response shapes un
 
 ## Payments
 
-`PaymentStep.native.tsx` wraps Stripe PaymentSheet (`initPaymentSheet` / `presentPaymentSheet`) using the client secret from `POST /v1/payments/intents`; outcomes are confirmed server-side by signed Stripe webhooks. Without `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` the screen says **Payments not configured**; dev and mock builds offer "Simulate successful payment" so flows can be completed. Web (`PaymentStep.tsx`) never loads the native SDK. Stripe needs a development build (`eas build --profile development`) — not Expo Go — when the key is set.
+`PaymentStep.native.tsx` wraps Stripe PaymentSheet (`initPaymentSheet` / `presentPaymentSheet`) using the client secret the API returns when the booking hold or order is created; outcomes are confirmed server-side by signed Stripe webhooks. Without `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` the screen says **Payments not configured**; mock, dev and sandbox-API builds offer "Simulate successful payment" so flows can be completed. Web (`PaymentStep.tsx`) never loads the native SDK. Stripe needs a development build (`eas build --profile development`) — not Expo Go — when the key is set.
 
 ## Builds
 

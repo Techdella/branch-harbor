@@ -74,7 +74,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     let intlLocale: string = locale;
     try {
       const device = getLocales()[0];
-      if (device?.languageCode && locale.startsWith(device.languageCode) && device.languageTag) intlLocale = device.languageTag;
+      // Device tags can carry POSIX suffixes ("en-US@posix") that Intl rejects; keep only valid BCP 47 tags.
+      const tag = device?.languageTag?.split('@')[0];
+      if (device?.languageCode && locale.startsWith(device.languageCode) && tag) intlLocale = Intl.getCanonicalLocales(tag)[0] ?? locale;
     } catch {
       /* keep app locale */
     }

@@ -178,6 +178,7 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 
 - `GET /v1/public/foods/{locationId}/menu`
 - `GET /v1/public/foods/{locationId}/pickup-slots`
+- `POST /v1/public/foods/{locationId}/quote`
 - `POST /v1/public/foods/{locationId}/orders`
 - `GET /v1/public/foods/orders/{id}`
 - `GET /v1/orgs/{orgId}/foods/menus`
@@ -230,6 +231,11 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 - `GET /v1/me/export`
 - `GET /v1/me/consents`
 - `POST /v1/me/consents`
+- `POST /v1/me/push-tokens` / `DELETE /v1/me/push-tokens` (Expo push token registry; no sending yet)
+- `GET /v1/me/bookings`, `POST /v1/me/bookings/{id}/cancel` (signed-in customer, matched by account or email)
+- `GET /v1/me/food-orders`
+- `GET /v1/me/messages?locationId=`, `POST /v1/me/messages` (customer ↔ location conversation)
+- `GET /v1/orgs/{orgId}/messages?locationId=` (`customers.read`), `POST /v1/orgs/{orgId}/messages` (`customers.write`, replies only)
 
 **orgs**
 

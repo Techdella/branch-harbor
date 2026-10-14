@@ -60,18 +60,15 @@ export async function effectiveMenu(db: Exec, organizationId: string, loc: Locat
 
 export type FoodOrderInput = z.infer<typeof foodOrderCreateSchema>;
 
-/** Create a pickup order. Slot capacity, cutoff, menu availability, modifiers and totals are all checked server-side. */
-export async function createFoodOrder(s: Services, organizationId: string, locationId: string, input: FoodOrderInput) {
-  const [loc] = await s.db.select().from(locations).where(and(eq(locations.id, locationId), eq(locations.organizationId, organizationId)));
-  if (!loc || !loc.publiclyVisible) throw notFound('Location');
-  if (loc.status !== 'operating') throw conflict('location_not_accepting_orders', 'This location is not taking orders right now');
-  const payAtPickup = loc.settings.payAtPickup === true;
-  if (!loc.paymentsEnabled && !payAtPickup) throw new AppError(409, 'payments_not_enabled', 'Online ordering is not available at this location yet');
-
-  const menu = await effectiveMenu(s.db, organizationId, loc);
+/**
+ * Price order lines against the location's effective menu: availability, modifier rules, unit prices,
+ * and tax only when the business configured a rate for the location. Shared by order creation and quotes.
+ */
+export async function priceFoodOrderLines(db: Exec, organizationId: string, loc: Location, inputLines: FoodOrderInput['lines']) {
+  const menu = await effectiveMenu(db, organizationId, loc);
   const lines: FoodOrderLine[] = [];
   const fieldErrors: Record<string, string> = {};
-  input.lines.forEach((l, idx) => {
+  inputLines.forEach((l, idx) => {
     const item = menu.find((m) => m.id === l.menuItemId);
     if (!item) { fieldErrors[`lines.${idx}.menuItemId`] = 'Item is not on this location menu'; return; }
     if (!item.available || !item.price) { fieldErrors[`lines.${idx}.menuItemId`] = `${item.name}: ${item.unavailableReason ?? 'unavailable'}`; return; }
@@ -96,7 +93,18 @@ export async function createFoodOrder(s: Services, organizationId: string, locat
   // Tax only when the business configured a rate for this location; never a guessed universal rate.
   const taxBps = typeof loc.settings.taxRateBps === 'number' ? (loc.settings.taxRateBps as number) : 0;
   const tax = Math.round((subtotal * taxBps) / 10_000);
-  const total = subtotal + tax;
+  return { lines, subtotal, tax, taxRateBps: taxBps, total: subtotal + tax };
+}
+
+/** Create a pickup order. Slot capacity, cutoff, menu availability, modifiers and totals are all checked server-side. */
+export async function createFoodOrder(s: Services, organizationId: string, locationId: string, input: FoodOrderInput) {
+  const [loc] = await s.db.select().from(locations).where(and(eq(locations.id, locationId), eq(locations.organizationId, organizationId)));
+  if (!loc || !loc.publiclyVisible) throw notFound('Location');
+  if (loc.status !== 'operating') throw conflict('location_not_accepting_orders', 'This location is not taking orders right now');
+  const payAtPickup = loc.settings.payAtPickup === true;
+  if (!loc.paymentsEnabled && !payAtPickup) throw new AppError(409, 'payments_not_enabled', 'Online ordering is not available at this location yet');
+
+  const { lines, subtotal, tax, total } = await priceFoodOrderLines(s.db, organizationId, loc, input.lines);
   if (input.expectedTotalMinor !== undefined && input.expectedTotalMinor !== total) {
     throw new AppError(409, 'price_changed', 'Prices changed since you started. Please review your order.', undefined, { totalMinor: total, currency: loc.currency });
   }

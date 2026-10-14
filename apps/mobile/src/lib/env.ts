@@ -3,6 +3,8 @@ export const env = {
   apiUrl: (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, ''),
   useMocks: (process.env.EXPO_PUBLIC_USE_MOCKS ?? 'true') !== 'false',
   stripePublishableKey: process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+  /** Live mode: organisation slugs whose public locations make up the customer catalogue (white-label brands). */
+  brandSlugs: (process.env.EXPO_PUBLIC_BRAND_SLUGS || 'stillwater-yoga,maple-and-ember').split(',').map((s) => s.trim()).filter(Boolean),
   appVersion: '0.1.0',
 } as const;
 

@@ -13,6 +13,7 @@ const KIND: Record<ApprovalKind, { icon: IconName; bg: string; key: string }> = 
   ad_spend: { icon: 'megaphone', bg: pastel.lilac, key: 'owner.adSpend' },
   refund: { icon: 'undo', bg: pastel.blush, key: 'owner.refund' },
   shift_swap: { icon: 'repeat', bg: pastel.aqua, key: 'owner.shiftSwap' },
+  website: { icon: 'globe', bg: pastel.butter, key: 'owner.websiteChange' },
 };
 
 export default function Approvals() {
@@ -29,6 +30,7 @@ export default function Approvals() {
     if (a.kind === 'refund' && a.amount) return t('owner.refundConsequence', { amount: fmtMoney(a.amount, intlLocale), location: a.locationName });
     if (a.kind === 'ad_spend' && a.amount) return t('owner.adConsequence', { amount: fmtMoney(a.amount, intlLocale), channel: a.channel ?? '', location: a.locationName, days: a.days ?? 0 });
     if (a.kind === 'shift_swap' && a.swap) return t('owner.swapConsequence', { a: a.swap.a, b: a.swap.b, session: a.swap.session });
+    if (a.kind === 'website') return t('owner.websiteConsequence', { location: a.locationName });
     return '';
   };
 

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Image, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Banner, Button, Card, EmptyState, Icon, ListItem, MoneyText, PaymentStep, Screen, ScreenHeader, SkeletonCard, Text } from '@/components';
+import { Banner, Button, Card, EmptyState, Icon, ListItem, MoneyText, PaymentStep, Screen, ScreenHeader, SkeletonCard, Text, TextField } from '@/components';
 import { useCatalog } from '@/features/customer/catalog';
 import { useI18n } from '@/i18n';
-import { api } from '@/lib/api';
+import { api, guestContact } from '@/lib/api';
 import { ApiError } from '@/lib/errors';
 import { fmtDateTime, fmtMoney, fmtZone } from '@/lib/format';
 import { announce } from '@/lib/motion';
@@ -12,7 +12,7 @@ import { useApi } from '@/lib/useApi';
 import type { Booking } from '@/lib/types';
 import { color, pastel, radius } from '@/theme';
 
-type Phase = 'holding' | 'held' | 'expired' | 'full' | 'done' | 'waitlisted' | 'error';
+type Phase = 'holding' | 'held' | 'expired' | 'full' | 'done' | 'waitlisted' | 'error' | 'contact';
 
 export default function ClassBooking() {
   const { id: raw } = useLocalSearchParams<{ id: string }>();
@@ -29,6 +29,9 @@ export default function ClassBooking() {
   const [err, setErr] = useState<ApiError | null>(null);
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState(false);
+  // Live API only: guests give a name + email once so the business can send the confirmation.
+  const [contact, setContact] = useState({ name: '', email: '', next: 'hold' as 'hold' | 'waitlist' });
+  const [contactErrors, setContactErrors] = useState<Record<string, string>>({});
 
   const hold = useCallback(async () => {
     setPhase('holding');
@@ -36,13 +39,52 @@ export default function ClassBooking() {
     try {
       const b = await api.holdBooking(id);
       setBooking(b);
-      setPhase('held');
+      // Free classes are confirmed straight away (no hold, no payment).
+      setPhase(b.status === 'confirmed' ? 'done' : 'held');
     } catch (e) {
       const ae = e as ApiError;
       setErr(ae);
-      setPhase(ae.code === 'class_full' ? 'full' : 'error');
+      if (ae.code === 'contact_required') {
+        setContact((c) => ({ ...c, next: 'hold' }));
+        setPhase('contact');
+      } else setPhase(ae.code === 'class_full' ? 'full' : 'error');
     }
   }, [id]);
+
+  const joinWaitlist = async () => {
+    setBusy(true);
+    try {
+      setBooking(await api.joinWaitlist(c!.id));
+      setPhase('waitlisted');
+    } catch (e) {
+      const ae = e as ApiError;
+      setErr(ae);
+      if (ae.code === 'contact_required') {
+        setContact((x) => ({ ...x, next: 'waitlist' }));
+        setPhase('contact');
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (phase !== 'contact') return;
+    void guestContact.get().then((g) => g && setContact((x) => ({ ...x, name: x.name || g.name, email: x.email || g.email })));
+  }, [phase]);
+
+  const submitContact = async () => {
+    const e: Record<string, string> = {};
+    if (!contact.name.trim()) e.name = t('order.fieldRequired');
+    if (!/\S+@\S+\.\S+/.test(contact.email)) e.email = t('order.fieldRequired');
+    setContactErrors(e);
+    if (Object.keys(e).length) return;
+    await guestContact.set({ name: contact.name.trim(), email: contact.email.trim() });
+    if (contact.next === 'waitlist') {
+      setPhase('full');
+      await joinWaitlist();
+    } else await hold();
+  };
 
   // Hold a spot as soon as the class is open for booking; full classes go straight to waitlist.
   useEffect(() => {
@@ -117,6 +159,16 @@ export default function ClassBooking() {
           : <Banner tone="danger" title={err.message} action={t('common.retry')} onAction={hold} />
       ) : null}
       {phase === 'full' ? <Banner tone="info" icon="users" title={t('book.full')} body={t('book.waitlistBody')} /> : null}
+      {phase === 'full' && err && err.code !== 'class_full' ? <Banner tone="danger" title={err.message} /> : null}
+      {phase === 'contact' ? (
+        <Card>
+          <Text variant="h3">{t('book.contactTitle')}</Text>
+          <Text variant="small" tone="muted">{t('book.contactBody')}</Text>
+          <TextField label={t('book.contactName')} value={contact.name} onChangeText={(v) => setContact((x) => ({ ...x, name: v }))} error={contactErrors.name} autoComplete="name" textContentType="name" />
+          <TextField label={t('book.contactEmail')} value={contact.email} onChangeText={(v) => setContact((x) => ({ ...x, email: v }))} error={contactErrors.email} keyboardType="email-address" autoCapitalize="none" autoComplete="email" textContentType="emailAddress" />
+          <Button label={t('book.contactCta')} size="lg" onPress={submitContact} />
+        </Card>
+      ) : null}
 
       <View style={{ gap: 8 }}>
         <ListItem icon="calendar" iconBg={pastel.lilac} title={t('book.when')} subtitle={`${when} · ${t('book.minutes', { count: c.durationMin })}`} />
@@ -136,19 +188,9 @@ export default function ClassBooking() {
           size="lg"
           icon="clock"
           loading={busy}
-          onPress={async () => {
-            setBusy(true);
-            try {
-              setBooking(await api.joinWaitlist(c.id));
-              setPhase('waitlisted');
-            } catch (e) {
-              setErr(e as ApiError);
-            } finally {
-              setBusy(false);
-            }
-          }}
+          onPress={joinWaitlist}
         />
-      ) : (
+      ) : phase === 'contact' ? null : (
         <PaymentStep
           amount={c.price}
           label={t('book.payAndBook', { amount: price })}

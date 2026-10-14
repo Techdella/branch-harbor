@@ -2,7 +2,7 @@ import { and, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
-  aiConversations, aiMessages, auditEvents, classBookings, consentRecords, customers, foodOrders, appointments, refreshTokens, roleAssignments, users, organizations, registrations,
+  aiConversations, aiMessages, auditEvents, classBookings, consentRecords, customers, foodOrders, appointments, pushTokens, refreshTokens, roleAssignments, users, organizations, registrations,
 } from '../db/schema/index.ts';
 import { AppError, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
@@ -85,6 +85,7 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
       await tx.update(refreshTokens).set({ revokedAt: new Date() }).where(and(eq(refreshTokens.userId, u.id), isNull(refreshTokens.revokedAt)));
       await tx.update(customers).set({ name: 'Erased customer', email: null, phone: null, dateOfBirth: null, notes: null, erasedAt: new Date() }).where(eq(customers.userId, u.id));
       await tx.delete(aiConversations).where(eq(aiConversations.userId, u.id));
+      await tx.delete(pushTokens).where(eq(pushTokens.userId, u.id));
       await tx.update(users).set({
         email: `deleted+${u.id}@invalid.branchharbor`, name: 'Deleted user', passwordHash: null, deletionRequestedAt: new Date(), deletedAt: new Date(), updatedAt: new Date(),
       }).where(eq(users.id, u.id));

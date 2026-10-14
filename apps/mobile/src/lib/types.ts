@@ -239,7 +239,7 @@ export interface Pulse {
   locations: PulseLocation[];
   updatedAt: string;
 }
-export type ApprovalKind = 'ad_spend' | 'refund' | 'shift_swap';
+export type ApprovalKind = 'ad_spend' | 'refund' | 'shift_swap' | 'website';
 export interface Approval {
   id: string;
   kind: ApprovalKind;

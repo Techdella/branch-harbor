@@ -17,6 +17,7 @@ import { wellnessRoutes } from './wellness.ts';
 import { commerceRoutes } from './commerce.ts';
 import { foodRoutes } from './foods.ts';
 import { aiRoutes } from './ai.ts';
+import { mobileRoutes } from './mobile.ts';
 
 /** All /v1 routes. Public and webhook routes are unauthenticated; everything else requires a bearer token. */
 export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -39,4 +40,5 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register(crmRoutes);
   await app.register(commerceRoutes);
   await app.register(aiRoutes);
+  await app.register(mobileRoutes);
 };

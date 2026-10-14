@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from './api';
+import { setSessionExpiredHandler } from './http';
 import { storage, tokenStore } from './storage';
 import type { Experience, Me } from './types';
 
@@ -52,6 +53,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setStatus('signedOut');
       }
     })();
+  }, []);
+
+  // Live API: when the refresh token is rejected (expired, revoked, reused) the user must sign in again.
+  useEffect(() => {
+    setSessionExpiredHandler(() => {
+      setMe(null);
+      setExpState(null);
+      setStatus('signedOut');
+    });
+    return () => setSessionExpiredHandler(null);
   }, []);
 
   const setExperience = useCallback((e: Experience | null) => {

@@ -15,6 +15,13 @@
       "when": 1791989162518,
       "tag": "0001_constraints",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791993035161,
+      "tag": "0002_mobile_push_messages",
+      "breakpoints": true
     }
   ]
 }

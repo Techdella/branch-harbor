@@ -13,8 +13,6 @@ import { useApi } from '@/lib/useApi';
 import type { FoodOrderStatus, KitchenOrder } from '@/lib/types';
 import { color, pastel, radius, status as S } from '@/theme';
 
-const KITCHEN_LOCATION = 'me-bl';
-
 const NEXT: Partial<Record<FoodOrderStatus, { to: FoodOrderStatus; key: string }>> = {
   awaiting_acceptance: { to: 'accepted', key: 'staff.accept' },
   accepted: { to: 'preparing', key: 'staff.startPreparing' },
@@ -27,9 +25,12 @@ export default function Kitchen() {
   const online = useOnline();
   const simOffline = useSimulatedOffline();
   const { byId } = useLocations();
-  const loc = byId(KITCHEN_LOCATION);
+  // Mock: the sample Ballard kitchen. Live API: the first Foods location the signed-in user works at.
+  const kitchenQ = useApi(() => api.kitchenLocationId(), []);
+  const kitchenId = kitchenQ.data;
+  const loc = kitchenId ? byId(kitchenId) : undefined;
   const tz = loc?.timeZone ?? 'America/Los_Angeles';
-  const q = useApi(() => api.kitchenOrders(KITCHEN_LOCATION), [], { pollMs: 10_000 });
+  const q = useApi(() => (kitchenId ? api.kitchenOrders(kitchenId) : kitchenQ.error ? Promise.reject(kitchenQ.error) : new Promise<KitchenOrder[]>(() => {})), [kitchenId, kitchenQ.error], { pollMs: 10_000 });
   // Pending = sent to server, waiting for acknowledgement. The card keeps its server state until ack.
   const [pending, setPending] = useState<Record<string, FoodOrderStatus>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
