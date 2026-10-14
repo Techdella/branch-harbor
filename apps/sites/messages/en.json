@@ -17,7 +17,8 @@
     "testMode": "Test mode",
     "errorSummary": "Please fix the following:",
     "required": "{field} is required",
-    "invalidEmail": "Enter a valid email address"
+    "invalidEmail": "Enter a valid email address",
+    "languageSubmit": "Change language"
   },
   "error": {
     "title": "This page isn't available right now",
@@ -83,8 +84,8 @@
     "foodsCta": "Start an order",
     "wellness": "Book an appointment",
     "wellnessCta": "Book now",
-    "sports": "Programmes",
-    "sportsCta": "See programmes",
+    "sports": "Programs",
+    "sportsCta": "See programs",
     "commerce": "Shop this store",
     "commerceCta": "Browse products",
     "realty": "Properties",
@@ -95,7 +96,7 @@
     "noClasses": "No classes on this day.",
     "spotsLeft": "{n, plural, one {# spot left} other {# spots left}}",
     "full": "Full · waitlist open",
-    "cancelled": "Cancelled",
+    "cancelled": "Canceled",
     "unavailable": "Not bookable online",
     "book": "Book",
     "joinWaitlist": "Join waitlist",
@@ -145,7 +146,7 @@
     "status": {
       "held": "Held — awaiting payment",
       "confirmed": "Confirmed",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "expired": "Hold expired",
       "attended": "Attended",
       "no_show": "Missed",
@@ -162,9 +163,9 @@
     "confirmCancel": "Yes, cancel",
     "keep": "Keep it",
     "cancelQuestion": "Cancel this booking? This can't be undone.",
-    "cancelledRefund": "Cancelled. A refund has been issued to your payment method.",
-    "cancelledVoid": "Cancelled. You haven't been charged.",
-    "cancelledNone": "Cancelled.",
+    "cancelledRefund": "Canceled. A refund has been issued to your payment method.",
+    "cancelledVoid": "Canceled. You haven't been charged.",
+    "cancelledNone": "Canceled.",
     "notCancellable": "This booking can no longer be changed online. Please contact the location.",
     "policy": "Cancellation policy",
     "leave": "Leave waitlist",
@@ -177,7 +178,7 @@
       "processing": "Processing",
       "succeeded": "Paid",
       "failed": "Failed",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     }
   },
   "order": {
@@ -228,7 +229,7 @@
       "ready": "Ready for pickup",
       "collected": "Collected",
       "rejected": "Not accepted",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     },
     "statusBody": {
       "accepted": "{location} accepted your order. It will be ready at your pickup time.",
@@ -236,7 +237,7 @@
       "ready": "Your order is ready. Head to the counter at {location}.",
       "collected": "Enjoy your meal!",
       "rejected": "Sorry — {location} couldn't accept this order.",
-      "cancelled": "This order was cancelled."
+      "cancelled": "This order was canceled."
     },
     "reason": "Reason: {reason}",
     "paymentStatus": {
@@ -300,31 +301,31 @@
     "submittedTitle": "Registration received",
     "pendingBody": "It's pending review. You'll get an email when a place is confirmed.",
     "acceptedBody": "The registration is accepted.",
-    "waitlistedBody": "The programme is full; you're on the waitlist.",
-    "noProgrammes": "No programmes are open for registration right now.",
+    "waitlistedBody": "The program is full; you're on the waitlist.",
+    "noProgrammes": "No programs are open for registration right now.",
     "portalLink": "Guardian portal",
-    "filterLabel": "Find programmes by age",
+    "filterLabel": "Find programs by age",
     "filterDob": "Participant's date of birth",
-    "filterApply": "Show eligible programmes",
+    "filterApply": "Show eligible programs",
     "filterClear": "Show all",
     "filterHelp": "We only use the date to check age groups; it isn't stored until you register.",
     "eligible": "Eligible · {group}",
     "born": "Born {from} – {to}",
     "ruleBirthYear": "birth-year groups",
-    "instalmentsAvailable": "Instalment plans available",
+    "instalmentsAvailable": "Installment plans available",
     "siblingDiscount": "{pct}% sibling discount",
     "venues": "Venues",
     "eligibility": "Who can join",
-    "noneForAge": "No open programme matches that date of birth.",
+    "noneForAge": "No open program matches that date of birth.",
     "paymentPendingBody": "We're holding the place while you pay. If payment doesn't complete, the place is released.",
     "paidNotSelected": "Payment received. This does not confirm a place — the club reviews every registration.",
-    "nextInstalments": "Next instalments: {list}",
-    "retryNote": "If the payment fails you can try again; if the programme fills meanwhile you'll be offered the waitlist and not charged.",
+    "nextInstalments": "Next installments: {list}",
+    "retryNote": "If the payment fails you can try again; if the program fills meanwhile you'll be offered the waitlist and not charged.",
     "dobHint": "Age groups are worked out from the date of birth using the club's cut-off date.",
     "secondGuardianNote": "You can invite a second parent or guardian from the guardian portal after registering.",
     "aboutParticipant": "About the participant",
     "careInfo": "Emergency and medical information",
-    "careInfoNote": "Kept separately from the rest of the registration. Only programme administrators see medical details; coaches see the emergency contact and any action plan you share. Never used by AI.",
+    "careInfoNote": "Kept separately from the rest of the registration. Only program administrators see medical details; coaches see the emergency contact and any action plan you share. Never used by AI.",
     "consents": "Consents",
     "paymentOption": "How would you like to pay?",
     "today": "Today",
@@ -380,7 +381,7 @@
     },
     "noParticipants": "No participants yet",
     "noParticipantsBody": "Once you register a participant, or a guardian invitation is accepted, they appear here.",
-    "browse": "Browse programmes",
+    "browse": "Browse programs",
     "payNow": "Complete payment",
     "payAmount": "Pay {amount}",
     "paid": "Payment received. Thank you.",
@@ -393,14 +394,14 @@
       "overdue": "Overdue",
       "waived": "Waived"
     },
-    "instalment": "Instalment {seq} · due {date}",
+    "instalment": "Installment {seq} · due {date}",
     "inst": {
       "scheduled": "Scheduled",
       "due": "Due",
       "overdue": "Overdue",
       "paid": "Paid",
       "waived": "Waived",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     },
     "pay": "Pay",
     "policy": "Withdrawal & refunds",
@@ -413,7 +414,7 @@
       "neutral": "neutral"
     },
     "venueTbc": "venue to be confirmed",
-    "cancelled": "Cancelled",
+    "cancelled": "Canceled",
     "reported": "{status} {reason}",
     "att": {
       "present": "Present",
@@ -449,7 +450,7 @@
     "withdraw": "Withdraw",
     "withdrawReason": "Reason for withdrawing",
     "confirmWithdraw": "Confirm withdrawal",
-    "withdrawn": "Registration withdrawn. Unpaid instalments were cancelled.",
+    "withdrawn": "Registration withdrawn. Unpaid installments were canceled.",
     "otherGuardians": "Other guardians",
     "noOtherGuardians": "No other guardians.",
     "rel": {
@@ -482,7 +483,7 @@
     "status": {
       "coming_soon": "Coming soon",
       "active": "For sale or rent",
-      "under_offer": "Under offer"
+      "under_offer": "Under contract"
     },
     "transaction": {
       "sale": "For sale",
@@ -502,7 +503,7 @@
       "confirmed": "Confirmed",
       "completed": "Completed",
       "no_show": "Missed",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     },
     "search": {
       "title": "Property search",
@@ -538,7 +539,8 @@
       "mapBody": "An interactive map isn't enabled for this site yet.",
       "fairHousing": "Search uses property details only. We never filter homes or buyers by personal characteristics.",
       "allHomes": "All homes",
-      "bedsPlus": "{n}+ bedrooms"
+      "bedsPlus": "{n}+ bedrooms",
+      "sqft": "sq ft"
     },
     "listing": {
       "noPhoto": "No photo yet",
@@ -573,7 +575,7 @@
     },
     "book": {
       "title": "Book a viewing",
-      "comingSoon": "Viewings open when this home is listed. You can make an enquiry now.",
+      "comingSoon": "Viewings open when this home is listed. You can make an inquiry now.",
       "anAgent": "An agent",
       "requestedTitle": "Viewing requested",
       "requestedBody": "{agent} will confirm your viewing on {when} by email.",
@@ -582,7 +584,7 @@
       "chooseDay": "Choose a day",
       "chooseTime": "Choose a time",
       "timesIn": "times in {zone}",
-      "noSlots": "No times available that day. Try another day or make an enquiry.",
+      "noSlots": "No times available that day. Try another day or make an inquiry.",
       "kind": "Viewing type",
       "inPerson": "In person",
       "virtual": "Video call",
@@ -606,8 +608,8 @@
         "valuation": "A valuation of my home",
         "general": "Something else"
       },
-      "privacy": "We use your details only to answer your enquiry.",
-      "send": "Send enquiry",
+      "privacy": "We use your details only to answer your inquiry.",
+      "send": "Send inquiry",
       "sent": "Thanks — an agent will get back to you soon."
     },
     "save": {
@@ -725,14 +727,14 @@
       "active": "Active",
       "redeemed": "Fully used",
       "expired": "Expired",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "pending_payment": "Awaiting payment"
     },
     "packageStatus": {
       "active": "Active",
       "exhausted": "All sessions used",
       "expired": "Expired",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "pending_payment": "Awaiting payment"
     },
     "waitlistStatus": {
@@ -753,7 +755,7 @@
     "voucherCurrencyRule": "Usable for bookings in {currency} only.",
     "guests": "{n} guests",
     "freeNow": "You can cancel or move this appointment free of charge right now.",
-    "lateNow": "Cancelling now is a late cancellation: {fee} under the policy.",
+    "lateNow": "Canceling now is a late cancellation: {fee} under the policy.",
     "depositOutcome": "Deposit: {refund} refunded, {kept} kept towards the charge",
     "voucherOutcome": "{amount} goes back onto your voucher",
     "sessionReturned": "Your package session is returned",
@@ -761,7 +763,7 @@
     "outstanding": "{amount} would still be owed",
     "reschedule": "Change the time",
     "confirmLate": "Cancel and accept the late-cancellation charge of {fee}?",
-    "cancelledRetained": "Cancelled. Your deposit was kept towards the late-cancellation charge.",
+    "cancelledRetained": "Canceled. Your deposit was kept towards the late-cancellation charge.",
     "moveIntro": "Pick a new time. Your current time stays booked until the new one is secured.",
     "noTimes": "No times available on this day.",
     "moveTaken": "That time was just taken — your original appointment is unchanged.",
@@ -820,7 +822,7 @@
       "grace": "Payment failed",
       "suspended": "On hold",
       "cancelling": "Ending",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "pending": "Awaiting payment",
       "ended": "Ended"
     },
@@ -859,14 +861,14 @@
     },
     "cancel": "Cancel",
     "cancelBookingConfirm": "Cancel this booking? The cancellation policy applies.",
-    "bookingCancelled": "Booking cancelled.",
+    "bookingCancelled": "Booking canceled.",
     "waitlisted": "You're on {n} waitlist(s).",
     "onlineLink": "Online classes",
     "history": "Past classes",
     "bookingStatus": {
       "attended": "Attended",
       "no_show": "No-show",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "confirmed": "Booked",
       "held": "Paying",
       "expired": "Expired"
@@ -928,7 +930,21 @@
     "buy": "Buy",
     "accountTitle": "My account",
     "onlineTitle": "Online classes",
-    "onlineIntro": "Livestreams and recordings. Join links are shown only to customers with access."
+    "onlineIntro": "Livestreams and recordings. Join links are shown only to customers with access.",
+    "terms": {
+      "windowHours": "Cancel at least {hours, plural, one {# hour} other {# hours}} before the class starts to avoid a late cancellation.",
+      "windowMinutes": "Cancel at least {minutes} minutes before the class starts to avoid a late cancellation.",
+      "creditUsed": "Late cancellations with a class pack use the credit.",
+      "creditReturned": "Class pack credits are returned even for late cancellations.",
+      "paidRefunded": "Single-class payments are refunded on late cancellation.",
+      "paidNotRefunded": "Single-class payments are not refunded on late cancellation.",
+      "lateFee": "Late cancellation fee: {amount}.",
+      "lateFeeMembers": "Late cancellation fee: {amount} (not charged to members).",
+      "noLateFee": "No late cancellation fee.",
+      "noShowFee": "No-show fee: {amount}.",
+      "noShowFeeMembers": "No-show fee: {amount} (not charged to members).",
+      "noNoShowFee": "No no-show fee."
+    }
   },
   "storefront": {
     "account": "My account",
@@ -975,7 +991,7 @@
     "shipping": "Shipping",
     "address": "Street address",
     "city": "City",
-    "postcode": "Postcode",
+    "postcode": "Postal code",
     "country": "Country (2 letters)",
     "yourDetails": "Your details",
     "name": "Name",
@@ -1017,7 +1033,7 @@
     },
     "state": {
       "expired": "Payment window ended — nothing was charged and the items were released.",
-      "cancelled": "This order was cancelled.",
+      "cancelled": "This order was canceled.",
       "stock_conflict": "Paid — the store will contact you about your items.",
       "step0": "Waiting for payment",
       "step1": "Order confirmed",
@@ -1044,7 +1060,7 @@
     "returnState": {
       "requested": "Requested",
       "reviewed": "Being reviewed",
-      "authorised": "Authorised — bring or send the items back",
+      "authorised": "Authorized — bring or send the items back",
       "received": "Received",
       "refund_pending_approval": "Refund being approved",
       "resolved": "Resolved",
@@ -1085,7 +1101,7 @@
       "backordered": "Backordered",
       "awaiting_transfer": "On its way to the store",
       "stock_conflict": "Store will contact you",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     }
   }
 }

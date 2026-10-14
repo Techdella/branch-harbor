@@ -93,9 +93,9 @@ export default async function LocationHome({ params }: Props) {
           {heroTitle !== l.name && <p className="mt-2 text-xl font-semibold">{l.name}</p>}
           <div className="mt-4 flex flex-wrap items-center gap-2"><OpenBadge loc={l} /></div>
           <ul className="mt-4 space-y-2 text-graphite">
-            <li className="flex gap-2"><Icon name="pin" size={18} className="mt-0.5 shrink-0" />{address}</li>
+            <li className="flex gap-2"><Icon name="pin" size={18} className="mt-0.5 shrink-0" /><bdi>{address}</bdi></li>
             {l.hours.summary && <li className="flex gap-2"><Icon name="clock" size={18} className="mt-0.5 shrink-0" />{l.hours.summary}</li>}
-            {l.phone && <li className="flex gap-2"><Icon name="phone" size={18} className="mt-0.5 shrink-0" /><a href={`tel:${l.phone.replace(/\s+/g, '')}`} className="hover:underline">{l.phone}</a></li>}
+            {l.phone && <li className="flex gap-2"><Icon name="phone" size={18} className="mt-0.5 shrink-0" /><a href={`tel:${l.phone.replace(/\s+/g, '')}`} className="hover:underline" dir="ltr">{l.phone}</a></li>}
           </ul>
           {offer && (
             <p className="mt-5 flex items-start gap-2 rounded-2xl bg-brand-tint p-4 font-semibold">
@@ -166,7 +166,7 @@ export default async function LocationHome({ params }: Props) {
           <h2 className="text-xl font-extrabold">{t('location.contact')}</h2>
           <address className="mt-3 not-italic">
             <p>{data.site.singleLocation || l.name === data.brand.name ? data.brand.name : `${data.brand.name} ${l.name}`}</p>
-            <p>{address}</p>
+            <p><bdi>{address}</bdi></p>
           </address>
           <div className="mt-4 flex flex-wrap gap-2">
             <a href={directions} className="btn btn-secondary" rel="noopener"><Icon name="map" size={16} />{t('location.directions')}</a>

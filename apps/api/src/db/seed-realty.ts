@@ -36,7 +36,7 @@ export async function seedRealty(c: { db: Db; today: string; upsertUser: (email:
   const done = Object.fromEntries(['industry', 'business_details', 'first_location', 'website', 'industry_data', 'connections', 'invite_staff'].map((k) => [k, { status: 'complete' as const, updatedAt: new Date().toISOString() }]));
   const [org] = await db.insert(t.organizations).values({
     slug: REALTY_DEMO_SLUG, name: 'Keystone Realty Network', industry: 'realty', model: 'network', country: 'CA', defaultCurrency: 'CAD', defaultLocale: 'en', defaultTimeZone: 'America/Toronto',
-    dataRegion: 'us', onboarding: done, settings: { site: { tagline: 'Local agents. One trusted network.', primaryColor: '#0F6E73', font: 'Plus Jakarta Sans', enabledLocales: ['en', 'fr', 'es'] } },
+    dataRegion: 'us', onboarding: done, settings: { site: { tagline: 'Local agents. One trusted network.', primaryColor: '#0F6E73', font: 'plus-jakarta-sans', enabledLocales: ['en', 'fr', 'es'] } },
   }).returning();
   const orgId = org!.id;
   const [americas, emea, apac] = await db.insert(t.regions).values([{ organizationId: orgId, name: 'Americas' }, { organizationId: orgId, name: 'Europe & Middle East' }, { organizationId: orgId, name: 'Asia-Pacific' }]).returning();

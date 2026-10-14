@@ -43,8 +43,11 @@ export async function effectivePolicy(db: Exec, organizationId: string, location
 const fmtMoney = (amount: number, currency: string) => new Intl.NumberFormat('en', { style: 'currency', currency }).format(amount / 10 ** (new Intl.NumberFormat('en', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits ?? 2));
 const fmtWindow = (m: number) => (m % 60 === 0 ? `${m / 60} hour${m === 60 ? '' : 's'}` : `${m} minutes`);
 
-/** Plain-language policy shown to customers before they book. */
-export function describePolicy(p: StudioPolicy, currency: string): { lines: string[]; lateCancelFee: { amount: number; currency: string } | null; noShowFee: { amount: number; currency: string } | null } {
+/** The policy facts behind `lines`, so apps can phrase them in the customer's own language. */
+export interface PolicyTerms { lateCancelMinutes: number; forfeitCreditOnLateCancel: boolean; refundPaidOnLateCancel: boolean; feesApplyToMembers: boolean }
+
+/** Plain-language policy shown to customers before they book (English `lines` plus structured `terms`). */
+export function describePolicy(p: StudioPolicy, currency: string): { lines: string[]; terms: PolicyTerms; lateCancelFee: { amount: number; currency: string } | null; noShowFee: { amount: number; currency: string } | null } {
   const late = p.lateCancelFee[currency];
   const noShow = p.noShowFee[currency];
   const lines = [
@@ -54,7 +57,8 @@ export function describePolicy(p: StudioPolicy, currency: string): { lines: stri
     late ? `Late cancellation fee: ${fmtMoney(late, currency)}${p.feesApplyToMembers ? '' : ' (not charged to members)'}.` : 'No late cancellation fee.',
     noShow ? `No-show fee: ${fmtMoney(noShow, currency)}${p.feesApplyToMembers ? '' : ' (not charged to members)'}.` : 'No no-show fee.',
   ];
-  return { lines, lateCancelFee: late ? { amount: late, currency } : null, noShowFee: noShow ? { amount: noShow, currency } : null };
+  const terms: PolicyTerms = { lateCancelMinutes: p.lateCancelMinutes, forfeitCreditOnLateCancel: p.forfeitCreditOnLateCancel, refundPaidOnLateCancel: p.refundPaidOnLateCancel, feesApplyToMembers: p.feesApplyToMembers };
+  return { lines, terms, lateCancelFee: late ? { amount: late, currency } : null, noShowFee: noShow ? { amount: noShow, currency } : null };
 }
 
 // ───────────── Location access ─────────────

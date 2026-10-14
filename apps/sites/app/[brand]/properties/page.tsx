@@ -98,7 +98,7 @@ export default async function Properties({ params, searchParams }: Props) {
         <div className="grid grid-cols-2 gap-2">
           <div><label htmlFor="minArea" className="mb-1 block text-sm font-semibold">{t('search.minArea')}</label><input id="minArea" name="minArea" inputMode="decimal" defaultValue={sp.minArea ?? ''} className="field" /></div>
           <div><label htmlFor="areaUnit" className="mb-1 block text-sm font-semibold">{t('search.unit')}</label>
-            <select id="areaUnit" name="areaUnit" defaultValue={areaUnit} className="field" aria-invalid={areaWithoutUnit || undefined}><option value="">{t('search.officeUnit')}</option><option value="sqm">m²</option><option value="sqft">sq ft</option></select></div>
+            <select id="areaUnit" name="areaUnit" defaultValue={areaUnit} className="field" aria-invalid={areaWithoutUnit || undefined}><option value="">{t('search.officeUnit')}</option><option value="sqm">m²</option><option value="sqft">{t('search.sqft')}</option></select></div>
           {areaWithoutUnit && <p className="col-span-2 text-sm font-semibold text-danger">{t('search.needUnit')}</p>}
         </div>
         <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4">

@@ -4,7 +4,7 @@ import { useId } from 'react';
 import { LOCALE_LABELS, type Locale } from '@bh/shared';
 
 /** Only the languages the business enabled. Works without JS as a GET form. */
-export function LanguageSwitcher({ current, available, label }: { current: string; available: string[]; label: string }) {
+export function LanguageSwitcher({ current, available, label, submitLabel }: { current: string; available: string[]; label: string; submitLabel: string }) {
   const id = useId();
   if (available.length < 2) return null;
   return (
@@ -25,7 +25,7 @@ export function LanguageSwitcher({ current, available, label }: { current: strin
           <option key={l} value={l} lang={l}>{LOCALE_LABELS[l as Locale] ?? l}</option>
         ))}
       </select>
-      <noscript><button type="submit" className="btn btn-secondary ms-2">OK</button></noscript>
+      <noscript><button type="submit" className="btn btn-secondary ms-2">{submitLabel}</button></noscript>
     </form>
   );
 }

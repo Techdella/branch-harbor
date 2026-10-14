@@ -1,0 +1,7 @@
+{
+  "title": "Cette page est momentanément indisponible",
+  "body": "Impossible de charger cette page. Aucune réservation ni aucun paiement n’a été effectué. Veuillez réessayer dans un instant.",
+  "retry": "Réessayer",
+  "network": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+  "requestFailed": "La requête a échoué ({status})"
+}

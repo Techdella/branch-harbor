@@ -7,6 +7,7 @@
 import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import { http } from '@/lib/http';
+import type { CustomerPolicy } from './policy';
 
 export type Money = { amount: number; currency: string };
 export interface Entitlements {
@@ -19,11 +20,11 @@ export interface Pricing {
   packs: Array<{ id: string; name: string; credits: number; validityDays: number; price: Money; access: string }>;
   memberships: Array<{ id: string; name: string; classesPerPeriod: number | null; price: Money; access: string; terms: string[] }>;
   offers: Array<{ id: string; name: string; credits: number | null; validDays: number; price: Money; newCustomersOnly: boolean }>;
-  policy: { lines: string[] };
+  policy: CustomerPolicy;
   location: { paymentsEnabled: boolean };
 }
 export interface BookingOptions {
-  signedIn: boolean; price: Money; policy: { lines: string[] }; outstandingFees: number;
+  signedIn: boolean; price: Money; policy: CustomerPolicy; outstandingFees: number;
   credits: Array<{ id: string; name: string; creditsRemaining: number; creditsNeeded: number; usable: boolean; reason: string | null }>;
   memberships: Array<{ id: string; name: string; usable: boolean; reason: string | null; usage: { used: number; limit: number | null } | null }>;
 }

@@ -1,0 +1,7 @@
+{
+  "title": "Diese Seite ist gerade nicht verfügbar",
+  "body": "Die Seite konnte nicht geladen werden. Es wurde nichts gebucht oder berechnet. Bitte versuchen Sie es gleich noch einmal.",
+  "retry": "Erneut versuchen",
+  "network": "Netzwerkfehler. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "requestFailed": "Anfrage fehlgeschlagen ({status})"
+}

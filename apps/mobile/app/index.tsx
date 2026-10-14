@@ -80,7 +80,7 @@ export default function Entry() {
       </View>
       <Card>
         <TextField label={t('welcome.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" textContentType="emailAddress" error={fields.email} />
-        <TextField label={t('welcome.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="password" textContentType="password" error={fields.password} hint={env.useMocks ? 'Demo: any 6+ characters' : undefined} />
+        <TextField label={t('welcome.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="password" textContentType="password" error={fields.password} hint={env.useMocks ? t('welcome.demoPassword') : undefined} />
         {err && !err.fields ? <Banner tone="danger" title={err.code === 'invalid_credentials' ? t('welcome.signInError') : err.message} /> : null}
         <Button
           label={t('welcome.signIn')}
@@ -116,7 +116,7 @@ export default function Entry() {
         />
       </Card>
       <Text variant="small" tone="muted" align="center">
-        {Platform.OS === 'web' ? 'Web preview · ' : ''}{env.useMocks ? t('common.sampleData') : env.apiUrl}
+        {Platform.OS === 'web' ? `${t('welcome.webPreview')} · ` : ''}{env.useMocks ? t('common.sampleData') : env.apiUrl}
       </Text>
     </Screen>
   );

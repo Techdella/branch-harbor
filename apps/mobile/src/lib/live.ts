@@ -15,6 +15,7 @@ import { ROLE_PERMISSIONS, type Permission, type Role, type RoleAssignment } fro
 import { BRANDS, IMG } from '@/mock/data';
 import { env } from './env';
 import { ApiError } from './errors';
+import { currentLocale, tNow } from '@/i18n/current';
 import { addDaysKey, localDateKey, zonedToUtcIso } from './format';
 import { GUEST_TOKEN, http, refreshStore } from './http';
 import { storage, tokenStore } from './storage';
@@ -309,7 +310,7 @@ function toFoodOrder(o: RawFoodOrder): FoodOrder {
   return {
     id: o.id, number: o.orderNumber, locationId: o.locationId, status: o.status, pickupAt: o.promisedAt ?? o.createdAt,
     lines: o.lines.map((l) => ({ itemId: l.menuItemId, name: l.name, quantity: l.quantity, options: l.modifiers.map((m) => m.name), lineTotal: { amount: l.lineTotalMinor, currency: cur } })),
-    subtotal: o.subtotal, tax: o.tax.amount > 0 ? o.tax : null, taxLabel: o.tax.amount > 0 ? 'Tax' : null, taxInclusive: false, total: o.total,
+    subtotal: o.subtotal, tax: o.tax.amount > 0 ? o.tax : null, taxLabel: o.tax.amount > 0 ? tNow('order.tax', 'Tax') : null, taxInclusive: false, total: o.total,
     customerName: o.contact.name, notes: o.notes ?? undefined, createdAt: o.createdAt,
   };
 }
@@ -537,7 +538,7 @@ export const liveApi = {
     return {
       lines: r.lines.map((l) => ({ itemId: l.menuItemId, name: l.name, quantity: l.quantity, options: l.modifiers, lineTotal: l.lineTotal })),
       subtotal: r.subtotal, tax: r.tax,
-      taxLabel: r.tax && r.taxRateBps ? `Tax ${(r.taxRateBps / 100).toLocaleString('en', { maximumFractionDigits: 2 })}%` : null,
+      taxLabel: r.tax && r.taxRateBps ? `${tNow('order.tax', 'Tax')} ${new Intl.NumberFormat(currentLocale(), { style: 'percent', maximumFractionDigits: 2 }).format(r.taxRateBps / 10000)}` : null,
       taxInclusive: r.taxInclusive, total: r.total,
     };
   },
@@ -811,7 +812,7 @@ export const liveApi = {
         if (a.kind === 'ad_spend') return { ...base, kind: 'ad_spend' as const, title: a.title, amount: a.amount ?? undefined, channel: CHANNEL[String(p.channel)] ?? String(p.channel ?? ''), days: Number(p.durationDays ?? 0) };
         if (a.kind === 'shift_swap') {
           const sh = p.shift as { startsAt?: string; timeZone?: string; role?: string } | undefined;
-          const when = sh?.startsAt ? new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: sh.timeZone ?? 'UTC' }).format(new Date(sh.startsAt)) : '';
+          const when = sh?.startsAt ? new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: sh.timeZone ?? 'UTC' }).format(new Date(sh.startsAt)) : '';
           return { ...base, kind: 'shift_swap' as const, title: a.title, swap: { a: String((p.from as { name?: string })?.name ?? '—'), b: String((p.to as { name?: string })?.name ?? '—'), session: `${sh?.role ?? 'Shift'} · ${when}` } };
         }
         return { ...base, kind: 'website' as const, title: a.kind === 'field' ? `Website · ${String(p.fieldKey ?? 'field').replace(/_/g, ' ')}: “${String(p.value ?? '')}”` : 'Website page ready to publish' };

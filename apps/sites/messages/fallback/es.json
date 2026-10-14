@@ -1,0 +1,7 @@
+{
+  "title": "Esta página no está disponible en este momento",
+  "body": "No hemos podido cargar esta página. No se ha hecho ninguna reserva ni ningún cargo. Vuelve a intentarlo en unos instantes.",
+  "retry": "Reintentar",
+  "network": "Error de red. Comprueba tu conexión y vuelve a intentarlo.",
+  "requestFailed": "La solicitud ha fallado ({status})"
+}

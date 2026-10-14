@@ -101,9 +101,9 @@ export function LocationWizard({ value, onChange, errors, ownerGroups, compact }
         <Field label={t('template')}>
           {(p) => (
             <Select id={p.id} value={value.template} onChange={(e) => set('template', e.target.value)}>
-              <option>Standard location · v15</option>
-              <option>Flagship location · v3</option>
-              <option>Pop-up / seasonal · v2</option>
+              <option value="Standard location · v15">{t('templateStandard')}</option>
+              <option value="Flagship location · v3">{t('templateFlagship')}</option>
+              <option value="Pop-up / seasonal · v2">{t('templatePopup')}</option>
             </Select>
           )}
         </Field>
@@ -166,7 +166,7 @@ export function LocationWizard({ value, onChange, errors, ownerGroups, compact }
         </Field>
         <Field label={t('phone')} optional>{(p) => <Input id={p.id} type="tel" value={value.phone} onChange={(e) => set('phone', e.target.value)} placeholder="+44 20 7946 0321" autoComplete="tel" />}</Field>
         <Field label={t('email')} optional error={errors.email}>{(p) => <Input id={p.id} type="email" aria-describedby={p.describedBy} aria-invalid={p.invalid} value={value.email} onChange={(e) => set('email', e.target.value)} autoComplete="email" />}</Field>
-        <Field label={t('hours')} optional hint={t('hoursHint')}>{(p) => <Input id={p.id} aria-describedby={p.describedBy} value={value.hours} onChange={(e) => set('hours', e.target.value)} placeholder="Mon–Fri 07:00–21:00" />}</Field>
+        <Field label={t('hours')} optional hint={t('hoursHint')}>{(p) => <Input id={p.id} aria-describedby={p.describedBy} value={value.hours} onChange={(e) => set('hours', e.target.value)} placeholder={t('hoursPh')} />}</Field>
       </fieldset>
 
       <fieldset>

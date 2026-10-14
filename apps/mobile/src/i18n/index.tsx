@@ -9,6 +9,7 @@ import es from './es';
 import de from './de';
 import ptBR from './ptBR';
 import { storage } from '@/lib/storage';
+import { setCurrentI18n } from './current';
 import { foodsxDe, foodsxEn, foodsxEs, foodsxFr, foodsxPt } from '@/features/foods/i18n';
 
 export const APP_LOCALES = ['en', 'fr', 'es', 'de', 'pt-BR'] as const;
@@ -83,6 +84,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       /* keep app locale */
     }
     const t: TFn = (key, opts) => i18n.t(key, { locale, ...opts });
+    setCurrentI18n(locale, t);
     // Layouts use start/end so they mirror correctly; native direction changes need a reload.
     const rtl = isRtl(locale) || I18nManager.isRTL;
     return { locale, intlLocale, setLocale, t, rtl };

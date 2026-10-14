@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { Badge, Button, Toggle, cx } from '@bh/ui';
 import type { FoodConfig, LocationSettings } from '@/lib/foods/types';
 import { useFoods, useFoodsMutation } from '@/lib/foods/useFoods';
@@ -36,6 +37,7 @@ export function OrderingSettingsScreen() {
 
 function SettingsForm({ s, canWrite, onSaved }: { s: LocationSettings; canWrite: boolean; onSaved: () => void }) {
   const t = useFx();
+  const locale = useLocale();
   const [cfg, setCfg] = useState<FoodConfig>(s.config);
   const [tax, setTax] = useState(s.taxRateBps === null ? '' : (s.taxRateBps / 100).toString());
   const [presets, setPresets] = useState(s.config.tips.presetsBps.map((b) => b / 100).join(', '));
@@ -68,7 +70,7 @@ function SettingsForm({ s, canWrite, onSaved }: { s: LocationSettings; canWrite:
           </div>
           <div className="flex flex-wrap gap-1.5">{['dine_in', 'catering', 'delivery', 'pickup'].map((c) => <button key={c} type="button" aria-pressed={cfg.serviceCharge.channels.includes(c)} onClick={() => set('serviceCharge', { ...cfg.serviceCharge, channels: chanToggle(cfg.serviceCharge.channels, c) })} className={cx('h-8 rounded-full px-3 text-xs font-bold', cfg.serviceCharge.channels.includes(c) ? 'bg-ink text-white' : 'bg-canvas')}>{t(`channel.${c}`)}</button>)}</div>
           <Labeled label={t('settings.tax')} hint={t('settings.taxHint')}><input inputMode="decimal" value={tax} onChange={(e) => setTax(e.target.value)} placeholder={t('settings.taxNone')} className={inputCls} /></Labeled>
-          <p className="text-xs text-stone">{cfg.serviceCharge.bps ? t('settings.serviceSummary', { pct: pctFromBps(cfg.serviceCharge.bps) }) : t('settings.noServiceCharge')}</p>
+          <p className="text-xs text-stone">{cfg.serviceCharge.bps ? t('settings.serviceSummary', { pct: pctFromBps(cfg.serviceCharge.bps, locale) }) : t('settings.noServiceCharge')}</p>
         </div>
       </Section>
       <Section title={t('settings.allergenConvention')}>

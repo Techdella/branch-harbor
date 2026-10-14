@@ -1,11 +1,15 @@
 /** Isomorphic formatting: money in the location currency, times in the location timezone. */
+import { isRtl } from '@bh/shared';
 import type { Money } from './types';
 
 const EXP: Record<string, number> = { JPY: 0 };
 
 export function money(m: Money | null | undefined, locale: string): string {
   if (!m) return '';
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: m.currency }).format(m.amount / 10 ** (EXP[m.currency] ?? 2));
+  const s = new Intl.NumberFormat(locale, { style: 'currency', currency: m.currency }).format(m.amount / 10 ** (EXP[m.currency] ?? 2));
+  // In right-to-left pages, isolate the amount (FSI…PDI) so it never reorders with surrounding text. CLDR's leading
+  // RLM is dropped so a Latin currency code ("15.00 UK£") keeps its own order instead of rendering as "£UK 15.00".
+  return isRtl(locale) ? `\u2068${s.replace(/[\u200e\u200f]/g, '')}\u2069` : s;
 }
 
 export function time(iso: string, timeZone: string, locale: string): string {

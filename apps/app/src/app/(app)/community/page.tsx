@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { CommunityScreen } from '@/components/screens/SimpleScreens';
 
-export const metadata: Metadata = { title: 'Community & resources' };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations('meta'))('community') };
+}
 export default function Page() {
   return <CommunityScreen />;
 }

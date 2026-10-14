@@ -14,7 +14,7 @@ export default async function AccountPage({ params }: { params: Promise<{ brand:
   const links = makeLinks(await getRouting(), brand, { brandPrimaryHost: data.site.brandPrimaryHost });
   return (
     <main id="main" className="mx-auto max-w-3xl px-4 py-10">
-      <a href={links.location(location, '/shop')} className="link text-sm">← {t('backToShop')}</a>
+      <a href={links.location(location, '/shop')} className="link text-sm"><span aria-hidden className="inline-block rtl:-scale-x-100">←</span> {t('backToShop')}</a>
       <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{t('account')}</h1>
       <ShopAccount brand={brand} />
     </main>

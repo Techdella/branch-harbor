@@ -80,7 +80,7 @@ function Settings({ s, onSaved }: { s: StoreSettings; onSaved: () => void }) {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col gap-2 rounded-lg bg-canvas-raised p-3">
               <Toggle checked={v.pickupEnabled} onChange={(x) => set({ pickupEnabled: x })} label={t('storefront.pickup')} />
-              <label className="flex items-center gap-2">{t('storefront.readyIn')}<NumberInput value={v.pickupReadyMinutes} onChange={(n) => set({ pickupReadyMinutes: n })} label={t('storefront.readyIn')} />min</label>
+              <label className="flex items-center gap-2">{t('storefront.readyIn')}<NumberInput value={v.pickupReadyMinutes} onChange={(n) => set({ pickupReadyMinutes: n })} label={t('storefront.readyIn')} />{t('storefront.minutes')}</label>
               <Input value={v.pickupInstructions ?? ''} onChange={(e) => set({ pickupInstructions: e.target.value || null })} placeholder={t('storefront.instructions')} aria-label={t('storefront.instructions')} />
               <Toggle checked={v.crossLocationPickup} onChange={(x) => set({ crossLocationPickup: x })} label={t('storefront.crossPickup')} />
             </div>
@@ -97,7 +97,7 @@ function Settings({ s, onSaved }: { s: StoreSettings; onSaved: () => void }) {
             </div>
           </div>
           <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2">{t('storefront.reservation')}<NumberInput value={v.reservationMinutes} onChange={(n) => set({ reservationMinutes: n })} label={t('storefront.reservation')} />min</label>
+            <label className="flex items-center gap-2">{t('storefront.reservation')}<NumberInput value={v.reservationMinutes} onChange={(n) => set({ reservationMinutes: n })} label={t('storefront.reservation')} />{t('storefront.minutes')}</label>
             <label className="flex items-center gap-2">{t('storefront.returnWindow')}<NumberInput value={v.returnWindowDays} onChange={(n) => set({ returnWindowDays: n })} label={t('storefront.returnWindow')} />{t('storefront.days')}</label>
           </div>
           <ActionError error={save.error} />

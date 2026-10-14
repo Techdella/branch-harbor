@@ -124,7 +124,7 @@ export const toMinor = (major: string) => {
   return Number.isFinite(n) ? Math.round(n * 100) : NaN;
 };
 export const toMajor = (minor: number | undefined) => (minor === undefined ? '' : (minor / 100).toFixed(2));
-export const pctFromBps = (bps: number) => `${(bps / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`;
+export const pctFromBps = (bps: number, locale: string) => new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 2 }).format(bps / 10000);
 
 /** Small labelled input row used by the foods forms. */
 export function Labeled({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {

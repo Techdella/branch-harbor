@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: Props) {
   return (
     <main id="main" className="mx-auto max-w-6xl px-4 py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <nav className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm"><a href={links.location(location, '/shop')} className="link">← {t('backToShop')}</a>{sf.checkout.mode === 'native' && <CartLink locationId={sf.location.id} href={links.location(location, '/shop/cart')} />}</nav>
+      <nav className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm"><a href={links.location(location, '/shop')} className="link"><span aria-hidden className="inline-block rtl:-scale-x-100">←</span> {t('backToShop')}</a>{sf.checkout.mode === 'native' && <CartLink locationId={sf.location.id} href={links.location(location, '/shop/cart')} />}</nav>
       <div className="grid gap-8 md:grid-cols-2">
         <div className="flex flex-col gap-3">
           {img ? (

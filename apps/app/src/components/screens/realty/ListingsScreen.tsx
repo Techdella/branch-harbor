@@ -64,6 +64,7 @@ export function ListingsScreen() {
 
 function ListingCard({ l, onOpen }: { l: RealtyListing; onOpen: () => void }) {
   const t = useTranslations('realty');
+  const locale = useLocale();
   const app = useApp();
   const office = app.locations.find((x) => x.id === l.locationId);
   return (
@@ -79,7 +80,7 @@ function ListingCard({ l, onOpen }: { l: RealtyListing; onOpen: () => void }) {
       <div className="flex flex-wrap gap-x-2.5 text-xs text-stone">
         <span>{l.bedrooms ?? '–'} {t('facts.bedShort')}</span>
         <span>{l.bathrooms ?? '–'} {t('facts.bathShort')}</span>
-        <span>{l.area ? `${l.area.value.toLocaleString()} ${l.area.label}` : t('unavailable')}</span>
+        <span>{l.area ? `${l.area.value.toLocaleString(locale)} ${l.area.label}` : t('unavailable')}</span>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-1 text-xs text-stone">
         <span>{office?.name ?? l.address.city}</span>
