@@ -14,7 +14,7 @@ export interface PaymentStepProps {
   /** Button label, e.g. "Pay CA$28.00 and book". */
   label: string;
   /** Asks the API for a PaymentIntent (client secret) for this booking/order. */
-  createIntent: () => Promise<{ clientSecret: string; merchantDisplayName: string; customerId?: string; ephemeralKey?: string }>;
+  createIntent: () => Promise<{ clientSecret: string; merchantDisplayName: string; customerId?: string; ephemeralKey?: string; publishableKey?: string | null; stripeAccountId?: string | null; merchantCountry?: string | null; sandbox?: boolean }>;
   /** Called after the payment sheet succeeds; the server confirms via signed Stripe webhooks. */
   onPaid: (paymentIntentId?: string) => Promise<void>;
   disabled?: boolean;

@@ -782,6 +782,14 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         visibleLocations(ctx.industry, ctx.role).map((l) => ({ locationId: l.id, provider: ctx.industry === 'commerce' ? 'WooCommerce gateway' : 'Stripe Connect', arrangement: l.ownership === 'franchise' ? ('own' as const) : ('shared' as const), status: l.site === 'unpublished' ? ('pending_verification' as const) : l.sync === 'attention' && ctx.industry === 'sports' ? ('not_set_up' as const) : ('enabled' as const), capabilities: l.site === 'unpublished' ? [] : ['Card payments', 'Refunds', ...(l.currency === 'EUR' ? ['SEPA debit'] : []), ...(l.currency === 'GBP' ? ['Bacs debit'] : [])] })),
       );
     },
+    automation: (ctx) => {
+      requirePerm(ctx, 'payments.read');
+      return read(() => ({ settings: { ...mockAutomation }, charges: [] }));
+    },
+    setAutomation: (patch) => {
+      Object.assign(mockAutomation, patch);
+      return read(() => ({ ...mockAutomation }));
+    },
   },
 
   connections: {
@@ -978,5 +986,7 @@ function withContext<T extends object>(target: T): T {
     },
   });
 }
+
+const mockAutomation = { autoChargeFees: true, feeChargeDelayHours: 24, autoChargeInstalments: true, providerMode: 'sandbox' as const };
 
 export const mockApi: BranchHarborApi = withContext(withIndependent(rawMockApi));

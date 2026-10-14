@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
 import { money } from '@/lib/format';
 import { readCart, shop, writeCart, type CartLine, type PublicOrder, type Quote, type Storefront } from '@/lib/shop';
 
@@ -72,7 +72,7 @@ export function Checkout({ sf, statusBase, shopHref }: { sf: Storefront; statusB
       <section className="card mt-6 max-w-xl space-y-4 p-6" aria-labelledby="h-pay">
         <h2 id="h-pay" className="text-xl font-extrabold">{t('payTitle', { number: placed.order.number })}</h2>
         <p>{t('heldUntil', { minutes: sf.reservationMinutes })}</p>
-        <PayButton payment={placed.payment} label={t('payCta', { amount: money(placed.order.amountDue, locale) })} onDone={(r) => { if (r.ok) window.location.assign(`${statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`); else setError({ message: r.message ?? t('paymentFailed') }); }} />
+        <CardPayment payment={placed.payment} returnUrl={`${statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`} label={t('payCta', { amount: money(placed.order.amountDue, locale) })} onDone={(r) => { if (r.ok) window.location.assign(`${statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`); else setError({ message: r.message ?? t('paymentFailed') }); }} />
         <ErrorSummary message={error?.message ?? null} />
         <a className="link text-sm" href={`${statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`}>{t('viewOrder')}</a>
       </section>

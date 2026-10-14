@@ -10,7 +10,7 @@ import { conflict, notFound, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { audit } from '../services/audit.ts';
 import { findOrCreateCustomer } from '../services/customers.ts';
-import { reverseTargetPayment } from '../services/payments.ts';
+import { connectedAccountFor, reverseTargetPayment } from '../services/payments.ts';
 import { bookClass, cancelBooking } from '../services/studios.ts';
 import { cancelMembership, chargeRenewalSandbox, createPurchase, pauseMembership, pricingFor, serializeMembership, serializePack, serializePurchase } from '../services/studios-commerce.ts';
 import { describePolicy, effectivePolicy, entitlementOptions, membershipUsage, type PayWith } from '../services/studios-entitlements.ts';
@@ -260,7 +260,14 @@ export const studioCustomerRoutes: FastifyPluginAsyncZod = async (_app) => {
     const p = await portal(req);
     const m = await myMembership([p.customer.id], req.params.id);
     if (!['grace', 'suspended'].includes(m.status)) throw conflict('nothing_to_retry', 'There is no failed payment on this membership');
-    if (studioBilling(s.cfg).mode !== 'sandbox') throw conflict('update_card_at_provider', 'Update your card from the payment link in your email; we retry automatically.');
+    if (studioBilling(s).mode !== 'sandbox') {
+      // Live: retry the open renewal invoice with the card on file; the outcome arrives as invoice.paid / invoice.payment_failed.
+      if (!m.stripeSubscriptionId) throw conflict('update_card', 'Add a card to restart this membership.');
+      const acct = await connectedAccountFor(s.db, m.organizationId, m.locationId!);
+      const retried = await s.payments.payOpenInvoices({ connectedAccountId: acct.accountId, subscriptionId: m.stripeSubscriptionId });
+      if (!retried) throw conflict('update_card', 'The renewal could not be charged. Update your card and we will retry automatically.');
+      return serializeMembership(m);
+    }
     const r = await chargeRenewalSandbox(s, m.id, 'succeeded');
     return serializeMembership(r.membership);
   });

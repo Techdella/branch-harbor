@@ -6,7 +6,8 @@ import { Icon } from '@bh/ui';
 import { call } from '@/lib/client';
 import { addDays, calendarLabel, dateLong, money, time, zone } from '@/lib/format';
 import type { Money } from '@/lib/types';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
+import { FeeConsent } from '@/components/payments/FeeConsent';
 
 export interface Variant { id: string; name: string; durationMinutes: number; price: Money; deposit: Money }
 export interface Policy { freeCancelHours: number; lateCancelFeePercent: number; noShowFeePercent: number; depositRefundable: boolean }
@@ -139,6 +140,7 @@ export function BookAppointment(props: { locationId: string; timeZone: string; t
             <dt className="font-bold">{tw('dueAtVisit')}</dt><dd className="text-end font-bold">{money(s.dueAtVisit, locale)}</dd>
           </dl>
         )}
+        <FeeConsent targetType="appointment" targetId={booked.appointment.id} manageToken={booked.manageToken} />
         <a href={`${props.manageBase}/appointment/${booked.appointment.id}?token=${encodeURIComponent(booked.manageToken)}`} className="btn btn-secondary mt-5">{t('manage')}</a>
       </section>
     );
@@ -150,7 +152,7 @@ export function BookAppointment(props: { locationId: string; timeZone: string; t
         <h2 className="text-xl font-extrabold">{t('terms')}</h2>
         <p>{t('depositToday', { amount: money(amount, locale) })}</p>
         <ErrorSummary message={error?.message ?? null} />
-        <PayButton payment={booked.payment} label={tb('payCta', { amount: money(amount, locale) })} onDone={(r) => (r.ok ? setPaid(true) : setError({ message: r.message ?? tb('paymentFailed') }))} />
+        <CardPayment payment={booked.payment} returnUrl={`${props.manageBase}/appointment/${booked.appointment.id}?token=${encodeURIComponent(booked.manageToken)}`} label={tb('payCta', { amount: money(amount, locale) })} onDone={(r) => (r.ok ? setPaid(true) : setError({ message: r.message ?? tb('paymentFailed') }))} />
       </section>
     );
   }

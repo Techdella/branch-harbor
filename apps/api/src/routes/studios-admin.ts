@@ -417,13 +417,14 @@ export const studioAdminRoutes: FastifyPluginAsyncZod = async (_app) => {
       s.db.select().from(studioPurchases).where(eq(studioPurchases.customerId, c.id)).orderBy(desc(studioPurchases.createdAt)).limit(50),
       s.db.select({ g: onlineAccessGrants, title: onlineContent.title }).from(onlineAccessGrants).innerJoin(onlineContent, eq(onlineContent.id, onlineAccessGrants.contentId)).where(eq(onlineAccessGrants.customerId, c.id)),
     ]);
+    const feeAuto = await (await import('../services/payments-saved.ts')).autoChargeStates(s.db, 'studio_fee', fees.map((f) => f.id));
     const memberOut = await Promise.all(ms.map(async (m) => ({ ...serializeMembership(m), usage: ['active', 'grace'].includes(m.status) ? await membershipUsage(s.db, m, new Date()).then((u) => ({ used: u.used, limit: u.limit, periodStart: u.periodStart.toISOString(), periodEnd: u.periodEnd.toISOString() })) : null, invoices: (await invoicesFor(s.db, m.id)).map((i) => ({ id: i.id, periodStart: i.periodStart.toISOString(), periodEnd: i.periodEnd.toISOString(), amount: { amount: i.amountMinor, currency: i.currency }, status: i.status, attempts: i.attempts, failureReason: i.failureReason })) })));
     return {
       id: c.id, name: c.name, email: c.email, phone: c.phone, locationId: c.locationId, createdAt: c.createdAt.toISOString(),
       memberships: memberOut, packs: ps.map((p) => serializePack(p)),
       bookings: bks.map((r) => ({ id: r.b.id, occurrenceId: r.b.occurrenceId, className: r.name, locationName: r.loc, timeZone: r.tz, startsAt: r.startsAt.toISOString(), status: r.b.status, paymentMethod: r.b.paymentMethod, lateCancel: r.b.lateCancel, checkedInAt: r.b.checkedInAt?.toISOString() ?? null })),
       attendance: { attended: bks.filter((b) => b.b.status === 'attended').length, noShows: bks.filter((b) => b.b.status === 'no_show').length, lateCancels: bks.filter((b) => b.b.lateCancel).length, upcoming: bks.filter((b) => b.startsAt > new Date() && b.b.status === 'confirmed').length },
-      fees: fees.map((f) => ({ id: f.id, kind: f.kind, amount: { amount: f.amountMinor, currency: f.currency }, status: f.status, bookingId: f.bookingId, waiveReason: f.waiveReason, createdAt: f.createdAt.toISOString() })),
+      fees: fees.map((f) => ({ id: f.id, kind: f.kind, amount: { amount: f.amountMinor, currency: f.currency }, status: f.status, bookingId: f.bookingId, waiveReason: f.waiveReason, createdAt: f.createdAt.toISOString(), autoCharge: feeAuto.get(f.id) ?? null })),
       consents: cons.map((r) => ({ purpose: r.purpose, granted: r.granted, version: r.version, source: r.source, recordedAt: r.recordedAt.toISOString() })),
       purchases: purchases.map(serializePurchase),
       online: grants.map((g) => ({ contentId: g.g.contentId, title: g.title, kind: g.g.kind, basis: g.g.basis, joinedAt: g.g.joinedAt?.toISOString() ?? null })),
@@ -462,7 +463,7 @@ export const studioAdminRoutes: FastifyPluginAsyncZod = async (_app) => {
     return serializeMembership(await cancelMembership(s, m, { actorUserId: req.user!.id, immediate: req.body.immediate, reason: req.body.reason }));
   });
   app.post('/orgs/:orgId/studios/memberships/:id/sandbox-renewal', { schema: { tags, security: secured, params: idParams, body: z.object({ outcome: z.enum(['succeeded', 'failed']) }), summary: 'Sandbox only: charge the next renewal now with a simulated outcome (failed → grace period)' } }, async (req) => {
-    if (studioBilling(s.cfg).mode !== 'sandbox') throw new AppError(409, 'not_sandbox', 'Renewals are charged by Stripe in live mode');
+    if (studioBilling(s).mode !== 'sandbox') throw new AppError(409, 'not_sandbox', 'Renewals are charged by Stripe in live mode');
     const m = await loadMembership(req, req.params.orgId, req.params.id);
     const r = await chargeRenewalSandbox(s, m.id, req.body.outcome);
     return { membership: serializeMembership(r.membership), invoice: { id: r.invoice.id, status: r.invoice.status, periodStart: r.invoice.periodStart.toISOString(), amount: { amount: r.invoice.amountMinor, currency: r.invoice.currency } } };
@@ -474,7 +475,8 @@ export const studioAdminRoutes: FastifyPluginAsyncZod = async (_app) => {
     if (!ids.length) return { items: [] };
     const rows = await s.db.select({ f: studioFees, name: customers.name }).from(studioFees).innerJoin(customers, eq(customers.id, studioFees.customerId))
       .where(and(eq(studioFees.organizationId, req.params.orgId), inArray(studioFees.locationId, ids), req.query.status ? eq(studioFees.status, req.query.status) : sql`true`)).orderBy(desc(studioFees.createdAt)).limit(200);
-    return { items: rows.map((r) => ({ id: r.f.id, kind: r.f.kind, customer: { id: r.f.customerId, name: r.name }, locationId: r.f.locationId, amount: { amount: r.f.amountMinor, currency: r.f.currency }, status: r.f.status, bookingId: r.f.bookingId, waiveReason: r.f.waiveReason, createdAt: r.f.createdAt.toISOString() })) };
+    const auto = await (await import('../services/payments-saved.ts')).autoChargeStates(s.db, 'studio_fee', rows.map((r) => r.f.id));
+    return { items: rows.map((r) => ({ id: r.f.id, kind: r.f.kind, customer: { id: r.f.customerId, name: r.name }, locationId: r.f.locationId, amount: { amount: r.f.amountMinor, currency: r.f.currency }, status: r.f.status, bookingId: r.f.bookingId, waiveReason: r.f.waiveReason, createdAt: r.f.createdAt.toISOString(), autoCharge: auto.get(r.f.id) ?? null })) };
   });
   app.post('/orgs/:orgId/studios/fees/:id/waive', { schema: { tags, security: secured, params: idParams, body: z.object({ reason: z.string().trim().min(3).max(200) }) } }, async (req) => {
     const [f] = await s.db.select().from(studioFees).where(and(eq(studioFees.id, req.params.id), eq(studioFees.organizationId, req.params.orgId)));

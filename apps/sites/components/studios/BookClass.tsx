@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
 import { call, sleep } from '@/lib/client';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
+import { FeeConsent } from '@/components/payments/FeeConsent';
 
 type Held = { outcome: 'held'; bookingId: string; manageToken: string; holdExpiresAt: string | null; payment: (PaymentInfo & { amount: number; currency: string }) | null };
 type BookResult =
@@ -91,6 +92,7 @@ export function BookClass(props: { occurrenceId: string; full: boolean; paid: bo
         <p className="mt-2 text-graphite">
           {ok ? t('confirmedBody', { name: props.className, when: props.whenLabel, location: props.locationName }) : t('waitlistedBody', { position: phase.position, name: props.className })}
         </p>
+        {phase.kind === 'confirmed' && <FeeConsent targetType="class_booking" targetId={phase.bookingId} manageToken={phase.token} />}
         {href && <a href={href} className="btn btn-secondary mt-5">{ok ? t('manage') : t('manageWaitlist')}</a>}
       </section>
     );
@@ -119,7 +121,7 @@ export function BookClass(props: { occurrenceId: string; full: boolean; paid: bo
         <h2 ref={heading} tabIndex={-1} className="text-xl font-extrabold outline-none">{t('holdTitle')}</h2>
         <p>{t.rich('holdBody', { time: mmss, b: (c) => <span className="rounded-full bg-canvas px-2 py-0.5 font-bold tabular">{c}</span> })}</p>
         <ErrorSummary message={error?.message ?? null} />
-        {phase.r.payment && <PayButton payment={phase.r.payment} label={t('payCta', { amount: props.priceLabel })} onDone={(res) => afterPayment(res, phase.r)} />}
+        {phase.r.payment && <CardPayment payment={phase.r.payment} returnUrl={`${props.manageBase}/booking/${phase.r.bookingId}?token=${encodeURIComponent(phase.r.manageToken)}`} label={t('payCta', { amount: props.priceLabel })} onDone={(res) => afterPayment(res, phase.r)} />}
       </section>
     );
   }

@@ -3,8 +3,8 @@ import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
 import { Badge, Banner, Button, Card, Text } from '@/components';
 import { useI18n } from '@/i18n';
-import { usePaymentsSandbox } from '@/lib/api';
 import { env } from '@/lib/env';
+import { payPayment } from '@/lib/cardPayment';
 import { ApiError } from '@/lib/errors';
 import { useApi } from '@/lib/useApi';
 import { useSession } from '@/lib/session';
@@ -18,7 +18,6 @@ export const useIsGuest = () => {
 /** Buy a pack / membership / offer / online class: server price → (sandbox) payment → issued. */
 export function BuyButton({ locationId, kind, id, label, onDone }: { locationId: string; kind: 'pack' | 'membership' | 'offer' | 'online'; id: string; label: string; onDone: () => void }) {
   const { t } = useI18n();
-  const sandbox = usePaymentsSandbox();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   return (
@@ -29,8 +28,12 @@ export function BuyButton({ locationId, kind, id, label, onDone }: { locationId:
         try {
           const r = await studioApi.buy(locationId, kind, id);
           if (r.payment) {
-            if (!(r.payment.sandbox && (sandbox || env.useMocks || __DEV__))) { setMsg({ ok: false, text: t('studio.cardNotAvailable') }); return; }
-            await studioApi.confirmSandbox(r.payment.id);
+            if (env.useMocks && r.payment.sandbox) await studioApi.confirmSandbox(r.payment.id);
+            else {
+              // PaymentSheet (memberships ask for renewal consent first); sandbox API → simulated through the webhook processor.
+              const paid = await payPayment(r.payment, t);
+              if (!paid.ok) { setMsg({ ok: false, text: paid.message }); return; }
+            }
             for (let i = 0; i < 10; i++) { if ((await studioApi.purchaseStatus(r.purchase.id)).status === 'paid') break; await new Promise((x) => setTimeout(x, 700)); }
           }
           setMsg({ ok: true, text: t('studio.purchased') });

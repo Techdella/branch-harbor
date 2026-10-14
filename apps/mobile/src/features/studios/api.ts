@@ -39,7 +39,7 @@ const live = {
   pricing: (locationId: string) => http<Pricing>('GET', `/public/studios/${locationId}/pricing`, undefined, { auth: false }),
   options: (occ: string) => http<BookingOptions>('GET', `/me/studios/occurrences/${occOf(occ)}/options`),
   book: (occ: string, payWith: PayWith, joinWaitlist: boolean) => http<{ outcome: string; bookingId?: string; position?: number }>('POST', `/me/studios/occurrences/${occOf(occ)}/bookings`, { payWith, joinWaitlist }),
-  buy: (locationId: string, kind: 'pack' | 'membership' | 'offer' | 'online', id: string) => http<{ purchase: { id: string; status: string }; payment: { id: string; sandbox: boolean } | null }>('POST', '/me/studios/purchases', { locationId, kind, ...(kind === 'offer' ? { offerId: id } : { productId: id }) }),
+  buy: (locationId: string, kind: 'pack' | 'membership' | 'offer' | 'online', id: string) => http<{ purchase: { id: string; status: string }; payment: { id: string; sandbox: boolean; clientSecret?: string | null } | null }>('POST', '/me/studios/purchases', { locationId, kind, ...(kind === 'offer' ? { offerId: id } : { productId: id }) }),
   confirmSandbox: async (paymentId: string) => { await http('POST', `/public/payments/${paymentId}/sandbox-confirm`, { outcome: 'succeeded' }, { auth: false }); },
   purchaseStatus: (id: string) => http<{ status: string }>('GET', `/me/studios/purchases/${id}`),
   online: (locationId: string) => http<{ items: OnlineClass[] }>('GET', `/me/studios/online?locationId=${locationId}`).then((r) => r.items),

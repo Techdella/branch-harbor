@@ -5,6 +5,7 @@
 import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import { http } from '@/lib/http';
+import { payPayment, type PayablePayment, type Translate } from '@/lib/cardPayment';
 /** Money as returned by the API (currency is any ISO code). */
 export type Money = { amount: number; currency: string };
 
@@ -37,10 +38,11 @@ const live = {
     return (await http<{ slots: WSlot[] }>('GET', `/public/wellness/${locationId}/availability?${q}`, undefined, { auth: false })).slots;
   },
   async book(locationId: string, input: { serviceId: string; variantId?: string; startsAt: string; contact: { name: string; email: string }; voucherCode?: string; packageId?: string }) {
-    return http<{ appointment: { id: string }; payment: { id: string; sandbox: boolean; amount: number; currency: string } | null; summary: { depositDue: Money; dueAtVisit: Money } }>('POST', `/public/wellness/${locationId}/appointments`, input, { auth: false });
+    return http<{ appointment: { id: string }; payment: { id: string; sandbox: boolean; amount: number; currency: string; clientSecret?: string | null } | null; summary: { depositDue: Money; dueAtVisit: Money } }>('POST', `/public/wellness/${locationId}/appointments`, input, { auth: false });
   },
-  async confirmSandbox(paymentId: string) {
-    await http('POST', `/public/payments/${paymentId}/sandbox-confirm`, { outcome: 'succeeded' }, { auth: false });
+  /** Deposit: PaymentSheet on iOS/Android (sandbox: simulated); resolves once the API has the signed webhook. */
+  async pay(payment: PayablePayment, t?: Translate) {
+    return payPayment(payment, t);
   },
   async myAppointments(): Promise<MyAppointment[]> {
     return (await http<{ items: MyAppointment[] }>('GET', '/me/wellness/appointments')).items;
@@ -124,7 +126,7 @@ const mock: typeof live = {
     const dep = (v?.deposit ?? s.deposit);
     return sleep({ appointment: { id: M.appts[0]!.id }, payment: dep.amount ? { id: 'pay_mock', sandbox: true, amount: dep.amount, currency: dep.currency } : null, summary: { depositDue: dep, dueAtVisit: { amount: price.amount - dep.amount, currency: price.currency } } });
   },
-  confirmSandbox: async () => { await sleep(null); },
+  pay: async () => sleep({ ok: true as const }),
   myAppointments: async () => sleep(M.appts),
   cancel: async (id, accept) => {
     const a = M.appts.find((x) => x.id === id);

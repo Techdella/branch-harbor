@@ -1,0 +1,29 @@
+{
+  "autoPay": {
+    "tab": "Prélèvements automatiques",
+    "title": "Prélèvement automatique",
+    "intro": "Les frais et échéances sont débités sur la carte enregistrée d’un client uniquement s’il l’a accepté au paiement. Un échec laisse le montant impayé et le client reçoit un e-mail.",
+    "autoFees": "Débiter automatiquement les frais d’annulation tardive et d’absence",
+    "delay": "Délai d’annulation des frais avant le débit",
+    "hours": "{n} h",
+    "autoInstalments": "Débiter les échéances sportives à leur date",
+    "saved": "Paramètres enregistrés",
+    "none": "Aucun prélèvement automatique pour l’instant.",
+    "kind_studio_fee": "Frais de cours",
+    "kind_wellness_fee": "Frais de rendez-vous",
+    "kind_sports_instalment": "Échéance",
+    "state_pending": "En attente",
+    "state_processing": "En cours",
+    "state_succeeded": "Débité",
+    "state_failed": "Échec",
+    "state_requires_action": "Confirmation client requise",
+    "state_cancelled": "Annulé",
+    "customer": "Client",
+    "amount": "Montant",
+    "status": "Statut",
+    "when": "Date",
+    "reason": "Motif",
+    "providerSandbox": "Sandbox : les prélèvements sont simulés.",
+    "autoBadge": "Prélèvement auto : {state}"
+  }
+}

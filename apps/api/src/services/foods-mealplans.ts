@@ -65,7 +65,7 @@ export function serializeSubscription(sub: Sub, plan: Plan, loc: Pick<Location, 
   };
 }
 
-export async function subscribe(s: Services, loc: Location, input: { planId: string; contact: { name: string; email: string; phone?: string; marketingConsent?: boolean }; address?: { line1: string; city: string; postalCode: string; lat?: number; lng?: number } & Record<string, unknown>; startWeek?: string }) {
+export async function subscribe(s: Services, loc: Location, input: { planId: string; contact: { name: string; email: string; phone?: string; marketingConsent?: boolean }; address?: { line1: string; city: string; postalCode: string; lat?: number; lng?: number } & Record<string, unknown>; startWeek?: string; renewalConsent?: { text?: string; locale?: string } | null; ip?: string }) {
   const cfg = await loadFoodConfig(s.db, loc.id);
   if (!cfg.channels.mealPlans) throw conflict('channel_unavailable', 'Meal plans are not available at this location');
   const [plan] = await s.db.select().from(foodMealPlans).where(and(eq(foodMealPlans.id, input.planId), eq(foodMealPlans.organizationId, loc.organizationId), eq(foodMealPlans.active, true)));
@@ -73,6 +73,8 @@ export async function subscribe(s: Services, loc: Location, input: { planId: str
   const price = plan.pricesPerWeek[loc.currency];
   if (price === undefined) throw conflict('no_price', `This plan has no price in ${loc.currency}`);
   if (!loc.paymentsEnabled) throw conflict('payments_not_enabled', 'Online payments are not available at this location yet');
+  // Weekly renewals charge the saved card: explicit consent is required with real payments.
+  if (s.payments.mode === 'live' && !input.renewalConsent) throw validationError('Please agree to weekly charges to your saved card', { renewalConsent: 'Required' });
   let zoneId: string | null = null;
   if (plan.fulfilment === 'delivery') {
     if (!input.address) throw validationError('Enter a delivery address', { address: 'Required' });
@@ -98,13 +100,26 @@ export async function subscribe(s: Services, loc: Location, input: { planId: str
     return row!;
   });
   const acct = await connectedAccountFor(s.db, loc.organizationId, loc.id);
-  const provider = subscriptionProvider(s);
-  const created = await provider.create({
-    email: input.contact.email, name: input.contact.name, productName: `${plan.name} (${loc.name})`, amountMinor: price, currency: loc.currency, connectedAccountId: acct.accountId,
-    metadata: { bh_org: loc.organizationId, bh_location: loc.id, bh_meal_plan_subscription: sub.id }, idempotencyKey: `meal_plan:${sub.id}`,
+  const { CONSENT_TEXT, clientConfigFor, ensurePaymentCustomer, ensureRecurringPrice, savedCardFor } = await import('./payments-saved.ts');
+  const { paymentConsents } = await import('../db/schema/index.ts');
+  const pc = await ensurePaymentCustomer(s, { organizationId: loc.organizationId, customerId: sub.customerId!, connectedAccountId: acct.accountId });
+  if (input.renewalConsent) {
+    await s.db.insert(paymentConsents).values({
+      organizationId: loc.organizationId, customerId: sub.customerId!, connectedAccountId: acct.accountId ?? '', purpose: 'renewals', targetType: 'meal_plan_subscription', targetId: sub.id,
+      text: (input.renewalConsent.text?.trim() || CONSENT_TEXT.renewals(acct.org.name)).slice(0, 2000), locale: input.renewalConsent.locale ?? null, source: 'web', ip: input.ip ?? null,
+    });
+  }
+  const recurring = await ensureRecurringPrice(s, { connectedAccountId: acct.accountId, planKey: `meal_plan:${plan.id}`, productName: plan.name, amountMinor: price, currency: loc.currency, interval: 'week' });
+  const card = await savedCardFor(s.db, sub.customerId!, acct.accountId);
+  // The first week is paid now (Payment Element / PaymentSheet confirms the first invoice); Stripe keeps the card as the subscription default.
+  const created = await s.payments.createSubscription({
+    connectedAccountId: acct.accountId, customerId: pc.stripeCustomerId, priceId: recurring.priceId, defaultPaymentMethodId: card?.defaultPaymentMethodId ?? null, trialEnd: null,
+    applicationFeePercent: (acct.feeBps ?? 0) / 100, metadata: { bh_org: loc.organizationId, bh_location: loc.id, bh_meal_plan_subscription: sub.id }, idempotencyKey: `meal_plan:${sub.id}`, collectFirstPayment: true,
   });
-  const [u] = await s.db.update(foodMealPlanSubscriptions).set({ externalId: created.id, sandbox: provider.mode === 'sandbox', updatedAt: new Date() }).where(eq(foodMealPlanSubscriptions.id, sub.id)).returning();
-  return { subscription: u!, plan, manageToken: token, payment: { clientSecret: created.clientSecret, sandbox: provider.mode === 'sandbox' } };
+  const sandbox = s.payments.mode === 'sandbox';
+  const [u] = await s.db.update(foodMealPlanSubscriptions).set({ externalId: created.id, sandbox, updatedAt: new Date() }).where(eq(foodMealPlanSubscriptions.id, sub.id)).returning();
+  const pay = await clientConfigFor(s, loc.organizationId, loc.id);
+  return { subscription: u!, plan, manageToken: token, payment: { clientSecret: created.clientSecret, sandbox, publishableKey: pay.publishableKey, stripeAccount: pay.stripeAccount, merchantDisplayName: pay.merchantDisplayName, merchantCountry: pay.merchantCountry, mode: pay.mode } };
 }
 
 export async function subscriptionByToken(db: Exec, id: string, token: string) {
@@ -226,6 +241,7 @@ stripeEventExtensions.push(async (tx: Tx, event: Stripe.Event) => {
   if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') to = sub.status === 'pending_payment' || sub.status === 'past_due' ? 'active' : null;
   else if (event.type === 'invoice.payment_failed') to = sub.status === 'cancelled' ? null : 'past_due';
   else if (event.type === 'customer.subscription.deleted') to = 'cancelled';
+  else if (event.type === 'customer.subscription.updated') to = (obj.status === 'past_due' || obj.status === 'unpaid') && sub.status === 'active' ? 'past_due' : obj.status === 'canceled' && sub.status !== 'cancelled' ? 'cancelled' : null;
   if (to) {
     await tx.update(foodMealPlanSubscriptions).set({ status: to, cancelledAt: to === 'cancelled' ? new Date() : sub.cancelledAt, updatedAt: new Date() }).where(eq(foodMealPlanSubscriptions.id, sub.id));
     await audit(tx, { organizationId: sub.organizationId, actorUserId: null, actorType: 'webhook', action: `meal_plan.${to}`, scopeKind: 'location', scopeId: sub.locationId, targetType: 'meal_plan_subscription', targetId: sub.id, metadata: { eventId: event.id, type: event.type } });

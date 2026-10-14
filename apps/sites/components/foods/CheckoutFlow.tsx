@@ -7,7 +7,7 @@ import { call } from '@/lib/client';
 import { calendarLabel, dateTime, localDate, money, time, zone } from '@/lib/format';
 import type { FoodOrder, Slot } from '@/lib/foods';
 import type { CheckoutQuote, DeliveryCheck, MenuItemX, MenuX, ProductionDateX } from '@/lib/foods-ext';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
 
 type Channel = 'pickup' | 'delivery' | 'dine_in' | 'preorder';
 type Line = { key: string; item: MenuItemX; modifierIds: string[]; quantity: number };
@@ -348,7 +348,7 @@ export function CheckoutFlow(p: CheckoutProps) {
         <section aria-labelledby="h-pay" className="card max-w-xl space-y-4 p-6">
           <h2 id="h-pay" ref={heading} tabIndex={-1} className="text-xl font-extrabold outline-none">{to('statusTitle', { number: placed.order.orderNumber })}</h2>
           <p>{to('awaitingBody')}</p>
-          <PayButton payment={placed.payment} label={tb('payCta', { amount: money(placed.order.total, locale) })} onDone={(r) => { if (r.ok) window.location.assign(`${p.statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`); else setError({ message: r.message ?? tb('paymentFailed') }); }} />
+          <CardPayment payment={placed.payment} returnUrl={`${p.statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`} label={tb('payCta', { amount: money(placed.order.total, locale) })} onDone={(r) => { if (r.ok) window.location.assign(`${p.statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`); else setError({ message: r.message ?? tb('paymentFailed') }); }} />
         </section>
       )}
     </div>

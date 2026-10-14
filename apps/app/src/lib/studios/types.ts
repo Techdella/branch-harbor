@@ -61,7 +61,7 @@ export interface MemberDetail {
   memberships: MembershipVM[]; packs: PackVM[];
   bookings: Array<{ id: string; className: string; locationName: string; timeZone: string; startsAt: string; status: string; paymentMethod: string; lateCancel: boolean; checkedInAt: string | null }>;
   attendance: { attended: number; noShows: number; lateCancels: number; upcoming: number };
-  fees: Array<{ id: string; kind: string; amount: Money; status: string; waiveReason: string | null; createdAt: string }>;
+  fees: Array<{ id: string; kind: string; amount: Money; status: string; waiveReason: string | null; createdAt: string; autoCharge?: { state: string; failureMessage: string | null; at: string } | null }>;
   consents: Array<{ purpose: string; granted: boolean; version: string; source: string; recordedAt: string }>;
   purchases: Array<{ id: string; kind: string; name: string; status: string; amount: Money; createdAt: string }>;
   online: Array<{ contentId: string; title: string; kind: string; basis: string; joinedAt: string | null }>;

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, DataTable, Drawer, Icon, cx, type Tone } from '@bh/ui';
 import { totalsByCurrency } from '@bh/shared';
-import type { PaymentState, ReconciliationItem, RefundState, Transaction } from '@/lib/types';
+import type { AutoChargeRow, PaymentState, ReconciliationItem, RefundState, Transaction } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
 import { fmtDateTime, moneyWithCode } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
@@ -14,7 +14,7 @@ import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { Timeline } from './Timeline';
 
-type Tab = 'transactions' | 'reconciliation' | 'setup';
+type Tab = 'transactions' | 'reconciliation' | 'automatic' | 'setup';
 const payTone: Record<PaymentState, Tone> = { created: 'neutral', requires_action: 'warning', processing: 'info', succeeded: 'success', failed: 'danger', cancelled: 'neutral' };
 const refTone: Record<RefundState, Tone> = { none: 'neutral', requested: 'warning', pending: 'warning', partial: 'info', complete: 'info', failed: 'danger' };
 const CURRENCY_PASTEL = ['#E2F5A6', '#CDEEEE', '#E9DDF8', '#F7EDA8', '#F8D6D8', '#D4E6D9'];
@@ -25,12 +25,14 @@ export function PaymentsScreen() {
   const router = useRouter();
   const params = useSearchParams();
   const tab = (params.get('tab') as Tab) || 'transactions';
+  const ta = useTranslations('autoPay');
   const recRes = useApi((api) => api.payments.reconciliation(app.ctx), [app.industry, app.role, app.scopeId], app.can('payments.read'));
   if (!app.can('payments.read')) return <DeniedState permission="payments.read" detail={t('denied')} />;
   const open = recRes.status === 'ready' ? recRes.data.filter((r) => r.status !== 'resolved').length : 0;
   const tabs: [Tab, string, number][] = [
     ['transactions', t('tab.transactions'), 0],
     ['reconciliation', t('tab.reconciliation'), open],
+    ['automatic', ta('tab'), 0],
     ['setup', t('tab.setup'), 0],
   ];
   return (
@@ -48,7 +50,7 @@ export function PaymentsScreen() {
           </button>
         ))}
       </div>
-      {tab === 'reconciliation' ? <Reconciliation res={recRes} /> : tab === 'setup' ? <Setup /> : <Transactions />}
+      {tab === 'reconciliation' ? <Reconciliation res={recRes} /> : tab === 'setup' ? <Setup /> : tab === 'automatic' ? <Automatic /> : <Transactions />}
     </>
   );
 }
@@ -311,3 +313,68 @@ function Setup() {
   );
 }
 
+
+const autoTone: Record<AutoChargeRow['state'], Tone> = { pending: 'neutral', processing: 'info', succeeded: 'success', failed: 'danger', requires_action: 'warning', cancelled: 'neutral' };
+
+/** Automatic charging: org switches (fees / instalments, waive window) and every off-session charge with its outcome. */
+function Automatic() {
+  const t = useTranslations('autoPay');
+  const app = useApp();
+  const locale = useLocale();
+  const res = useApi((api) => api.payments.automation(app.ctx), [app.industry, app.role, app.scopeId]);
+  const save = useMutation((api, patch: { autoChargeFees?: boolean; feeChargeDelayHours?: number; autoChargeInstalments?: boolean }) => api.payments.setAutomation(patch));
+  const [savedMsg, setSavedMsg] = useState(false);
+  const canManage = app.can('billing.manage');
+  const loc = useLocLookup();
+  const update = async (patch: { autoChargeFees?: boolean; feeChargeDelayHours?: number; autoChargeInstalments?: boolean }) => {
+    setSavedMsg(false);
+    if (await save.run(patch)) { setSavedMsg(true); res.reload(); }
+  };
+  return (
+    <Async res={res} permission="payments.read" loading={<LoadingBlock variant="cards" rows={3} />}>
+      {({ settings, charges }) => (
+        <div className="flex flex-col gap-4">
+          <section className="flex flex-col gap-3 rounded-lg bg-surface p-4">
+            <h2 className="text-[15px] font-bold">{t('title')}</h2>
+            <p className="text-xs text-stone">{t('intro')}</p>
+            {settings.providerMode === 'sandbox' && <Banner tone="neutral">{t('providerSandbox')}</Banner>}
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" className="size-4" checked={settings.autoChargeFees} disabled={!canManage || save.pending} onChange={(e) => void update({ autoChargeFees: e.target.checked })} />
+              {t('autoFees')}
+            </label>
+            <label className="flex flex-wrap items-center gap-2 text-sm">
+              {t('delay')}
+              <select className="h-9 rounded-md border border-canvas bg-white px-2" value={settings.feeChargeDelayHours} disabled={!canManage || save.pending || !settings.autoChargeFees} onChange={(e) => void update({ feeChargeDelayHours: Number(e.target.value) })}>
+                {[0, 2, 12, 24, 48, 72, 168].map((n) => <option key={n} value={n}>{t('hours', { n })}</option>)}
+              </select>
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" className="size-4" checked={settings.autoChargeInstalments} disabled={!canManage || save.pending} onChange={(e) => void update({ autoChargeInstalments: e.target.checked })} />
+              {t('autoInstalments')}
+            </label>
+            {savedMsg && <p role="status" className="text-xs font-semibold text-success">{t('saved')}</p>}
+            {save.error && <p role="alert" className="text-xs font-semibold text-danger">{save.error.message}</p>}
+          </section>
+          {charges.length === 0 ? <Empty title={t('none')} /> : (
+            <div className="overflow-x-auto rounded-lg bg-surface">
+              <table className="w-full text-left text-sm">
+                <thead><tr className="text-xs text-stone"><th className="p-3">{t('customer')}</th><th className="p-3">{t('amount')}</th><th className="p-3">{t('status')}</th><th className="p-3">{t('reason')}</th><th className="p-3">{t('when')}</th></tr></thead>
+                <tbody>
+                  {charges.map((c) => (
+                    <tr key={c.id} className="border-t border-canvas">
+                      <td className="p-3"><span className="font-semibold">{c.customer.name ?? '—'}</span><span className="block text-xs text-stone">{t(`kind_${c.kind}`)} · {loc(c.locationId).name}</span></td>
+                      <td className="p-3 tabular">{moneyWithCode(c.amount as Parameters<typeof moneyWithCode>[0], locale)}</td>
+                      <td className="p-3"><Badge tone={autoTone[c.state]}>{t(`state_${c.state}`)}</Badge></td>
+                      <td className="p-3 text-xs text-stone">{c.failureMessage ?? '—'}</td>
+                      <td className="p-3 text-xs">{fmtDateTime(c.createdAt, loc(c.locationId).timeZone ?? 'UTC', locale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </Async>
+  );
+}

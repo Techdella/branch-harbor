@@ -1,0 +1,29 @@
+{
+  "autoPay": {
+    "tab": "Cobros automáticos",
+    "title": "Cobro automático",
+    "intro": "Las tarifas y los plazos se cobran en la tarjeta guardada solo si el cliente lo aceptó al pagar. Los cobros fallidos quedan pendientes y el cliente recibe un correo.",
+    "autoFees": "Cobrar automáticamente las tarifas por cancelación tardía y no presentación",
+    "delay": "Plazo para condonar antes del cobro",
+    "hours": "{n} h",
+    "autoInstalments": "Cobrar los plazos deportivos en su fecha",
+    "saved": "Ajustes guardados",
+    "none": "Aún no hay cobros automáticos.",
+    "kind_studio_fee": "Tarifa de clase",
+    "kind_wellness_fee": "Tarifa de cita",
+    "kind_sports_instalment": "Plazo",
+    "state_pending": "Pendiente",
+    "state_processing": "Procesando",
+    "state_succeeded": "Cobrado",
+    "state_failed": "Fallido",
+    "state_requires_action": "El cliente debe confirmar",
+    "state_cancelled": "Cancelado",
+    "customer": "Cliente",
+    "amount": "Importe",
+    "status": "Estado",
+    "when": "Fecha",
+    "reason": "Motivo",
+    "providerSandbox": "Sandbox: los cobros son simulados.",
+    "autoBadge": "Cobro automático: {state}"
+  }
+}

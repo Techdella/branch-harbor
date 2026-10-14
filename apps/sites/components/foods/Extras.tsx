@@ -6,7 +6,8 @@ import { Icon } from '@bh/ui';
 import { call } from '@/lib/client';
 import { calendarLabel, dateTime, money } from '@/lib/format';
 import type { CateringEnquiryX, CateringPackageX, MealPlanX, SubscriptionX, TabX } from '@/lib/foods-ext';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
+import { SavedCard, type CardOnFile, type SetupStart } from '@/components/payments/SavedCard';
 
 /* ───────── Table tab ───────── */
 
@@ -52,7 +53,7 @@ export function TabPanel({ storageKey, tipsBps }: { storageKey: string; tipsBps:
           <Icon name="card" size={18} />{t('payTab', { amount: money({ amount: tab.amountDue.amount + tipMinor, currency: tab.amountDue.currency }, locale) })}
         </button>
       ) : (
-        <div className="mt-4"><PayButton payment={payment} label={t('confirmPayment')} onDone={(r) => { if (r.ok) setTab({ ...tab, status: 'paid' }); else setMsg(r.message ?? ''); }} /></div>
+        <div className="mt-4"><CardPayment payment={payment} label={t('confirmPayment')} onDone={(r) => { if (r.ok) setTab({ ...tab, status: 'paid' }); else setMsg(r.message ?? ''); }} /></div>
       )}
       <p className="mt-2 text-xs text-graphite">{t('tabCounter')}</p>
     </section>
@@ -165,7 +166,7 @@ export function CateringQuoteView({ initial, token, timeZone }: { initial: Cater
               <button type="button" className="btn btn-secondary" onClick={async () => { const r = await call<CateringEnquiryX>('POST', `/public/foods/catering/enquiries/${e.id}/decline`, { token }); if (r.ok) setE({ ...e, ...r.data }); }}>{t('declineQuote')}</button>
             </div>
           )}
-          {payment && e.status === 'accepted' && <div className="mt-4"><PayButton payment={payment} label={t('payDeposit', { amount: money(e.quote.deposit, locale) })} onDone={async (r) => { if (r.ok) await refresh(); else setMsg(r.message ?? ''); }} /></div>}
+          {payment && e.status === 'accepted' && <div className="mt-4"><CardPayment payment={payment} label={t('payDeposit', { amount: money(e.quote.deposit, locale) })} onDone={async (r) => { if (r.ok) await refresh(); else setMsg(r.message ?? ''); }} /></div>}
         </section>
       )}
     </div>
@@ -183,15 +184,30 @@ export function MealPlanSubscribe({ locationId, brandName, plans, timeZone, mana
   const [f, setF] = useState({ name: '', email: '', line1: '', city: '', postalCode: '', consent: false });
   const [error, setError] = useState<{ message: string; fields?: Record<string, string> } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [renewals, setRenewals] = useState(false);
+  const [live, setLive] = useState<{ id: string; token: string; payment: { clientSecret: string | null; sandbox: boolean; publishableKey: string | null; stripeAccount: string | null; merchantDisplayName: string; mode: 'live' | 'sandbox' } } | null>(null);
+  const tp = useTranslations('payment');
   const plan = plans.find((p) => p.id === planId);
+  if (live) {
+    const manage = `${manageBase}/${live.id}?token=${encodeURIComponent(live.token)}`;
+    return (
+      <section className="card mt-6 max-w-xl space-y-4 p-6">
+        <h2 className="text-xl font-extrabold">{tp('title')}</h2>
+        <ErrorSummary message={error?.message ?? null} />
+        <CardPayment payment={{ sandbox: false, clientSecret: live.payment.clientSecret }} config={live.payment} returnUrl={manage} label={t('subscribe')} onDone={(r) => { if (r.ok) window.location.assign(manage); else setError({ message: r.message ?? tb('paymentFailed') }); }} />
+      </section>
+    );
+  }
   return (
     <form noValidate className="mt-6 space-y-5" onSubmit={async (e) => {
       e.preventDefault();
       if (!f.name.trim() || !EMAIL_RE.test(f.email)) { setError({ message: tb('yourDetails'), fields: { ...(!f.name.trim() ? { name: tc('required', { field: tb('name') }) } : {}), ...(!EMAIL_RE.test(f.email) ? { email: tc('invalidEmail') } : {}) } }); return; }
+      if (!renewals) { setError({ message: tp('consentRequired'), fields: { renewalConsent: tp('consentRequired') } }); return; }
       setBusy(true); setError(null);
-      const r = await call<{ subscription: { id: string }; manageToken: string; payment: { sandbox: boolean } }>('POST', `/public/foods/${locationId}/meal-plans/subscriptions`, { planId, contact: { name: f.name.trim(), email: f.email.trim(), marketingConsent: f.consent }, ...(plan?.fulfilment === 'delivery' ? { address: { line1: f.line1, city: f.city, postalCode: f.postalCode } } : {}) });
+      const r = await call<{ subscription: { id: string }; manageToken: string; payment: { sandbox: boolean; clientSecret: string | null; publishableKey: string | null; stripeAccount: string | null; merchantDisplayName: string; mode: 'live' | 'sandbox' } }>('POST', `/public/foods/${locationId}/meal-plans/subscriptions`, { planId, contact: { name: f.name.trim(), email: f.email.trim(), marketingConsent: f.consent }, ...(plan?.fulfilment === 'delivery' ? { address: { line1: f.line1, city: f.city, postalCode: f.postalCode } } : {}), renewalConsent: { text: tp('consentRenewals', { business: brandName }), locale } });
       if (!r.ok) { setBusy(false); setError({ message: r.error.message }); return; }
-      if (r.data.payment.sandbox) await call('POST', `/public/foods/meal-plans/subscriptions/${r.data.subscription.id}/sandbox-activate`, { token: r.data.manageToken });
+      if (!r.data.payment.sandbox) { setBusy(false); setLive({ id: r.data.subscription.id, token: r.data.manageToken, payment: r.data.payment }); return; }
+      await call('POST', `/public/foods/meal-plans/subscriptions/${r.data.subscription.id}/sandbox-activate`, { token: r.data.manageToken });
       window.location.assign(`${manageBase}/${r.data.subscription.id}?token=${encodeURIComponent(r.data.manageToken)}`);
     }}>
       <ErrorSummary message={error?.message ?? null} fields={error?.fields} />
@@ -212,6 +228,7 @@ export function MealPlanSubscribe({ locationId, brandName, plans, timeZone, mana
         {plan?.fulfilment === 'delivery' && <div className="grid gap-3 sm:grid-cols-3"><Field label={t('address')} value={f.line1} onChange={(e) => setF({ ...f, line1: e.target.value })} /><Field label={t('city')} value={f.city} onChange={(e) => setF({ ...f, city: e.target.value })} /><Field label={t('postcode')} value={f.postalCode} onChange={(e) => setF({ ...f, postalCode: e.target.value })} /></div>}
         <Checkbox label={tb('marketing', { brand: brandName })} checked={f.consent} onChange={(v) => setF({ ...f, consent: v })} />
         <p className="text-xs text-graphite">{t('subscriptionNote')}</p>
+        <Checkbox label={tp('consentRenewals', { business: brandName })} checked={renewals} onChange={setRenewals} error={error?.fields?.renewalConsent} />
         <button type="submit" className="btn btn-primary" disabled={busy || !plan?.price} aria-busy={busy}>{t('subscribe')}</button>
       </div>
     </form>
@@ -253,6 +270,12 @@ export function MealPlanManage({ initial, token, timeZone }: { initial: Subscrip
           ))}
         </ul>
       </section>
+      {s.status !== 'cancelled' && (
+        <SavedCard
+          load={() => call<CardOnFile>('POST', `/public/foods/meal-plans/subscriptions/${s.id}/payment-method`, { token })}
+          start={(text, loc) => call<SetupStart>('POST', `/public/foods/meal-plans/subscriptions/${s.id}/payment-method/setup`, { token, purposes: ['renewals'], text, locale: loc })}
+        />
+      )}
       <div className="flex flex-wrap gap-2">
         {s.status === 'active' && <button type="button" className="btn btn-secondary" onClick={() => status('paused')}>{t('pause')}</button>}
         {s.status === 'paused' && <button type="button" className="btn btn-primary" onClick={() => status('active')}>{t('resume')}</button>}

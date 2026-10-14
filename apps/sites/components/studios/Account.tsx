@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
-import { EMAIL_RE, ErrorSummary, Field, PayButton } from '@/components/forms';
+import { EMAIL_RE, ErrorSummary, Field, CardPayment } from '@/components/forms';
 import { sleep } from '@/lib/client';
 import { dateTime, money } from '@/lib/format';
 import { getSession, pcall, setSession, type Account as AccountT } from '@/lib/portal';
+import { SavedCard, type CardOnFile, type SetupStart } from '@/components/payments/SavedCard';
 
 /** Email sign-in (magic link → session) used by the account, pricing and online pages. */
 export function SignIn({ brand, locationId, returnPath, compact }: { brand: string; locationId: string; returnPath: string; compact?: boolean }) {
@@ -133,7 +134,7 @@ export function AccountView({ brand, locationId, accountPath, pricingPath, onlin
             <div key={f.id} className="mt-2 flex flex-wrap items-center gap-3 text-sm">
               <span className="flex-1">{t(`feeKind.${f.kind}`)} · <strong>{money(f.amount, locale)}</strong></span>
               {feePay?.feeId === f.id ? (
-                <PayButton payment={feePay.payment} label={t('payAmount', { amount: money(f.amount, locale) })} onDone={async (r) => {
+                <CardPayment payment={feePay.payment} label={t('payAmount', { amount: money(f.amount, locale) })} onDone={async (r) => {
                   if (!r.ok) { setMsg({ ok: false, text: r.message ?? t('payFailed') }); return; }
                   for (let i = 0; i < 10; i++) { const s = await pcall<{ status: string }>(brand, 'GET', `/public/studios/account/purchases/${feePay.purchaseId}`); if (s.ok && s.data.status === 'paid') break; await sleep(800); }
                   setFeePay(null); setMsg({ ok: true, text: t('feePaid') }); await load();
@@ -149,6 +150,13 @@ export function AccountView({ brand, locationId, accountPath, pricingPath, onlin
           ))}
         </section>
       )}
+
+      <SavedCard
+        returnUrl={accountPath}
+        load={() => pcall<CardOnFile>(brand, 'GET', `/public/studios/account/payment-method?locationId=${locationId}`)}
+        start={(text, loc) => pcall<SetupStart>(brand, 'POST', '/public/studios/account/payment-method/setup', { locationId, purposes: ['save_card', 'renewals', 'fees'], text, locale: loc })}
+        remove={() => pcall(brand, 'POST', '/public/studios/account/payment-method/remove', { locationId })}
+      />
 
       <section className="card p-5">
         <h2 className="font-extrabold">{t('upcoming')}</h2>

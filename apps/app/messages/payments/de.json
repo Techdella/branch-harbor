@@ -1,0 +1,29 @@
+{
+  "autoPay": {
+    "tab": "Automatische Abbuchungen",
+    "title": "Automatische Abbuchung",
+    "intro": "Gebühren und Raten werden nur dann von der gespeicherten Karte abgebucht, wenn die Kundschaft beim Bezahlen zugestimmt hat. Fehlgeschlagene Abbuchungen bleiben offen und die Kundschaft erhält eine E-Mail.",
+    "autoFees": "Gebühren für späte Stornierung und Nichterscheinen automatisch abbuchen",
+    "delay": "Erlassfrist vor der Abbuchung",
+    "hours": "{n} Std.",
+    "autoInstalments": "Sport-Raten am Fälligkeitstag abbuchen",
+    "saved": "Einstellungen gespeichert",
+    "none": "Noch keine automatischen Abbuchungen.",
+    "kind_studio_fee": "Kursgebühr",
+    "kind_wellness_fee": "Termingebühr",
+    "kind_sports_instalment": "Rate",
+    "state_pending": "Ausstehend",
+    "state_processing": "In Bearbeitung",
+    "state_succeeded": "Abgebucht",
+    "state_failed": "Fehlgeschlagen",
+    "state_requires_action": "Bestätigung durch Kundschaft nötig",
+    "state_cancelled": "Storniert",
+    "customer": "Kunde",
+    "amount": "Betrag",
+    "status": "Status",
+    "when": "Zeitpunkt",
+    "reason": "Grund",
+    "providerSandbox": "Sandbox: Abbuchungen werden simuliert.",
+    "autoBadge": "Auto-Abbuchung: {state}"
+  }
+}

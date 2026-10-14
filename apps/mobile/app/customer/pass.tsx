@@ -3,6 +3,8 @@ import { Badge, Banner, Card, DataStatus, Screen, ScreenHeader, SectionHeader, S
 import { useCatalog } from '@/features/customer/catalog';
 import { studioApi } from '@/features/studios/api';
 import { BuyButton, useIsGuest } from '@/features/studios/components';
+import { SavedCard } from '@/components/SavedCard';
+import { env } from '@/lib/env';
 import { useI18n } from '@/i18n';
 import { fmtDay, fmtMoney } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
@@ -83,6 +85,7 @@ export default function Pass() {
           {pricing.data.policy.lines.map((l) => <Text key={l} variant="small" tone="muted">• {l}</Text>)}
         </Card>
       ) : null}
+      {!guest && !env.useMocks ? <SavedCard locationId={location.id} /> : null}
     </Screen>
   );
 }

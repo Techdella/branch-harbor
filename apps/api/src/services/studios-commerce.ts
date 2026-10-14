@@ -172,7 +172,7 @@ export async function pauseMembership(s: Services, m: Membership, input: { from:
   // Billing is deferred by the pause length (the paid period is extended).
   const periodEnd = m.currentPeriodEnd && m.currentPeriodEnd > input.from ? new Date(m.currentPeriodEnd.getTime() + days * DAY) : m.currentPeriodEnd;
   const [u] = await s.db.update(memberships).set({ pausedFrom: input.from, pausedUntil: input.until, pauseReason: input.reason ?? null, currentPeriodEnd: periodEnd, updatedAt: new Date() }).where(eq(memberships.id, m.id)).returning();
-  if (m.stripeSubscriptionId) await studioBilling(s.cfg).pauseCollection({ subscriptionId: m.stripeSubscriptionId, connectedAccountId: (await connectedAccountFor(s.db, m.organizationId, m.locationId!)).accountId, resumesAt: input.until });
+  if (m.stripeSubscriptionId) await studioBilling(s).pauseCollection({ subscriptionId: m.stripeSubscriptionId, connectedAccountId: (await connectedAccountFor(s.db, m.organizationId, m.locationId!)).accountId, resumesAt: input.until });
   await audit(s.db, { organizationId: m.organizationId, actorUserId: input.actorUserId, action: 'membership.paused', scopeKind: 'location', scopeId: m.locationId, targetType: 'membership', targetId: m.id, metadata: { from: input.from.toISOString(), until: input.until.toISOString(), days } });
   return u!;
 }
@@ -182,7 +182,7 @@ export async function resumeMembership(s: Services, m: Membership, actorUserId: 
   const now = new Date();
   const unused = Math.max(0, m.pausedUntil.getTime() - Math.max(now.getTime(), m.pausedFrom?.getTime() ?? now.getTime()));
   const [u] = await s.db.update(memberships).set({ pausedUntil: m.pausedFrom && m.pausedFrom > now ? null : now, pausedFrom: m.pausedFrom && m.pausedFrom > now ? null : m.pausedFrom, currentPeriodEnd: m.currentPeriodEnd ? new Date(m.currentPeriodEnd.getTime() - unused) : null, updatedAt: now }).where(eq(memberships.id, m.id)).returning();
-  if (m.stripeSubscriptionId) await studioBilling(s.cfg).pauseCollection({ subscriptionId: m.stripeSubscriptionId, connectedAccountId: (await connectedAccountFor(s.db, m.organizationId, m.locationId!)).accountId, resumesAt: null });
+  if (m.stripeSubscriptionId) await studioBilling(s).pauseCollection({ subscriptionId: m.stripeSubscriptionId, connectedAccountId: (await connectedAccountFor(s.db, m.organizationId, m.locationId!)).accountId, resumesAt: null });
   await audit(s.db, { organizationId: m.organizationId, actorUserId, action: 'membership.resumed', scopeKind: 'location', scopeId: m.locationId, targetType: 'membership', targetId: m.id });
   return u!;
 }
@@ -195,7 +195,7 @@ export async function cancelMembership(s: Services, m: Membership, input: { acto
   const now = new Date();
   const cancelAt = input.immediate || !m.recurring ? now : new Date(now.getTime() + (plan?.noticeDays ?? 30) * DAY);
   const [u] = await s.db.update(memberships).set(input.immediate ? { status: 'cancelled', cancelAt, cancelRequestedAt: now, endsAt: now, updatedAt: now } : { cancelAt, cancelRequestedAt: now, updatedAt: now }).where(eq(memberships.id, m.id)).returning();
-  if (m.stripeSubscriptionId) await studioBilling(s.cfg).cancelSubscription({ subscriptionId: m.stripeSubscriptionId, connectedAccountId: (await connectedAccountFor(s.db, m.organizationId, m.locationId!)).accountId, at: input.immediate ? 'now' : cancelAt });
+  if (m.stripeSubscriptionId) await studioBilling(s).cancelSubscription({ subscriptionId: m.stripeSubscriptionId, connectedAccountId: (await connectedAccountFor(s.db, m.organizationId, m.locationId!)).accountId, at: input.immediate ? 'now' : cancelAt });
   await audit(s.db, { organizationId: m.organizationId, actorUserId: input.actorUserId, action: input.immediate ? 'membership.cancelled' : 'membership.cancellation_requested', scopeKind: 'location', scopeId: m.locationId, targetType: 'membership', targetId: m.id, metadata: { cancelAt: cancelAt.toISOString(), reason: input.reason } });
   return u!;
 }
@@ -239,7 +239,7 @@ export async function runStudioLifecycle(s: Services, now = new Date()) {
     await enqueueCustomerNotifications(s.db, { organizationId: m.organizationId, locationId: m.locationId!, customerIds: [m.customerId], kind: 'membership_changed', subject: `Membership on hold: ${m.plan}`, body: `Your ${m.plan} membership is on hold because the renewal payment could not be taken. Update your payment details to book again.` });
     await audit(s.db, { organizationId: m.organizationId, actorUserId: null, actorType: 'system', action: 'membership.suspended', scopeKind: 'location', scopeId: m.locationId, targetType: 'membership', targetId: m.id });
   }
-  const billing = studioBilling(s.cfg);
+  const billing = studioBilling(s);
   if (billing.mode === 'sandbox') {
     const due = await s.db.select({ id: memberships.id }).from(memberships).where(and(eq(memberships.recurring, true), eq(memberships.status, 'active'), lte(memberships.currentPeriodEnd, now),
       or(isNull(memberships.cancelAt), sql`${memberships.cancelAt} > ${memberships.currentPeriodEnd}`), or(isNull(memberships.pausedFrom), sql`not (${memberships.pausedFrom} <= now() and ${memberships.pausedUntil} > now())`))).limit(200);
@@ -248,15 +248,13 @@ export async function runStudioLifecycle(s: Services, now = new Date()) {
       stats.renewed++;
     }
   } else {
-    // Live: create the provider subscription for memberships whose first period was paid at checkout.
-    const pending = await s.db.select().from(memberships).where(and(eq(memberships.recurring, true), eq(memberships.status, 'active'), isNull(memberships.stripeSubscriptionId), isNull(memberships.cancelAt))).limit(50);
+    // Live: create the provider subscription (saved card as default) for memberships whose first period was paid at checkout.
+    const { ensureMembershipSubscription } = await import('./payments-saved.ts');
+    const pending = await s.db.select({ id: memberships.id }).from(memberships).where(and(eq(memberships.recurring, true), eq(memberships.status, 'active'), isNull(memberships.stripeSubscriptionId), isNull(memberships.cancelAt))).limit(50);
     for (const m of pending) {
       try {
-        const acct = await connectedAccountFor(s.db, m.organizationId, m.locationId!);
-        const [c] = await s.db.select().from(customers).where(eq(customers.id, m.customerId));
-        const sub = await billing.createSubscription({ connectedAccountId: acct.accountId, email: c?.email ?? null, name: c?.name ?? 'Member', amountMinor: m.priceMinor ?? 0, currency: m.currency ?? acct.location.currency, productName: m.plan, firstBillingAt: m.currentPeriodEnd ?? new Date(now.getTime() + 30 * DAY), applicationFeePercent: (acct.feeBps ?? 0) / 100, metadata: { bh_org: m.organizationId, bh_location: m.locationId ?? '', bh_membership: m.id }, idempotencyKey: `membership:${m.id}` });
-        await s.db.update(memberships).set({ stripeCustomerId: sub.customerId, stripeSubscriptionId: sub.subscriptionId, updatedAt: new Date() }).where(eq(memberships.id, m.id));
-        stats.subscriptions++;
+        const r = await ensureMembershipSubscription(s, m.id);
+        if (r.status === 'created') stats.subscriptions++;
       } catch (err) {
         s.log.error({ err, membershipId: m.id }, '[studios] subscription setup failed');
       }

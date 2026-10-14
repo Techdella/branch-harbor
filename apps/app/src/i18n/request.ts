@@ -4,6 +4,7 @@ import { LOCALE_COOKIE, resolveAppLocale } from './config';
 import en from '../../messages/en.json';
 import singleEn from '../../messages/single/en.json';
 import foodsEn from '../../messages/foods/en.json';
+import paymentsEn from '../../messages/payments/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -27,12 +28,13 @@ export default getRequestConfig(async () => {
   const locale = resolveAppLocale(raw);
   // Independent-business strings live in messages/single/*.json (namespace "single") and foods strings in
   // messages/foods/*.json so they merge cleanly.
-  let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages }, foodsEn as Messages);
+  let messages: Messages = merge(merge({ ...(en as Messages), single: singleEn as Messages }, foodsEn as Messages), paymentsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
     messages = merge(messages, { ...translated, single });
     messages = merge(messages, (await import(`../../messages/foods/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/payments/${locale}.json`).catch(() => ({ default: {} }))).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

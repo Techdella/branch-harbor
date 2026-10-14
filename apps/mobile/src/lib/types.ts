@@ -163,6 +163,14 @@ export interface PaymentIntentParams {
   merchantDisplayName: string;
   customerId?: string;
   ephemeralKey?: string;
+  /** BranchHarbor payment id (polled until the signed webhook marks it paid). */
+  paymentId?: string;
+  /** From the API: publishable key + connected account for direct charges (PaymentSheet `stripeAccountId`). */
+  publishableKey?: string | null;
+  stripeAccountId?: string | null;
+  merchantCountry?: string | null;
+  /** The API runs payments in sandbox mode: simulate instead of opening the sheet. */
+  sandbox?: boolean;
 }
 
 // ---------- Staff ----------

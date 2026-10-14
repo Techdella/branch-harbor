@@ -38,7 +38,7 @@ export interface PublicOrder {
   reservationExpiresAt: string | null; history: Array<{ at: string; event: string; note?: string }>; createdAt: string; paidAt: string | null;
   fulfilments: Array<{ id: string; method: string; status: string; carrier: string | null; trackingNumber: string | null }>; transfer: { number: string; status: string } | null;
   brand: { name: string; slug: string }; store: { name: string; slug: string; address: Address; timeZone: string; phone: string | null; pickupInstructions: string | null };
-  payment: { id: string; state: string; sandbox: boolean } | null;
+  payment: { id: string; state: string; sandbox: boolean; clientSecret?: string | null } | null;
   returns: Array<{ id: string; rmaNumber: string | null; status: string; lines: Array<{ name?: string; quantity: number }>; resolution: string | null; createdAt: string }>;
   returnPolicy: { days: number; endsAt: string; open: boolean }; returnable: Array<{ variantId: string; name: string; max: number }>; cancellable: boolean;
 }
