@@ -730,6 +730,14 @@ export type FoodOrderFulfilment = {
   serviceChargeLabel?: string;
   /** Set once slot capacity and stock held by a cancelled order were released. */
   resourcesReleased?: boolean;
+  /** Delivery partner quote taken at checkout (Uber Direct). */
+  providerQuote?: { provider: string; quoteId: string | null; feeMinor: number; currency: string; expiresAt: string | null; feeMode: 'absorb' | 'pass_through'; sandbox: boolean };
+  /** Shown to the customer when the partner could not be used (e.g. not available in the country). */
+  deliveryNotice?: string;
+  /** Marketplace order received through Deliverect (channel attribution). */
+  marketplace?: { via: 'deliverect'; channel: string; channelName: string; channelOrderId: string; channelOrderDisplayId: string; deliverectOrderId: string; courier: 'channel' | 'restaurant'; discountMinor: number; driverTipMinor: number; dueMinor: number; testOrder: boolean; unmatchedItems: string[] };
+  /** Result of pushing the order to the location POS through Deliverect. */
+  pos?: { provider: 'deliverect'; status: 'sent' | 'sandbox' | 'failed'; at: string; error?: string };
 };
 
 export const foodOrders = pgTable('food_orders', {

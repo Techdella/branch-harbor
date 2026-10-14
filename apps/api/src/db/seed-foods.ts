@@ -140,6 +140,11 @@ export async function seedFoods(c: FoodsSeedCtx) {
     'LIS-PR': cfg({ channels: { pickup: true, delivery: false, dineIn: true, preorder: true, catering: false, mealPlans: false }, tips: { enabled: true, presetsBps: [500, 1000], allowCustom: true, channels: ['dine_in'] } }),
   };
   for (const l of locs) await db.insert(t.foodLocationSettings).values({ organizationId: meId, locationId: l.id, config: settingsByCode[l.code]!, updatedBy: c.demo.id });
+  // Partner connections in SANDBOX (no partner credentials in demo data — nothing is ever sent to Uber or Deliverect).
+  await db.insert(t.connections).values([
+    { organizationId: meId, locationId: L['SEA-FR'].id, provider: 'uber_direct', kind: 'delivery', direction: 'bidirectional', authoritative: 'branchharbor', state: 'disconnected', config: { enabled: true, mode: 'sandbox', feeMode: 'absorb' } },
+    { organizationId: meId, locationId: london!.id, provider: 'deliverect', kind: 'pos', direction: 'bidirectional', authoritative: 'branchharbor', state: 'disconnected', config: { enabled: true, mode: 'sandbox', environment: 'staging', posInjection: true, marketplaceOrders: true, autoAccept: false } },
+  ]);
 
   // ───────── Kitchen stations, drivers, tables ─────────
   for (const l of locs) await db.insert(t.foodStations).values(DEFAULT_STATIONS.map((d) => ({ ...d, organizationId: meId, locationId: l.id }))).onConflictDoNothing();

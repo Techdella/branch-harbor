@@ -9,6 +9,7 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requirePerm, resolveScopeChain, type ScopeTarget } from '../services/authz.ts';
 import { credentialsOf, serializeConnection } from '../services/connections.ts';
+import { isPartnerProvider } from '../services/partner-connections.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 export const connectionRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -18,13 +19,14 @@ export const connectionRoutes: FastifyPluginAsyncZod = async (app) => {
 
   async function load(orgId: string, id: string) {
     const [c] = await s.db.select().from(connections).where(and(eq(connections.id, id), eq(connections.organizationId, orgId)));
-    if (!c) throw notFound('Connection');
+    if (!c || isPartnerProvider(c.provider)) throw notFound('Connection');
     return c;
   }
 
   app.get('/orgs/:orgId/connections', { schema: { tags: ['connections'], security: secured, params: orgParams } }, async (req) => {
     const allowed = await authorisedLocations(req, s.db, req.params.orgId, 'connections.manage');
-    const rows = await s.db.select().from(connections).where(eq(connections.organizationId, req.params.orgId));
+    // Partner integrations (delivery, POS, property portals) have their own screens and routes (/partner-connections).
+    const rows = (await s.db.select().from(connections).where(eq(connections.organizationId, req.params.orgId))).filter((c) => !isPartnerProvider(c.provider));
     const errs = await s.db.select({ id: externalMappings.connectionId, c: count() }).from(externalMappings).where(and(eq(externalMappings.organizationId, req.params.orgId), eq(externalMappings.status, 'error'))).groupBy(externalMappings.connectionId);
     return {
       items: rows.filter((c) => allowed === 'all' || (c.locationId && allowed.has(c.locationId))).map((c) => serializeConnection(c, { mappingErrors: errs.find((e) => e.id === c.id)?.c ?? 0 })),

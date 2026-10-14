@@ -40,6 +40,14 @@ export function registerJobHandlers(s: Services) {
     await deliverPush(s, input);
   });
 
+  s.jobs.register('foods.partner_order_event', async ({ orderId, to }: { orderId: string; to: string }) => {
+    await (await import('../services/foods-partners.ts')).onFoodOrderTransition(s, orderId, to);
+  });
+
+  s.jobs.register('realty.portal_sync', async ({ listingId }: { listingId: string }) => {
+    await (await import('../services/realty-portals.ts')).syncListingPortals(s, listingId);
+  });
+
   s.jobs.register('studios.expire-holds', async () => {
     await expireHolds(s);
     await (await import('../services/studios-commerce.ts')).runStudioLifecycle(s);

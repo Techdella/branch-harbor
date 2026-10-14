@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
+import { PartnerIntegrationsPanel } from './PartnerIntegrations';
 
 const STATE: Record<ConnectionState, [Tone, IconName]> = {
   connected: ['success', 'check-circle'],
@@ -111,6 +112,7 @@ export function ConnectionsScreen() {
         )}
       </Async>
       <p className="text-xs text-stone">{t('footer')}</p>
+      {(app.industry === 'foods' || app.industry === 'realty') && <PartnerIntegrationsPanel industry={app.industry} />}
     </>
   );
 }

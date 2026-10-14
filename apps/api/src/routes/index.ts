@@ -29,6 +29,7 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register(publicRoutes);
   await app.register(authRoutes);
   await app.register(webhookRoutes);
+  await app.register((await import('./partner-webhooks.ts')).partnerWebhookRoutes);
   await app.register(studioRoutes);
   await app.register(foodRoutes);
   await app.register(wellnessRoutes);
@@ -40,6 +41,7 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register(websiteRoutes);
   await app.register(domainRoutes);
   await app.register(connectionRoutes);
+  await app.register((await import('./partner-integrations.ts')).partnerIntegrationRoutes);
   await app.register(paymentRoutes);
   await app.register(reportRoutes);
   await app.register(crmRoutes);

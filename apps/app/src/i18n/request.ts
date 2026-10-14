@@ -4,6 +4,7 @@ import { LOCALE_COOKIE, resolveAppLocale } from './config';
 import en from '../../messages/en.json';
 import singleEn from '../../messages/single/en.json';
 import foodsEn from '../../messages/foods/en.json';
+import partnersEn from '../../messages/partners/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -27,7 +28,8 @@ export default getRequestConfig(async () => {
   const locale = resolveAppLocale(raw);
   // Independent-business strings live in messages/single/*.json (namespace "single") and foods strings in
   // messages/foods/*.json so they merge cleanly.
-  let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages }, foodsEn as Messages);
+  // Partner integrations (delivery partners, POS, property portals): namespace "partners", English only for now (falls back per key).
+  let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages, partners: partnersEn as Messages }, foodsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;

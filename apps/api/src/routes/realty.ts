@@ -340,6 +340,8 @@ export const realtyRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!canEditListing(a, listing, agentIds)) throw forbidden('Only the listing agents or an office manager can change the status');
       const r = await s.db.transaction((tx) => transitionListing(tx, { listing, office, to: req.body.to, actorUserId: req.user!.id, canApprove: locationAllowed(a.approve, listing.locationId), closedPriceMinor: req.body.closedPriceMinor, note: req.body.note }));
       for (const v of r.cancelledViewings ?? []) if (v.contactEmail) void s.mailer.send({ to: v.contactEmail, subject: `Viewing cancelled: ${listing.title}`, text: `Your viewing of ${listing.title} has been cancelled because the property is no longer available. We are sorry for the inconvenience.`, tag: 'realty-viewing-cancelled' }).catch(() => {});
+      // Portal syndication follows the status (re-send while public, remove when withdrawn / sold / let).
+      if (r.result !== 'pending_approval') await s.jobs.enqueue('realty.portal_sync', { listingId: id });
       return reply.code(r.result === 'pending_approval' ? 202 : 200).send({ result: r.result, cancelledViewings: r.cancelledViewings?.length ?? 0, listing: await detail(req, orgId, id) });
     });
 
@@ -366,6 +368,7 @@ export const realtyRoutes: FastifyPluginAsyncZod = async (app) => {
         }
         await audit(tx, { organizationId: orgId, ...actor(req), action: `realty.listing.${req.body.decision === 'approve' ? 'approved' : 'rejected'}`, scopeKind: 'location', scopeId: listing.locationId, targetType: 'realty_listing', targetId: id, metadata: { comment: req.body.comment, requestedStatus: listing.requestedStatus, changes: listing.pendingChanges ? Object.keys(listing.pendingChanges) : [] } });
       });
+      if (req.body.decision === 'approve') await s.jobs.enqueue('realty.portal_sync', { listingId: id });
       return detail(req, orgId, id);
     });
 

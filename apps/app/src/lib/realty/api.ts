@@ -10,7 +10,7 @@ import { http } from '../http/client';
 import { orgId } from '../http/workspace';
 import type { ViewRole } from '../types';
 import type {
-  Agent, AiResult, Enquiry, FeedPreview, ListingDetail, ListingInput, Offer, Office, Portal, RealtyListing, RealtyMe, RealtyReport, Viewing,
+  Agent, AiResult, Enquiry, FeedPreview, ListingDetail, ListingInput, Offer, Office, Portal, RealtyListing, RealtyMe, RealtyReport, SyndicationRow, Viewing,
 } from './types';
 
 export interface RealtyCtx {
@@ -46,7 +46,8 @@ export interface RealtyApi {
   reports(c: RealtyCtx): Promise<RealtyReport>;
   portals(c: RealtyCtx): Promise<Portal[]>;
   feed(c: RealtyCtx, portal: string): Promise<FeedPreview>;
-  exportFeed(c: RealtyCtx, portal: string): Promise<{ results: Array<{ listingId: string; reference: string; status: string; issues: string[] }> }>;
+  exportFeed(c: RealtyCtx, portal: string): Promise<{ transmitted: boolean; results: Array<{ listingId: string; reference: string; status: string; issues: string[] }> }>;
+  syndicationListings(c: RealtyCtx): Promise<SyndicationRow[]>;
   aiDescription(c: RealtyCtx, listingId: string, instructions?: string): Promise<AiResult>;
   aiFeedback(c: RealtyCtx, listingId: string): Promise<AiResult>;
   aiDecision(c: RealtyCtx, proposalId: string, decision: 'apply' | 'dismiss'): Promise<{ status: string; result?: Record<string, unknown> }>;
@@ -83,6 +84,7 @@ const live: RealtyApi = {
   portals: async (_c) => items(await http.get<{ items: Portal[] }>(R('/syndication/portals'))),
   feed: (_c, portal) => http.get(R(`/syndication/${portal}/feed`)),
   exportFeed: (_c, portal) => http.post(R(`/syndication/${portal}/export`), {}),
+  syndicationListings: async (_c) => items(await http.get<{ items: SyndicationRow[] }>(R('/syndication/listings'))),
   aiDescription: (_c, id, instructions) => http.post(R(`/listings/${id}/ai/description`), { instructions: instructions || undefined }),
   aiFeedback: (_c, id) => http.post(R(`/listings/${id}/ai/feedback-summary`), {}),
   aiDecision: (_c, id, decision) => http.post(R(`/ai/proposals/${id}/decision`), { decision }),

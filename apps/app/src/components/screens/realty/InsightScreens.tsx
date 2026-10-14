@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, Drawer, Icon } from '@bh/ui';
 import type { Currency } from '@bh/shared';
@@ -78,33 +79,73 @@ export function PulseScreen() {
   );
 }
 
-/** Portal syndication: sandbox adapters only — never presented as live integrations. */
+/** Portal feeds: per-office status (not configured / sandbox / live), validation errors per listing, preview and export. */
 export function PortalsScreen() {
   const t = useTranslations('realty');
+  const tp = useTranslations('partners');
   const tOps = useTranslations('ops.realty.portals');
   const locale = useLocale();
   const ctx = useRealtyCtx();
   const res = useRealty((api) => api.portals(ctx), [ctx]);
+  const rows = useRealty((api) => api.syndicationListings(ctx), [ctx]);
   const [preview, setPreview] = useState<string | null>(null);
   const exp = useRealtyMutation((api, p: string) => api.exportFeed(ctx, p));
   const [result, setResult] = useState<string | null>(null);
+  const tone = (s: string) => (s === 'live' ? 'success' : s === 'sandbox' ? 'warning' : s === 'error' ? 'danger' : s === 'awaiting_portal' ? 'info' : 'neutral') as 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+  const failing = (rows.data ?? []).filter((r) => r.issues.length || r.lastStatus === 'error' || r.lastStatus === 'invalid');
   return (
     <>
-      <PageHeader icon="plug" title={tOps('title')} description={tOps('description')} />
-      <Banner tone="info" icon="info" title={t('portals.sandboxTitle')}>{t('portals.sandboxBody')}</Banner>
+      <PageHeader icon="plug" title={tOps('title')} description={tp('descriptionRealty')} />
+      <Banner tone="info" icon="lock" title={tp('status.sandbox')} action={<Link className="text-xs font-bold underline" href="/connections">{tp('portals.openConnections')}</Link>}>{tp('sandboxBanner')} {tp('portals.configureHint')}</Banner>
       {result && <Banner tone="success" live="polite">{result}</Banner>}
       {exp.error && <Banner tone="danger" live="assertive">{exp.error.message}</Banner>}
+      <section className="rounded-xl bg-surface p-4" aria-labelledby="portal-errors">
+        <h2 id="portal-errors" className="mb-2 text-sm font-bold">{tp('portals.errorsTitle')}</h2>
+        <RAsync res={rows} variant="table">
+          {() => failing.length === 0 ? <p className="text-sm text-stone">{tp('portals.errorsEmpty')}</p> : (
+            <ul className="flex flex-col gap-2 text-sm" data-testid="portal-errors">
+              {failing.map((r) => (
+                <li key={`${r.listingId}-${r.portal}`} className="rounded-md bg-warning-bg px-3 py-2 text-warning">
+                  <div className="flex flex-wrap items-center gap-2"><strong>{r.reference}</strong><span>{r.title}</span><Badge tone="neutral">{tp(`portals.names.${r.portal}`)}</Badge><Badge tone="warning">{tp(`portals.lastStatus.${r.lastStatus}`)}</Badge></div>
+                  <ul className="mt-1 list-disc ps-5 text-xs">{(r.issues.length ? r.issues : r.lastIssues).map((i) => <li key={i}>{i}</li>)}</ul>
+                </li>
+              ))}
+            </ul>
+          )}
+        </RAsync>
+      </section>
       <RAsync res={res} variant="cards">
-        {(rows) => (
+        {(portals) => (
           <div className="grid gap-3 md:grid-cols-2">
-            {rows.map((p) => (
-              <section key={p.id} className="flex flex-col gap-2 rounded-xl bg-surface p-4 text-sm">
-                <div className="flex flex-wrap items-center gap-2"><strong className="flex-1">{p.name}</strong><Badge tone="neutral" icon="lock">{t('portals.sandbox')}</Badge><Badge tone="neutral">{p.format.toUpperCase()}</Badge></div>
-                <p className="text-xs text-stone">{p.description} · {p.countries.join(', ')}</p>
-                <p className="text-xs">{t('portals.optedIn', { count: p.optedInListings })} · {p.lastExportedAt ? t('portals.lastExport', { when: relativeTime(p.lastExportedAt, locale) }) : t('portals.neverExported')}</p>
-                <div className="flex gap-2">
+            {portals.map((p) => (
+              <section key={p.id} className="flex flex-col gap-2 rounded-xl bg-surface p-4 text-sm" data-testid={`portal-${p.id}`}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <strong className="flex-1">{p.name}</strong>
+                  <Badge tone={p.live ? 'success' : 'warning'} icon={p.live ? 'check-circle' : 'lock'}>{p.live ? tp('status.live') : t('portals.sandbox')}</Badge>
+                  <Badge tone="neutral">{p.format.toUpperCase()}</Badge>
+                </div>
+                <p className="text-xs text-stone">{p.description} · {p.countries.join(', ')} · {tp(`portals.delivery.${p.delivery}`)}</p>
+                <p className="text-xs">{t('portals.optedIn', { count: p.optedInListings })}{p.invalidListings ? ` · ${t('portals.issues', { count: p.invalidListings })}` : ''} · {p.lastExportedAt ? t('portals.lastExport', { when: relativeTime(p.lastExportedAt, locale) }) : t('portals.neverExported')}</p>
+                <div>
+                  <h3 className="text-xs font-bold uppercase text-stone">{tp('portals.statusTitle')}</h3>
+                  {p.offices.length === 0 ? <p className="text-xs text-stone">{tp('portals.noOffices')}</p> : (
+                    <ul className="mt-1 flex flex-col gap-1">
+                      {p.offices.map((o) => (
+                        <li key={o.locationId} className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="font-semibold">{o.name}</span>
+                          <Badge tone={tone(o.status)}>{tp(`status.${o.status}`)}</Badge>
+                          <span className="text-stone">{o.lastPush ? tp('portals.lastPush', { action: o.lastPush.action.replace('_', ' '), status: o.lastPush.status, when: relativeTime(o.lastPush.at, locale) }) : o.statusReason}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
                   <Button size="sm" variant="secondary" icon="eye" onClick={() => setPreview(p.id)}>{t('portals.preview')}</Button>
-                  <Button size="sm" variant="secondary" icon="refresh" loading={exp.pending} onClick={async () => { const r = await exp.run(p.id); if (r) { setResult(t('portals.exported', { count: r.results.filter((x) => x.status === 'sandbox_exported').length, invalid: r.results.filter((x) => x.status !== 'sandbox_exported').length })); res.reload(); } }}>{t('portals.runSandbox')}</Button>
+                  <Button size="sm" variant="secondary" icon="refresh" loading={exp.pending} onClick={async () => {
+                    const r = await exp.run(p.id);
+                    if (r) { setResult(tp('portals.exported', { ok: r.results.filter((x) => ['published', 'sandbox_exported', 'removed', 'sandbox_removed'].includes(x.status)).length, invalid: r.results.filter((x) => x.status === 'invalid' || x.status === 'error').length, transmitted: r.transmitted ? 'true' : 'false' })); res.reload(); rows.reload(); }
+                  }}>{p.live ? tp('portals.export') : tp('portals.exportSandbox')}</Button>
                 </div>
               </section>
             ))}
@@ -125,7 +166,7 @@ function FeedDrawer({ portal, onClose }: { portal: string; onClose: () => void }
       <RAsync res={res} variant="detail">
         {(f) => (
           <div className="flex flex-col gap-3 text-sm">
-            <Banner tone="info" icon="lock">{f.notice}</Banner>
+            <Banner tone={f.mode === 'live' ? 'success' : 'info'} icon="lock">{f.notice}</Banner>
             <p>{t('portals.included', { count: f.included.length })}</p>
             {f.excluded.length > 0 && (
               <ul className="flex flex-col gap-1 text-xs">{f.excluded.map((x) => <li key={x.listingId}><strong>{x.reference}</strong>: {x.issues.join('; ')}</li>)}</ul>

@@ -1,0 +1,221 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`portal feeds > REAXML: validation, feed, and withdrawn/sold entries so portals remove them 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<propertyList date="2026-10-14-12:00:00">
+  <residential modTime="2026-10-01-10:30:00" status="current">
+    <agentID>XYZ123</agentID>
+    <uniqueID>SYD-0001</uniqueID>
+    <underOffer value="no"/>
+    <listingAgent id="1"><name>James Okafor</name><telephone type="BH">+44 20 7946 0271</telephone><email>james@example.com</email></listingAgent>
+    <price display="yes">2350000</price>
+    <address display="yes"><streetNumber>21</streetNumber><street>Glenmore Rd</street><suburb display="yes">Paddington</suburb><state>NSW</state><postcode>2021</postcode><country>AUS</country></address>
+    <category name="Townhouse"/>
+    <headline>Paddington terrace with courtyard</headline>
+    <description>Three-bedroom Victorian terraced house with a south-facing garden and original fireplaces.</description>
+    <features><bedrooms>3</bedrooms><bathrooms>2</bathrooms></features>
+    <buildingDetails><area unit="squareMeter">118</area></buildingDetails><landDetails><area unit="squareMeter">120</area></landDetails>
+    <images><img id="m" modTime="2026-10-01-10:30:00" url="https://img.example.com/a.jpg"/><img id="a" modTime="2026-10-01-10:30:00" url="https://img.example.com/b.jpg"/></images>
+    <objects><floorplan id="1" modTime="2026-10-01-10:30:00" url="https://img.example.com/plan.pdf"/></objects>
+  </residential>
+  <rental modTime="2026-10-01-10:30:00" status="current">
+    <agentID>XYZ123</agentID>
+    <uniqueID>SYD-0003</uniqueID>
+    <underOffer value="no"/>
+    <listingAgent id="1"><name>James Okafor</name><telephone type="BH">+44 20 7946 0271</telephone><email>james@example.com</email></listingAgent>
+    <rent period="week" display="yes">950</rent>
+    <address display="yes"><streetNumber>21</streetNumber><street>Glenmore Rd</street><suburb display="yes">Paddington</suburb><state>NSW</state><postcode>2021</postcode><country>AUS</country></address>
+    <category name="Townhouse"/>
+    <headline>Paddington terrace with courtyard</headline>
+    <description>Three-bedroom Victorian terraced house with a south-facing garden and original fireplaces.</description>
+    <features><bedrooms>3</bedrooms><bathrooms>2</bathrooms></features>
+    <buildingDetails><area unit="squareMeter">118</area></buildingDetails><landDetails><area unit="squareMeter">120</area></landDetails>
+    <images><img id="m" modTime="2026-10-01-10:30:00" url="https://img.example.com/a.jpg"/><img id="a" modTime="2026-10-01-10:30:00" url="https://img.example.com/b.jpg"/></images>
+    <objects><floorplan id="1" modTime="2026-10-01-10:30:00" url="https://img.example.com/plan.pdf"/></objects>
+  </rental>
+  <residential modTime="2026-10-12-00:00:00" status="sold"><agentID>XYZ123</agentID><uniqueID>SYD-0002</uniqueID></residential>
+  <rental modTime="2026-10-13-00:00:00" status="withdrawn"><agentID>XYZ123</agentID><uniqueID>SYD-0009</uniqueID></rental>
+</propertyList>
+"
+`;
+
+exports[`portal feeds > Rightmove RTDF: validation and SendProperty/RemoveProperty output 1`] = `
+{
+  "generated": "2026-10-14T12:00:00.000Z",
+  "remove_property": [
+    {
+      "branch": {
+        "branch_id": 5678,
+        "channel": 2,
+      },
+      "network": {
+        "network_id": 1234,
+      },
+      "property": {
+        "agent_ref": "LON-0003",
+        "transaction_date": "10-10-2026",
+      },
+    },
+  ],
+  "send_property": [
+    {
+      "branch": {
+        "branch_id": 5678,
+        "channel": 1,
+        "overseas": false,
+      },
+      "network": {
+        "network_id": 1234,
+      },
+      "property": {
+        "address": {
+          "display_address": "Flask Walk, London, NW3",
+          "house_name_number": "14 Flask Walk",
+          "latitude": 51.5567,
+          "longitude": -0.1781,
+          "postcode_1": "NW3",
+          "postcode_2": "1HE",
+          "town": "London",
+        },
+        "agent_ref": "LON-0001",
+        "create_date": "01-09-2026 09:00:00",
+        "details": {
+          "bathrooms": 2,
+          "bedrooms": 3,
+          "council_tax_band": "H",
+          "description": "Three-bedroom Victorian terraced house with a south-facing garden and original fireplaces.",
+          "features": [
+            "Garden",
+            "Original fireplaces",
+          ],
+          "summary": "Victorian terrace on Flask Walk",
+          "year_built": 1880,
+        },
+        "media": [
+          {
+            "caption": "Front",
+            "media_type": 1,
+            "media_url": "https://img.example.com/a.jpg",
+            "sort_order": 1,
+          },
+          {
+            "media_type": 1,
+            "media_url": "https://img.example.com/b.jpg",
+            "sort_order": 2,
+          },
+          {
+            "media_type": 2,
+            "media_url": "https://img.example.com/plan.pdf",
+            "sort_order": 1,
+          },
+        ],
+        "price_information": {
+          "price": 2450000,
+          "price_qualifier": 2,
+          "tenure_type": 1,
+        },
+        "property_type": 0,
+        "published": true,
+        "status": 1,
+        "update_date": "01-10-2026 10:30:00",
+      },
+    },
+  ],
+}
+`;
+
+exports[`portal feeds > Zillow / RESO XML: validation and feed 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<!-- Element names follow the Zillow Listing Feed layout; RESO Data Dictionary equivalents: MlsId=ListingKey, Price=ListPrice, Status=StandardStatus, LivingArea=LivingArea(SquareFeet). -->
+<Listings generated="2026-10-14T12:00:00.000Z" feedId="zfeed-1" source="Keystone Realty Network">
+  <Listing>
+    <Location><StreetAddress>42 Birchmount Cres</StreetAddress><UnitNumber></UnitNumber><City>Toronto</City><State>ON</State><Zip>M1N 1A1</Zip><Country>CA</Country><Lat>51.5567</Lat><Long>-0.1781</Long><DisplayAddress>Yes</DisplayAddress></Location>
+    <ListingDetails><Status>Active</Status><Price>1649000</Price><Currency>CAD</Currency><ListingUrl></ListingUrl><MlsId>TOR-0001</MlsId><ProviderListingId>0b6f2c3e-7d1a-4c5b-9e8f-000000000001</ProviderListingId></ListingDetails>
+    <BasicDetails><PropertyType>SingleFamily</PropertyType><Title>Victorian terrace on Flask Walk</Title><Description>Three-bedroom Victorian terraced house with a south-facing garden and original fireplaces.</Description><Bedrooms>3</Bedrooms><Bathrooms>2.5</Bathrooms><FullBathrooms>2</FullBathrooms><HalfBathrooms>1</HalfBathrooms><LivingArea>1640</LivingArea><LotSize></LotSize><YearBuilt>1880</YearBuilt></BasicDetails>
+    <Pictures><Picture><PictureUrl>https://img.example.com/a.jpg</PictureUrl><Caption>Front</Caption></Picture><Picture><PictureUrl>https://img.example.com/b.jpg</PictureUrl><Caption></Caption></Picture></Pictures>
+    <Agent><FirstName>James</FirstName><LastName>Okafor</LastName><EmailAddress>james@example.com</EmailAddress><OfficeLineNumber>+44 20 7946 0271</OfficeLineNumber><LicenseNum></LicenseNum></Agent>
+    <Office><BrokerageName>Keystone Midtown Inc.</BrokerageName><BrokerPhone>+44 20 7946 0270</BrokerPhone><BrokerEmail>lon@example.com</BrokerEmail><BrokerageLicense>Keystone Midtown Inc., Brokerage</BrokerageLicense></Office>
+    <RichDetails><AdditionalFeatures>Garden, Original fireplaces</AdditionalFeatures></RichDetails>
+  </Listing>
+  <Listing>
+    <Location><StreetAddress></StreetAddress><UnitNumber></UnitNumber><City>Toronto</City><State>ON</State><Zip>M1N 1A1</Zip><Country>CA</Country><DisplayAddress>No</DisplayAddress></Location>
+    <ListingDetails><Status>Active</Status><Price>1649000</Price><Currency>CAD</Currency><ListingUrl></ListingUrl><MlsId>TOR-0002</MlsId><ProviderListingId>h</ProviderListingId></ListingDetails>
+    <BasicDetails><PropertyType>SingleFamily</PropertyType><Title>Condo &lt;with&gt; &quot;quotes&quot; &amp; more</Title><Description>Three-bedroom Victorian terraced house with a south-facing garden and original fireplaces.</Description><Bedrooms>3</Bedrooms><Bathrooms>2.5</Bathrooms><FullBathrooms>2</FullBathrooms><HalfBathrooms>1</HalfBathrooms><LivingArea>1640</LivingArea><LotSize></LotSize><YearBuilt>1880</YearBuilt></BasicDetails>
+    <Pictures><Picture><PictureUrl>https://img.example.com/a.jpg</PictureUrl><Caption>Front</Caption></Picture><Picture><PictureUrl>https://img.example.com/b.jpg</PictureUrl><Caption></Caption></Picture></Pictures>
+    <Agent><FirstName>James</FirstName><LastName>Okafor</LastName><EmailAddress>james@example.com</EmailAddress><OfficeLineNumber>+44 20 7946 0271</OfficeLineNumber><LicenseNum></LicenseNum></Agent>
+    <Office><BrokerageName>Keystone Midtown Inc.</BrokerageName><BrokerPhone>+44 20 7946 0270</BrokerPhone><BrokerEmail>lon@example.com</BrokerEmail><BrokerageLicense>Keystone Midtown Inc., Brokerage</BrokerageLicense></Office>
+    <RichDetails><AdditionalFeatures>Garden, Original fireplaces</AdditionalFeatures></RichDetails>
+  </Listing>
+</Listings>
+"
+`;
+
+exports[`portal feeds > idealista: validation and JSON import file 1`] = `
+{
+  "customerCode": "ilc0000sample",
+  "customerContact": {
+    "contactEmail": "mad@example.com",
+    "contactName": "Keystone Realty Network",
+  },
+  "customerCountry": "Spain",
+  "customerProperties": [
+    {
+      "propertyAddress": {
+        "addressCoordinatesLatitude": 51.5567,
+        "addressCoordinatesLongitude": -0.1781,
+        "addressCoordinatesPrecision": "exact",
+        "addressCountry": "Spain",
+        "addressPostalCode": "28001",
+        "addressStreetName": "Calle de Velázquez",
+        "addressStreetNumber": "58",
+        "addressTown": "Madrid",
+        "addressVisibility": "full",
+      },
+      "propertyCode": "0b6f2c3e-7d1a-4c5b-9e8f-000000000001",
+      "propertyContact": {
+        "contactEmail": "james@example.com",
+        "contactName": "James Okafor",
+        "contactPrimaryPhoneNumber": "+44 20 7946 0271",
+      },
+      "propertyDescriptions": [
+        {
+          "descriptionLanguage": "spanish",
+          "descriptionText": "Piso exterior de tres dormitorios con balcones a la calle, ascensor y portero.",
+        },
+      ],
+      "propertyFeatures": {
+        "featuresAreaConstructed": 142,
+        "featuresBathroomNumber": 2,
+        "featuresBedroomNumber": 3,
+        "featuresBuiltYear": 1880,
+        "featuresEnergyCertificateRating": "D",
+        "featuresType": "house_independent",
+      },
+      "propertyImages": [
+        {
+          "imageLabel": "Front",
+          "imageOrder": 1,
+          "imageUrl": "https://img.example.com/a.jpg",
+        },
+        {
+          "imageOrder": 2,
+          "imageUrl": "https://img.example.com/b.jpg",
+        },
+        {
+          "imageLabel": "plan",
+          "imageOrder": 3,
+          "imageUrl": "https://img.example.com/plan.pdf",
+        },
+      ],
+      "propertyOperation": {
+        "operationPrice": 1150000,
+        "operationType": "sale",
+      },
+      "propertyReference": "MAD-0001",
+      "propertyVisibility": "idealista",
+    },
+  ],
+  "customerReference": "Keystone Realty Network",
+  "customerSendDate": "2026/10/14 12:00:00",
+}
+`;

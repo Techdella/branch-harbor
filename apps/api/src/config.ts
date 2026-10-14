@@ -131,6 +131,19 @@ const envSchema = z.object({
   SHOPIFY_API_SECRET: optional,
   WOOCOMMERCE_CONSUMER_KEY: optional,
   WOOCOMMERCE_CONSUMER_SECRET: optional,
+
+  // Partner integrations (per-location credentials live in connections; these are platform-level overrides)
+  /** Override Uber Direct endpoints (defaults: https://auth.uber.com/oauth/v2/token, https://api.uber.com). */
+  UBER_DIRECT_AUTH_URL: optional,
+  UBER_DIRECT_API_URL: optional,
+  /** Comma-separated ISO countries where Uber Direct may be offered (default: built-in list). */
+  UBER_DIRECT_COUNTRIES: optional,
+  /** Fallback webhook signing key when a location connection has none (single Uber Direct account setups). */
+  UBER_DIRECT_WEBHOOK_SIGNING_KEY: optional,
+  /** Override the Deliverect API base (defaults per connection: staging or production). */
+  DELIVERECT_API_URL: optional,
+  /** Fallback Deliverect webhook HMAC secret (production partner secret). */
+  DELIVERECT_WEBHOOK_SECRET: optional,
 });
 
 export type Config = z.infer<typeof envSchema>;
@@ -178,5 +191,8 @@ export function integrationStatus(cfg: Config) {
     shopify: mode(!!cfg.SHOPIFY_API_KEY, 'sandbox'),
     woocommerce: 'per-connection credentials',
     wordpress: 'per-connection credentials',
+    uberDirect: 'per-location credentials (sandbox without them)',
+    deliverect: 'per-location credentials (sandbox without them)',
+    propertyPortals: 'per-office credentials (sandbox without them)',
   } as const;
 }
