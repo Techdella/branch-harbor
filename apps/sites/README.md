@@ -46,7 +46,7 @@ Seeded examples: `/stillwater-yoga` (studios, 5 public locations; Leslieville is
 | `…/order` → `…/orders/{id}?token=` | Foods: pickup slot → menu → modifiers → cart → server quote (tax only if configured) → details → pay → status page that polls and separates "awaiting acceptance" from "accepted" |
 | `…/book` | Wellness: service → practitioner or any → date → slot → terms → details → book (→ deposit) |
 | `…/programmes` | Sports: guardian + participant registration → review-pending confirmation (payment ≠ selection) |
-| `…/shop` | Commerce: products with this location's stock band; no native checkout — links out when an external store (e.g. WooCommerce) is authoritative |
+| `…/shop`, `…/shop/p/{product}`, `…/shop/cart`, `…/shop/orders/{id}?token=`, `…/shop/account` | Commerce storefront: collections, search, product page (variants, this store's stock, sibling stores), cart → pickup / collect at another store / delivery / shipping → server quote with configured taxes → order (stock held for the payment window) → pay → status page with return requests; account (sign in → orders, store credit per currency). Links out instead when an external store (e.g. WooCommerce) is authoritative. Browser calls go through `app/api/shop/[...path]` (public commerce, sandbox confirm, login, `/me/commerce`). |
 | `…/manage/booking/{id}?token=` · `…/manage/waitlist/{id}?token=` · `…/manage/appointment/{id}?token=` | Manage pages: cancel booking (refund/void reported from the server), leave waitlist, cancel appointment |
 | `/{brand}/sitemap.xml`, `/{brand}/robots.txt` | Per-brand sitemap (canonical URLs) and robots (manage/order pages disallowed); `/sitemap.xml` and `/robots.txt` on custom domains |
 
