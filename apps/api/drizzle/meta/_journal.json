@@ -64,6 +64,13 @@
       "when": 1792012513958,
       "tag": "0008_studios_full",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792012691803,
+      "tag": "0009_commerce_full",
+      "breakpoints": true
     }
   ]
 }

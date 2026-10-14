@@ -9,3 +9,4 @@ export * from './sports-ext.ts';
 export * from './realty-ext.ts';
 export * from './wellness-ext.ts';
 export * from './studios-ext.ts';
+export * from './commerce-ext.ts';

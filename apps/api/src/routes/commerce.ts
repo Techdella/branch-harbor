@@ -11,6 +11,7 @@ import { authorisedLocations, requireLocationPerm, requirePerm } from '../servic
 import { serializePayment } from '../services/payments.ts';
 import { refundCommerceOrder } from '../services/commerce.ts';
 import { assertRefundWithinThreshold } from '../services/approvals.ts';
+import { assertWithinBounds } from '../services/commerce-catalogue.ts';
 import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
 const RETURN_FLOW: Record<string, string[]> = { requested: ['reviewed', 'rejected'], reviewed: ['authorised', 'rejected'], authorised: ['received'], received: ['resolved'], resolved: [], rejected: [] };
@@ -54,6 +55,11 @@ export const commerceRoutes: FastifyPluginAsyncZod = async (app) => {
     const loc = await requireLocationPerm(req, s.db, orgId, locationId, 'operations.write');
     const [v] = await s.db.select().from(variants).where(and(eq(variants.id, variantId), eq(variants.organizationId, orgId)));
     if (!v) throw notFound('Variant');
+    if (req.body.priceMinor != null) {
+      // Local prices stay inside the HQ range for the store's currency.
+      const [p] = await s.db.select().from(products).where(eq(products.id, v.productId));
+      assertWithinBounds(p!, v, loc.currency, req.body.priceMinor);
+    }
     const values = { organizationId: orgId, locationId, variantId, ...req.body, currency: loc.currency, updatedAt: new Date() };
     const [row] = await s.db.insert(locationVariants).values(values).onConflictDoUpdate({ target: [locationVariants.locationId, locationVariants.variantId], set: { ...req.body, updatedAt: new Date() } }).returning();
     return { ...row, effectivePrice: row!.priceMinor ?? v.prices[loc.currency] ?? null, priceOrigin: row!.priceMinor != null ? 'local' : 'hq' };
@@ -68,7 +74,7 @@ export const commerceRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post('/orgs/:orgId/commerce/stock-movements', {
     schema: {
       tags: ['commerce'], security: secured, params: orgParams, summary: 'Record an inventory movement with a reason (history, not just a mutable number)',
-      body: z.object({ locationId: z.uuid(), variantId: z.uuid(), quantity: z.number().int().refine((n) => n !== 0, 'Quantity cannot be zero'), reason: z.enum(['adjustment', 'count', 'return', 'transfer_in', 'transfer_out', 'damage', 'received']), note: z.string().max(500).optional(), reference: z.string().max(120).optional() }),
+      body: z.object({ locationId: z.uuid(), variantId: z.uuid(), quantity: z.number().int().refine((n) => n !== 0, 'Quantity cannot be zero'), reason: z.enum(['adjustment', 'count', 'return', 'transfer_in', 'transfer_out', 'damage', 'received', 'shrinkage', 'found', 'correction', 'supplier_return']), note: z.string().max(500).optional(), reference: z.string().max(120).optional() }),
     },
   }, async (req, reply) => {
     const { orgId } = req.params;

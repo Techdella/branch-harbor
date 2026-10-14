@@ -2,14 +2,16 @@ import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/tabs';
 import { TabBar, type IconName } from '@/components';
 import { useI18n } from '@/i18n';
+import { useCt } from '@/features/commerce/strings';
 import { api } from '@/lib/api';
 import { useSession } from '@/lib/session';
 import { useApi } from '@/lib/useApi';
 
-const ICONS: Record<string, IconName> = { pulse: 'activity', approvals: 'check-circle', locations: 'store', alerts: 'bell', utilisation: 'chart' };
+const ICONS: Record<string, IconName> = { pulse: 'activity', approvals: 'check-circle', locations: 'store', alerts: 'bell', utilisation: 'chart', sales: 'cart' };
 
 export default function OwnerTabs() {
   const { t } = useI18n();
+  const { ct } = useCt();
   const { status, me } = useSession();
   // A single independent business has one location: no locations list to switch between.
   const single = me?.business?.model === 'independent';
@@ -23,6 +25,7 @@ export default function OwnerTabs() {
       <Tabs.Screen name="locations" options={{ title: t('tabs.locations'), ...(single ? { href: null } : {}) }} />
       <Tabs.Screen name="alerts" options={{ title: t('tabs.alerts') }} />
       <Tabs.Screen name="utilisation" options={{ title: 'Utilisation' }} />
+      <Tabs.Screen name="sales" options={{ title: ct('shopTitle') }} />
     </Tabs>
   );
 }

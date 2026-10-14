@@ -13,6 +13,7 @@ export const affectsOnHand = (reason: string) => !(RESERVATION_REASONS as readon
 export const REASON_LABEL: Record<string, string> = {
   adjustment: 'Adjustment', count: 'Stock count', received: 'Received', sale: 'Sale', return: 'Return', damage: 'Damaged / write-off',
   transfer_in: 'Transfer in', transfer_out: 'Transfer out', reservation: 'Reserved for unpaid order', release: 'Reservation released',
+  shrinkage: 'Shrinkage (loss/theft)', found: 'Found stock', correction: 'Correction', supplier_return: 'Returned to supplier',
 };
 
 type OrderRow = typeof orders.$inferSelect;

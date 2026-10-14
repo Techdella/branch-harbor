@@ -10,6 +10,7 @@ import { audit } from './audit.ts';
 import { convertReservationToSale } from './inventory.ts';
 import { fulfilRegistrationPayment } from './sports-core.ts';
 import { failStudioPayment, fulfilStudioPayment, processStudioBillingEvent, studioTargetsInOrder } from './studios-fulfil.ts';
+import { commerceOrderPaymentEnded, fulfilCommerceOrderPayment } from './commerce-orders.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
 export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration' | 'wellness_package' | 'wellness_voucher' | 'studio_purchase' | 'membership_invoice';
@@ -108,15 +109,9 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
       await tx.update(foodOrders).set({ paymentStatus: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(foodOrders.id, o.id));
       return { fulfilled: true, note: 'Order paid — awaiting restaurant acceptance' };
     }
-    case 'order': {
-      const [o] = await tx.select().from(orders).where(eq(orders.id, p.targetId)).for('update');
-      if (!o) return { fulfilled: false, note: 'Order record missing' };
-      if (o.status === 'pending_payment') {
-        await tx.update(orders).set({ status: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(orders.id, o.id));
-        await convertReservationToSale(tx, o);
-      }
-      return { fulfilled: true, note: 'Order paid' };
-    }
+    case 'order':
+      // Commerce: reservation → sale, cross-store transfer, or the late-payment recovery path.
+      return fulfilCommerceOrderPayment(tx, p);
     case 'appointment': {
       const [a] = await tx.select().from(appointments).where(eq(appointments.id, p.targetId));
       if (!a) return { fulfilled: false, note: 'Appointment record missing' };
@@ -210,6 +205,7 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
             await tx.update(classBookings).set({ status: 'expired' }).where(and(eq(classBookings.id, ref.targetId), eq(classBookings.status, 'held')));
           }
           if (ref.targetType === 'studio_purchase') await failStudioPayment(tx, ref);
+          if (ref.targetType === 'order' && ref.targetId) await commerceOrderPaymentEnded(tx, ref, finalState);
           if (ref.targetType === 'food_order' && ref.targetId) {
             await tx.update(foodOrders).set({ paymentStatus: 'voided', status: 'cancelled', updatedAt: new Date() }).where(and(eq(foodOrders.id, ref.targetId), eq(foodOrders.status, 'awaiting_acceptance'), eq(foodOrders.paymentStatus, 'pending')));
           }
@@ -368,7 +364,7 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
       switch (p.targetType) {
         case 'class_booking': { const b = p.targetId ? bookingsMap.get(p.targetId) : undefined; ok = !!b && ['confirmed', 'attended', 'no_show'].includes(b.status); break; }
         case 'food_order': { const o = p.targetId ? foodMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'rejected' && o.status !== 'cancelled' ? true : !!o && p.refundedMinor >= p.amountMinor; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
-        case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'pending_payment'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
+        case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && !['pending_payment', 'expired', 'cancelled'].includes(o.status) && o.fulfilmentStatus !== 'stock_conflict'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
         case 'appointment': {
           const a = p.targetId ? apptMap.get(p.targetId) : undefined;
           // Wellness deposits: a fee retained under the cancellation/no-show policy is not a missing record.

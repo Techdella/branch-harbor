@@ -383,7 +383,23 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 
 - `GET /v1/orgs/{orgId}/audit-events`
 
-**commerce**
+**commerce (full product — routes/commerce-*.ts, services/commerce-*.ts, schema/commerce-ext.ts)**
+
+- Catalogue (HQ, `templates.write`): `GET/POST /orgs/{orgId}/commerce/catalogue`, `GET/PUT …/catalogue/{id}` (option matrix validated, SKUs locked after distribution, removed variants archived), `POST …/catalogue/variant-matrix`, `PUT/DELETE …/catalogue/{id}/translations/{locale}`, `GET/POST/PUT …/collections`
+- Distribution: `POST …/distributions/preview` (per store/product: list/update/delist/blocked + local prices outside new bounds), `POST …/distributions`, `GET …/distributions[/{id}]`, `POST …/distributions/{id}/retry`. Stores show the distributed **snapshot**, never undistributed edits.
+- Local assortment: `GET …/locations/{locationId}/assortment`, `PUT …/assortment/{variantId}` (price within HQ % bounds per currency — managers only; availability; reorder point/qty; backorders), `POST …/assortment/reset`
+- Storefront settings: `GET …/fulfilment-settings`, `PUT …/locations/{id}/fulfilment-settings`, `PUT …/locations/{id}/tax-rates` (`policies.write`; only configured rates are applied)
+- Orders: `GET …/overview`, `GET …/sales-orders[/{id}]`, `POST …/sales-orders/{id}/fulfilments`, `POST …/fulfilments/{id}/pick`, `POST …/fulfilments/{id}/status`, `GET …/fulfilment-queue?locationId`, `POST …/sales-orders/{id}/allocate-backorders`, `POST …/sales-orders/{id}/recover` (stock conflict), `POST …/sales-orders/{id}/cancel`, `POST …/reservations/expire`
+- Inventory: `GET …/inventory/alerts`, `GET/POST …/stock-counts`, `GET …/stock-counts/{id}`, `POST …/stock-counts/{id}/entries|submit|apply`, `GET/POST …/transfers`, `GET …/transfers/{id}`, `POST …/transfers/{id}/decision|ship|receive|cancel`, `GET/POST …/suppliers`, `GET/POST …/purchase-orders`, `POST …/purchase-orders/{id}/send|receive|cancel`, `GET …/variants/lookup?code`
+- Returns: `GET …/returns[/{id}]`, `POST …/sales-orders/{id}/returns`, `POST …/returns/{id}/review|authorise|reject|receive|resolve` (refund — above threshold → approvals inbox; store credit; exchange)
+- Gift cards / store credit: `GET/POST …/gift-cards`, `GET …/gift-cards/{id}`, `POST …/gift-cards/{id}/adjust`, `GET …/store-credit?email`
+- Reports & AI: `GET …/reports` (per currency; `combinedRevenue: null`), `POST …/ai/product-copy`, `GET …/ai/merchandising`, `GET …/ai/stock-explainer`
+- External orders: `POST …/connections/{id}/sync-orders` (WooCommerce, idempotent), `POST /v1/webhooks/woocommerce/{connectionId}` (HMAC `X-WC-Webhook-Signature`, `credentials.webhookSecret`)
+- Storefront (public): `GET /v1/public/commerce/{brand}/{location}/storefront|products|products/{slugOrId}`, `POST /v1/public/commerce/locations/{id}/quote|checkout` (`Idempotency-Key`), `GET /v1/public/commerce/orders/{id}?token`, `POST …/orders/{id}/cancel|returns?token`, `POST /v1/public/commerce/gift-cards/balance`
+- Signed-in customer: `GET /v1/me/commerce/orders[/{id}]`, `POST /v1/me/commerce/orders/{id}/returns`, `GET /v1/me/commerce/credit`
+- Rules: reservations lock `location_variants` rows (`FOR UPDATE`) so the last unit sells once; unpaid checkouts hold stock for `reservationMinutes` and the sweep (60 s, plus lazily) releases it and cancels the payment intent; a payment landing after expiry re-allocates if stock is free, otherwise the order is kept paid with `fulfilmentStatus: stock_conflict` and appears in the reconciliation queue. Cross-store collection reserves at the selling store, creates an approved transfer, and sells at the collection store on handover.
+
+**commerce (first release)**
 
 - `GET /v1/orgs/{orgId}/commerce/products`
 - `POST /v1/orgs/{orgId}/commerce/products`

@@ -21,7 +21,7 @@ import { AttendanceScreen } from './sports/AttendanceScreen';
 import { SportsScreen } from './sports/SportsScreens';
 import { CalendarScreen } from './wellness/CalendarScreen';
 import { wellnessScreen } from './wellness/WellnessRouter';
-import { CommerceOrdersScreen } from './commerce/OrdersScreen';
+import { CommerceRoutes } from './commerce/CommerceRoutes';
 import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
 import { KitchenScreen } from './foods/KitchenScreen';
@@ -55,6 +55,7 @@ export function OpsRouter({ screen }: { screen: string }) {
   if (app.industry === 'wellness') { const w = wellnessScreen(def.key); if (w) return w; }
   if (def.kind === 'table') return <TableScreen tableKey={def.key} title={title} icon={def.icon} permission="operations.read" />;
   const key = `${app.industry}:${def.key}`;
+  if (app.industry === 'commerce') return <CommerceRoutes screen={def.key} />;
   switch (key) {
     case 'studios:classes':
       return <ClassesScreen />;
@@ -87,8 +88,6 @@ export function OpsRouter({ screen }: { screen: string }) {
       return <SportsScreen screen={def.key} />;
     case 'wellness:calendar':
       return <CalendarScreen />;
-    case 'commerce:orders':
-      return <CommerceOrdersScreen />;
     case 'foods:menu':
       return <MenuScreen />;
     case 'foods:orders':

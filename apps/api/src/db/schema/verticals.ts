@@ -453,6 +453,24 @@ export const products = pgTable('products', {
   /** Fields locations may not change. */
   lockedFields: jsonb('locked_fields').$type<string[]>().notNull().default(['name', 'description', 'sku']),
   images: jsonb('images').$type<string[]>().notNull().default([]),
+  /** URL-safe handle for storefront product pages (unique per organisation when set). */
+  slug: text('slug'),
+  vendor: text('vendor'),
+  productType: text('product_type'),
+  tags: jsonb('tags').$type<string[]>().notNull().default([]),
+  /** Option matrix, e.g. [{ name: 'Size', values: ['A5', 'Pocket'] }, { name: 'Ruling', values: ['Dot', 'Ruled'] }]. */
+  options: jsonb('options').$type<Array<{ name: string; values: string[] }>>().notNull().default([]),
+  /** Specifications supplied by HQ. AI copy may only use these facts. */
+  specs: jsonb('specs').$type<Record<string, string>>().notNull().default({}),
+  /** Which locations may list the product. */
+  eligibility: jsonb('eligibility').$type<{ mode: 'all' | 'selected'; locationIds: string[] }>().notNull().default({ mode: 'all', locationIds: [] }),
+  /** HQ bounds for local price overrides per currency, as % of the HQ list price. Missing currency = no local overrides. */
+  priceBounds: jsonb('price_bounds').$type<Record<string, { minPct: number; maxPct: number }>>().notNull().default({}),
+  allowBackorder: boolean('allow_backorder').notNull().default(false),
+  returnable: boolean('returnable').notNull().default(true),
+  /** Bumped on every master content change; listings record the version they were distributed with. */
+  contentVersion: integer('content_version').notNull().default(1),
+  updatedBy: uuid('updated_by'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [uniqueIndex('products_org_sku_uq').on(t.organizationId, t.sku)]);
@@ -466,6 +484,11 @@ export const variants = pgTable('variants', {
   options: jsonb('options').$type<Record<string, string>>().notNull().default({}),
   /** HQ list price per currency, minor units: { "USD": 2500, "CAD": 3300 } */
   prices: jsonb('prices').$type<Record<string, number>>().notNull().default({}),
+  barcode: text('barcode'),
+  /** active | archived */
+  status: text('status').notNull().default('active'),
+  position: integer('position').notNull().default(0),
+  imageUrl: text('image_url'),
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('variants_org_sku_uq').on(t.organizationId, t.sku)]);
 
@@ -482,6 +505,13 @@ export const locationVariants = pgTable('location_variants', {
   /** Units held for unpaid orders. Reservations never change on-hand stock. */
   reserved: integer('reserved').notNull().default(0),
   reorderPoint: integer('reorder_point'),
+  /** Suggested quantity to reorder when the reorder point is reached. */
+  reorderQty: integer('reorder_qty'),
+  /** null = follow the product's backorder setting. */
+  allowBackorder: boolean('allow_backorder'),
+  priceSetBy: uuid('price_set_by'),
+  priceSetAt: ts('price_set_at'),
+  updatedBy: uuid('updated_by'),
   updatedAt: updatedAt(),
 }, (t) => [uniqueIndex('location_variants_uq').on(t.locationId, t.variantId)]);
 
@@ -517,10 +547,49 @@ export const orders = pgTable('orders', {
   totalMinor: minor('total_minor').notNull(),
   refundedMinor: minor('refunded_minor').notNull().default(0),
   paymentId: uuid('payment_id'),
-  lines: jsonb('lines').$type<Array<{ variantId: string; sku: string; name: string; quantity: number; unitPriceMinor: number }>>().notNull().default([]),
+  lines: jsonb('lines').$type<OrderLine[]>().notNull().default([]),
+  orderNumber: text('order_number'),
+  /** pending | paid | failed | expired | refunded | partially_refunded | external | not_required */
+  paymentStatus: text('payment_status').notNull().default('pending'),
+  /** Collection store when it differs from the selling store (stock moves by transfer). */
+  fulfilmentLocationId: uuid('fulfilment_location_id'),
+  userId: uuid('user_id'),
+  customerName: text('customer_name'),
+  customerEmail: text('customer_email'),
+  customerPhone: text('customer_phone'),
+  shippingAddress: jsonb('shipping_address').$type<Record<string, string>>(),
+  fulfilmentFeeMinor: minor('fulfilment_fee_minor').notNull().default(0),
+  /** Gift card / store credit applied (same currency). */
+  creditAppliedMinor: minor('credit_applied_minor').notNull().default(0),
+  taxLines: jsonb('tax_lines').$type<Array<{ name: string; rateBps: number; inclusive: boolean; amountMinor: number }>>().notNull().default([]),
+  reservationExpiresAt: ts('reservation_expires_at'),
+  manageTokenHash: text('manage_token_hash'),
+  idempotencyKey: text('idempotency_key'),
+  notes: text('notes'),
+  /** Why the order needs a person (e.g. paid after the reservation expired and stock is gone). */
+  attention: text('attention'),
+  externalStatus: text('external_status'),
+  stockAppliedAt: ts('stock_applied_at'),
+  history: jsonb('history').$type<Array<{ at: string; event: string; by?: string | null; note?: string }>>().notNull().default([]),
+  paidAt: ts('paid_at'),
+  fulfilledAt: ts('fulfilled_at'),
+  cancelledAt: ts('cancelled_at'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
-}, (t) => [uniqueIndex('orders_source_ext_uq').on(t.organizationId, t.source, t.externalId)]);
+}, (t) => [
+  uniqueIndex('orders_source_ext_uq').on(t.organizationId, t.source, t.externalId),
+  uniqueIndex('orders_idem_uq').on(t.organizationId, t.idempotencyKey),
+  index('orders_loc_created_idx').on(t.locationId, t.createdAt),
+]);
+
+/** One order line. Quantities: allocated (reserved/sold from stock) + backordered = quantity. */
+export interface OrderLine {
+  variantId: string; sku: string; name: string; quantity: number; unitPriceMinor: number;
+  productId?: string; productName?: string; options?: Record<string, string>;
+  allocated?: number; backordered?: number;
+  /** External line whose SKU has no BranchHarbor variant (no stock effect). */
+  unmapped?: boolean;
+}
 
 export const returns = pgTable('returns', {
   id: pk(),
@@ -529,12 +598,27 @@ export const returns = pgTable('returns', {
   orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
   /** requested | reviewed | authorised | received | resolved | rejected */
   status: text('status').notNull().default('requested'),
-  lines: jsonb('lines').$type<Array<{ variantId: string; quantity: number }>>().notNull().default([]),
+  lines: jsonb('lines').$type<ReturnLine[]>().notNull().default([]),
   reason: text('reason'),
   refundId: uuid('refund_id'),
+  rmaNumber: text('rma_number'),
+  /** customer | staff */
+  requestedVia: text('requested_via').notNull().default('staff'),
+  customerEmail: text('customer_email'),
+  /** refund | exchange | store_credit */
+  resolution: text('resolution'),
+  refundAmountMinor: minor('refund_amount_minor'),
+  currency: currencyCol(),
+  approvalId: uuid('approval_id'),
+  giftCardId: uuid('gift_card_id'),
+  exchangeOrderId: uuid('exchange_order_id'),
+  decisionNote: text('decision_note'),
+  history: jsonb('history').$type<Array<{ at: string; event: string; by?: string | null; note?: string }>>().notNull().default([]),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+export interface ReturnLine { variantId: string; quantity: number; reason?: string; disposition?: 'restock' | 'write_off'; receivedQty?: number; unitPriceMinor?: number; name?: string; sku?: string }
 
 // ───────────── Foods ─────────────
 export const menus = pgTable('menus', {
