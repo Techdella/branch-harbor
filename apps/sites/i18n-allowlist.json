@@ -1,0 +1,6 @@
+{
+  "$comment": "Strings the hard-coded-string lint (pnpm lint:strings) accepts: brand names, units and code formats that are the same in every language. Prefer moving UI text to messages/*.json.",
+  "files": [],
+  "texts": ["UTC"],
+  "patterns": []
+}

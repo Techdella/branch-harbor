@@ -10,6 +10,9 @@
     "web": "expo start --web",
     "export:web": "expo export --platform web",
     "typecheck": "tsc --noEmit",
+    "check:messages": "node scripts/check-messages.mjs",
+    "lint:strings": "node ../../scripts/i18n/lint-strings.mjs --root app --root src --allow i18n-allowlist.json",
+    "lint": "pnpm run check:messages && pnpm run lint:strings",
     "doctor": "expo-doctor",
     "assets": "node scripts/generate-assets.mjs"
   },

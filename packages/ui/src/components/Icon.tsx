@@ -9,6 +9,9 @@ export interface IconProps {
   label?: string;
 }
 
+/** Icons that point along the reading direction; they mirror in right-to-left pages. */
+const DIRECTIONAL = new Set<string>(['arrow-right', 'arrow-left', 'arrow-up-right', 'chevron-right', 'chevron-left', 'undo', 'send', 'logout']);
+
 export function Icon({ name, size = 20, stroke = 1.9, className, label }: IconProps) {
   return (
     <svg
@@ -20,7 +23,7 @@ export function Icon({ name, size = 20, stroke = 1.9, className, label }: IconPr
       strokeWidth={stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      className={DIRECTIONAL.has(name) ? (className ? `rtl:-scale-x-100 ${className}` : 'rtl:-scale-x-100') : className}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}

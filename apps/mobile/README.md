@@ -92,7 +92,7 @@ src/
   lib/format.ts              Intl money + location-timezone time helpers (DST-safe wall-clock → UTC)
   lib/network.ts, motion.ts  connectivity (+ simulated outage in mock mode), reduced motion, SR announcements
   mock/                      sample brands/locations/menu (from design/prototype/bh-data.js) + in-process /v1 mock
-  i18n/                      en (complete), fr, es, de, pt-BR (core strings; fall back to en)
+  i18n/                      en, fr, es, de, pt-BR — all complete (`pnpm check:messages`)
   features/                  customer catalog/cart/order-status helpers, shared hooks
 ```
 

@@ -65,7 +65,7 @@ export function ErrorState({ error, onRetry, compact }: { error?: ApiError; onRe
     <div role="alert" className={cx('flex flex-col items-center gap-3 rounded-xl bg-surface text-center', compact ? 'p-6' : 'px-6 py-14')}>
       <IconTile name="alert" pastel="#FBE4E1" />
       <h2 className="text-h3 font-bold">{t('errorTitle')}</h2>
-      <p className="max-w-md text-sm text-stone">{error?.message ?? t('errorBody')}</p>
+      <p className="max-w-md text-sm text-stone">{error?.message && error.code !== 'unknown_error' ? error.message : t('errorBody')}</p>
       {error?.code && <p className="text-xs text-mute">{t('errorCode', { code: error.code })}</p>}
       {onRetry && (
         <Button variant="secondary" icon="refresh" onClick={onRetry}>

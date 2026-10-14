@@ -131,9 +131,11 @@ integer minor units + ISO currency, formatted with `Intl` in the viewer's locale
 per currency — "Combined total: Not shown — no conversion method defined".
 
 UI language is cookie-based (`NEXT_LOCALE`, no URL prefix), chosen from the profile menu, sign-in or Settings and
-falling back to `Accept-Language`. `messages/en.json` is complete; `fr`, `es`, `de`, `pt-BR` cover navigation, shell,
-common, states, overview, AI panel, auth and operations titles, and fall back to English key-by-key. Sample business
-content (metric names, record text) comes from the data layer and is English.
+falling back to `Accept-Language`. Every catalogue (`messages/*.json`, `messages/single/*`, `messages/foods/*`) is complete in `en` (US English), `fr`,
+`es`, `de` and `pt-BR`; `pnpm lint` runs `check:messages` (same keys, same ICU arguments and plural forms in every
+locale) and `lint:strings` (no hard-coded JSX text or labels; exceptions in `i18n-allowlist.json`). Terminology lives
+in [`docs/i18n-glossary.md`](../../docs/i18n-glossary.md). Sample business content (metric names, record text) and API
+error messages come from the data layer and are English.
 
 ## Routes
 

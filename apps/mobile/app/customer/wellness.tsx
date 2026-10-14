@@ -72,7 +72,7 @@ function BookFlow({ onBooked }: { onBooked: () => void }) {
       {(services.data ?? []).map((s) => (
         <Card key={s.id} onPress={() => { setSvc(s); setVariantId(s.variants[0]?.id); setSlot(null); }} bg={svc?.id === s.id ? '#E2F5A6' : undefined} accessibilityLabel={s.name}>
           <Text weight={700}>{s.name}</Text>
-          <Text variant="small" tone="muted">{s.variants.length ? s.variants.map((x) => `${x.name} ${fmtMoney(x.price, locale)}`).join(' · ') : `${s.durationMinutes} min · ${fmtMoney(s.price, locale)}`}</Text>
+          <Text variant="small" tone="muted">{s.variants.length ? s.variants.map((x) => `${x.name} ${fmtMoney(x.price, locale)}`).join(' · ') : `${t('minutes', { n: s.durationMinutes })} · ${fmtMoney(s.price, locale)}`}</Text>
         </Card>
       ))}
       {svc && svc.variants.length > 1 && (

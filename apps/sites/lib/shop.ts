@@ -1,5 +1,6 @@
 /** Commerce storefront view models and the browser client (same-origin /api/shop proxy). */
 import type { Address, Money } from './types';
+import { fallbackText } from './fallback-messages';
 
 export type Band = 'in_stock' | 'low_stock' | 'out_of_stock' | 'backorder' | 'not_stocked';
 export interface ShopVariant { id: string; sku: string; name: string; options: Record<string, string>; imageUrl: string | null; price: Money | null; availability: Band }
@@ -54,10 +55,10 @@ export async function shop<T>(method: 'GET' | 'POST', path: string, body?: unkno
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
     const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-    if (!res.ok) return { ok: false, status: res.status, error: (json.error as { code: string; message: string; fields?: Record<string, string> }) ?? { code: 'http_error', message: `Request failed (${res.status})` } };
+    if (!res.ok) return { ok: false, status: res.status, error: (json.error as { code: string; message: string; fields?: Record<string, string> }) ?? { code: 'http_error', message: fallbackText('requestFailed', { status: res.status }) } };
     return { ok: true, data: json as T, status: res.status };
   } catch {
-    return { ok: false, status: 0, error: { code: 'network', message: 'Network error. Check your connection and try again.' } };
+    return { ok: false, status: 0, error: { code: 'network', message: fallbackText('network') } };
   }
 }
 

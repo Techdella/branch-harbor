@@ -35,11 +35,11 @@ export function TabBar({ state, descriptors, navigation, icons }: BottomTabBarPr
                 const e = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
                 if (!focused && !e.defaultPrevented) navigation.navigate(route.name, route.params);
               }}
-              style={{ minHeight: 50, minWidth: 48, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: focused ? color.lime : 'transparent', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              style={{ minHeight: 50, minWidth: 44, flexShrink: focused ? 1 : 0, paddingHorizontal: routes.length > 5 ? 10 : 12, borderRadius: radius.pill, backgroundColor: focused ? color.lime : 'transparent', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}
             >
               <Icon name={icon} size={19} color={focused ? color.ink : color.surface} />
               {focused ? (
-                <Text variant="small" weight={800} color={color.ink} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                <Text variant="small" weight={800} color={color.ink} numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ flexShrink: 1 }}>
                   {label}
                 </Text>
               ) : null}

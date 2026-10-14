@@ -86,7 +86,7 @@
     "expandNav": "Expand navigation",
     "industrySwitcher": "Industry (prototype switcher)",
     "scope": "Scope",
-    "allLocations": "All authorised locations ({count})",
+    "allLocations": "All authorized locations ({count})",
     "scopeKind": {
       "all": "All",
       "region": "Region",
@@ -130,7 +130,7 @@
     "errorCode": "Error code: {code}",
     "retry": "Try again",
     "deniedTitle": "You don't have access to this",
-    "deniedBody": "Your role doesn't include this area. Ask an organisation owner if you need it.",
+    "deniedBody": "Your role doesn't include this area. Ask an organization owner if you need it.",
     "deniedPermission": "Needs: {permission}",
     "notFoundTitle": "Page not found",
     "notFoundBody": "This page doesn't exist or you don't have access to it.",
@@ -168,10 +168,10 @@
     "usage": "{used} of {limit} requests this month",
     "statusOk": "Available",
     "statusDown": "Unavailable",
-    "intro": "I can draft and summarise using data you're allowed to see. Publishing, sending or price changes need your approval.",
+    "intro": "I can draft and summarize using data you're allowed to see. Publishing, sending or price changes need your approval.",
     "assumptions": "Assumptions:",
     "sources": "Sources",
-    "thinking": "Gathering authorised data…",
+    "thinking": "Gathering authorized data…",
     "askLabel": "Ask BranchHarbor AI",
     "askPlaceholder": "Ask about this scope…",
     "send": "Send",
@@ -233,7 +233,7 @@
     },
     "sports": {
       "programmes": {
-        "title": "Programmes",
+        "title": "Programs",
         "description": "Seasons, camps and age groups with venues, fees, payment options and registration windows."
       },
       "registrations": {
@@ -246,23 +246,23 @@
       },
       "schedule": {
         "title": "Schedule",
-        "description": "Training, fixtures and venue clash indicators, in each location's local time."
+        "description": "Training, games and venue clash indicators, in each location's local time."
       },
       "attendance": {
         "title": "Attendance",
         "description": "Fast check-in for the session you're assigned to."
       },
       "overview": {
-        "title": "Programme overview",
-        "description": "Enrolment against capacity, administrative work waiting for you and the next sessions."
+        "title": "Program overview",
+        "description": "Enrollment against capacity, administrative work waiting for you and the next sessions."
       },
       "balances": {
         "title": "Balances",
-        "description": "Instalments, overdue payments, financial aid and waivers — per currency."
+        "description": "Installments, overdue payments, financial aid and waivers — per currency."
       },
       "announcements": {
         "title": "Announcements",
-        "description": "Message the guardians of one team or one programme."
+        "description": "Message the guardians of one team or one program."
       },
       "guardians": {
         "title": "Guardians",
@@ -270,7 +270,7 @@
       },
       "reports": {
         "title": "Sports reports",
-        "description": "Enrolment, capacity, attendance rates and outstanding balances per currency."
+        "description": "Enrollment, capacity, attendance rates and outstanding balances per currency."
       },
       "guardian": {
         "title": "Guardian portal",
@@ -304,14 +304,14 @@
     },
     "commerce": {
       "catalogue": {
-        "title": "Catalogue"
+        "title": "Catalog"
       },
       "assortment": {
         "title": "Local assortment"
       },
       "orders": {
         "title": "Orders",
-        "description": "Payment, fulfilment and refund states, with the sync timeline from the authoritative store."
+        "description": "Payment, fulfillment and refund states, with the sync timeline from the authoritative store."
       },
       "inventory": {
         "title": "Inventory"
@@ -364,15 +364,15 @@
     "realty": {
       "pulse": {
         "title": "Pulse",
-        "description": "Listings, days on market, the enquiry → viewing → offer funnel and closed volume per currency."
+        "description": "Listings, days on market, the inquiry → viewing → offer funnel and closed volume per currency."
       },
       "listings": {
         "title": "Listings",
-        "description": "From draft to sold or let. Managed and standard offices publish after HQ advertising checks."
+        "description": "From draft to sold or rented. Managed and standard offices publish after HQ advertising checks."
       },
       "enquiries": {
-        "title": "Enquiries",
-        "description": "Website, portal and phone enquiries, routed to the listing agent, round-robin or the office pool."
+        "title": "Inquiries",
+        "description": "Website, portal and phone inquiries, routed to the listing agent, round-robin or the office pool."
       },
       "viewings": {
         "title": "Viewings",
@@ -414,7 +414,7 @@
     "denied": "Customer details aren't included in your role. Headquarters doesn't see customer records automatically just because it can see network reports."
   },
   "marketing": {
-    "description": "Campaigns, forms and lead routing. AI drafts stay drafts until an authorised person approves them."
+    "description": "Campaigns, forms and lead routing. AI drafts stay drafts until an authorized person approves them."
   },
   "studios": {
     "newClass": "New class",
@@ -539,7 +539,7 @@
     "status": {
       "confirmed": "Confirmed",
       "deposit_paid": "Deposit paid",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     },
     "reschedule": "Reschedule appointment",
     "current": "Current:",
@@ -570,7 +570,7 @@
       "failed": "Refund failed"
     },
     "fulfilment": {
-      "to_fulfil": "To fulfil",
+      "to_fulfil": "To fulfill",
       "fulfilled": "Fulfilled",
       "on_hold": "On hold",
       "store_disconnected": "Store disconnected"
@@ -609,14 +609,14 @@
         "paid": "Paid",
         "failed": "Payment failed",
         "expired": "Payment window ended",
-        "cancelled": "Cancelled",
+        "cancelled": "Canceled",
         "refunded": "Refunded",
         "partially_refunded": "Partially refunded",
         "external": "Paid in external store",
         "not_required": "No payment needed"
       },
       "fulfilment": {
-        "unfulfilled": "To fulfil",
+        "unfulfilled": "To fulfill",
         "picking": "Picking",
         "packed": "Packed",
         "ready_for_pickup": "Ready for pickup",
@@ -626,7 +626,7 @@
         "backordered": "Backordered",
         "awaiting_transfer": "Awaiting transfer",
         "stock_conflict": "Needs attention",
-        "cancelled": "Cancelled"
+        "cancelled": "Canceled"
       },
       "transfer": {
         "requested": "Requested",
@@ -634,12 +634,12 @@
         "rejected": "Rejected",
         "in_transit": "In transit",
         "received": "Received",
-        "cancelled": "Cancelled"
+        "cancelled": "Canceled"
       },
       "return": {
         "requested": "Requested",
         "reviewed": "Reviewed",
-        "authorised": "Authorised",
+        "authorised": "Authorized",
         "received": "Received",
         "refund_pending_approval": "Refund awaiting approval",
         "resolved": "Resolved",
@@ -650,13 +650,13 @@
         "sent": "Sent",
         "partially_received": "Partly received",
         "received": "Received",
-        "cancelled": "Cancelled"
+        "cancelled": "Canceled"
       },
       "count": {
         "in_progress": "In progress",
         "submitted": "Submitted",
         "applied": "Applied",
-        "cancelled": "Cancelled"
+        "cancelled": "Canceled"
       },
       "product": {
         "draft": "Draft",
@@ -675,7 +675,7 @@
         "initial_sync": "Initial sync",
         "degraded": "Degraded",
         "disconnected": "Disconnected",
-        "authorization_expired": "Authorisation expired"
+        "authorization_expired": "Authorization expired"
       }
     },
     "event": {
@@ -683,7 +683,7 @@
       "paid": "Payment confirmed",
       "payment_failed": "Payment failed",
       "expired": "Reservation released",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "needs_attention": "Needs attention",
       "recovered": "Recovered",
       "picking_started": "Picking started",
@@ -701,7 +701,7 @@
       "external_update": "Updated by external store",
       "requested": "Requested",
       "reviewed": "Reviewed",
-      "authorised": "Authorised",
+      "authorised": "Authorized",
       "received": "Received",
       "resolved": "Resolved",
       "rejected": "Rejected",
@@ -714,7 +714,7 @@
       "description": "Orders needing action, stock warnings, revenue by currency and connection health.",
       "ordersTitle": "Orders",
       "openOrders": "Open orders",
-      "toFulfil": "To fulfil",
+      "toFulfil": "To fulfill",
       "ready": "Ready for pickup",
       "backordered": "Backordered",
       "awaitingTransfer": "Awaiting transfer",
@@ -751,7 +751,7 @@
       "syncOrders": "Import orders"
     },
     "catalogue": {
-      "title": "Catalogue",
+      "title": "Catalog",
       "description": "Master products, options, variants, images and per-language content. Distribute to stores with a preview and per-store results.",
       "distribute": "Distribute ({n})",
       "newProduct": "New product",
@@ -872,7 +872,7 @@
       "staffNote": "Store associates can hide items; a store manager sets local prices and reorder settings.",
       "resetAll": "Reset {n} local price(s) to HQ",
       "empty": "Nothing listed at this store",
-      "emptyBody": "Headquarters distributes products from the catalogue.",
+      "emptyBody": "Headquarters distributes products from the catalog.",
       "delisted": "Removed by HQ",
       "updateAvailable": "HQ update pending (v{from} → v{to})",
       "locked": "Name, description, images and SKUs are managed by HQ",
@@ -898,9 +898,9 @@
     },
     "orders": {
       "title": "Orders",
-      "description": "Payment and fulfilment states, store and source. Pick, pack and hand over; handle backorders and recovery.",
+      "description": "Payment and fulfillment states, store and source. Pick, pack and hand over; handle backorders and recovery.",
       "filter": {
-        "action": "To fulfil",
+        "action": "To fulfill",
         "payment": "Awaiting payment",
         "ready": "Ready",
         "backordered": "Backordered",
@@ -921,7 +921,7 @@
       "reserved": "Stock held until the payment window ends —",
       "attention": {
         "paid_after_expiry_no_stock": "Paid after the stock hold ended — the item sold meanwhile",
-        "paid_after_cancel": "Payment arrived after the order was cancelled",
+        "paid_after_cancel": "Payment arrived after the order was canceled",
         "credit_unavailable": "Gift card credit was used elsewhere"
       },
       "recoveryHelp": "The customer has paid. Re-allocate if stock is back, accept it as a backorder, or transfer from another store. To cancel, refund the payment.",
@@ -930,7 +930,7 @@
       "transferFrom": "Transfer from…",
       "transfer": "Transfer",
       "lineBackordered": "{n} backordered",
-      "unmapped": "Not in catalogue",
+      "unmapped": "Not in catalog",
       "subtotal": "Subtotal",
       "fee": {
         "pickup": "Pickup",
@@ -944,7 +944,7 @@
       "credit": "Gift card / store credit",
       "refunded": "Refunded",
       "transferLinked": "Collection transfer {number}",
-      "fulfilment": "Fulfilment",
+      "fulfilment": "Fulfillment",
       "startPicking": "Start picking",
       "allocateBackorders": "Allocate arrived stock",
       "fstatus": {
@@ -955,7 +955,7 @@
         "out_for_delivery": "Out for delivery",
         "delivered": "Delivered",
         "collected": "Collected",
-        "cancelled": "Cancelled"
+        "cancelled": "Canceled"
       },
       "to": {
         "packed": "Mark packed",
@@ -972,7 +972,7 @@
       "partialRefund": "Partial refund",
       "refundAmount": "Refund amount",
       "refund": "Refund",
-      "refundNote": "Refunds above the organisation threshold are sent to the approvals inbox.",
+      "refundNote": "Refunds above the organization threshold are sent to the approvals inbox.",
       "refundExternal": "Recorded here only — issue the refund in {provider}.",
       "cancelUnpaid": "Cancel unpaid order",
       "returns": "Returns",
@@ -1108,11 +1108,13 @@
       "cancel": "Cancel PO",
       "backordersWaiting": "Backorders can now be allocated",
       "received": "Goods received.",
-      "create": "Create draft"
+      "create": "Create draft",
+      "qtyFor": "{name} quantity",
+      "costFor": "{name} unit cost"
     },
     "returns": {
       "title": "Returns",
-      "description": "Requested → reviewed → authorised → received → resolved. Refunds above the threshold go to the approvals inbox.",
+      "description": "Requested → reviewed → authorized → received → resolved. Refunds above the threshold go to the approvals inbox.",
       "tabs": {
         "open": "Open",
         "approval": "Awaiting approval",
@@ -1146,7 +1148,7 @@
       "codeOnce": "Give the customer this code (shown once):",
       "note": "Note (required to reject)",
       "markReviewed": "Mark reviewed",
-      "authorise": "Authorise",
+      "authorise": "Authorize",
       "reject": "Reject",
       "receive": "Receive goods",
       "resolve": "Resolve",
@@ -1157,7 +1159,7 @@
       },
       "amount": "Amount",
       "confirmResolve": "Resolve return",
-      "thresholdNote": "Refunds above the organisation’s threshold, or by someone without refund permission, go to the approvals inbox.",
+      "thresholdNote": "Refunds above the organization’s threshold, or by someone without refund permission, go to the approvals inbox.",
       "waitingApproval": "Waiting for refund approval.",
       "openApprovals": "Open approvals"
     },
@@ -1201,7 +1203,7 @@
       "productsN": "{n} products",
       "collectionTitle": "Collection title",
       "addCollection": "Add collection",
-      "ordering": "Ordering & fulfilment",
+      "ordering": "Ordering & fulfillment",
       "defaults": "Not configured yet — defaults apply (pickup only).",
       "enabled": "Take orders on the website",
       "pickup": "Pickup in store",
@@ -1211,7 +1213,7 @@
       "delivery": "Local delivery",
       "fee": "Fee",
       "freeOver": "Free over",
-      "postcodes": "Postcode prefixes (comma separated)",
+      "postcodes": "Postal code prefixes (comma separated)",
       "shipping": "Shipping",
       "shippingFee": "Shipping fee",
       "countries": "Countries (ISO codes)",
@@ -1225,7 +1227,8 @@
       "taxRate": "Rate",
       "inclusive": "Included in prices",
       "addTax": "Add rate",
-      "saveTaxes": "Save taxes"
+      "saveTaxes": "Save taxes",
+      "minutes": "min"
     },
     "insights": {
       "title": "Commerce reports",
@@ -1285,7 +1288,7 @@
       "preparing": "Preparing",
       "ready": "Ready",
       "collected": "Collected",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "rejected": "Rejected"
     },
     "action": {
@@ -1357,7 +1360,7 @@
       "hours": "Opening hours",
       "offer": "Intro offer",
       "offerValue": "New Year Intro",
-      "brand": "Brand colours & logo",
+      "brand": "Brand colors & logo",
       "brandValue": "Locked"
     },
     "noAutoPublish": "Adding or editing a location doesn't publish its website.",
@@ -1409,7 +1412,7 @@
     },
     "sharedTitle": "Shared from headquarters",
     "shared": {
-      "brand": "Logo, colours and fonts",
+      "brand": "Logo, colors and fonts",
       "nav": "Header navigation",
       "legal": "Legal and policy pages",
       "descriptions": "Brand descriptions"
@@ -1424,7 +1427,11 @@
       "city": "Enter a city.",
       "timeZone": "Choose a time zone.",
       "email": "Enter a valid email."
-    }
+    },
+    "templateStandard": "Standard location · v15",
+    "templateFlagship": "Flagship location · v3",
+    "templatePopup": "Pop-up / seasonal · v2",
+    "hoursPh": "Mon–Fri 07:00–21:00"
   },
   "websites": {
     "title": "Websites",
@@ -1546,7 +1553,7 @@
       "processing": "Processing",
       "succeeded": "Succeeded",
       "failed": "Failed",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     },
     "refundState": {
       "none": "No refund",
@@ -1598,7 +1605,7 @@
     },
     "ownAccount": "Own account",
     "sharedAccount": "Shared account",
-    "ownDetail": "Independently owned: separate account, authorised by the owner.",
+    "ownDetail": "Independently owned: separate account, authorized by the owner.",
     "sharedDetail": "Company-owned: shared account with reporting allocation.",
     "notPurchasable": "Payment-dependent bookings and orders stay unavailable here until the account is enabled.",
     "subscriptionNote": "Your BranchHarbor subscription is billed separately from customer payments. See Settings › Billing."
@@ -1615,7 +1622,7 @@
       "initial_sync": "Initial sync",
       "degraded": "Degraded",
       "disconnected": "Disconnected",
-      "authorization_expired": "Authorisation expired"
+      "authorization_expired": "Authorization expired"
     },
     "lastSync": "Last successful sync",
     "inProgress": "In progress · {pct}%",
@@ -1640,9 +1647,9 @@
     "roleLabel": "Role",
     "scope": "Scope",
     "scopeHint": "The locations this role applies to.",
-    "wholeOrg": "All authorised locations",
+    "wholeOrg": "All authorized locations",
     "role": {
-      "org_owner": "Organisation owner",
+      "org_owner": "Organization owner",
       "hq_admin": "Headquarters admin",
       "regional_manager": "Regional manager",
       "franchise_owner": "Franchise owner",
@@ -1652,12 +1659,12 @@
       "finance": "Finance user"
     },
     "roleHelp": {
-      "hq_admin": "Templates, locations, policies and authorised reports. Does not include customer details by default.",
+      "hq_admin": "Templates, locations, policies and authorized reports. Does not include customer details by default.",
       "regional_manager": "Location oversight and approvals within assigned regions.",
       "franchise_owner": "Local operations, permitted payments and staff for owned locations.",
       "location_manager": "Daily management and local publishing for assigned locations.",
       "staff": "Relevant schedules, attendance or orders for assigned work only.",
-      "marketing_contributor": "Drafts content; publishes only if authorised.",
+      "marketing_contributor": "Drafts content; publishes only if authorized.",
       "finance": "Payments, reconciliation and permitted refunds."
     },
     "send": "Send invitation",
@@ -1674,7 +1681,7 @@
       "invited": "Invited",
       "support": "Support access"
     },
-    "footer": "Support access is authorised, time-limited and logged.",
+    "footer": "Support access is authorized, time-limited and logged.",
     "tab": {
       "members": "Members & roles",
       "schedule": "Schedule"
@@ -1708,7 +1715,7 @@
     "title": "Settings",
     "personal": "Your preferences",
     "languageHint": "Language for your BranchHarbor screens. Customer-facing pages use each location's language.",
-    "orgDenied": "Organisation settings are managed by the organisation owner.",
+    "orgDenied": "Organization settings are managed by the organization owner.",
     "saved": "Settings saved.",
     "business": "Business details",
     "businessName": "Business name",
@@ -1721,7 +1728,7 @@
     "defaultTimeZone": "Default time zone",
     "dataPolicies": "Data and policies",
     "dataRegion": "Data region",
-    "dataRegionHint": "Chosen when the organisation was created. Contact support to discuss a move.",
+    "dataRegionHint": "Chosen when the organization was created. Contact support to discuss a move.",
     "region": {
       "us": "United States",
       "eu": "European Union",
@@ -1837,17 +1844,17 @@
     },
     "account": {
       "doneTitle": "Account created and email verified",
-      "doneBody": "You're signed in as the organisation owner.",
+      "doneBody": "You're signed in as the organization owner.",
       "note": "You can add more administrators in the Invite team step."
     },
     "industryLegend": "Industry",
     "selfServe": "Self-service setup",
     "pilotOnly": "Pilot by request",
-    "pilotOnlyBody": "{industry} is available through our pilot programme. You can explore setup, but publishing needs a pilot agreement — we'll be in touch.",
+    "pilotOnlyBody": "{industry} is available through our pilot program. You can explore setup, but publishing needs a pilot agreement — we'll be in touch.",
     "industry": {
       "studios": {
         "name": "Studios",
-        "workflow": "Enquiry → trial → class → membership",
+        "workflow": "Inquiry → trial → class → membership",
         "itemsTitle": "Add your class types",
         "itemSingular": "Class type",
         "itemPh": "e.g. Hot Vinyasa · 60 min · 20 spots"
@@ -1855,8 +1862,8 @@
       "sports": {
         "name": "Sports",
         "workflow": "Registration → group assignment → attendance",
-        "itemsTitle": "Add your programmes",
-        "itemSingular": "Programme",
+        "itemsTitle": "Add your programs",
+        "itemSingular": "Program",
         "itemPh": "e.g. U10 Saturday Skills · Autumn"
       },
       "wellness": {
@@ -1868,7 +1875,7 @@
       },
       "commerce": {
         "name": "Commerce",
-        "workflow": "Product discovery → order → fulfilment",
+        "workflow": "Product discovery → order → fulfillment",
         "itemsTitle": "Add your products",
         "itemSingular": "Product",
         "itemPh": "e.g. Linen overshirt · 3 sizes"
@@ -1897,7 +1904,7 @@
       "currencyHint": "Locations in other countries keep their own currency.",
       "language": "Default language",
       "dataRegion": "Data region",
-      "dataRegionHint": "Where your organisation's data is stored. Hard to change later."
+      "dataRegionHint": "Where your organization's data is stored. Hard to change later."
     },
     "region": {
       "us": "United States",
@@ -1945,7 +1952,7 @@
       "exampleNote": "Included address format is subject to final routing design.",
       "wpStepsTitle": "Connect your WordPress site",
       "wpStep1": "Install the free BranchHarbor connector plugin from WordPress.org.",
-      "wpStep2": "Authorise with a scoped application password — never your main password.",
+      "wpStep2": "Authorize with a scoped application password — never your main password.",
       "wpStep3": "Map the WordPress site to this location.",
       "wpStep4": "Choose data direction, run a test, then check the status.",
       "wpNote": "We never disable other plugins, overwrite content or copy all customer records automatically."
@@ -1994,7 +2001,7 @@
         "wellness": "Appointment system",
         "commerce": "Store and checkout",
         "foods": "Ordering",
-        "realty": "Listings and enquiries"
+        "realty": "Listings and inquiries"
       },
       "status": {
         "available": "Available",
@@ -2014,13 +2021,13 @@
           },
           "none": {
             "title": "No online booking yet",
-            "body": "Customers send an enquiry from each class."
+            "body": "Customers send an inquiry from each class."
           }
         },
         "sports": {
           "native": {
             "title": "BranchHarbor registrations",
-            "body": "Programmes, forms and rosters in BranchHarbor."
+            "body": "Programs, forms and rosters in BranchHarbor."
           },
           "keep": {
             "title": "Keep my current registration tool",
@@ -2060,7 +2067,7 @@
         "realty": {
           "native": {
             "title": "BranchHarbor listings",
-            "body": "Listings, enquiries, viewings and offers."
+            "body": "Listings, inquiries, viewings and offers."
           },
           "keep": {
             "title": "Listing service connection",
@@ -2100,7 +2107,7 @@
       "itemsCount": "{count} added",
       "payOn": "Enabled for this location",
       "payOff": "Not enabled — purchase buttons stay hidden",
-      "tested": "Test completed, then cancelled automatically",
+      "tested": "Test completed, then canceled automatically",
       "notTested": "Run a test from the preview to check the flow",
       "runTest": "Run test",
       "setUp": "Set up",
@@ -2110,7 +2117,7 @@
       "publish": "Publish",
       "publishNote": "Publishing makes this location's site visible to customers. You can unpublish at any time.",
       "previewHeadline": "Find your place in {location}",
-      "enquire": "Enquire",
+      "enquire": "Inquire",
       "purchaseHidden": "Booking and checkout buttons appear once payments are enabled.",
       "cta": {
         "studios": "Book",
@@ -2214,22 +2221,22 @@
       "waived": "Waived"
     },
     "overview": {
-      "aiSummary": "Summarise enrolment",
-      "aiSummaryTitle": "AI enrolment summary",
+      "aiSummary": "Summarize enrollment",
+      "aiSummaryTitle": "AI enrollment summary",
       "draftOnly": "Draft — check before sharing",
-      "aiSource": "From BranchHarbor registrations and instalments · {at} (UTC). Names and care information are never sent to AI.",
+      "aiSource": "From BranchHarbor registrations and installments · {at} (UTC). Names and care information are never sent to AI.",
       "awaitingReview": "Awaiting review",
       "awaitingReviewSub": "Registrations to decide",
-      "overdueInstalments": "Overdue instalments",
+      "overdueInstalments": "Overdue installments",
       "noFinanceAccess": "Needs customer access in this scope",
       "nothingOverdue": "Nothing overdue",
       "openDisputes": "Open relationship disputes",
       "openDisputesSub": "Guardian access suspended until resolved",
       "pendingSelections": "Squad selections",
       "pendingSelectionsSub": "Waiting for a director",
-      "enrolment": "Enrolment and capacity",
+      "enrolment": "Enrollment and capacity",
       "enrolmentNote": "Places held = accepted + awaiting review + payments in progress",
-      "noProgrammes": "No programmes in this scope yet.",
+      "noProgrammes": "No programs in this scope yet.",
       "status": {
         "draft": "Draft",
         "published": "Published",
@@ -2244,24 +2251,24 @@
       "noUpcoming": "No sessions in the next 7 days.",
       "vs": "vs",
       "venueTbc": "Venue to be confirmed",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "kind": {
         "training": "Training",
-        "fixture": "Fixture"
+        "fixture": "Game"
       },
       "openSchedule": "Open the schedule",
       "unavailable": "Unavailable"
     },
     "reports": {
-      "meta": "Attendance over the last {days} days · as of {at} (UTC) · source: registrations, attendance and instalments",
+      "meta": "Attendance over the last {days} days · as of {at} (UTC) · source: registrations, attendance and installments",
       "balances": "Balances by currency",
       "noCombined": "Currencies are never added together — no conversion method is defined.",
       "noBalances": "No fees in this scope.",
       "outstanding": "Outstanding",
       "overdue": "Overdue",
       "collected": "Collected",
-      "enrolment": "Enrolment",
-      "programme": "Programme",
+      "enrolment": "Enrollment",
+      "programme": "Program",
       "location": "Location",
       "accepted": "Accepted",
       "review": "Review",
@@ -2285,10 +2292,10 @@
         "archived": "{name} archived."
       },
       "descriptionSaved": "Description saved.",
-      "empty": "No programmes yet",
-      "emptyBody": "The setup wizard creates a season with its programmes, age groups, venues, fees and groups in one go.",
+      "empty": "No programs yet",
+      "emptyBody": "The setup wizard creates a season with its programs, age groups, venues, fees and groups in one go.",
       "kinds": {
-        "programme": "Programme",
+        "programme": "Program",
         "academy": "Academy",
         "camp": "Camp",
         "league": "League"
@@ -2341,7 +2348,7 @@
       },
       "defaultSeason": "Season",
       "exampleProgramme": "Youth Academy",
-      "exampleRefund": "Full refund before the first session; after that, unpaid instalments are cancelled.",
+      "exampleRefund": "Full refund before the first session; after that, unpaid installments are canceled.",
       "location": "Location",
       "seasonName": "Season name",
       "startsOn": "Starts",
@@ -2358,14 +2365,14 @@
         "birth_year": "Birth year"
       },
       "cutoffDate": "Cut-off date (optional override)",
-      "venuesHelp": "Pitches, courts and halls are schedulable resources. Half pitches you add later clash with the whole pitch.",
+      "venuesHelp": "Fields, courts and halls are schedulable resources. Half fields you add later clash with the whole field.",
       "existingVenues": "Venues at this location",
       "noVenues": "No venues yet — add one below.",
       "newVenues": "New venues",
       "venueName": "Venue name",
       "venueKind": "Venue type",
       "venueKinds": {
-        "pitch": "Pitch",
+        "pitch": "Field",
         "court": "Court",
         "hall": "Hall",
         "field": "Field",
@@ -2374,10 +2381,10 @@
       },
       "remove": "Remove",
       "addVenue": "Add venue",
-      "programmeName": "Programme name",
+      "programmeName": "Program name",
       "kind": "Type",
       "kinds": {
-        "programme": "Programme",
+        "programme": "Program",
         "academy": "Academy",
         "camp": "Camp",
         "league": "League"
@@ -2394,20 +2401,20 @@
       "eligibility": "Eligibility criteria shown to families",
       "eligibilityPlaceholder": "e.g. All abilities welcome; groups by age, no trials",
       "description": "Description",
-      "removeProgramme": "Remove programme",
+      "removeProgramme": "Remove program",
       "addProgramme": "Add another age group",
       "fee": "Fee ({currency})",
       "instalments": "Payment options",
       "payInFullOnly": "Pay in full only",
-      "nInstalmentsMonthly": "Pay in full or {n} monthly instalments",
+      "nInstalmentsMonthly": "Pay in full or {n} monthly installments",
       "sibling": "Sibling discount (%)",
-      "scheduleNote": "Instalments due: {dates}. The first is charged at registration.",
+      "scheduleNote": "Installments due: {dates}. The first is charged at registration.",
       "refundPolicy": "Refund and withdrawal policy",
       "refundPolicyHelp": "Shown before checkout and accepted by the guardian.",
-      "policyRequired": "Paid programmes must show a refund/withdrawal policy",
+      "policyRequired": "Paid programs must show a refund/withdrawal policy",
       "feesNote": "Payments go to this location's connected account in its currency. Paying never confirms a place when review is required.",
       "payInFull": "Pay in full",
-      "nInstalments": "{n} instalments",
+      "nInstalments": "{n} installments",
       "noCoaches": "Nobody holds a staff or manager role at this location yet. Invite coaches from Team first, or assign them later.",
       "groupName": "Group name",
       "groupCapacity": "Capacity",
@@ -2449,18 +2456,18 @@
       "untitled": "Untitled",
       "reviewLine": "Ages {min}–{max} · capacity {capacity} · {fee} · {groups} groups · {plans} payment options",
       "publishNow": "Publish now",
-      "publishNote": "Programmes appear on the location website and families can register.",
-      "draftNote": "Everything is saved as a draft; publish each programme when you're ready.",
+      "publishNote": "Programs appear on the location website and families can register.",
+      "draftNote": "Everything is saved as a draft; publish each program when you're ready.",
       "back": "Back",
       "next": "Next",
       "createPublish": "Create and publish",
       "createDraft": "Create drafts",
-      "created": "{season}: {n, plural, one {# programme} other {# programmes}} created."
+      "created": "{season}: {n, plural, one {# program} other {# programs}} created."
     },
     "registrations": {
       "readOnly": "You can see registrations for your groups but can't accept or assign them.",
       "statusTabs": "Registration status",
-      "search": "Search participant, guardian or programme",
+      "search": "Search participant, guardian or program",
       "tab": {
         "awaiting_review": "Awaiting review",
         "submitted": "Awaiting payment",
@@ -2468,7 +2475,7 @@
         "waitlisted": "Waitlisted",
         "withdrawn": "Withdrawn"
       },
-      "submittedNote": "A place is held while the first payment completes. If the hold expires and the programme fills, the registration moves to the waitlist instead.",
+      "submittedNote": "A place is held while the first payment completes. If the hold expires and the program fills, the registration moves to the waitlist instead.",
       "empty": "No registrations with this status.",
       "ageGroup": "{group} (age {age})",
       "ageUnknown": "Age unavailable",
@@ -2484,7 +2491,7 @@
       "payment": "Payment",
       "plan": {
         "full": "pay in full",
-        "instalments": "instalments"
+        "instalments": "installments"
       },
       "formsComplete": "Required forms complete",
       "formsMissing": "Required forms missing",
@@ -2528,8 +2535,8 @@
       "noteLabel": "Note for the guardian / reason",
       "reject": "Don't accept",
       "withdraw": "Withdraw registration",
-      "withdrawn": "{name} withdrawn. Unpaid instalments were cancelled.",
-      "withdrawNote": "Withdrawing cancels unpaid instalments. Refunds of paid amounts follow the policy shown at checkout and are made from Payments.",
+      "withdrawn": "{name} withdrawn. Unpaid installments were canceled.",
+      "withdrawNote": "Withdrawing cancels unpaid installments. Refunds of paid amounts follow the policy shown at checkout and are made from Payments.",
       "unavailable": "Unavailable"
     },
     "teams": {
@@ -2567,7 +2574,7 @@
       "squad": "Squad",
       "titleLabel": "Selection title",
       "participants": "Participants ({n} selected)",
-      "poolEmpty": "No accepted participants in this programme's groups.",
+      "poolEmpty": "No accepted participants in this program's groups.",
       "notes": "Notes for the director",
       "notesPlaceholder": "What you observed (attendance, availability) — not personal judgements.",
       "propose": "Send for approval",
@@ -2595,7 +2602,7 @@
       "squad": "Squad",
       "titleLabel": "Selection title",
       "participants": "Participants ({n} selected)",
-      "poolEmpty": "No accepted participants in this programme's groups.",
+      "poolEmpty": "No accepted participants in this program's groups.",
       "notes": "Notes for the director",
       "notesPlaceholder": "What you observed (attendance, availability) — not personal judgements.",
       "propose": "Send for approval",
@@ -2645,7 +2652,7 @@
       "out": "out"
     },
     "schedule": {
-      "addFixture": "Add fixture",
+      "addFixture": "Add game",
       "addRecurring": "Weekly training",
       "prevWeek": "Previous week",
       "nextWeek": "Next week",
@@ -2659,9 +2666,9 @@
       "nothingWeek": "No sessions this week.",
       "vs": "vs",
       "venueTbc": "Venue to be confirmed",
-      "fixture": "Fixture",
+      "fixture": "Game",
       "training": "Training",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "clash": "Venue clash",
       "ha": {
         "home": "Home",
@@ -2684,9 +2691,9 @@
       "apply": "Apply",
       "applied": "Session moved. {n, plural, one {# guardian} other {# guardians}} of that group notified.",
       "proposalNote": "Proposals are suggestions only. Applying re-checks the venue and notifies only this group's guardians.",
-      "cancelReason": "Reason for cancelling",
+      "cancelReason": "Reason for canceling",
       "cancel": "Cancel session",
-      "cancelledMsg": "Cancelled. {n, plural, one {# guardian} other {# guardians}} of {team} notified.",
+      "cancelledMsg": "Canceled. {n, plural, one {# guardian} other {# guardians}} of {team} notified.",
       "cancelScope": "Only guardians of {team} are notified — never the whole network.",
       "team": "Group",
       "localTime": "Times are in the location's time zone ({tz}).",
@@ -2713,15 +2720,15 @@
       "skipClashes": "Skip dates that clash with another booking",
       "duration": "Duration (minutes)",
       "save": "Save",
-      "fixtureAdded": "Fixture added. Guardians of the group are notified.",
-      "fixtureClash": "Fixture added, but the venue is double-booked — see the clash indicator.",
+      "fixtureAdded": "Game added. Guardians of the group are notified.",
+      "fixtureClash": "Game added, but the venue is double-booked — see the clash indicator.",
       "recurringAdded": "{n} sessions created · {skipped} dates had clashes."
     },
     "attendance": {
       "noSessions": "No sessions around today",
       "noSessionsCoach": "You'll see the sessions of groups you coach here.",
       "sessions": "Sessions",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "mark": {
         "present": "Present",
         "late": "Late",
@@ -2735,8 +2742,8 @@
         "absent": "Absent",
         "excused": "Excused"
       },
-      "scopedNote": "You see only the roster you're authorised for and the care notes families allowed coaches to see.",
-      "cancelledSession": "This session was cancelled.",
+      "scopedNote": "You see only the roster you're authorized for and the care notes families allowed coaches to see.",
+      "cancelledSession": "This session was canceled.",
       "save": "Save {n, plural, one {# mark} other {# marks}}",
       "markRestPresent": "Mark everyone else present",
       "saved": "{n} recorded · {notified} guardians alerted about absences · {skipped} not alerted (no consent).",
@@ -2775,18 +2782,18 @@
       },
       "empty": "Nothing here.",
       "participant": "Participant",
-      "programme": "Programme",
+      "programme": "Program",
       "plan": "Plan",
       "planKind": {
         "full": "Pay in full",
-        "instalments": "Instalments"
+        "instalments": "Installments"
       },
       "paid": "Paid",
       "next": "Next due",
       "state": "Status",
       "withdrawn": "Withdrawn",
-      "listFee": "Programme fee",
-      "instalments": "Instalments",
+      "listFee": "Program fee",
+      "instalments": "Installments",
       "instalmentLine": "#{seq} · due {date}",
       "inst": {
         "scheduled": "Scheduled",
@@ -2794,7 +2801,7 @@
         "overdue": "Overdue",
         "paid": "Paid",
         "waived": "Waived",
-        "cancelled": "Cancelled"
+        "cancelled": "Canceled"
       },
       "reminded": "{n} reminders",
       "adjustments": "Discounts and aid",
@@ -2807,7 +2814,7 @@
       "waiveAll": "Waive everything still owed",
       "amount": "Amount ({currency})",
       "reason": "Reason (recorded in the audit log)",
-      "aidPreview": "Reduces unpaid instalments by {amount}, latest first. Paid amounts are not changed.",
+      "aidPreview": "Reduces unpaid installments by {amount}, latest first. Paid amounts are not changed.",
       "apply": "Apply",
       "everything": "the full outstanding balance",
       "adjusted": "Balance for {name} updated.",
@@ -2817,9 +2824,9 @@
       "compose": "New announcement",
       "nothingToAnnounce": "You don't coach any group in this scope.",
       "to": "Send to",
-      "choose": "Choose a team or programme…",
+      "choose": "Choose a team or program…",
       "teams": "Teams & groups",
-      "programmes": "Programmes",
+      "programmes": "Programs",
       "titleLabel": "Title",
       "message": "Message",
       "preview": "Goes to the verified guardians of {n} participants in this group only.",
@@ -2828,7 +2835,7 @@
       "history": "Sent",
       "none": "No announcements yet.",
       "team": "Team",
-      "programme": "Programme",
+      "programme": "Program",
       "meta": "{n} recipients · {by} · {at} UTC"
     },
     "guardians": {
@@ -2878,18 +2885,18 @@
       "draft": "Draft",
       "coming_soon": "Coming soon",
       "active": "Active",
-      "under_offer": "Under offer",
+      "under_offer": "Under contract",
       "sold": "Sold",
-      "let": "Let",
+      "let": "Rented",
       "withdrawn": "Withdrawn"
     },
     "action": {
       "draft": "Back to draft",
       "coming_soon": "Publish as coming soon",
       "active": "Publish as active",
-      "under_offer": "Mark under offer",
+      "under_offer": "Mark under contract",
       "sold": "Mark sold",
-      "let": "Mark let",
+      "let": "Mark rented",
       "withdrawn": "Withdraw"
     },
     "approval": {
@@ -2974,7 +2981,7 @@
       "changeStatus": "Change status",
       "sentForApproval": "Sent to HQ for approval. The listing stays unpublished until it is approved.",
       "statusChanged": "Status changed to {status}.",
-      "viewingsCancelled": "{count, plural, one {# upcoming viewing was} other {# upcoming viewings were}} cancelled and the buyers notified.",
+      "viewingsCancelled": "{count, plural, one {# upcoming viewing was} other {# upcoming viewings were}} canceled and the buyers notified.",
       "approvalHint": "This office needs HQ approval before a listing goes live.",
       "changesPending": "Saved. Changes to the live listing wait for HQ approval.",
       "saved": "Saved.",
@@ -2982,7 +2989,7 @@
       "noOffices": "No offices in this scope.",
       "newHint": "New listings start as drafts. Prices use the office currency; areas use the office unit.",
       "createDraft": "Create draft",
-      "countEnquiries": "Enquiries",
+      "countEnquiries": "Inquiries",
       "countViewings": "Upcoming viewings",
       "countOffers": "Open offers"
     },
@@ -3011,7 +3018,7 @@
     "ai": {
       "title": "BranchHarbor AI",
       "draftsOnly": "Drafts only",
-      "factsOnly": "Drafts use only this listing's facts. AI never adds features, views, schools or neighbourhood claims, and never targets or excludes people.",
+      "factsOnly": "Drafts use only this listing's facts. AI never adds features, views, schools or neighborhood claims, and never targets or excludes people.",
       "instructions": "Instructions",
       "instructionsHint": "Tone or focus, e.g. “mention the renovated kitchen first”",
       "draft": "Draft description",
@@ -3046,9 +3053,9 @@
       "all": "All",
       "mine": "Mine",
       "pool": "Office pool",
-      "emptyTitle": "No enquiries",
-      "emptyBody": "New website, portal and phone enquiries appear here.",
-      "noListing": "General enquiry",
+      "emptyTitle": "No inquiries",
+      "emptyBody": "New website, portal and phone inquiries appear here.",
+      "noListing": "General inquiry",
       "assignedTo": "Assigned to {name}",
       "inPool": "Office pool",
       "claim": "Claim",
@@ -3056,7 +3063,7 @@
       "toPool": "Office pool",
       "markContacted": "Mark contacted",
       "markLost": "Mark lost",
-      "privacy": "Enquiries hold client details. Agents see their own and the office pool; office managers see their office; HQ sees totals only."
+      "privacy": "Inquiries hold client details. Agents see their own and the office pool; office managers see their office; HQ sees totals only."
     },
     "enquiryStatus": {
       "new": "New",
@@ -3119,7 +3126,7 @@
       "confirmed": "Confirmed",
       "completed": "Completed",
       "no_show": "No-show",
-      "cancelled": "Cancelled"
+      "cancelled": "Canceled"
     },
     "interest": {
       "none": "None",
@@ -3184,7 +3191,7 @@
       "you": "You",
       "inactive": "Inactive",
       "liveListings": "{count, plural, one {# live listing} other {# live listings}}",
-      "openEnquiries": "{count, plural, one {# open enquiry} other {# open enquiries}}",
+      "openEnquiries": "{count, plural, one {# open inquiry} other {# open inquiries}}",
       "upcomingViewings": "{count, plural, one {# upcoming viewing} other {# upcoming viewings}}",
       "noAvailability": "No viewing availability set",
       "acceptsLeads": "Accepts new leads"
@@ -3202,26 +3209,26 @@
       "emptyTitle": "No report access in this scope",
       "emptyBody": "Reports need report access for at least one office.",
       "active": "Active listings",
-      "activeSub": "{underOffer} under offer · {comingSoon} coming soon",
+      "activeSub": "{underOffer} under contract · {comingSoon} coming soon",
       "dom": "Median days on market",
       "domSub": "Across {count} live listings",
-      "funnel": "Enquiries → viewings → offers",
+      "funnel": "Inquiries → viewings → offers",
       "funnelSub": "Last 90 days",
       "awaitingApproval": "Awaiting HQ approval",
       "awaitingSub": "Listings or changes",
       "volume": "Closed volume (last 90 days)",
       "sold": "Sold",
-      "let": "Let",
+      "let": "Rented",
       "deals": "{count, plural, one {# deal} other {# deals}}",
       "noneClosed": "None",
       "combined": "Combined total: not shown — no currency conversion method is defined.",
       "byOffice": "By office",
       "office": "Office",
       "domShort": "DOM (median)",
-      "enquiries": "Enquiries",
+      "enquiries": "Inquiries",
       "viewings": "Viewings",
       "offers": "Offers",
-      "conversion": "Enquiry → viewing",
+      "conversion": "Inquiry → viewing",
       "privacy": "Reports contain no client personal data.",
       "freshness": "Generated {when} · {source}"
     }
@@ -3233,7 +3240,7 @@
       "confirmed": "Confirmed",
       "checked_in": "Checked in",
       "completed": "Completed",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "no_show": "No-show",
       "rescheduled": "Rescheduled",
       "active": "Active",
@@ -3245,14 +3252,14 @@
       "offered": "Offered",
       "booked": "Booked",
       "left": "Left",
-      "cancelled_pkg": "Cancelled"
+      "cancelled_pkg": "Canceled"
     },
     "policy": {
       "window": {
         "free": "Free cancellation window",
         "late": "Late cancellation",
         "no_show": "No-show",
-        "business": "Cancelled by the business"
+        "business": "Canceled by the business"
       },
       "hoursBefore": "{hours} h before the start",
       "price": "Price",
@@ -3332,12 +3339,12 @@
       "move": "Move",
       "applyVoucher": "Apply voucher",
       "cancelAppt": "Cancel",
-      "byBusiness": "Cancelled by us (full refund, no fee)",
+      "byBusiness": "Canceled by us (full refund, no fee)",
       "waiveFee": "Waive the fee",
       "reason": "Reason",
       "confirmCancel": "Confirm cancellation",
       "back": "Back",
-      "cancelledDone": "Cancelled.",
+      "cancelledDone": "Canceled.",
       "confirmNoShow": "Record no-show",
       "noShowDone": "No-show recorded.",
       "voucherCode": "Voucher code",
@@ -3430,7 +3437,7 @@
       "freeHours": "Free cancel (hours)",
       "lateFee": "Late fee %",
       "noShowFee": "No-show fee %",
-      "depositRefundable": "Refund the deposit when cancelled in time",
+      "depositRefundable": "Refund the deposit when canceled in time",
       "policyText": "Policy shown to clients",
       "policyTextHint": "Used on the website, in confirmations and by AI reply drafts.",
       "room": "Room",
@@ -3448,7 +3455,9 @@
       "variantName": "Option name",
       "priceAt": "{location} ({currency})",
       "addVariantBtn": "Add option",
-      "currencyNote": "Prices are in each location’s own currency (e.g. {example}) and are never converted."
+      "currencyNote": "Prices are in each location’s own currency (e.g. {example}) and are never converted.",
+      "minutes": "{count} min",
+      "variantPh": "90 min"
     },
     "practitioners": {
       "title": "Practitioners & availability",
@@ -3643,17 +3652,18 @@
         "reversal": "Returned (cancellation)",
         "adjust": "Adjusted",
         "expire": "Expired"
-      }
+      },
+      "planPh": "5 × Restorative massage"
     },
     "insights": {
       "title": "Appointment reports",
-      "description": "Utilisation per practitioner and room, cancellations and no-shows, revenue per currency, and package and voucher liability.",
+      "description": "Utilization per practitioner and room, cancellations and no-shows, revenue per currency, and package and voucher liability.",
       "name": "Name",
       "location": "Location",
       "bookedHours": "Booked h",
       "scheduledHours": "Scheduled h",
-      "utilisation": "Utilisation",
-      "summarising": "Summarising…",
+      "utilisation": "Utilization",
+      "summarising": "Summarizing…",
       "summarise": "AI summary",
       "lastDays": "Last {n} days",
       "allInScope": "All locations in scope",
@@ -3686,8 +3696,8 @@
       "business": "By us",
       "noShows": "No-shows",
       "rate": "Cancel rate",
-      "utilPractitioners": "Practitioner utilisation",
-      "utilRooms": "Room and equipment utilisation",
+      "utilPractitioners": "Practitioner utilization",
+      "utilRooms": "Room and equipment utilization",
       "noUtil": "No scheduled hours in this period"
     }
   },
@@ -3698,7 +3708,7 @@
       "grace": "Payment failed · grace",
       "suspended": "Suspended",
       "cancelling": "Ends soon (notice)",
-      "cancelled": "Cancelled",
+      "cancelled": "Canceled",
       "pending": "Awaiting payment",
       "ended": "Ended"
     },
@@ -3787,7 +3797,8 @@
       "publishN": "Publish {n} classes",
       "publishAnyway": "Publish despite clashes",
       "saveDraft": "Save draft",
-      "publishNote": "Publishing makes the classes bookable on your website and app. Existing bookings elsewhere are not affected."
+      "publishNote": "Publishing makes the classes bookable on your website and app. Existing bookings elsewhere are not affected.",
+      "minutes": "{count} min"
     },
     "classPanel": {
       "roster": "Roster & check-in",
@@ -3834,7 +3845,7 @@
       "capacity": "Capacity",
       "unchanged": "Unchanged",
       "reason": "Reason (customers see it)",
-      "reasonHint": "Bookings are cancelled; pack credits are returned and single-class payments refunded.",
+      "reasonHint": "Bookings are canceled; pack credits are returned and single-class payments refunded.",
       "messageNote": "Note for customers",
       "optional": "Optional",
       "notify": "Notify booked customers (email unless opted out · SMS only with consent · app push)",
@@ -3933,12 +3944,12 @@
       "saved": "{name} created.",
       "policyIntro": "What customers see before booking, per location.",
       "localOverride": "Location policy",
-      "orgDefault": "Organisation default",
+      "orgDefault": "Organization default",
       "editLocal": "Edit for this location",
-      "editDefault": "Edit organisation default",
+      "editDefault": "Edit organization default",
       "policyFor": "Policy for {name}",
       "lateWindow": "Late-cancel window (hours)",
-      "lateWindowHint": "Cancelling closer to the start than this is a late cancellation.",
+      "lateWindowHint": "Canceling closer to the start than this is a late cancellation.",
       "fees": "Fees",
       "lateFee": "Late-cancel fee ({c})",
       "noShowFee": "No-show fee ({c})",
@@ -4068,7 +4079,7 @@
         "held": "Paying",
         "attended": "Attended",
         "no_show": "No-show",
-        "cancelled": "Cancelled",
+        "cancelled": "Canceled",
         "expired": "Expired"
       },
       "method": {
@@ -4202,8 +4213,8 @@
         "model": "Drafted by AI from the class facts.",
         "template": "AI unavailable — drafted from a template using the class facts."
       },
-      "attendanceTitle": "Summarise attendance changes",
-      "summarise": "Summarise last 4 weeks",
+      "attendanceTitle": "Summarize attendance changes",
+      "summarise": "Summarize last 4 weeks",
       "observations": "Observations",
       "audienceTitle": "Propose follow-up audiences",
       "propose": "Propose audiences",
@@ -4212,5 +4223,26 @@
       "people": "people",
       "consented": "with email consent"
     }
+  },
+  "meta": {
+    "resetPassword": "Reset password",
+    "signUp": "Create account",
+    "signIn": "Sign in",
+    "verifyEmail": "Verify email",
+    "overview": "Overview",
+    "community": "Community & resources",
+    "team": "Team",
+    "addLocation": "Add location",
+    "locations": "Locations",
+    "websites": "Websites",
+    "customers": "Customers",
+    "connections": "Connections",
+    "approvals": "Approvals",
+    "settings": "Settings",
+    "marketing": "Marketing",
+    "payments": "Payments",
+    "reports": "Reports",
+    "onboarding": "Set up BranchHarbor",
+    "description": "One home for every location. Manage your brand together. Run each location with confidence."
   }
 }

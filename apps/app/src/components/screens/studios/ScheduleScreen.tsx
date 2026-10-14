@@ -112,7 +112,7 @@ export function ScheduleScreen() {
               <Labeled label={t('classType')}>
                 <select className={inputCls} value={form.classTypeId} onChange={(e) => set('classTypeId', e.target.value)}>
                   <option value="">{t('choose')}</option>
-                  {(types.data ?? []).filter((x) => !x.locationId || x.locationId === locId).map((x) => <option key={x.id} value={x.id}>{x.name} · {x.durationMinutes} min</option>)}
+                  {(types.data ?? []).filter((x) => !x.locationId || x.locationId === locId).map((x) => <option key={x.id} value={x.id}>{x.name} · {t('minutes', { count: x.durationMinutes })}</option>)}
                 </select>
               </Labeled>
               <Labeled label={t('instructor')} hint={t('instructorHint')}>

@@ -88,7 +88,7 @@ function PlanDrawer({ services, onClose, onDone }: { services: { id: string; nam
     <Drawer open onClose={onClose} kicker={t('tabPlans')} title={t('newPlan')}>
       <div className="flex flex-col gap-3">
         <Field label={t('soldAt')}>{({ id }) => <Select id={id} value={f.locationId} onChange={(e) => setF({ ...f, locationId: e.target.value })}>{locs.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.currency})</option>)}</Select>}</Field>
-        <Field label={t('plan')}>{({ id }) => <Input id={id} value={f.name} placeholder="5 × Restorative massage" onChange={(e) => setF({ ...f, name: e.target.value })} />}</Field>
+        <Field label={t('plan')}>{({ id }) => <Input id={id} value={f.name} placeholder={t('planPh')} onChange={(e) => setF({ ...f, name: e.target.value })} />}</Field>
         <Field label={t('service')}>{({ id }) => <Select id={id} value={f.serviceId} onChange={(e) => setF({ ...f, serviceId: e.target.value })}><option value="">{t('chooseService')}</option>{services.filter((s) => !s.locationId || s.locationId === f.locationId).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select>}</Field>
         <div className="grid grid-cols-3 gap-2">
           <Field label={t('sessions')}>{({ id }) => <Input id={id} type="number" min={1} value={f.sessions} onChange={(e) => setF({ ...f, sessions: Number(e.target.value) })} />}</Field>

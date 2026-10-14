@@ -3,7 +3,7 @@
   "tasks": {
     "build": { "dependsOn": ["^build"], "outputs": [".next/**", "!.next/cache/**", "dist/**"] },
     "dev": { "cache": false, "persistent": true },
-    "lint": {},
+    "lint": { "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/scripts/i18n/**", "$TURBO_ROOT$/packages/shared/src/locale.ts"] },
     "typecheck": { "dependsOn": ["^build"] },
     "test": {}
   }

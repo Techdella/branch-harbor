@@ -79,13 +79,13 @@ function ServiceCard({ s, pracs, onEdit }: { s: WService; pracs: WPractitioner[]
         {s.variants.length ? (
           <ul className="flex flex-col gap-1">
             {s.variants.map((v) => (
-              <li key={v.id}><strong>{v.name}</strong> <span className="text-stone">({v.durationMinutes} min)</span>
+              <li key={v.id}><strong>{v.name}</strong> <span className="text-stone">({t('minutes', { count: v.durationMinutes })})</span>
                 <ul className="pl-3">{v.prices.map((p) => <li key={p.locationId} className="flex justify-between gap-2"><span className="text-stone">{locName(p.locationId)}</span><Money m={{ amount: p.priceMinor, currency: p.currency }} /></li>)}{!v.prices.length && <li className="text-stone">{t('noPrices')}</li>}</ul>
               </li>
             ))}
           </ul>
         ) : (
-          <p><strong>{s.durationMinutes} min</strong> · <Money m={{ amount: s.priceMinor, currency: s.currency }} /> {s.locationId && <span className="text-stone">· {locName(s.locationId)}</span>}</p>
+          <p><strong>{t('minutes', { count: s.durationMinutes })}</strong> · <Money m={{ amount: s.priceMinor, currency: s.currency }} /> {s.locationId && <span className="text-stone">· {locName(s.locationId)}</span>}</p>
         )}
       </div>
       <div className="flex flex-col justify-between gap-2 text-[13px]">
@@ -201,7 +201,7 @@ function ServiceEditor({ svc, pracs, onClose, onSaved }: { svc: WService | null;
           <fieldset className="flex flex-col gap-2 rounded-lg border border-line-soft p-3">
             <legend className="px-1 text-[13px] font-bold">{t('addVariant')}</legend>
             <div className="grid grid-cols-2 gap-2">
-              <Field label={t('variantName')}>{({ id }) => <Input id={id} placeholder="90 min" value={variant.name} onChange={(e) => setVariant({ ...variant, name: e.target.value })} />}</Field>
+              <Field label={t('variantName')}>{({ id }) => <Input id={id} placeholder={t('variantPh')} value={variant.name} onChange={(e) => setVariant({ ...variant, name: e.target.value })} />}</Field>
               <Field label={t('duration')}>{({ id }) => <Input id={id} type="number" min={5} value={variant.durationMinutes} onChange={(e) => setVariant({ ...variant, durationMinutes: Number(e.target.value) })} />}</Field>
             </div>
             {priceLocs.map((l) => <Field key={l.id} label={t('priceAt', { location: l.name, currency: l.currency })} optional>{({ id }) => <Input id={id} type="number" min={0} step="0.01" value={variant.prices[l.id] ?? ''} onChange={(e) => setVariant({ ...variant, prices: { ...variant.prices, [l.id]: e.target.value } })} />}</Field>)}

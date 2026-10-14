@@ -272,6 +272,7 @@ function ItemDrawer({ item, b, vocab, canEdit, currencies, onClose, onSaved }: {
 
 function ModifierGroups({ item, currencies, canEdit, onChanged }: { item: BuilderItem; currencies: string[]; canEdit: boolean; onChanged: () => void }) {
   const t = useFx();
+  const locale = useLocale();
   const [name, setName] = useState('');
   const [min, setMin] = useState('0');
   const [max, setMax] = useState('1');
@@ -291,7 +292,7 @@ function ModifierGroups({ item, currencies, canEdit, onChanged }: { item: Builde
                 {canEdit && <button type="button" aria-label={t('builder.removeGroup', { name: g.name })} onClick={async () => { await del.run(g.id); onChanged(); }} className="rounded-full p-1 hover:bg-surface"><Icon name="x" size={14} /></button>}
               </span>
             </div>
-            <p className="mt-1 text-xs text-stone">{g.modifiers.map((m) => `${m.name}${Object.values(m.prices).some((p) => p > 0) ? ` (+${currencies.map((c) => (m.prices[c] !== undefined ? `${c} ${(m.prices[c]! / 100).toFixed(2)}` : null)).filter(Boolean).join(' / ')})` : ''}`).join(' · ')}</p>
+            <p className="mt-1 text-xs text-stone">{g.modifiers.map((m) => `${m.name}${Object.values(m.prices).some((p) => p > 0) ? ` (+${currencies.map((c) => (m.prices[c] !== undefined ? new Intl.NumberFormat(locale, { style: 'currency', currency: c }).format(m.prices[c]! / 100) : null)).filter(Boolean).join(' / ')})` : ''}`).join(' · ')}</p>
           </li>
         ))}
       </ul>
@@ -318,13 +319,14 @@ function ModifierGroups({ item, currencies, canEdit, onChanged }: { item: Builde
 
 function DayPartsTab({ parts, canEdit, reload }: { parts: DayPart[]; canEdit: boolean; reload: () => void }) {
   const t = useFx();
+  const locale = useLocale();
   const [name, setName] = useState('');
   const [start, setStart] = useState('07:00');
   const [end, setEnd] = useState('11:00');
   const [days, setDays] = useState<number[]>(WEEKDAYS);
   const create = useFoodsMutation((api, body: Parameters<typeof api.createDayPart>[0]) => api.createDayPart(body));
   const remove = useFoodsMutation((api, id: string) => api.deleteDayPart(id));
-  const dayName = (d: number) => new Date(Date.UTC(2026, 0, 4 + d)).toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' });
+  const dayName = (d: number) => new Date(Date.UTC(2026, 0, 4 + d)).toLocaleDateString(locale, { weekday: 'short', timeZone: 'UTC' });
   return (
     <Section title={t('builder.tabDayParts')}>
       <p className="mb-3 text-sm text-stone">{t('builder.dayPartsBody')}</p>

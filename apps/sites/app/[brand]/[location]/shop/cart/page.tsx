@@ -17,7 +17,7 @@ export default async function CartPage({ params }: { params: Promise<{ brand: st
   const links = makeLinks(await getRouting(), brand, { brandPrimaryHost: data.site.brandPrimaryHost });
   return (
     <main id="main" className="mx-auto max-w-5xl px-4 py-10">
-      <a href={links.location(location, '/shop')} className="link text-sm">← {t('backToShop')}</a>
+      <a href={links.location(location, '/shop')} className="link text-sm"><span aria-hidden className="inline-block rtl:-scale-x-100">←</span> {t('backToShop')}</a>
       <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{t('cartTitle')}</h1>
       <p className="mt-1 text-graphite">{data.brand.name} {data.location.name}</p>
       {sf.checkout.mode !== 'native' ? <p className="card mt-6 p-6">{t('checkoutUnavailable')}</p> : <Checkout sf={sf} statusBase={links.location(location, '/shop/orders')} shopHref={links.location(location, '/shop')} />}

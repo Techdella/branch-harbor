@@ -3,6 +3,7 @@ import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
 import { Badge, Banner, Button, Card, Text } from '@/components';
 import { useI18n } from '@/i18n';
+import { policyLines } from './policy';
 import { usePaymentsSandbox } from '@/lib/api';
 import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors';
@@ -48,7 +49,7 @@ export function BuyButton({ locationId, kind, id, label, onDone }: { locationId:
 
 /** On the class screen: book with a membership or pack credit (signed-in customers), plus the cancellation policy. */
 export function MemberBookCard({ occurrenceId, full, onBooked, beforeBook }: { occurrenceId: string; full: boolean; onBooked: () => void; beforeBook?: () => Promise<void> }) {
-  const { t } = useI18n();
+  const { t, intlLocale } = useI18n();
   const guest = useIsGuest();
   const q = useApi(() => (guest ? Promise.resolve(null) : studioApi.options(occurrenceId)), [occurrenceId, guest]);
   const [busy, setBusy] = useState(false);
@@ -86,7 +87,7 @@ export function MemberBookCard({ occurrenceId, full, onBooked, beforeBook }: { o
       ))}
       {err ? <Text variant="small" color="#9E1B12" accessibilityRole="alert">{err}</Text> : null}
       <Text variant="small" weight={700}>{t('studio.policy')}</Text>
-      {o.policy.lines.map((l) => <Text key={l} variant="small" tone="muted">• {l}</Text>)}
+      {policyLines(o.policy, t, intlLocale).map((l) => <Text key={l} variant="small" tone="muted">• {l}</Text>)}
       <Button label={t('studio.getCredits')} variant="ghost" size="sm" onPress={() => router.push('/customer/pass')} />
     </Card>
   );

@@ -150,7 +150,7 @@ function Editor() {
                     ) : (
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-sm text-graphite">{f.value}</span>
-                        <span className="flex gap-1.5">
+                        <span className="flex flex-wrap gap-1.5">
                           {canEdit && (
                             <Button size="sm" variant="secondary" icon={needsApproval ? 'shield' : 'edit'} onClick={() => (setEditing(f.key), setDraft(f.value), setReason(''), setToast(''))}>
                               {needsApproval ? t('requestChange') : t('edit')}

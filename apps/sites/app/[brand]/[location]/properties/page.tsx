@@ -35,7 +35,7 @@ export default async function OfficeProperties({ params }: Props) {
   return (
     <main id="main" className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-3xl font-extrabold tracking-tight">{t('office.title', { office: page.office.name })}</h1>
-      <p className="mt-1 text-graphite">{page.office.addressLines.join(', ')}{page.office.phone ? ` · ${page.office.phone}` : ''}</p>
+      <p className="mt-1 text-graphite"><bdi>{page.office.addressLines.join(', ')}</bdi>{page.office.phone ? ` · ${page.office.phone}` : ''}</p>
       <p className="mt-2 text-sm text-graphite">{t('office.units', { unit: page.office.areaUnit === 'sqm' ? 'm²' : 'sq ft', currency: page.office.currency })}</p>
 
       <section className="mt-8" aria-labelledby="homes-h">
@@ -62,7 +62,7 @@ export default async function OfficeProperties({ params }: Props) {
                 <p className="font-bold">{a.name}</p>
                 <p className="text-graphite">{a.title}{a.licenceNumber ? ` · ${a.licenceNumber}` : ''}</p>
                 {a.languages.length > 0 && <p className="text-graphite">{t('office.languages', { list: a.languages.map((x) => { try { return new Intl.DisplayNames([locale], { type: 'language' }).of(x) ?? x; } catch { return x; } }).join(', ') })}</p>}
-                {a.phone && <a className="link" href={`tel:${a.phone.replace(/\s/g, '')}`}>{a.phone}</a>}
+                {a.phone && <a className="link" dir="ltr" href={`tel:${a.phone.replace(/\s/g, '')}`}>{a.phone}</a>}
               </div>
             </li>
           ))}

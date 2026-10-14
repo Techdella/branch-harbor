@@ -26,7 +26,7 @@ export async function ListingCardView({ l, href, locale }: { l: ListingCard; hre
           <p className="mt-1 text-sm text-graphite">
             {l.bedrooms != null ? t('listing.beds', { count: l.bedrooms }) : t('listing.bedsUnknown')} · {l.bathrooms != null ? t('listing.baths', { count: l.bathrooms }) : t('listing.bathsUnknown')} · {l.area ? `${l.area.value.toLocaleString(locale)} ${l.area.label}` : t('listing.areaUnknown')}
           </p>
-          <p className="mt-1 text-sm text-graphite">{l.addressLines.join(', ')}{l.office ? ` · ${l.office.name}` : ''}</p>
+          <p className="mt-1 text-sm text-graphite"><bdi>{l.addressLines.join(', ')}</bdi>{l.office ? ` · ${l.office.name}` : ''}</p>
         </div>
       </a>
     </article>

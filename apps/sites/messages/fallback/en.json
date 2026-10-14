@@ -1,0 +1,7 @@
+{
+  "title": "This page isn't available right now",
+  "body": "We couldn't load this page. Nothing was booked or charged. Please try again in a moment.",
+  "retry": "Try again",
+  "network": "Network error. Check your connection and try again.",
+  "requestFailed": "Request failed ({status})"
+}

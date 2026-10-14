@@ -3,6 +3,7 @@ import { Badge, Banner, Card, DataStatus, Screen, ScreenHeader, SectionHeader, S
 import { useCatalog } from '@/features/customer/catalog';
 import { studioApi } from '@/features/studios/api';
 import { BuyButton, useIsGuest } from '@/features/studios/components';
+import { policyLines } from '@/features/studios/policy';
 import { useI18n } from '@/i18n';
 import { fmtDay, fmtMoney } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
@@ -80,7 +81,7 @@ export default function Pass() {
       {pricing.data ? (
         <Card>
           <Text weight={700}>{t('studio.policy')}</Text>
-          {pricing.data.policy.lines.map((l) => <Text key={l} variant="small" tone="muted">• {l}</Text>)}
+          {policyLines(pricing.data.policy, t, intlLocale).map((l) => <Text key={l} variant="small" tone="muted">• {l}</Text>)}
         </Card>
       ) : null}
     </Screen>

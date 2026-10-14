@@ -104,8 +104,8 @@ function NewPo({ suppliers, onClose, onCreated }: { suppliers: Supplier[]; onClo
               {d.items.flatMap((p) => p.variants.map((v) => (
                 <li key={v.variantId} className="flex flex-wrap items-center gap-2">
                   <span className="min-w-40 flex-1">{p.productName} — {v.name} <span className="text-xs text-stone">({v.availableQty})</span></span>
-                  <NumberInput value={lines[v.variantId]?.q ?? 0} onChange={(n) => setLines((l) => ({ ...l, [v.variantId]: { q: n, cost: l[v.variantId]?.cost ?? null } }))} label={`${v.name} qty`} />
-                  <MoneyInput minor={lines[v.variantId]?.cost ?? null} currency={currency} label={`${v.name} cost`} onChange={(c) => setLines((l) => ({ ...l, [v.variantId]: { q: l[v.variantId]?.q ?? 0, cost: c } }))} />
+                  <NumberInput value={lines[v.variantId]?.q ?? 0} onChange={(n) => setLines((l) => ({ ...l, [v.variantId]: { q: n, cost: l[v.variantId]?.cost ?? null } }))} label={t('purchasing.qtyFor', { name: v.name })} />
+                  <MoneyInput minor={lines[v.variantId]?.cost ?? null} currency={currency} label={t('purchasing.costFor', { name: v.name })} onChange={(c) => setLines((l) => ({ ...l, [v.variantId]: { q: l[v.variantId]?.q ?? 0, cost: c } }))} />
                 </li>
               )))}
             </ul>

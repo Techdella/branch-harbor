@@ -121,7 +121,7 @@ export default async function BrandHome({ params, searchParams }: Props) {
                   <OpenBadge loc={l} />
                 </div>
                 <p className="mt-1 text-sm text-graphite">
-                  {[l.address.line1, l.address.city, l.address.region, l.address.postalCode].filter(Boolean).join(', ')} · {countryName(l.country)}
+                  <bdi>{[l.address.line1, l.address.city, l.address.region, l.address.postalCode].filter(Boolean).join(', ')}</bdi> · {countryName(l.country)}
                 </p>
                 {l.hours.summary && <p className="mt-1 text-sm text-graphite"><Icon name="clock" size={14} className="me-1 inline align-[-2px]" />{l.hours.summary}</p>}
                 {l.distanceKm !== null && <p className="mt-1 text-sm text-graphite">{t('distance', { km: l.distanceKm.toLocaleString(locale) })}</p>}

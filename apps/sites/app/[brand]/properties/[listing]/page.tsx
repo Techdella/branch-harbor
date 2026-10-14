@@ -98,7 +98,7 @@ export default async function ListingDetail({ params, searchParams }: Props) {
         <div className="min-w-0">
           <p className="inline-flex items-center gap-1 rounded-full bg-canvas px-3 py-1 text-sm font-bold"><Icon name={l.status === 'under_offer' ? 'receipt' : l.status === 'coming_soon' ? 'clock' : 'check'} size={14} />{t(`status.${l.status}`)}</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{l.title}</h1>
-          <p className="mt-1 text-graphite">{l.addressLines.join(', ')}{l.hideStreet ? ` · ${t('listing.streetHidden')}` : ''}</p>
+          <p className="mt-1 text-graphite"><bdi>{l.addressLines.join(', ')}</bdi>{l.hideStreet ? ` · ${t('listing.streetHidden')}` : ''}</p>
           <p className="mt-3 text-3xl font-extrabold">{money(l.price, locale)}{l.rentPeriod ? <span className="text-lg font-semibold text-graphite"> / {t(`per.${l.rentPeriod}`)}</span> : null}</p>
           <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="card p-3"><dt className="text-xs font-semibold text-graphite">{t('listing.bedrooms')}</dt><dd className="text-xl font-bold">{l.bedrooms ?? t('listing.unknown')}</dd></div>
@@ -125,7 +125,7 @@ export default async function ListingDetail({ params, searchParams }: Props) {
           <section className="mt-6" aria-labelledby="map-h">
             <h2 id="map-h" className="text-xl font-bold">{t('listing.location')}</h2>
             <figure className="card mt-2 grid min-h-40 place-items-center bg-[#EEF1EC] p-6 text-center text-sm">
-              <div><Icon name="map" size={24} /><p className="mt-1 font-semibold">{l.addressLines.join(', ')}</p><p className="text-graphite">{t('search.mapBody')}</p>
+              <div><Icon name="map" size={24} /><p className="mt-1 font-semibold"><bdi>{l.addressLines.join(', ')}</bdi></p><p className="text-graphite">{t('search.mapBody')}</p>
                 {l.geo && <a className="link mt-1 inline-block" href={`https://www.openstreetmap.org/?mlat=${l.geo.lat}&mlon=${l.geo.lng}#map=16/${l.geo.lat}/${l.geo.lng}`} target="_blank" rel="noopener noreferrer">{t('listing.openMap')}</a>}</div>
             </figure>
           </section>
@@ -152,7 +152,7 @@ export default async function ListingDetail({ params, searchParams }: Props) {
                     ? <img src={a.photoUrl} alt="" className="size-12 rounded-full object-cover" />
                     : <span className="grid size-12 place-items-center rounded-full bg-canvas font-bold" aria-hidden>{a.name.slice(0, 1)}</span>}
                   <div className="text-sm"><p className="font-bold">{a.name}</p><p className="text-graphite">{a.title}{a.licenceNumber ? ` · ${a.licenceNumber}` : ''}</p>
-                    {a.phone && <a className="link" href={`tel:${a.phone.replace(/\s/g, '')}`}>{a.phone}</a>}</div>
+                    {a.phone && <a className="link" dir="ltr" href={`tel:${a.phone.replace(/\s/g, '')}`}>{a.phone}</a>}</div>
                 </li>
               ))}
             </ul>

@@ -77,8 +77,9 @@ booking is hidden and the page points to that system.
   with a zone label (`lib/format.ts`).
 * **Language**: the location's locale (or brand default), switchable via `?lang=` / the switcher among the
   languages the business enabled (`PUT /v1/orgs/:orgId/sites/settings → enabledLocales`). The explicit choice is
-  remembered in an essential `bh_lang` cookie. UI strings exist for en, fr, de, es; other enabled locales use English
-  UI text with their own number/date formats. Business content is shown as published (not machine-translated).
+  remembered in an essential `bh_lang` cookie. UI strings are complete in all nine supported locales (en, en-GB, fr,
+  es, de, pt-BR, nl, it, ar — checked by `pnpm lint`); Arabic renders right-to-left (`<html dir>`, logical CSS
+  properties, mirrored directional icons, isolated amounts and phone numbers). Business content is shown as published (not machine-translated).
 * **Cookies**: only essential cookies (language choice, cookie choice). The banner says so; no analytics/ads.
 * **Theme**: `primaryColor` is checked for WCAG contrast by the API, which returns the button colour/text colour pair
   and a darkened "ink" variant for links. Fonts are limited to a safe list loaded via `next/font`.

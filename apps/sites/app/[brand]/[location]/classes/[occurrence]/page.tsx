@@ -30,7 +30,7 @@ export default async function BookClassPage({ params }: Props) {
 
   return (
     <main id="main" className="mx-auto max-w-2xl px-4 py-10">
-      <a href={links.location(location, '/classes')} className="link text-sm font-semibold">← {t('schedule.title')}</a>
+      <a href={links.location(location, '/classes')} className="link text-sm font-semibold"><span aria-hidden className="inline-block rtl:-scale-x-100">←</span> {t('schedule.title')}</a>
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight">{full ? t('booking.waitlistTitle', { name: c.classType.name }) : t('booking.title', { name: c.classType.name })}</h1>
       <dl className="card mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 p-5 text-sm">
         <dt className="font-semibold text-graphite">{t('booking.when')}</dt><dd>{when}</dd>

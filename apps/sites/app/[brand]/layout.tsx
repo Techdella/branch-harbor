@@ -27,7 +27,7 @@ export default async function BrandLayout({ children, params }: { children: Reac
             ) : (
               <>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand text-on-brand" aria-hidden>{brand.name.slice(0, 1)}</span>
-                <span className="truncate text-lg">{brand.name}</span>
+                <span className="truncate text-lg" dir="auto">{brand.name}</span>
               </>
             )}
           </a>
@@ -37,7 +37,7 @@ export default async function BrandLayout({ children, params }: { children: Reac
                 <Icon name="pin" size={16} />{t('allLocations')}
               </a>
             )}
-            <LanguageSwitcher current={locale} available={available} label={t('language')} />
+            <LanguageSwitcher current={locale} available={available} label={t('language')} submitLabel={t('languageSubmit')} />
           </nav>
         </div>
       </header>

@@ -1,0 +1,7 @@
+{
+  "title": "Deze pagina is nu niet beschikbaar",
+  "body": "We konden deze pagina niet laden. Er is niets geboekt of afgerekend. Probeer het zo meteen opnieuw.",
+  "retry": "Opnieuw proberen",
+  "network": "Netwerkfout. Controleer je verbinding en probeer het opnieuw.",
+  "requestFailed": "Verzoek mislukt ({status})"
+}

@@ -6,6 +6,7 @@ import { Icon } from '@bh/ui';
 import { PayButton } from '@/components/forms';
 import { sleep } from '@/lib/client';
 import { dateTime, money } from '@/lib/format';
+import { policyLines, type CustomerPolicy } from '@/lib/policy';
 import { getSession, pcall } from '@/lib/portal';
 import { SignIn, useStudioSession } from './Account';
 
@@ -52,7 +53,7 @@ interface Options {
   signedIn: boolean; price: Money; payOnline: boolean; creditCost: number | null; outstandingFees: number;
   credits: Array<{ id: string; name: string; creditsRemaining: number; creditsNeeded: number; expiresAt: string | null; usable: boolean; reason: string | null }>;
   memberships: Array<{ id: string; name: string; usable: boolean; reason: string | null; usage: { used: number; limit: number | null } | null }>;
-  policy: { lines: string[] };
+  policy: CustomerPolicy;
   recommended: { kind: 'pay' | 'credit' | 'membership'; packId?: string; membershipId?: string };
 }
 
@@ -79,7 +80,7 @@ export function MemberBooking({ brand, occurrenceId, locationId, full, accountPa
   return (
     <section className="card mt-5 space-y-3 p-5" aria-labelledby="policy-h">
       <h2 id="policy-h" className="text-lg font-extrabold">{t('policyTitle')}</h2>
-      <ul className="list-disc space-y-1 ps-5 text-sm text-graphite">{opts.policy.lines.map((l) => <li key={l}>{l}</li>)}</ul>
+      <ul className="list-disc space-y-1 ps-5 text-sm text-graphite">{policyLines(opts.policy, (k, v) => t(k as never, v as never), locale).map((l) => <li key={l}>{l}</li>)}</ul>
       {!session ? (
         <p className="text-sm">{t('memberPrompt')} <a className="link font-semibold" href={accountPath}>{t('signInToBook')}</a></p>
       ) : result ? (

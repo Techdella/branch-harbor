@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { BuyButton } from '@/components/studios/Commerce';
 import { apiGet } from '@/lib/api';
+import { policyLines, type CustomerPolicy } from '@/lib/policy';
 import { money } from '@/lib/format';
 import { getRouting, loadLocation, makeLinks } from '@/lib/site';
 
@@ -12,7 +13,7 @@ interface Pricing {
   packs: Array<{ id: string; name: string; description: string | null; credits: number; validityDays: number; price: Money; perClass: Money; access: string }>;
   memberships: Array<{ id: string; name: string; description: string | null; classesPerPeriod: number | null; price: Money & { interval: string }; access: string; terms: string[] }>;
   offers: Array<{ id: string; name: string; description: string | null; kind: string; credits: number | null; validDays: number; price: Money; newCustomersOnly: boolean }>;
-  policy: { lines: string[] };
+  policy: CustomerPolicy;
 }
 type Props = { params: Promise<{ brand: string; location: string }> };
 
@@ -85,7 +86,7 @@ export default async function PricingPage({ params }: Props) {
       </section>
       <section className="card p-5">
         <h2 className="font-extrabold">{t('policyTitle')}</h2>
-        <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-graphite">{p.policy.lines.map((l) => <li key={l}>{l}</li>)}</ul>
+        <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-graphite">{policyLines(p.policy, (k, v) => t(k as never, v as never), locale).map((l) => <li key={l}>{l}</li>)}</ul>
       </section>
     </main>
   );
