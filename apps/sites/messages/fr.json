@@ -314,5 +314,12 @@
     "details": "Détails",
     "essential": "Essentiels (toujours actifs) : langue, choix des cookies, sécurité.",
     "analytics": "Mesure d’audience : non utilisée sur ce site."
+  },
+  "studio": {
+    "nav": {
+      "pricing": "Tarifs",
+      "online": "En ligne",
+      "account": "Mon compte"
+    }
   }
 }

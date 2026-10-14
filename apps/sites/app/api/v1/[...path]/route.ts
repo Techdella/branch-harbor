@@ -14,6 +14,9 @@ async function forward(req: NextRequest, { params }: { params: Promise<{ path: s
   const headers: Record<string, string> = { accept: 'application/json' };
   const ct = req.headers.get('content-type');
   if (ct) headers['content-type'] = ct;
+  // Studio customer portal session (magic-link sign-in on hosted sites).
+  const portal = req.headers.get('x-bh-customer-session');
+  if (portal) headers['x-bh-customer-session'] = portal;
   const fwd = req.headers.get('x-forwarded-for');
   // The API trusts the proxy hop, so per-visitor rate limits keep working.
   headers['x-forwarded-for'] = fwd ?? '127.0.0.1';

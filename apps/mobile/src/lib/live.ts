@@ -663,18 +663,19 @@ export const liveApi = {
   },
   async roster(sessionId: string): Promise<RosterEntry[]> {
     const [orgId, occId] = split(sessionId, 2);
-    const r = await http<{ attendees: { bookingId: string; status: string; source: string; customer: { name: string } }[] }>('GET', `/orgs/${orgId}/studios/occurrences/${occId}`);
+    // Check-in roster: how each person booked (membership / pack / paid) and their check-in state.
+    const r = await http<{ items: { bookingId: string; status: string; source: string; bookedWith: string; customer: { name: string } }[] }>('GET', `/orgs/${orgId}/studios/occurrences/${occId}/roster`);
     // Roster carries display names only (no contact details), first name + initial.
-    return r.attendees.filter((a) => ['confirmed', 'attended', 'no_show'].includes(a.status)).map((a) => ({
+    return r.items.filter((a) => ['confirmed', 'attended', 'no_show'].includes(a.status)).map((a) => ({
       id: a.bookingId, displayName: firstNameInitial(a.customer.name),
-      note: a.source === 'waitlist' ? 'From the waitlist' : a.source === 'staff' ? 'Booked by staff' : 'Booked online',
+      note: `${a.bookedWith}${a.source === 'waitlist' ? ' · from the waitlist' : ''}`,
       status: a.status === 'attended' ? 'present' : a.status === 'no_show' ? 'absent' : 'unmarked',
     }));
   },
   async markAttendance(sessionId: string, entryId: string, status: AttendanceStatus): Promise<RosterEntry> {
     const [orgId] = split(sessionId, 2);
     if (status === 'unmarked') notSupported('Clearing attendance');
-    await http('POST', `/orgs/${orgId}/studios/bookings/${entryId}/attendance`, { status: status === 'present' ? 'attended' : 'no_show' });
+    await http('POST', `/orgs/${orgId}/studios/bookings/${entryId}/attendance`, { status: status === 'present' ? 'attended' : 'no_show', source: 'instructor' });
     const list = await liveApi.roster(sessionId);
     return list.find((r) => r.id === entryId) ?? { id: entryId, displayName: '', note: '', status };
   },

@@ -314,5 +314,12 @@
     "details": "Details",
     "essential": "Notwendig (immer aktiv): Sprachauswahl, Cookie-Auswahl, Sicherheit.",
     "analytics": "Analyse: auf dieser Website nicht verwendet."
+  },
+  "studio": {
+    "nav": {
+      "pricing": "Preise",
+      "online": "Online",
+      "account": "Mein Konto"
+    }
   }
 }

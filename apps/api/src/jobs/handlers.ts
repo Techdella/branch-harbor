@@ -40,5 +40,6 @@ export function registerJobHandlers(s: Services) {
 
   s.jobs.register('studios.expire-holds', async () => {
     await expireHolds(s);
+    await (await import('../services/studios-commerce.ts')).runStudioLifecycle(s);
   });
 }

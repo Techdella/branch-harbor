@@ -1,12 +1,13 @@
 import { and, asc, eq, sql } from 'drizzle-orm';
 import type { Services } from '../context.ts';
 import type { Tx } from '../db/client.ts';
-import { classBookings, classOccurrences, customers, waitlistEntries } from '../db/schema/index.ts';
+import { classBookings, classOccurrences, customers, locations, studioFees, waitlistEntries } from '../db/schema/index.ts';
 import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, conflict, notFound } from '../lib/errors.ts';
 import { audit } from './audit.ts';
 import { assertPaymentsEnabled, createPaymentForTarget } from './payments.ts';
 import { notify, userIdsForCustomer } from './notifications.ts';
+import { consumeEntitlement, effectivePolicy, returnCredits, type Consumed, type PayWith } from './studios-entitlements.ts';
 
 /** Seats in use = confirmed bookings + holds that have not expired. */
 export async function seatsInUse(tx: Tx, occurrenceId: string): Promise<number> {
@@ -22,10 +23,12 @@ export interface BookInput {
   joinWaitlist?: boolean;
   source?: string;
   actorUserId?: string | null;
+  /** How to pay. Guests (public contact bookings) can only pay per class; credits/memberships need an identified customer. */
+  payWith?: PayWith;
 }
 
 export type BookResult =
-  | { outcome: 'confirmed' | 'held'; bookingId: string; manageToken: string; holdExpiresAt: string | null; payment: { id: string; clientSecret: string | null; amount: number; currency: string; sandbox: boolean } | null }
+  | { outcome: 'confirmed' | 'held'; bookingId: string; manageToken: string; holdExpiresAt: string | null; paymentMethod?: string; packId?: string | null; membershipId?: string | null; creditsUsed?: number; payment: { id: string; clientSecret: string | null; amount: number; currency: string; sandbox: boolean } | null }
   | { outcome: 'waitlisted'; waitlistEntryId: string; position: number; manageToken: string };
 
 /**
@@ -36,7 +39,11 @@ export type BookResult =
 export async function bookClass(s: Services, input: BookInput): Promise<BookResult> {
   const [occPeek] = await s.db.select().from(classOccurrences).where(and(eq(classOccurrences.id, input.occurrenceId), eq(classOccurrences.organizationId, input.organizationId)));
   if (!occPeek) throw notFound('Class');
-  if (occPeek.priceMinor > 0) await assertPaymentsEnabled(s.db, input.organizationId, occPeek.locationId);
+  const payWith: PayWith = input.payWith ?? { kind: 'pay' };
+  if (occPeek.priceMinor > 0 && payWith.kind === 'pay') await assertPaymentsEnabled(s.db, input.organizationId, occPeek.locationId);
+  const [locRow] = await s.db.select().from(locations).where(eq(locations.id, occPeek.locationId));
+  const policy = await effectivePolicy(s.db, occPeek.organizationId, occPeek.locationId);
+  if (occPeek.startsAt.getTime() > Date.now() + policy.bookingWindowDays * 86400_000) throw conflict('outside_booking_window', `Booking opens ${policy.bookingWindowDays} days before the class`);
 
   const manageToken = randomToken();
   const res = await s.db.transaction(async (tx) => {
@@ -59,19 +66,25 @@ export async function bookClass(s: Services, input: BookInput): Promise<BookResu
       return { kind: 'waitlisted' as const, waitlistEntryId: w!.id, position: pos?.n ?? 1, occ };
     }
 
-    const paid = occ.priceMinor > 0;
+    // Credits / memberships are validated and consumed under row locks in this transaction.
+    let consumed: Consumed | null = await consumeEntitlement(tx, payWith, input.customerId, occ, locRow!);
+    if (!consumed) consumed = { paymentMethod: occ.priceMinor > 0 ? 'pay_per_class' : 'free', packId: null, membershipId: null, creditsUsed: 0 };
+    if (consumed.paymentMethod === 'pay_per_class' && payWith.kind !== 'pay') await assertPaymentsEnabled(tx, occ.organizationId, occ.locationId);
+    const paid = consumed.paymentMethod === 'pay_per_class';
     const holdExpiresAt = paid ? new Date(Date.now() + s.cfg.BOOKING_HOLD_MINUTES * 60_000) : null;
     const [b] = await tx.insert(classBookings).values({
       organizationId: occ.organizationId, locationId: occ.locationId, occurrenceId: occ.id, customerId: input.customerId,
       status: paid ? 'held' : 'confirmed', holdExpiresAt, source: input.source ?? 'web', manageTokenHash: sha256(manageToken), confirmedAt: paid ? null : new Date(),
+      paymentMethod: consumed.paymentMethod, packId: consumed.packId, membershipId: consumed.membershipId, creditsUsed: consumed.creditsUsed,
     }).returning();
-    await audit(tx, { organizationId: occ.organizationId, actorUserId: input.actorUserId ?? null, actorType: input.actorUserId ? 'user' : 'system', action: paid ? 'booking.held' : 'booking.confirmed', scopeKind: 'location', scopeId: occ.locationId, targetType: 'class_booking', targetId: b!.id });
+    await audit(tx, { organizationId: occ.organizationId, actorUserId: input.actorUserId ?? null, actorType: input.actorUserId ? 'user' : 'system', action: paid ? 'booking.held' : 'booking.confirmed', scopeKind: 'location', scopeId: occ.locationId, targetType: 'class_booking', targetId: b!.id, metadata: { paymentMethod: consumed.paymentMethod, packId: consumed.packId, membershipId: consumed.membershipId, creditsUsed: consumed.creditsUsed } });
     return { kind: 'booked' as const, booking: b!, occ };
   });
 
   if (res.kind === 'waitlisted') return { outcome: 'waitlisted', waitlistEntryId: res.waitlistEntryId, position: res.position, manageToken };
   const { booking, occ } = res;
-  if (booking.status === 'confirmed') return { outcome: 'confirmed', bookingId: booking.id, manageToken, holdExpiresAt: null, payment: null };
+  const via = { paymentMethod: booking.paymentMethod, packId: booking.packId, membershipId: booking.membershipId, creditsUsed: booking.creditsUsed };
+  if (booking.status === 'confirmed') return { outcome: 'confirmed', bookingId: booking.id, manageToken, holdExpiresAt: null, ...via, payment: null };
   try {
     const pay = await createPaymentForTarget(s, {
       organizationId: occ.organizationId, locationId: occ.locationId, amountMinor: occ.priceMinor, currency: occ.currency,
@@ -79,7 +92,7 @@ export async function bookClass(s: Services, input: BookInput): Promise<BookResu
       recordSnapshot: { occurrenceId: occ.id, customerId: booking.customerId },
     });
     await s.db.update(classBookings).set({ paymentId: pay.payment.id }).where(eq(classBookings.id, booking.id));
-    return { outcome: 'held', bookingId: booking.id, manageToken, holdExpiresAt: booking.holdExpiresAt!.toISOString(), payment: { id: pay.payment.id, clientSecret: pay.clientSecret, amount: occ.priceMinor, currency: occ.currency, sandbox: pay.sandbox } };
+    return { outcome: 'held', bookingId: booking.id, manageToken, holdExpiresAt: booking.holdExpiresAt!.toISOString(), ...via, payment: { id: pay.payment.id, clientSecret: pay.clientSecret, amount: occ.priceMinor, currency: occ.currency, sandbox: pay.sandbox } };
   } catch (err) {
     await s.db.update(classBookings).set({ status: 'expired' }).where(eq(classBookings.id, booking.id));
     throw err;
@@ -93,12 +106,16 @@ export async function promoteFromWaitlist(s: Services, tx: Tx, occurrenceId: str
   if ((await seatsInUse(tx, occ.id)) >= occ.capacity) return null;
   const [next] = await tx.select().from(waitlistEntries).where(and(eq(waitlistEntries.occurrenceId, occ.id), eq(waitlistEntries.status, 'waiting'))).orderBy(asc(waitlistEntries.createdAt)).limit(1).for('update', { skipLocked: true });
   if (!next) return null;
-  const paid = occ.priceMinor > 0;
+  // A waiting member / pack holder is confirmed with their entitlement; everyone else pays (paid classes) or is confirmed (free).
+  const [locRow] = await tx.select().from(locations).where(eq(locations.id, occ.locationId));
+  const ent = occ.priceMinor > 0 ? await tx.transaction((sp) => consumeEntitlement(sp, { kind: 'auto' }, next.customerId, occ, locRow!)).catch(() => null) : null;
+  const paid = occ.priceMinor > 0 && !ent;
   const token = randomToken();
   const [b] = await tx.insert(classBookings).values({
     organizationId: occ.organizationId, locationId: occ.locationId, occurrenceId: occ.id, customerId: next.customerId,
     status: paid ? 'held' : 'confirmed', holdExpiresAt: paid ? new Date(Date.now() + s.cfg.BOOKING_HOLD_MINUTES * 4 * 60_000) : null,
     source: 'waitlist', manageTokenHash: sha256(token), confirmedAt: paid ? null : new Date(),
+    paymentMethod: ent?.paymentMethod ?? (paid ? 'pay_per_class' : 'free'), packId: ent?.packId ?? null, membershipId: ent?.membershipId ?? null, creditsUsed: ent?.creditsUsed ?? 0,
   }).returning();
   await tx.update(waitlistEntries).set({ status: paid ? 'offered' : 'promoted', offeredBookingId: b!.id }).where(eq(waitlistEntries.id, next.id));
   const [c] = await tx.select({ email: customers.email }).from(customers).where(eq(customers.id, next.customerId));
@@ -106,15 +123,40 @@ export async function promoteFromWaitlist(s: Services, tx: Tx, occurrenceId: str
   return { entryId: next.id, bookingId: b!.id, status: paid ? 'held' : 'confirmed', manageToken: token, email: c?.email ?? null, customerId: next.customerId, organizationId: occ.organizationId };
 }
 
-export async function cancelBooking(s: Services, bookingId: string, opts: { actorUserId: string | null; organizationId?: string }) {
+export interface CancelOptions {
+  actorUserId: string | null;
+  organizationId?: string;
+  /** Staff cancellation on the customer's behalf without penalties (credits returned, no fee). */
+  waivePolicy?: boolean;
+}
+
+/**
+ * Cancel a booking and apply the location's late-cancellation policy: credits are returned unless a late
+ * cancellation forfeits them, a late-cancel fee is recorded when configured, and `refundEligible` says
+ * whether the caller should reverse a pay-per-class payment.
+ */
+export async function cancelBooking(s: Services, bookingId: string, opts: CancelOptions) {
   const out = await s.db.transaction(async (tx) => {
     const [b] = await tx.select().from(classBookings).where(eq(classBookings.id, bookingId)).for('update');
     if (!b || (opts.organizationId && b.organizationId !== opts.organizationId)) throw notFound('Booking');
     if (!['held', 'confirmed'].includes(b.status)) throw conflict('booking_not_active', `Booking is already ${b.status}`);
-    await tx.update(classBookings).set({ status: 'cancelled', cancelledAt: new Date() }).where(eq(classBookings.id, b.id));
-    await audit(tx, { organizationId: b.organizationId, actorUserId: opts.actorUserId, action: 'booking.cancelled', scopeKind: 'location', scopeId: b.locationId, targetType: 'class_booking', targetId: b.id });
+    const [occ] = await tx.select().from(classOccurrences).where(eq(classOccurrences.id, b.occurrenceId));
+    const policy = await effectivePolicy(tx, b.organizationId, b.locationId);
+    const late = !opts.waivePolicy && b.status === 'confirmed' && !!occ && occ.startsAt.getTime() - Date.now() < policy.lateCancelMinutes * 60_000;
+    const creditReturned = b.packId && b.creditsUsed > 0 ? !(late && policy.forfeitCreditOnLateCancel) : null;
+    if (b.packId && creditReturned) await returnCredits(tx, b.packId, b.creditsUsed);
+    await tx.update(classBookings).set({ status: 'cancelled', cancelledAt: new Date(), lateCancel: late, creditReturned }).where(eq(classBookings.id, b.id));
+    let fee: typeof studioFees.$inferSelect | null = null;
+    const feeAmount = occ ? policy.lateCancelFee[occ.currency] : undefined;
+    const member = b.paymentMethod === 'membership' || b.paymentMethod === 'credit';
+    if (late && feeAmount && b.paymentMethod !== 'comp' && (policy.feesApplyToMembers || !member)) {
+      const [f] = await tx.insert(studioFees).values({ organizationId: b.organizationId, locationId: b.locationId, customerId: b.customerId, bookingId: b.id, kind: 'late_cancel', amountMinor: feeAmount, currency: occ!.currency }).onConflictDoNothing().returning();
+      fee = f ?? null;
+    }
+    await audit(tx, { organizationId: b.organizationId, actorUserId: opts.actorUserId, action: late ? 'booking.cancelled_late' : 'booking.cancelled', scopeKind: 'location', scopeId: b.locationId, targetType: 'class_booking', targetId: b.id, metadata: { creditReturned, fee: fee ? { amount: fee.amountMinor, currency: fee.currency } : null, waivePolicy: !!opts.waivePolicy } });
     const promoted = await promoteFromWaitlist(s, tx, b.occurrenceId);
-    return { booking: b, promoted };
+    const refundEligible = b.status === 'confirmed' && b.paymentMethod === 'pay_per_class' && (!late || policy.refundPaidOnLateCancel);
+    return { booking: b, promoted, lateCancel: late, creditReturned, refundEligible, fee };
   });
   if (out.promoted?.email) {
     await s.jobs.enqueue('email.send', {
@@ -128,6 +170,38 @@ export async function cancelBooking(s: Services, bookingId: string, opts: { acto
   }
   if (out.promoted) await notifyWaitlistPromotion(s, out.promoted);
   return out;
+}
+
+/** Record attendance; a no-show applies the no-show fee policy (idempotent per booking). */
+export async function recordAttendance(s: Services, bookingId: string, status: 'attended' | 'no_show', opts: { actorUserId: string; source: 'desk' | 'instructor' | 'self' }) {
+  return s.db.transaction(async (tx) => {
+    const [b] = await tx.select().from(classBookings).where(eq(classBookings.id, bookingId)).for('update');
+    if (!b) throw notFound('Booking');
+    if (!['confirmed', 'attended', 'no_show'].includes(b.status)) throw conflict('booking_not_confirmed', `Booking is ${b.status}`);
+    const [u] = await tx.update(classBookings).set({
+      status, checkedInAt: status === 'attended' ? b.checkedInAt ?? new Date() : null, checkedInBy: status === 'attended' ? opts.actorUserId : null, checkInSource: status === 'attended' ? opts.source : null,
+    }).where(eq(classBookings.id, b.id)).returning();
+    let fee: typeof studioFees.$inferSelect | null = null;
+    if (status === 'no_show') {
+      const [occ] = await tx.select().from(classOccurrences).where(eq(classOccurrences.id, b.occurrenceId));
+      const policy = await effectivePolicy(tx, b.organizationId, b.locationId);
+      const amount = occ ? policy.noShowFee[occ.currency] : undefined;
+      const member = b.paymentMethod === 'membership' || b.paymentMethod === 'credit';
+      if (amount && b.paymentMethod !== 'comp' && (policy.feesApplyToMembers || !member)) {
+        const [f] = await tx.insert(studioFees).values({ organizationId: b.organizationId, locationId: b.locationId, customerId: b.customerId, bookingId: b.id, kind: 'no_show', amountMinor: amount, currency: occ!.currency }).onConflictDoNothing().returning();
+        fee = f ?? null;
+        if (!f) [fee = null] = await tx.select().from(studioFees).where(and(eq(studioFees.bookingId, b.id), eq(studioFees.kind, 'no_show')));
+        if (fee && fee.status === 'waived' && fee.waiveReason === 'Marked as attended') {
+          [fee = null] = await tx.update(studioFees).set({ status: 'due', waivedBy: null, waiveReason: null, updatedAt: new Date() }).where(eq(studioFees.id, fee.id)).returning();
+        }
+      }
+    } else {
+      // Marked attended after a no-show by mistake: an unpaid no-show fee no longer applies.
+      await tx.update(studioFees).set({ status: 'waived', waiveReason: 'Marked as attended', waivedBy: opts.actorUserId, updatedAt: new Date() }).where(and(eq(studioFees.bookingId, b.id), eq(studioFees.kind, 'no_show'), eq(studioFees.status, 'due')));
+    }
+    await audit(tx, { organizationId: b.organizationId, actorUserId: opts.actorUserId, action: `booking.${status}`, scopeKind: 'location', scopeId: b.locationId, targetType: 'class_booking', targetId: b.id, metadata: { source: opts.source, fee: fee ? fee.amountMinor : null } });
+    return { booking: u!, fee };
+  });
 }
 
 /** Push to the promoted customer's devices (if they have an account with push enabled). */

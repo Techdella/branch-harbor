@@ -10,6 +10,12 @@ import { LaterScreen } from './LaterScreen';
 import { TableScreen } from './TableScreen';
 import { ClassesScreen } from './studios/ClassesScreen';
 import { CoverScreen } from './studios/CoverScreen';
+import { ScheduleScreen } from './studios/ScheduleScreen';
+import { RoomsScreen } from './studios/RoomsScreen';
+import { PricingScreen } from './studios/PricingScreen';
+import { MembersScreen } from './studios/MembersScreen';
+import { OnlineScreen } from './studios/OnlineScreen';
+import { InsightsScreen } from './studios/InsightsScreen';
 import { RegistrationsScreen } from './sports/RegistrationsScreen';
 import { AttendanceScreen } from './sports/AttendanceScreen';
 import { CalendarScreen } from './wellness/CalendarScreen';
@@ -50,6 +56,18 @@ export function OpsRouter({ screen }: { screen: string }) {
       return <ClassesScreen />;
     case 'studios:cover':
       return <CoverScreen />;
+    case 'studios:schedule':
+      return <ScheduleScreen />;
+    case 'studios:rooms':
+      return <RoomsScreen />;
+    case 'studios:pricing':
+      return <PricingScreen />;
+    case 'studios:members':
+      return <MembersScreen />;
+    case 'studios:online':
+      return <OnlineScreen />;
+    case 'studios:insights':
+      return <InsightsScreen />;
     case 'sports:registrations':
       return <RegistrationsScreen />;
     case 'sports:attendance':

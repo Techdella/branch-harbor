@@ -11,8 +11,9 @@ import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { findOrCreateCustomer } from '../services/customers.ts';
 import { reverseTargetPayment } from '../services/payments.ts';
-import { bookClass, cancelBooking, leaveWaitlist, seatsInUse } from '../services/studios.ts';
+import { bookClass, cancelBooking, leaveWaitlist, recordAttendance, seatsInUse } from '../services/studios.ts';
 import { notify, usersWithPermissionAt } from '../services/notifications.ts';
+import { dispatchCustomerNotifications, enqueueCustomerNotifications } from '../services/studios-notify.ts';
 import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
 export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -68,8 +69,8 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
     const [b] = await s.db.select().from(classBookings).where(eq(classBookings.id, req.params.id));
     if (!b || b.manageTokenHash !== sha256(req.body.manageToken)) throw notFound('Booking');
     const out = await cancelBooking(s, b.id, { actorUserId: null });
-    const refund = out.booking.status === 'confirmed' ? await reverseTargetPayment(s, out.booking.paymentId, null, 'Customer cancelled booking') : { action: 'none' };
-    return { id: b.id, status: 'cancelled', payment: refund, waitlistPromoted: !!out.promoted };
+    const refund = out.refundEligible ? await reverseTargetPayment(s, out.booking.paymentId, null, 'Customer cancelled booking') : { action: 'none' };
+    return { id: b.id, status: 'cancelled', payment: refund, waitlistPromoted: !!out.promoted, lateCancel: out.lateCancel, creditReturned: out.creditReturned, fee: out.fee ? { amount: out.fee.amountMinor, currency: out.fee.currency } : null };
   });
 
   app.post('/public/studios/waitlist/:id/leave', {
@@ -200,7 +201,7 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
     });
 
     priv.post('/orgs/:orgId/studios/occurrences/:id/bookings', {
-      schema: { tags: ['studios'], security: secured, params: idParams, body: z.object({ customerId: z.uuid().optional(), contact: publicContactSchema.optional(), joinWaitlist: z.boolean().default(false) }), summary: 'Staff books a customer into a class' },
+      schema: { tags: ['studios'], security: secured, params: idParams, body: z.object({ customerId: z.uuid().optional(), contact: publicContactSchema.optional(), joinWaitlist: z.boolean().default(false), payWith: z.discriminatedUnion('kind', [z.object({ kind: z.literal('pay') }), z.object({ kind: z.literal('auto') }), z.object({ kind: z.literal('comp') }), z.object({ kind: z.literal('credit'), packId: z.uuid().optional() }), z.object({ kind: z.literal('membership'), membershipId: z.uuid().optional() })]).default({ kind: 'pay' }) }), summary: 'Staff books a customer into a class (pay, membership, pack credit or complimentary)' },
     }, async (req, reply) => {
       const o = await loadOcc(req.params.orgId, req.params.id);
       await requireLocationPerm(req, s.db, o.organizationId, o.locationId, 'operations.write');
@@ -210,27 +211,29 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
         if (!c) throw notFound('Customer');
       } else if (req.body.contact) customerId = (await findOrCreateCustomer(s.db, o.organizationId, o.locationId, req.body.contact, 'staff')).id;
       else throw validationError('Provide customerId or contact', { customerId: 'Required' });
-      const r = await bookClass(s, { organizationId: o.organizationId, occurrenceId: o.id, customerId, joinWaitlist: req.body.joinWaitlist, source: 'staff', actorUserId: req.user!.id });
+      const r = await bookClass(s, { organizationId: o.organizationId, occurrenceId: o.id, customerId, joinWaitlist: req.body.joinWaitlist, source: 'staff', actorUserId: req.user!.id, payWith: req.body.payWith });
       return reply.code(201).send(r);
     });
 
-    priv.post('/orgs/:orgId/studios/bookings/:id/cancel', { schema: { tags: ['studios'], security: secured, params: idParams } }, async (req) => {
-      const [b] = await s.db.select().from(classBookings).where(and(eq(classBookings.id, req.params.id), eq(classBookings.organizationId, req.params.orgId)));
-      if (!b) throw notFound('Booking');
-      await requireLocationPerm(req, s.db, b.organizationId, b.locationId, 'operations.write');
-      const out = await cancelBooking(s, b.id, { actorUserId: req.user!.id, organizationId: req.params.orgId });
-      return { id: b.id, status: 'cancelled', waitlistPromoted: out.promoted ? { bookingId: out.promoted.bookingId, status: out.promoted.status } : null };
-    });
-
-    priv.post('/orgs/:orgId/studios/bookings/:id/attendance', {
-      schema: { tags: ['studios'], security: secured, params: idParams, body: z.object({ status: z.enum(['attended', 'no_show']) }) },
+    priv.post('/orgs/:orgId/studios/bookings/:id/cancel', {
+      schema: { tags: ['studios'], security: secured, params: idParams, body: z.object({ waivePolicy: z.boolean().default(false) }).default({ waivePolicy: false }), summary: 'Staff cancels a booking. The late-cancel policy applies unless waived (credits returned, no fee).' },
     }, async (req) => {
       const [b] = await s.db.select().from(classBookings).where(and(eq(classBookings.id, req.params.id), eq(classBookings.organizationId, req.params.orgId)));
       if (!b) throw notFound('Booking');
       await requireLocationPerm(req, s.db, b.organizationId, b.locationId, 'operations.write');
-      if (!['confirmed', 'attended', 'no_show'].includes(b.status)) throw conflict('booking_not_confirmed', `Booking is ${b.status}`);
-      const [u] = await s.db.update(classBookings).set({ status: req.body.status }).where(eq(classBookings.id, b.id)).returning();
-      return u;
+      const out = await cancelBooking(s, b.id, { actorUserId: req.user!.id, organizationId: req.params.orgId, waivePolicy: req.body.waivePolicy });
+      const payment = out.refundEligible ? await reverseTargetPayment(s, out.booking.paymentId, req.user!.id, 'Cancelled by the studio') : { action: 'none' as const };
+      return { id: b.id, status: 'cancelled', payment, lateCancel: out.lateCancel, creditReturned: out.creditReturned, fee: out.fee ? { amount: out.fee.amountMinor, currency: out.fee.currency } : null, waitlistPromoted: out.promoted ? { bookingId: out.promoted.bookingId, status: out.promoted.status } : null };
+    });
+
+    priv.post('/orgs/:orgId/studios/bookings/:id/attendance', {
+      schema: { tags: ['studios'], security: secured, params: idParams, body: z.object({ status: z.enum(['attended', 'no_show']), source: z.enum(['desk', 'instructor']).default('desk') }), summary: 'Check in (attended) or mark a no-show (applies the no-show fee policy)' },
+    }, async (req) => {
+      const [b] = await s.db.select().from(classBookings).where(and(eq(classBookings.id, req.params.id), eq(classBookings.organizationId, req.params.orgId)));
+      if (!b) throw notFound('Booking');
+      await requireLocationPerm(req, s.db, b.organizationId, b.locationId, 'operations.write');
+      const r = await recordAttendance(s, b.id, req.body.status, { actorUserId: req.user!.id, source: req.body.source });
+      return { ...r.booking, fee: r.fee ? { id: r.fee.id, kind: r.fee.kind, amount: r.fee.amountMinor, currency: r.fee.currency, status: r.fee.status } : null };
     });
 
     // ── Instructor cover ──
@@ -269,12 +272,30 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
     };
 
     const applyCover = async (cr: typeof coverRequests.$inferSelect, actorId: string, action: string) => {
-      // Schedule and customer-facing instructor update together, in one transaction.
-      await s.db.transaction(async (tx) => {
-        await tx.update(coverRequests).set({ status: 'approved', approvedBy: actorId, history: [...cr.history, { at: new Date().toISOString(), by: actorId, action }], updatedAt: new Date() }).where(eq(coverRequests.id, cr.id));
-        await tx.update(classOccurrences).set({ instructorUserId: cr.substituteUserId, instructorName: cr.substituteName }).where(eq(classOccurrences.id, cr.occurrenceId));
-        await audit(tx, { organizationId: cr.organizationId, actorUserId: actorId, action: 'cover.approved', scopeKind: 'location', scopeId: cr.locationId, targetType: 'cover_request', targetId: cr.id, metadata: { substitute: cr.substituteUserId } });
+      // Atomic: the cover approval, the schedule's instructor, the customer-facing instructor name and the
+      // customer notifications (outbox) commit together — or not at all.
+      const out = await s.db.transaction(async (tx) => {
+        const [cur] = await tx.select().from(coverRequests).where(eq(coverRequests.id, cr.id)).for('update');
+        if (!cur || cur.status !== 'accepted' || !cur.substituteUserId) throw new AppError(409, 'cover_not_accepted', 'No substitute has accepted this request yet');
+        const [occ] = await tx.select().from(classOccurrences).where(eq(classOccurrences.id, cur.occurrenceId)).for('update');
+        if (!occ || occ.status !== 'scheduled') throw conflict('class_cancelled', 'This class is no longer scheduled');
+        const previous = occ.instructorName;
+        await tx.update(classOccurrences).set({ instructorUserId: cur.substituteUserId, instructorName: cur.substituteName, updatedAt: new Date() }).where(eq(classOccurrences.id, occ.id));
+        const booked = await tx.select({ customerId: classBookings.customerId }).from(classBookings).where(and(eq(classBookings.occurrenceId, occ.id), inArray(classBookings.status, ['held', 'confirmed'])));
+        const [ct] = await tx.select({ name: classTypes.name }).from(classTypes).where(eq(classTypes.id, occ.classTypeId));
+        const [l] = await tx.select({ name: locations.name, timeZone: locations.timeZone }).from(locations).where(eq(locations.id, occ.locationId));
+        const when = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: l?.timeZone ?? 'UTC' }).format(occ.startsAt);
+        const q = await enqueueCustomerNotifications(tx, {
+          organizationId: occ.organizationId, locationId: occ.locationId, customerIds: booked.map((b) => b.customerId), occurrenceId: occ.id, seriesId: occ.seriesId, kind: 'instructor_changed',
+          subject: `New instructor: ${ct?.name ?? 'your class'}, ${when}`,
+          body: `${ct?.name ?? 'Your class'} on ${when} at ${l?.name ?? 'the studio'} will now be taught by ${cur.substituteName ?? 'a substitute instructor'}${previous ? ` (instead of ${previous})` : ''}. Your booking is unchanged.`,
+        });
+        const [u] = await tx.update(coverRequests).set({ status: 'approved', approvedBy: actorId, customersNotified: q.customers, history: [...cur.history, { at: new Date().toISOString(), by: actorId, action, note: q.customers ? `${q.customers} booked customer(s) notified` : undefined }], updatedAt: new Date() }).where(eq(coverRequests.id, cur.id)).returning();
+        await audit(tx, { organizationId: cur.organizationId, actorUserId: actorId, action: 'cover.approved', scopeKind: 'location', scopeId: cur.locationId, targetType: 'cover_request', targetId: cur.id, metadata: { substitute: cur.substituteUserId, previousInstructor: previous, customersNotified: q.customers } });
+        return { cr: u!, batchId: q.batchId, when, className: ct?.name ?? 'Class' };
       });
+      if (out.batchId) await dispatchCustomerNotifications(s, out.batchId);
+      await notify(s, { userIds: [out.cr.requestedBy, out.cr.substituteUserId!].filter((x) => x !== actorId), organizationId: out.cr.organizationId, category: 'cover_request', title: 'Cover confirmed', body: `${out.className} · ${out.when}: ${out.cr.substituteName ?? 'substitute'} is teaching.`, data: { coverRequestId: out.cr.id, url: 'branchharbor://staff/cover' } });
     };
 
     priv.post('/orgs/:orgId/studios/cover-requests/:id/accept', { schema: { tags: ['studios'], security: secured, params: idParams, summary: 'An eligible instructor accepts the cover' } }, async (req) => {
@@ -284,9 +305,16 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
       if (cr.status !== 'open') throw conflict('cover_not_open', `Cover request is ${cr.status}`);
       if (cr.requestedBy === me.id) throw forbidden('You cannot cover your own class');
       const [u] = await s.db.select({ name: users.name }).from(users).where(eq(users.id, me.id));
-      const accepted = { ...cr, status: 'accepted', substituteUserId: me.id, substituteName: u?.name ?? null };
-      await s.db.update(coverRequests).set({ status: 'accepted', substituteUserId: me.id, substituteName: u?.name ?? null, history: [...cr.history, { at: new Date().toISOString(), by: me.id, action: 'accepted' }], updatedAt: new Date() }).where(eq(coverRequests.id, cr.id));
+      // Only one substitute can win: the update only applies while the request is still open.
+      const [accepted] = await s.db.update(coverRequests).set({ status: 'accepted', substituteUserId: me.id, substituteName: u?.name ?? null, history: [...cr.history, { at: new Date().toISOString(), by: me.id, action: 'accepted' }], updatedAt: new Date() })
+        .where(and(eq(coverRequests.id, cr.id), eq(coverRequests.status, 'open'))).returning();
+      if (!accepted) throw conflict('cover_not_open', 'Someone else has already accepted this cover');
+      await audit(s.db, { organizationId: cr.organizationId, ...actor(req), action: 'cover.accepted', scopeKind: 'location', scopeId: cr.locationId, targetType: 'cover_request', targetId: cr.id });
       if (!cr.requiresApproval) await applyCover(accepted, me.id, 'auto_approved');
+      else {
+        const managers = await usersWithPermissionAt(s.db, cr.organizationId, cr.locationId, 'operations.write', 'locations.read');
+        await notify(s, { userIds: managers.filter((x) => x !== me.id), organizationId: cr.organizationId, category: 'cover_request', title: 'Cover needs approval', body: `${u?.name ?? 'A colleague'} offered to cover a class. Confirm to update the schedule.`, data: { coverRequestId: cr.id, url: 'branchharbor://owner/approvals' } });
+      }
       return loadCover(req.params.orgId, cr.id);
     });
 

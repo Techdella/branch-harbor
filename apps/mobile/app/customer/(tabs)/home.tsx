@@ -36,6 +36,10 @@ export default function Home() {
     foods
       ? { label: t('customer.quickOrder'), icon: 'utensils', go: () => router.push('/customer/order'), bg: pastel.blush }
       : { label: t('customer.quickBook'), icon: 'calendar', go: () => router.push('/customer/book'), bg: pastel.lilac },
+    ...(foods ? [] : [
+      { label: t('studio.quickPass'), icon: 'wallet' as IconName, go: () => router.push('/customer/pass'), bg: pastel.butter },
+      { label: t('studio.quickOnline'), icon: 'play' as IconName, go: () => router.push('/customer/online'), bg: pastel.aqua },
+    ]),
     { label: t('customer.quickBookings'), icon: 'receipt', go: () => router.push('/customer/bookings'), bg: color.surface },
     { label: t('customer.quickInbox'), icon: 'message', go: () => router.push('/customer/inbox'), bg: color.surface },
     { label: t('tabs.locations'), icon: 'pin', go: () => router.push('/customer/locations'), bg: color.surface },

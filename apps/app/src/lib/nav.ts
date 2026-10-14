@@ -13,9 +13,14 @@ export interface OpsDef {
 export const OPS: Record<IndustryKey, OpsDef[]> = {
   studios: [
     { key: 'classes', icon: 'calendar', kind: 'screen' },
+    { key: 'schedule', icon: 'repeat', kind: 'screen' },
+    { key: 'members', icon: 'user', kind: 'screen' },
+    { key: 'pricing', icon: 'wallet', kind: 'screen' },
+    { key: 'rooms', icon: 'room', kind: 'screen' },
     { key: 'cover', icon: 'users', kind: 'screen' },
     { key: 'offers', icon: 'tag', kind: 'table' },
-    { key: 'online', icon: 'play', kind: 'later' },
+    { key: 'online', icon: 'play', kind: 'screen' },
+    { key: 'insights', icon: 'chart', kind: 'screen' },
   ],
   sports: [
     { key: 'programmes', icon: 'flag', kind: 'table' },

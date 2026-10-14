@@ -8,9 +8,10 @@ import {
 import { AppError, conflict, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
 import { convertReservationToSale } from './inventory.ts';
+import { failStudioPayment, fulfilStudioPayment, processStudioBillingEvent, studioTargetsInOrder } from './studios-fulfil.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
-export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration';
+export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration' | 'studio_purchase' | 'membership_invoice';
 
 export async function connectedAccountFor(db: Exec, organizationId: string, locationId: string) {
   const [row] = await db
@@ -130,6 +131,9 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
       }
       return { fulfilled: true, note: r.prog.requiresApproval ? 'Registration paid — awaiting review' : 'Registration accepted' };
     }
+    case 'studio_purchase':
+    case 'membership_invoice':
+      return fulfilStudioPayment(tx, p);
     default:
       return { fulfilled: false, note: `Unknown target ${p.targetType}` };
   }
@@ -207,6 +211,7 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
           if (ref.targetType === 'class_booking' && ref.targetId) {
             await tx.update(classBookings).set({ status: 'expired' }).where(and(eq(classBookings.id, ref.targetId), eq(classBookings.status, 'held')));
           }
+          if (ref.targetType === 'studio_purchase') await failStudioPayment(tx, ref);
           if (ref.targetType === 'food_order' && ref.targetId) {
             await tx.update(foodOrders).set({ paymentStatus: 'voided', status: 'cancelled', updatedAt: new Date() }).where(and(eq(foodOrders.id, ref.targetId), eq(foodOrders.status, 'awaiting_acceptance'), eq(foodOrders.paymentStatus, 'pending')));
           }
@@ -226,6 +231,10 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
           note = 'Refund recorded';
         }
       }
+    } else if (event.type.startsWith('invoice.') || event.type.startsWith('customer.subscription.')) {
+      const r = await processStudioBillingEvent(tx, event);
+      note = r.note;
+      orgId = r.organizationId;
     } else if (event.type === 'account.updated') {
       const acct = event.data.object as Stripe.Account;
       const enabled = !!acct.charges_enabled;
@@ -349,6 +358,7 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
   const orderMap = new Map((orderIds.length ? await db.select().from(orders).where(inArray(orders.id, orderIds)) : []).map((o) => [o.id, o]));
   const apptMap = new Map((apptIds.length ? await db.select().from(appointments).where(inArray(appointments.id, apptIds)) : []).map((o) => [o.id, o]));
   const regMap = new Map((regIds.length ? await db.select().from(registrations).where(inArray(registrations.id, regIds)) : []).map((o) => [o.id, o]));
+  const studioOk = await studioTargetsInOrder(db, pays);
 
   for (const p of pays) {
     if (!inScope(p.locationId)) continue;
@@ -362,6 +372,7 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
         case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'pending_payment'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
         case 'appointment': { const a = p.targetId ? apptMap.get(p.targetId) : undefined; ok = !!a && a.status !== 'cancelled' ? true : !!a && p.refundedMinor >= p.amountMinor; if (a) expected = { amount: a.priceMinor, currency: a.currency }; break; }
         case 'registration': { const r = p.targetId ? regMap.get(p.targetId) : undefined; ok = !!r && r.status !== 'submitted'; break; }
+        case 'studio_purchase': case 'membership_invoice': ok = studioOk.has(p.id); break;
         default: ok = false;
       }
       if (!ok && p.refundedMinor < p.amountMinor) {

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { BookClass } from '@/components/studios/BookClass';
+import { MemberBooking } from '@/components/studios/Commerce';
 import { apiGet } from '@/lib/api';
 import { dateLong, money, time, zone } from '@/lib/format';
 import { getRouting, loadLocation, makeLinks } from '@/lib/site';
@@ -37,6 +38,9 @@ export default async function BookClassPage({ params }: Props) {
         {c.instructorName && (<><dt className="font-semibold text-graphite">{t('booking.instructor')}</dt><dd>{c.instructorName}</dd></>)}
         <dt className="font-semibold text-graphite">{t('booking.price')}</dt><dd className="font-bold">{c.price.amount ? money(c.price, locale) : t('schedule.free')}</dd>
       </dl>
+      {c.action && (
+        <MemberBooking brand={brand} occurrenceId={c.id} locationId={data.location.id} full={full} timeZone={tz} accountPath={links.location(location, '/account')} manageBase={links.location(location, '/manage')} />
+      )}
       {c.action ? (
         <BookClass
           occurrenceId={c.id}
