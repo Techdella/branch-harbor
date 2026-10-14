@@ -154,6 +154,11 @@ Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `onlin
 (+ season setup wizard) `registrations` `teams` (transfers, coaches, squad selection) `schedule` (week/list, fixtures, clash resolutions)
 `attendance` `balances` `announcements` `guardians` (relationships, disputes, messages) `reports` — data via `src/lib/sports/` (live `/v1/orgs/:orgId/sports/*`, sample mode `mock.ts`) · Wellness `calendar` (practitioner/room/list +
 reschedule) `services` `practitioners` `forms` `packages`·Later · Commerce `orders` (partial refund + sync timeline)
+Wellness (full product, `src/components/screens/wellness/*`, data layer `src/lib/wellness/*` with its own live client + stateful mock): `calendar` (practitioner / room & equipment / list views, drag to move with a conflict dry run, appointment drawer: check-in, complete, no-show and cancel with policy preview, voucher, keyboard move form; new booking with any-available, couples, voucher), `services` (variants with per-location prices, buffers, deposit rule, policy, eligible practitioners, room/equipment, online flag, AI copy draft with health-claim screening), `practitioners` (weekly hours per location without overlaps, leave/absence with affected appointments and per-appointment rebook), `clients` (history, packages, preferences, confidential/shared notes, intake restricted + excluded from AI, policy reply assistant), `packages` (plans, client packages, gift vouchers with ledger), `insights` (utilisation, cancellations, revenue per currency, liability, AI summary).
+
+Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `registrations`
+`attendance` `programmes` `teams` `schedule` `guardian`·Later · Wellness `calendar` (practitioner/room/list +
+reschedule) `services` `practitioners` `clients` `packages` `forms` `insights` (see Wellness above) · Commerce `orders` (partial refund + sync timeline)
 `catalogue` `assortment` `inventory` `returns`·Later · Foods `menu` (master/location, origins, reset) `orders`
 (board) `kitchen` (large cards, overdue, stale-connection banner, full screen) `pickup` `catering`·Later.
 

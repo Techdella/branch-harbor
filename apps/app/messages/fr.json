@@ -1,17 +1,340 @@
 {
-  "common": { "sample": "exemple", "later": "Plus tard", "save": "Enregistrer", "saving": "Enregistrement…", "saved": "Enregistré", "cancel": "Annuler", "close": "Fermer", "back": "Retour", "next": "Suivant", "continue": "Continuer", "retry": "Réessayer", "edit": "Modifier", "reset": "Réinitialiser", "approve": "Approuver", "reject": "Refuser", "confirm": "Confirmer", "restart": "Relancer la démo", "optional": "Facultatif", "required": "Obligatoire", "all": "Tout", "location": "Établissement", "status": "Statut", "notifyMe": "Me prévenir quand ce sera disponible", "notifyThanks": "Merci — nous vous préviendrons dès que ce sera disponible." },
-  "nav": { "label": "Navigation principale", "overview": "Vue d’ensemble", "locations": "Établissements", "customers": "Clients", "websites": "Sites web", "marketing": "Marketing", "payments": "Paiements", "team": "Équipe", "community": "Communauté et ressources", "reports": "Rapports", "connections": "Connexions", "settings": "Paramètres", "shared": "Commun", "setup": "Liste de configuration", "restricted": "(non disponible pour votre rôle)", "badge": "{count} à traiter" },
-  "industries": { "studios": { "name": "Studios", "customers": "Membres" }, "sports": { "name": "Sports", "customers": "Participants" }, "wellness": { "name": "Bien-être", "customers": "Clients" }, "commerce": { "name": "Commerce", "customers": "Clients" }, "foods": { "name": "Restauration", "customers": "Convives" }, "realty": { "name": "Immobilier", "customers": "Clients" } },
-  "shell": { "skip": "Aller au contenu", "navigation": "Navigation", "openNav": "Ouvrir la navigation", "closeNav": "Fermer la navigation", "collapseNav": "Réduire", "expandNav": "Développer la navigation", "industrySwitcher": "Secteur (sélecteur du prototype)", "scope": "Périmètre", "allLocations": "Tous les établissements autorisés ({count})", "scopeKind": { "all": "Tout", "region": "Région", "owner_group": "Groupe propriétaire", "location": "Établissement" }, "search": "Rechercher", "searchPlaceholder": "Rechercher dans les fiches accessibles", "searchEmpty": "Aucune fiche accessible ne correspond.", "searchScoped": "Les résultats respectent vos autorisations et sont regroupés par type.", "notifications": "Notifications", "notificationsCount": "Notifications ({count})", "notificationsEmpty": "Rien de nouveau.", "notificationKind": { "action": "Action requise", "integration": "Échec d’intégration", "info": "Information" }, "viewingAs": "Vue en tant que", "roles": { "hq": "Admin siège", "local": "Responsable d’établissement", "staff": "Personnel" }, "profile": "Profil", "profileOf": "Menu du compte de {name}", "language": "Langue", "settings": "Paramètres", "signOut": "Se déconnecter", "sample": "Données d’exemple", "sampleHint": "Données d’exemple intégrées (NEXT_PUBLIC_USE_MOCKS).", "fallback": "Hors ligne · exemple", "fallbackTitle": "Impossible de joindre le service BranchHarbor", "fallbackHint": "Vous voyez des données d’exemple jusqu’au retour de la connexion. Les modifications ne sont pas enregistrées." },
-  "states": { "loading": "Chargement…", "errorTitle": "Chargement impossible", "errorBody": "Un problème est survenu de notre côté. Vos données sont en sécurité — réessayez.", "errorCode": "Code d’erreur : {code}", "retry": "Réessayer", "deniedTitle": "Vous n’avez pas accès à cette page", "deniedBody": "Votre rôle n’inclut pas cette section. Demandez à un propriétaire de l’organisation si besoin.", "deniedPermission": "Requiert : {permission}", "notFoundTitle": "Page introuvable", "notFoundBody": "Cette page n’existe pas ou vous n’y avez pas accès.", "backToOverview": "Retour à la vue d’ensemble", "emptyTitle": "Rien pour l’instant", "emptyFiltered": "Aucune fiche ne correspond à ce filtre dans le périmètre actuel." },
-  "overview": { "title": "Vue d’ensemble", "metrics": "Indicateurs clés", "notConnected": "Non connecté", "unavailable": "Indisponible", "ratio": "{value} sur {of}", "definitionOf": "Définition de {label}", "source": "Source : {source}", "localTimes": "Heure locale de chaque établissement", "nothingUpcoming": "Rien de prévu aujourd’hui dans ce périmètre.", "needsAttention": "À traiter", "allClear": "Rien à traiter dans ce périmètre.", "kind": { "action": "Action requise", "integration": "Intégration", "info": "Information" }, "aiNote": "Brouillons uniquement · données de {scope}", "ask": "Demander" },
-  "ai": { "title": "BranchHarbor IA", "close": "Fermer le panneau IA", "scope": "Périmètre :", "activeScope": "Périmètre actif : {scope}", "draftsOnly": "Brouillons uniquement", "usage": "{used} sur {limit} requêtes ce mois-ci", "statusOk": "Disponible", "statusDown": "Indisponible", "intro": "Je peux rédiger et résumer à partir des données auxquelles vous avez accès. Publier, envoyer ou changer un prix nécessite votre approbation.", "assumptions": "Hypothèses :", "sources": "Sources", "thinking": "Collecte des données autorisées…", "askLabel": "Demander à BranchHarbor IA", "askPlaceholder": "Posez une question sur ce périmètre…", "send": "Envoyer", "proposedAction": "Action proposée · approbation requise", "affected": "Concernés ({count})", "excluded": "Exclus", "preview": "Aperçu des fiches concernées", "approveDraft": "Approuver · enregistrer en brouillon", "approveSend": "Approuver et envoyer", "discard": "Ignorer", "discarded": "Ignoré. Rien n’a été modifié.", "running": "Exécution via des outils validés…", "resultDraftSaved": "brouillon enregistré", "doneNothingSent": "Terminé. Brouillons enregistrés ; rien n’a été publié ni envoyé.", "needsPermission": "Vous pouvez prévisualiser, mais l’approbation requiert {permission}." },
-  "ops": { "laterTitle": "{name} n’est pas dans la première version", "laterBadge": "Prévu · pas encore disponible", "switchTo": "Passer à {industry}", "backToOverview": "Retour à la vue d’ensemble",
-    "studios": { "classes": { "title": "Cours" }, "cover": { "title": "Remplacements" }, "offers": { "title": "Offres" }, "online": { "title": "Cours en ligne" } },
-    "sports": { "overview": { "title": "Vue des programmes" }, "programmes": { "title": "Programmes" }, "registrations": { "title": "Inscriptions" }, "teams": { "title": "Équipes et groupes" }, "schedule": { "title": "Planning" }, "attendance": { "title": "Présences" }, "balances": { "title": "Soldes" }, "announcements": { "title": "Annonces" }, "guardians": { "title": "Parents et tuteurs" }, "reports": { "title": "Rapports sport" } },
-    "wellness": { "calendar": { "title": "Agenda" }, "services": { "title": "Prestations" }, "practitioners": { "title": "Praticiens" }, "packages": { "title": "Forfaits" }, "forms": { "title": "Formulaires" } },
-    "commerce": { "catalogue": { "title": "Catalogue" }, "assortment": { "title": "Assortiment local" }, "orders": { "title": "Commandes" }, "inventory": { "title": "Stock" }, "returns": { "title": "Retours" } },
-    "foods": { "menu": { "title": "Menus" }, "orders": { "title": "Commandes" }, "kitchen": { "title": "Vue cuisine" }, "pickup": { "title": "Retrait" }, "catering": { "title": "Précommandes et traiteur" } },
-    "realty": { "pulse": { "title": "Tableau de bord" }, "listings": { "title": "Annonces" }, "enquiries": { "title": "Demandes" }, "viewings": { "title": "Visites" }, "offers": { "title": "Offres" }, "agents": { "title": "Agents et agences" }, "portals": { "title": "Flux portails" } } },
-  "auth": { "promise": "Un seul foyer pour chaque établissement.", "promiseSub": "Gérez votre marque ensemble. Pilotez chaque établissement en confiance.", "signInTitle": "Bon retour", "signInSub": "Connectez-vous à BranchHarbor.", "email": "E-mail", "workEmail": "E-mail professionnel", "password": "Mot de passe", "forgot": "Mot de passe oublié ?", "signIn": "Se connecter", "noAccount": "Nouveau sur BranchHarbor ?", "createAccount": "Créer un compte", "signUpTitle": "Configurer BranchHarbor", "name": "Votre nom", "haveAccount": "Vous avez déjà un compte ?", "verifyTitle": "Vérifiez votre e-mail", "verifySub": "Nous avons envoyé un code à 6 chiffres à {email}.", "code": "Code de vérification", "verify": "Vérifier l’e-mail", "resend": "Envoyer un nouveau code", "forgotTitle": "Réinitialiser le mot de passe", "sendLink": "Envoyer le lien", "backToSignIn": "Retour à la connexion" }
+  "common": {
+    "sample": "exemple",
+    "later": "Plus tard",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "continue": "Continuer",
+    "retry": "Réessayer",
+    "edit": "Modifier",
+    "reset": "Réinitialiser",
+    "approve": "Approuver",
+    "reject": "Refuser",
+    "confirm": "Confirmer",
+    "restart": "Relancer la démo",
+    "optional": "Facultatif",
+    "required": "Obligatoire",
+    "all": "Tout",
+    "location": "Établissement",
+    "status": "Statut",
+    "notifyMe": "Me prévenir quand ce sera disponible",
+    "notifyThanks": "Merci — nous vous préviendrons dès que ce sera disponible."
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "overview": "Vue d’ensemble",
+    "locations": "Établissements",
+    "customers": "Clients",
+    "websites": "Sites web",
+    "marketing": "Marketing",
+    "payments": "Paiements",
+    "team": "Équipe",
+    "community": "Communauté et ressources",
+    "reports": "Rapports",
+    "connections": "Connexions",
+    "settings": "Paramètres",
+    "shared": "Commun",
+    "setup": "Liste de configuration",
+    "restricted": "(non disponible pour votre rôle)",
+    "badge": "{count} à traiter"
+  },
+  "industries": {
+    "studios": {
+      "name": "Studios",
+      "customers": "Membres"
+    },
+    "sports": {
+      "name": "Sports",
+      "customers": "Participants"
+    },
+    "wellness": {
+      "name": "Bien-être",
+      "customers": "Clients"
+    },
+    "commerce": {
+      "name": "Commerce",
+      "customers": "Clients"
+    },
+    "foods": {
+      "name": "Restauration",
+      "customers": "Convives"
+    },
+    "realty": {
+      "name": "Immobilier",
+      "customers": "Clients"
+    }
+  },
+  "shell": {
+    "skip": "Aller au contenu",
+    "navigation": "Navigation",
+    "openNav": "Ouvrir la navigation",
+    "closeNav": "Fermer la navigation",
+    "collapseNav": "Réduire",
+    "expandNav": "Développer la navigation",
+    "industrySwitcher": "Secteur (sélecteur du prototype)",
+    "scope": "Périmètre",
+    "allLocations": "Tous les établissements autorisés ({count})",
+    "scopeKind": {
+      "all": "Tout",
+      "region": "Région",
+      "owner_group": "Groupe propriétaire",
+      "location": "Établissement"
+    },
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher dans les fiches accessibles",
+    "searchEmpty": "Aucune fiche accessible ne correspond.",
+    "searchScoped": "Les résultats respectent vos autorisations et sont regroupés par type.",
+    "notifications": "Notifications",
+    "notificationsCount": "Notifications ({count})",
+    "notificationsEmpty": "Rien de nouveau.",
+    "notificationKind": {
+      "action": "Action requise",
+      "integration": "Échec d’intégration",
+      "info": "Information"
+    },
+    "viewingAs": "Vue en tant que",
+    "roles": {
+      "hq": "Admin siège",
+      "local": "Responsable d’établissement",
+      "staff": "Personnel"
+    },
+    "profile": "Profil",
+    "profileOf": "Menu du compte de {name}",
+    "language": "Langue",
+    "settings": "Paramètres",
+    "signOut": "Se déconnecter",
+    "sample": "Données d’exemple",
+    "sampleHint": "Données d’exemple intégrées (NEXT_PUBLIC_USE_MOCKS).",
+    "fallback": "Hors ligne · exemple",
+    "fallbackTitle": "Impossible de joindre le service BranchHarbor",
+    "fallbackHint": "Vous voyez des données d’exemple jusqu’au retour de la connexion. Les modifications ne sont pas enregistrées."
+  },
+  "states": {
+    "loading": "Chargement…",
+    "errorTitle": "Chargement impossible",
+    "errorBody": "Un problème est survenu de notre côté. Vos données sont en sécurité — réessayez.",
+    "errorCode": "Code d’erreur : {code}",
+    "retry": "Réessayer",
+    "deniedTitle": "Vous n’avez pas accès à cette page",
+    "deniedBody": "Votre rôle n’inclut pas cette section. Demandez à un propriétaire de l’organisation si besoin.",
+    "deniedPermission": "Requiert : {permission}",
+    "notFoundTitle": "Page introuvable",
+    "notFoundBody": "Cette page n’existe pas ou vous n’y avez pas accès.",
+    "backToOverview": "Retour à la vue d’ensemble",
+    "emptyTitle": "Rien pour l’instant",
+    "emptyFiltered": "Aucune fiche ne correspond à ce filtre dans le périmètre actuel."
+  },
+  "overview": {
+    "title": "Vue d’ensemble",
+    "metrics": "Indicateurs clés",
+    "notConnected": "Non connecté",
+    "unavailable": "Indisponible",
+    "ratio": "{value} sur {of}",
+    "definitionOf": "Définition de {label}",
+    "source": "Source : {source}",
+    "localTimes": "Heure locale de chaque établissement",
+    "nothingUpcoming": "Rien de prévu aujourd’hui dans ce périmètre.",
+    "needsAttention": "À traiter",
+    "allClear": "Rien à traiter dans ce périmètre.",
+    "kind": {
+      "action": "Action requise",
+      "integration": "Intégration",
+      "info": "Information"
+    },
+    "aiNote": "Brouillons uniquement · données de {scope}",
+    "ask": "Demander"
+  },
+  "ai": {
+    "title": "BranchHarbor IA",
+    "close": "Fermer le panneau IA",
+    "scope": "Périmètre :",
+    "activeScope": "Périmètre actif : {scope}",
+    "draftsOnly": "Brouillons uniquement",
+    "usage": "{used} sur {limit} requêtes ce mois-ci",
+    "statusOk": "Disponible",
+    "statusDown": "Indisponible",
+    "intro": "Je peux rédiger et résumer à partir des données auxquelles vous avez accès. Publier, envoyer ou changer un prix nécessite votre approbation.",
+    "assumptions": "Hypothèses :",
+    "sources": "Sources",
+    "thinking": "Collecte des données autorisées…",
+    "askLabel": "Demander à BranchHarbor IA",
+    "askPlaceholder": "Posez une question sur ce périmètre…",
+    "send": "Envoyer",
+    "proposedAction": "Action proposée · approbation requise",
+    "affected": "Concernés ({count})",
+    "excluded": "Exclus",
+    "preview": "Aperçu des fiches concernées",
+    "approveDraft": "Approuver · enregistrer en brouillon",
+    "approveSend": "Approuver et envoyer",
+    "discard": "Ignorer",
+    "discarded": "Ignoré. Rien n’a été modifié.",
+    "running": "Exécution via des outils validés…",
+    "resultDraftSaved": "brouillon enregistré",
+    "doneNothingSent": "Terminé. Brouillons enregistrés ; rien n’a été publié ni envoyé.",
+    "needsPermission": "Vous pouvez prévisualiser, mais l’approbation requiert {permission}."
+  },
+  "ops": {
+    "laterTitle": "{name} n’est pas dans la première version",
+    "laterBadge": "Prévu · pas encore disponible",
+    "switchTo": "Passer à {industry}",
+    "backToOverview": "Retour à la vue d’ensemble",
+    "studios": {
+      "classes": {
+        "title": "Cours"
+      },
+      "cover": {
+        "title": "Remplacements"
+      },
+      "offers": {
+        "title": "Offres"
+      },
+      "online": {
+        "title": "Cours en ligne"
+      }
+    },
+    "sports": {
+      "overview": {
+        "title": "Vue des programmes"
+      },
+      "programmes": {
+        "title": "Programmes"
+      },
+      "registrations": {
+        "title": "Inscriptions"
+      },
+      "teams": {
+        "title": "Équipes et groupes"
+      },
+      "schedule": {
+        "title": "Planning"
+      },
+      "attendance": {
+        "title": "Présences"
+      },
+      "balances": {
+        "title": "Soldes"
+      },
+      "announcements": {
+        "title": "Annonces"
+      },
+      "guardians": {
+        "title": "Parents et tuteurs"
+      },
+      "reports": {
+        "title": "Rapports sport"
+      },
+      "guardian": {
+        "title": "Portail parents"
+      }
+    },
+    "wellness": {
+      "calendar": {
+        "title": "Agenda"
+      },
+      "services": {
+        "title": "Prestations"
+      },
+      "practitioners": {
+        "title": "Praticiens"
+      },
+      "packages": {
+        "title": "Forfaits"
+      },
+      "forms": {
+        "title": "Formulaires"
+      },
+      "clients": {
+        "title": "Dossiers clients"
+      },
+      "insights": {
+        "title": "Rapports de rendez-vous"
+      }
+    },
+    "commerce": {
+      "catalogue": {
+        "title": "Catalogue"
+      },
+      "assortment": {
+        "title": "Assortiment local"
+      },
+      "orders": {
+        "title": "Commandes"
+      },
+      "inventory": {
+        "title": "Stock"
+      },
+      "returns": {
+        "title": "Retours"
+      }
+    },
+    "foods": {
+      "menu": {
+        "title": "Menus"
+      },
+      "orders": {
+        "title": "Commandes"
+      },
+      "kitchen": {
+        "title": "Vue cuisine"
+      },
+      "pickup": {
+        "title": "Retrait"
+      },
+      "catering": {
+        "title": "Précommandes et traiteur"
+      }
+    },
+    "realty": {
+      "pulse": {
+        "title": "Tableau de bord"
+      },
+      "listings": {
+        "title": "Annonces"
+      },
+      "enquiries": {
+        "title": "Demandes"
+      },
+      "viewings": {
+        "title": "Visites"
+      },
+      "offers": {
+        "title": "Offres"
+      },
+      "agents": {
+        "title": "Agents et agences"
+      },
+      "portals": {
+        "title": "Flux portails"
+      }
+    }
+  },
+  "auth": {
+    "promise": "Un seul foyer pour chaque établissement.",
+    "promiseSub": "Gérez votre marque ensemble. Pilotez chaque établissement en confiance.",
+    "signInTitle": "Bon retour",
+    "signInSub": "Connectez-vous à BranchHarbor.",
+    "email": "E-mail",
+    "workEmail": "E-mail professionnel",
+    "password": "Mot de passe",
+    "forgot": "Mot de passe oublié ?",
+    "signIn": "Se connecter",
+    "noAccount": "Nouveau sur BranchHarbor ?",
+    "createAccount": "Créer un compte",
+    "signUpTitle": "Configurer BranchHarbor",
+    "name": "Votre nom",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "verifyTitle": "Vérifiez votre e-mail",
+    "verifySub": "Nous avons envoyé un code à 6 chiffres à {email}.",
+    "code": "Code de vérification",
+    "verify": "Vérifier l’e-mail",
+    "resend": "Envoyer un nouveau code",
+    "forgotTitle": "Réinitialiser le mot de passe",
+    "sendLink": "Envoyer le lien",
+    "backToSignIn": "Retour à la connexion"
+  }
 }

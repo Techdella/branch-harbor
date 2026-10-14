@@ -47,6 +47,10 @@ Seeded examples: `/stillwater-yoga` (studios, 5 public locations; Leslieville is
 | `…/book` | Wellness: service → practitioner or any → date → slot → terms → details → book (→ deposit) |
 | `…/programmes` (`?dob=`) | Sports: catalogue with age filter (birth-date ranges per age rule), registration with guardian + participant, form questions (medical/emergency restricted), payment option (full / instalments), refund policy before checkout, first payment → review-pending confirmation (payment ≠ selection) |
 | `…/programmes/portal` (`?token=` / `?invite=`) | Guardian portal: emailed sign-in link, participants, schedule + absence reporting, balances + instalment payment, forms, messages, second-guardian invitation, relationship disputes, withdrawal |
+| `…/book` | Wellness: service menu by category → length (variant) → practitioner or any (couples: two assigned) → date → slot → policy preview → details (+ second guest, voucher code or package reference, SMS reminder opt-in) → book (→ deposit); full day → join the waitlist for a time window |
+| `…/packages` | Wellness: buy session packages and gift vouchers (location currency, sandbox payment), voucher balance check |
+| `…/manage/appointment/{id}?token=` · `…/manage/package/{id}` · `…/manage/voucher/{id}` · `…/manage/wellness-waitlist/{id}` | Wellness self-service: policy preview, cancel (late fee acceptance), reschedule (new time secured first); package balance; voucher code + balance; claim an offered waitlist slot |
+| `…/programmes` | Sports: guardian + participant registration → review-pending confirmation (payment ≠ selection) |
 | `…/shop` | Commerce: products with this location's stock band; no native checkout — links out when an external store (e.g. WooCommerce) is authoritative |
 | `…/manage/booking/{id}?token=` · `…/manage/waitlist/{id}?token=` · `…/manage/appointment/{id}?token=` | Manage pages: cancel booking (refund/void reported from the server), leave waitlist, cancel appointment |
 | `/{brand}/sitemap.xml`, `/{brand}/robots.txt` | Per-brand sitemap (canonical URLs) and robots (manage/order pages disallowed); `/sitemap.xml` and `/robots.txt` on custom domains |

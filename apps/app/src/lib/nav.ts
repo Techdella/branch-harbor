@@ -31,10 +31,12 @@ export const OPS: Record<IndustryKey, OpsDef[]> = {
   ],
   wellness: [
     { key: 'calendar', icon: 'calendar', kind: 'screen' },
-    { key: 'services', icon: 'leaf', kind: 'table' },
-    { key: 'practitioners', icon: 'user', kind: 'table' },
-    { key: 'packages', icon: 'gift', kind: 'later' },
+    { key: 'services', icon: 'leaf', kind: 'screen' },
+    { key: 'practitioners', icon: 'user', kind: 'screen' },
+    { key: 'clients', icon: 'users', kind: 'screen' },
+    { key: 'packages', icon: 'gift', kind: 'screen' },
     { key: 'forms', icon: 'file', kind: 'table' },
+    { key: 'insights', icon: 'chart', kind: 'screen' },
   ],
   commerce: [
     { key: 'catalogue', icon: 'layers', kind: 'table' },

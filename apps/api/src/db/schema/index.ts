@@ -7,3 +7,4 @@ export * from './mobile.ts';
 export * from './operations.ts';
 export * from './sports-ext.ts';
 export * from './realty-ext.ts';
+export * from './wellness-ext.ts';

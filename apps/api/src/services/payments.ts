@@ -11,7 +11,7 @@ import { convertReservationToSale } from './inventory.ts';
 import { fulfilRegistrationPayment } from './sports-core.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
-export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration';
+export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration' | 'wellness_package' | 'wellness_voucher';
 
 export async function connectedAccountFor(db: Exec, organizationId: string, locationId: string) {
   const [row] = await db
@@ -125,6 +125,9 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
     case 'registration':
       // Payment never equals selection; capacity is re-checked under the programme lock (services/sports-core.ts).
       return fulfilRegistrationPayment(tx, p);
+    case 'wellness_package':
+    case 'wellness_voucher':
+      return (await import('./wellness-commerce.ts')).fulfilWellnessPurchase(tx, p);
     default:
       return { fulfilled: false, note: `Unknown target ${p.targetType}` };
   }
@@ -344,6 +347,7 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
   const orderMap = new Map((orderIds.length ? await db.select().from(orders).where(inArray(orders.id, orderIds)) : []).map((o) => [o.id, o]));
   const apptMap = new Map((apptIds.length ? await db.select().from(appointments).where(inArray(appointments.id, apptIds)) : []).map((o) => [o.id, o]));
   const regMap = new Map((regIds.length ? await db.select().from(registrations).where(inArray(registrations.id, regIds)) : []).map((o) => [o.id, o]));
+  const wellnessPurchases = await (await import('./wellness-ops.ts')).purchaseStates(db, ids('wellness_package'), ids('wellness_voucher'));
 
   for (const p of pays) {
     if (!inScope(p.locationId)) continue;
@@ -355,7 +359,15 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
         case 'class_booking': { const b = p.targetId ? bookingsMap.get(p.targetId) : undefined; ok = !!b && ['confirmed', 'attended', 'no_show'].includes(b.status); break; }
         case 'food_order': { const o = p.targetId ? foodMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'rejected' && o.status !== 'cancelled' ? true : !!o && p.refundedMinor >= p.amountMinor; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
         case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'pending_payment'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
-        case 'appointment': { const a = p.targetId ? apptMap.get(p.targetId) : undefined; ok = !!a && a.status !== 'cancelled' ? true : !!a && p.refundedMinor >= p.amountMinor; if (a) expected = { amount: a.priceMinor, currency: a.currency }; break; }
+        case 'appointment': {
+          const a = p.targetId ? apptMap.get(p.targetId) : undefined;
+          // Wellness deposits: a fee retained under the cancellation/no-show policy is not a missing record.
+          ok = !!a && !['cancelled', 'no_show'].includes(a.status) ? true : !!a && (p.refundedMinor >= p.amountMinor || ['late', 'no_show'].includes(a.cancellationKind ?? ''));
+          if (a) expected = a.depositMinor > 0 ? { amount: a.depositMinor, currency: a.currency } : { amount: a.priceMinor, currency: a.currency };
+          break;
+        }
+        case 'wellness_package':
+        case 'wellness_voucher': { const w = p.targetId ? wellnessPurchases.get(p.targetId) : undefined; ok = !!w && w.status !== 'pending_payment' && w.status !== 'cancelled'; if (w) expected = w.expected; break; }
         case 'registration': { const r = p.targetId ? regMap.get(p.targetId) : undefined; ok = !!r && r.status !== 'submitted'; break; }
         default: ok = false;
       }

@@ -14,6 +14,7 @@ import { RegistrationsScreen } from './sports/RegistrationsScreen';
 import { AttendanceScreen } from './sports/AttendanceScreen';
 import { SportsScreen } from './sports/SportsScreens';
 import { CalendarScreen } from './wellness/CalendarScreen';
+import { wellnessScreen } from './wellness/WellnessRouter';
 import { CommerceOrdersScreen } from './commerce/OrdersScreen';
 import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
@@ -45,6 +46,7 @@ export function OpsRouter({ screen }: { screen: string }) {
   const title = t(`${app.industry}.${def.key}.title`);
   if (def.kind === 'later') return <LaterScreen icon={def.icon} title={title} note={t(`${app.industry}.${def.key}.later`)} />;
   if (!app.can('operations.read')) return <DeniedState permission="operations.read" />;
+  if (app.industry === 'wellness') { const w = wellnessScreen(def.key); if (w) return w; }
   if (def.kind === 'table') return <TableScreen tableKey={def.key} title={title} icon={def.icon} permission="operations.read" />;
   const key = `${app.industry}:${def.key}`;
   switch (key) {

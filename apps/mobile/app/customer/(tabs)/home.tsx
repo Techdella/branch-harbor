@@ -41,6 +41,7 @@ export default function Home() {
     { label: t('customer.quickInbox'), icon: 'message', go: () => router.push('/customer/inbox'), bg: color.surface },
     // Single-location businesses skip the location picker.
     ...(locations.length > 1 ? [{ label: t('tabs.locations'), icon: 'pin' as IconName, go: () => router.push('/customer/locations'), bg: color.surface }] : []),
+    { label: 'Spa & wellness', icon: 'leaf' as IconName, go: () => router.push('/customer/wellness'), bg: color.surface },
   ];
 
   return (
