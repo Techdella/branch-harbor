@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FBFAF7;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="sites"></bh-topbar>
+
+<div style="background:#141414;color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 14px;position:sticky;top:0;z-index:60">
+  <span style="font-size:11px;font-weight:700;color:#9C9C96;margin-right:6px">Customer view</span>
+  <sc-for list="{{ indSwitch }}" as="i" hint-placeholder-count="6"><button onClick="{{ i.pick }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;border:none;background:{{ i.bg }};color:{{ i.fg }};font-size:12px;font-weight:700;cursor:pointer"><bh-icon name="{{ i.icon }}" size="13"></bh-icon>{{ i.name }}</button></sc-for>
+  <span style="margin-left:auto;display:flex;gap:6px"><a href="{{ links.hq }}" style="height:30px;display:flex;align-items:center;padding:0 10px;border-radius:999px;border:1px solid #444;color:#fff;font-size:11px;font-weight:700;text-decoration:none">HQ</a><a href="{{ links.loc }}" style="height:30px;display:flex;align-items:center;padding:0 10px;border-radius:999px;border:1px solid #444;color:#fff;font-size:11px;font-weight:700;text-decoration:none">Location</a><a href="{{ links.staff }}" style="height:30px;display:flex;align-items:center;padding:0 10px;border-radius:999px;border:1px solid #444;color:#fff;font-size:11px;font-weight:700;text-decoration:none">Staff</a></span>
+</div>
+
+<header style="background:#fff;border-bottom:1px solid #EEEDE8;position:sticky;top:46px;z-index:50">
+  <div style="max-width:1240px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+    <button onClick="{{ goBrand }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;color:#141414"><span style="width:38px;height:38px;border-radius:12px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ ind.icon }}" size="19"></bh-icon></span><span style="font-size:19px;font-weight:800;letter-spacing:-.02em">{{ ind.brand }}</span></button>
+    <nav style="display:flex;gap:4px;flex-wrap:wrap">
+      <sc-for list="{{ topNav }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.go }}" style="height:38px;padding:0 14px;border-radius:999px;border:none;background:{{ n.bg }};font-size:14px;font-weight:600;cursor:pointer;color:#141414">{{ n.label }}</button></sc-for>
+    </nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <sc-if value="{{ hasLoc }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goLoc }}" style="display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414"><bh-icon name="pin" size="14"></bh-icon>{{ loc.name }}</button></sc-if>
+      <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><button onClick="{{ openCart }}" aria-label="Cart" style="position:relative;width:40px;height:40px;border-radius:20px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="cart" size="18"></bh-icon><span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#141414;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ cartCount }}</span></button></sc-if>
+      <button onClick="{{ goAccount }}" aria-label="Account" style="width:40px;height:40px;border-radius:20px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="user" size="18"></bh-icon></button>
+    </div>
+  </div>
+</header>
+
+<main style="max-width:1240px;margin:0 auto;padding:20px 20px 60px;display:flex;flex-direction:column;gap:28px">
+
+  <!-- BRAND HOME -->
+  <sc-if value="{{ p.brand }}" hint-placeholder-val="{{ true }}">
+    <section style="position:relative;border-radius:32px;overflow:hidden;min-height:480px;display:flex;align-items:flex-end">
+      <img src="{{ img.hero }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 100%)"></div>
+      <div style="position:relative;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:18px;max-width:760px;color:#fff">
+        <h1 style="margin:0;font-size:clamp(40px,6vw,76px);line-height:1;font-weight:700;letter-spacing:-.045em">{{ ind.tagline }}</h1>
+        <div style="display:flex;gap:8px;background:#fff;border-radius:999px;padding:6px;max-width:560px">
+          <span style="display:flex;align-items:center;padding:0 0 0 14px;color:#141414"><bh-icon name="search" size="18"></bh-icon></span>
+          <input aria-label="City or postal code" placeholder="City or postal code" value="{{ q }}" onChange="{{ setQ }}" style="flex:1;min-width:0;border:none;font-size:15px;outline:none;background:transparent;color:#141414">
+          <button onClick="{{ goFinder }}" style="height:48px;padding:0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">Find a location</button>
+        </div>
+      </div>
+    </section>
+    <section style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+      <sc-for list="{{ locCards }}" as="l" hint-placeholder-count="4">
+        <button onClick="{{ l.open }}" style="text-align:left;border:none;padding:0;background:#fff;border-radius:28px;overflow:hidden;cursor:pointer;color:#141414;display:flex;flex-direction:column">
+          <div style="position:relative;height:180px"><img src="{{ l.img }}" alt="" style="width:100%;height:100%;object-fit:cover"><span style="position:absolute;top:12px;left:12px;padding:5px 10px;border-radius:999px;background:{{ l.stBg }};font-size:11px;font-weight:800">{{ l.openLabel }}</span></div>
+          <div style="padding:16px 18px;display:flex;flex-direction:column;gap:4px"><span style="font-size:18px;font-weight:700">{{ l.name }}</span><span style="font-size:13px;color:#5D5D58">{{ l.kind }}</span><span style="font-size:12px;color:#5D5D58">{{ l.addr }}</span></div>
+        </button>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <!-- FINDER -->
+  <sc-if value="{{ p.finder }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <h1 style="margin:0;flex:1;min-width:220px;font-size:40px;font-weight:700;letter-spacing:-.04em">Find a location</h1>
+      <div style="display:flex;gap:8px;background:#fff;border:1.5px solid #141414;border-radius:999px;padding:4px 4px 4px 16px;min-width:280px;flex:0 1 420px"><span style="display:flex;align-items:center"><bh-icon name="search" size="17"></bh-icon></span><input aria-label="Search locations" placeholder="City, name or postal code" value="{{ q }}" onChange="{{ setQ }}" style="flex:1;min-width:0;border:none;font-size:14px;outline:none"><button onClick="{{ useMyLoc }}" style="height:40px;padding:0 14px;border-radius:999px;background:#F3F2EE;border:none;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;color:#141414"><bh-icon name="target" size="14"></bh-icon>Near me</button></div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ kinds }}" as="k" hint-placeholder-count="4"><button onClick="{{ k.pick }}" style="height:36px;padding:0 14px;border-radius:999px;border:1.5px solid {{ k.bd }};background:{{ k.bg }};color:{{ k.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ k.label }}</button></sc-for></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ results }}" as="r" hint-placeholder-count="4">
+          <div style="background:#fff;border-radius:24px;padding:12px;display:flex;gap:14px;align-items:center;border:2px solid {{ r.bd }}">
+            <img src="{{ r.img }}" alt="" style="width:96px;height:96px;border-radius:18px;object-fit:cover;flex-shrink:0">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:16px;font-weight:700">{{ r.name }}</span><span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:{{ r.stBg }}">{{ r.openLabel }}</span></div><span style="font-size:12px;color:#5D5D58">{{ r.kind }} · {{ r.dist }}</span><span style="font-size:12px;color:#3E3E3A">{{ r.addr }}</span><span style="font-size:12px;color:#3E3E3A">{{ r.hours }}</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><button onClick="{{ r.open }}" style="height:38px;padding:0 14px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">{{ r.cta }}</button><button onClick="{{ r.hover }}" style="height:34px;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;background:#fff;font-size:11px;font-weight:700;cursor:pointer;color:#141414">On map</button></div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border-radius:24px;padding:24px;font-size:14px;line-height:1.6">No locations match "{{ q }}". Try a city name, or <button onClick="{{ clearQ }}" style="background:none;border:none;padding:0;font-weight:700;text-decoration:underline;cursor:pointer;color:#141414">show all locations</button>.</div></sc-if>
+      </div>
+      <div style="position:sticky;top:130px;height:520px;border-radius:28px;background:{{ ind.pastel }};overflow:hidden">
+        <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(20,20,20,.12) 1px,transparent 1px);background-size:18px 18px"></div>
+        <sc-for list="{{ results }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.hover }}" title="{{ r.name }}" style="position:absolute;left:{{ r.x }};top:{{ r.y }};transform:translate(-50%,-100%);background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center"><span style="display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:999px;background:{{ r.pinBg }};color:{{ r.pinFg }};font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.15)">{{ r.short }}</span><span style="width:10px;height:10px;border-radius:5px;background:#141414;border:2px solid #fff"></span></button></sc-for>
+        <span style="position:absolute;left:14px;bottom:12px;font-size:11px;font-weight:600;color:#3E3E3A">Schematic map · not to scale</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- LOCATION WEBSITE -->
+  <sc-if value="{{ p.location }}" hint-placeholder-val="{{ false }}">
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+      <div style="position:relative;border-radius:32px;overflow:hidden;min-height:420px"><img src="{{ img.loc }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><span style="position:absolute;top:16px;left:16px;padding:6px 12px;border-radius:999px;background:{{ locSt.bg }};font-size:12px;font-weight:800">{{ locSt.label }}</span></div>
+      <div style="background:#fff;border-radius:32px;padding:clamp(24px,3vw,40px);display:flex;flex-direction:column;gap:16px;justify-content:center">
+        <div style="font-size:13px;font-weight:700;color:#5D5D58">{{ ind.brand }} · {{ loc.kind }}</div>
+        <h1 style="margin:0;font-size:clamp(36px,4.5vw,56px);line-height:1.02;font-weight:700;letter-spacing:-.04em">{{ loc.name }}</h1>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><span style="display:flex;gap:10px;align-items:center"><bh-icon name="pin" size="16"></bh-icon>{{ loc.addr }}</span><span style="display:flex;gap:10px;align-items:center"><bh-icon name="clock" size="16"></bh-icon>{{ loc.hours }}</span><span style="display:flex;gap:10px;align-items:center"><bh-icon name="phone" size="16"></bh-icon>{{ loc.phone }}</span></div>
+        <div style="background:{{ ind.pastel }};border-radius:20px;padding:14px 18px;font-size:15px;font-weight:700;display:flex;gap:10px;align-items:center"><bh-icon name="gift" size="18"></bh-icon>{{ offer }}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ scrollMain }}" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer">{{ ind.cta }}<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-down" size="17"></bh-icon></span></button><button onClick="{{ goFinder }}" style="height:52px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:700;cursor:pointer;color:#141414">Other locations</button></div>
+      </div>
+    </section>
+
+    <section id="bh-main" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px"><h2 style="margin:0;flex:1;min-width:220px;font-size:34px;font-weight:700;letter-spacing:-.035em">{{ mainTitle }}</h2><span style="font-size:12px;color:#5D5D58">{{ mainNote }}</span></div>
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ showDays }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><sc-for list="{{ days }}" as="d" hint-placeholder-count="5"><button onClick="{{ d.pick }}" style="height:52px;min-width:64px;padding:0 12px;border-radius:18px;border:none;background:{{ d.bg }};color:{{ d.fg }};font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center">{{ d.d }}<span style="font-size:15px">{{ d.n }}</span></button></sc-for></div></sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ listItems }}" as="it" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:24px;padding:16px 18px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+              <span style="width:44px;height:44px;border-radius:14px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ ind.icon }}" size="19"></bh-icon></span>
+              <span style="flex:1 1 220px;min-width:0"><span style="display:block;font-size:16px;font-weight:700">{{ it.t }}</span><span style="font-size:13px;color:#5D5D58">{{ it.sub }}</span></span>
+              <span style="font-size:15px;font-weight:800;font-variant-numeric:tabular-nums">{{ it.price }}</span>
+              <span style="font-size:12px;font-weight:700;color:{{ it.availFg }}">{{ it.avail }}</span>
+              <button onClick="{{ it.pick }}" style="height:44px;padding:0 20px;border-radius:999px;background:{{ it.btnBg }};color:{{ it.btnFg }};border:{{ it.btnBd }};font-size:13px;font-weight:700;cursor:pointer">{{ it.cta }}</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">
+          <sc-for list="{{ gridItems }}" as="g" hint-placeholder-count="6">
+            <div style="background:#fff;border-radius:24px;overflow:hidden;display:flex;flex-direction:column">
+              <div style="position:relative;height:{{ g.h }};background:#F3F2EE"><img src="{{ g.img }}" alt="" style="width:100%;height:100%;object-fit:cover"><sc-if value="{{ g.tag }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:12px;left:12px;padding:5px 10px;border-radius:999px;background:{{ g.tagBg }};font-size:11px;font-weight:800">{{ g.tag }}</span></sc-if></div>
+              <div style="padding:14px 16px;display:flex;flex-direction:column;gap:4px;flex:1"><span style="font-size:16px;font-weight:700">{{ g.t }}</span><span style="font-size:12px;color:#5D5D58">{{ g.sub }}</span><span style="font-size:17px;font-weight:800;margin-top:4px">{{ g.price }}</span><button onClick="{{ g.pick }}" disabled="{{ g.disabled }}" style="margin-top:auto;height:44px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ g.cta }}</button></div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5D5D58;display:flex;gap:8px;align-items:center"><bh-icon name="box" size="14"></bh-icon>Stock shown for {{ loc.name }}. Checkout runs on WooCommerce.</div></sc-if>
+      </sc-if>
+    </section>
+
+    <sc-if value="{{ hasOnline }}" hint-placeholder-val="{{ false }}">
+      <section style="background:#141414;color:#fff;border-radius:32px;padding:clamp(20px,3vw,32px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px;align-items:center">
+        <div style="display:flex;flex-direction:column;gap:12px"><span style="align-self:flex-start;display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:#D6F26B;color:#141414;font-size:12px;font-weight:800"><bh-icon name="video" size="13"></bh-icon>Online classes</span><h2 style="margin:0;font-size:34px;font-weight:700;letter-spacing:-.035em">Practise at home with {{ loc.name }}</h2><p style="margin:0;font-size:15px;line-height:1.6;color:#C9C9C3">Live classes from the studio and a replay library. Included with memberships, or try 3 free classes.</p><button onClick="{{ goOnline }}" style="align-self:flex-start;height:48px;padding:0 22px;border-radius:999px;background:#fff;color:#141414;border:none;font-size:14px;font-weight:700;cursor:pointer">Browse online classes</button></div>
+        <div style="position:relative;height:260px;border-radius:24px;overflow:hidden"><img src="{{ img.online }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+      </section>
+    </sc-if>
+
+    <section style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-.03em">{{ teamTitle }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        <sc-for list="{{ team }}" as="t" hint-placeholder-count="4"><div style="background:#fff;border-radius:24px;overflow:hidden"><img src="{{ t.img }}" alt="" style="width:100%;height:200px;object-fit:cover;display:block"><div style="padding:12px 14px"><div style="font-size:15px;font-weight:700">{{ t.name }}</div><div style="font-size:12px;color:#5D5D58">{{ t.role }}</div></div></div></sc-for>
+      </div>
+    </section>
+
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px">
+      <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:12px">
+        <h3 style="margin:0;font-size:22px;font-weight:700">Get in touch</h3>
+        <input aria-label="Name" placeholder="Name" style="height:48px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px">
+        <input aria-label="Email" placeholder="Email" style="height:48px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px">
+        <label style="display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.5;color:#3E3E3A"><input type="checkbox" style="accent-color:#141414;margin-top:2px">Send me news and offers from {{ ind.brand }} {{ loc.name }}. Unsubscribe any time.</label>
+        <button onClick="{{ sendEnquiry }}" style="align-self:flex-start;height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ enquiryCta }}</button>
+      </div>
+      <div style="position:relative;border-radius:28px;overflow:hidden;min-height:260px;background:{{ ind.pastel }}"><div style="position:absolute;inset:0;background-image:radial-gradient(rgba(20,20,20,.12) 1px,transparent 1px);background-size:18px 18px"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center"><span style="padding:6px 12px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:800">{{ loc.name }}</span><span style="width:12px;height:12px;border-radius:6px;background:#141414;border:2px solid #fff"></span></div><div style="position:absolute;left:14px;right:14px;bottom:14px;background:#fff;border-radius:18px;padding:12px 14px;font-size:13px;display:flex;justify-content:space-between;gap:8px;align-items:center"><span>{{ loc.addr }}</span><span style="font-weight:700;white-space:nowrap">Directions</span></div></div>
+    </section>
+  </sc-if>
+
+  <!-- ONLINE CLASSES -->
+  <sc-if value="{{ p.online }}" hint-placeholder-val="{{ false }}">
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:14px;align-items:start">
+      <div style="background:#141414;border-radius:28px;overflow:hidden">
+        <div style="position:relative;aspect-ratio:16/9"><img src="{{ video.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:{{ video.op }}"><sc-if value="{{ video.locked }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;text-align:center;padding:20px"><bh-icon name="lock" size="30"></bh-icon><div style="font-size:18px;font-weight:700">Included with membership or the online pass</div><button onClick="{{ unlock }}" style="height:44px;padding:0 20px;border-radius:999px;background:#D6F26B;color:#141414;border:none;font-size:13px;font-weight:800;cursor:pointer">Start 3 free classes</button></div></sc-if><sc-if value="{{ video.playable }}" hint-placeholder-val="{{ true }}"><button onClick="{{ togglePlay }}" aria-label="Play" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:36px;border:none;background:rgba(255,255,255,.92);cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ video.icon }}" size="28"></bh-icon></button></sc-if><sc-if value="{{ video.live }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:14px;left:14px;padding:5px 10px;border-radius:999px;background:#F8D6D8;font-size:11px;font-weight:800">LIVE · 38 watching</span></sc-if></div>
+        <div style="padding:16px 20px;color:#fff;display:flex;flex-wrap:wrap;gap:10px;align-items:center"><div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:700">{{ video.title }}</div><div style="font-size:13px;color:#C9C9C3">{{ video.sub }}</div></div><div style="width:100%;height:4px;border-radius:2px;background:#333;overflow:hidden"><div style="height:100%;width:{{ video.progress }};background:#D6F26B"></div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ videos }}" as="vd" hint-placeholder-count="5"><button onClick="{{ vd.pick }}" style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:20px;border:2px solid {{ vd.bd }};background:#fff;cursor:pointer;text-align:left;color:#141414"><span style="position:relative;width:120px;height:72px;border-radius:14px;overflow:hidden;flex-shrink:0"><img src="{{ vd.img }}" alt="" style="width:100%;height:100%;object-fit:cover"><span style="position:absolute;bottom:6px;right:6px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;font-weight:700">{{ vd.dur }}</span></span><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ vd.t }}</span><span style="font-size:12px;color:#5D5D58">{{ vd.sub }}</span></span><span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:{{ vd.tagBg }}">{{ vd.tag }}</span></button></sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <!-- ACCOUNT -->
+  <sc-if value="{{ p.account }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:center;gap:14px"><img src="{{ img.cust }}" alt="" style="width:64px;height:64px;border-radius:32px;object-fit:cover"><div><h1 style="margin:0;font-size:34px;font-weight:700;letter-spacing:-.035em">Hi, Hana</h1><div style="font-size:13px;color:#5D5D58">Home location: {{ loc.name }}</div></div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px">
+      <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px"><div style="font-size:17px;font-weight:700">{{ acct.upTitle }}</div><sc-for list="{{ acct.upcoming }}" as="u" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#F8F7F3"><bh-icon name="{{ ind.icon }}" size="17"></bh-icon><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ u.t }}</span><span style="font-size:12px;color:#5D5D58">{{ u.sub }}</span></span><span style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:{{ u.bg }}">{{ u.st }}</span></div></sc-for></div>
+      <div style="background:{{ ind.pastel }};border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px"><div style="font-size:17px;font-weight:700">{{ acct.planTitle }}</div><div style="font-size:28px;font-weight:700;letter-spacing:-.02em">{{ acct.plan }}</div><div style="font-size:13px">{{ acct.planSub }}</div></div>
+      <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px"><div style="font-size:17px;font-weight:700">Communication preferences</div><sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="3"><button onClick="{{ pf.toggle }}" role="switch" aria-checked="{{ pf.on }}" style="display:flex;align-items:center;gap:12px;background:none;border:none;padding:6px 0;cursor:pointer;text-align:left;color:#141414;font-size:14px"><span style="width:42px;height:24px;border-radius:12px;background:{{ pf.track }};position:relative;flex-shrink:0"><span style="position:absolute;top:3px;left:{{ pf.knob }};width:18px;height:18px;border-radius:9px;background:#fff"></span></span>{{ pf.t }}</button></sc-for></div>
+    </div>
+  </sc-if>
+</main>
+
+<footer style="background:#141414;color:#C9C9C3">
+  <div style="max-width:1240px;margin:0 auto;padding:36px 20px;display:flex;flex-wrap:wrap;gap:16px 40px;font-size:13px">
+    <span style="font-size:16px;font-weight:800;color:#fff">{{ ind.brand }}</span>
+    <button onClick="{{ goFinder }}" style="background:none;border:none;padding:0;color:#C9C9C3;font-size:13px;cursor:pointer">All locations</button>
+    <span>Careers</span><span>Franchise with us</span>
+    <span style="margin-left:auto">Privacy policy · Terms · Refund policy</span>
+    <span style="width:100%;font-size:11px;color:#7C7C76">{{ footNote }}</span>
+  </div>
+</footer>
+
+<!-- DRAWER -->
+<sc-if value="{{ drawer.open }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:80"></div>
+  <aside role="dialog" aria-label="{{ drawer.title }}" style="position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:#fff;z-index:90;display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.15)">
+    <div style="padding:18px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #EEEDE8"><span style="flex:1;font-size:20px;font-weight:700">{{ drawer.title }}</span><button onClick="{{ closeDrawer }}" aria-label="Close" style="width:40px;height:40px;border-radius:20px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="17"></bh-icon></button></div>
+    <div style="flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <sc-if value="{{ drawer.isCart }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ cartItems }}" as="c" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:12px"><img src="{{ c.img }}" alt="" style="width:64px;height:64px;border-radius:16px;object-fit:cover"><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ c.t }}</span><span style="font-size:12px;color:#5D5D58">{{ c.price }}</span></span><div style="display:flex;align-items:center;gap:6px"><button onClick="{{ c.dec }}" aria-label="Less" style="width:30px;height:30px;border-radius:15px;border:1.5px solid #D8D6CF;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="minus" size="13"></bh-icon></button><span style="font-weight:800;min-width:16px;text-align:center">{{ c.q }}</span><button onClick="{{ c.inc }}" aria-label="More" style="width:30px;height:30px;border-radius:15px;border:1.5px solid #D8D6CF;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="plus" size="13"></bh-icon></button></div></div></sc-for>
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:#5D5D58">Your cart is empty.</div></sc-if>
+        <div style="background:#F8F7F3;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px;font-size:14px"><div style="display:flex;justify-content:space-between"><span>Subtotal</span><strong>{{ totals.sub }}</strong></div><div style="display:flex;justify-content:space-between;color:#5D5D58"><span>Tax</span><span>Calculated at checkout</span></div><div style="display:flex;justify-content:space-between;color:#5D5D58"><span>{{ totals.fulfil }}</span><span>Free</span></div></div>
+        <sc-if value="{{ isFoods }}" hint-placeholder-val="{{ false }}"><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Pickup time<select style="height:46px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:14px;background:#fff"><option>12:30 pm · 4 slots left</option><option>12:45 pm · 6 slots left</option><option>1:00 pm · 8 slots left</option></select></label></sc-if>
+      </sc-if>
+      <sc-if value="{{ drawer.isBook }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:12px;align-items:center;background:{{ ind.pastel }};border-radius:20px;padding:14px"><bh-icon name="{{ ind.icon }}" size="20"></bh-icon><span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ bk.t }}</span><span style="font-size:12px">{{ bk.sub }}</span></span><span style="font-weight:800">{{ bk.price }}</span></div>
+        <sc-if value="{{ bk.needSlot }}" hint-placeholder-val="{{ false }}"><div><div style="font-size:13px;font-weight:700;margin-bottom:8px">{{ bk.slotLabel }}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><sc-for list="{{ slots }}" as="sl" hint-placeholder-count="6"><button onClick="{{ sl.pick }}" disabled="{{ sl.taken }}" style="height:44px;border-radius:14px;border:1.5px solid {{ sl.bd }};background:{{ sl.bg }};color:{{ sl.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ sl.t }}</button></sc-for></div></div></sc-if>
+        <sc-if value="{{ bk.isFull }}" hint-placeholder-val="{{ false }}"><div style="background:#F7EDA8;border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.5">This is full. Join the waitlist and we'll email you if a spot opens. You won't be charged unless you get a spot.</div></sc-if>
+        <sc-if value="{{ bk.isGuardian }}" hint-placeholder-val="{{ false }}"><input aria-label="Child's name" placeholder="Child's full name" style="height:48px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px"><input aria-label="Date of birth" placeholder="Date of birth (YYYY-MM-DD)" style="height:48px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px"><div style="font-size:12px;color:#5D5D58;line-height:1.5">Registration is reviewed by the academy. Payment doesn't confirm a team place.</div></sc-if>
+        <input aria-label="Your name" placeholder="Your name" value="Hana Suzuki" style="height:48px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px">
+        <input aria-label="Email" placeholder="Email" value="hana@example.com" style="height:48px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px">
+        <div style="font-size:12px;color:#5D5D58;line-height:1.5">{{ bk.policy }}</div>
+      </sc-if>
+      <sc-if value="{{ drawer.isDone }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding-top:20px"><span style="width:64px;height:64px;border-radius:32px;background:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-icon name="check" size="30" stroke="2.6"></bh-icon></span><div style="font-size:26px;font-weight:700;letter-spacing:-.02em">{{ done.title }}</div><div style="font-size:14px;line-height:1.6;color:#3E3E3A">{{ done.text }}</div><div style="background:#F8F7F3;border-radius:16px;padding:12px 14px;font-size:13px;width:100%">{{ ind.brand }} {{ loc.name }} · {{ loc.addr }}</div></div>
+      </sc-if>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid #EEEDE8">
+      <sc-if value="{{ drawer.showCta }}" hint-placeholder-val="{{ true }}"><button onClick="{{ drawerCta }}" disabled="{{ drawer.ctaDisabled }}" style="width:100%;height:54px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer">{{ drawer.cta }}</button></sc-if>
+      <sc-if value="{{ drawer.isDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ doneAccount }}" style="width:100%;height:54px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:15px;font-weight:700;cursor:pointer;color:#141414">View in my account</button></sc-if>
+    </div>
+  </aside>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MAIN = {
+  studios: ['Class schedule', 'Times in local time · booking runs on our booking system', 'list', 'Book', 'Pick a class'],
+  sports: ['Programmes', 'Registration is reviewed before a team place is confirmed', 'list', 'Register', 'Register a participant'],
+  health: ['Services', 'Administrative booking only · bring your health card', 'list', 'Book', 'Choose a time'],
+  commerce: ['Shop this store', 'In stock at this location', 'grid', 'Add to cart', ''],
+  foods: ['Order for pickup', 'Menu and prices for this location', 'grid', 'Add', ''],
+  realty: ['Homes for sale', 'Listings from our agents at this office', 'grid', 'Book a viewing', 'Book a viewing'],
+};
+const KINDLBL = { studios: 'Studio', sports: 'Academy', commerce: 'Store', foods: 'Restaurant', realty: 'Office' };
+const pad = n => String(n).padStart(2, '0');
+
+class Component extends DCLogic {
+  state = { ind: 'studios', loc: null, page: 'brand', q: '', kind: 'All', hover: null, day: 0, drawer: null, item: null, slot: null, cart: {}, done: null, booked: [], video: 0, playing: false, unlocked: false, prefs: { email: true, sms: false, partner: false }, enquiry: false };
+  componentDidMount() {
+    if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50);
+    try { const h = new URLSearchParams(location.hash.slice(1)); const p = {}; if (h.get('ind')) p.ind = h.get('ind'); if (h.get('loc')) { p.loc = h.get('loc'); p.page = 'location'; } this.setState(p); } catch (e) {}
+  }
+  componentWillUnmount() { clearInterval(this.poll); clearInterval(this.playT); }
+  go(page) { this.setState({ page }); window.scrollTo(0, 0); }
+
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {}, P = D.P;
+    const L0 = I.locs.find(l => l.id === s.loc);
+    const L = L0 || I.locs[0];
+    const M = MAIN[s.ind];
+    const sym = L.cur === 'CAD' ? 'CA$' : '$';
+    const kindOf = l => l.kind || KINDLBL[s.ind];
+    const ql = s.q.trim().toLowerCase();
+    const kinds = ['All', ...new Set(I.locs.map(kindOf))];
+    const results = I.locs.filter(l => (!ql || `${l.name} ${l.city} ${l.region}`.toLowerCase().includes(ql)) && (s.kind === 'All' || kindOf(l) === s.kind));
+    const openLabel = l => l.status === 'Operating' ? 'Open now' : l.status;
+    const stBg = l => l.status === 'Operating' ? '#D6F26B' : '#F7EDA8';
+    const openLoc = id => { this.setState({ loc: id, page: 'location' }); window.scrollTo(0, 0); };
+
+    // items
+    const items = I.items.map((it, i) => ({ i, t: it[0], sub: it[1], price: it[2], left: it[3], img: IMG[it[4]] || IMG[I.imgs[i % 5]] }));
+    const cartN = Object.values(s.cart).reduce((a, b) => a + b, 0);
+    const priceNum = p => parseFloat(String(p).replace(/[^0-9.]/g, '')) || 0;
+    const sub = Object.entries(s.cart).reduce((a, [i, q]) => a + priceNum(I.items[i][2]) * q, 0);
+    const it = s.item != null ? items[s.item] : null;
+    const needSlot = ['health', 'realty'].includes(s.ind);
+    const isFull = it && it.left === 0 && ['studios', 'sports'].includes(s.ind);
+    const baseDay = new Date(2026, 9, 17);
+    const doneT = s.done;
+
+    const drawerCfg = !s.drawer ? { open: false } : s.drawer === 'cart' ? { open: true, title: s.ind === 'foods' ? 'Your pickup order' : 'Your cart', isCart: true, showCta: true, cta: s.ind === 'foods' ? `Pay ${sym}${sub.toFixed(2)} and place order` : 'Checkout with WooCommerce', ctaDisabled: !cartN }
+      : s.drawer === 'book' ? { open: true, title: isFull ? 'Join the waitlist' : M[4], isBook: true, showCta: true, cta: isFull ? 'Join waitlist' : s.ind === 'sports' ? `Submit registration · ${it.price}` : needSlot ? (s.slot ? (it.price === 'Covered' ? 'Confirm appointment' : s.ind === 'realty' ? 'Request viewing' : `Book · ${it.price}`) : 'Choose a time') : `Book and pay ${it.price}`, ctaDisabled: needSlot && !s.slot }
+      : { open: true, title: 'Confirmed', isDone: true, showCta: false };
+
+    const videos = [['Evening Flow · live', 'Tonight 7:00 pm · Maya Rao', 'LIVE', 'onlineCall', 'Live', P.blush, true], ['Morning Vinyasa replay', 'Maya Rao · from the studio', '45 min', 'onlineYoga', 'Members', P.lilac], ['Breathwork basics', 'Jordan Lee', '20 min', 'yogaMeditate', 'Free', '#D6F26B'], ['Pilates core · 1', 'Ana Silva', '30 min', 'yogaPink', 'Online pass', P.lilac], ['Desk stretch', 'Sam Tran', '15 min', 'yogaRed', 'Free', '#D6F26B']];
+    const vv = videos[s.video];
+    const locked = !s.unlocked && (vv[4] === 'Members' || vv[4] === 'Online pass');
+
+    const acct = {
+      studios: ['Upcoming classes', 'Membership', '10-class pack', '3 classes left · expires 30 Nov · use at any Toronto studio'],
+      sports: ['Upcoming sessions', 'Registrations', 'U8 Fundamentals', 'Ella · accepted · Saturdays 9:00 am'],
+      health: ['Upcoming appointments', 'Package', '5 massages', '2 remaining · expires 31 Mar'],
+      commerce: ['Recent orders', 'Rewards', '420 points', 'Earned at Fieldnote stores · 80 to your next reward'],
+      foods: ['Recent orders', 'Favourite', 'Ember chicken bowl', 'Ordered 6 times at this location'],
+      realty: ['Saved viewings', 'Saved search', '3 bed · under $1.2M', '4 new matches this week'],
+    }[s.ind];
+
+    return {
+      ind: I, loc: { ...L, kind: kindOf(L) }, hasLoc: !!L0, q: s.q,
+      img: { hero: IMG[I.hero], loc: IMG[L.img], online: IMG.onlineCall, cust: IMG.pW4 },
+      links: { hq: `BranchHarbor HQ.dc.html#ind=${s.ind}`, loc: `BranchHarbor Location.dc.html#ind=${s.ind}&loc=${L.id}`, staff: `BranchHarbor Staff.dc.html#ind=${s.ind}&loc=${L.id}` },
+      indSwitch: Object.values(D.IND).map(x => ({ name: x.name, icon: x.icon, bg: x.key === s.ind ? x.pastel : 'transparent', fg: x.key === s.ind ? '#141414' : '#C9C9C3', pick: () => { this.setState({ ind: x.key, loc: null, page: 'brand', cart: {}, drawer: null, q: '', kind: 'All' }); window.scrollTo(0, 0); } })),
+      topNav: [['finder', 'Locations'], ...(L0 ? [['location', M[0]]] : []), ...(s.ind === 'studios' ? [['online', 'Online classes']] : []), ['brand', 'About']].map(([k, label]) => ({ label, bg: s.page === k ? '#F3F2EE' : 'transparent', go: () => k === 'location' ? openLoc(L.id) : this.go(k) })),
+      p: { brand: s.page === 'brand', finder: s.page === 'finder', location: s.page === 'location', online: s.page === 'online', account: s.page === 'account' },
+      goBrand: () => this.go('brand'), goFinder: () => this.go('finder'), goLoc: () => openLoc(L.id), goOnline: () => this.go('online'), goAccount: () => this.go('account'),
+      setQ: e => this.setState({ q: e.target.value }), clearQ: () => this.setState({ q: '', kind: 'All' }), useMyLoc: () => this.setState({ q: I.locs[0].city }),
+      hasCart: ['commerce', 'foods'].includes(s.ind), cartCount: cartN, openCart: () => this.setState({ drawer: 'cart' }),
+      locCards: I.locs.map(l => ({ name: `${I.brand} ${l.name}`, kind: kindOf(l), addr: l.addr, img: IMG[l.img], openLabel: openLabel(l), stBg: stBg(l), open: () => openLoc(l.id) })),
+      kinds: kinds.map(k => ({ label: k, bd: s.kind === k ? '#141414' : '#D8D6CF', bg: s.kind === k ? '#141414' : '#fff', fg: s.kind === k ? '#fff' : '#141414', pick: () => this.setState({ kind: k }) })),
+      results: results.map((l, i) => ({ name: `${I.brand} ${l.name}`, short: l.name, kind: kindOf(l), addr: l.addr, hours: l.hours, img: IMG[l.img], openLabel: openLabel(l), stBg: stBg(l), dist: `${(1.2 + i * 2.7).toFixed(1)} km`, x: `${l.x}%`, y: `${l.y + 12}%`,
+        bd: s.hover === l.id ? '#141414' : 'transparent', pinBg: s.hover === l.id ? '#141414' : '#fff', pinFg: s.hover === l.id ? '#fff' : '#141414', cta: l.status === 'Operating' ? 'Visit page' : 'Get updates', open: () => openLoc(l.id), hover: () => this.setState({ hover: l.id }) })),
+      noResults: !results.length,
+      locSt: { label: openLabel(L), bg: stBg(L) }, offer: { studios: 'First week unlimited for $39', sports: 'Free trial session for new players', health: 'Book online and skip the wait', commerce: 'Free pickup in store', foods: 'Order ahead, skip the line', realty: 'Free home valuation' }[s.ind],
+      scrollMain: () => { const el = document.getElementById('bh-main'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 130, behavior: 'smooth' }); },
+      mainTitle: M[0], mainNote: M[1], isList: M[2] === 'list', isGrid: M[2] === 'grid', isShop: s.ind === 'commerce', showDays: s.ind === 'studios',
+      days: [0, 1, 2, 3, 4].map(i => { const d = new Date(baseDay); d.setDate(d.getDate() + i); return { d: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed'][i], n: d.getDate(), bg: s.day === i ? '#141414' : '#fff', fg: s.day === i ? '#fff' : '#141414', pick: () => this.setState({ day: i }) }; }),
+      listItems: items.map(x => { const full = x.left === 0; const booked = s.booked.includes(`${s.ind}${x.i}`); return { t: x.t, sub: x.sub, price: x.price, avail: booked ? 'Booked' : full ? 'Full · waitlist open' : x.left <= 2 ? `${x.left} left` : `${x.left} available`, availFg: full ? '#8A5A00' : '#5D5D58', cta: booked ? 'Booked' : full ? 'Join waitlist' : M[3], btnBg: full || booked ? '#fff' : '#141414', btnFg: full || booked ? '#141414' : '#fff', btnBd: full || booked ? '1.5px solid #141414' : 'none', pick: () => this.setState({ drawer: 'book', item: x.i, slot: null }) }; }),
+      gridItems: items.map(x => { const out = s.ind === 'commerce' && x.left === 0; return { t: x.t, sub: x.sub, price: x.price, img: x.img, h: s.ind === 'realty' ? '220px' : '200px', tag: s.ind === 'realty' ? (x.i === 1 ? 'Conditional' : 'For sale') : s.ind === 'commerce' ? (out ? 'Out of stock here' : x.left < 4 ? `Only ${x.left} left` : '') : '', tagBg: out ? '#F8D6D8' : '#fff', disabled: out, cta: out ? 'Check other stores' : s.cart[x.i] ? `In cart · ${s.cart[x.i]}` : M[3],
+        pick: () => s.ind === 'realty' ? this.setState({ drawer: 'book', item: x.i, slot: null }) : this.setState(y => ({ cart: { ...y.cart, [x.i]: (y.cart[x.i] || 0) + 1 } })) }; }),
+      hasOnline: s.ind === 'studios',
+      teamTitle: { studios: 'Instructors', sports: 'Coaches', health: 'Our team', commerce: 'Store team', foods: 'Kitchen team', realty: 'Agents at this office' }[s.ind],
+      team: [[I.staffName, I.staffImg], ['Sam Tran', 'pM2'], ['Ana Silva', 'pW3'], ['Jordan Lee', 'pM4']].map(([name, img], i) => ({ name: i === 0 ? I.staffName : name, img: IMG[img], role: I.staffRole })),
+      sendEnquiry: () => this.setState({ enquiry: true }), enquiryCta: s.enquiry ? `Sent to ${L.name}` : 'Send',
+      footNote: `${I.brand} ${L0 ? L.name + ' is independently owned and operated by ' + L.owner + ' under licence.' : 'locations are independently owned and operated under licence.'} Sample prototype data.`,
+
+      drawer: drawerCfg, closeDrawer: () => this.setState({ drawer: null }), isFoods: s.ind === 'foods',
+      cartItems: Object.entries(s.cart).filter(([, q]) => q > 0).map(([i, q]) => ({ t: I.items[i][0], price: I.items[i][2], q, img: IMG[I.items[i][4]] || IMG[I.imgs[i % 5]], inc: () => this.setState(y => ({ cart: { ...y.cart, [i]: q + 1 } })), dec: () => this.setState(y => ({ cart: { ...y.cart, [i]: Math.max(0, q - 1) } })) })),
+      cartEmpty: !cartN, totals: { sub: `${sym}${sub.toFixed(2)}`, fulfil: s.ind === 'foods' ? `Pickup at ${L.name}` : `Store pickup · ${L.name}` },
+      bk: it ? { t: it.t, sub: it.sub, price: it.price, needSlot, isFull, isGuardian: s.ind === 'sports', slotLabel: s.ind === 'realty' ? 'Viewing time · Sat 19 Oct' : 'Available times · Fri 18 Oct',
+        policy: { studios: 'Cancel up to 12 hours before class for a full refund. Your spot is held for 5 minutes while you pay.', sports: 'Withdrawals before the first session are refunded minus a $20 admin fee.', health: 'Cancel or reschedule up to 24 hours before. Your current appointment is kept until a new time is confirmed.', realty: 'An agent confirms by email. Viewings may be shared with other buyers.' }[s.ind] || '' } : { t: '', sub: '', price: '', policy: '' },
+      slots: ['9:00', '9:45', '10:30', '11:15', '1:00', '2:30'].map((t, i) => ({ t, taken: i === 1 || i === 4, bd: s.slot === t ? '#141414' : '#D8D6CF', bg: s.slot === t ? '#141414' : '#fff', fg: s.slot === t ? '#fff' : '#141414', pick: () => this.setState({ slot: t }) })),
+      drawerCta: () => {
+        if (s.drawer === 'cart') { const id = 1047 + Math.floor(Math.random() * 20); this.setState({ drawer: 'done', done: s.ind === 'foods' ? { title: `Order #${id} sent`, text: `Waiting for ${L.name} to accept. You'll get a text when it's accepted and again when it's ready. You won't be charged if the restaurant can't take it.` } : { title: 'Order placed', text: `Paid through WooCommerce. We'll email you when it's ready for pickup at ${L.name}, usually within 2 hours.` }, cart: {} }); return; }
+        const title = isFull ? 'You\u2019re on the waitlist' : s.ind === 'sports' ? 'Registration submitted' : s.ind === 'realty' ? 'Viewing requested' : 'You\u2019re booked';
+        const text = isFull ? 'We\u2019ll email you if a spot opens. No charge unless you get a spot.' : s.ind === 'sports' ? 'The academy reviews registrations within a few days. You\u2019ll get an email when a team place is confirmed.' : s.ind === 'realty' ? `${I.staffName} will confirm your ${s.slot} viewing by email.` : `${it.t}${s.slot ? ' at ' + s.slot : ''}. Confirmation sent to hana@example.com.`;
+        this.setState(y => ({ drawer: 'done', done: { title, text }, booked: isFull ? y.booked : [...y.booked, `${s.ind}${s.item}`] }));
+      },
+      done: doneT || { title: '', text: '' }, doneAccount: () => { this.setState({ drawer: null }); this.go('account'); },
+
+      videos: videos.map((v, i) => ({ t: v[0], sub: v[1], dur: v[2], img: IMG[v[3]], tag: v[4], tagBg: v[5], bd: s.video === i ? '#141414' : 'transparent', pick: () => { clearInterval(this.playT); this.setState({ video: i, playing: false, prog: 0 }); } })),
+      video: { title: vv[0], sub: vv[1], img: IMG[vv[3]], locked, playable: !locked, live: !!vv[6], op: locked ? 0.35 : 1, icon: s.playing ? 'minus' : 'play', progress: `${s.prog || 0}%` },
+      unlock: () => this.setState({ unlocked: true }),
+      togglePlay: () => { if (s.playing) { clearInterval(this.playT); this.setState({ playing: false }); } else { this.setState({ playing: true }); this.playT = setInterval(() => this.setState(y => ({ prog: Math.min(100, (y.prog || 0) + 1) })), 300); } },
+
+      acct: { upTitle: acct[0], planTitle: acct[1], plan: acct[2], planSub: acct[3],
+        upcoming: [...s.booked.filter(b => b.startsWith(s.ind)).map(b => { const x = I.items[+b.slice(s.ind.length)]; return { t: x[0], sub: `${L.name} · ${x[1]}`, st: 'Confirmed', bg: '#D6F26B' }; }), { t: I.items[2 % I.items.length][0], sub: `${L.name} · last week`, st: 'Completed', bg: '#F3F2EE' }] },
+      prefs: [['email', `Email news from ${L.name}`], ['sms', 'Text reminders'], ['partner', `Offers from other ${I.brand} locations`]].map(([k, t]) => { const on = !!s.prefs[k]; return { t, on, track: on ? '#141414' : '#D8D6CF', knob: on ? '21px' : '3px', toggle: () => this.setState(y => ({ prefs: { ...y.prefs, [k]: !on } })) }; }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

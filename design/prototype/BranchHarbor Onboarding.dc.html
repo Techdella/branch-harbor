@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="location"></bh-topbar>
+
+<!-- AUTH -->
+<sc-if value="{{ isAuth }}" hint-placeholder-val="{{ true }}">
+  <div style="min-height:100vh;padding:16px;display:flex">
+    <div style="flex:1;background:#fff;border-radius:32px;overflow:hidden;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))">
+      <div style="position:relative;min-height:420px;background:#F7EDA8">
+        <img src="{{ img.auth }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div style="position:absolute;left:24px;right:24px;bottom:24px;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-radius:24px;padding:20px">
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.02em">One home for every location.</div>
+          <div style="font-size:14px;color:#5D5D58;margin-top:4px">Your progress saves at every step. You can leave and come back.</div>
+        </div>
+      </div>
+      <div style="padding:40px clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center;gap:22px">
+        <a href="BranchHarbor Website.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none"><bh-logo size="36"></bh-logo><span style="font-size:19px;font-weight:800;letter-spacing:-.02em">BranchHarbor</span></a>
+        <sc-if value="{{ authForm }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE;align-self:flex-start">
+            <sc-for list="{{ authTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.pick }}" style="height:40px;padding:0 18px;border-radius:999px;border:none;background:{{ t.bg }};font-size:14px;font-weight:700;cursor:pointer;color:#141414">{{ t.label }}</button></sc-for>
+          </div>
+          <h1 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-.04em">{{ authTitle }}</h1>
+          <div style="display:flex;flex-direction:column;gap:14px;max-width:440px">
+            <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ true }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Your name<input value="{{ acc.name }}" onChange="{{ on.accName }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+            </sc-if>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Work email<input type="email" value="{{ acc.email }}" onChange="{{ on.accEmail }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Password<input type="password" value="{{ acc.pw }}" onChange="{{ on.accPw }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"><span style="font-size:12px;font-weight:500;color:#5D5D58">At least 10 characters.</span></label>
+            <div role="alert" style="font-size:13px;font-weight:600;color:#B3261E">{{ authErr }}</div>
+            <button onClick="{{ authSubmit }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;height:54px;padding:0 6px 0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer">{{ authCta }}<span style="width:42px;height:42px;border-radius:21px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="18"></bh-icon></span></button>
+            <div style="font-size:12px;color:#5D5D58;line-height:1.6">Studios is open for pilot signup. Other industries start with a <a href="BranchHarbor Website.dc.html">demo request</a>.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ authVerify }}" hint-placeholder-val="{{ false }}">
+          <span style="width:56px;height:56px;border-radius:18px;background:#E9DDF8;display:flex;align-items:center;justify-content:center"><bh-icon name="mail" size="26"></bh-icon></span>
+          <h1 style="margin:0;font-size:36px;font-weight:700;letter-spacing:-.04em">Check your email</h1>
+          <p style="margin:0;font-size:15px;line-height:1.6;color:#5D5D58;max-width:440px">We sent a 6-digit code to <strong style="color:#141414">{{ acc.email }}</strong>. For this prototype, use 482915.</p>
+          <div style="display:flex;gap:10px;max-width:440px">
+            <input aria-label="Verification code" inputmode="numeric" maxlength="6" value="{{ code }}" onChange="{{ on.code }}" style="flex:1;height:56px;border:1.5px solid #141414;border-radius:999px;padding:0 24px;font-size:22px;font-weight:700;letter-spacing:.3em;font-variant-numeric:tabular-nums">
+            <button onClick="{{ verify }}" style="height:56px;padding:0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer">Verify</button>
+          </div>
+          <div role="alert" style="font-size:13px;font-weight:600;color:#B3261E">{{ codeErr }}</div>
+          <div style="display:flex;gap:16px;font-size:13px;font-weight:600"><button onClick="{{ fillCode }}" style="background:none;border:none;padding:0;cursor:pointer;color:#5E7D68;font-weight:700">Resend code</button><button onClick="{{ backToAuth }}" style="background:none;border:none;padding:0;cursor:pointer;color:#5D5D58;font-weight:600">Use a different email</button></div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- SETUP -->
+<sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:12px;display:flex;flex-direction:column;gap:12px;min-height:100vh">
+    <header style="background:#fff;border-radius:24px;padding:12px 14px 12px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px"><bh-logo size="32"></bh-logo><span style="font-size:16px;font-weight:800;letter-spacing:-.02em">BranchHarbor</span><span style="font-size:13px;color:#5D5D58">Setup</span></div>
+      <div style="flex:1;min-width:160px;max-width:360px;height:8px;border-radius:4px;background:#F3F2EE;overflow:hidden"><div style="height:100%;width:{{ progressPct }};background:#141414;border-radius:4px"></div></div>
+      <span style="font-size:13px;font-weight:600">{{ progressLabel }}</span>
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#2F6B3A;font-weight:600"><bh-icon name="check-circle" size="15"></bh-icon>{{ savedLabel }}</span>
+      <a href="BranchHarbor App.dc.html" style="margin-left:auto;display:flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;font-size:13px;font-weight:700;text-decoration:none">Go to dashboard</a>
+    </header>
+
+    <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+      <aside style="flex:0 0 300px;max-width:100%;background:#fff;border-radius:28px;padding:16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:12px">
+        <div style="padding:6px 10px 12px"><div style="font-size:18px;font-weight:700;letter-spacing:-.02em">Setup checklist</div><div style="font-size:12px;color:#5D5D58">Jump to any step. Optional steps can be skipped.</div></div>
+        <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="9">
+          <button onClick="{{ c.go }}" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:18px;border:none;background:{{ c.bg }};cursor:pointer;text-align:left;color:#141414">
+            <span style="width:32px;height:32px;border-radius:16px;background:{{ c.dotBg }};color:{{ c.dotFg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0"><bh-icon name="{{ c.icon }}" size="15"></bh-icon></span>
+            <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:{{ c.w }}">{{ c.label }}</span><span style="font-size:11px;font-weight:600;color:{{ c.stColor }}">{{ c.status }}</span></span>
+          </button>
+        </sc-for>
+      </aside>
+
+      <main style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:12px">
+        <div style="background:#fff;border-radius:28px;padding:clamp(20px,3vw,36px);display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;align-items:flex-start;gap:14px">
+            <span style="width:52px;height:52px;border-radius:18px;background:{{ cur.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ cur.icon }}" size="24"></bh-icon></span>
+            <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#5D5D58">Step {{ cur.n }} of 9{{ cur.opt }}</div><h1 style="margin:2px 0 0;font-size:clamp(26px,3vw,34px);font-weight:700;letter-spacing:-.035em">{{ cur.title }}</h1><p style="margin:6px 0 0;font-size:15px;line-height:1.55;color:#5D5D58;max-width:640px">{{ cur.desc }}</p></div>
+          </div>
+
+          <!-- 2 · Industry -->
+          <sc-if value="{{ s.industry }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
+              <sc-for list="{{ indCards }}" as="i" hint-placeholder-count="5">
+                <button onClick="{{ i.pick }}" aria-pressed="{{ i.on }}" style="position:relative;height:220px;border-radius:24px;overflow:hidden;border:3px solid {{ i.bd }};padding:0;cursor:pointer;background:{{ i.pastel }};text-align:left">
+                  <img src="{{ i.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                  <span style="position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:999px;background:#141414;color:#fff;font-size:11px;font-weight:700">{{ i.avail }}</span>
+                  <span style="position:absolute;left:8px;right:8px;bottom:8px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.9);display:flex;align-items:center;gap:8px;color:#141414"><bh-icon name="{{ i.icon }}" size="17"></bh-icon><span style="font-size:15px;font-weight:700;flex:1">{{ i.name }}</span><sc-if value="{{ i.on }}" hint-placeholder-val="{{ false }}"><bh-icon name="check-circle" size="18"></bh-icon></sc-if></span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ indNotSelf }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:12px;align-items:center;background:#FFF3C9;border-radius:20px;padding:14px 18px;font-size:14px;line-height:1.5;color:#5A4300"><bh-icon name="info" size="18"></bh-icon><span style="flex:1">{{ indPick.name }} is planned, so self-service setup isn't available yet. You can explore setup here, but publishing needs a pilot agreement.</span><a href="BranchHarbor Website.dc.html" style="font-weight:700;color:#5A4300">Request a demo</a></div>
+            </sc-if>
+            <div>
+              <div style="font-size:14px;font-weight:700;margin-bottom:8px">Business type</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+                <sc-for list="{{ btypes }}" as="b" hint-placeholder-count="2">
+                  <button onClick="{{ b.pick }}" aria-pressed="{{ b.on }}" style="display:flex;gap:14px;align-items:flex-start;text-align:left;padding:18px;border-radius:22px;border:1.5px solid {{ b.bd }};background:{{ b.bg }};cursor:pointer;color:#141414"><span style="width:40px;height:40px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ b.icon }}" size="19"></bh-icon></span><span><span style="display:block;font-size:15px;font-weight:700">{{ b.name }}</span><span style="font-size:13px;color:#5D5D58;line-height:1.5">{{ b.desc }}</span></span></button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- 3 · Business -->
+          <sc-if value="{{ s.business }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Business name<input value="{{ biz.name }}" onChange="{{ on.bizName }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Country<select value="{{ biz.country }}" onChange="{{ on.bizCountry }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>Canada</option><option>United States</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Default timezone<select value="{{ biz.tz }}" onChange="{{ on.bizTz }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>Eastern time (Toronto)</option><option>Central time (Chicago)</option><option>Mountain time (Denver)</option><option>Pacific time (Vancouver)</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Default currency<select value="{{ biz.currency }}" onChange="{{ on.bizCurrency }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>CAD</option><option>USD</option></select></label>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:18px;padding:14px 16px;font-size:13px;line-height:1.55;color:#3E3E3A"><bh-icon name="info" size="17"></bh-icon>Each location can use its own timezone and currency. Reports keep currencies separate and never add CAD and USD together.</div>
+          </sc-if>
+
+          <!-- 4 · Location -->
+          <sc-if value="{{ s.location }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Location name<input value="{{ loc.name }}" onChange="{{ on.locName }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Internal code<input value="{{ loc.code }}" onChange="{{ on.locCode }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Owner group<select value="{{ loc.owner }}" onChange="{{ on.locOwner }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>Company-owned</option><option>Franchise: Lakeshore Holdings</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;grid-column:1/-1">Address<input value="{{ loc.address }}" onChange="{{ on.locAddress }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Timezone<select value="{{ loc.tz }}" onChange="{{ on.locTz }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>Eastern time (Toronto)</option><option>Pacific time (Vancouver)</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Currency<select value="{{ loc.currency }}" onChange="{{ on.locCurrency }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>CAD</option><option>USD</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Phone<input value="{{ loc.phone }}" onChange="{{ on.locPhone }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Hours<input value="{{ loc.hours }}" onChange="{{ on.locHours }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Template<select value="{{ loc.template }}" onChange="{{ on.locTemplate }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option>Studio location · v15</option><option>Studio pop-up · v3</option></select></label>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;margin-bottom:4px">What can this location change?</div>
+              <div style="font-size:13px;color:#5D5D58;margin-bottom:10px">Everything else is inherited from headquarters.</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
+                <sc-for list="{{ overrideToggles }}" as="o" hint-placeholder-count="5">
+                  <button onClick="{{ o.toggle }}" role="switch" aria-checked="{{ o.on }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:40px;height:24px;border-radius:12px;background:{{ o.track }};position:relative;flex-shrink:0"><span style="position:absolute;top:3px;left:{{ o.knob }};width:18px;height:18px;border-radius:9px;background:#fff"></span></span><span style="font-size:14px;font-weight:600">{{ o.label }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+              <div style="background:#E9DDF8;border-radius:22px;padding:18px"><div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:8px"><bh-icon name="lock" size="16"></bh-icon>Shared from headquarters</div><sc-for list="{{ sharedList }}" as="x" hint-placeholder-count="4"><div style="font-size:13px;line-height:1.8">{{ x }}</div></sc-for></div>
+              <div style="background:#E2F5A6;border-radius:22px;padding:18px"><div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:8px"><bh-icon name="edit" size="16"></bh-icon>Managed locally</div><sc-for list="{{ localList }}" as="x" hint-placeholder-count="3"><div style="font-size:13px;line-height:1.8">{{ x }}</div></sc-for></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:18px;padding:14px 16px;font-size:13px;line-height:1.55"><bh-icon name="eye" size="17"></bh-icon>Saving a location doesn't publish its website or show it to customers. You'll publish in the last step.</div>
+            <sc-if value="{{ isNetwork }}" hint-placeholder-val="{{ true }}">
+              <div style="border:1.5px solid #EEEDE8;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><bh-icon name="download" size="18"></bh-icon><div style="flex:1;min-width:200px"><div style="font-size:15px;font-weight:700">Import more locations</div><div style="font-size:13px;color:#5D5D58">Upload a spreadsheet. Each row is checked before anything is created.</div></div><button onClick="{{ toggleImport }}" style="height:42px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414">{{ importCta }}</button></div>
+                <sc-if value="{{ importOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:#5D5D58">locations-sample.csv · 4 rows</div>
+                  <sc-for list="{{ importRows }}" as="r" hint-placeholder-count="4">
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:{{ r.bg }};font-size:13px">
+                      <span style="width:24px;font-weight:700;color:#5D5D58">{{ r.n }}</span><span style="flex:1 1 180px;font-weight:700">{{ r.name }}</span><span style="flex:1 1 140px;color:#3E3E3A">{{ r.tzLabel }}</span>
+                      <sc-if value="{{ r.bad }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;color:#9E1B12;font-weight:600"><bh-icon name="alert" size="15"></bh-icon>Timezone missing</span><select aria-label="Choose timezone" onChange="{{ r.fix }}" style="height:34px;border-radius:999px;border:1.5px solid #141414;padding:0 10px;font-size:12px;background:#fff"><option value="">Choose…</option><option>Eastern time (Toronto)</option><option>Pacific time (Vancouver)</option></select></sc-if>
+                      <sc-if value="{{ r.good }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:6px;color:#2F6B3A;font-weight:600"><bh-icon name="check-circle" size="15"></bh-icon>Ready</span></sc-if>
+                    </div>
+                  </sc-for>
+                  <button onClick="{{ doImport }}" disabled="{{ importBlocked }}" style="align-self:flex-start;height:44px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ importBtn }}</button>
+                </sc-if>
+              </div>
+            </sc-if>
+          </sc-if>
+
+          <!-- 5 · Website -->
+          <sc-if value="{{ s.website }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+              <sc-for list="{{ siteOpts }}" as="o" hint-placeholder-count="2">
+                <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="display:flex;flex-direction:column;gap:8px;text-align:left;padding:20px;border-radius:24px;border:2px solid {{ o.bd }};background:{{ o.pastel }};cursor:pointer;color:#141414"><span style="display:flex;justify-content:space-between;width:100%"><span style="width:44px;height:44px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ o.icon }}" size="21"></bh-icon></span><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><bh-icon name="check-circle" size="22"></bh-icon></sc-if></span><span style="font-size:18px;font-weight:700">{{ o.name }}</span><span style="font-size:13px;line-height:1.55;color:#3E3E3A">{{ o.desc }}</span></button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ siteWp }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:#141414;color:#fff;border-radius:24px;padding:20px 22px">
+                <bh-icon name="wordpress" size="28"></bh-icon>
+                <div style="flex:1;min-width:220px"><div style="font-size:16px;font-weight:700">Install the BranchHarbor connector</div><div style="font-size:13px;color:#C9C9C3;line-height:1.5">Add it from your WordPress dashboard, then sign in to link the site. Your hosting and editor stay the same.</div></div>
+                <a href="BranchHarbor WordPress Plugin.dc.html" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 6px 0 20px;border-radius:999px;background:#D6F26B;color:#141414;font-size:14px;font-weight:700;text-decoration:none">Open connector setup<span style="width:34px;height:34px;border-radius:17px;background:#141414;color:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="16"></bh-icon></span></a>
+              </div>
+            </sc-if>
+            <sc-if value="{{ siteHosted }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <div style="font-size:14px;font-weight:700;margin-bottom:8px">Website address</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <sc-for list="{{ addrOpts }}" as="a" hint-placeholder-count="3">
+                    <button onClick="{{ a.pick }}" disabled="{{ a.disabled }}" aria-pressed="{{ a.on }}" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 18px;border-radius:999px;border:1.5px solid {{ a.bd }};background:{{ a.bg }};color:{{ a.fg }};font-size:14px;font-weight:700;cursor:pointer"><bh-icon name="{{ a.icon }}" size="16"></bh-icon>{{ a.label }}<sc-if value="{{ a.disabled }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;padding:2px 7px;border-radius:999px;background:#F3F2EE;color:#5D5D58">Later</span></sc-if></button>
+                  </sc-for>
+                </div>
+              </div>
+              <sc-if value="{{ addrIncluded }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#F3F2EE;border-radius:20px;padding:16px 18px">
+                  <bh-icon name="globe" size="18"></bh-icon>
+                  <code style="flex:1;min-width:200px;font-size:14px;font-weight:600;word-break:break-all">{{ includedAddr }}</code>
+                  <span style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;background:#D6F26B">Ready to use</span>
+                </div>
+                <div style="font-size:13px;color:#5D5D58">You can connect your own domain at any time. This address keeps working.</div>
+              </sc-if>
+              <sc-if value="{{ addrDomain }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ domSteps }}" as="d" hint-placeholder-count="5">
+                    <span style="display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:999px;background:{{ d.bg }};color:{{ d.fg }};font-size:12px;font-weight:700"><bh-icon name="{{ d.icon }}" size="14"></bh-icon>{{ d.label }}</span>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ dom.enter }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">
+                    <label style="flex:1 1 280px;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Your domain<input placeholder="www.yourbusiness.com" value="{{ domHost }}" onChange="{{ on.domHost }}" style="height:50px;border:1.5px solid {{ domBd }};border-radius:999px;padding:0 20px;font-size:15px"><span style="font-size:12px;font-weight:600;color:#B3261E">{{ domErr }}</span></label>
+                    <button onClick="{{ domStart }}" style="margin-top:26px;height:50px;padding:0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">Continue</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ dom.dns }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:14px;line-height:1.6">Add these records at the company where you bought <strong>{{ domHost }}</strong>. Your included address keeps working while you set this up.</div>
+                  <div style="border:1.5px solid #EEEDE8;border-radius:22px;overflow:auto">
+                    <div style="display:grid;grid-template-columns:90px minmax(170px,1.2fr) minmax(220px,1.6fr) 90px;min-width:600px;font-size:12px;font-weight:700;color:#5D5D58;padding:12px 16px;border-bottom:1px solid #EEEDE8"><span>Type</span><span>Name</span><span>Value</span><span></span></div>
+                    <sc-for list="{{ dnsRows }}" as="r" hint-placeholder-count="2">
+                      <div style="display:grid;grid-template-columns:90px minmax(170px,1.2fr) minmax(220px,1.6fr) 90px;min-width:600px;align-items:center;font-size:13px;padding:12px 16px;border-bottom:1px solid #F3F2EE">
+                        <span style="font-weight:800">{{ r.type }}</span><code style="word-break:break-all">{{ r.name }}</code><code style="word-break:break-all">{{ r.value }}</code>
+                        <button onClick="{{ r.copy }}" style="justify-self:end;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414"><bh-icon name="{{ r.copyIcon }}" size="13"></bh-icon>{{ r.copyLabel }}</button>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+                    <div style="display:flex;gap:10px;background:#CDEEEE;border-radius:20px;padding:14px 16px;font-size:13px;line-height:1.55"><bh-icon name="mail" size="17"></bh-icon><span><strong>Keep your email records.</strong> Don't change or delete MX records. Email keeps working as it does today.</span></div>
+                    <div style="display:flex;gap:10px;background:#F7EDA8;border-radius:20px;padding:14px 16px;font-size:13px;line-height:1.55"><bh-icon name="refresh" size="17"></bh-icon><span><strong>Redirect plan.</strong> 3 existing pages will redirect: /timetable → /classes, /prices → /pricing, /contact-us → /contact.</span></div>
+                  </div>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick="{{ domCheck }}" style="display:flex;align-items:center;gap:8px;height:50px;padding:0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer"><bh-icon name="refresh" size="16"></bh-icon>Check DNS now</button><button onClick="{{ domEdit }}" style="height:50px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:700;cursor:pointer">Change domain</button></div>
+                </sc-if>
+                <sc-if value="{{ dom.checking }}" hint-placeholder-val="{{ false }}">
+                  <div role="status" style="display:flex;align-items:center;gap:12px;background:#CDEEEE;border-radius:20px;padding:18px;font-size:14px;font-weight:600"><bh-icon name="refresh" size="18"></bh-icon>{{ domCheckingLabel }}</div>
+                </sc-if>
+                <sc-if value="{{ dom.failed }}" hint-placeholder-val="{{ false }}">
+                  <div role="alert" style="display:flex;flex-direction:column;gap:10px;background:#F8D6D8;border-radius:22px;padding:18px;color:#5C1414">
+                    <div style="display:flex;gap:10px;align-items:center;font-size:15px;font-weight:700"><bh-icon name="alert" size="18"></bh-icon>Verification failed</div>
+                    <div style="font-size:14px;line-height:1.55">We found the TXT record, but the CNAME record for <code>{{ domHost }}</code> doesn't point to sites.branchharbor.com yet. DNS changes can take a few hours to spread.</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ domCheck }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Check again</button><button onClick="{{ domBackDns }}" style="height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #5C1414;background:transparent;color:#5C1414;font-size:13px;font-weight:700;cursor:pointer">View DNS records</button></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ dom.ready }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:stretch">
+                    <div style="background:#D6F26B;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:8px">
+                      <div style="display:flex;gap:10px;align-items:center;font-size:16px;font-weight:700"><bh-icon name="shield" size="20"></bh-icon>{{ domReadyTitle }}</div>
+                      <div style="font-size:13px;line-height:1.55">DNS verified and security certificate issued for {{ domHost }}.</div>
+                      <sc-if value="{{ domNotPrimary }}" hint-placeholder-val="{{ true }}"><button onClick="{{ domPrimary }}" style="align-self:flex-start;margin-top:auto;height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Set as primary address</button></sc-if>
+                      <sc-if value="{{ domIsPrimary }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;font-weight:700">Primary address. {{ includedAddrShort }} now redirects here.</div></sc-if>
+                    </div>
+                    <div style="border:1.5px solid #EEEDE8;border-radius:22px;overflow:hidden">
+                      <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#F3F2EE;font-size:12px"><span style="width:8px;height:8px;border-radius:4px;background:#E0A0A0"></span><span style="width:8px;height:8px;border-radius:4px;background:#E8D18A"></span><span style="width:8px;height:8px;border-radius:4px;background:#A9D3A0"></span><span style="flex:1;margin-left:8px;background:#fff;border-radius:999px;padding:3px 10px;display:flex;align-items:center;gap:6px"><bh-icon name="lock" size="11"></bh-icon>{{ domHost }}</span></div>
+                      <div style="position:relative;height:150px"><img src="{{ img.site }}" alt="" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:12px;bottom:12px;background:#fff;border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700">{{ biz.name }} · {{ loc.name }}</div></div>
+                    </div>
+                  </div>
+                </sc-if>
+              </sc-if>
+            </sc-if>
+          </sc-if>
+
+          <!-- 6 · Industry data -->
+          <sc-if value="{{ s.data }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ items }}" as="it" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 12px 12px 16px;border-radius:18px;background:#F8F7F3">
+                  <span style="width:36px;height:36px;border-radius:12px;background:{{ indPick.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ indPick.icon }}" size="17"></bh-icon></span>
+                  <span style="flex:1;font-size:14px;font-weight:700">{{ it.name }}</span>
+                  <span style="font-size:12px;color:#5D5D58">{{ it.meta }}</span>
+                  <button onClick="{{ it.remove }}" aria-label="Remove {{ it.name }}" style="width:36px;height:36px;border-radius:18px;border:none;background:#fff;cursor:pointer;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="15"></bh-icon></button>
+                </div>
+              </sc-for>
+              <sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}"><div style="border:2px dashed #D8D6CF;border-radius:20px;padding:22px;text-align:center;font-size:14px;color:#5D5D58">Add at least one {{ indPick.itemSingular }} so customers have something to choose.</div></sc-if>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input aria-label="New {{ indPick.itemSingular }}" placeholder="{{ indPick.itemPh }}" value="{{ newItem }}" onChange="{{ on.newItem }}" style="flex:1 1 260px;height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px">
+              <button onClick="{{ addItem }}" style="display:flex;align-items:center;gap:8px;height:50px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer"><bh-icon name="plus" size="16"></bh-icon>Add</button>
+            </div>
+          </sc-if>
+
+          <!-- 7 · Connections -->
+          <sc-if value="{{ s.connect }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1.5px solid #EEEDE8;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:12px"><span style="width:42px;height:42px;border-radius:14px;background:{{ indPick.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ indPick.connIcon }}" size="19"></bh-icon></span><div><div style="font-size:16px;font-weight:700">{{ indPick.connTitle }}</div><div style="font-size:13px;color:#5D5D58">Choose which system holds the official record.</div></div></div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ connOpts }}" as="c" hint-placeholder-count="3">
+                  <button onClick="{{ c.pick }}" disabled="{{ c.disabled }}" aria-pressed="{{ c.on }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:20px;height:20px;border-radius:10px;border:2px solid #141414;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:10px;height:10px;border-radius:5px;background:{{ c.dot }}"></span></span><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ c.name }}</span><span style="font-size:12px;color:#5D5D58;line-height:1.5">{{ c.desc }}</span></span><span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:{{ c.tagBg }}">{{ c.tag }}</span></button>
+                </sc-for>
+              </div>
+              <sc-if value="{{ connPicked }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;background:#CDEEEE;border-radius:18px;padding:12px 16px;font-size:13px;line-height:1.55"><bh-icon name="info" size="16"></bh-icon>{{ connNote }}</div></sc-if>
+            </div>
+            <div style="border:1.5px solid #EEEDE8;border-radius:24px;padding:20px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+              <span style="width:42px;height:42px;border-radius:14px;background:#F7EDA8;display:flex;align-items:center;justify-content:center"><bh-icon name="card" size="19"></bh-icon></span>
+              <div style="flex:1;min-width:220px"><div style="font-size:16px;font-weight:700">Customer payments</div><div style="font-size:13px;color:#5D5D58;line-height:1.5">{{ pay.desc }}</div></div>
+              <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;background:{{ pay.bg }}"><bh-icon name="{{ pay.icon }}" size="14"></bh-icon>{{ pay.label }}</span>
+              <sc-if value="{{ pay.canStart }}" hint-placeholder-val="{{ true }}"><button onClick="{{ payStart }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ pay.cta }}</button></sc-if>
+            </div>
+          </sc-if>
+
+          <!-- 8 · Team -->
+          <sc-if value="{{ s.team }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ invites }}" as="iv" hint-placeholder-count="2">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px;border-radius:20px;background:#F8F7F3">
+                  <span style="width:38px;height:38px;border-radius:19px;background:{{ iv.pastel }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">{{ iv.init }}</span>
+                  <span style="flex:1 1 180px;min-width:0"><span style="display:block;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis">{{ iv.email }}</span><span style="font-size:12px;color:#5D5D58">{{ iv.state }}</span></span>
+                  <select aria-label="Role" value="{{ iv.role }}" onChange="{{ iv.setRole }}" style="height:38px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 12px;font-size:13px;background:#fff"><option>Location manager</option><option>Instructor</option><option>Marketing contributor</option><option>Finance user</option><option>Headquarters admin</option></select>
+                  <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;background:#fff"><bh-icon name="pin" size="13"></bh-icon>{{ loc.name }}</span>
+                  <button onClick="{{ iv.remove }}" aria-label="Remove invite" style="width:36px;height:36px;border-radius:18px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#141414"><bh-icon name="x" size="15"></bh-icon></button>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input type="email" aria-label="Email to invite" placeholder="name@business.com" value="{{ newInvite }}" onChange="{{ on.newInvite }}" style="flex:1 1 260px;height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px">
+              <button onClick="{{ addInvite }}" style="display:flex;align-items:center;gap:8px;height:50px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer"><bh-icon name="send" size="15"></bh-icon>Invite</button>
+            </div>
+            <div role="alert" style="font-size:13px;font-weight:600;color:#B3261E">{{ inviteErr }}</div>
+            <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:18px;padding:14px 16px;font-size:13px;line-height:1.55"><bh-icon name="shield" size="17"></bh-icon>People only see records for the locations you assign. Removing a location from someone ends their access straight away.</div>
+          </sc-if>
+
+          <!-- 9 · Preview & publish -->
+          <sc-if value="{{ s.publish }}" hint-placeholder-val="{{ false }}">
+            <sc-if value="{{ notPublished }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px;align-items:start">
+                <div style="border:1.5px solid #EEEDE8;border-radius:24px;overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:#F3F2EE;font-size:12px"><span style="width:8px;height:8px;border-radius:4px;background:#E0A0A0"></span><span style="width:8px;height:8px;border-radius:4px;background:#E8D18A"></span><span style="width:8px;height:8px;border-radius:4px;background:#A9D3A0"></span><span style="flex:1;margin-left:8px;background:#fff;border-radius:999px;padding:3px 10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">{{ liveAddr }}</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:#F7EDA8">Preview</span></div>
+                  <div style="position:relative;height:200px"><img src="{{ img.site }}" alt="" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:auto 14px 14px 14px;background:rgba(255,255,255,.92);border-radius:18px;padding:12px 14px"><div style="font-size:18px;font-weight:800;letter-spacing:-.02em">{{ biz.name }}</div><div style="font-size:12px;color:#5D5D58">{{ loc.name }} · {{ loc.hours }}</div></div></div>
+                  <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ previewItems }}" as="p" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#F8F7F3;font-size:13px"><span style="flex:1;font-weight:700">{{ p.name }}</span><span style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">{{ ctaWord }}</span></div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:15px;font-weight:700">Before you publish</div>
+                  <sc-for list="{{ readiness }}" as="r" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:{{ r.bg }}">
+                      <span style="color:{{ r.fg }}"><bh-icon name="{{ r.icon }}" size="18"></bh-icon></span>
+                      <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ r.label }}</span><span style="font-size:12px;color:#3E3E3A;line-height:1.5">{{ r.note }}</span></span>
+                      <sc-if value="{{ r.fixable }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.fix }}" style="height:36px;padding:0 14px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">{{ r.fixLabel }}</button></sc-if>
+                    </div>
+                  </sc-for>
+                  <div style="border-top:1px solid #EEEDE8;padding-top:12px;display:flex;flex-direction:column;gap:10px">
+                    <sc-if value="{{ payBlocked }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:1.55;color:#5A4300;background:#FFF3C9;border-radius:16px;padding:12px 14px">Payments aren't enabled, so customers will see <strong>Enquire</strong> instead of <strong>{{ indPick.payCta }}</strong> until you finish payment setup.</div></sc-if>
+                    <button onClick="{{ doPublish }}" disabled="{{ publishBlocked }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 6px 0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer">{{ publishLabel }}<span style="width:44px;height:44px;border-radius:22px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="18"></bh-icon></span></button>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isPublished }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px">
+                <div style="background:#D6F26B;border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:12px">
+                  <span style="width:60px;height:60px;border-radius:30px;background:#141414;color:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-icon name="check" size="28" stroke="2.6"></bh-icon></span>
+                  <div style="font-size:30px;font-weight:700;letter-spacing:-.03em">{{ loc.name }} is live</div>
+                  <div style="font-size:14px;line-height:1.6">Published to <strong style="word-break:break-all">{{ liveAddr }}</strong>. {{ publishNote }}</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto"><a href="BranchHarbor App.dc.html" style="display:flex;align-items:center;gap:8px;height:50px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;font-size:14px;font-weight:700;text-decoration:none">Open dashboard<span style="width:38px;height:38px;border-radius:19px;background:#fff;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="16"></bh-icon></span></a><a href="BranchHarbor Customer Flows.dc.html" style="display:flex;align-items:center;height:50px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;font-size:14px;font-weight:700;text-decoration:none">See customer view</a></div>
+                </div>
+                <div style="background:#F8F7F3;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:15px;font-weight:700">Still on your list</div>
+                  <sc-for list="{{ remaining }}" as="r" hint-placeholder-count="2">
+                    <button onClick="{{ r.go }}" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;border:none;background:#fff;cursor:pointer;text-align:left;color:#141414;font-size:14px;font-weight:600"><bh-icon name="{{ r.icon }}" size="16"></bh-icon><span style="flex:1">{{ r.label }}</span><bh-icon name="chevron-right" size="16"></bh-icon></button>
+                  </sc-for>
+                  <sc-if value="{{ nothingLeft }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:#5D5D58">Nothing left. Setup is complete.</div></sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </sc-if>
+
+          <div role="alert" style="font-size:13px;font-weight:600;color:#B3261E">{{ stepErr }}</div>
+          <sc-if value="{{ showFooter }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:1px solid #EEEDE8;padding-top:20px">
+              <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" style="display:flex;align-items:center;gap:8px;height:50px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:700;cursor:pointer"><bh-icon name="arrow-left" size="16"></bh-icon>Back</button></sc-if>
+              <span style="margin-left:auto"></span>
+              <sc-if value="{{ cur.optional }}" hint-placeholder-val="{{ false }}"><button onClick="{{ skip }}" style="height:50px;padding:0 20px;border-radius:999px;border:none;background:transparent;color:#5D5D58;font-size:14px;font-weight:700;cursor:pointer">Skip for now</button></sc-if>
+              <button onClick="{{ next }}" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">Save and continue<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="17"></bh-icon></span></button>
+            </div>
+          </sc-if>
+        </div>
+      </main>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE' };
+const STEPS = [
+  { key: 'account', label: 'Account', icon: 'user', title: 'Create account', desc: '' },
+  { key: 'industry', label: 'Industry & type', icon: 'grid', title: 'What kind of business is this?', desc: 'We use this to set up the right workflows. You can add industries later.' },
+  { key: 'business', label: 'Business details', icon: 'building', title: 'Business details', desc: 'These become the defaults for new locations.' },
+  { key: 'location', label: 'First location', icon: 'pin', title: 'Add your first location', desc: 'Choose what this location inherits from headquarters and what it can change.' },
+  { key: 'website', label: 'Website', icon: 'globe', title: 'Choose your website', desc: 'Launch a hosted site or keep your WordPress site. Both use the same records.' },
+  { key: 'data', label: 'Industry data', icon: 'list', title: '', desc: '' },
+  { key: 'connect', label: 'Connections', icon: 'plug', title: 'Connect your systems', desc: 'Decide where official records live. Nothing is copied until you confirm.', optional: true },
+  { key: 'team', label: 'Invite team', icon: 'users', title: 'Invite your team', desc: 'Give each person a role and the locations they work at.', optional: true },
+  { key: 'publish', label: 'Preview & publish', icon: 'eye', title: 'Preview and publish', desc: 'Check what customers will see, then publish.' },
+];
+const IND = {
+  studios: { name: 'Studios', icon: 'lotus', pastel: P.lilac, img: 'yogaStudio', avail: 'Pilot', self: true, itemTitle: 'Add your class types', itemSingular: 'class type', itemPh: 'e.g. Hot Vinyasa · 60 min', items: [['Morning Vinyasa', '60 min · 20 spots'], ['Slow Flow', '75 min · 16 spots']], payCta: 'Book', connIcon: 'calendar', connTitle: 'Booking system',
+    conns: [['keep', 'Keep my current booking system', 'Connect through a supported adapter. It stays the official record for bookings.', 'Requires setup', P.butter], ['bh', 'BranchHarbor bookings', 'Native classes, packs and memberships.', 'Later', '#F3F2EE', true], ['none', 'No online booking yet', 'Customers send an enquiry from each class.', 'Available', P.lime]] },
+  sports: { name: 'Sports', icon: 'trophy', pastel: P.lime, img: 'sportKids', avail: 'Planned', self: false, itemTitle: 'Add your programmes', itemSingular: 'programme', itemPh: 'e.g. U10 Saturday Skills · Autumn', items: [['U8 Fundamentals', 'Autumn · ages 6–8'], ['U12 Development', 'Autumn · ages 10–12']], payCta: 'Register', connIcon: 'file', connTitle: 'Registration system',
+    conns: [['bh', 'BranchHarbor registrations', 'Programmes, forms and rosters in BranchHarbor.', 'Available', P.lime], ['keep', 'Keep my current registration tool', 'Selected adapters only.', 'Planned', '#F3F2EE', true]] },
+  wellness: { name: 'Wellness', icon: 'leaf', pastel: P.sage, img: 'spaMassage', avail: 'Planned', self: false, itemTitle: 'Add your services', itemSingular: 'service', itemPh: 'e.g. Deep tissue massage · 60 min', items: [['Relaxation massage', '60 min · $120'], ['Hydrating facial', '45 min · $95']], payCta: 'Book', connIcon: 'calendar', connTitle: 'Appointment system',
+    conns: [['bh', 'BranchHarbor appointments', 'Practitioner and room calendars in BranchHarbor.', 'Available', P.lime], ['keep', 'Keep my current scheduler', 'Selected adapters only.', 'Planned', '#F3F2EE', true]] },
+  commerce: { name: 'Commerce', icon: 'bag', pastel: P.butter, img: 'shopInterior', avail: 'Planned', self: false, itemTitle: 'Add your products', itemSingular: 'product', itemPh: 'e.g. Linen overshirt · 3 sizes', items: [['Waxed canvas tote', '2 colours'], ['Field notebook set', 'Pack of 3']], payCta: 'Buy', connIcon: 'cart', connTitle: 'Store and checkout',
+    conns: [['woo', 'WooCommerce', 'Keep your WooCommerce checkout. It stays the official record for orders.', 'Tested', P.lime], ['bh', 'BranchHarbor storefront', 'Native checkout and inventory.', 'Later', '#F3F2EE', true]] },
+  foods: { name: 'Foods', icon: 'utensils', pastel: P.blush, img: 'foodChef', avail: 'Planned next', self: false, itemTitle: 'Add menu items', itemSingular: 'menu item', itemPh: 'e.g. Ember chicken bowl · $16', items: [['Ember chicken bowl', '$16.00'], ['Smoked brisket sandwich', '$15.00']], payCta: 'Order', connIcon: 'utensils', connTitle: 'Ordering',
+    conns: [['bh', 'BranchHarbor pickup ordering', 'Menus, pickup slots and kitchen view.', 'Available', P.lime], ['pos', 'Point-of-sale connection', 'Send orders to your POS.', 'Later', '#F3F2EE', true]] },
+};
+const OVR = [['hours', 'Opening hours'], ['prices', 'Local prices'], ['offers', 'Local offers'], ['images', 'Hero images'], ['staff', 'Staff bios']];
+const SHARED = ['Logo, colours and fonts', 'Header navigation', 'Legal and policy pages', 'Brand class descriptions'];
+const pad = n => String(n).padStart(2, '0');
+const emailOk = v => /^\S+@\S+\.\S+$/.test(v || '');
+const hostOk = v => /^([a-z0-9-]+\.)+[a-z]{2,}$/i.test((v || '').trim());
+const slug = v => (v || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+class Component extends DCLogic {
+  state = {
+    phase: 'auth', authMode: 'create', acc: { name: 'Jamie Morgan', email: 'jamie@stillwater-sample.com', pw: '' }, authErr: '', code: '', codeErr: '',
+    step: 1, done: { account: true }, skipped: {}, savedAt: new Date(), stepErr: '',
+    ind: 'studios', btype: 'network',
+    biz: { name: 'Stillwater Yoga Collective', country: 'Canada', tz: 'Eastern time (Toronto)', currency: 'CAD' },
+    loc: { name: 'Toronto – Queen West', code: 'TOR-QW', owner: 'Company-owned', address: '812 Queen St W, Toronto, ON', tz: 'Eastern time (Toronto)', currency: 'CAD', phone: '(416) 555-0142', hours: 'Mon–Fri 6am–9pm · Sat–Sun 8am–6pm', template: 'Studio location · v15' },
+    ovr: { hours: true, prices: true, offers: true, images: false, staff: true },
+    importOpen: false, importFix: '', imported: false,
+    site: 'hosted', addr: 'included', domHost: '', domErr: '', dom: 'enter', domTries: 0, domPrimary: false, copied: '',
+    items: null, newItem: '',
+    conn: '', pay: 'not',
+    invites: [{ email: 'maya@stillwater-sample.com', role: 'Location manager' }], newInvite: '', inviteErr: '',
+    published: false,
+  };
+  componentWillUnmount() { (this.t || []).forEach(clearTimeout); }
+  later(fn, ms) { (this.t = this.t || []).push(setTimeout(fn, ms)); }
+  save(p) { this.setState({ ...p, savedAt: new Date() }); }
+  setIn(k, f) { return e => { const v = e.target.value; this.save({ [k]: { ...this.state[k], [f]: v } }); }; }
+  items() { return this.state.items || IND[this.state.ind].items.map(([name, meta]) => ({ name, meta })); }
+  go(i) { this.setState({ step: i, stepErr: '' }); window.scrollTo(0, 0); }
+  validate(key) {
+    const s = this.state;
+    if (key === 'business' && !s.biz.name.trim()) return 'Enter your business name.';
+    if (key === 'location' && (!s.loc.name.trim() || !s.loc.address.trim())) return 'Enter a location name and address.';
+    if (key === 'data' && !this.items().length) return `Add at least one ${IND[s.ind].itemSingular}.`;
+    return '';
+  }
+  next() {
+    const s = this.state, key = STEPS[s.step].key, err = this.validate(key);
+    if (err) { this.setState({ stepErr: err }); return; }
+    const skipped = { ...s.skipped }; delete skipped[key];
+    this.save({ done: { ...s.done, [key]: true }, skipped, stepErr: '' });
+    this.go(Math.min(8, s.step + 1));
+  }
+  skip() { const s = this.state, key = STEPS[s.step].key; this.save({ skipped: { ...s.skipped, [key]: true } }); this.go(Math.min(8, s.step + 1)); }
+  domCheck() {
+    this.setState({ dom: 'checking', domLabel: 'Verifying ownership…' });
+    const tries = this.state.domTries + 1;
+    if (tries === 1) { this.later(() => this.setState({ dom: 'failed', domTries: tries }), 1500); return; }
+    this.later(() => this.setState({ domLabel: 'Certificate pending · issuing security certificate…', domPhase: 'cert' }), 1100);
+    this.later(() => this.save({ dom: 'ready', domTries: tries, domPhase: '' }), 2400);
+  }
+  copy(k, v) { try { navigator.clipboard && navigator.clipboard.writeText(v); } catch (e) {} this.setState({ copied: k }); this.later(() => this.setState({ copied: '' }), 1500); }
+
+  renderVals() {
+    const s = this.state, I = IND[s.ind], img = window.BH_IMG || {};
+    const step = STEPS[s.step];
+    const items = this.items();
+    const included = `https://sites.branchharbor.com/${slug(s.biz.name) || 'your-business'}/${slug(s.loc.name) || 'your-location'}`;
+    const customLive = s.addr === 'domain' && s.dom === 'ready' && s.domPrimary;
+    const liveAddr = customLive ? `https://${s.domHost.trim()}` : included;
+    const payOn = s.pay === 'enabled';
+    const doneN = STEPS.filter(x => s.done[x.key]).length;
+    const sec = Math.round((Date.now() - s.savedAt) / 1000);
+
+    const stIdx = { enter: 0, dns: 0, checking: 1, failed: 1, ready: 3 }[s.dom];
+    const domStepDefs = [['Awaiting DNS', 'clock'], ['Verifying', 'refresh'], ['Certificate pending', 'shield'], ['Ready', 'check-circle']];
+    const domSteps = domStepDefs.map(([label, icon], i) => {
+      const failedHere = s.dom === 'failed' && i === 1;
+      const active = s.dom === 'checking' ? (s.domPhase === 'cert' ? i === 2 : i === 1) : i === stIdx;
+      const passed = s.dom === 'ready' ? true : (s.dom === 'checking' && s.domPhase === 'cert' ? i < 2 : i < stIdx);
+      return { label: failedHere ? 'Failed' : label, icon: failedHere ? 'alert' : passed ? 'check' : icon,
+        bg: failedHere ? P.blush : active ? '#141414' : passed ? '#D6F26B' : '#F3F2EE', fg: active && !failedHere ? '#fff' : '#141414' };
+    });
+
+    const conn = s.conn || '';
+    const readiness = [
+      { label: 'Location details', ok: !!s.done.location, note: s.done.location ? `${s.loc.name} · ${s.loc.tz}` : 'Not saved yet', go: 3 },
+      { label: 'Website address', ok: !!s.done.website, note: s.site === 'wp' ? 'Connected through WordPress' : liveAddr, go: 4 },
+      { label: I.itemTitle.replace('Add your ', '').replace('Add ', ''), ok: items.length > 0, note: `${items.length} added`, go: 5 },
+      { label: 'Customer payments', ok: payOn, warn: !payOn, note: payOn ? 'Enabled for this location' : s.pay === 'pending' ? 'Waiting for account verification' : 'Not set up', go: 6, fixLabel: 'Set up' },
+      { label: 'Test booking', ok: !!s.tested, warn: !s.tested, note: s.tested ? 'Test completed, then cancelled automatically' : 'Run a test from the preview to check the flow', test: true, fixLabel: 'Run test' },
+    ].map(r => ({ ...r, icon: r.ok ? 'check-circle' : r.warn ? 'alert' : 'x', bg: r.ok ? '#F1F8E0' : r.warn ? '#FFF7DC' : '#FDECEC', fg: r.ok ? '#2F6B3A' : r.warn ? '#8A5A00' : '#9E1B12',
+      fixable: !r.ok, fix: r.test ? () => { this.setState({ testing: true }); this.later(() => this.save({ tested: true, testing: false }), 900); } : () => this.go(r.go) }));
+    const hardBlock = !s.done.location || !s.done.website || !items.length || (!I.self);
+
+    return {
+      img: { auth: img.yogaRoom || img.yogaStudio, site: img[I.img] },
+      isAuth: s.phase === 'auth', isSetup: s.phase === 'setup',
+      authForm: !s.verifying, authVerify: !!s.verifying, isCreate: s.authMode === 'create',
+      authTabs: [['create', 'Create account'], ['signin', 'Sign in']].map(([k, label]) => ({ label, bg: s.authMode === k ? '#fff' : 'transparent', pick: () => this.setState({ authMode: k, authErr: '' }) })),
+      authTitle: s.authMode === 'create' ? 'Set up BranchHarbor' : 'Welcome back', authCta: s.authMode === 'create' ? 'Create account' : 'Sign in',
+      acc: s.acc, authErr: s.authErr, code: s.code, codeErr: s.codeErr,
+      on: {
+        accName: this.setIn('acc', 'name'), accEmail: this.setIn('acc', 'email'), accPw: this.setIn('acc', 'pw'),
+        code: e => this.setState({ code: e.target.value.replace(/\D/g, '').slice(0, 6), codeErr: '' }),
+        bizName: this.setIn('biz', 'name'), bizCountry: this.setIn('biz', 'country'), bizTz: this.setIn('biz', 'tz'), bizCurrency: this.setIn('biz', 'currency'),
+        locName: this.setIn('loc', 'name'), locCode: this.setIn('loc', 'code'), locOwner: this.setIn('loc', 'owner'), locAddress: this.setIn('loc', 'address'), locTz: this.setIn('loc', 'tz'), locCurrency: this.setIn('loc', 'currency'), locPhone: this.setIn('loc', 'phone'), locHours: this.setIn('loc', 'hours'), locTemplate: this.setIn('loc', 'template'),
+        domHost: e => this.setState({ domHost: e.target.value, domErr: '' }), newItem: e => this.setState({ newItem: e.target.value }), newInvite: e => this.setState({ newInvite: e.target.value, inviteErr: '' }),
+      },
+      authSubmit: () => {
+        const a = s.acc;
+        if ((s.authMode === 'create' && !a.name.trim()) || !emailOk(a.email)) { this.setState({ authErr: 'Enter your name and a valid work email.' }); return; }
+        if ((a.pw || '').length < 10) { this.setState({ authErr: 'Password must be at least 10 characters.' }); return; }
+        if (s.authMode === 'signin') { this.setState({ phase: 'setup', step: 4, done: { account: true, industry: true, business: true, location: true } }); return; }
+        this.setState({ verifying: true, authErr: '' });
+      },
+      verify: () => { if (s.code !== '482915') { this.setState({ codeErr: 'That code doesn\u2019t match. Check the email or resend the code.' }); return; } this.save({ phase: 'setup', verifying: false, step: 1 }); },
+      fillCode: () => this.setState({ code: '', codeErr: '', resent: true }), backToAuth: () => this.setState({ verifying: false }),
+
+      progressPct: `${Math.round(doneN / 9 * 100)}%`, progressLabel: `${doneN} of 9 done`, savedLabel: sec < 5 ? 'Saved just now' : `Saved ${sec}s ago`,
+      checklist: STEPS.map((x, i) => {
+        const on = s.step === i, d = s.done[x.key], sk = s.skipped[x.key];
+        const block = x.key === 'connect' && !payOn && d;
+        return { label: x.label, icon: d ? 'check' : x.icon, w: on ? 800 : 600, bg: on ? '#F3F2EE' : 'transparent',
+          dotBg: d ? '#141414' : on ? '#D6F26B' : '#F3F2EE', dotFg: d ? '#D6F26B' : '#141414',
+          status: block ? 'Payments not enabled' : d ? 'Done' : sk ? 'Skipped' : on ? 'In progress' : x.optional ? 'Optional' : 'To do',
+          stColor: block ? '#8A5A00' : d ? '#2F6B3A' : '#5D5D58', go: () => i === 0 ? null : this.go(i) };
+      }),
+      cur: { n: s.step + 1, icon: step.icon, pastel: I.pastel, optional: !!step.optional, opt: step.optional ? ' · optional' : '',
+        title: step.key === 'data' ? I.itemTitle : step.title, desc: step.key === 'data' ? 'Start with a couple. You can import the rest later.' : step.desc },
+      s: { industry: step.key === 'industry', business: step.key === 'business', location: step.key === 'location', website: step.key === 'website', data: step.key === 'data', connect: step.key === 'connect', team: step.key === 'team', publish: step.key === 'publish' },
+      indCards: Object.entries(IND).map(([k, v]) => ({ name: v.name, icon: v.icon, pastel: v.pastel, avail: v.avail, img: img[v.img], on: s.ind === k, bd: s.ind === k ? '#141414' : 'transparent', pick: () => this.save({ ind: k, items: null, conn: '' }) })),
+      indPick: I, indNotSelf: !I.self, isNetwork: s.btype === 'network',
+      btypes: [['single', 'Independent business', 'One location. Network settings stay out of the way until you add another.', 'store'], ['network', 'Network or franchise', 'Several locations, with headquarters controls and local permissions.', 'building']].map(([k, name, desc, icon]) => ({ name, desc, icon, on: s.btype === k, bd: s.btype === k ? '#141414' : '#EEEDE8', bg: s.btype === k ? '#F3F2EE' : '#fff', pick: () => this.save({ btype: k }) })),
+      biz: s.biz, loc: s.loc,
+      overrideToggles: OVR.map(([k, label]) => { const on = !!s.ovr[k]; return { label, on, bd: on ? '#141414' : '#EEEDE8', bg: on ? '#F8F7F3' : '#fff', track: on ? '#141414' : '#D8D6CF', knob: on ? '19px' : '3px', toggle: () => this.save({ ovr: { ...s.ovr, [k]: !on } }) }; }),
+      sharedList: [...SHARED, ...OVR.filter(([k]) => !s.ovr[k]).map(([, l]) => l)], localList: OVR.filter(([k]) => s.ovr[k]).map(([, l]) => l),
+      importOpen: s.importOpen, importCta: s.imported ? '3 locations added' : s.importOpen ? 'Hide' : 'Upload CSV', toggleImport: () => !s.imported && this.setState({ importOpen: !s.importOpen }),
+      importRows: [['Toronto – Leslieville', 'Eastern time (Toronto)'], ['Vancouver – Kitsilano', 'Pacific time (Vancouver)'], ['Ottawa – Glebe', ''], ['Calgary – Kensington', 'Mountain time']].slice(0, 3).map(([name, tz], i) => {
+        const val = tz || s.importFix; const bad = !val; return { n: i + 2, name, tzLabel: val || '—', bad, good: !bad, bg: bad ? '#FDECEC' : '#F8F7F3', fix: e => this.setState({ importFix: e.target.value }) };
+      }),
+      importBlocked: !s.importFix, importBtn: s.importFix ? 'Add 3 locations' : 'Fix 1 row to continue', doImport: () => this.save({ imported: true, importOpen: false }),
+
+      siteOpts: [['hosted', 'BranchHarbor site', 'We host your website and dashboard. Start with an included address or connect your domain.', 'globe', P.aqua], ['wp', 'Keep my WordPress site', 'Add BranchHarbor blocks, forms and schedules. Your hosting stays the same.', 'wordpress', P.butter]].map(([k, name, desc, icon, pastel]) => ({ name, desc, icon, pastel, on: s.site === k, bd: s.site === k ? '#141414' : 'transparent', pick: () => this.save({ site: k }) })),
+      siteWp: s.site === 'wp', siteHosted: s.site === 'hosted',
+      addrOpts: [['included', 'Use included address', 'link'], ['domain', 'Connect my domain', 'globe'], ['buy', 'Buy a domain', 'cart']].map(([k, label, icon]) => ({ label, icon, disabled: k === 'buy', on: s.addr === k, bd: s.addr === k ? '#141414' : '#D8D6CF', bg: s.addr === k ? '#141414' : '#fff', fg: s.addr === k ? '#fff' : '#141414', pick: () => this.save({ addr: k }) })),
+      addrIncluded: s.addr === 'included', addrDomain: s.addr === 'domain', includedAddr: included, includedAddrShort: included.replace('https://', ''),
+      domSteps, dom: { enter: s.dom === 'enter', dns: s.dom === 'dns', checking: s.dom === 'checking', failed: s.dom === 'failed', ready: s.dom === 'ready' },
+      domHost: s.domHost, domErr: s.domErr, domBd: s.domErr ? '#B3261E' : '#D8D6CF', domCheckingLabel: s.domLabel || 'Verifying…',
+      domStart: () => { if (!hostOk(s.domHost)) { this.setState({ domErr: 'Enter a domain like www.yourbusiness.com, without https://.' }); return; } this.save({ dom: 'dns', domHost: s.domHost.trim().toLowerCase() }); },
+      domCheck: () => this.domCheck(), domEdit: () => this.setState({ dom: 'enter', domTries: 0 }), domBackDns: () => this.setState({ dom: 'dns' }),
+      dnsRows: [['TXT', `_bh-verify.${(s.domHost || '').replace(/^www\./, '')}`, 'bh-verify=7f3a9c21e8'], ['CNAME', s.domHost || 'www', 'sites.branchharbor.com']].map(([type, name, value], i) => ({ type, name, value, copyLabel: s.copied === 'r' + i ? 'Copied' : 'Copy', copyIcon: s.copied === 'r' + i ? 'check' : 'copy', copy: () => this.copy('r' + i, value) })),
+      domReadyTitle: s.domPrimary ? 'Connected and primary' : 'Ready', domNotPrimary: !s.domPrimary, domIsPrimary: s.domPrimary, domPrimary: () => this.save({ domPrimary: true }),
+
+      items: items.map((it, i) => ({ ...it, remove: () => this.save({ items: items.filter((_, j) => j !== i) }) })), noItems: !items.length, newItem: s.newItem,
+      addItem: () => { const v = s.newItem.trim(); if (!v) return; this.save({ items: [...items, { name: v, meta: 'Draft' }], newItem: '', stepErr: '' }); },
+
+      connOpts: I.conns.map(([k, name, desc, tag, tagBg, disabled]) => ({ name, desc, tag, tagBg, disabled: !!disabled, on: conn === k, bd: conn === k ? '#141414' : '#EEEDE8', bg: conn === k ? '#F8F7F3' : '#fff', dot: conn === k ? '#141414' : 'transparent', pick: () => this.save({ conn: k }) })),
+      connPicked: !!conn, connNote: conn === 'keep' ? 'After setup, choose your provider from Connections. BranchHarbor shows its schedule and never changes bookings it doesn\u2019t own.' : conn === 'woo' ? 'Connect from the WordPress connector. BranchHarbor won\u2019t add a second checkout.' : conn === 'none' ? 'Each class shows an Enquire button that sends leads to this location.' : 'Records are created and kept in BranchHarbor.',
+      pay: s.pay === 'enabled' ? { label: 'Enabled', icon: 'check-circle', bg: '#D6F26B', desc: `Payments go to ${s.biz.name}'s connected account for ${s.loc.name}.`, canStart: false }
+        : s.pay === 'pending' ? { label: 'Verifying account', icon: 'clock', bg: P.butter, desc: 'The payment provider is reviewing your details. This prototype finishes in a moment.', canStart: false }
+        : { label: 'Not set up', icon: 'alert', bg: P.blush, desc: 'Connect a payment account for this location. Card details are handled by the provider, never stored by BranchHarbor.', canStart: true, cta: 'Connect payment account' },
+      payStart: () => { this.save({ pay: 'pending' }); this.later(() => this.save({ pay: 'enabled' }), 2200); },
+
+      invites: s.invites.map((iv, i) => ({ ...iv, init: iv.email.slice(0, 2).toUpperCase(), pastel: [P.blush, P.aqua, P.butter, P.lilac][i % 4], state: 'Invite will send when you finish setup',
+        setRole: e => { const v = e.target.value; this.save({ invites: s.invites.map((x, j) => j === i ? { ...x, role: v } : x) }); }, remove: () => this.save({ invites: s.invites.filter((_, j) => j !== i) }) })),
+      newInvite: s.newInvite, inviteErr: s.inviteErr,
+      addInvite: () => { if (!emailOk(s.newInvite)) { this.setState({ inviteErr: 'Enter a valid email address.' }); return; } this.save({ invites: [...s.invites, { email: s.newInvite.trim(), role: 'Instructor' }], newInvite: '' }); },
+
+      liveAddr, readiness, payBlocked: !payOn, ctaWord: payOn ? I.payCta : 'Enquire', previewItems: items.slice(0, 3),
+      publishBlocked: hardBlock || s.testing, publishLabel: !I.self ? `${I.name} needs a pilot agreement to publish` : hardBlock ? 'Finish required steps to publish' : payOn ? `Publish ${s.loc.name}` : 'Publish with enquiries only',
+      doPublish: () => { this.setState({ testing: true }); this.later(() => this.save({ published: true, testing: false, done: { ...this.state.done, publish: true } }), 1000); },
+      notPublished: !s.published, isPublished: s.published,
+      publishNote: payOn ? 'Customers can book and pay.' : 'Customers can send enquiries. Booking turns on when payments are enabled.',
+      remaining: [...(!payOn ? [{ label: 'Enable customer payments', icon: 'card', go: () => this.go(6) }] : []), ...(s.skipped.team || !s.done.team ? [{ label: 'Invite your team', icon: 'users', go: () => this.go(7) }] : []), ...(s.addr !== 'domain' ? [{ label: 'Connect your own domain', icon: 'globe', go: () => { this.save({ addr: 'domain' }); this.go(4); } }] : [])],
+      nothingLeft: payOn && s.done.team && s.addr === 'domain',
+
+      stepErr: s.stepErr, showFooter: step.key !== 'publish', canBack: s.step > 1,
+      back: () => this.go(Math.max(1, s.step - 1)), next: () => this.next(), skip: () => this.skip(),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

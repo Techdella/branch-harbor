@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="hub"></bh-topbar>
+
+<div style="background:#141414;color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 16px;position:sticky;top:0;z-index:50">
+  <div style="font-size:12px;font-weight:600;color:#9C9C96;margin-right:8px">Prototype scenarios</div>
+  <sc-for list="{{ scenarios }}" as="s" hint-placeholder-count="5">
+    <button onClick="{{ s.go }}" style="display:flex;gap:8px;align-items:center;height:36px;padding:0 14px;border-radius:999px;border:1px solid #333;background:{{ s.bg }};color:{{ s.fg }};font-size:13px;font-weight:600;cursor:pointer"><span style="opacity:.55">{{ s.num }}</span><span>{{ s.label }}</span></button>
+  </sc-for>
+  <span style="margin-left:auto;font-size:12px;color:#9C9C96">Sample data · drop your own photos into any image slot</span>
+</div>
+
+<!-- ============ 1 · WEBSITE ============ -->
+<sc-if value="{{ isWeb }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1320px;margin:0 auto;padding:16px">
+    <div style="background:#fff;border-radius:32px;overflow:hidden">
+      <header style="display:flex;align-items:center;gap:24px;padding:20px 28px">
+        <button onClick="{{ goHome }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;color:#141414;flex-shrink:0">
+          <span style="width:36px;height:36px;border-radius:12px;background:#141414;display:flex;align-items:center;justify-content:center"><span style="width:12px;height:12px;border-radius:6px;background:#D6F26B"></span></span>
+          <span style="font-size:19px;font-weight:800;letter-spacing:-.02em">BranchHarbor</span>
+        </button>
+        <nav style="margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;padding:4px;border-radius:24px;background:#F3F2EE;min-width:0;white-space:nowrap">
+          <span style="padding:8px 12px;border-radius:999px;background:#fff;font-size:14px;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.06)">Industries</span>
+          <span style="padding:8px 12px;font-size:14px;font-weight:500;color:#5D5D58">For franchises</span>
+          <span style="padding:8px 12px;font-size:14px;font-weight:500;color:#5D5D58">Integrations</span>
+          <span style="padding:8px 12px;font-size:14px;font-weight:500;color:#5D5D58">Pricing</span>
+        </nav>
+        <div style="display:flex;gap:16px;align-items:center;flex-shrink:0;white-space:nowrap">
+          <span style="font-size:14px;font-weight:600">Sign in</span>
+          <button onClick="{{ openDemo }}" style="display:flex;align-items:center;gap:10px;height:46px;padding:0 6px 0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer">Request a demo<span style="width:34px;height:34px;border-radius:17px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center;font-size:16px">↗</span></button>
+        </div>
+      </header>
+
+      <sc-if value="{{ webHome }}" hint-placeholder-val="{{ true }}">
+        <section style="padding:40px 28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+          <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;border:1px solid #E4E2DC;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:4px;background:#8B6BC8"></span>Now piloting with studio networks</span>
+          <h1 style="margin:0;font-size:clamp(44px,6.4vw,84px);line-height:1.02;font-weight:700;letter-spacing:-.045em;max-width:980px;text-wrap:balance">One home for <span style="color:#5E7D68">every location.</span></h1>
+          <p style="margin:0;font-size:18px;line-height:1.6;color:#5D5D58;max-width:620px;text-wrap:pretty">Connect your websites, customer activity and industry workflows. Give headquarters visibility and local teams the control they need.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+            <button onClick="{{ scrollIndustries }}" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">Explore your industry<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center">↓</span></button>
+            <button onClick="{{ scrollHow }}" style="height:52px;padding:0 24px;border-radius:999px;background:#fff;color:#141414;border:1.5px solid #141414;font-size:15px;font-weight:600;cursor:pointer">See how it works</button>
+          </div>
+        </section>
+
+        <section style="padding:24px 28px 56px">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.1fr);gap:16px">
+            <div style="position:relative;min-height:440px;border-radius:28px;overflow:hidden;background:#E9DDF8">
+              <image-slot id="v2-hero-photo" shape="rect" placeholder="Studio photo — instructor or class"></image-slot>
+              <div style="position:absolute;left:14px;right:14px;bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.82);backdrop-filter:blur(10px);pointer-events:none">
+                <div style="text-align:left"><div style="font-size:15px;font-weight:700">Toronto – Queen West</div><div style="font-size:12px;color:#5D5D58">Studio · 9 classes today</div></div>
+                <span style="width:32px;height:32px;border-radius:16px;background:#141414;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">↗</span>
+              </div>
+            </div>
+            <div style="border-radius:28px;background:#5E7D68;padding:18px">
+              <div style="background:#fff;border-radius:20px;overflow:hidden;height:100%">
+                <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #EEEDE8">
+                  <span style="font-size:16px;font-weight:700">Overview</span>
+                  <span style="font-size:13px;color:#5D5D58">All authorised locations</span>
+                  <span style="margin-left:auto;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#F3F2EE;color:#5D5D58">SAMPLE DATA</span>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)">
+                  <div style="padding:10px;display:flex;flex-direction:column;gap:2px">
+                    <sc-for list="{{ previewRows }}" as="r" hint-placeholder-count="6">
+                      <button onClick="{{ r.pick }}" style="display:flex;width:100%;text-align:left;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:none;background:{{ r.bg }};cursor:pointer;color:#141414">
+                        <span style="width:30px;height:30px;border-radius:10px;background:{{ r.dot }};flex-shrink:0"></span>
+                        <span style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1"><span style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="font-size:12px;color:{{ r.syncColor }}">{{ r.sync }}</span></span>
+                        <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums">{{ r.enq }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                  <div style="padding:18px;background:#FAFAF7;border-left:1px solid #EEEDE8;display:flex;flex-direction:column;gap:12px">
+                    <div style="text-align:left"><div style="font-size:12px;color:#5D5D58">{{ previewLoc.region }}</div><div style="font-size:17px;font-weight:700;letter-spacing:-.01em">{{ previewLoc.name }}</div></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                      <div style="background:#E2F5A6;border-radius:16px;padding:12px;text-align:left"><div style="font-size:11px;font-weight:600">Enquiries · 7 days</div><div style="font-size:28px;font-weight:700;font-variant-numeric:tabular-nums">{{ previewLoc.enq }}</div></div>
+                      <div style="background:#E9DDF8;border-radius:16px;padding:12px;text-align:left"><div style="font-size:11px;font-weight:600">Classes today</div><div style="font-size:28px;font-weight:700;font-variant-numeric:tabular-nums">{{ previewLoc.classes }}</div></div>
+                    </div>
+                    <div style="background:#fff;border:1px solid #EEEDE8;border-radius:16px;padding:12px;text-align:left"><div style="font-size:11px;font-weight:600;color:#5D5D58">Occupancy · this week</div><div style="font-size:22px;font-weight:700">{{ previewLoc.occ }}</div></div>
+                    <div style="font-size:12px;font-weight:600;color:{{ previewLoc.syncColor }};text-align:left">{{ previewLoc.syncIcon }} {{ previewLoc.sync }}</div>
+                    <div style="font-size:11px;color:#5D5D58;text-align:left">Enquiries: website forms. Classes: booking connection.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="bh2-industries" style="padding:24px 28px 56px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+            <div style="background:#5E7D68;color:#fff;border-radius:28px;padding:28px;min-height:360px;display:flex;flex-direction:column;justify-content:space-between">
+              <h2 style="margin:0;font-size:34px;line-height:1.08;font-weight:600;letter-spacing:-.03em">Choose your industry</h2>
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#E6EEE7">One shared platform, shaped around how your business works. Studios is in pilot; the rest are on the roadmap.</p>
+            </div>
+            <sc-for list="{{ industries }}" as="ind" hint-placeholder-count="5">
+              <div style="position:relative;border-radius:28px;overflow:hidden;min-height:360px;background:{{ ind.pastel }}">
+                <image-slot id="{{ ind.slot }}" shape="rect" placeholder="{{ ind.ph }}"></image-slot>
+                <span style="position:absolute;top:14px;left:14px;padding:5px 10px;border-radius:999px;background:#141414;color:#fff;font-size:11px;font-weight:700;pointer-events:none">{{ ind.avail }}</span>
+                <div style="position:absolute;left:12px;right:12px;bottom:12px;padding:14px;border-radius:20px;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:18px;font-weight:700;letter-spacing:-.01em">{{ ind.name }}</span><button onClick="{{ ind.demo }}" aria-label="{{ ind.cta }}" style="width:34px;height:34px;border-radius:17px;border:none;background:#141414;color:#fff;font-size:14px;cursor:pointer;flex-shrink:0">↗</button></div>
+                  <div style="font-size:12px;line-height:1.5;color:#3E3E3A">{{ ind.who }}</div>
+                  <div style="font-size:12px;font-weight:600">{{ ind.flow }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="padding:24px 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:14px">
+          <div style="background:#141414;color:#fff;border-radius:28px;padding:36px;display:flex;flex-direction:column;gap:14px">
+            <span style="align-self:flex-start;padding:5px 12px;border-radius:999px;background:#D6F26B;color:#141414;font-size:12px;font-weight:700">Headquarters</span>
+            <h3 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em">Shared controls</h3>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#C9C9C3">Lock brand content, publish templates to chosen locations and see network reports. Customer details stay with the location unless your policy allows sharing.</p>
+          </div>
+          <div style="background:#E9DDF8;border-radius:28px;padding:36px;display:flex;flex-direction:column;gap:14px">
+            <span style="align-self:flex-start;padding:5px 12px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">Locations</span>
+            <h3 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em">Local autonomy</h3>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#3E3E3A">Update hours, prices and local offers where headquarters allows it. Every field shows whether it is shared, local or needs approval.</p>
+          </div>
+        </section>
+
+        <section id="bh2-how" style="padding:56px 28px;background:#F8F7F3">
+          <h2 style="margin:0 0 8px;text-align:center;font-size:clamp(32px,4vw,48px);font-weight:700;letter-spacing:-.035em">Get started in three steps</h2>
+          <p style="margin:0 auto 36px;text-align:center;font-size:16px;color:#5D5D58;max-width:520px">Start with one location and add the rest when you're ready.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+            <div style="background:#fff;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:10px"><span style="width:44px;height:44px;border-radius:14px;background:#F7EDA8;display:flex;align-items:center;justify-content:center;font-weight:800">1</span><div style="font-size:20px;font-weight:700;letter-spacing:-.01em">Choose your industry</div><div style="font-size:14px;line-height:1.6;color:#5D5D58">Start with workflows built for studios, sports, wellness, retail or food.</div></div>
+            <div style="background:#fff;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:10px"><span style="width:44px;height:44px;border-radius:14px;background:#CDEEEE;display:flex;align-items:center;justify-content:center;font-weight:800">2</span><div style="font-size:20px;font-weight:700;letter-spacing:-.01em">Connect or launch</div><div style="font-size:14px;line-height:1.6;color:#5D5D58">Launch a hosted site, or keep your WordPress site and connect supported tools.</div></div>
+            <div style="background:#fff;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:10px"><span style="width:44px;height:44px;border-radius:14px;background:#F8D6D8;display:flex;align-items:center;justify-content:center;font-weight:800">3</span><div style="font-size:20px;font-weight:700;letter-spacing:-.01em">Coordinate locations</div><div style="font-size:14px;line-height:1.6;color:#5D5D58">Share what should be consistent and let each team manage the rest.</div></div>
+          </div>
+        </section>
+
+        <section style="padding:56px 28px">
+          <h2 style="margin:0 0 28px;font-size:clamp(32px,4vw,48px);font-weight:700;letter-spacing:-.035em;max-width:620px">What's included</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+            <sc-for list="{{ capabilities }}" as="c" hint-placeholder-count="6">
+              <div style="border:1px solid #EEEDE8;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="width:40px;height:40px;border-radius:12px;background:{{ c.pastel }}"></span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ c.tagBg }};color:{{ c.tagFg }}">{{ c.tag }}</span></div>
+                <div style="font-size:18px;font-weight:700;letter-spacing:-.01em">{{ c.name }}</div>
+                <div style="font-size:14px;line-height:1.55;color:#5D5D58">{{ c.desc }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="padding:0 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:14px">
+          <div style="background:#CDEEEE;border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:10px">
+            <h3 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em">Start with a BranchHarbor site</h3>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#2E3A3A">We host your website and dashboard. Use an included address or connect your own domain when you're ready.</p>
+            <span style="align-self:flex-start;margin-top:6px;padding:6px 12px;border-radius:999px;background:#fff;font-size:13px;font-weight:600">Best for new or rebuilt websites</span>
+          </div>
+          <div style="background:#F7EDA8;border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:10px">
+            <h3 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em">Keep your WordPress site</h3>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#3D3A20">Add BranchHarbor forms, schedules and connections to the site you already have. Your hosting stays the same.</p>
+            <span style="align-self:flex-start;margin-top:6px;padding:6px 12px;border-radius:999px;background:#fff;font-size:13px;font-weight:600">Check supported connections first</span>
+          </div>
+        </section>
+
+        <section style="padding:0 28px 28px">
+          <div style="background:#D6F26B;border-radius:28px;padding:56px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+            <h2 style="margin:0;font-size:clamp(30px,4vw,48px);font-weight:700;letter-spacing:-.035em;max-width:700px">See BranchHarbor with your workflow</h2>
+            <p style="margin:0;font-size:16px;color:#2E3A12;max-width:520px">Tell us about your locations and we'll walk you through the relevant setup.</p>
+            <button onClick="{{ openDemo }}" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">Request a demo<span style="width:40px;height:40px;border-radius:20px;background:#fff;color:#141414;display:flex;align-items:center;justify-content:center">↗</span></button>
+          </div>
+        </section>
+        <footer style="padding:28px;display:flex;flex-wrap:wrap;gap:16px 40px;font-size:14px;color:#5D5D58;border-top:1px solid #EEEDE8">
+          <span style="font-weight:800;color:#141414">BranchHarbor</span><span>Studios · Sports · Wellness · Commerce · Foods</span><span>Docs</span><span>Support</span><span>About</span><span style="margin-left:auto">Privacy · Terms · Security</span>
+        </footer>
+      </sc-if>
+
+      <sc-if value="{{ webDemo }}" hint-placeholder-val="{{ false }}">
+        <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));min-height:780px">
+          <div style="background:#F7EDA8;padding:40px;display:flex;flex-direction:column;gap:24px">
+            <button onClick="{{ goHome }}" style="align-self:flex-start;height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #141414;background:transparent;color:#141414;font-size:14px;font-weight:600;cursor:pointer">← Back</button>
+            <div style="position:relative;flex:1;min-height:280px;border-radius:24px;overflow:hidden">
+              <image-slot id="v2-demo-art" shape="rect" placeholder="Illustration or team photo"></image-slot>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:8px">What happens next</div>
+              <ol style="margin:0;padding-left:20px;font-size:15px;line-height:1.75;color:#3D3A20"><li>A product specialist reviews your answers.</li><li>We email you to arrange a time.</li><li>The demo uses your industry and location setup.</li></ol>
+            </div>
+          </div>
+          <div style="padding:48px clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center">
+            <sc-if value="{{ demoForm }}" hint-placeholder-val="{{ true }}">
+              <form onSubmit="{{ submitDemo }}" novalidate="novalidate" style="display:flex;flex-direction:column;gap:20px;max-width:560px;width:100%;margin:0 auto">
+                <div><h1 style="margin:0 0 6px;font-size:44px;font-weight:700;letter-spacing:-.04em">Request a demo</h1><p style="margin:0;font-size:16px;color:#5D5D58">We'll show you the workflow for your industry and how it fits the tools you already use.</p></div>
+                <sc-if value="{{ hasErrors }}" hint-placeholder-val="{{ false }}">
+                  <div role="alert" style="border-radius:18px;background:#FDE7E5;padding:14px 18px;font-size:14px;line-height:1.55;color:#8A1D16">
+                    <div style="font-weight:700;margin-bottom:2px">Please check {{ errorCount }} fields</div>
+                    <sc-for list="{{ errorList }}" as="e" hint-placeholder-count="2"><div>· {{ e }}</div></sc-for>
+                  </div>
+                </sc-if>
+                <div>
+                  <div style="font-size:14px;font-weight:600;margin-bottom:8px">Industry</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px">
+                    <sc-for list="{{ industryChips }}" as="ch" hint-placeholder-count="5">
+                      <button type="button" onClick="{{ ch.pick }}" aria-pressed="{{ ch.on }}" style="height:42px;padding:0 18px;border-radius:999px;border:1.5px solid {{ ch.bd }};background:{{ ch.bg }};color:{{ ch.fg }};font-size:14px;font-weight:600;cursor:pointer">{{ ch.name }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:600;margin-bottom:8px">Business type</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="2">
+                      <button type="button" onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="text-align:left;padding:14px 18px;border-radius:20px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};cursor:pointer;color:#141414"><div style="font-size:14px;font-weight:700">{{ o.name }}</div><div style="font-size:12px;color:#5D5D58;margin-top:2px">{{ o.desc }}</div></button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px">Name<input value="{{ form.name }}" onChange="{{ on.name }}" style="height:50px;border:1.5px solid {{ bd.name }};border-radius:999px;padding:0 20px;font-size:15px;color:#141414;margin-left:-4px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.name }}</span></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px">Work email<input type="email" value="{{ form.email }}" onChange="{{ on.email }}" style="height:50px;border:1.5px solid {{ bd.email }};border-radius:999px;padding:0 20px;font-size:15px;color:#141414;margin-left:-4px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.email }}</span></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px">Business name<input value="{{ form.business }}" onChange="{{ on.business }}" style="height:50px;border:1.5px solid {{ bd.business }};border-radius:999px;padding:0 20px;font-size:15px;color:#141414;margin-left:-4px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.business }}</span></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px">Number of locations<input inputmode="numeric" value="{{ form.locations }}" onChange="{{ on.locations }}" style="height:50px;border:1.5px solid {{ bd.locations }};border-radius:999px;padding:0 20px;font-size:15px;color:#141414;margin-left:-4px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.locations }}</span></label>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px">Existing website
+                  <select value="{{ form.website }}" onChange="{{ on.website }}" style="height:50px;border:1.5px solid {{ bd.website }};border-radius:999px;padding:0 18px;font-size:15px;color:#141414;background:#fff;margin-left:-4px">
+                    <option value="">Choose…</option><option>Yes, on WordPress</option><option>Yes, on another platform</option><option>No website yet</option><option>Not sure</option>
+                  </select><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.website }}</span></label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px">What's the main difficulty you want to solve?
+                  <textarea rows="3" value="{{ form.difficulty }}" onChange="{{ on.difficulty }}" style="border:1.5px solid {{ bd.difficulty }};border-radius:24px;padding:14px 20px;font-size:15px;line-height:1.5;color:#141414;resize:vertical;margin-left:-4px"></textarea><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.difficulty }}</span></label>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px"><span>Phone <span style="font-weight:400;color:#5D5D58">· optional</span></span><input value="{{ form.phone }}" onChange="{{ on.phone }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px;margin-left:-4px"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;padding-left:4px"><span>Systems you use now <span style="font-weight:400;color:#5D5D58">· optional</span></span><input value="{{ form.systems }}" onChange="{{ on.systems }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px;margin-left:-4px"></label>
+                </div>
+                <button type="submit" disabled="{{ sending }}" style="align-self:center;height:54px;padding:0 44px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:16px;font-weight:600;cursor:pointer">{{ submitLabel }}</button>
+              </form>
+            </sc-if>
+            <sc-if value="{{ demoDone }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="display:flex;flex-direction:column;gap:18px;max-width:520px;margin:0 auto">
+                <div style="width:64px;height:64px;border-radius:32px;background:#D6F26B;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800">✓</div>
+                <h2 style="margin:0;font-size:38px;font-weight:700;letter-spacing:-.035em">Thanks, {{ form.name }}. Your request is in.</h2>
+                <p style="margin:0;font-size:16px;line-height:1.65;color:#5D5D58">A product specialist will email <strong style="color:#141414">{{ form.email }}</strong> to arrange a time. The demo will cover {{ form.industry }} workflows for {{ sizeSummary }}.</p>
+                <div style="background:#F3F2EE;border-radius:20px;padding:18px;font-size:14px;line-height:1.8">
+                  <div><strong>Business:</strong> {{ form.business }}</div><div><strong>Existing website:</strong> {{ form.website }}</div>
+                </div>
+                <button onClick="{{ goHome }}" style="align-self:flex-start;height:48px;padding:0 22px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">Back to home</button>
+              </div>
+            </sc-if>
+          </div>
+        </section>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============ APP SHELL (4 & 11) ============ -->
+<sc-if value="{{ inApp }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;gap:12px;padding:12px;min-height:calc(100vh - 92px)">
+    <aside style="width:clamp(210px,19vw,248px);flex-shrink:0;background:#fff;border-radius:28px;padding:18px 14px;display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:10px;padding:2px 8px 18px">
+        <span style="width:34px;height:34px;border-radius:11px;background:#141414;display:flex;align-items:center;justify-content:center"><span style="width:11px;height:11px;border-radius:6px;background:#D6F26B"></span></span>
+        <div><div style="font-size:15px;font-weight:800;letter-spacing:-.02em">BranchHarbor</div><div style="font-size:12px;color:#5D5D58">Studios</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:18px;background:#F3F2EE;margin-bottom:14px">
+        <span style="width:36px;height:36px;border-radius:18px;background:#E9DDF8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">JM</span>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700">Jamie Morgan</div><div style="font-size:11px;color:#5D5D58;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">HQ admin · Stillwater (sample)</div></div>
+      </div>
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="11">
+        <div style="height:40px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:{{ n.weight }};background:{{ n.bg }};color:{{ n.fg }}"><span style="width:6px;height:6px;border-radius:3px;background:{{ n.dot }}"></span>{{ n.name }}</div>
+      </sc-for>
+    </aside>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+      <div style="min-height:68px;background:#fff;border-radius:24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 18px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#5D5D58;min-width:0">Scope
+          <select value="{{ scope }}" onChange="{{ setScope }}" style="height:42px;border:1.5px solid #141414;border-radius:999px;padding:0 14px;font-size:14px;font-weight:700;color:#141414;background:#fff;min-width:0;max-width:280px">
+            <sc-for list="{{ scopeOpts }}" as="so" hint-placeholder-count="5"><option value="{{ so.id }}">{{ so.label }}</option></sc-for>
+          </select>
+        </label>
+        <input placeholder="Search records you can access" style="flex:1;min-width:120px;max-width:380px;height:42px;border:none;border-radius:999px;padding:0 18px;font-size:14px;background:#F3F2EE">
+        <span style="margin-left:auto;height:42px;display:flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #EEEDE8;font-size:13px;font-weight:600">Sun, 11 Oct</span>
+      </div>
+
+      <!-- 4 · Shared publish -->
+      <sc-if value="{{ isPublish }}" hint-placeholder-val="{{ false }}">
+        <main style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border-radius:28px;padding:28px">
+            <div style="font-size:13px;color:#5D5D58;margin-bottom:6px">Websites › Templates › Class schedule page</div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between">
+              <h1 style="margin:0;font-size:34px;font-weight:700;letter-spacing:-.035em">Publish shared change</h1>
+              <span style="padding:6px 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:600">Version 14 → 15 · snapshot saved, rollback available</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:20px">
+              <div style="background:#F7EDA8;border-radius:20px;padding:16px"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Changed</div><div style="font-size:15px;font-weight:700;line-height:1.4">Intro offer section, header navigation</div></div>
+              <div style="background:#E9DDF8;border-radius:20px;padding:16px"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Locked brand content</div><div style="font-size:15px;font-weight:700;line-height:1.4">Header navigation updates everywhere</div></div>
+              <div style="background:#CDEEEE;border-radius:20px;padding:16px"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Local overrides</div><div style="font-size:15px;font-weight:700;line-height:1.4">Kept. Affected locations are listed below.</div></div>
+            </div>
+          </div>
+
+          <sc-if value="{{ pubBanner.show }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:{{ pubBanner.bg }};border-radius:20px;padding:16px 20px;font-size:14px;line-height:1.5;color:{{ pubBanner.fg }}">
+              <strong>{{ pubBanner.icon }} {{ pubBanner.title }}</strong><span>{{ pubBanner.text }}</span>
+              <sc-if value="{{ pubPartial }}" hint-placeholder-val="{{ false }}"><button onClick="{{ retryFailed }}" style="margin-left:auto;height:40px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Retry failed location</button></sc-if>
+              <sc-if value="{{ pubDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resetPublish }}" style="margin-left:auto;height:40px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:transparent;color:#141414;font-size:13px;font-weight:600;cursor:pointer">Restart prototype</button></sc-if>
+            </div>
+          </sc-if>
+
+          <div style="background:#fff;border-radius:28px;padding:10px;overflow:auto">
+            <div style="display:grid;grid-template-columns:44px minmax(190px,1.4fr) minmax(110px,.8fr) minmax(140px,1fr) minmax(200px,1.6fr) minmax(190px,1.2fr);min-width:920px;font-size:12px;font-weight:600;color:#5D5D58">
+              <div style="padding:12px 0 12px 14px"></div><div style="padding:12px">Location</div><div style="padding:12px">Changed pages</div><div style="padding:12px">Excluded overrides</div><div style="padding:12px">Warnings</div><div style="padding:12px">Status</div>
+            </div>
+            <sc-for list="{{ pubRows }}" as="r" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:44px minmax(190px,1.4fr) minmax(110px,.8fr) minmax(140px,1fr) minmax(200px,1.6fr) minmax(190px,1.2fr);min-width:920px;font-size:14px;line-height:1.45;align-items:center;border-radius:18px;margin-bottom:4px;background:{{ r.rowBg }}">
+                <div style="padding:14px 0 14px 14px"><input type="checkbox" aria-label="Include {{ r.name }}" checked="{{ r.inc }}" disabled="{{ r.locked }}" onChange="{{ r.toggle }}" style="width:20px;height:20px;accent-color:#141414"></div>
+                <div style="padding:12px;display:flex;gap:10px;align-items:center"><span style="width:34px;height:34px;border-radius:12px;background:{{ r.dot }};flex-shrink:0"></span><div><div style="font-weight:700">{{ r.name }}</div><div style="font-size:12px;color:#5D5D58">{{ r.region }} · {{ r.cur }}</div></div></div>
+                <div style="padding:12px;color:#3E3E3A">{{ r.pages }}</div>
+                <div style="padding:12px;color:#3E3E3A">{{ r.overrides }}</div>
+                <div style="padding:12px;color:#6A4E00">{{ r.warn }}</div>
+                <div style="padding:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+                  <span style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;background:{{ r.stBg }};color:{{ r.stFg }}">{{ r.stIcon }} {{ r.stLabel }}</span>
+                  <sc-if value="{{ r.failed }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:12px;color:#5D5D58">Site connection timed out. The previous version is still live.</span>
+                    <button onClick="{{ r.retry }}" style="height:34px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:12px;font-weight:600;cursor:pointer">Retry</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ pubReview }}" hint-placeholder-val="{{ true }}">
+            <div style="position:sticky;bottom:12px;background:#141414;color:#fff;border-radius:999px;padding:10px 10px 10px 28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+              <div style="font-size:14px;line-height:1.45"><strong>{{ pubCount }} of {{ pubTotal }} locations selected</strong><div style="color:#B9B9B3;font-size:13px">Scope: {{ scopeLabel }}. Customers see the change as each location publishes.</div></div>
+              <button onClick="{{ runPublish }}" disabled="{{ pubNone }}" style="margin-left:auto;display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#D6F26B;color:#141414;border:none;font-size:15px;font-weight:700;cursor:pointer">Publish to {{ pubCount }} locations<span style="width:40px;height:40px;border-radius:20px;background:#141414;color:#fff;display:flex;align-items:center;justify-content:center">↗</span></button>
+            </div>
+          </sc-if>
+        </main>
+      </sc-if>
+
+      <!-- 11 · AI campaign -->
+      <sc-if value="{{ isAI }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;gap:12px;min-height:0">
+          <main style="flex:1;min-width:0;background:#fff;border-radius:28px;padding:28px;overflow:auto">
+            <div style="font-size:13px;color:#5D5D58;margin-bottom:6px">Marketing</div>
+            <h1 style="margin:0 0 20px;font-size:34px;font-weight:700;letter-spacing:-.035em">Campaigns</h1>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ campaigns }}" as="c" hint-placeholder-count="2">
+                <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:14px 16px;border-radius:18px;background:{{ c.bg }};font-size:14px">
+                  <div style="flex:1 1 200px;min-width:0"><div style="font-weight:700">{{ c.name }}</div><div style="font-size:12px;color:#5D5D58">{{ c.scope }}</div></div>
+                  <div style="display:flex;gap:10px;align-items:center"><span style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;background:{{ c.tagBg }}">{{ c.status }}</span><span style="font-size:12px;color:#5D5D58;width:64px;text-align:right">{{ c.updated }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </main>
+          <aside aria-label="BranchHarbor AI" style="width:min(420px,46%);min-width:320px;flex-shrink:0;background:#fff;border-radius:28px;display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:20px;background:linear-gradient(135deg,#F1E7FB 0%,#FDEDE4 100%);display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <span style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;white-space:nowrap"><span style="flex-shrink:0;width:34px;height:34px;border-radius:17px;background:linear-gradient(135deg,#7B4FD6,#E8835A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px">✦</span>BranchHarbor AI</span>
+                <span style="font-size:11px;color:#4A3D5C;white-space:nowrap">12/200 this month</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;background:#fff;border-radius:999px;padding:8px 14px"><span style="color:#5D5D58">Scope</span><strong>{{ scopeLabel }}</strong></div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ aiIdle }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:14px;line-height:1.6;color:#5D5D58">I can draft, summarise and propose changes using data you're allowed to see in the current scope. Anything that publishes or sends needs your approval.</div>
+              </sc-if>
+              <sc-if value="{{ aiAsked }}" hint-placeholder-val="{{ false }}">
+                <div style="align-self:flex-end;max-width:86%;background:#141414;color:#fff;border-radius:22px 22px 6px 22px;padding:12px 16px;font-size:14px;line-height:1.5">{{ aiPrompt }}</div>
+              </sc-if>
+              <sc-if value="{{ aiThinking }}" hint-placeholder-val="{{ false }}">
+                <div role="status" style="align-self:flex-start;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#F1E7FB;font-size:13px;font-weight:600;color:#5A3B9A">✦ Reading offers and consent records…</div>
+              </sc-if>
+              <sc-if value="{{ aiNoCands }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:14px;line-height:1.6;background:#FFF3C9;border-radius:18px;padding:14px 16px;color:#5A4300">None of the locations in your current scope are in Canada. Change the scope to include Canadian studios, then ask again.</div>
+              </sc-if>
+              <sc-if value="{{ aiHasPlan }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6">
+                  <div>I found {{ aiCandCount }} Canadian locations in your scope. Here's a draft plan.</div>
+                  <div style="background:#F3F2EE;border-radius:18px;padding:14px"><div style="font-weight:700">Assumptions</div><div style="color:#3E3E3A">Uses the "New Year Intro" offer: 3 classes for $39 CAD, valid 2–31 January. Prices aren't changed. Email is drafted only where a consented list is connected.</div></div>
+                  <div style="background:#FFF3C9;border-radius:18px;padding:14px"><div style="font-weight:700">Missing data</div><div style="color:#5A4300">Vancouver – Kitsilano has no consented email list connected, so I'll draft its web page only.</div></div>
+                  <div style="font-size:12px;color:#5D5D58">Sources: Offers › New Year Intro (updated 2 days ago) · Members › Consent report (synced today, 9:12 am)</div>
+                </div>
+                <div style="border:1.5px solid #141414;border-radius:24px;overflow:hidden">
+                  <div style="padding:16px 18px;border-bottom:1px solid #EEEDE8"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#7B4FD6">PROPOSED ACTION</div><div style="font-size:16px;font-weight:700;margin-top:2px">Create draft campaign "New year, new practice"</div></div>
+                  <div style="padding:6px 18px">
+                    <sc-for list="{{ aiRows }}" as="a" hint-placeholder-count="3">
+                      <label style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #F1F0EB;font-size:14px;line-height:1.4">
+                        <input type="checkbox" checked="{{ a.inc }}" disabled="{{ a.locked }}" onChange="{{ a.toggle }}" style="width:20px;height:20px;margin-top:1px;accent-color:#141414">
+                        <span style="flex:1"><span style="font-weight:700;display:block">{{ a.name }}</span><span style="font-size:12px;color:#5D5D58">{{ a.channels }}</span></span>
+                        <span style="font-size:12px;font-weight:700;color:{{ a.resColor }};text-align:right;max-width:120px">{{ a.result }}</span>
+                      </label>
+                    </sc-for>
+                  </div>
+                  <div style="margin:10px 18px;background:#E9DDF8;border-radius:18px;padding:14px">
+                    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:6px">PREVIEW · WEB PAGE</div>
+                    <div style="font-size:16px;font-weight:700;margin-bottom:4px">Start the year on the mat</div>
+                    <div style="font-size:13px;line-height:1.55;color:#3E3550">New to Stillwater? Try three classes for $39 at your local studio, any time from 2 to 31 January.</div>
+                  </div>
+                  <div style="padding:14px 18px;border-top:1px solid #EEEDE8;display:flex;flex-direction:column;gap:10px">
+                    <div style="font-size:12px;color:#5D5D58">Drafts only. Nothing is published or sent until someone approves it in Campaigns.</div>
+                    <sc-if value="{{ aiPlanReady }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:8px"><button onClick="{{ aiRun }}" disabled="{{ aiNone }}" style="flex:1;height:48px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">Create {{ aiCount }} drafts</button><button onClick="{{ aiReset }}" style="height:48px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">Discard</button></div>
+                    </sc-if>
+                    <sc-if value="{{ aiFinished }}" hint-placeholder-val="{{ false }}">
+                      <div role="status" style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:#2F6B3A">✓ {{ aiCount }} drafts created <button onClick="{{ aiReset }}" style="margin-left:auto;height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:12px;font-weight:600;cursor:pointer">Restart</button></div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+            <div style="padding:14px;border-top:1px solid #EEEDE8;display:flex;gap:8px">
+              <input value="{{ aiPrompt }}" onChange="{{ aiType }}" aria-label="Message BranchHarbor AI" style="flex:1;min-width:0;height:48px;border:none;border-radius:999px;padding:0 18px;font-size:14px;background:#F3F2EE">
+              <button onClick="{{ aiSend }}" disabled="{{ aiBusy }}" aria-label="Send" style="width:48px;height:48px;border-radius:24px;background:linear-gradient(135deg,#7B4FD6,#E8835A);color:#fff;border:none;font-size:18px;cursor:pointer;flex-shrink:0">↑</button>
+            </div>
+          </aside>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============ 6 · STUDIO ============ -->
+<sc-if value="{{ isStudio }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1240px;margin:0 auto;padding:32px 20px 64px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:center">
+    <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:12px;align-items:center">
+      <div style="font-size:13px;font-weight:600;color:#5D5D58">Customer · booking app</div>
+      <div style="width:390px;max-width:100%;height:820px;background:#161616;border-radius:52px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.25)">
+        <div style="height:100%;background:#1E1E1E;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;color:#fff;position:relative">
+          <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700;flex-shrink:0"><span>9:41</span><span style="width:100px;height:28px;border-radius:14px;background:#000"></span><span style="font-size:11px">●●● ▮</span></div>
+
+          <sc-if value="{{ stStepLoc }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;overflow:auto;padding:12px 20px 24px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:46px;height:46px;border-radius:16px;background:#F8D6D8;color:#141414;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">AK</span>
+                <div style="flex:1;height:46px;border-radius:16px;background:#2A2A2A;display:flex;align-items:center;padding:0 16px;font-size:14px;color:#8E8E88">Search studios</div>
+              </div>
+              <h2 style="margin:10px 0 4px;font-size:30px;line-height:1.1;font-weight:400;letter-spacing:-.02em">Find your<br><strong style="font-weight:800">Stillwater studio</strong></h2>
+              <sc-for list="{{ stLocs }}" as="l" hint-placeholder-count="6">
+                <button onClick="{{ l.pick }}" style="text-align:left;min-height:64px;padding:12px 14px;border-radius:22px;border:none;background:#2A2A2A;cursor:pointer;color:#fff;display:flex;align-items:center;gap:12px">
+                  <span style="width:40px;height:40px;border-radius:14px;background:{{ l.dot }};flex-shrink:0"></span>
+                  <span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ l.name }}</span><span style="font-size:12px;color:#A3A39D">{{ l.region }} · {{ l.tz }}</span></span>
+                  <span style="width:32px;height:32px;border-radius:16px;background:#fff;color:#141414;display:flex;align-items:center;justify-content:center;font-size:14px">→</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ stStepClasses }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;overflow:auto;padding:12px 20px 24px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:14px">
+                <button onClick="{{ stBack }}" aria-label="Back" style="width:52px;height:52px;border-radius:18px;border:1.5px solid #3A3A3A;background:transparent;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0">←</button>
+                <div><div style="font-size:22px;font-weight:400;letter-spacing:-.02em">Classes at</div><div style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1">{{ stLocName }}</div></div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ stDays }}" as="d" hint-placeholder-count="3">
+                  <button onClick="{{ d.pick }}" aria-pressed="{{ d.on }}" style="flex:1;height:46px;border-radius:16px;border:{{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ d.label }}</button>
+                </sc-for>
+              </div>
+              <div style="font-size:12px;color:#A3A39D">Times shown in {{ stTz }}</div>
+              <sc-for list="{{ stClasses }}" as="c" hint-placeholder-count="4">
+                <div style="position:relative;border-radius:28px;background:{{ c.pastel }};color:#141414;min-height:176px;overflow:hidden;display:flex">
+                  <div style="position:absolute;right:0;top:0;bottom:0;width:46%"><image-slot id="{{ c.slot }}" shape="rect" placeholder="Instructor photo"></image-slot></div>
+                  <div style="position:relative;padding:16px 18px;display:flex;flex-direction:column;gap:4px;width:60%;pointer-events:none">
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">{{ c.init }}</span><span style="font-size:13px;font-weight:600;line-height:1.2">{{ c.inst }}<br><span style="font-size:11px;font-weight:500;color:#3E3E3A">{{ c.time }} · {{ c.dur }}</span></span></div>
+                    <div style="margin-top:auto;font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.1">{{ c.name }}</div>
+                    <div style="font-size:12px;font-weight:700;color:{{ c.spotsColor }}">{{ c.spots }}</div>
+                    <button onClick="{{ c.pick }}" style="pointer-events:auto;align-self:flex-start;margin-top:6px;height:40px;padding:0 20px;border-radius:999px;border:none;background:{{ c.btnBg }};color:{{ c.btnFg }};font-size:13px;font-weight:700;cursor:pointer">{{ c.cta }}</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ stStepDetails }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;overflow:auto;padding:12px 20px 20px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <button onClick="{{ stBack }}" aria-label="Back" style="width:52px;height:52px;border-radius:18px;border:1.5px solid #3A3A3A;background:transparent;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0">←</button>
+                <div style="flex:1;display:flex;align-items:center;gap:10px;height:52px;padding:0 8px;border-radius:18px;background:#2A2A2A"><span style="width:36px;height:36px;border-radius:18px;background:{{ stCls.pastel }};color:#141414;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">{{ stCls.init }}</span><span style="font-size:14px;font-weight:700;line-height:1.2">{{ stCls.inst }}<br><span style="font-size:11px;font-weight:500;color:#A3A39D">Instructor</span></span></div>
+              </div>
+              <h2 style="margin:4px 0 0;font-size:30px;line-height:1.08;font-weight:800;letter-spacing:-.025em">{{ stCls.name }}</h2>
+              <div style="font-size:13px;color:#A3A39D">{{ stDayLabel }} · {{ stLocName }}</div>
+              <div style="background:{{ stCls.pastel }};color:#141414;border-radius:24px;padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+                <div><div style="font-size:11px">Starts</div><div style="font-size:16px;font-weight:800">{{ stCls.time }}</div></div>
+                <div><div style="font-size:11px">Length</div><div style="font-size:16px;font-weight:800">{{ stCls.dur }}</div></div>
+                <div><div style="font-size:11px">Spots</div><div style="font-size:16px;font-weight:800">{{ stSpotsShort }}</div></div>
+              </div>
+              <sc-if value="{{ stIsFull }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F7EDA8;color:#3D3500;border-radius:20px;padding:14px;font-size:13px;line-height:1.5"><strong>This class is full.</strong> Join the waitlist and we'll email you if a spot opens. You won't be charged unless your spot is confirmed.</div>
+              </sc-if>
+              <sc-if value="{{ stHasHold }}" hint-placeholder-val="{{ false }}">
+                <div role="timer" style="display:flex;justify-content:space-between;align-items:center;border-radius:999px;background:#2A2A2A;padding:10px 16px;font-size:13px"><span style="color:#D6F26B">● Spot held while you finish</span><strong style="font-variant-numeric:tabular-nums">{{ stHoldLabel }}</strong></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;padding:0 4px"><span style="color:#A3A39D">Drop-in class</span><strong style="font-variant-numeric:tabular-nums">{{ stPrice }}</strong></div>
+              </sc-if>
+              <sc-if value="{{ stExpired }}" hint-placeholder-val="{{ false }}">
+                <div role="alert" style="background:#F8D6D8;color:#5C1414;border-radius:20px;padding:14px;font-size:13px;line-height:1.5"><strong>Your hold expired.</strong> The spot was released and you haven't been charged.<div style="margin-top:8px"><button onClick="{{ stRecheck }}" style="height:36px;padding:0 14px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Check availability again</button></div></div>
+              </sc-if>
+              <input placeholder="Full name" aria-label="Full name" value="{{ st.name }}" onChange="{{ stOn.name }}" style="height:52px;border:none;border-radius:18px;padding:0 18px;font-size:15px;background:#2A2A2A;color:#fff">
+              <input placeholder="Email" aria-label="Email" type="email" value="{{ st.email }}" onChange="{{ stOn.email }}" style="height:52px;border:none;border-radius:18px;padding:0 18px;font-size:15px;background:#2A2A2A;color:#fff">
+              <div role="alert" style="font-size:12px;font-weight:600;color:#FFB4AE">{{ st.err }}</div>
+              <div style="margin-top:auto;font-size:11px;color:#A3A39D;text-align:center">Cancel up to 12 hours before class for a full refund.</div>
+              <button onClick="{{ stSubmit }}" disabled="{{ stSubmitDisabled }}" style="height:58px;border-radius:999px;background:#fff;color:#141414;border:none;font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0">{{ stSubmitLabel }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ stStepDone }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="flex:1;padding:24px;display:flex;flex-direction:column;gap:16px">
+              <div style="width:72px;height:72px;border-radius:36px;background:{{ stDone.iconBg }};color:#141414;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;margin-top:40px">{{ stDone.icon }}</div>
+              <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-.025em">{{ stDone.title }}</h2>
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#C9C9C3">{{ stDone.text }}</p>
+              <div style="background:{{ stCls.pastel }};color:#141414;border-radius:24px;padding:16px;font-size:14px;line-height:1.6"><strong style="font-size:16px">{{ stCls.name }}</strong><br>{{ stDayLabel }} · {{ stCls.time }}<br>{{ stLocName }}</div>
+              <button onClick="{{ stRestart }}" style="margin-top:auto;height:56px;border-radius:999px;border:1.5px solid #3A3A3A;background:transparent;color:#fff;font-size:15px;font-weight:700;cursor:pointer">{{ stDone.manage }}</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1 1 460px;min-width:320px;max-width:640px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:13px;font-weight:600;color:#5D5D58">Manager · instructor cover</div>
+      <div style="background:#fff;border-radius:28px;overflow:hidden">
+        <div style="padding:24px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div><div style="font-size:26px;font-weight:700;letter-spacing:-.03em">Cover request</div><div style="font-size:13px;color:#5D5D58">Scope: Toronto – Queen West</div></div>
+          <span style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;background:{{ cover.tagBg }};color:#141414">{{ cover.tag }}</span>
+        </div>
+        <div style="padding:0 24px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+          <div style="background:#CDEEEE;border-radius:20px;padding:16px;font-size:13px;line-height:1.5"><div style="font-size:11px;font-weight:600">Class</div><div style="font-size:16px;font-weight:800">Morning Vinyasa</div>Sat 17 Oct · 7:00 am</div>
+          <div style="background:#F8D6D8;border-radius:20px;padding:16px;font-size:13px;line-height:1.5"><div style="font-size:11px;font-weight:600">Requested by</div><div style="font-size:16px;font-weight:800">Maya Rao</div>Reason: unavailable</div>
+          <div style="background:#F7EDA8;border-radius:20px;padding:16px;font-size:13px;line-height:1.5"><div style="font-size:11px;font-weight:600">Booked</div><div style="font-size:16px;font-weight:800">16 of 20</div>Notified when confirmed</div>
+        </div>
+        <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:2px">Eligible instructors notified</div>
+          <sc-for list="{{ cover.staff }}" as="p" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:999px;background:#F3F2EE;font-size:14px">
+              <span style="width:36px;height:36px;border-radius:18px;background:{{ p.pastel }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">{{ p.init }}</span>
+              <div style="flex:1;min-width:0"><strong>{{ p.name }}</strong><div style="font-size:12px;color:#5D5D58">{{ p.note }}</div></div>
+              <span style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;background:{{ p.bg }};color:{{ p.fg }}">{{ p.state }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <sc-if value="{{ cover.isOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ coverAccept }}" style="height:48px;padding:0 20px;border-radius:999px;border:1.5px dashed #5D5D58;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">Simulate: Sam Tran accepts</button></sc-if>
+            <sc-if value="{{ cover.isAccepted }}" hint-placeholder-val="{{ false }}">
+              <div style="width:100%;font-size:14px;line-height:1.55;color:#5D5D58">Approving updates the schedule and the public class page to Sam Tran together, then emails the 16 booked customers.</div>
+              <button onClick="{{ coverApprove }}" style="display:flex;align-items:center;gap:10px;height:50px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">Approve cover<span style="width:38px;height:38px;border-radius:19px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center">✓</span></button>
+              <button onClick="{{ coverDecline }}" style="height:50px;padding:0 22px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">Decline</button>
+            </sc-if>
+            <sc-if value="{{ cover.isDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ coverReset }}" style="height:48px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">Restart prototype</button></sc-if>
+          </div>
+        </div>
+        <div style="padding:20px 24px;background:#F8F7F3">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">History</div>
+          <sc-for list="{{ cover.history }}" as="h" hint-placeholder-count="2">
+            <div style="display:flex;gap:12px;font-size:13px;line-height:1.8"><span style="color:#5D5D58;width:64px;font-variant-numeric:tabular-nums">{{ h.t }}</span><span>{{ h.e }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============ 10 · KITCHEN ============ -->
+<sc-if value="{{ isKitchen }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:calc(100vh - 56px);background:#0F0F0F;color:#fff;display:flex;flex-direction:column;padding:12px;gap:12px">
+    <div style="background:#1E1E1E;border-radius:28px;padding:14px 16px 14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:16px">
+      <div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Kitchen · Seattle – Ballard</div><div style="font-size:13px;color:#A3A39D">Maple &amp; Ember (sample) · Pickup orders</div></div>
+      <div style="font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;padding:0 16px;border-left:1px solid #333">{{ clock }}</div>
+      <div style="margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="height:44px;display:flex;align-items:center;font-size:13px;font-weight:700;padding:0 16px;border-radius:999px;background:{{ conn.bg }};color:#141414">{{ conn.label }}</span>
+        <button onClick="{{ toggleAlerts }}" aria-pressed="{{ alerts }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px solid #3A3A3A;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer">{{ alertsLabel }}</button>
+        <button onClick="{{ addOrder }}" disabled="{{ offline }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px dashed #5A5A55;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Simulate new order</button>
+        <button onClick="{{ toggleOnline }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px dashed #5A5A55;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer">{{ onlineToggleLabel }}</button>
+      </div>
+    </div>
+    <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="background:#F8D6D8;color:#5C1414;border-radius:24px;padding:16px 24px;font-size:17px;font-weight:700">⚠ Connection lost. Last refreshed {{ lastRefresh }}. Orders may be out of date and status changes are paused.</div>
+    </sc-if>
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="background:#D6F26B;color:#141414;border-radius:999px;padding:12px 24px;font-size:15px;font-weight:600;align-self:flex-start">{{ toast }}</div>
+    </sc-if>
+    <div style="flex:1;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;opacity:{{ boardOpacity }}">
+      <sc-for list="{{ columns }}" as="col" hint-placeholder-count="3">
+        <section style="flex:1 1 300px;min-width:280px;background:#1A1A1A;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:10px">
+          <h2 style="margin:0;padding:6px 8px;font-size:17px;font-weight:700;display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:5px;background:{{ col.dot }}"></span>{{ col.title }}<span style="margin-left:auto;min-width:32px;height:32px;border-radius:16px;background:#2A2A2A;display:flex;align-items:center;justify-content:center;font-size:14px;font-variant-numeric:tabular-nums">{{ col.count }}</span></h2>
+          <sc-for list="{{ col.orders }}" as="o" hint-placeholder-count="2">
+            <article style="background:{{ o.bg }};color:#141414;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <div><div style="font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums">#{{ o.id }}</div><div style="font-size:15px;font-weight:600">{{ o.name }}</div></div>
+                <div style="text-align:right"><div style="font-size:12px;font-weight:600">Pickup</div><div style="font-size:24px;font-weight:800;font-variant-numeric:tabular-nums">{{ o.due }}</div><div style="font-size:13px;font-weight:800;color:#9E1B12">{{ o.overdue }}</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.6);border-radius:18px;padding:12px 14px">
+                <sc-for list="{{ o.items }}" as="it" hint-placeholder-count="2">
+                  <div style="font-size:18px;font-weight:700;line-height:1.35"><span style="font-variant-numeric:tabular-nums">{{ it.q }}×</span> {{ it.n }}<div style="font-size:15px;font-weight:600;color:#7A3D00">{{ it.m }}</div></div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ o.isPending }}" hint-placeholder-val="{{ false }}"><div role="status" style="height:56px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(0,0,0,.08);font-size:15px;font-weight:700">Waiting for server confirmation…</div></sc-if>
+              <sc-if value="{{ o.isRejecting }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5">
+                  <strong style="color:#9E1B12">Reject order #{{ o.id }}?</strong><span>The payment will be voided and the customer notified.</span>
+                  <div style="display:flex;gap:8px"><button onClick="{{ o.confirmReject }}" disabled="{{ offline }}" style="flex:1;height:52px;border-radius:999px;background:#9E1B12;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer">Reject order</button><button onClick="{{ o.cancelReject }}" style="flex:1;height:52px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:15px;font-weight:700;cursor:pointer">Keep</button></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ o.showActions }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ o.primary }}" disabled="{{ offline }}" style="flex:2;height:60px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:18px;font-weight:800;cursor:pointer">{{ o.primaryLabel }}</button>
+                  <sc-if value="{{ o.isNew }}" hint-placeholder-val="{{ false }}"><button onClick="{{ o.reject }}" disabled="{{ offline }}" style="flex:1;height:60px;border-radius:999px;border:1.5px solid #141414;background:transparent;color:#141414;font-size:16px;font-weight:700;cursor:pointer">Reject</button></sc-if>
+                </div>
+              </sc-if>
+            </article>
+          </sc-for>
+          <sc-if value="{{ col.empty }}" hint-placeholder-val="{{ false }}"><div style="border:2px dashed #333;border-radius:24px;padding:28px;text-align:center;font-size:15px;font-weight:600;color:#8E8E88">{{ col.emptyText }}</div></sc-if>
+        </section>
+      </sc-for>
+      <aside style="flex:0 1 270px;min-width:240px;background:#1A1A1A;border-radius:28px;padding:16px;display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0 0 6px;padding:0 4px;font-size:17px;font-weight:700">Item availability</h2>
+        <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="5">
+          <button onClick="{{ m.toggle }}" disabled="{{ offline }}" aria-pressed="{{ m.sold }}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:54px;padding:0 8px 0 16px;border-radius:999px;border:none;background:#2A2A2A;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left"><span>{{ m.name }}</span><span style="font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;background:{{ m.bg }};color:#141414;white-space:nowrap">{{ m.label }}</span></button>
+        </sc-for>
+        <div style="margin-top:6px;background:#D6F26B;color:#141414;border-radius:22px;padding:16px"><div style="font-size:12px;font-weight:600">Collected today</div><div style="font-size:34px;font-weight:800;font-variant-numeric:tabular-nums">{{ collected }}</div></div>
+      </aside>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE' };
+const LOCS = [
+  { id: 'qw', name: 'Toronto – Queen West', region: 'Ontario', cur: 'CAD', tz: 'Eastern time', pages: 'Home, Schedule', overrides: 'None', warn: '', enq: 14, classes: 9, occ: '78%', sync: 'Connected · 4 min ago', ok: true, dot: P.lilac },
+  { id: 'ls', name: 'Toronto – Leslieville', region: 'Ontario', cur: 'CAD', tz: 'Eastern time', pages: 'Home, Schedule', overrides: 'Local hero image', warn: '', enq: 9, classes: 7, occ: '64%', sync: 'Connected · 6 min ago', ok: true, dot: P.butter },
+  { id: 'kt', name: 'Vancouver – Kitsilano', region: 'British Columbia', cur: 'CAD', tz: 'Pacific time', pages: 'Home, Schedule', overrides: 'None', warn: '', enq: 11, classes: 8, occ: 'Unavailable', sync: 'Degraded · last sync 2 h ago', ok: false, dot: P.aqua },
+  { id: 'ch', name: 'Seattle – Capitol Hill', region: 'Washington', cur: 'USD', tz: 'Pacific time', pages: 'Home, Schedule', overrides: 'Local intro price', warn: 'Intro price is a local override and won\u2019t change', enq: 6, classes: 6, occ: '71%', sync: 'Connected · 3 min ago', ok: true, dot: P.blush },
+  { id: 'pd', name: 'Portland – Pearl District', region: 'Oregon', cur: 'USD', tz: 'Pacific time', pages: 'Schedule', overrides: 'Custom home page', warn: '', enq: 8, classes: 5, occ: '59%', sync: 'Connected · 9 min ago', ok: true, dot: P.sage },
+  { id: 'dv', name: 'Denver – LoHi', region: 'Colorado', cur: 'USD', tz: 'Mountain time', pages: 'Home, Schedule', overrides: 'None', warn: 'Website not yet live — change applies when it publishes', enq: 3, classes: 4, occ: 'Not connected', sync: 'Booking system not connected', ok: false, dot: P.lime },
+];
+const LOC = Object.fromEntries(LOCS.map(l => [l.id, l]));
+const SCOPES = [
+  { id: 'all', label: 'All authorised locations', ids: LOCS.map(l => l.id) },
+  { id: 'on', label: 'Region: Ontario', ids: ['qw', 'ls'] },
+  { id: 'bc', label: 'Region: British Columbia', ids: ['kt'] },
+  { id: 'pnw', label: 'Owner group: Pacific Northwest', ids: ['ch', 'pd'] },
+  { id: 'qw', label: 'Toronto – Queen West', ids: ['qw'] },
+];
+const SCEN = [['web', '01', 'Website → demo'], ['publish', '04', 'HQ shared publish'], ['studio', '06', 'Studio booking & cover'], ['kitchen', '10', 'Food pickup kitchen'], ['ai', '11', 'AI campaign']];
+const IND = [
+  { name: 'Studios', pastel: P.lilac, who: 'Yoga, Pilates, dance, barre, cycling and boutique fitness', flow: 'Enquiry → trial → class → membership', cta: 'Request a studio demo', avail: 'Pilot', ph: 'Studio class photo' },
+  { name: 'Sports', pastel: P.lime, who: 'Academies, clubs, training programmes and camps', flow: 'Registration → group → attendance', cta: 'Request a sports demo', avail: 'Planned', ph: 'Sports training photo' },
+  { name: 'Wellness', pastel: P.sage, who: 'Spas, massage, wellness centres and appointments', flow: 'Service → practitioner → appointment', cta: 'Request a wellness demo', avail: 'Planned', ph: 'Wellness / spa photo' },
+  { name: 'Commerce', pastel: P.butter, who: 'Retail groups and franchise stores', flow: 'Discovery → order → fulfilment', cta: 'Request a commerce demo', avail: 'Planned', ph: 'Retail store photo' },
+  { name: 'Foods', pastel: P.blush, who: 'Restaurants, cafés, bakeries and food franchises', flow: 'Location → menu → order → pickup', cta: 'Request a food-business demo', avail: 'Planned next', ph: 'Café / kitchen photo' },
+];
+const CAPS = [
+  { name: 'Websites', tag: 'At launch', pastel: P.aqua, desc: 'Hosted sites or WordPress blocks, shared templates and local pages.' },
+  { name: 'Customers', tag: 'At launch', pastel: P.lilac, desc: 'Enquiries, members and participants, kept with the right location.' },
+  { name: 'Marketing', tag: 'At launch', pastel: P.blush, desc: 'Campaign pages, forms and lead routing to each location.' },
+  { name: 'Payments', tag: 'Requires setup', pastel: P.butter, desc: 'Through a connected payment account for each business or location.' },
+  { name: 'BranchHarbor AI', tag: 'Preview', pastel: P.lilac, desc: 'Drafts and summaries within your permissions. Changes need approval.' },
+  { name: 'Connections', tag: 'Selected systems', pastel: P.sage, desc: 'Supported booking and commerce tools, each with a clear status.' },
+];
+const CLASSES = [
+  { id: 'c1', time: '7:00 am', dur: '60 min', name: 'Morning Vinyasa', inst: 'Maya Rao', init: 'MR', left: 4, pastel: P.aqua },
+  { id: 'c2', time: '9:00 am', dur: '75 min', name: 'Slow Flow', inst: 'Sam Tran', init: 'ST', left: 0, pastel: P.blush },
+  { id: 'c3', time: '12:15 pm', dur: '45 min', name: 'Lunchtime Pilates', inst: 'Ana Silva', init: 'AS', left: 9, pastel: P.butter },
+  { id: 'c4', time: '6:30 pm', dur: '60 min', name: 'Yin & Restore', inst: 'Jordan Lee', init: 'JL', left: 1, pastel: P.lilac },
+];
+const DAYS = [['Sat 17', '#fff'], ['Sun 18', P.butter], ['Mon 19', P.lilac]];
+const DAY_FULL = ['Sat 17 Oct', 'Sun 18 Oct', 'Mon 19 Oct'];
+const MENU = ['Ember chicken bowl', 'Smoked brisket sandwich', 'Maple lemonade', 'Side slaw', 'Cornbread'];
+const NEW_ORDERS = [
+  { name: 'Lena W.', items: [{ q: 2, n: 'Ember chicken bowl', m: 'One without sauce' }, { q: 2, n: 'Maple lemonade', m: '' }] },
+  { name: 'Omar H.', items: [{ q: 1, n: 'Smoked brisket sandwich', m: 'Extra pickles' }, { q: 1, n: 'Cornbread', m: '' }] },
+];
+const pad = n => String(n).padStart(2, '0');
+const hm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const hms = d => `${hm(d)}:${pad(d.getSeconds())}`;
+const emailOk = v => /^\S+@\S+\.\S+$/.test(v || '');
+const freshForm = () => ({ industry: 'Studios', size: 'Network', name: '', email: '', business: '', locations: '', website: '', difficulty: '', phone: '', systems: '' });
+const freshCover = () => ({ phase: 'open', history: [{ t: '8:42 am', e: 'Maya Rao requested cover' }, { t: '8:42 am', e: '3 eligible instructors notified' }] });
+const scrollToId = id => { const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' }); };
+
+class Component extends DCLogic {
+  state = {
+    scenario: 'web', webView: 'home', previewLoc: 'qw', form: freshForm(), errors: {}, submitted: false,
+    scope: 'all', pubPhase: 'review', pubInclude: Object.fromEntries(LOCS.map(l => [l.id, true])), pubStatus: {},
+    st: { step: 'location', loc: null, day: 0, cls: null, name: '', email: '', hold: 300, expired: false, busy: false, err: '' },
+    cover: freshCover(),
+    orders: null, pending: {}, rejecting: null, online: true, alerts: true, soldOut: { 'Cornbread': true }, collected: 23, toast: '', lastRefresh: '', nextId: 1047, now: new Date(),
+    ai: { phase: 'idle', prompt: 'Draft a January intro-offer campaign for our Canadian studios.', cands: [], include: {}, results: {} },
+    campaigns: [
+      { name: 'Teacher training info night', scope: 'Toronto – Queen West', status: 'Scheduled', updated: '2 Oct' },
+      { name: 'Spring open house', scope: 'All authorised locations', status: 'Completed', updated: '12 Apr' },
+    ],
+  };
+  componentDidMount() {
+    const b = Date.now(), m = x => new Date(b + x * 60000);
+    this.setState({
+      orders: [
+        { id: 1039, name: 'Tom R.', due: m(-2), status: 'ready', items: [{ q: 1, n: 'Smoked brisket sandwich', m: '' }, { q: 1, n: 'Side slaw', m: '' }] },
+        { id: 1041, name: 'Priya S.', due: m(-6), status: 'preparing', items: [{ q: 1, n: 'Ember chicken bowl', m: 'No onions · Extra rice' }, { q: 2, n: 'Maple lemonade', m: '' }] },
+        { id: 1044, name: 'Ana P.', due: m(14), status: 'preparing', items: [{ q: 3, n: 'Ember chicken bowl', m: 'Gluten-free · Sauce on side' }] },
+        { id: 1045, name: 'Daniel K.', due: m(18), status: 'new', items: [{ q: 1, n: 'Smoked brisket sandwich', m: 'Gluten-free bun' }, { q: 1, n: 'Side slaw', m: '' }] },
+        { id: 1046, name: 'Mei L.', due: m(25), status: 'new', items: [{ q: 2, n: 'Ember chicken bowl', m: 'Allergy: sesame (customer note)' }, { q: 1, n: 'Maple lemonade', m: 'No ice' }] },
+      ],
+    });
+    this.clockT = setInterval(() => { if (this.state.online) this.setState({ now: new Date() }); }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.clockT); clearInterval(this.holdT); (this.timers || []).forEach(clearTimeout); }
+  later(fn, ms) { (this.timers = this.timers || []).push(setTimeout(fn, ms)); }
+  scopeIds() { return SCOPES.find(s => s.id === this.state.scope).ids; }
+
+  validate(f) {
+    const e = {};
+    if (!f.name.trim()) e.name = 'Enter your name.';
+    if (!emailOk(f.email)) e.email = 'Enter a work email, like name@business.com.';
+    if (!f.business.trim()) e.business = 'Enter your business name.';
+    if (!(parseInt(f.locations, 10) >= 1)) e.locations = 'Enter how many locations you have (1 or more).';
+    if (!f.website) e.website = 'Choose an option for your existing website.';
+    if (!f.difficulty.trim()) e.difficulty = 'Tell us the main difficulty you want to solve.';
+    return e;
+  }
+  setForm(k, v) { this.setState(s => { const form = { ...s.form, [k]: v }; return { form, errors: s.submitted ? this.validate(form) : s.errors }; }); }
+  submitDemo(e) {
+    if (e) e.preventDefault();
+    const errs = this.validate(this.state.form);
+    if (Object.keys(errs).length) { this.setState({ errors: errs, submitted: true }); return; }
+    this.setState({ webView: 'sending' });
+    this.later(() => { this.setState({ webView: 'done' }); window.scrollTo(0, 0); }, 900);
+  }
+  openDemo(industry) { this.setState(s => ({ webView: 'demo', form: industry ? { ...s.form, industry } : s.form })); window.scrollTo(0, 0); }
+
+  runPublish() {
+    const ids = this.scopeIds().filter(id => this.state.pubInclude[id]);
+    this.setState({ pubPhase: 'running', pubStatus: Object.fromEntries(ids.map(id => [id, 'queued'])) });
+    ids.forEach((id, i) => {
+      this.later(() => this.setState(s => ({ pubStatus: { ...s.pubStatus, [id]: 'running' } })), i * 650);
+      this.later(() => this.setState(s => {
+        const ps = { ...s.pubStatus, [id]: id === 'kt' ? 'fail' : 'ok' };
+        const done = ids.every(x => ps[x] === 'ok' || ps[x] === 'fail');
+        return { pubStatus: ps, pubPhase: done ? (ids.some(x => ps[x] === 'fail') ? 'partial' : 'done') : 'running' };
+      }), i * 650 + 600);
+    });
+  }
+  retry(id) {
+    this.setState(s => ({ pubStatus: { ...s.pubStatus, [id]: 'running' }, pubPhase: 'running' }));
+    this.later(() => this.setState(s => { const ps = { ...s.pubStatus, [id]: 'ok' }; return { pubStatus: ps, pubPhase: Object.values(ps).includes('fail') ? 'partial' : 'done' }; }), 1300);
+  }
+
+  stSet(p) { this.setState(s => ({ st: { ...s.st, ...p } })); }
+  startHold() {
+    clearInterval(this.holdT);
+    this.holdT = setInterval(() => this.setState(s => {
+      const h = s.st.hold - 1;
+      if (h <= 0) { clearInterval(this.holdT); return { st: { ...s.st, hold: 0, expired: true } }; }
+      return { st: { ...s.st, hold: h } };
+    }), 1000);
+  }
+  pickClass(c) { clearInterval(this.holdT); this.stSet({ cls: c.id, step: 'details', hold: 300, expired: false, err: '' }); if (c.left > 0) this.startHold(); }
+  stSubmit() {
+    const st = this.state.st;
+    if (!st.name.trim() || !emailOk(st.email)) { this.stSet({ err: 'Enter your name and a valid email to continue.' }); return; }
+    const full = CLASSES.find(c => c.id === st.cls).left === 0;
+    this.stSet({ busy: true, err: '' });
+    this.later(() => { clearInterval(this.holdT); this.stSet({ busy: false, step: full ? 'waitlisted' : 'confirmed' }); }, 900);
+  }
+
+  act(id, next, verb) {
+    this.setState(s => ({ pending: { ...s.pending, [id]: true }, rejecting: null }));
+    this.later(() => this.setState(s => {
+      const p = { ...s.pending }; delete p[id];
+      let orders = s.orders, collected = s.collected;
+      if (next === 'collected' || next === 'rejected') { orders = orders.filter(o => o.id !== id); if (next === 'collected') collected++; }
+      else orders = orders.map(o => o.id === id ? { ...o, status: next, fresh: false } : o);
+      const toast = next === 'rejected' ? `Order #${id} rejected · payment void requested, customer notified` : `Server confirmed: order #${id} ${verb}`;
+      return { pending: p, orders, collected, toast };
+    }), 900);
+  }
+  addOrder() {
+    this.setState(s => {
+      const tpl = NEW_ORDERS[s.nextId % 2];
+      const o = { id: s.nextId, name: tpl.name, items: tpl.items, status: 'new', due: new Date(Date.now() + 30 * 60000), fresh: true };
+      return { orders: [...s.orders, o], nextId: s.nextId + 1, toast: `New order #${o.id} received${s.alerts ? ' · alert sound played' : ''}` };
+    });
+  }
+
+  aiSend() {
+    this.setState(s => ({ ai: { ...s.ai, phase: 'thinking', results: {} } }));
+    this.later(() => this.setState(s => {
+      const cands = this.scopeIds().filter(id => LOC[id].cur === 'CAD');
+      return { ai: { ...s.ai, phase: cands.length ? 'plan' : 'nocands', cands, include: Object.fromEntries(cands.map(id => [id, true])) } };
+    }), 1400);
+  }
+  aiRun() {
+    const ids = this.state.ai.cands.filter(id => this.state.ai.include[id]);
+    this.setState(s => ({ ai: { ...s.ai, phase: 'running', results: Object.fromEntries(ids.map(id => [id, 'queued'])) } }));
+    ids.forEach((id, i) => this.later(() => this.setState(s => {
+      const results = { ...s.ai.results, [id]: 'ok' };
+      return {
+        ai: { ...s.ai, results, phase: ids.every(x => results[x] === 'ok') ? 'done' : 'running' },
+        campaigns: [{ name: 'New year, new practice', scope: LOC[id].name, status: 'Draft', updated: 'Just now', fresh: true }, ...s.campaigns],
+      };
+    }), 700 * (i + 1)));
+  }
+
+  renderVals() {
+    const s = this.state, sc = s.scenario;
+    const scopeObj = SCOPES.find(x => x.id === s.scope);
+    const scopeLabel = `${scopeObj.label} (${scopeObj.ids.length})`;
+
+    const f = s.form, er = s.errors;
+    const on = {}; Object.keys(freshForm()).forEach(k => on[k] = e => this.setForm(k, e.target.value));
+    const bd = {}; ['name', 'email', 'business', 'locations', 'website', 'difficulty'].forEach(k => bd[k] = er[k] ? '#B3261E' : '#141414');
+    const pl = LOC[s.previewLoc];
+    const capTag = t => t === 'At launch' ? ['#D6F26B', '#141414'] : t === 'Preview' ? ['#141414', '#fff'] : ['#F3F2EE', '#3E3E3A'];
+
+    const ids = this.scopeIds();
+    const locked = s.pubPhase !== 'review';
+    const stMap = { queued: ['Waiting', '◷', '#F3F2EE', '#3E3E3A'], running: ['Publishing…', '◌', P.aqua, '#0E3B3B'], ok: ['Published', '✓', '#D6F26B', '#141414'], fail: ['Failed', '✕', P.blush, '#7A1010'] };
+    const pubRows = ids.map(id => {
+      const l = LOC[id], inc = !!s.pubInclude[id], st = s.pubStatus[id];
+      const [lab, ic, sb, sf] = !inc ? ['Not included', '–', '#F3F2EE', '#5D5D58'] : st ? stMap[st] : ['Ready', '', '#F3F2EE', '#3E3E3A'];
+      return { ...l, warn: l.warn || '—', inc, locked, stLabel: lab, stIcon: ic, stBg: sb, stFg: sf, failed: st === 'fail' && s.pubPhase !== 'running', rowBg: st === 'fail' ? '#FDF0F0' : inc ? '#FAFAF7' : '#fff',
+        toggle: () => this.setState(x => ({ pubInclude: { ...x.pubInclude, [id]: !x.pubInclude[id] } })), retry: () => this.retry(id) };
+    });
+    const incIds = ids.filter(id => s.pubInclude[id]);
+    const okN = incIds.filter(id => s.pubStatus[id] === 'ok').length, failN = incIds.filter(id => s.pubStatus[id] === 'fail').length;
+    const pubBanner = s.pubPhase === 'partial'
+      ? { show: true, icon: '⚠', title: `${okN} of ${incIds.length} locations published.`, text: `${failN} failed and still shows the previous version.`, bg: '#FFF3C9', fg: '#5A4300' }
+      : s.pubPhase === 'done' ? { show: true, icon: '✓', title: `All ${incIds.length} locations published.`, text: 'Version 15 is live. Roll back from Version history if needed.', bg: '#D6F26B', fg: '#141414' }
+      : s.pubPhase === 'running' ? { show: true, icon: '◌', title: 'Publishing…', text: `${okN + failN} of ${incIds.length} processed. Each location updates independently.`, bg: P.aqua, fg: '#0E3B3B' }
+      : { show: false };
+
+    const st = s.st, sl = st.loc ? LOC[st.loc] : null, cls = CLASSES.find(c => c.id === st.cls) || CLASSES[0];
+    const full = cls.left === 0;
+    const price = sl ? (sl.cur === 'CAD' ? '$28.00 CAD' : '$26.00 USD') : '';
+    const stDone = st.step === 'waitlisted'
+      ? { icon: '#3', iconBg: P.butter, title: 'You\u2019re on the waitlist', text: `You\u2019re number 3. We\u2019ll email ${st.email} if a spot opens. You won\u2019t be charged unless your spot is confirmed.`, manage: 'Leave waitlist' }
+      : { icon: '✓', iconBg: '#D6F26B', title: 'You\u2019re booked', text: `Confirmation sent to ${st.email}. Paid ${price}. Cancel up to 12 hours before class for a full refund.`, manage: 'Manage or cancel booking' };
+    const cv = s.cover.phase;
+    const cover = {
+      isOpen: cv === 'open', isAccepted: cv === 'accepted', isDone: cv === 'confirmed' || cv === 'declined',
+      tag: { open: 'Open · awaiting instructor', accepted: 'Accepted · needs approval', confirmed: 'Confirmed', declined: 'Declined · still open' }[cv],
+      tagBg: cv === 'confirmed' ? '#D6F26B' : cv === 'open' ? '#F3F2EE' : P.butter,
+      staff: [
+        { init: 'ST', pastel: P.blush, name: 'Sam Tran', note: 'Available · teaches Vinyasa', state: cv === 'accepted' ? 'Accepted' : cv === 'confirmed' ? 'Assigned' : 'Notified', bg: cv === 'confirmed' ? '#D6F26B' : cv === 'accepted' ? P.aqua : '#fff', fg: '#141414' },
+        { init: 'AS', pastel: P.butter, name: 'Ana Silva', note: 'Available · teaches Vinyasa', state: 'Notified', bg: '#fff', fg: '#141414' },
+        { init: 'JL', pastel: P.lilac, name: 'Jordan Lee', note: 'Teaching at Leslieville 7:00 am', state: 'Unavailable', bg: '#fff', fg: '#5D5D58' },
+      ],
+      history: s.cover.history,
+    };
+
+    const offline = !s.online, orders = s.orders || [];
+    const mk = o => {
+      const mins = Math.round((o.due - s.now) / 60000);
+      const pending = !!s.pending[o.id], rej = s.rejecting === o.id;
+      const late = mins < 0 && o.status !== 'ready';
+      const prim = { new: ['Accept', 'preparing', 'accepted'], preparing: ['Mark ready', 'ready', 'marked ready'], ready: ['Collected', 'collected', 'collected'] }[o.status];
+      return {
+        id: o.id, name: o.name, due: hm(o.due), items: o.items,
+        overdue: late ? `⏱ Overdue ${-mins} min` : mins < 0 ? `Waiting ${-mins} min` : '',
+        bg: late ? '#F8C9C6' : o.status === 'new' ? P.butter : o.status === 'ready' ? P.lime : '#FFFFFF',
+        isPending: pending, isRejecting: rej && !pending, showActions: !pending && !rej, isNew: o.status === 'new',
+        primaryLabel: prim[0], primary: () => this.act(o.id, prim[1], prim[2]),
+        reject: () => this.setState({ rejecting: o.id }), cancelReject: () => this.setState({ rejecting: null }), confirmReject: () => this.act(o.id, 'rejected'),
+      };
+    };
+    const col = (key, title, dot, emptyText) => { const list = orders.filter(o => o.status === key).sort((a, b) => a.due - b.due).map(mk); return { title, dot, orders: list, count: list.length, empty: !list.length, emptyText }; };
+
+    const ai = s.ai;
+    const aiRunning = ai.phase === 'running' || ai.phase === 'done';
+    const aiRows = ai.cands.map(id => ({
+      name: LOC[id].name, inc: !!ai.include[id], locked: aiRunning,
+      channels: id === 'kt' ? 'Web page only · no consented email list' : 'Web page + email to consented members',
+      result: !ai.include[id] ? 'Excluded' : ai.results[id] === 'ok' ? '✓ Draft created' : ai.results[id] === 'queued' ? 'Creating…' : '',
+      resColor: ai.results[id] === 'ok' ? '#2F6B3A' : '#5D5D58',
+      toggle: () => this.setState(x => ({ ai: { ...x.ai, include: { ...x.ai.include, [id]: !x.ai.include[id] } } })),
+    }));
+    const aiCount = ai.cands.filter(id => ai.include[id]).length;
+    const navActive = n => (sc === 'publish' && n === 'Websites') || (sc === 'ai' && n === 'Marketing');
+
+    return {
+      scenarios: SCEN.map(([id, num, label]) => ({ num, label, bg: sc === id ? '#fff' : 'transparent', fg: sc === id ? '#141414' : '#D0D0CA', go: () => { this.setState({ scenario: id }); window.scrollTo(0, 0); } })),
+      isWeb: sc === 'web', inApp: sc === 'publish' || sc === 'ai', isPublish: sc === 'publish', isAI: sc === 'ai', isStudio: sc === 'studio', isKitchen: sc === 'kitchen',
+
+      webHome: s.webView === 'home', webDemo: s.webView !== 'home', demoForm: s.webView === 'demo' || s.webView === 'sending', demoDone: s.webView === 'done',
+      goHome: () => { this.setState({ webView: 'home' }); window.scrollTo(0, 0); },
+      openDemo: () => this.openDemo(), scrollIndustries: () => scrollToId('bh2-industries'), scrollHow: () => scrollToId('bh2-how'),
+      previewRows: LOCS.map(l => ({ name: l.name, enq: l.enq, dot: l.dot, sync: l.ok ? l.sync : `⚠ ${l.sync}`, syncColor: l.ok ? '#5D5D58' : '#8A5A00', bg: l.id === s.previewLoc ? '#F3F2EE' : 'transparent', pick: () => this.setState({ previewLoc: l.id }) })),
+      previewLoc: { ...pl, syncColor: pl.ok ? '#2F6B3A' : '#8A5A00', syncIcon: pl.ok ? '✓' : '⚠' },
+      industries: IND.map(i => ({ ...i, slot: `v2-ind-${i.name.toLowerCase()}`, demo: () => this.openDemo(i.name) })),
+      capabilities: CAPS.map(c => { const [b, fg] = capTag(c.tag); return { ...c, tagBg: b, tagFg: fg }; }),
+      industryChips: IND.map(i => { const o = f.industry === i.name; return { name: i.name, on: o, bg: o ? '#141414' : i.pastel, fg: o ? '#fff' : '#141414', bd: o ? '#141414' : i.pastel, pick: () => this.setForm('industry', i.name) }; }),
+      sizeOpts: [['Single business', 'One location'], ['Network', 'Several locations or franchises']].map(([n, d]) => { const o = f.size === n; return { name: n, desc: d, on: o, bg: o ? '#F3F2EE' : '#fff', bd: o ? '#141414' : '#D8D6CF', pick: () => this.setState(x => ({ form: { ...x.form, size: n, locations: n === 'Single business' ? '1' : (x.form.locations === '1' ? '' : x.form.locations) } })) }; }),
+      form: f, errors: er, on, bd,
+      hasErrors: Object.keys(er).length > 0, errorCount: Object.keys(er).length, errorList: Object.values(er),
+      submitDemo: e => this.submitDemo(e), sending: s.webView === 'sending', submitLabel: s.webView === 'sending' ? 'Sending…' : 'Request demo',
+      sizeSummary: f.size === 'Network' ? `a network of ${f.locations} locations` : 'a single location',
+
+      navItems: ['Overview', 'Locations', 'Classes', 'Members', 'Websites', 'Marketing', 'Payments', 'Team', 'Reports', 'Connections', 'Settings'].map(n => { const a = navActive(n); return { name: n, bg: a ? '#D6F26B' : 'transparent', fg: a ? '#141414' : '#5D5D58', weight: a ? 700 : 500, dot: a ? '#141414' : 'transparent' }; }),
+      scope: s.scope, scopeOpts: SCOPES.map(x => ({ id: x.id, label: `${x.label} (${x.ids.length})` })), scopeLabel,
+      setScope: e => this.setState(x => ({ scope: e.target.value, pubPhase: 'review', pubStatus: {}, ai: { ...x.ai, phase: 'idle', cands: [], results: {} } })),
+
+      pubRows, pubBanner, pubReview: s.pubPhase === 'review', pubPartial: s.pubPhase === 'partial', pubDone: s.pubPhase === 'done',
+      pubCount: incIds.length, pubTotal: ids.length, pubNone: incIds.length === 0,
+      runPublish: () => this.runPublish(), retryFailed: () => incIds.filter(id => s.pubStatus[id] === 'fail').forEach(id => this.retry(id)),
+      resetPublish: () => this.setState({ pubPhase: 'review', pubStatus: {}, pubInclude: Object.fromEntries(LOCS.map(l => [l.id, true])) }),
+
+      st, stOn: { name: e => this.stSet({ name: e.target.value }), email: e => this.stSet({ email: e.target.value }) },
+      stStepLoc: st.step === 'location', stStepClasses: st.step === 'classes', stStepDetails: st.step === 'details', stStepDone: st.step === 'confirmed' || st.step === 'waitlisted',
+      stBack: () => { clearInterval(this.holdT); this.stSet({ step: st.step === 'details' ? 'classes' : 'location' }); },
+      stLocName: sl ? sl.name : 'Stillwater Yoga', stTz: sl ? sl.tz : '',
+      stLocs: LOCS.map(l => ({ ...l, pick: () => this.stSet({ loc: l.id, step: 'classes' }) })),
+      stDays: DAYS.map(([d, c], i) => { const o = st.day === i; return { label: d, on: o, bg: o ? '#fff' : '#2A2A2A', fg: o ? '#141414' : c, bd: o ? 'none' : '1.5px solid #3A3A3A', pick: () => this.stSet({ day: i }) }; }),
+      stClasses: CLASSES.map(c => ({ ...c, slot: `v2-class-${c.id}`, spots: c.left === 0 ? 'Full · waitlist open' : c.left === 1 ? '1 spot left' : `${c.left} spots left`, spotsColor: c.left <= 1 ? '#7A1010' : '#3E3E3A',
+        cta: c.left === 0 ? 'Join waitlist' : 'Book', btnBg: c.left === 0 ? '#141414' : '#fff', btnFg: c.left === 0 ? '#fff' : '#141414', pick: () => this.pickClass(c) })),
+      stCls: cls, stDayLabel: DAY_FULL[st.day], stIsFull: full, stHasHold: !full && !st.expired, stExpired: !full && st.expired, stPrice: price,
+      stSpotsShort: full ? 'Full' : `${cls.left} left`,
+      stHoldLabel: `${Math.floor(st.hold / 60)}:${pad(st.hold % 60)}`,
+      stRecheck: () => { this.stSet({ hold: 300, expired: false }); this.startHold(); },
+      stSubmit: () => this.stSubmit(), stSubmitDisabled: st.busy || (!full && st.expired),
+      stSubmitLabel: st.busy ? (full ? 'Joining…' : 'Processing payment…') : full ? 'Join waitlist' : `Book · ${price}`,
+      stDone, stRestart: () => this.stSet({ step: 'classes', cls: null, err: '' }),
+      cover,
+      coverAccept: () => this.setState(x => ({ cover: { phase: 'accepted', history: [...x.cover.history, { t: '9:05 am', e: 'Sam Tran accepted' }] } })),
+      coverApprove: () => this.setState(x => ({ cover: { phase: 'confirmed', history: [...x.cover.history, { t: '9:11 am', e: 'Jamie M. approved · schedule and class page updated' }, { t: '9:11 am', e: '16 booked customers emailed' }] } })),
+      coverDecline: () => this.setState(x => ({ cover: { phase: 'declined', history: [...x.cover.history, { t: '9:11 am', e: 'Jamie M. declined Sam Tran · request reopened' }] } })),
+      coverReset: () => this.setState({ cover: freshCover() }),
+
+      clock: hm(s.now), offline, alerts: s.alerts, collected: s.collected, toast: s.toast, lastRefresh: s.lastRefresh, boardOpacity: offline ? 0.5 : 1,
+      conn: offline ? { label: '✕ Offline', bg: P.blush } : { label: '● Live', bg: '#D6F26B' },
+      alertsLabel: s.alerts ? 'Alert sound: on' : 'Alert sound: off', toggleAlerts: () => this.setState(x => ({ alerts: !x.alerts })),
+      onlineToggleLabel: offline ? 'Simulate reconnect' : 'Simulate connection loss',
+      toggleOnline: () => this.setState(x => x.online ? { online: false, lastRefresh: hms(new Date()), toast: '' } : { online: true, now: new Date(), toast: 'Reconnected · orders refreshed just now' }),
+      addOrder: () => this.addOrder(),
+      columns: [col('new', 'New', P.butter, 'No new orders'), col('preparing', 'Preparing', '#fff', 'Nothing in preparation'), col('ready', 'Ready for pickup', '#D6F26B', 'No orders waiting')],
+      menuItems: MENU.map(n => { const so = !!s.soldOut[n]; return { name: n, sold: so, label: so ? 'SOLD OUT' : 'AVAILABLE', bg: so ? P.blush : '#D6F26B', toggle: () => this.setState(x => ({ soldOut: { ...x.soldOut, [n]: !x.soldOut[n] } })) }; }),
+
+      campaigns: s.campaigns.map(c => ({ ...c, bg: c.fresh ? '#F5EEFC' : '#F8F7F3', tagBg: c.status === 'Draft' ? P.lilac : c.status === 'Scheduled' ? P.aqua : '#fff' })),
+      aiPrompt: ai.prompt, aiType: e => { const v = e.target.value; this.setState(x => ({ ai: { ...x.ai, prompt: v } })); },
+      aiSend: () => this.aiSend(), aiBusy: ai.phase === 'thinking' || ai.phase === 'running',
+      aiIdle: ai.phase === 'idle', aiAsked: ai.phase !== 'idle', aiThinking: ai.phase === 'thinking', aiNoCands: ai.phase === 'nocands',
+      aiHasPlan: ['plan', 'running', 'done'].includes(ai.phase), aiPlanReady: ai.phase === 'plan', aiFinished: ai.phase === 'done',
+      aiRows, aiCount, aiNone: aiCount === 0, aiCandCount: ai.cands.length,
+      aiRun: () => this.aiRun(),
+      aiReset: () => this.setState(x => ({ ai: { ...x.ai, phase: 'idle', cands: [], results: {} }, campaigns: x.campaigns.filter(c => !c.fresh) })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<script src="./bh-shell.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+</helmet>
+<bh-topbar active="business"></bh-topbar>
+<div style="display:flex;gap:12px;padding:12px;align-items:flex-start">
+  <aside style="width:232px;flex-shrink:0;background:#fff;border-radius:28px;padding:16px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto">
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:2px 6px 12px"><span style="width:36px;height:36px;border-radius:12px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ ind.icon }}" size="18"></bh-icon></span><div><div style="font-size:14px;font-weight:800">Business suite</div><div style="font-size:11px;color:#5D5D58">{{ ind.org }}</div></div></div>
+    <div style="flex-shrink:0;display:flex;gap:3px;padding:4px;border-radius:999px;background:#F3F2EE;margin-bottom:8px"><sc-for list="{{ roles }}" as="r" hint-placeholder-count="2"><button onClick="{{ r.pick }}" style="flex:1;height:32px;border-radius:999px;border:none;background:{{ r.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ r.label }}</button></sc-for></div>
+    <sc-if value="{{ isLoc }}" hint-placeholder-val="{{ false }}"><select aria-label="Location" value="{{ locId }}" onChange="{{ setLoc }}" style="flex-shrink:0;height:40px;border-radius:14px;border:1.5px solid #141414;padding:0 10px;font-size:13px;font-weight:700;background:#fff;margin-bottom:6px"><sc-for list="{{ locOpts }}" as="l" hint-placeholder-count="3"><option value="{{ l.id }}">{{ l.name }}</option></sc-for></select></sc-if>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="7"><button onClick="{{ n.go }}" style="height:40px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:999px;border:none;font-size:13px;font-weight:{{ n.w }};background:{{ n.bg }};color:#141414;cursor:pointer;text-align:left;width:100%"><bh-icon name="{{ n.icon }}" size="16"></bh-icon><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;border-radius:10px;background:#141414;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px">{{ n.badge }}</span></sc-if></button></sc-for>
+    <div style="flex-shrink:0;margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:2px"><a href="{{ backHref }}" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:600;color:#5D5D58;text-decoration:none"><bh-icon name="arrow-left" size="15"></bh-icon>{{ backLabel }}</a></div>
+  </aside>
+
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding:6px 6px 0">
+      <div style="flex:1;min-width:240px"><div style="font-size:13px;font-weight:600;color:#5D5D58">{{ scopeLabel }}</div><h1 style="margin:2px 0 0;font-size:34px;font-weight:700;letter-spacing:-.035em">{{ title }}</h1></div>
+      <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#fff;flex-wrap:wrap"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="height:36px;padding:0 14px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ t.label }}</button></sc-for></div>
+    </div>
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div role="status" style="align-self:flex-start;display:flex;align-items:center;gap:10px;background:#D6F26B;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:700"><bh-icon name="check-circle" size="17"></bh-icon>{{ toast }}</div></sc-if>
+    <sc-if value="{{ hasKpis }}" hint-placeholder-val="{{ true }}"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px"><sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:{{ k.bg }};border-radius:24px;padding:16px"><div style="display:flex;justify-content:space-between;gap:6px"><span style="font-size:12px;font-weight:700">{{ k.l }}</span><bh-icon name="{{ k.icon }}" size="15"></bh-icon></div><div style="font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums">{{ k.v }}</div><div style="font-size:11px;color:#3E3E3A">{{ k.n }}</div></div></sc-for></div></sc-if>
+
+    <!-- GENERIC TABLE -->
+    <sc-if value="{{ hasTable }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border-radius:28px;padding:10px;overflow:auto">
+        <div style="display:grid;grid-template-columns:{{ tbl.grid }};min-width:{{ tbl.minW }};padding:10px 14px;font-size:12px;font-weight:700;color:#5D5D58"><sc-for list="{{ tbl.cols }}" as="c" hint-placeholder-count="5"><span>{{ c }}</span></sc-for></div>
+        <sc-for list="{{ tbl.rows }}" as="r" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:{{ tbl.grid }};min-width:{{ tbl.minW }};padding:10px 14px;border-radius:16px;align-items:center;font-size:13px;background:{{ r.bg }}">
+            <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+              <span style="min-width:0">
+                <sc-if value="{{ c.isPill }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:{{ c.bg }}">{{ c.t }}</span></sc-if>
+                <sc-if value="{{ c.isBtn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.act }}" style="height:32px;padding:0 12px;border-radius:999px;border:{{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ c.t }}</button></sc-if>
+                <sc-if value="{{ c.isImg }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:10px"><img src="{{ c.img }}" alt="" style="width:34px;height:34px;border-radius:{{ c.radius }};object-fit:cover;flex-shrink:0"><span style="min-width:0"><strong style="display:block">{{ c.t }}</strong><span style="font-size:11px;color:#5D5D58">{{ c.sub }}</span></span></span></sc-if>
+                <sc-if value="{{ c.isBar }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px"><span style="width:70px;height:6px;border-radius:3px;background:#F3F2EE;overflow:hidden"><span style="display:block;height:100%;width:{{ c.w }};background:{{ c.bg }}"></span></span><span style="font-size:12px;font-weight:700">{{ c.t }}</span></span></sc-if>
+                <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ true }}"><span style="display:block;font-weight:{{ c.w }};font-variant-numeric:tabular-nums">{{ c.t }}</span><sc-if value="{{ c.sub }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#5D5D58">{{ c.sub }}</span></sc-if></sc-if>
+              </span>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ tblNote }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:20px;padding:12px 16px;font-size:12px;line-height:1.55"><bh-icon name="info" size="15"></bh-icon>{{ tblNote }}</div></sc-if>
+    </sc-if>
+
+    <!-- REPORT CHARTS -->
+    <sc-if value="{{ hasCharts }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px">
+        <sc-for list="{{ charts }}" as="ch" hint-placeholder-count="2">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><div style="font-size:16px;font-weight:700">{{ ch.title }}</div><div style="font-size:11px;color:#5D5D58">{{ ch.def }}</div></div><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:#F3F2EE;white-space:nowrap">{{ ch.fresh }}</span></div>
+            <sc-if value="{{ ch.isCols }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:10px"><sc-for list="{{ ch.bars }}" as="b" hint-placeholder-count="12"><div title="{{ b.tip }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end"><span style="width:100%;height:{{ b.h }};border-radius:8px 8px 4px 4px;background:{{ b.bg }}"></span><span style="font-size:9px;color:#5D5D58">{{ b.l }}</span></div></sc-for></div></sc-if>
+            <sc-if value="{{ ch.isRows }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ ch.bars }}" as="b" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:10px;font-size:12px"><span style="width:130px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.l }}</span><span style="flex:1;height:22px;border-radius:8px;background:#F3F2EE;overflow:hidden"><span style="display:block;height:100%;width:{{ b.h }};background:{{ b.bg }};border-radius:8px"></span></span><span style="width:90px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums">{{ b.tip }}</span></div></sc-for></div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- SCHEDULE GRID -->
+    <sc-if value="{{ hasRoster }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:28px;padding:14px;overflow:auto">
+        <div style="display:grid;grid-template-columns:180px repeat(7,minmax(110px,1fr));gap:6px;min-width:960px">
+          <span></span><sc-for list="{{ rosterDays }}" as="d" hint-placeholder-count="7"><span style="font-size:12px;font-weight:800;padding:6px;text-align:center;border-radius:10px;background:{{ d.bg }}">{{ d.l }}</span></sc-for>
+          <sc-for list="{{ roster }}" as="r" hint-placeholder-count="5">
+            <span style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700"><img src="{{ r.img }}" alt="" style="width:30px;height:30px;border-radius:15px;object-fit:cover">{{ r.name }}<br></span>
+            <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7"><button onClick="{{ c.act }}" title="{{ c.title }}" style="min-height:52px;border-radius:12px;border:{{ c.bd }};background:{{ c.bg }};font-size:11px;font-weight:700;cursor:pointer;color:#141414;padding:4px;line-height:1.3">{{ c.t }}<br><span style="font-weight:500;color:#3E3E3A">{{ c.sub }}</span></button></sc-for>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px">
+        <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:8px"><div style="font-size:15px;font-weight:700">Requests</div><sc-for list="{{ rosterReqs }}" as="q" hint-placeholder-count="3"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:#F8F7F3;font-size:13px"><img src="{{ q.img }}" alt="" style="width:30px;height:30px;border-radius:15px;object-fit:cover"><span style="flex:1 1 180px"><strong>{{ q.who }}</strong> · {{ q.t }}</span><sc-if value="{{ q.open }}" hint-placeholder-val="{{ true }}"><button onClick="{{ q.approve }}" style="height:32px;padding:0 12px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">Approve</button><button onClick="{{ q.decline }}" style="height:32px;padding:0 12px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">Decline</button></sc-if><sc-if value="{{ q.closed }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:{{ q.stBg }}">{{ q.st }}</span></sc-if></div></sc-for></div>
+        <div style="background:#141414;color:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px"><div style="font-size:15px;font-weight:700">Publish schedule</div><div style="font-size:13px;color:#C9C9C3;line-height:1.55">{{ rosterSummary }}</div><button onClick="{{ publishRoster }}" disabled="{{ rosterPublished }}" style="align-self:flex-start;height:44px;padding:0 18px;border-radius:999px;background:#D6F26B;color:#141414;border:none;font-size:13px;font-weight:800;cursor:pointer">{{ publishLabel }}</button></div>
+      </div>
+    </sc-if>
+
+    <!-- SPLIT PANEL (support thread / course player / invoice) -->
+    <sc-if value="{{ hasPanel }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:10px;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ panel.items }}" as="i" hint-placeholder-count="5"><button onClick="{{ i.pick }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:none;background:{{ i.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:40px;height:40px;border-radius:12px;background:{{ i.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><sc-if value="{{ i.img }}" hint-placeholder-val="{{ false }}"><img src="{{ i.img }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if><sc-if value="{{ i.noImg }}" hint-placeholder-val="{{ true }}"><bh-icon name="{{ i.icon }}" size="17"></bh-icon></sc-if></span><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ i.t }}</span><span style="font-size:12px;color:#5D5D58">{{ i.sub }}</span></span><sc-if value="{{ i.st }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ i.stBg }};white-space:nowrap">{{ i.st }}</span></sc-if></button></sc-for>
+          <sc-if value="{{ panel.hasNew }}" hint-placeholder-val="{{ false }}"><button onClick="{{ panel.newAct }}" style="margin:6px;height:42px;border-radius:999px;border:1.5px dashed #5D5D58;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414">{{ panel.newLabel }}</button></sc-if>
+        </div>
+        <div style="background:#fff;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:12px;position:sticky;top:12px">
+          <sc-if value="{{ panel.hero }}" hint-placeholder-val="{{ false }}"><div style="position:relative;border-radius:20px;overflow:hidden;aspect-ratio:16/9;background:#141414"><img src="{{ panel.hero }}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.85"><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:30px;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center"><bh-icon name="play" size="24"></bh-icon></span></div></sc-if>
+          <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:20px;font-weight:700;letter-spacing:-.02em">{{ panel.title }}</div><div style="font-size:12px;color:#5D5D58">{{ panel.sub }}</div></div><sc-if value="{{ panel.st }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:{{ panel.stBg }}">{{ panel.st }}</span></sc-if></div>
+          <sc-for list="{{ panel.blocks }}" as="b" hint-placeholder-count="3">
+            <sc-if value="{{ b.isMsg }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px"><img src="{{ b.img }}" alt="" style="width:32px;height:32px;border-radius:16px;object-fit:cover;flex-shrink:0"><div style="flex:1;min-width:0"><div style="font-size:12px"><strong>{{ b.who }}</strong> <span style="color:#5D5D58">· {{ b.at }}</span></div><div style="font-size:13px;line-height:1.55;background:{{ b.bg }};border-radius:4px 16px 16px 16px;padding:9px 12px;margin-top:3px">{{ b.t }}</div></div></div></sc-if>
+            <sc-if value="{{ b.isLine }}" hint-placeholder-val="{{ true }}"><div style="display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:12px;background:{{ b.bg }};font-size:13px"><span style="font-weight:{{ b.w }}">{{ b.k }}</span><span style="font-weight:{{ b.w }};font-variant-numeric:tabular-nums">{{ b.v }}</span></div></sc-if>
+            <sc-if value="{{ b.isCheck }}" hint-placeholder-val="{{ false }}"><button onClick="{{ b.act }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;border:none;background:#F8F7F3;cursor:pointer;text-align:left;font-size:13px;color:#141414"><span style="color:{{ b.fg }}"><bh-icon name="{{ b.icon }}" size="16"></bh-icon></span><span style="flex:1;font-weight:600">{{ b.t }}</span><span style="font-size:11px;color:#5D5D58">{{ b.v }}</span></button></sc-if>
+          </sc-for>
+          <sc-if value="{{ panel.hasInput }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px"><input aria-label="Reply" placeholder="{{ panel.ph }}" value="{{ draft }}" onChange="{{ setDraft }}" style="flex:1;min-width:0;height:44px;border:none;border-radius:999px;padding:0 16px;font-size:14px;background:#F3F2EE"><button onClick="{{ panel.send }}" style="height:44px;padding:0 16px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Send</button></div></sc-if>
+          <sc-if value="{{ panel.cta }}" hint-placeholder-val="{{ false }}"><button onClick="{{ panel.ctaAct }}" disabled="{{ panel.ctaOff }}" style="align-self:flex-start;height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ panel.cta }}</button></sc-if>
+          <sc-if value="{{ panel.note }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#5D5D58;line-height:1.5">{{ panel.note }}</div></sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- CARDS GRID (KB articles, plans, permission matrix etc.) -->
+    <sc-if value="{{ hasCards }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ cardsTitle }}" hint-placeholder-val="{{ false }}"><div style="font-size:17px;font-weight:700;padding:4px 6px 0">{{ cardsTitle }}</div></sc-if>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:12px">
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="4"><div style="background:{{ c.bg }};border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:8px;border:2px solid {{ c.bd }}"><div style="display:flex;align-items:center;gap:10px"><span style="width:38px;height:38px;border-radius:12px;background:{{ c.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ c.icon }}" size="17"></bh-icon></span><span style="flex:1;font-size:15px;font-weight:700">{{ c.t }}</span><sc-if value="{{ c.tag }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:#fff">{{ c.tag }}</span></sc-if></div><div style="font-size:13px;line-height:1.55;color:#3E3E3A">{{ c.d }}</div><sc-if value="{{ c.cta }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.act }}" style="margin-top:auto;align-self:flex-start;height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ c.cta }}</button></sc-if></div></sc-for>
+      </div>
+    </sc-if>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P0 = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE' };
+const MODS = [['finance', 'Finance', 'wallet'], ['reports', 'Reports', 'chart'], ['scheduling', 'Scheduling', 'calendar'], ['inventory', 'Inventory & suppliers', 'box'], ['training', 'Training', 'book'], ['support', 'Help & support', 'help'], ['settings', 'Settings & billing', 'settings']];
+const TABS = {
+  finance: { hq: ['Royalties', 'Reconciliation', 'Payouts'], loc: ['Statements', 'Transactions', 'Payouts'] },
+  reports: { hq: ['Network', 'Locations', 'Marketing'], loc: ['My location', 'vs network', 'Marketing'] },
+  scheduling: { hq: ['Coverage'], loc: ['This week', 'Time off'] },
+  inventory: { hq: ['Network stock', 'Suppliers', 'Orders'], loc: ['Stock', 'Orders', 'Transfers'] },
+  training: { hq: ['Courses', 'Completion'], loc: ['My team', 'Courses'] },
+  support: { hq: ['Location tickets', 'Knowledge base'], loc: ['My tickets', 'Knowledge base'] },
+  settings: { hq: ['Subscription', 'Roles & permissions', 'Security & data'], loc: ['Location settings', 'Notifications'] },
+};
+const STOCK = {
+  studios: [['Yoga mat · Stillwater', 'Retail', 14, 10, 'Brand supplier'], ['Mat cleaner 500ml', 'Studio use', 3, 8, 'Brand supplier'], ['Water bottle', 'Retail', 22, 12, 'Brand supplier'], ['Towels', 'Studio use', 40, 50, 'Local laundry']],
+  sports: [['Size 4 balls', 'Equipment', 18, 24, 'Brand supplier'], ['Training bibs', 'Equipment', 60, 48, 'Brand supplier'], ['Cones (set)', 'Equipment', 4, 6, 'Brand supplier'], ['First aid kits', 'Safety', 2, 4, 'Local pharmacy']],
+  health: [['Massage oil 1L', 'Treatment', 5, 6, 'Approved supplier'], ['Disposable linens', 'Treatment', 120, 200, 'Approved supplier'], ['Hand sanitizer', 'Clinic', 9, 12, 'Approved supplier'], ['Retail vitamins', 'Retail', 31, 20, 'Approved supplier']],
+  commerce: [['Waxed canvas backpack', 'Product', 12, 10, 'Fieldnote HQ'], ['Leather watch', 'Product', 3, 6, 'Fieldnote HQ'], ['Everyday sneaker', 'Product', 0, 8, 'Fieldnote HQ'], ['Gift boxes', 'Packaging', 80, 100, 'Local supplier']],
+  foods: [['Chicken thigh (kg)', 'Protein', 18, 25, 'Pacific Foods'], ['00 flour (kg)', 'Dry goods', 40, 30, 'Pacific Foods'], ['Maple syrup (L)', 'Dry goods', 3, 6, 'Brand supplier'], ['Takeaway bowls', 'Packaging', 220, 400, 'Brand supplier']],
+  realty: [['For-sale signs', 'Signage', 14, 10, 'Brand print partner'], ['Open house A-frames', 'Signage', 3, 6, 'Brand print partner'], ['Listing brochures', 'Print', 120, 200, 'Brand print partner'], ['Lockboxes', 'Equipment', 8, 10, 'Local supplier']],
+};
+const COURSES = [['Running your day in BranchHarbor', '25 min · 5 lessons', 'All staff', 'play'], ['Brand standards v4.0', '15 min · 3 lessons', 'All staff', 'palette'], ['Customer privacy basics', '12 min · quiz', 'All staff', 'shield'], ['Payments, refunds and disputes', '20 min', 'Owners & managers', 'card'], ['Social media policy', '10 min', 'Marketing roles', 'share'], ['Opening & closing checklist', '8 min', 'Front desk', 'check-circle']];
+const KB = [['Connect your payment account', 'Payments', 'card'], ['Why is my payout pending?', 'Payments', 'clock'], ['Change opening hours', 'Website', 'globe'], ['Invite a staff member', 'Team', 'users'], ['Fix a booking sync error', 'Connections', 'refresh'], ['Request a local ad', 'Marketing', 'target']];
+
+class Component extends DCLogic {
+  state = { ind: 'studios', role: 'hq', loc: null, mod: 'finance', tab: 0, done: {}, sel: 0, draft: '', msgs: {}, shifts: {}, reqs: {}, published: false, po: {}, lessons: {}, plan: 'Network', toast: '' };
+  componentDidMount() {
+    if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50);
+    const st = window.BH_STATE ? window.BH_STATE.get() : {}; const p = {}; if (st.ind) p.ind = st.ind; if (st.loc) { p.loc = st.loc; p.role = 'loc'; }
+    try { const h = new URLSearchParams(location.hash.slice(1)); if (h.get('screen')) p.mod = h.get('screen'); if (h.get('role')) p.role = h.get('role'); } catch (e) {}
+    this.setState(p);
+  }
+  componentWillUnmount() { clearInterval(this.poll); clearTimeout(this.tt); }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  T(cols, grid, rows, minW) { return { cols, grid: grid.split(' ').map(x => x.endsWith('px') ? x : `minmax(0,${x}fr)`).join(' '), minW: minW || '760px', rows: rows.map((r, i) => ({ bg: i % 2 ? '#fff' : '#FAFAF7', cells: r.map(c => typeof c === 'object' && c ? { isPill: c.k === 'pill', isBtn: c.k === 'btn', isImg: c.k === 'img', isBar: c.k === 'bar', isText: !c.k, t: c.t, sub: c.sub || '', w: c.w || 600, bg: c.bg || '#F3F2EE', fg: c.fg || '#141414', bd: c.bd || 'none', img: c.img, radius: c.radius || '17px', act: c.act || (() => {}) } : { isText: true, t: c, sub: '', w: 500 }) })) }; }
+
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {}, P = D.P;
+    const hq = s.role === 'hq';
+    const L = I.locs.find(l => l.id === s.loc) || I.locs[0];
+    const locs = hq ? I.locs : [L];
+    const tabs = TABS[s.mod][hq ? 'hq' : 'loc'];
+    const tab = Math.min(s.tab, tabs.length - 1);
+    const pill = (t, bg) => ({ k: 'pill', t, bg });
+    const btn = (t, act, primary) => ({ k: 'btn', t, act, bg: primary ? '#141414' : '#fff', fg: primary ? '#fff' : '#141414', bd: primary ? 'none' : '1.5px solid #141414' });
+    const money = (n, cur) => `${cur === 'CAD' ? 'CA$' : '$'}${Math.round(n).toLocaleString('en-US')}`;
+    const op = locs.filter(l => l.status === 'Operating');
+    const sales = (l, i) => [38400, 29100, 33800, 24200, 21900, 0][i % 6] * (s.ind === 'realty' ? 1.8 : s.ind === 'commerce' ? 1.4 : 1);
+    let out = { kpis: [], table: null, note: '', charts: null, roster: null, panel: null, cards: null, cardsTitle: '' };
+    const isDone = k => !!s.done[k];
+    const mark = (k, msg) => () => { this.setState(x => ({ done: { ...x.done, [k]: true } })); if (msg) this.toast(msg); };
+
+    if (s.mod === 'finance') {
+      if (hq) {
+        out.kpis = [['Royalties due · USD', money(9840, 'USD'), 'October · 6% of gross sales', 'receipt', I.pastel], ['Royalties due · CAD', money(5210, 'CAD'), 'October · shown separately', 'receipt', '#fff'], ['Marketing fund', '2% of sales', 'USD $3,280 · CA$1,740 collected', 'megaphone', P.butter], ['Overdue', '1 statement', 'Coastline Wellness · 12 days', 'alert', P.blush]];
+        if (tab === 0) out.table = this.T(['Franchisee', 'Period', 'Gross sales', 'Royalty 6%', 'Fund 2%', 'Status', ''], '1.4 .8 1 .9 .8 .9 120px', I.locs.filter(l => l.owner !== 'Company-owned' && l.status === 'Operating').map((l, i) => { const g = sales(l, i), k = `roy${l.id}`, st = isDone(k) ? 'Sent' : ['Paid', 'Draft', 'Overdue', 'Draft', 'Paid'][i % 5]; return [{ k: 'img', img: IMG[l.img], t: l.owner, sub: l.name, radius: '10px' }, 'October', { t: money(g, l.cur), sub: 'From POS & bookings' }, money(g * .06, l.cur), money(g * .02, l.cur), pill(st, st === 'Paid' ? '#E2F5A6' : st === 'Overdue' ? P.blush : st === 'Sent' ? P.aqua : '#F3F2EE'), st === 'Draft' ? btn('Send', mark(k, `Statement sent to ${l.owner}`), true) : st === 'Overdue' ? btn('Remind', mark(k, 'Reminder sent')) : '']; }));
+        if (tab === 1) { out.table = this.T(['Issue', 'Location', 'Amount', 'Found', 'Status', ''], '1.6 1 .8 .8 .9 130px', [['Paid, no booking record', 0, 28, '2h ago'], ['Amount differs from order', 1, 4.5, 'Yesterday'], ['Refund in provider, not in BranchHarbor', 2, 62, '2 days'], ['Duplicate payment event (ignored)', 0, 28, '3 days', true]].map(([t, li, amt, at, auto], i) => { const l = I.locs[li % I.locs.length], k = `rec${i}`, done = auto || isDone(k); return [{ t, sub: `Ref pi_${3812 + i}`, w: 700 }, l.name, money(amt, l.cur), at, pill(done ? 'Resolved' : 'Open', done ? '#E2F5A6' : P.butter), done ? '' : btn(i === 0 ? 'Create booking' : 'Match record', mark(k, 'Resolved and logged'), true)]; })); out.note = 'BranchHarbor checks signed payment events against bookings and orders every 15 minutes. Nothing is changed in the payment provider.'; }
+        if (tab === 2) out.table = this.T(['Location', 'Account', 'Next payout', 'Last payout', 'Status'], '1.2 1 .9 .9 .8', I.locs.map((l, i) => [{ k: 'img', img: IMG[l.img], t: l.name, sub: l.owner, radius: '10px' }, l.owner === 'Company-owned' ? 'HQ merchant account' : 'Franchisee account', l.status === 'Operating' ? money(sales(l, i) / 8, l.cur) : '—', l.status === 'Operating' ? 'Tue 8 Oct' : '—', pill(l.status === 'Operating' ? (i === 3 ? 'Verifying' : 'Enabled') : 'Not set up', l.status === 'Operating' ? (i === 3 ? P.butter : '#E2F5A6') : '#F3F2EE')]));
+      } else {
+        const g = sales(L, 0);
+        out.kpis = [[`Gross sales · ${L.cur}`, money(g, L.cur), 'October to date', 'trending', I.pastel], ['Royalty (6%)', money(g * .06, L.cur), 'Due 10 Nov', 'receipt', '#fff'], ['Marketing fund (2%)', money(g * .02, L.cur), 'Pays for network campaigns', 'megaphone', '#fff'], ['Next payout', money(g / 8, L.cur), 'Tue 15 Oct', 'wallet', P.butter]];
+        if (tab === 0) { const paid = isDone('paystmt'); out.panel = { items: ['October 2026', 'September 2026', 'August 2026'].map((m, i) => ({ t: m, sub: i === 0 ? 'Due 10 Nov' : 'Paid', icon: 'receipt', pastel: i === 0 ? P.butter : '#F3F2EE', noImg: true, img: '', st: i === 0 ? (paid ? 'Paid' : 'Due') : 'Paid', stBg: i === 0 && !paid ? P.butter : '#E2F5A6', bg: i === 0 ? '#F3F2EE' : 'transparent', pick: () => {} })), title: 'October royalty statement', sub: `${L.owner} · ${I.brand} ${L.name}`, st: paid ? 'Paid' : 'Due 10 Nov', stBg: paid ? '#E2F5A6' : P.butter,
+          blocks: [['Gross sales (bookings, shop, POS)', money(g, L.cur)], ['Less refunds', `−${money(312, L.cur)}`], ['Net sales', money(g - 312, L.cur)], ['Royalty 6%', money((g - 312) * .06, L.cur)], ['Marketing fund 2%', money((g - 312) * .02, L.cur)], ['Technology fee', money(149, L.cur)], ['Total due', money((g - 312) * .08 + 149, L.cur), true]].map(([k, v, b]) => ({ isLine: true, k, v, w: b ? 800 : 500, bg: b ? '#D6F26B' : '#F8F7F3' })),
+          cta: paid ? 'Paid · receipt emailed' : `Pay ${money((g - 312) * .08 + 149, L.cur)} by bank debit`, ctaOff: paid, ctaAct: mark('paystmt', 'Payment scheduled'), note: 'Sales figures come from connected booking, shop and POS data. Dispute a line from Help & support.' }; }
+        if (tab === 1) out.table = this.T(['Date', 'Customer', 'For', 'Amount', 'Payment', 'Refund'], '.7 1 1.2 .7 .8 .8', [['Today 9:12', 'Hana S.', I.items[0][0], I.items[0][2], 'Succeeded', '—'], ['Today 8:40', 'Leo M.', I.items[2 % I.items.length][0], I.items[2 % I.items.length][2], 'Succeeded', '—'], ['Yesterday', 'Chris W.', I.items[1][0], I.items[1][2], 'Succeeded', 'Partial · $10.00'], ['Yesterday', 'Priya N.', I.items[3 % I.items.length][0], I.items[3 % I.items.length][2], 'Failed', '—']].map(([d, c, f, a, p, r]) => [d, c, f, a, pill(p, p === 'Failed' ? P.blush : '#E2F5A6'), r]));
+        if (tab === 2) out.table = this.T(['Payout', 'Arrives', 'Amount', 'Status'], '1 1 1 1', [['#PO-2291', 'Tue 15 Oct', money(g / 8, L.cur), 'In transit'], ['#PO-2264', 'Tue 8 Oct', money(g / 9, L.cur), 'Paid'], ['#PO-2238', 'Tue 1 Oct', money(g / 10, L.cur), 'Paid']].map(([a, b, c, d]) => [{ t: a, w: 700 }, b, c, pill(d, d === 'Paid' ? '#E2F5A6' : P.aqua)]));
+      }
+    }
+
+    if (s.mod === 'reports') {
+      const weeks = Array.from({ length: 12 }, (_, i) => 40 + Math.round(Math.sin(i / 1.6) * 14 + i * 3));
+      out.kpis = (hq ? [['Revenue · USD', '$128,400', 'Last 30 days · connected sources', 'wallet', I.pastel], ['Revenue · CAD', 'CA$84,900', 'Not combined with USD', 'wallet', '#fff'], ['Active customers', '6,214', 'Visited or ordered in 90 days', 'users', '#fff'], ['Retention', '71%', 'Returned within 60 days', 'repeat', P.butter]] : [[`Revenue · ${L.cur}`, money(sales(L, 0), L.cur), 'Last 30 days', 'wallet', I.pastel], ['Active customers', '812', '90 days', 'users', '#fff'], ['Retention', '74%', 'Network median 71%', 'repeat', '#fff'], ['Occupancy / utilisation', '72%', 'Network median 66%', 'activity', P.butter]]).map(k => k);
+      const tabName = tabs[tab];
+      out.charts = tabName === 'Marketing' ? [{ title: 'Leads by source', def: 'First recorded source · last 30 days', fresh: 'Synced 1 h ago', rows: [['Meta lead ads', 164], ['Website forms', 131], ['Google Ads', 88], ['Instagram DMs', 47], ['Business Profile', 32]] }, { title: 'Cost per lead by channel', def: 'USD campaigns only · ad platform spend ÷ leads', fresh: 'Daily', rows: [['Google Ads', 21.8], ['Meta', 15.2], ['TikTok', 0], ['LinkedIn', 38.5]], money: true }]
+        : (hq && tabName === 'Locations') || (!hq && tabName === 'vs network') ? [{ title: hq ? 'Revenue by location · last 30 days' : 'You vs network', def: hq ? 'Each in its own currency' : 'Other locations are anonymised', fresh: 'Updated hourly', rows: (hq ? op : [L, ...I.locs.slice(1, 4)]).map((l, i) => [hq ? l.name : i === 0 ? `${L.name} (you)` : `Location ${String.fromCharCode(65 + i)}`, Math.round(sales(l, i) / 1000)]), k: true }, { title: 'Retention by location', def: 'Returned within 60 days', fresh: 'Daily', rows: (hq ? op : [L, ...I.locs.slice(1, 4)]).map((l, i) => [hq ? l.name : i === 0 ? `${L.name} (you)` : `Location ${String.fromCharCode(65 + i)}`, [74, 69, 77, 62, 71][i % 5]]), pct: true }]
+        : [{ title: hq ? 'Network revenue · weekly' : 'Weekly revenue', def: 'Gross sales from connected bookings, shop and POS', fresh: 'Updated hourly', cols: weeks }, { title: { studios: 'Class occupancy by hour', sports: 'Enrolment by age group', health: 'Utilisation by service', commerce: 'Sales by category', foods: 'Orders by hour', realty: 'Leads by stage' }[s.ind], def: 'Last 30 days', fresh: 'Daily', cols: [32, 58, 74, 66, 41, 38, 52, 81, 69, 44] }];
+      out.charts = out.charts.map(c => { if (c.cols) { const mx = Math.max(...c.cols); return { ...c, isCols: true, isRows: false, bars: c.cols.map((v, i) => ({ h: `${Math.round(v / mx * 100)}%`, bg: i === c.cols.length - 1 ? '#141414' : I.pastel, l: c.cols.length === 12 ? `W${i + 1}` : ['6a', '8a', '10a', '12p', '2p', '4p', '5p', '6p', '7p', '8p'][i], tip: String(v) })) }; } const mx = Math.max(...c.rows.map(r => r[1]), 1); return { ...c, isCols: false, isRows: true, bars: c.rows.map(([l, v], i) => ({ l, h: `${Math.round(v / mx * 100)}%`, bg: i === 0 ? '#141414' : I.pastel, tip: c.money ? (v ? `$${v.toFixed(2)}` : 'Not connected') : c.pct ? `${v}%` : c.k ? `${v}k` : String(v) })) }; });
+    }
+
+    if (s.mod === 'scheduling') {
+      const days = ['Mon 14', 'Tue 15', 'Wed 16', 'Thu 17', 'Fri 18', 'Sat 19', 'Sun 20'];
+      const staff = [[I.staffName, I.staffImg], ['Sam Tran', 'pM2'], ['Ana Silva', 'pW3'], ['Jordan Lee', 'pM4'], ['Taylor Brooks', 'pW2']];
+      const shiftDef = (r, d) => { const v = s.shifts[`${r}-${d}`]; if (v !== undefined) return v; if ((r + d) % 4 === 3) return null; return r === 4 ? 'mgr' : (r + d) % 2 ? 'am' : 'pm'; };
+      const LBL = { am: ['6:30–2:00', 'Open', I.pastel], pm: ['1:30–9:00', 'Close', P.aqua], mgr: ['9:00–5:00', 'Manager', P.butter] };
+      if (hq) {
+        out.kpis = [['Scheduled hours', '1,240', 'This week · all locations', 'clock', I.pastel], ['Open shifts', '6', '3 locations', 'alert', P.butter], ['Cover pool used', '4 shifts', 'HQ approved staff', 'users', '#fff'], ['Labour vs target', '96%', 'Of planned hours', 'activity', '#fff']];
+        out.table = this.T(['Location', 'Scheduled hours', 'Open shifts', 'Time-off requests', 'Published', ''], '1.2 .9 .8 .9 .8 140px', I.locs.map((l, i) => [{ k: 'img', img: IMG[l.img], t: l.name, sub: l.owner, radius: '10px' }, `${[212, 186, 240, 168, 150, 0][i % 6]} h`, { k: 'pill', t: String([1, 0, 2, 0, 3, 0][i % 6]), bg: [1, 0, 2, 0, 3, 0][i % 6] ? P.butter : '#E2F5A6' }, String(i % 3), pill(l.status === 'Operating' ? (i === 2 ? 'Draft' : 'Published') : '—', i === 2 ? P.butter : '#E2F5A6'), [1, 0, 2, 0, 3, 0][i % 6] ? btn('Offer to cover pool', mark(`cov${l.id}`, 'Offered to HQ cover pool')) : '']));
+      } else {
+        out.kpis = [['Scheduled hours', '186', 'This week', 'clock', I.pastel], ['Open shifts', String(Object.values(s.shifts).filter(v => v === 'open').length + 1), 'Need someone', 'alert', P.butter], ['Labour cost', money(4620, L.cur), 'Estimate · 13% of sales', 'wallet', '#fff'], ['Requests', String(2 - Object.keys(s.reqs).length), 'Swaps and time off', 'repeat', '#fff']];
+        out.roster = { days: days.map((l, d) => ({ l, bg: d === 3 ? '#D6F26B' : '#F3F2EE' })), rows: staff.map(([name, img], r) => ({ name, img: IMG[img], cells: days.map((_, d) => { const v = shiftDef(r, d); const open = v === 'open'; const L2 = LBL[v]; return { t: open ? 'Open shift' : L2 ? L2[0] : '+', sub: open ? 'Tap to fill' : L2 ? L2[1] : '', bg: open ? '#fff' : L2 ? L2[2] : '#FAFAF7', bd: open ? '2px dashed #C2502C' : '1px solid transparent', title: 'Click to change', act: () => this.setState(x => ({ shifts: { ...x.shifts, [`${r}-${d}`]: v === null ? 'am' : v === 'am' ? 'pm' : v === 'pm' ? 'open' : null }, published: false })) }; }) })) };
+        out.rosterReqs = [['Ana Silva', 'pW3', 'Time off Sat 19 Oct (family event)'], ['Sam Tran', 'pM2', 'Swap Tue close with Jordan']].map(([who, img, t], i) => { const st = s.reqs[i]; return { who, img: IMG[img], t, open: !st, closed: !!st, st: st || '', stBg: st === 'Approved' ? '#E2F5A6' : '#F3F2EE', approve: () => this.setState(x => ({ reqs: { ...x.reqs, [i]: 'Approved' } })), decline: () => this.setState(x => ({ reqs: { ...x.reqs, [i]: 'Declined' } })) }; });
+      }
+    }
+
+    if (s.mod === 'inventory') {
+      const items = STOCK[s.ind];
+      const low = items.filter(it => it[2] < it[3]).length;
+      out.kpis = [['Items tracked', String(items.length * (hq ? 8 : 1) + (hq ? 120 : 34)), hq ? 'Across all locations' : 'At this location', 'box', I.pastel], ['Below reorder level', String(hq ? low * 4 : low), 'Suggested orders ready', 'alert', P.butter], ['Open orders', String(1 + Object.keys(s.po).length), 'With suppliers', 'truck', '#fff'], ['Approved suppliers', hq ? '9' : '6', hq ? 'Set by HQ' : '4 HQ · 2 local', 'shield', '#fff']];
+      if (tabs[tab] === 'Stock' || tabs[tab] === 'Network stock') out.table = this.T(['Item', 'Type', 'On hand', 'Reorder at', 'Supplier', ''], '1.4 .8 .9 .7 1 140px', items.map(([n, t, oh, par, sup], i) => { const k = `po${i}`, ordered = !!s.po[k]; const h = hq ? oh * 6 : oh, p2 = hq ? par * 6 : par; return [{ t: n, w: 700 }, t, { k: 'bar', t: `${h}`, w: `${Math.min(100, Math.round(h / (p2 * 2) * 100))}%`, bg: h < p2 ? '#C2502C' : '#141414' }, String(p2), sup, h < p2 ? (ordered ? pill('Ordered', P.aqua) : btn(hq ? 'Notify locations' : `Order ${p2 * 2 - h}`, () => { this.setState(x => ({ po: { ...x.po, [k]: true } })); this.toast(hq ? 'Locations notified' : `Purchase order sent to ${sup}`); }, true)) : pill('OK', '#E2F5A6')]; }));
+      if (tabs[tab] === 'Suppliers') out.table = this.T(['Supplier', 'Supplies', 'Locations', 'Terms', 'Status'], '1.2 1.2 .8 .8 .8', [['Brand supplier', 'Branded retail and studio goods', 'All', 'Net 30', 'Approved'], ['Pacific Foods', 'Food and dry goods', 'West', 'Net 14', 'Approved'], ['Local laundry', 'Towels and linens', '2', 'Weekly', 'Local · approved'], ['Northline Paper', 'Packaging', '—', '—', 'Requested by 2 locations']].map(([a, b, c, d, e]) => [{ t: a, w: 700 }, b, c, d, pill(e, e.startsWith('Requested') ? P.butter : '#E2F5A6')]));
+      if (tabs[tab] === 'Orders') out.table = this.T(['Order', 'Supplier', 'Location', 'Items', 'Total', 'Status'], '.7 1 1 .6 .8 .9', [['#PO-1182', items[0][4], L.name, '3', money(486, L.cur), 'Delivered'], ['#PO-1190', items[1][4], L.name, '2', money(212, L.cur), 'Sent'], ...Object.keys(s.po).map((k, i) => [`#PO-12${i}${i}`, items[+k.slice(2)][4], L.name, '1', money(140, L.cur), 'Sent'])].map(([a, b, c, d, e, f]) => [{ t: a, w: 700 }, b, c, d, e, pill(f, f === 'Delivered' ? '#E2F5A6' : P.aqua)]));
+      if (tabs[tab] === 'Transfers') { out.table = this.T(['Item', 'From', 'To', 'Qty', 'Status', ''], '1.2 1 1 .5 .8 130px', [[items[2][0], I.locs[1 % I.locs.length].name, L.name, 6, 'Requested'], [items[0][0], L.name, I.locs[2 % I.locs.length].name, 4, 'In transit']].map(([n, f, t2, q, st], i) => [{ t: n, w: 700 }, f, t2, String(q), pill(isDone(`tr${i}`) ? 'Received' : st, isDone(`tr${i}`) ? '#E2F5A6' : P.aqua), st === 'In transit' && !isDone(`tr${i}`) ? btn('Mark received', mark(`tr${i}`, 'Received · stock updated with reason "transfer"')) : ''])); out.note = 'Every stock change keeps a reason: sale, delivery, transfer, damage or count.'; }
+    }
+
+    if (s.mod === 'training') {
+      if (hq || tabs[tab] === 'Courses') {
+        out.kpis = hq ? [['Courses', String(COURSES.length + 8), '6 required', 'book', I.pastel], ['Completion', '84%', 'Required courses · all staff', 'check-circle', '#fff'], ['Overdue', '17 people', 'Brand standards v4.0', 'alert', P.butter], ['Avg. quiz score', '91%', 'Last 30 days', 'star', '#fff']] : [];
+        if (hq && tab === 1) out.table = this.T(['Location', 'Staff', 'Required done', 'Overdue', ''], '1.2 .6 1 .6 140px', I.locs.map((l, i) => { const pct = [96, 88, 72, 91, 64, 40][i % 6]; return [{ k: 'img', img: IMG[l.img], t: l.name, sub: l.owner, radius: '10px' }, String(8 + i), { k: 'bar', t: `${pct}%`, w: `${pct}%`, bg: pct < 75 ? '#C2502C' : '#141414' }, String(Math.round((100 - pct) / 10)), pct < 80 ? btn('Send reminder', mark(`trn${i}`, `Reminder sent to ${l.name}`)) : '']; }));
+        else { const c = COURSES[s.sel] || COURSES[0]; const done = COURSES.map((_, i) => s.lessons[i] >= 3); out.panel = { items: COURSES.map((cc, i) => ({ t: cc[0], sub: `${cc[1]} · ${cc[2]}`, icon: cc[3], pastel: i === s.sel ? '#D6F26B' : '#F3F2EE', noImg: true, img: '', st: hq ? `${[96, 84, 90, 77, 81, 93][i]}%` : done[i] ? 'Completed' : (s.lessons[i] ? 'In progress' : 'Not started'), stBg: done[i] || hq ? '#E2F5A6' : s.lessons[i] ? P.aqua : '#F3F2EE', bg: s.sel === i ? '#F3F2EE' : 'transparent', pick: () => this.setState({ sel: i }) })), hasNew: hq, newLabel: '+ New course', newAct: () => this.toast('Opens the course builder'),
+          hero: IMG[I.imgs[s.sel % 5]], title: c[0], sub: `${c[1]} · for ${c[2].toLowerCase()}`, st: hq ? 'Required' : '', stBg: P.butter,
+          blocks: ['Why it matters', 'Step by step', 'Common mistakes', 'Quick check'].map((t, i) => { const d = (s.lessons[s.sel] || 0) > i; return { isCheck: true, t: `${i + 1}. ${t}`, v: d ? 'Done' : i === 3 ? '3 questions' : '3 min', icon: d ? 'check-circle' : 'play', fg: d ? '#2F6B3A' : '#141414', act: () => this.setState(x => ({ lessons: { ...x.lessons, [x.sel]: Math.max(x.lessons[x.sel] || 0, i + 1) } })) }; }),
+          cta: hq ? 'Assign to locations' : done[s.sel] ? 'Completed · certificate saved' : 'Continue', ctaOff: !hq && done[s.sel], ctaAct: () => hq ? this.toast('Assigned to all locations · due in 14 days') : this.setState(x => ({ lessons: { ...x.lessons, [x.sel]: Math.min(4, (x.lessons[x.sel] || 0) + 1) } })) }; }
+      } else {
+        out.kpis = [['Team members', '8', L.name, 'users', I.pastel], ['Required done', '86%', 'Network median 84%', 'check-circle', '#fff'], ['Overdue', '2', 'Brand standards v4.0', 'alert', P.butter], ['Certificates', '31', 'Saved to profiles', 'star', '#fff']];
+        out.table = this.T(['Person', 'Role', 'Required', 'Overdue course', ''], '1.2 .9 1 1.2 120px', [[I.staffName, I.staffImg, I.staffRole, 100, ''], ['Sam Tran', 'pM2', I.staffRole, 80, 'Brand standards v4.0'], ['Ana Silva', 'pW3', I.staffRole, 100, ''], ['Jordan Lee', 'pM4', 'Front desk', 60, 'Customer privacy basics'], ['Taylor Brooks', 'pW2', 'Location manager', 100, '']].map(([n, img, r, pct, od], i) => [{ k: 'img', img: IMG[img], t: n }, r, { k: 'bar', t: `${pct}%`, w: `${pct}%`, bg: pct < 80 ? '#C2502C' : '#141414' }, od || '—', od ? btn(isDone(`nudge${i}`) ? 'Nudged' : 'Nudge', mark(`nudge${i}`, `Reminder sent to ${n.split(' ')[0]}`)) : '']));
+      }
+    }
+
+    if (s.mod === 'support') {
+      if (tabs[tab] === 'Knowledge base') { out.cardsTitle = 'Popular articles'; out.cards = KB.map(([t, tag, icon], i) => ({ t, tag, icon, d: ['Step-by-step guide with screenshots.', 'What each payout status means and how long it takes.', 'Update hours on your website, Business Profile and booking pages at once.', 'Roles, location access and what each person can see.', 'Common causes and how to re-run a sync safely.', 'What your tier allows and how approval works.'][i], pastel: [I.pastel, P.butter, P.aqua, P.sage, P.blush, P.lilac][i], bg: '#fff', bd: 'transparent', cta: 'Read', act: () => this.toast('Opens the article') })); }
+      else {
+        const TK = [['#482', 'Payout pending for 3 days', 'Payments', hq ? I.locs[1 % I.locs.length].name : 'You', 'Answered', [['in', I.locs[1 % I.locs.length].owner, I.staffImg, 'Our payout shows pending since Friday. Is that normal?', 'Mon 10:05'], ['out', 'Daniel Kim', 'pM1', 'Yes. First payouts take up to 7 days while the provider verifies the account. Yours is on track for Tuesday.', 'Mon 10:40']]], ['#479', 'Class times showing 3 hours off', 'Connections', hq ? I.locs[2 % I.locs.length].name : 'You', 'Open', [['in', I.locs[2 % I.locs.length].owner, 'pM2', 'Our schedule on the website shows Eastern time but we are in Vancouver.', 'Sun 18:20']]], ['#471', 'Request: add a local supplier', 'Inventory', hq ? I.locs[0].name : 'You', 'Waiting on you', [['in', I.locs[0].owner, I.staffImg, 'Can we add Northline Paper for packaging?', 'Thu'], ['out', 'Jamie Morgan', 'pW1', 'Sure. Please upload their insurance certificate and we\u2019ll approve.', 'Fri']]], ['#466', 'Website photo approval', 'Website', hq ? I.locs[3 % I.locs.length].name : 'You', 'Closed', [['in', I.locs[3 % I.locs.length].owner, 'pM4', 'Can you approve our new team photo?', 'Last week'], ['out', 'Ines Duarte', 'pW3', 'Approved and published.', 'Last week']]]];
+        const tk = TK[s.sel] || TK[0];
+        const extra = s.msgs[tk[0]] || [];
+        out.kpis = hq ? [['Open tickets', '7', 'From locations', 'help', I.pastel], ['Oldest open', '1 day', 'Connections', 'clock', P.butter], ['Typical first reply', '3 h', 'Business hours · last 30 days', 'message', '#fff'], ['Resolved this week', '24', '', 'check-circle', '#fff']] : [];
+        out.panel = { items: TK.map((t, i) => ({ t: `${t[0]} · ${t[1]}`, sub: `${t[2]}${hq ? ' · ' + t[3] : ''}`, icon: 'help', pastel: i === s.sel ? '#D6F26B' : '#F3F2EE', noImg: true, img: '', st: t[4], stBg: t[4] === 'Open' ? P.butter : t[4] === 'Closed' ? '#F3F2EE' : t[4] === 'Answered' ? '#E2F5A6' : P.aqua, bg: s.sel === i ? '#F3F2EE' : 'transparent', pick: () => this.setState({ sel: i, draft: '' }) })), hasNew: !hq, newLabel: '+ New ticket', newAct: () => this.toast('New ticket form · choose a category'),
+          title: tk[1], sub: `${tk[0]} · ${tk[2]} · ${hq ? tk[3] : 'to ' + I.brand + ' HQ'}`, st: tk[4], stBg: P.aqua,
+          blocks: [...tk[5], ...extra].map(([dir, who, img, t, at]) => ({ isMsg: true, who, img: IMG[img], t, at, bg: dir === 'out' ? '#F1F8E0' : '#F8F7F3' })),
+          hasInput: true, ph: hq ? 'Reply to the location' : 'Reply to HQ', send: () => { const t = s.draft.trim(); if (!t) return; this.setState(x => ({ draft: '', msgs: { ...x.msgs, [tk[0]]: [...(x.msgs[tk[0]] || []), [hq ? 'out' : 'in', hq ? 'Jamie Morgan' : L.owner, hq ? 'pW1' : I.staffImg, t, 'Just now']] } })); },
+          note: 'Platform issues are passed to BranchHarbor support automatically, with your permission.' };
+      }
+    }
+
+    if (s.mod === 'settings') {
+      if (hq && tab === 0) {
+        out.kpis = [['Plan', s.plan, 'Billed per location', 'star', I.pastel], ['Locations billed', String(I.locs.filter(l => l.status === 'Operating').length), 'Opening locations are free', 'pin', '#fff'], ['Next invoice', '$1,404', '1 Nov · sample pricing', 'receipt', '#fff'], ['Payment method', 'Visa ···· 4242', 'Expires 08/28', 'card', '#fff']];
+        out.cards = [['Starter', 'One location. Website, bookings and basic marketing.', '$79/mo'], ['Network', 'Per location. HQ controls, autonomy tiers, marketing suite.', '$234/location'], ['Enterprise', 'Custom roles, SSO, data warehouse export and a named success manager.', 'Talk to us']].map(([t, d, tag], i) => ({ t, d, tag, icon: ['store', 'building', 'shield'][i], pastel: [P.butter, I.pastel, P.aqua][i], bg: s.plan === t ? '#fff' : '#FAFAF7', bd: s.plan === t ? '#141414' : 'transparent', cta: s.plan === t ? 'Current plan' : 'Switch', act: () => { this.setState({ plan: t }); this.toast(`Plan changed to ${t} from next invoice`); } }));
+        out.cardsTitle = 'Plans · sample pricing';
+        out.table = this.T(['Invoice', 'Period', 'Locations', 'Amount', 'Status', ''], '.8 1 .7 .8 .7 100px', [['INV-2026-10', 'October', '5', '$1,404.00', 'Paid'], ['INV-2026-09', 'September', '5', '$1,404.00', 'Paid'], ['INV-2026-08', 'August', '4', '$1,170.00', 'Paid']].map(([a, b, c, d, e]) => [{ t: a, w: 700 }, b, c, d, pill(e, '#E2F5A6'), btn('PDF', () => this.toast('Invoice downloaded'))]));
+      }
+      if (hq && tab === 1) { const roles = ['Org owner', 'HQ admin', 'Account manager', 'Franchise owner', 'Location manager', 'Staff', 'Marketing', 'Finance']; const perms = [['Billing & plan', 'xooooooo'], ['Autonomy policies', 'xxoooooo'], ['Brand center edit', 'xxoooooo'], ['Locations: all', 'xxxooooo'], ['Own locations', 'xxxxxooo'], ['Customer records', 'xoxxxooo'], ['Payments & refunds', 'xoxxoooX'], ['Publish marketing', 'xxoooo?o'], ['Schedules', 'xxoxxooo']]; out.table = this.T(['Permission', ...roles], '1.4 ' + roles.map(() => '.8').join(' '), perms.map(([p, m]) => [{ t: p, w: 700 }, ...m.split('').map(c => c === 'x' || c === 'X' ? pill('✓', '#E2F5A6') : c === '?' ? pill('Tier', P.butter) : pill('—', '#F3F2EE'))]), '1100px'); out.note = 'HQ access to customer records is off by default. Account managers see customer details only when a franchisee shares a ticket.'; }
+      if (hq && tab === 2) { out.cards = [['Single sign-on', 'Connect your identity provider for HQ staff.', 'shield', 'Enterprise'], ['Two-step verification', 'Required for everyone with payments or HQ access.', 'key', 'On'], ['Support access', 'BranchHarbor support can access your account only when you grant it, for up to 72 hours. Every action is logged.', 'eye', 'Off'], ['Data export', 'Download all records as CSV, or schedule a nightly export.', 'download', ''], ['Retention', 'Delete inactive customer records after 3 years unless a location needs them for legal reasons.', 'clock', ''], ['Audit log', 'Who changed what, where and when.', 'list', '']].map(([t, d, icon, tag], i) => ({ t, d, icon, tag, pastel: [P.aqua, '#E2F5A6', P.butter, I.pastel, P.sage, '#F3F2EE'][i], bg: '#fff', bd: 'transparent', cta: ['Set up', 'Manage', 'Grant access', 'Export', 'Edit', 'Open'][i], act: () => this.toast('Opens settings') })); }
+      if (!hq) { out.cards = (tab === 0 ? [['Business details', `${L.owner} · tax number on file`, 'building'], ['Location profile', `${L.addr} · ${L.hours}`, 'pin'], ['Payment account', 'Enabled · payouts every Tuesday', 'card'], ['Connections', 'Booking, shop and calendar connections for this location', 'plug'], ['Holidays & closures', 'Closures update the website, Business Profile and booking at once', 'calendar'], ['Data requests', 'Export or delete a customer\u2019s data when they ask', 'shield']] : [['New bookings and orders', 'Push and email', 'bell'], ['Messages from HQ', 'Push, email and staff app', 'megaphone'], ['Payment issues', 'Push, email and SMS', 'alert'], ['Daily summary', 'Email at 7:00 am', 'mail']]).map(([t, d, icon], i) => ({ t, d, icon, pastel: [I.pastel, P.aqua, P.butter, P.sage, P.blush, P.lilac][i % 6], bg: '#fff', bd: 'transparent', cta: tab === 0 ? 'Edit' : 'Change', act: () => this.toast('Saved') })); }
+    }
+
+    out.panelDefault = null;
+    return this.render2(s, I, IMG, P, hq, L, locs, tabs, tab, out, pill, btn, money, mark, isDone, sales);
+  }
+
+  render2(s, I, IMG, P, hq, L, locs, tabs, tab, out, pill, btn, money, mark, isDone, sales) {
+    const D = window.BH_DATA;
+    const modDef = MODS.find(m => m[0] === s.mod);
+    return {
+      ind: I, toast: s.toast, isLoc: !hq, locId: L.id, locOpts: I.locs.map(l => ({ id: l.id, name: l.name })), setLoc: e => { const v = e.target.value; this.setState({ loc: v }); window.BH_STATE && window.BH_STATE.set({ loc: v }); },
+      roles: [['hq', 'HQ'], ['loc', 'Location']].map(([k, label]) => ({ label, bg: s.role === k ? '#D6F26B' : 'transparent', pick: () => this.setState({ role: k, tab: 0 }) })),
+      nav: MODS.map(([k, label, icon]) => ({ label, icon, w: s.mod === k ? 800 : 500, bg: s.mod === k ? '#D6F26B' : 'transparent', badge: k === 'support' ? 2 : k === 'finance' && hq ? 1 : 0, go: () => { this.setState({ mod: k, tab: 0, sel: 0 }); window.scrollTo(0, 0); } })),
+      backHref: hq ? `BranchHarbor HQ.dc.html#ind=${s.ind}` : `BranchHarbor Location.dc.html#ind=${s.ind}&loc=${L.id}`, backLabel: hq ? 'HQ console' : 'Location console',
+      scopeLabel: hq ? `${I.org} · all locations` : `${I.brand} ${L.name} · ${L.owner}`, title: modDef[1],
+      tabs: tabs.map((label, i) => ({ label, bg: tab === i ? '#141414' : 'transparent', fg: tab === i ? '#fff' : '#141414', pick: () => this.setState({ tab: i, sel: 0 }) })),
+      hasKpis: out.kpis.length > 0, kpis: out.kpis.map(([l, v, n, icon, bg]) => ({ l, v, n, icon, bg })),
+      hasTable: !!out.table, tbl: out.table || { cols: [], rows: [], grid: '1fr', minW: '0' }, tblNote: out.note,
+      hasCharts: !!out.charts, charts: out.charts || [],
+      hasRoster: !!out.roster, rosterDays: out.roster ? out.roster.days : [], roster: out.roster ? out.roster.rows : [], rosterReqs: out.rosterReqs || [],
+      rosterSummary: s.published ? 'Published. Staff were notified in the staff app.' : 'Changes are saved as a draft. Staff see the schedule after you publish.', rosterPublished: s.published, publishLabel: s.published ? 'Published' : 'Publish and notify staff', publishRoster: () => { this.setState({ published: true }); this.toast('Schedule published · 5 staff notified'); },
+      hasPanel: !!out.panel, panel: out.panel ? { hasNew: false, hasInput: false, hero: '', st: '', note: '', cta: '', ...out.panel, blocks: (out.panel.blocks || []).map(b => ({ isMsg: false, isLine: false, isCheck: false, ...b })) } : { items: [], blocks: [] },
+      hasCards: !!out.cards, cards: out.cards || [], cardsTitle: out.cardsTitle,
+      draft: s.draft, setDraft: e => this.setState({ draft: e.target.value }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

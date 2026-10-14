@@ -1,0 +1,25 @@
+{
+  "name": "branch-harbor",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "dev:web": "pnpm --filter @bh/web dev",
+    "dev:app": "pnpm --filter @bh/app dev",
+    "dev:api": "pnpm --filter @bh/api dev",
+    "dev:mobile": "pnpm --filter @bh/mobile start",
+    "db:up": "docker compose up -d postgres redis mailpit",
+    "db:migrate": "pnpm --filter @bh/api db:migrate",
+    "db:seed": "pnpm --filter @bh/api db:seed"
+  },
+  "devDependencies": {
+    "turbo": "2.11.8",
+    "typescript": "5.9.3",
+    "prettier": "3.6.2"
+  }
+}

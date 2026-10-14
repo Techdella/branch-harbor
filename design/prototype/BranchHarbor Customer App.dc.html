@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<script src="./bh-shell.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input{font-family:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+</helmet>
+<bh-topbar active="custapp"></bh-topbar>
+<div style="max-width:1240px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:center">
+  <div style="width:390px;max-width:100%;height:820px;background:#161616;border-radius:52px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.22);flex-shrink:0">
+    <div style="height:100%;background:#FBFAF7;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;position:relative">
+      <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700;flex-shrink:0"><span>9:41</span><span style="width:100px;height:28px;border-radius:14px;background:#000"></span><span style="font-size:11px">●●● ▮</span></div>
+      <div style="flex:1;overflow:auto;padding:4px 16px 96px;display:flex;flex-direction:column;gap:14px">
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div role="status" style="background:#D6F26B;border-radius:16px;padding:10px 14px;font-size:13px;font-weight:700">{{ toast }}</div></sc-if>
+
+        <sc-if value="{{ t.home }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:10px"><img src="{{ img.me }}" alt="" style="width:42px;height:42px;border-radius:21px;object-fit:cover"><div style="flex:1"><div style="font-size:12px;color:#5D5D58">Good morning</div><div style="font-size:18px;font-weight:800">Hana</div></div><span style="display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:999px;background:#fff;font-size:12px;font-weight:700"><bh-icon name="pin" size="13"></bh-icon>{{ loc.name }}</span></div>
+          <div style="position:relative;height:200px;border-radius:28px;overflow:hidden"><img src="{{ img.hero }}" alt="" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.6))"></div><div style="position:absolute;left:16px;right:16px;bottom:14px;color:#fff"><div style="font-size:12px;font-weight:700;color:#D6F26B">{{ ind.brand }}</div><div style="font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.15">{{ offer }}</div></div></div>
+          <sc-if value="{{ next.show }}" hint-placeholder-val="{{ true }}"><div style="background:#141414;color:#fff;border-radius:24px;padding:16px;display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:14px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ ind.icon }}" size="20"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:11px;color:#D6F26B;font-weight:700">{{ next.kicker }}</span><span style="display:block;font-size:15px;font-weight:700">{{ next.t }}</span><span style="font-size:12px;color:#C9C9C3">{{ next.sub }}</span></span></div></sc-if>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><sc-for list="{{ quick }}" as="q" hint-placeholder-count="4"><button onClick="{{ q.go }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:20px;border:none;background:{{ q.bg }};cursor:pointer;font-size:11px;font-weight:700;color:#141414"><bh-icon name="{{ q.icon }}" size="20"></bh-icon>{{ q.l }}</button></sc-for></div>
+          <div style="font-size:16px;font-weight:700">{{ browseTitle }}</div>
+          <sc-for list="{{ itemsShort }}" as="it" hint-placeholder-count="2"><button onClick="{{ it.open }}" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:10px;border:none;cursor:pointer;text-align:left;color:#141414"><img src="{{ it.img }}" alt="" style="width:64px;height:64px;border-radius:16px;object-fit:cover"><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ it.t }}</span><span style="font-size:12px;color:#5D5D58">{{ it.sub }}</span></span><span style="font-size:13px;font-weight:800">{{ it.price }}</span></button></sc-for>
+        </sc-if>
+
+        <sc-if value="{{ t.browse }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ browseTitle }}</div>
+          <sc-if value="{{ hasDays }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><sc-for list="{{ days }}" as="d" hint-placeholder-count="5"><button onClick="{{ d.pick }}" style="flex:1;height:56px;border-radius:16px;border:none;background:{{ d.bg }};color:{{ d.fg }};font-size:11px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center">{{ d.d }}<span style="font-size:15px">{{ d.n }}</span></button></sc-for></div></sc-if>
+          <sc-for list="{{ items }}" as="it" hint-placeholder-count="4"><div style="background:#fff;border-radius:22px;overflow:hidden;display:flex;flex-direction:column"><sc-if value="{{ it.big }}" hint-placeholder-val="{{ false }}"><img src="{{ it.img }}" alt="" style="width:100%;height:150px;object-fit:cover;display:block"></sc-if><div style="padding:12px 14px;display:flex;align-items:center;gap:10px"><sc-if value="{{ it.small }}" hint-placeholder-val="{{ true }}"><img src="{{ it.img }}" alt="" style="width:52px;height:52px;border-radius:14px;object-fit:cover"></sc-if><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ it.t }}</span><span style="font-size:12px;color:#5D5D58">{{ it.sub }}</span><span style="display:block;font-size:11px;font-weight:700;color:{{ it.availFg }}">{{ it.avail }}</span></span><button onClick="{{ it.act }}" disabled="{{ it.off }}" style="height:38px;padding:0 14px;border-radius:999px;border:{{ it.bd }};background:{{ it.bg }};color:{{ it.fg }};font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">{{ it.cta }}</button></div></div></sc-for>
+          <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><button onClick="{{ checkout }}" style="position:sticky;bottom:0;height:56px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 22px">{{ cartLabel }}<span style="height:42px;padding:0 16px;border-radius:999px;background:#D6F26B;color:#141414;display:flex;align-items:center;font-size:13px">Checkout</span></button></sc-if>
+        </sc-if>
+
+        <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="display:flex;flex-direction:column;gap:12px;padding-top:30px"><span style="width:72px;height:72px;border-radius:36px;background:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-icon name="check" size="32" stroke="2.6"></bh-icon></span><div style="font-size:28px;font-weight:800;letter-spacing:-.02em">{{ doneMsg.title }}</div><div style="font-size:14px;line-height:1.6;color:#3E3E3A">{{ doneMsg.text }}</div><div style="background:#fff;border-radius:18px;padding:14px;font-size:13px">{{ ind.brand }} {{ loc.name }} · {{ loc.addr }}</div><button onClick="{{ goMine }}" style="height:52px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ mineLabel }}</button></div>
+        </sc-if>
+
+        <sc-if value="{{ t.mine }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ mineLabel }}</div>
+          <div style="background:{{ ind.pastel }};border-radius:22px;padding:16px"><div style="font-size:12px;font-weight:700">{{ plan.l }}</div><div style="font-size:22px;font-weight:800">{{ plan.v }}</div><div style="font-size:12px">{{ plan.n }}</div></div>
+          <sc-for list="{{ mine }}" as="m" hint-placeholder-count="3"><div style="background:#fff;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ m.t }}</span><span style="font-size:12px;color:#5D5D58">{{ m.sub }}</span></span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ m.stBg }}">{{ m.st }}</span></div><sc-if value="{{ m.canManage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><button onClick="{{ m.change }}" style="flex:1;height:38px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ m.changeLabel }}</button><button onClick="{{ m.cancel }}" style="flex:1;height:38px;border-radius:999px;border:none;background:#F3F2EE;font-size:12px;font-weight:700;cursor:pointer;color:#141414">Cancel</button></div></sc-if></div></sc-for>
+        </sc-if>
+
+        <sc-if value="{{ t.inbox }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:24px;font-weight:700;letter-spacing:-.02em">Inbox</div>
+          <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4"><div style="background:#fff;border-radius:20px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start"><span style="width:38px;height:38px;border-radius:12px;background:{{ n.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ n.icon }}" size="17"></bh-icon></span><span style="flex:1"><span style="display:flex;justify-content:space-between;gap:6px"><strong style="font-size:13px">{{ n.t }}</strong><span style="font-size:11px;color:#5D5D58">{{ n.at }}</span></span><span style="font-size:12px;line-height:1.5;color:#3E3E3A">{{ n.d }}</span></span></div></sc-for>
+          <div style="display:flex;gap:8px"><input aria-label="Message the location" placeholder="Message {{ loc.name }}" value="{{ draft }}" onChange="{{ setDraft }}" style="flex:1;min-width:0;height:46px;border:none;border-radius:999px;padding:0 16px;font-size:14px;background:#fff"><button onClick="{{ sendMsg }}" aria-label="Send" style="width:46px;height:46px;border-radius:23px;border:none;background:#141414;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="send" size="16"></bh-icon></button></div>
+        </sc-if>
+
+        <sc-if value="{{ t.me }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px"><img src="{{ img.me }}" alt="" style="width:60px;height:60px;border-radius:30px;object-fit:cover"><div><div style="font-size:20px;font-weight:800">Hana Suzuki</div><div style="font-size:12px;color:#5D5D58">Home location: {{ loc.name }}</div></div></div>
+          <sc-for list="{{ settings }}" as="st" hint-placeholder-count="5"><button onClick="{{ st.toggle }}" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;padding:14px;border:none;cursor:pointer;text-align:left;color:#141414"><bh-icon name="{{ st.icon }}" size="17"></bh-icon><span style="flex:1;font-size:14px;font-weight:600">{{ st.t }}</span><sc-if value="{{ st.isSwitch }}" hint-placeholder-val="{{ false }}"><span style="width:42px;height:24px;border-radius:12px;background:{{ st.track }};position:relative"><span style="position:absolute;top:3px;left:{{ st.knob }};width:18px;height:18px;border-radius:9px;background:#fff"></span></span></sc-if><sc-if value="{{ st.isLink }}" hint-placeholder-val="{{ true }}"><bh-icon name="chevron-right" size="15"></bh-icon></sc-if></button></sc-for>
+        </sc-if>
+      </div>
+      <nav style="position:absolute;left:12px;right:12px;bottom:14px;height:66px;background:#141414;border-radius:33px;display:flex;align-items:center;justify-content:space-around;padding:0 6px">
+        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="5"><button onClick="{{ tb.pick }}" aria-label="{{ tb.l }}" style="height:50px;min-width:48px;padding:0 12px;border-radius:25px;border:none;background:{{ tb.bg }};color:{{ tb.fg }};display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;cursor:pointer;position:relative"><bh-icon name="{{ tb.icon }}" size="19"></bh-icon><sc-if value="{{ tb.on }}" hint-placeholder-val="{{ false }}">{{ tb.l }}</sc-if><sc-if value="{{ tb.badge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:4px;background:#D6F26B"></span></sc-if></button></sc-for>
+      </nav>
+    </div>
+  </div>
+  <div style="flex:1 1 360px;max-width:520px;display:flex;flex-direction:column;gap:12px">
+    <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:12px">
+      <span style="align-self:flex-start;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:{{ ind.pastel }};font-size:12px;font-weight:800"><bh-icon name="{{ ind.icon }}" size="14"></bh-icon>{{ ind.brand }} app</span>
+      <h1 style="margin:0;font-size:34px;line-height:1.08;font-weight:700;letter-spacing:-.035em">{{ side.title }}</h1>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#3E3E3A">{{ side.text }}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ side.points }}" as="p" hint-placeholder-count="4"><div style="background:#fff;border-radius:18px;padding:12px 14px;display:flex;gap:10px;align-items:center;font-size:13px"><bh-icon name="check-circle" size="16"></bh-icon>{{ p }}</div></sc-for></div>
+    <div style="font-size:12px;color:#5D5D58;line-height:1.6;padding:0 6px">Branded per franchise. Each location appears under the same brand app; customers pick a home location and can book at others if the brand's policy allows.</div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CFG = {
+  studios: { browse: 'Classes', q: [['Book', 'calendar'], ['Online', 'video'], ['Pass', 'card'], ['Studios', 'pin']], cta: 'Book', mine: 'My classes', plan: ['Membership', '10-class pack', '3 classes left · expires 30 Nov'], title: 'Book, check in and stream classes', text: 'Members book classes, join waitlists, check in with a QR code and stream online classes. Packs and memberships work at any studio the brand allows.', points: ['Waitlist with automatic promotion', 'QR check-in at the front desk', 'Online class library and live streams', 'Cancel within policy, credit returned'] },
+  sports: { browse: 'Programmes', q: [['Register', 'file'], ['Schedule', 'calendar'], ['Kids', 'users'], ['Venues', 'pin']], cta: 'Register', mine: 'My family', plan: ['Registered', 'Ella · U8 Fundamentals', 'Saturdays 9:00 am · Field 2'], title: 'Registration and schedules for families', text: 'Guardians register children, see session times and cancellations for their groups only, and get updates from coaches.', points: ['One account for several children', 'Approval before a team place is confirmed', 'Session changes only for their group', 'Fees and balances in one place'] },
+  health: { browse: 'Services', q: [['Book', 'calendar'], ['Pharmacy', 'pill'], ['Visits', 'clock'], ['Clinics', 'pin']], cta: 'Book', mine: 'Appointments', plan: ['Package', '5 massages', '2 remaining · expires 31 Mar'], title: 'Appointments and pharmacy pickup', text: 'Patients and clients book services, reschedule safely and see when a pharmacy order is ready. Clinical information stays in the clinic\u2019s own system.', points: ['Reschedule keeps the old slot until the new one is confirmed', 'Pickup alerts without medication names', 'Clinic, pharmacy and spa in one brand app', 'Administrative forms only'] },
+  commerce: { browse: 'Shop', q: [['Shop', 'bag'], ['Orders', 'receipt'], ['Rewards', 'star'], ['Stores', 'pin']], cta: 'Add', mine: 'My orders', plan: ['Rewards', '420 points', '80 to your next reward'], title: 'Shop online, pick up in store', text: 'Shoppers see stock for their chosen store, check out through the brand\u2019s WooCommerce shop and track pickup or delivery.', points: ['Stock shown for the selected store', 'Pickup or delivery', 'Returns started from the app', 'Rewards across stores'] },
+  foods: { browse: 'Menu', q: [['Order', 'utensils'], ['Reorder', 'repeat'], ['Rewards', 'star'], ['Locations', 'pin']], cta: 'Add', mine: 'My orders', plan: ['Favourite', 'Ember chicken bowl', 'Ordered 6 times'], title: 'Order ahead for pickup', text: 'Guests choose a pickup time, order from the local menu and see when the restaurant accepts the order and when it\u2019s ready.', points: ['Clear "waiting for restaurant" state', 'Sold-out items hidden per location', 'Allergy notes sent to the kitchen', 'One-tap reorder'] },
+  realty: { browse: 'Homes', q: [['Search', 'search'], ['Saved', 'heart'], ['Viewings', 'key'], ['Offices', 'pin']], cta: 'View', mine: 'My viewings', plan: ['Saved search', '3 bed · under $1.2M', '4 new matches this week'], title: 'Search homes and book viewings', text: 'Buyers save searches, get alerts for new listings and book viewings with an agent from their nearest office.', points: ['Alerts for new matches', 'Viewing requests confirmed by an agent', 'Open house RSVPs', 'Chat with your agent'] },
+};
+class Component extends DCLogic {
+  state = { ind: 'studios', tab: 'home', day: 0, cart: {}, booked: [], cancelled: {}, done: null, draft: '', sent: [], prefs: { push: true, email: true, sms: false }, toast: '' };
+  componentDidMount() { if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50); const st = window.BH_STATE ? window.BH_STATE.get() : {}; if (st.ind) this.setState({ ind: st.ind, loc: st.loc }); }
+  componentWillUnmount() { clearInterval(this.poll); clearTimeout(this.tt); }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {}, P = D.P, C = CFG[s.ind];
+    const L = I.locs.find(l => l.id === s.loc) || I.locs[0];
+    const isCart = ['commerce', 'foods'].includes(s.ind);
+    const items = I.items.map((it, i) => ({ i, t: it[0], sub: it[1], price: it[2], left: it[3], img: IMG[it[4]] || IMG[I.imgs[i % 5]] }));
+    const cartN = Object.values(s.cart).reduce((a, b) => a + b, 0);
+    const num = p => parseFloat(String(p).replace(/[^0-9.]/g, '')) || 0;
+    const total = Object.entries(s.cart).reduce((a, [i, q]) => a + num(I.items[i][2]) * q, 0);
+    const myBooked = s.booked.filter(b => !s.cancelled[b]);
+    const nb = myBooked[0] != null ? items[myBooked[0]] : items[0];
+    const book = it => { if (it.left === 0 && ['studios', 'sports'].includes(s.ind)) { this.setState({ tab: 'done', done: { title: 'You\u2019re on the waitlist', text: `We\u2019ll notify you if a spot opens for ${it.t}. No charge unless you get a spot.` } }); return; } this.setState(x => ({ booked: [...x.booked, it.i], tab: 'done', done: { title: s.ind === 'sports' ? 'Registration submitted' : s.ind === 'realty' ? 'Viewing requested' : 'You\u2019re booked', text: s.ind === 'sports' ? 'The academy reviews registrations. You\u2019ll get a notification when a place is confirmed.' : s.ind === 'realty' ? `${I.staffName} will confirm a time for ${it.t}.` : `${it.t}. ${it.sub}. Confirmation sent.` } })); };
+    return {
+      ind: I, loc: L, toast: s.toast, img: { me: IMG.pW4, hero: IMG[I.hero] }, offer: { studios: 'First week unlimited for $39', sports: 'Spring season is open', health: 'Flu shots available now', commerce: 'Free pickup in store', foods: 'Lunch ready when you are', realty: '4 new homes match your search' }[s.ind],
+      t: { home: s.tab === 'home', browse: s.tab === 'browse', done: s.tab === 'done', mine: s.tab === 'mine', inbox: s.tab === 'inbox', me: s.tab === 'me' },
+      tabs: [['home', 'Home', 'home'], ['browse', C.browse, I.icon], ['mine', isCart ? 'Orders' : 'Mine', 'calendar'], ['inbox', 'Inbox', 'message'], ['me', 'Me', 'user']].map(([k, l, icon]) => ({ l, icon, on: s.tab === k, bg: s.tab === k ? '#D6F26B' : 'transparent', fg: s.tab === k ? '#141414' : '#fff', badge: k === 'inbox' && s.tab !== 'inbox', pick: () => this.setState({ tab: k }) })),
+      next: { show: true, kicker: myBooked.length ? 'COMING UP' : 'RECOMMENDED', t: nb.t, sub: myBooked.length ? `${nb.sub} · ${L.name}` : `${nb.sub}` },
+      quick: C.q.map(([l, icon], i) => ({ l, icon, bg: i === 0 ? I.pastel : '#fff', go: () => this.setState({ tab: i === 2 || i === 1 && ['commerce', 'foods', 'health', 'realty'].includes(s.ind) ? 'mine' : 'browse' }) })),
+      browseTitle: `${C.browse} at ${L.name}`, hasDays: s.ind === 'studios' || s.ind === 'sports',
+      days: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed'].map((d, i) => ({ d, n: 17 + i, bg: s.day === i ? '#141414' : '#fff', fg: s.day === i ? '#fff' : '#141414', pick: () => this.setState({ day: i }) })),
+      itemsShort: items.slice(0, 2).map(it => ({ ...it, open: () => this.setState({ tab: 'browse' }) })),
+      items: items.map(it => { const full = it.left === 0 && ['studios', 'sports'].includes(s.ind); const out = s.ind === 'commerce' && it.left === 0; const inCart = s.cart[it.i]; const bk = myBooked.includes(it.i); return { ...it, big: ['realty', 'commerce', 'foods'].includes(s.ind), small: !['realty', 'commerce', 'foods'].includes(s.ind), avail: out ? 'Out of stock at this store' : full ? 'Full · waitlist open' : bk ? 'Booked' : s.ind === 'commerce' ? `${it.left} in stock here` : '', availFg: full || out ? '#8A5A00' : '#2F6B3A', off: out || bk, cta: bk ? 'Booked' : full ? 'Waitlist' : isCart ? (inCart ? `In cart · ${inCart}` : C.cta) : s.ind === 'realty' ? 'Book viewing' : C.cta, bg: full ? '#fff' : '#141414', fg: full ? '#141414' : '#fff', bd: full ? '1.5px solid #141414' : 'none', act: () => isCart ? this.setState(x => ({ cart: { ...x.cart, [it.i]: (x.cart[it.i] || 0) + 1 } })) : book(it) }; }),
+      hasCart: isCart && cartN > 0, cartLabel: `${cartN} item${cartN > 1 ? 's' : ''} · $${total.toFixed(2)}`,
+      checkout: () => this.setState({ cart: {}, tab: 'done', done: s.ind === 'foods' ? { title: 'Order sent', text: `Waiting for ${L.name} to accept. Pickup at 12:30 pm. You won\u2019t be charged if they can\u2019t take it.` } : { title: 'Order placed', text: `Paid. We\u2019ll notify you when it\u2019s ready for pickup at ${L.name}.` } }),
+      doneMsg: s.done || { title: '', text: '' }, mineLabel: C.mine, goMine: () => this.setState({ tab: 'mine' }),
+      plan: { l: C.plan[0], v: C.plan[1], n: C.plan[2] },
+      mine: [...s.booked.map(i => ({ i, it: items[i], st: s.cancelled[i] ? 'Cancelled' : 'Confirmed' })), { i: -1, it: items[2 % items.length], st: 'Completed' }].map(({ i, it, st }) => ({ t: it.t, sub: `${L.name} · ${it.sub}`, st, stBg: st === 'Confirmed' ? '#D6F26B' : '#F3F2EE', canManage: st === 'Confirmed', changeLabel: s.ind === 'health' ? 'Reschedule' : 'Change', change: () => this.toast('Pick a new time. Your current booking is kept until it\u2019s confirmed.'), cancel: () => { this.setState(x => ({ cancelled: { ...x.cancelled, [i]: true } })); this.toast('Cancelled within policy. Credit returned.'); } })),
+      notes: [['calendar', 'Reminder', `Your ${I.items[0][0]} is tomorrow`, '1h', I.pastel], ['gift', 'Offer', `${I.brand} ${L.name}: this week only`, '1d', P.butter], ['message', L.name, 'Thanks for visiting! How did we do?', '2d', P.aqua], ...s.sent.map(t => ['send', 'You', t, 'now', '#F3F2EE'])].map(([icon, t, d, at, bg]) => ({ icon, t, d, at, bg })),
+      draft: s.draft, setDraft: e => this.setState({ draft: e.target.value }), sendMsg: () => { const t = s.draft.trim(); if (!t) return; this.setState(x => ({ draft: '', sent: [...x.sent, t] })); this.toast(`Sent to ${L.name}. Replies arrive here.`); },
+      settings: [['Push notifications', 'bell', 'push'], ['Email offers from my location', 'mail', 'email'], ['Text reminders', 'phone', 'sms'], ['Payment methods', 'card'], ['Change home location', 'pin'], ['Privacy & my data', 'shield']].map(([t, icon, k]) => { const on = k && s.prefs[k]; return { t, icon, isSwitch: !!k, isLink: !k, track: on ? '#141414' : '#D8D6CF', knob: on ? '21px' : '3px', toggle: () => k ? this.setState(x => ({ prefs: { ...x.prefs, [k]: !on } })) : this.toast(t) }; }),
+      side: { title: C.title, text: C.text, points: C.points },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

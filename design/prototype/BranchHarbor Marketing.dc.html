@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="marketing"></bh-topbar>
+
+<div style="display:flex;gap:12px;padding:12px;min-height:100vh;align-items:flex-start">
+  <aside style="width:236px;flex-shrink:0;background:#141414;color:#fff;border-radius:28px;padding:16px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto">
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:2px 6px 12px"><bh-logo size="34" dark="true"></bh-logo><div><div style="font-size:15px;font-weight:800;letter-spacing:-.02em">BranchHarbor</div><div style="font-size:12px;color:#B9B9B3">Marketing & sales</div></div></div>
+    <div style="flex-shrink:0;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:4px;border-radius:16px;background:#262626;margin-bottom:6px">
+      <sc-for list="{{ indSwitch }}" as="i" hint-placeholder-count="6"><button onClick="{{ i.pick }}" title="{{ i.name }}" aria-label="{{ i.name }}" style="height:34px;border-radius:11px;border:none;background:{{ i.bg }};color:{{ i.fg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ i.icon }}" size="16"></bh-icon></button></sc-for>
+    </div>
+    <div style="flex-shrink:0;display:flex;gap:3px;padding:4px;border-radius:999px;background:#262626;margin-bottom:8px">
+      <sc-for list="{{ roles }}" as="r" hint-placeholder-count="2"><button onClick="{{ r.pick }}" style="flex:1;height:32px;border-radius:999px;border:none;background:{{ r.bg }};color:{{ r.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ r.label }}</button></sc-for>
+    </div>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="14">
+      <sc-if value="{{ n.head }}" hint-placeholder-val="{{ false }}"><div style="flex-shrink:0;font-size:10px;font-weight:800;color:#7C7C76;padding:12px 12px 4px;letter-spacing:.08em">{{ n.label }}</div></sc-if>
+      <sc-if value="{{ n.item }}" hint-placeholder-val="{{ true }}"><button onClick="{{ n.go }}" style="height:38px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:999px;border:none;font-size:13px;font-weight:{{ n.w }};background:{{ n.bg }};color:{{ n.fg }};cursor:pointer;text-align:left;width:100%"><bh-icon name="{{ n.icon }}" size="16"></bh-icon><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;border-radius:10px;background:#D6F26B;color:#141414;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px">{{ n.badge }}</span></sc-if></button></sc-if>
+    </sc-for>
+    <div style="flex-shrink:0;margin-top:auto;padding-top:14px;display:flex;flex-direction:column;gap:2px">
+      <a href="{{ links.back }}" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:600;color:#B9B9B3;text-decoration:none"><bh-icon name="arrow-left" size="15"></bh-icon>{{ links.backLabel }}</a>
+      <a href="BranchHarbor Hub.dc.html" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:600;color:#B9B9B3;text-decoration:none"><bh-icon name="layers" size="15"></bh-icon>Prototype hub</a>
+    </div>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+    <div style="background:#fff;border-radius:24px;padding:10px 12px 10px 18px;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+      <span style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;background:#F3F2EE;font-size:13px;font-weight:700"><bh-icon name="{{ scope.icon }}" size="15"></bh-icon>{{ scope.label }}</span>
+      <span style="font-size:12px;color:#5D5D58">{{ scope.sub }}</span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#5D5D58"><img src="{{ me.img }}" alt="" style="width:34px;height:34px;border-radius:17px;object-fit:cover">{{ me.name }}</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding:6px 6px 0">
+      <div style="flex:1;min-width:240px"><div style="font-size:13px;font-weight:600;color:#5D5D58">{{ page.group }}</div><h1 style="margin:2px 0 0;font-size:34px;font-weight:700;letter-spacing:-.035em">{{ page.title }}</h1></div>
+      <sc-if value="{{ page.hasCta }}" hint-placeholder-val="{{ false }}"><button onClick="{{ page.go }}" style="display:flex;align-items:center;gap:10px;height:48px;padding:0 6px 0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ page.cta }}<span style="width:36px;height:36px;border-radius:18px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="plus" size="16"></bh-icon></span></button></sc-if>
+    </div>
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div role="status" style="align-self:flex-start;display:flex;align-items:center;gap:10px;background:#D6F26B;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:700"><bh-icon name="check-circle" size="17"></bh-icon>{{ toast }}</div></sc-if>
+
+    <!-- OVERVIEW -->
+    <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5"><div style="background:{{ k.bg }};border-radius:24px;padding:16px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:700">{{ k.label }}</span><bh-icon name="{{ k.icon }}" size="15"></bh-icon></div><div style="font-size:28px;font-weight:700;font-variant-numeric:tabular-nums">{{ k.value }}</div><div style="font-size:11px;color:#3E3E3A">{{ k.note }}</div></div></sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:17px;font-weight:700">Lead funnel · last 30 days</span><span style="font-size:11px;color:#5D5D58">From forms, inbox and pipeline</span></div>
+          <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-size:13px;font-weight:600">{{ f.label }}</span><span style="flex:1;height:30px;border-radius:10px;background:#F3F2EE;overflow:hidden"><span style="display:flex;align-items:center;justify-content:flex-end;padding-right:10px;height:100%;width:{{ f.w }};background:{{ f.bg }};border-radius:10px;font-size:12px;font-weight:800">{{ f.n }}</span></span></div></sc-for>
+        </div>
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:17px;font-weight:700">Leads by source</div>
+          <sc-for list="{{ sources }}" as="s" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:#F8F7F3;font-size:13px"><span style="width:26px;height:26px;border-radius:8px;background:{{ s.color }};color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ s.mark }}</span><span style="flex:1;font-weight:600">{{ s.name }}</span><span style="font-weight:800;font-variant-numeric:tabular-nums">{{ s.n }}</span><span style="width:110px;font-size:11px;color:#5D5D58;text-align:right">{{ s.fresh }}</span></div></sc-for>
+          <div style="font-size:11px;color:#5D5D58;line-height:1.5">Attribution uses the first recorded source. Ad platform numbers aren't deduplicated against forms.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- INBOX -->
+    <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;min-height:620px">
+        <div style="flex:0 1 330px;min-width:280px;background:#fff;border-radius:28px;padding:10px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;gap:4px;flex-wrap:wrap;padding:4px 4px 8px"><sc-for list="{{ inboxFilters }}" as="f" hint-placeholder-count="5"><button onClick="{{ f.pick }}" style="height:30px;padding:0 10px;border-radius:999px;border:none;background:{{ f.bg }};color:{{ f.fg }};font-size:11px;font-weight:700;cursor:pointer">{{ f.label }}</button></sc-for></div>
+          <sc-for list="{{ convos }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.pick }}" style="display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:18px;border:none;background:{{ c.bg }};cursor:pointer;text-align:left;color:#141414">
+              <span style="position:relative;flex-shrink:0"><img src="{{ c.img }}" alt="" style="width:40px;height:40px;border-radius:20px;object-fit:cover"><span style="position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:7px;background:{{ c.chColor }};color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff">{{ c.chMark }}</span></span>
+              <span style="flex:1;min-width:0"><span style="display:flex;justify-content:space-between;gap:6px"><span style="font-size:13px;font-weight:{{ c.w }}">{{ c.name }}</span><span style="font-size:10px;color:#5D5D58">{{ c.at }}</span></span><span style="display:block;font-size:12px;color:#3E3E3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.last }}</span><span style="font-size:10px;font-weight:700;color:#5D5D58">{{ c.loc }}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="flex:1 1 420px;min-width:0;background:#fff;border-radius:28px;display:flex;flex-direction:column;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid #EEEDE8;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+            <img src="{{ cv.img }}" alt="" style="width:40px;height:40px;border-radius:20px;object-fit:cover">
+            <div style="flex:1;min-width:160px"><div style="font-size:15px;font-weight:700">{{ cv.name }}</div><div style="font-size:12px;color:#5D5D58">{{ cv.ch }} · {{ cv.loc }}</div></div>
+            <select aria-label="Assign" value="{{ cv.assignee }}" onChange="{{ setAssignee }}" style="height:36px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 12px;font-size:12px;font-weight:700;background:#fff"><option>Unassigned</option><option>Front desk</option><option>{{ ind.staffName }}</option><option>Location manager</option></select>
+            <button onClick="{{ toDeal }}" style="height:36px;padding:0 12px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ cv.dealCta }}</button>
+          </div>
+          <div style="flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:10px;background:#FAFAF7;overflow:auto">
+            <sc-for list="{{ cv.msgs }}" as="m" hint-placeholder-count="3"><div style="align-self:{{ m.align }};max-width:78%;display:flex;flex-direction:column;gap:3px"><div style="background:{{ m.bg }};color:{{ m.fg }};border-radius:{{ m.radius }};padding:10px 14px;font-size:14px;line-height:1.5">{{ m.t }}</div><span style="font-size:10px;color:#5D5D58;align-self:{{ m.align }}">{{ m.meta }}</span></div></sc-for>
+          </div>
+          <sc-if value="{{ cv.waClosed }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:center;background:#FFF3C9;padding:10px 18px;font-size:12px;line-height:1.5;color:#5A4300"><bh-icon name="clock" size="15"></bh-icon>More than 24 hours since their last message. WhatsApp only allows an approved template until they reply.</div></sc-if>
+          <div style="padding:12px;border-top:1px solid #EEEDE8;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <sc-if value="{{ cv.waClosed }}" hint-placeholder-val="{{ false }}"><select aria-label="Template" value="{{ waTpl }}" onChange="{{ setWaTpl }}" style="flex:1;min-width:200px;height:46px;border-radius:999px;border:1.5px solid #141414;padding:0 14px;font-size:13px;background:#fff"><sc-for list="{{ waTemplatesOk }}" as="t" hint-placeholder-count="2"><option value="{{ t.id }}">{{ t.name }}</option></sc-for></select></sc-if>
+            <sc-if value="{{ cv.free }}" hint-placeholder-val="{{ true }}"><input aria-label="Reply" placeholder="{{ cv.ph }}" value="{{ reply }}" onChange="{{ setReply }}" style="flex:1;min-width:200px;height:46px;border:none;border-radius:999px;padding:0 18px;font-size:14px;background:#F3F2EE"></sc-if>
+            <button onClick="{{ sendReply }}" style="height:46px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px"><bh-icon name="send" size="15"></bh-icon>{{ cv.sendLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PIPELINE -->
+    <sc-if value="{{ v.pipeline }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px">
+        <sc-for list="{{ stages }}" as="st" hint-placeholder-count="5">
+          <div style="flex:0 0 240px;background:#fff;border-radius:24px;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:420px">
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 6px"><span style="width:10px;height:10px;border-radius:5px;background:{{ st.color }}"></span><span style="flex:1;font-size:13px;font-weight:800">{{ st.label }}</span><span style="font-size:12px;font-weight:700;color:#5D5D58">{{ st.count }}</span></div>
+            <sc-for list="{{ st.deals }}" as="d" hint-placeholder-count="2">
+              <div style="padding:12px;border-radius:18px;background:#F8F7F3;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;gap:8px"><img src="{{ d.img }}" alt="" style="width:28px;height:28px;border-radius:14px;object-fit:cover"><span style="font-size:13px;font-weight:700;flex:1">{{ d.name }}</span></div>
+                <div style="font-size:12px;color:#3E3E3A">{{ d.what }}</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;font-weight:800"><span style="padding:3px 8px;border-radius:999px;background:#fff">{{ d.loc }}</span><span style="padding:3px 8px;border-radius:999px;background:#fff">{{ d.src }}</span><sc-if value="{{ d.value }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 8px;border-radius:999px;background:#E2F5A6">{{ d.value }}</span></sc-if></div>
+                <div style="display:flex;gap:6px"><sc-if value="{{ d.canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.back }}" aria-label="Move back" style="width:32px;height:32px;border-radius:16px;border:1.5px solid #D8D6CF;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="chevron-left" size="14"></bh-icon></button></sc-if><sc-if value="{{ d.canFwd }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.fwd }}" style="flex:1;height:32px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:11px;font-weight:700;cursor:pointer">{{ d.fwdLabel }}</button></sc-if><sc-if value="{{ d.canLose }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.lose }}" style="height:32px;padding:0 10px;border-radius:999px;border:1.5px solid #D8D6CF;background:#fff;font-size:11px;font-weight:700;cursor:pointer;color:#141414">Lost</button></sc-if></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- CONTACTS -->
+    <sc-if value="{{ v.contacts }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:15px;font-weight:700">Segment builder</span><span style="font-size:12px;color:#5D5D58">Matches update as you change rules</span><span style="margin-left:auto;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums">{{ segCount }}</span><span style="font-size:12px;font-weight:600;color:#5D5D58">contacts</span></div>
+        <sc-for list="{{ segRules }}" as="r" hint-placeholder-count="3"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;border-radius:16px;background:#F8F7F3;font-size:13px"><span style="font-size:11px;font-weight:800;color:#5D5D58;width:36px">{{ r.join }}</span><span style="font-weight:700">{{ r.field }}</span><select aria-label="{{ r.field }}" value="{{ r.val }}" onChange="{{ r.set }}" style="height:34px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 12px;font-size:12px;font-weight:600;background:#fff"><sc-for list="{{ r.opts }}" as="o" hint-placeholder-count="3"><option>{{ o }}</option></sc-for></select><button onClick="{{ r.remove }}" aria-label="Remove rule" style="margin-left:auto;width:30px;height:30px;border-radius:15px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="13"></bh-icon></button></div></sc-for>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ addRule }}" style="height:38px;padding:0 14px;border-radius:999px;border:1.5px dashed #5D5D58;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">+ Add rule</button><button onClick="{{ saveSeg }}" style="height:38px;padding:0 14px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">Save segment</button></div>
+      </div>
+      <div style="background:#fff;border-radius:28px;padding:10px;overflow:auto">
+        <div style="display:grid;grid-template-columns:minmax(200px,1.4fr) minmax(140px,1fr) 120px 150px minmax(140px,1fr);min-width:800px;padding:10px 14px;font-size:12px;font-weight:700;color:#5D5D58"><span>Contact</span><span>Location</span><span>Source</span><span>Consent</span><span>Tags</span></div>
+        <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:minmax(200px,1.4fr) minmax(140px,1fr) 120px 150px minmax(140px,1fr);min-width:800px;padding:10px 14px;border-radius:16px;align-items:center;font-size:13px;background:{{ c.bg }}">
+            <span style="display:flex;align-items:center;gap:10px"><img src="{{ c.img }}" alt="" style="width:32px;height:32px;border-radius:16px;object-fit:cover"><span><strong>{{ c.name }}</strong><br><span style="font-size:11px;color:#5D5D58">{{ c.stage }}</span></span></span>
+            <span>{{ c.loc }}</span><span style="font-size:12px">{{ c.src }}</span>
+            <span style="display:flex;gap:4px"><sc-for list="{{ c.consent }}" as="k" hint-placeholder-count="3"><span title="{{ k.title }}" style="display:flex;align-items:center;gap:3px;font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;background:{{ k.bg }}"><bh-icon name="{{ k.icon }}" size="10"></bh-icon>{{ k.l }}</span></sc-for></span>
+            <span style="display:flex;gap:4px;flex-wrap:wrap"><sc-for list="{{ c.tags }}" as="t" hint-placeholder-count="2"><span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:#F3F2EE">{{ t }}</span></sc-for></span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- FORMS & ROUTING -->
+    <sc-if value="{{ v.forms }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ forms }}" as="f" hint-placeholder-count="4"><div style="background:#fff;border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:12px;background:{{ f.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ f.icon }}" size="18"></bh-icon></span><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ f.name }}</span><span style="font-size:12px;color:#5D5D58">{{ f.where }}</span></span><span style="text-align:right"><span style="display:block;font-size:16px;font-weight:800">{{ f.n }}</span><span style="font-size:10px;color:#5D5D58">this month</span></span></div></sc-for>
+        </div>
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px;font-weight:700">Lead routing rules</div>
+          <div style="font-size:12px;color:#5D5D58">Checked in order. The first match wins.</div>
+          <sc-for list="{{ rules }}" as="r" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:{{ r.bg }};font-size:13px"><span style="width:24px;height:24px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">{{ r.n }}</span><span style="flex:1"><strong>If</strong> {{ r.if }} <strong>→</strong> {{ r.then }}</span></div></sc-for>
+          <div style="border-top:1px solid #EEEDE8;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700">Test a lead</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><input aria-label="Postal code" placeholder="Postal or ZIP code" value="{{ testPc }}" onChange="{{ setTestPc }}" style="flex:1;min-width:160px;height:44px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 16px;font-size:14px"><select aria-label="Interest" value="{{ testInt }}" onChange="{{ setTestInt }}" style="height:44px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 12px;font-size:13px;background:#fff"><option>General enquiry</option><option>Corporate / group</option><option>Franchise enquiry</option></select></div>
+            <div style="display:flex;gap:10px;align-items:center;background:#D6F26B;border-radius:16px;padding:12px 14px;font-size:13px;font-weight:700"><bh-icon name="arrow-right" size="15"></bh-icon>{{ testResult }}</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- EMAIL -->
+    <sc-if value="{{ v.email }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ em.list }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ emailCampaigns }}" as="e" hint-placeholder-count="4"><button onClick="{{ e.open }}" style="background:#fff;border-radius:22px;padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;border:none;cursor:pointer;text-align:left;color:#141414"><img src="{{ e.img }}" alt="" style="width:56px;height:56px;border-radius:14px;object-fit:cover"><span style="flex:1 1 220px;min-width:0"><span style="display:block;font-size:15px;font-weight:700">{{ e.name }}</span><span style="font-size:12px;color:#5D5D58">{{ e.aud }}</span></span><sc-for list="{{ e.stats }}" as="st" hint-placeholder-count="3"><span style="min-width:70px;text-align:right"><span style="display:block;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums">{{ st.v }}</span><span style="font-size:10px;color:#5D5D58">{{ st.l }}</span></span></sc-for><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:{{ e.stBg }}">{{ e.status }}</span></button></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ em.builder }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button onClick="{{ emBack }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;gap:6px;align-items:center;color:#141414"><bh-icon name="arrow-left" size="14"></bh-icon>Campaigns</button><sc-for list="{{ emSteps }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px 0 6px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:13px;font-weight:700;cursor:pointer"><span style="width:28px;height:28px;border-radius:14px;background:{{ t.dot }};color:#141414;display:flex;align-items:center;justify-content:center;font-size:12px">{{ t.n }}</span>{{ t.label }}</button></sc-for></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <sc-if value="{{ em.sAud }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:16px;font-weight:700">Who gets it</div>
+              <sc-for list="{{ audOpts }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.pick }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:1.5px solid {{ a.bd }};background:{{ a.bg }};cursor:pointer;text-align:left;color:#141414"><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ a.name }}</span><span style="font-size:12px;color:#5D5D58">{{ a.desc }}</span></span><span style="font-size:15px;font-weight:800">{{ a.n }}</span></button></sc-for>
+              <div style="font-size:13px;font-weight:700">Locations</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ emLocs }}" as="l" hint-placeholder-count="4"><button onClick="{{ l.toggle }}" disabled="{{ l.locked }}" style="height:36px;padding:0 12px;border-radius:999px;border:1.5px solid {{ l.bd }};background:{{ l.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ l.name }}</button></sc-for></div>
+              <div style="display:flex;gap:10px;align-items:flex-start;background:#CDEEEE;border-radius:16px;padding:12px 14px;font-size:12px;line-height:1.5"><bh-icon name="shield" size="15"></bh-icon>{{ emExcl }}</div>
+            </sc-if>
+            <sc-if value="{{ em.sContent }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Content blocks</span><span style="font-size:11px;color:#5D5D58">From HQ template · {{ ind.brand }}</span></div>
+              <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;border:1.5px solid {{ b.bd }};background:#fff"><button onClick="{{ b.pick }}" style="flex:1;display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;text-align:left;color:#141414;min-width:0"><span style="width:32px;height:32px;border-radius:10px;background:#F3F2EE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ b.icon }}" size="15"></bh-icon></span><span style="min-width:0"><span style="display:block;font-size:13px;font-weight:700">{{ b.kind }}</span><span style="font-size:11px;color:#5D5D58;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">{{ b.text }}</span></span></button><span style="display:flex;align-items:center;gap:3px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:{{ b.lockBg }}"><bh-icon name="{{ b.lockIcon }}" size="10"></bh-icon>{{ b.lock }}</span><button onClick="{{ b.up }}" aria-label="Move up" style="width:28px;height:28px;border-radius:14px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="chevron-down" size="12"></bh-icon></button><sc-if value="{{ b.canRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ b.remove }}" aria-label="Remove" style="width:28px;height:28px;border-radius:14px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="12"></bh-icon></button></sc-if></div></sc-for>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ addBlocks }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.add }}" style="height:34px;padding:0 12px;border-radius:999px;border:1.5px dashed #5D5D58;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">+ {{ a.label }}</button></sc-for></div>
+              <sc-if value="{{ selBlock.editable }}" hint-placeholder-val="{{ false }}"><label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700">Edit {{ selBlock.kind }}<textarea rows="3" value="{{ selBlock.text }}" onChange="{{ setBlockText }}" style="border:1.5px solid #141414;border-radius:16px;padding:10px 14px;font-size:13px;line-height:1.5;resize:vertical"></textarea></label></sc-if>
+            </sc-if>
+            <sc-if value="{{ em.sSettings }}" hint-placeholder-val="{{ false }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Subject<input value="{{ emSubject }}" onChange="{{ setSubject }}" style="height:46px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px"></label>
+              <button onClick="{{ toggleAB }}" role="switch" aria-checked="{{ emAB }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;font-size:13px;font-weight:700;color:#141414"><span style="width:42px;height:24px;border-radius:12px;background:{{ abTrack }};position:relative"><span style="position:absolute;top:3px;left:{{ abKnob }};width:18px;height:18px;border-radius:9px;background:#fff"></span></span>Test a second subject line</button>
+              <sc-if value="{{ emAB }}" hint-placeholder-val="{{ false }}"><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Subject B<input value="{{ emSubjectB }}" onChange="{{ setSubjectB }}" style="height:46px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px"><span style="font-size:11px;font-weight:500;color:#5D5D58">20% get A or B for 4 hours. The rest get the winner by opens.</span></label></sc-if>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">From name<select style="height:46px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:14px;background:#fff"><option>{{ ind.brand }} + location name (recommended)</option><option>{{ ind.brand }}</option></select></label>
+              <div style="font-size:12px;color:#5D5D58;line-height:1.5">Sent from mail.{{ domain }} · replies go to each location's inbox. Every email includes the location's address and an unsubscribe link.</div>
+            </sc-if>
+            <sc-if value="{{ em.sReview }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ emReview }}" as="r" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:#F1F8E0;font-size:13px"><bh-icon name="check-circle" size="15"></bh-icon><span style="flex:1"><strong>{{ r.k }}</strong> · {{ r.v }}</span></div></sc-for>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ emSend }}" style="height:48px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ emSendLabel }}</button><button onClick="{{ emTest }}" style="height:48px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:700;cursor:pointer;color:#141414">Send test to me</button></div>
+            </sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:center;position:sticky;top:12px">
+            <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#fff"><sc-for list="{{ devices }}" as="d" hint-placeholder-count="2"><button onClick="{{ d.pick }}" style="height:32px;padding:0 14px;border-radius:999px;border:none;background:{{ d.bg }};color:{{ d.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ d.label }}</button></sc-for></div>
+            <div style="width:{{ previewW }};max-width:100%;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.06)">
+              <div style="padding:10px 14px;border-bottom:1px solid #EEEDE8;font-size:12px"><strong>{{ previewSubject }}</strong><br><span style="color:#5D5D58">{{ ind.brand }} {{ firstLoc }}</span></div>
+              <sc-for list="{{ blocksPreview }}" as="b" hint-placeholder-count="4">
+                <sc-if value="{{ b.isHeader }}" hint-placeholder-val="{{ false }}"><div style="padding:16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #F3F2EE"><bh-icon name="{{ ind.icon }}" size="18"></bh-icon><strong style="font-size:15px">{{ ind.brand }}</strong></div></sc-if>
+                <sc-if value="{{ b.isImage }}" hint-placeholder-val="{{ false }}"><img src="{{ b.img }}" alt="" style="width:100%;height:170px;object-fit:cover;display:block"></sc-if>
+                <sc-if value="{{ b.isText }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 18px;font-size:14px;line-height:1.6;color:#3E3E3A">{{ b.text }}</div></sc-if>
+                <sc-if value="{{ b.isHeading }}" hint-placeholder-val="{{ false }}"><div style="padding:18px 18px 0;font-size:22px;font-weight:700;letter-spacing:-.02em">{{ b.text }}</div></sc-if>
+                <sc-if value="{{ b.isButton }}" hint-placeholder-val="{{ false }}"><div style="padding:6px 18px 16px"><span style="display:inline-flex;height:42px;align-items:center;padding:0 20px;border-radius:999px;background:#141414;color:#fff;font-size:13px;font-weight:700">{{ b.text }}</span></div></sc-if>
+                <sc-if value="{{ b.isFooter }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 18px;font-size:10px;line-height:1.6;color:#5D5D58;background:#FAFAF7">{{ ind.brand }} {{ firstLoc }} · {{ firstAddr }}<br>Unsubscribe · Update preferences</div></sc-if>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ em.report }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:8px;align-items:center"><button onClick="{{ emBack }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;gap:6px;align-items:center;color:#141414"><bh-icon name="arrow-left" size="14"></bh-icon>Campaigns</button><span style="font-size:18px;font-weight:700">{{ emReport.name }}</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px"><sc-for list="{{ emReport.kpis }}" as="k" hint-placeholder-count="5"><div style="background:{{ k.bg }};border-radius:22px;padding:16px"><div style="font-size:12px;font-weight:700">{{ k.l }}</div><div style="font-size:26px;font-weight:700;font-variant-numeric:tabular-nums">{{ k.v }}</div></div></sc-for></div>
+        <div style="background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:6px"><div style="font-size:15px;font-weight:700">By location</div><sc-for list="{{ emReport.locs }}" as="l" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;font-size:13px;padding:6px 0"><span style="flex:1;font-weight:600">{{ l.name }}</span><span style="width:160px;height:8px;border-radius:4px;background:#F3F2EE;overflow:hidden"><span style="display:block;height:100%;width:{{ l.w }};background:#141414"></span></span><span style="width:60px;text-align:right;font-weight:800">{{ l.v }}</span></div></sc-for></div>
+      </sc-if>
+    </sc-if>
+
+    <!-- SMS -->
+    <sc-if value="{{ v.sms }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:16px;font-weight:700">New text message</div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Audience<select value="{{ smsAud }}" onChange="{{ setSmsAud }}" style="height:46px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:14px;background:#fff"><option>Opted in to texts · all locations</option><option>Opted in · no visit 30 days</option><option>Opted in · upcoming bookings tomorrow</option></select></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Message<textarea rows="4" value="{{ smsText }}" onChange="{{ setSmsText }}" style="border:1.5px solid #D8D6CF;border-radius:20px;padding:12px 16px;font-size:14px;line-height:1.5;resize:vertical"></textarea></label>
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:{{ smsCountColor }}"><span>{{ smsChars }} characters · {{ smsSegs }} segment(s) per message</span><span>"Reply STOP to opt out" added automatically</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ smsSend }}" style="height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ smsCta }}</button><span style="font-size:12px;color:#5D5D58;align-self:center">{{ smsReach }}</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:center"><div style="width:280px;background:#141414;border-radius:36px;padding:8px"><div style="background:#F3F2EE;border-radius:30px;padding:20px 14px;min-height:260px;display:flex;flex-direction:column;gap:8px"><div style="text-align:center;font-size:11px;font-weight:700;color:#5D5D58">{{ ind.brand }} {{ firstLoc }}</div><div style="align-self:flex-start;max-width:86%;background:#fff;border-radius:18px 18px 18px 4px;padding:10px 12px;font-size:13px;line-height:1.45">{{ smsPreview }}</div></div></div></div>
+          <div style="background:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:8px"><div style="font-size:15px;font-weight:700">Sending numbers</div><sc-for list="{{ smsNumbers }}" as="n" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;font-size:13px;padding:8px 10px;border-radius:14px;background:#F8F7F3"><bh-icon name="phone" size="14"></bh-icon><span style="flex:1"><strong>{{ n.loc }}</strong><br><span style="font-size:11px;color:#5D5D58">{{ n.num }}</span></span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ n.bg }}">{{ n.st }}</span></div></sc-for><div style="font-size:11px;color:#5D5D58;line-height:1.5">US numbers need carrier registration before marketing texts. Texts only go to people who opted in at that location.</div></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- WHATSAPP -->
+    <sc-if value="{{ v.whatsapp }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <sc-for list="{{ waKpis }}" as="k" hint-placeholder-count="4"><div style="background:{{ k.bg }};border-radius:22px;padding:16px"><div style="font-size:12px;font-weight:700">{{ k.l }}</div><div style="font-size:20px;font-weight:700">{{ k.v }}</div><div style="font-size:11px;color:#3E3E3A">{{ k.n }}</div></div></sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Message templates</span><button onClick="{{ newWaTpl }}" style="height:34px;padding:0 12px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">+ Template</button></div>
+          <sc-for list="{{ waTemplates }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:18px;border:1.5px solid {{ t.bd }};background:#fff;cursor:pointer;text-align:left;color:#141414"><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ t.name }}</span><span style="font-size:11px;color:#5D5D58">{{ t.cat }} · {{ t.lang }}</span></span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ t.stBg }}">{{ t.st }}</span></button></sc-for>
+          <div style="font-size:11px;color:#5D5D58;line-height:1.5">Templates are reviewed by Meta before use. Marketing templates go only to people who opted in to WhatsApp.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+          <div style="width:300px;max-width:100%;background:#E6DDD1;border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:300px">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:8px 10px"><span style="width:30px;height:30px;border-radius:15px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ ind.icon }}" size="14"></bh-icon></span><span style="font-size:12px;font-weight:700">{{ ind.brand }}</span><span style="margin-left:auto;font-size:10px;color:#2F6B3A;font-weight:700">Verified business</span></div>
+            <div style="align-self:flex-start;max-width:90%;background:#fff;border-radius:4px 16px 16px 16px;overflow:hidden"><sc-if value="{{ waSel.img }}" hint-placeholder-val="{{ false }}"><img src="{{ waSel.img }}" alt="" style="width:100%;height:120px;object-fit:cover;display:block"></sc-if><div style="padding:10px 12px;font-size:13px;line-height:1.45">{{ waSel.body }}</div><sc-for list="{{ waSel.buttons }}" as="b" hint-placeholder-count="2"><div style="border-top:1px solid #EEEDE8;padding:9px;text-align:center;font-size:13px;font-weight:700;color:#1F5F99">{{ b }}</div></sc-for></div>
+          </div>
+          <button onClick="{{ waBroadcast }}" disabled="{{ waSel.cantSend }}" style="height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ waSel.cta }}</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- AUTOMATIONS -->
+    <sc-if value="{{ v.automations }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ autoList }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.pick }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;border:none;background:{{ a.bg }};color:{{ a.fg }};font-size:13px;font-weight:700;cursor:pointer"><span style="width:8px;height:8px;border-radius:4px;background:{{ a.dot }}"></span>{{ a.name }}</button></sc-for></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:0">
+          <sc-for list="{{ flow }}" as="f" hint-placeholder-count="5">
+            <div style="width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center">
+              <sc-if value="{{ f.isBranch }}" hint-placeholder-val="{{ false }}">
+                <div style="width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:18px;background:#F7EDA8"><span style="width:34px;height:34px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="filter" size="15"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:10px;font-weight:800;letter-spacing:.05em">CONDITION</span><span style="font-size:13px;font-weight:600">{{ f.t }}</span></span><button onClick="{{ f.remove }}" aria-label="Remove step" style="width:28px;height:28px;border-radius:14px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="12"></bh-icon></button></div>
+                <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div style="background:#F1F8E0;border-radius:16px;padding:10px 12px;font-size:12px"><strong>Yes</strong> · {{ f.yes }}</div><div style="background:#F8F7F3;border-radius:16px;padding:10px 12px;font-size:12px"><strong>No</strong> · {{ f.no }}</div></div>
+              </sc-if>
+              <sc-if value="{{ f.isStep }}" hint-placeholder-val="{{ true }}">
+                <div style="width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:18px;background:{{ f.bg }}"><span style="width:34px;height:34px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ f.icon }}" size="15"></bh-icon></span><span style="flex:1;min-width:0"><span style="display:block;font-size:10px;font-weight:800;letter-spacing:.05em">{{ f.kind }}</span><span style="font-size:13px;font-weight:600">{{ f.t }}</span></span><sc-if value="{{ f.canRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.remove }}" aria-label="Remove step" style="width:28px;height:28px;border-radius:14px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="12"></bh-icon></button></sc-if></div>
+              </sc-if>
+              <span style="width:2px;height:16px;background:#D8D6CF"></span>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:6px;border:1.5px dashed #D8D6CF;border-radius:22px">
+            <sc-for list="{{ addSteps }}" as="a" hint-placeholder-count="7"><button onClick="{{ a.add }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;border:none;background:{{ a.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414"><bh-icon name="{{ a.icon }}" size="13"></bh-icon>{{ a.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:15px;font-weight:700;flex:1">Status</span><button onClick="{{ toggleAuto }}" role="switch" aria-checked="{{ autoOn }}" style="width:52px;height:30px;border-radius:15px;border:none;background:{{ autoTrack }};position:relative;cursor:pointer"><span style="position:absolute;top:4px;left:{{ autoKnob }};width:22px;height:22px;border-radius:11px;background:#fff"></span></button></div>
+            <div style="font-size:13px;color:#3E3E3A">{{ autoStatus }}</div>
+            <div style="font-size:13px;font-weight:700">Runs at</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ autoLocs }}" as="l" hint-placeholder-count="4"><button onClick="{{ l.toggle }}" style="height:34px;padding:0 12px;border-radius:999px;border:1.5px solid {{ l.bd }};background:{{ l.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ l.name }}</button></sc-for></div>
+            <div style="font-size:11px;color:#5D5D58;line-height:1.5">Stops if the person books, replies, unsubscribes or opts out of that channel. Quiet hours: no texts or WhatsApp between 9 pm and 8 am local time.</div>
+            <button onClick="{{ testAuto }}" style="align-self:flex-start;height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">Run a test with my contact</button>
+          </div>
+          <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:6px"><div style="font-size:15px;font-weight:700">Recent runs</div><sc-for list="{{ runLog }}" as="r" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid #F3F2EE"><span style="color:{{ r.fg }}"><bh-icon name="{{ r.icon }}" size="14"></bh-icon></span><span style="flex:1">{{ r.t }}</span><span style="color:#5D5D58">{{ r.at }}</span></div></sc-for></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- TEAM & SERVICES -->
+    <sc-if value="{{ v.team }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ isHQ }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:17px;font-weight:700">Who can run marketing and sales, by tier</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px">
+            <sc-for list="{{ tmPolicy }}" as="p" hint-placeholder-count="3"><div style="background:{{ p.pastel }};border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:6px"><div style="font-size:15px;font-weight:800">{{ p.name }}</div><sc-for list="{{ p.opts }}" as="o" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:{{ o.bg }};color:{{ o.fg }};font-size:12px;font-weight:700"><bh-icon name="{{ o.icon }}" size="13"></bh-icon>{{ o.label }}</div></sc-for></div></sc-for>
+          </div>
+          <div style="font-size:12px;color:#5D5D58">Edit these rules in Autonomy policies on the HQ console.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:17px;font-weight:700">HQ marketing & sales team</div>
+            <sc-for list="{{ hqTeam }}" as="m" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:#F8F7F3"><img src="{{ m.img }}" alt="" style="width:38px;height:38px;border-radius:19px;object-fit:cover"><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ m.name }}</span><span style="font-size:12px;color:#5D5D58">{{ m.role }}</span></span><span style="font-size:11px;font-weight:700;color:#5D5D58">{{ m.load }}</span></div></sc-for>
+          </div>
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:17px;font-weight:700">Requests from locations</div>
+            <sc-for list="{{ hqReqs }}" as="r" hint-placeholder-count="3"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:#F8F7F3;font-size:13px"><span style="flex:1 1 200px"><strong>{{ r.loc }}</strong> · {{ r.type }}<br><span style="font-size:12px;color:#3E3E3A">{{ r.t }}</span></span><span style="font-size:11px;color:#5D5D58">{{ r.who }}</span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ r.stBg }}">{{ r.st }}</span></div></sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:28px;padding:10px;overflow:auto">
+          <div style="display:grid;grid-template-columns:minmax(180px,1.2fr) 110px minmax(160px,1fr) minmax(200px,1.4fr) 170px;min-width:860px;padding:10px 14px;font-size:12px;font-weight:700;color:#5D5D58"><span>Location</span><span>Tier</span><span>Set-up</span><span>People</span><span>Cost</span></div>
+          <sc-for list="{{ tmRows }}" as="r" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(180px,1.2fr) 110px minmax(160px,1fr) minmax(200px,1.4fr) 170px;min-width:860px;padding:10px 14px;border-radius:16px;align-items:center;font-size:13px;background:{{ r.bg }}"><span><strong>{{ r.name }}</strong><br><span style="font-size:11px;color:#5D5D58">{{ r.owner }}</span></span><span style="justify-self:start;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:{{ r.tierBg }}">{{ r.tierName }}</span><span style="display:flex;align-items:center;gap:6px;font-weight:700"><bh-icon name="{{ r.modelIcon }}" size="14"></bh-icon>{{ r.model }}</span><span style="font-size:12px;color:#3E3E3A">{{ r.people }}</span><span style="font-size:12px">{{ r.fee }}</span></div></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isLoc }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px;font-weight:700">How marketing and sales run at {{ firstLoc }}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px">
+            <sc-for list="{{ modelOpts }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.pick }}" disabled="{{ m.disabled }}" style="display:flex;flex-direction:column;gap:8px;text-align:left;padding:16px;border-radius:20px;border:2px solid {{ m.bd }};background:{{ m.bg }};cursor:pointer;color:#141414"><span style="display:flex;align-items:center;gap:8px;width:100%"><bh-icon name="{{ m.icon }}" size="18"></bh-icon><span style="flex:1;font-size:15px;font-weight:700">{{ m.label }}</span><span style="width:18px;height:18px;border-radius:9px;border:2px solid #141414;display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:4px;background:{{ m.dot }}"></span></span></span><span style="font-size:12px;line-height:1.5;color:#3E3E3A">{{ m.desc }}</span><sc-if value="{{ m.disabled }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#5D5D58"><bh-icon name="lock" size="11"></bh-icon>{{ m.note }}</span></sc-if></button></sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+          <sc-if value="{{ showOwnTeam }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:17px;font-weight:700">Your marketing & sales people</div>
+              <sc-for list="{{ locTeam }}" as="m" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:#F8F7F3"><img src="{{ m.img }}" alt="" style="width:36px;height:36px;border-radius:18px;object-fit:cover"><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span><span style="font-size:12px;color:#5D5D58">{{ m.role }}</span></span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ m.stBg }}">{{ m.st }}</span><button onClick="{{ m.remove }}" aria-label="Remove" style="width:30px;height:30px;border-radius:15px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="13"></bh-icon></button></div></sc-for>
+              <div style="font-size:13px;font-weight:700;margin-top:6px">Add someone</div>
+              <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ roleOpts }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.pick }}" style="display:flex;flex-direction:column;gap:2px;text-align:left;padding:10px 12px;border-radius:14px;border:1.5px solid {{ r.bd }};background:{{ r.bg }};cursor:pointer;color:#141414"><span style="font-size:13px;font-weight:700">{{ r.r }}</span><span style="font-size:11px;color:#5D5D58">{{ r.d }}</span></button></sc-for></div>
+              <div style="display:flex;gap:8px"><input aria-label="Email" placeholder="name@company.com" value="{{ newMember }}" onChange="{{ setNewMember }}" style="flex:1;min-width:0;height:44px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 16px;font-size:14px"><button onClick="{{ addMember }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Invite</button></div>
+              <div style="font-size:11px;color:#5D5D58;line-height:1.5">They only see {{ firstLoc }}. Brand rules, HQ templates and approval steps still apply to everything they publish.</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showHqTeam }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:17px;font-weight:700">Your HQ team</div>
+              <sc-for list="{{ myHqTeam }}" as="m" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:#F8F7F3"><img src="{{ m.img }}" alt="" style="width:36px;height:36px;border-radius:18px;object-fit:cover"><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ m.name }}</span><span style="font-size:12px;color:#5D5D58">{{ m.role }} · HQ</span></span></div></sc-for>
+              <div style="font-size:13px;font-weight:700;margin-top:6px">Ask HQ for help</div>
+              <select aria-label="Request type" value="{{ reqType }}" onChange="{{ setReqType }}" style="height:44px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:13px;background:#fff"><option>Local campaign</option><option>Social posts</option><option>Email to my subscribers</option><option>Lead follow-up</option><option>Ads</option></select>
+              <textarea aria-label="Details" rows="2" placeholder="What do you need, and by when?" value="{{ reqText }}" onChange="{{ setReqText }}" style="border:1.5px solid #D8D6CF;border-radius:18px;padding:10px 14px;font-size:13px;line-height:1.5;resize:vertical"></textarea>
+              <button onClick="{{ sendReq }}" style="align-self:flex-start;height:42px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Send request</button>
+              <sc-for list="{{ reqs }}" as="r" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#F8F7F3;font-size:12px"><span style="flex:1"><strong>{{ r.type }}</strong> · {{ r.t }}</span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ r.stBg }}">{{ r.st }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- SOCIAL ACCOUNTS -->
+    <sc-if value="{{ v.social }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ isHQ }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><span style="font-size:17px;font-weight:700;flex:1">Who owns each account</span><span style="font-size:12px;color:#5D5D58">Applies to new locations. Existing accounts keep their setup until you migrate them.</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px">
+            <sc-for list="{{ ownRows }}" as="o" hint-placeholder-count="5">
+              <div style="border:1.5px solid #EEEDE8;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:10px;background:{{ o.color }};color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ o.mark }}</span><span style="flex:1;font-size:14px;font-weight:700">{{ o.name }}</span></div>
+                <div style="display:flex;flex-direction:column;gap:4px"><sc-for list="{{ o.opts }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.pick }}" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:14px;border:1.5px solid {{ m.bd }};background:{{ m.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:16px;height:16px;border-radius:8px;border:2px solid #141414;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px"><span style="width:8px;height:8px;border-radius:4px;background:{{ m.dot }}"></span></span><span><span style="display:block;font-size:12px;font-weight:700">{{ m.label }}</span><span style="font-size:11px;color:#5D5D58;line-height:1.4">{{ m.desc }}</span></span></button></sc-for></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:28px;padding:10px;overflow:auto">
+          <div style="display:grid;grid-template-columns:minmax(180px,1.2fr) repeat(5,minmax(120px,1fr)) 120px;min-width:960px;padding:10px 14px;font-size:12px;font-weight:700;color:#5D5D58"><span>Location</span><sc-for list="{{ chanHeads }}" as="h" hint-placeholder-count="5"><span>{{ h }}</span></sc-for><span></span></div>
+          <sc-for list="{{ socialMatrix }}" as="r" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:minmax(180px,1.2fr) repeat(5,minmax(120px,1fr)) 120px;min-width:960px;padding:10px 14px;border-radius:16px;align-items:center;font-size:12px;background:{{ r.bg }}">
+              <span><strong style="font-size:13px">{{ r.name }}</strong><br><span style="color:#5D5D58">{{ r.owner }}</span></span>
+              <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5"><span title="{{ c.title }}" style="justify-self:start;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ c.bg }}"><bh-icon name="{{ c.icon }}" size="10"></bh-icon>{{ c.label }}</span></sc-for>
+              <button onClick="{{ r.setup }}" style="justify-self:end;height:34px;padding:0 12px;border-radius:999px;background:{{ r.btnBg }};color:{{ r.btnFg }};border:{{ r.btnBd }};font-size:12px;font-weight:700;cursor:pointer">{{ r.cta }}</button>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ wiz.open }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:16px;border:2px solid #141414">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><span style="font-size:20px;font-weight:700;flex:1">Set up social accounts · {{ wiz.loc }}</span><button onClick="{{ closeWiz }}" aria-label="Close" style="width:38px;height:38px;border-radius:19px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="16"></bh-icon></button></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ wiz.steps }}" as="w" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 5px;border-radius:999px;background:{{ w.bg }};color:{{ w.fg }};font-size:12px;font-weight:700"><span style="width:26px;height:26px;border-radius:13px;background:{{ w.dot }};color:#141414;display:flex;align-items:center;justify-content:center;font-size:11px">{{ w.n }}</span>{{ w.label }}</span></sc-for></div>
+            <sc-if value="{{ wiz.s0 }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ wiz.chans }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.toggle }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:34px;height:34px;border-radius:10px;background:{{ c.color }};color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ c.mark }}</span><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ c.name }}</span><span style="font-size:12px;color:#5D5D58">{{ c.plan }}</span></span><span style="width:22px;height:22px;border-radius:7px;border:2px solid #141414;background:{{ c.box }};color:#D6F26B;display:flex;align-items:center;justify-content:center"><sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><bh-icon name="check" size="13" stroke="3"></bh-icon></sc-if></span></button></sc-for></div>
+            </sc-if>
+            <sc-if value="{{ wiz.s1 }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ wiz.create }}" as="c" hint-placeholder-count="4"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#F8F7F3"><span style="width:34px;height:34px;border-radius:10px;background:{{ c.color }};color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ c.mark }}</span><span style="flex:1 1 240px;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ c.handle }}</span><span style="font-size:12px;color:#3E3E3A;line-height:1.5">{{ c.how }}</span></span><span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:{{ c.stBg }}"><bh-icon name="{{ c.stIcon }}" size="11"></bh-icon>{{ c.st }}</span></div></sc-for></div>
+              <button onClick="{{ runCreate }}" disabled="{{ wiz.creating }}" style="align-self:flex-start;height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ wiz.createCta }}</button>
+              <div style="display:flex;gap:10px;align-items:flex-start;background:#CDEEEE;border-radius:16px;padding:12px 14px;font-size:12px;line-height:1.55"><bh-icon name="info" size="15"></bh-icon>Pages and business accounts are created inside your company's Meta business portfolio and TikTok Business Center, so HQ stays the owner. Some platforms ask HQ to confirm a code or verify the business before the account goes live.</div>
+            </sc-if>
+            <sc-if value="{{ wiz.s2 }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px"><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Give access to<input value="{{ wiz.ownerEmail }}" onChange="{{ setOwnerEmail }}" style="height:46px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 16px;font-size:14px"></label><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Access level<select value="{{ wiz.level }}" onChange="{{ setLevel }}" style="height:46px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:14px;background:#fff"><option>Post and reply only</option><option>Post, reply and see insights</option><option>View only</option></select></label></div>
+              <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ wiz.access }}" as="a" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#F8F7F3;font-size:13px"><span style="width:30px;height:30px;border-radius:9px;background:{{ a.color }};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ a.mark }}</span><span style="flex:1"><strong>{{ a.name }}</strong><br><span style="font-size:12px;color:#3E3E3A">{{ a.how }}</span></span></div></sc-for></div>
+              <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:16px;padding:12px 14px;font-size:12px;line-height:1.55"><bh-icon name="lock" size="15"></bh-icon>Passwords and two-factor codes stay with HQ. Owners get their own login through platform invites. They can't delete the account, change the name or remove HQ.</div>
+            </sc-if>
+            <sc-if value="{{ wiz.s3 }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px">
+                <div style="border:1px solid #EEEDE8;border-radius:20px;overflow:hidden"><div style="padding:12px 14px;border-bottom:1px solid #EEEDE8;font-size:12px"><strong>Your {{ ind.brand }} social accounts are ready</strong><br><span style="color:#5D5D58">From {{ am.name }} via BranchHarbor</span></div><div style="padding:14px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;gap:8px"><span>Hi {{ wiz.ownerFirst }}, your location's accounts are set up. Accept each invite below to start posting. You'll use your own login. No shared passwords.</span><sc-for list="{{ wiz.access }}" as="a" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#F8F7F3"><span style="width:22px;height:22px;border-radius:7px;background:{{ a.color }};color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ a.mark }}</span><span style="flex:1;font-weight:600">{{ a.name }}</span><span style="font-size:11px;font-weight:800;color:#1F5F99">Accept invite</span></span></sc-for><span>Before you post, please read the Social media & advertising policy in BranchHarbor.</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:10px"><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Personal note<textarea rows="3" value="{{ wiz.note }}" onChange="{{ setNote }}" style="border:1.5px solid #D8D6CF;border-radius:18px;padding:10px 14px;font-size:13px;line-height:1.5;resize:vertical"></textarea></label><button onClick="{{ toggleTraining }}" role="switch" aria-checked="{{ wiz.training }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;font-size:13px;font-weight:600;color:#141414"><span style="width:40px;height:22px;border-radius:11px;background:{{ wiz.trTrack }};position:relative"><span style="position:absolute;top:3px;left:{{ wiz.trKnob }};width:16px;height:16px;border-radius:8px;background:#fff"></span></span>Assign the 15-minute social media training</button></div>
+              </div>
+            </sc-if>
+            <div style="display:flex;gap:8px;border-top:1px solid #EEEDE8;padding-top:14px"><sc-if value="{{ wiz.canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ wizBack }}" style="height:46px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414">Back</button></sc-if><button onClick="{{ wizNext }}" disabled="{{ wiz.nextDisabled }}" style="margin-left:auto;height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ wiz.nextLabel }}</button></div>
+          </div>
+        </sc-if>
+      </sc-if>
+      <sc-if value="{{ isLoc }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#141414;color:#fff;border-radius:28px;padding:22px;display:flex;flex-wrap:wrap;gap:16px;align-items:center"><img src="{{ am.img }}" alt="" style="width:52px;height:52px;border-radius:26px;object-fit:cover"><div style="flex:1;min-width:220px"><div style="font-size:17px;font-weight:700">Your accounts are owned by {{ ind.brand }} HQ</div><div style="font-size:13px;color:#C9C9C3;line-height:1.5">{{ am.name }} set them up. You post and reply with your own login. HQ keeps the passwords and can help if you get locked out.</div></div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px">
+          <sc-for list="{{ myAccounts }}" as="a" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:40px;height:40px;border-radius:12px;background:{{ a.color }};color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ a.mark }}</span><span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ a.name }}</span><span style="font-size:12px;color:#5D5D58">{{ a.handle }}</span></span></div>
+              <div style="font-size:12px;color:#3E3E3A">{{ a.role }}</div>
+              <button onClick="{{ a.accept }}" disabled="{{ a.done }}" style="height:42px;border-radius:999px;background:{{ a.btnBg }};color:{{ a.btnFg }};border:{{ a.btnBd }};font-size:13px;font-weight:700;cursor:pointer">{{ a.cta }}</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CH = { email: ['Email', '@', '#5E7D68'], sms: ['SMS', 'S', '#7B5BB6'], wa: ['WhatsApp', 'W', '#2F8F5B'], ig: ['Instagram DM', 'IG', '#B5487A'], fb: ['Messenger', 'f', '#3A5BD9'], web: ['Web chat', 'C', '#141414'], meta: ['Meta lead ads', 'M', '#3A5BD9'], google: ['Google Ads', 'G', '#2F7D4E'], site: ['Website forms', 'W', '#141414'], gbp: ['Business Profile', 'GB', '#C2502C'], tiktok: ['TikTok', 'T', '#141414'], linkedin: ['LinkedIn', 'in', '#1F5F99'], fbpage: ['Facebook Page', 'f', '#3A5BD9'], igacct: ['Instagram', 'IG', '#B5487A'], ttacct: ['TikTok', 'T', '#141414'], yt: ['YouTube', 'Y', '#B3261E'], wab: ['WhatsApp Business', 'W', '#2F8F5B'] };
+const PIPE = {
+  studios: ['New lead', 'Contacted', 'Trial booked', 'Trial attended', 'Member'], sports: ['Enquiry', 'Trial session', 'Registration started', 'Registered'], health: ['Enquiry', 'Contacted', 'Appointment booked', 'Attended'],
+  commerce: ['Group enquiry', 'Quote sent', 'Negotiation', 'Won'], foods: ['Catering enquiry', 'Quote sent', 'Deposit paid', 'Confirmed'], realty: ['New lead', 'Qualified', 'Viewing', 'Offer', 'Closed'],
+};
+const DEALS = [['Priya Nair', 'pW5', 'meta', 0], ['Aaron Patel', 'pM3', 'site', 0], ['Lena Fischer', 'pW3', 'google', 1], ['Omar Haddad', 'pM2', 'ig', 1], ['Grace Liu', 'pW2', 'site', 2], ['Tom Becker', 'pM4', 'wa', 2], ['Hana Suzuki', 'pW4', 'meta', 3], ['Chris Wong', 'pM1', 'gbp', 0]];
+const WHAT = { studios: 'Intro week', sports: 'U10 Skills trial', health: 'Physio assessment', commerce: 'Corporate gifts · 40 units', foods: 'Office lunch · 30 people', realty: 'Buyer · 3 bed under $1.2M' };
+const VALUE = { commerce: '$3,200', foods: '$960', realty: '$1.15M' };
+const CONVOS = [
+  ['c1', 'Priya Nair', 'pW5', 'wa', '2h', [['in', 'Hi! Is the intro week still available at Queen West?', '10:02'], ['out', 'Yes, it is. Want me to book your first class?', '10:05 · Front desk']], false],
+  ['c2', 'Omar Haddad', 'pM2', 'ig', '4h', [['in', 'Do you have parking nearby?', '8:41']], false],
+  ['c3', 'Lena Fischer', 'pW3', 'sms', 'Yesterday', [['out', 'Reminder: your appointment is tomorrow at 9:45.', 'Yesterday · automation'], ['in', 'Can I move it to 11?', 'Yesterday']], false],
+  ['c4', 'Tom Becker', 'pM4', 'wa', '2 days', [['in', 'Thanks, see you Saturday.', 'Thu'], ['out', 'Great, see you then!', 'Thu · Maya']], true],
+  ['c5', 'Aaron Patel', 'pM3', 'email', '3 days', [['in', 'Could you send me pricing for groups of 10?', 'Wed']], false],
+  ['c6', 'Grace Liu', 'pW2', 'fb', '5 days', [['in', 'Are you open on the holiday Monday?', 'Mon']], false],
+];
+const WA_TPL = [['t1', 'Booking reminder', 'Utility', 'Approved', 'Hi {{name}}, a reminder about your booking tomorrow at {{time}} at {{location}}.', ['Confirm', 'Reschedule'], false], ['t2', 'Intro offer', 'Marketing', 'Approved', 'Your first week at {{location}} is waiting. Try any class for $39.', ['See classes'], true], ['t3', 'Order ready', 'Utility', 'Approved', 'Your order #{{order}} is ready for pickup at {{location}}.', [], false], ['t4', 'Holiday hours', 'Marketing', 'In review', 'Holiday hours at {{location}}: we close at 4 pm on 24 Dec.', [], false]];
+const SEG_FIELDS = [['Location', ['Any location', 'Queen West', 'Leslieville']], ['Last visit', ['More than 30 days ago', 'In the last 7 days', 'Never']], ['Email consent', ['Yes', 'Any']], ['Tag', ['Intro offer', 'Member', 'VIP']]];
+const BLOCK_DEFS = { header: ['Header', 'star', 'Locked'], image: ['Image', 'image', 'Brand photo'], heading: ['Heading', 'edit', 'Editable'], text: ['Text', 'file', 'Editable'], button: ['Button', 'arrow-right', 'Editable'], footer: ['Location footer', 'pin', 'Locked'] };
+const STEP_BG = { TRIGGER: '#D6F26B', WAIT: '#F3F2EE', EMAIL: '#E9DDF8', SMS: '#E4DAF5', WHATSAPP: '#D4EEDD', TASK: '#F8D6D8', 'UPDATE CONTACT': '#CDEEEE' };
+const AUTOS = [
+  ['New lead follow-up', [['TRIGGER', 'Form submitted or ad lead received', 'zap'], ['WHATSAPP', 'Thanks message (template: Intro offer)', 'message'], ['WAIT', '1 day', 'clock'], ['COND', 'Booked a trial?', 'Stop and tag "Trial booked"', 'Email: "Pick your first class"'], ['TASK', 'Location calls if no booking after 3 days', 'users']]],
+  ['Appointment reminders', [['TRIGGER', 'Booking created', 'zap'], ['WAIT', '24 hours before start', 'clock'], ['SMS', 'Reminder with address', 'message'], ['COND', 'Replied "R"?', 'Send reschedule link', 'No further action']]],
+  ['Win-back', [['TRIGGER', 'No visit for 30 days', 'zap'], ['EMAIL', 'We miss you', 'mail'], ['WAIT', '7 days', 'clock'], ['COND', 'Opened email?', 'SMS: this week\u2019s classes', 'Stop']]],
+  ['Review request', [['TRIGGER', 'Visit or order completed', 'zap'], ['WAIT', '2 hours', 'clock'], ['EMAIL', 'How did we do? (links to Business Profile)', 'mail']]],
+];
+const OWN = [['fbpage', [['hq', 'HQ owns, location posts', 'Created in HQ\u2019s business portfolio. Owner gets a posting role.'], ['hqonly', 'HQ only', 'Location has no access. HQ posts for them.'], ['loc', 'Location owns, HQ partner', 'Owner creates it and adds HQ as a partner.']]], ['igacct', null], ['ttacct', null], ['gbp', null], ['wab', [['hq', 'HQ owns number and account', 'Messages appear in the location\u2019s inbox.'], ['hqonly', 'HQ only', 'HQ answers WhatsApp for every location.'], ['loc', 'Location owns', 'Owner connects their own WhatsApp Business account.']]]];
+
+class Component extends DCLogic {
+  state = { ind: 'studios', role: 'hq', screen: 'overview', ifilter: 'All', conv: 'c1', reply: '', sent: {}, assignee: {}, waTpl: 't1', deals: {}, lost: {}, segVals: {}, segN: 3, testPc: '', testInt: 'General enquiry',
+    em: 'list', emStep: 0, aud: 'all', emLocsOff: {}, blocks: ['header', 'image', 'heading', 'text', 'button', 'footer'], blockText: {}, selBlock: 2, subject: '', subjectB: '', ab: false, device: 'desktop', sentEmail: false,
+    smsAud: 'Opted in to texts · all locations', smsText: '', smsSent: false, waSel: 't2', waSent: false, auto: 0, autoSteps: {}, autoOn: {}, autoLocsOff: {},
+    own: { fbpage: 'hq', igacct: 'hq', ttacct: 'hq', gbp: 'hq', wab: 'hq' }, setupDone: {}, wizLoc: null, wizStep: 0, wizChans: { fbpage: true, igacct: true, ttacct: true, gbp: true }, created: false, creating: false, ownerEmail: '', level: 'Post and reply only', note: '', training: true, accepted: {}, model: {}, locTeam: {}, newMember: '', newRole: 'Marketing contributor', reqs: [], reqType: 'Local campaign', reqText: '', toast: '' };
+  componentDidMount() { if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50); try { const h = new URLSearchParams(location.hash.slice(1)); const p = {}; if (h.get('ind')) p.ind = h.get('ind'); if (h.get('role')) p.role = h.get('role'); if (h.get('screen')) p.screen = h.get('screen'); this.setState(p); } catch (e) {} }
+  componentWillUnmount() { clearInterval(this.poll); clearTimeout(this.tt); (this.t || []).forEach(clearTimeout); }
+  later(fn, ms) { (this.t = this.t || []).push(setTimeout(fn, ms)); }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2800); }
+  go(screen) { this.setState({ screen, em: 'list' }); window.scrollTo(0, 0); }
+
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {}, P = D.P;
+    const hq = s.role === 'hq';
+    const L0 = I.locs[0];
+    const locs = hq ? I.locs : [L0];
+    const am = D.AMS[L0.am];
+    const domain = I.brand.toLowerCase().replace(/[^a-z]+/g, '') + '.com';
+    const slugB = I.brand.toLowerCase().replace(/[^a-z]+/g, '');
+    const NAV = [['h', 'GROW'], ['overview', 'Overview', 'activity'], ['inbox', 'Inbox', 'message'], ['pipeline', 'Pipeline', 'trending'], ['contacts', 'Contacts & segments', 'users'], ['forms', 'Forms & routing', 'file'], ['h', 'CHANNELS'], ['email', 'Email', 'mail', 'New campaign'], ['sms', 'SMS', 'phone'], ['whatsapp', 'WhatsApp', 'message'], ['automations', 'Automations', 'workflow', 'New automation'], ['social', 'Social accounts', 'share'], ['h', 'PEOPLE'], ['team', 'Marketing & sales team', 'users']];
+    // team & services
+    const TIER_POL = { managed: ['hq'], standard: ['hq', 'both'], flexible: ['hq', 'both', 'own'] };
+    const MODELS = { hq: ['HQ team runs it', 'HQ marketers and sales reps work this location\u2019s campaigns, inbox and leads.', 'building'], both: ['Shared', 'HQ runs network campaigns. The location adds its own people for local posts, inbox and follow-up.', 'users'], own: ['Location\u2019s own team', 'The location\u2019s marketers, sales reps or agency run everything within brand rules. HQ can still see results.', 'store'] };
+    const locModel = l => s.model[l.id] || (l.tier === 'managed' ? 'hq' : l.tier === 'standard' ? 'both' : 'own');
+    const HQTEAM = [['Jamie Morgan', 'pW1', 'Head of marketing'], ['Ines Duarte', 'pW3', 'Social & content'], ['Marcus Bell', 'pM2', 'Sales lead'], ['Ravi Shah', 'pM3', 'Paid ads']];
+    const ROLES = [['Marketing contributor', 'Drafts posts, emails and ads. Publishing follows the tier rules.'], ['Marketing manager', 'Publishes within the tier, sees reports, manages local automations.'], ['Sales rep', 'Works the inbox and pipeline for this location. No campaign access.'], ['Agency (external)', 'Same as marketing manager. Access expires on the date you set.']];
+    const myModel = locModel(L0);
+    const allowed = TIER_POL[L0.tier];
+    const locTeam = s.locTeam[L0.id] || [['Taylor Brooks', 'pW2', 'Marketing manager', 'Active'], ['Ben Okafor', 'pM2', 'Sales rep', 'Active']];
+    const cur = NAV.find(n => n[0] === s.screen) || NAV[1];
+
+    // inbox
+    const convs = CONVOS.filter(c => s.ifilter === 'All' || CH[c[3]][0].startsWith(s.ifilter));
+    const cc = CONVOS.find(c => c[0] === s.conv) || CONVOS[0];
+    const waClosed = cc[3] === 'wa' && cc[6];
+    const ccMsgs = [...cc[5], ...(s.sent[cc[0]] || [])];
+
+    // pipeline
+    const stagesL = PIPE[s.ind];
+    const dealStage = (i, d) => s.deals[`${s.ind}${i}`] ?? Math.min(d[3], stagesL.length - 1);
+    const colors = ['#E9DDF8', '#CDEEEE', '#F7EDA8', '#F8D6D8', '#D6F26B'];
+
+    // segments
+    const nRules = s.segN;
+    const segRules = SEG_FIELDS.slice(0, nRules).map(([field, opts], i) => ({ field, opts, join: i === 0 ? 'WHERE' : 'AND', val: s.segVals[i] || opts[0], set: e => { const v = e.target.value; this.setState(x => ({ segVals: { ...x.segVals, [i]: v } })); }, remove: () => this.setState(x => ({ segN: Math.max(1, x.segN - 1) })) }));
+    const segCount = Math.round(4820 / (1 + nRules * 1.6) / (Object.values(s.segVals).filter(v => v && !String(v).startsWith('Any')).length + 1));
+
+    // email
+    const blocks = s.blocks;
+    const btxt = (b, i) => s.blockText[i] ?? { heading: `This month at ${I.brand}`, text: `${I.tagline} Here's what's new at your local ${I.brand}.`, button: I.cta, image: '', header: '', footer: '' }[b];
+    const subject = s.subject || `This month at ${I.brand}`;
+    const audOpts = [['all', 'All subscribers', 'Agreed to marketing email', 4820], ['recent', 'Visited in last 90 days', 'Active customers', 2140], ['lapsed', 'Lapsed 30+ days', 'Win-back', 860], ['leads', 'Open leads', 'From forms and ads, not yet customers', 312]];
+    const audN = audOpts.find(a => a[0] === s.aud)[3];
+    const emLocsOn = locs.filter(l => !s.emLocsOff[l.id]);
+
+    // sms
+    const smsText = s.smsText || `${I.brand} ${L0.name}: ${{ studios: 'first week unlimited for $39 this month. Book:', sports: 'spring registration is open. Register:', health: 'flu shots available, book online:', commerce: 'new arrivals in store this week. Shop:', foods: 'order lunch ahead and skip the line:', realty: 'open house Sat 11am at 42 Birchmount.' }[s.ind]} ${slugB}.com/go`;
+    const chars = smsText.length + 22;
+    const segs = Math.ceil(chars / 160);
+
+    // automations
+    const au = AUTOS[s.auto];
+    const steps = s.autoSteps[s.auto] || au[1];
+    const autoOn = s.autoOn[s.auto] ?? true;
+
+    // social
+    const chanKeys = ['fbpage', 'igacct', 'ttacct', 'gbp', 'wab'];
+    const ownOpts = (k) => (OWN.find(o => o[0] === k)[1] || OWN[0][1]);
+    const cellFor = (l, k, i) => {
+      const done = s.setupDone[l.id];
+      const own = s.own[k];
+      if (k === 'wab') return own === 'hqonly' ? ['HQ answers', 'lock', '#F3F2EE'] : i % 3 === 2 ? ['Not set up', 'minus', '#F3F2EE'] : ['Live', 'check', '#E2F5A6'];
+      if (done) return ['Access sent', 'send', '#CDEEEE'];
+      if (l.status !== 'Operating') return ['Not created', 'minus', '#F3F2EE'];
+      if (k === 'ttacct' && i % 2) return ['Not created', 'minus', '#F3F2EE'];
+      if (own === 'hqonly') return ['HQ posts', 'lock', '#F3F2EE'];
+      return i === 1 && k === 'gbp' ? ['Verifying', 'clock', '#F7EDA8'] : ['Live · owner has access', 'check', '#E2F5A6'];
+    };
+    const wl = I.locs.find(l => l.id === s.wizLoc);
+    const wizChanList = ['fbpage', 'igacct', 'ttacct', 'gbp'];
+    const handleFor = k => k === 'fbpage' ? `${I.brand} ${wl ? wl.name : ''}` : k === 'igacct' ? `@${slugB}.${wl ? wl.id : ''}` : k === 'ttacct' ? `@${slugB}${wl ? wl.id : ''}` : `${I.brand} ${wl ? wl.name : ''} (Business Profile)`;
+    const createHow = { fbpage: 'New Page in HQ\u2019s Meta business portfolio, named and branded from the Brand center.', igacct: 'Professional account linked to the new Page. Login email uses HQ\u2019s alias social+' + (wl ? wl.id : '') + '@' + domain + '.', ttacct: 'Created through TikTok Business Center. HQ confirms the verification code sent to the alias email.', gbp: 'Location added to HQ\u2019s Business Profile group. Google sends a verification step to the location.' };
+    const accessHow = { fbpage: 'Facebook Page role: content and messages. Can\u2019t manage settings or people.', igacct: 'Access through the Page in Meta Business Suite. Posts, stories and DMs.', ttacct: 'Business Center member with Operator role for this account only.', gbp: 'Manager on this location only. Can reply to reviews and post updates.' };
+    const wizSelected = wizChanList.filter(k => s.wizChans[k]);
+    const ownerName = wl ? wl.owner : '';
+
+    return {
+      ind: I, toast: s.toast, isHQ: hq, isLoc: !hq, domain, firstLoc: L0.name, firstAddr: L0.addr, am: { ...am, img: IMG[am.img] },
+      me: hq ? { name: 'Jamie Morgan · HQ marketing', img: IMG.pW1 } : { name: `${L0.owner} · ${L0.name}`, img: IMG[I.staffImg] },
+      scope: hq ? { icon: 'building', label: `All locations (${I.locs.length})`, sub: 'Headquarters view' } : { icon: 'pin', label: `${I.brand} ${L0.name}`, sub: `${D.TIERS[L0.tier].name} autonomy · ${L0.owner}` },
+      links: hq ? { back: `BranchHarbor HQ.dc.html#ind=${s.ind}`, backLabel: 'HQ console' } : { back: `BranchHarbor Location.dc.html#ind=${s.ind}&loc=${L0.id}`, backLabel: 'Location console' },
+      indSwitch: Object.values(D.IND).map(x => ({ name: x.name, icon: x.icon, bg: x.key === s.ind ? x.pastel : 'transparent', fg: x.key === s.ind ? '#141414' : '#B9B9B3', pick: () => this.setState({ ind: x.key, deals: {}, wizLoc: null }) })),
+      roles: [['hq', 'HQ'], ['loc', 'Location']].map(([k, label]) => ({ label, bg: s.role === k ? '#D6F26B' : 'transparent', fg: s.role === k ? '#141414' : '#E6E6E3', pick: () => this.setState({ role: k, wizLoc: null }) })),
+      nav: NAV.map(n => n[0] === 'h' ? { head: true, item: false, label: n[1] } : { head: false, item: true, label: n[1], icon: n[2], w: s.screen === n[0] ? 800 : 500, bg: s.screen === n[0] ? '#D6F26B' : 'transparent', fg: s.screen === n[0] ? '#141414' : '#E6E6E3', badge: n[0] === 'inbox' ? 4 : 0, go: () => this.go(n[0]) }),
+      page: { group: hq ? 'Marketing & sales · HQ' : `Marketing & sales · ${L0.name}`, title: cur[1], hasCta: !!cur[3], cta: cur[3] || '', go: () => s.screen === 'email' ? this.setState({ em: 'builder', emStep: 0, sentEmail: false }) : this.setState({ autoSteps: { ...s.autoSteps, [s.auto]: [['TRIGGER', 'Choose a trigger', 'zap']] } }) },
+      v: Object.fromEntries(NAV.filter(n => n[0] !== 'h').map(n => [n[0], s.screen === n[0]])),
+
+      kpis: [['New leads', hq ? '486' : '74', 'Last 30 days', 'users', I.pastel], ['Conversion', '23%', 'Lead → customer', 'trending', '#fff'], ['Email subscribers', hq ? '4,820' : '812', 'With consent', 'mail', '#fff'], ['SMS & WhatsApp opt-ins', hq ? '2,310' : '366', 'Across both', 'message', P.aqua], ['Avg. first reply', '42 min', 'Inbox · business hours', 'clock', P.butter]].map(([label, value, note, icon, bg]) => ({ label, value, note, icon, bg })),
+      funnel: [['Leads', 486, I.pastel], ['Contacted', 402, '#CDEEEE'], [stagesL[2] || 'Booked', 214, '#F7EDA8'], [stagesL[3] || 'Attended', 161, '#F8D6D8'], ['Customers', 112, '#D6F26B']].map(([label, n, bg]) => ({ label, n: hq ? n : Math.round(n / 6), w: `${Math.round(n / 486 * 100)}%`, bg })),
+      sources: [['meta', 164, 'Synced 1 h ago'], ['site', 131, 'Live'], ['google', 88, 'Synced 3 h ago'], ['ig', 47, 'Live'], ['gbp', 32, 'Synced today'], ['wa', 24, 'Live']].map(([k, n, fresh]) => ({ name: CH[k][0], mark: CH[k][1], color: CH[k][2], n: hq ? n : Math.round(n / 6), fresh })),
+
+      inboxFilters: ['All', 'WhatsApp', 'SMS', 'Instagram', 'Messenger', 'Email'].map(f => ({ label: f, bg: s.ifilter === f ? '#141414' : '#F3F2EE', fg: s.ifilter === f ? '#fff' : '#141414', pick: () => this.setState({ ifilter: f }) })),
+      convos: convs.map((c, i) => ({ name: c[1], img: IMG[c[2]], chMark: CH[c[3]][1], chColor: CH[c[3]][2], at: c[4], last: [...c[5], ...(s.sent[c[0]] || [])].slice(-1)[0][1], loc: `${I.brand} ${locs[i % locs.length].name}`, w: i < 3 ? 800 : 600, bg: s.conv === c[0] ? '#F3F2EE' : 'transparent', pick: () => this.setState({ conv: c[0], reply: '' }) })),
+      cv: { name: cc[1], img: IMG[cc[2]], ch: CH[cc[3]][0], loc: `${I.brand} ${L0.name}`, assignee: s.assignee[cc[0]] || 'Unassigned', waClosed, free: !waClosed, ph: `Reply by ${CH[cc[3]][0]}`, sendLabel: waClosed ? 'Send template' : 'Send', dealCta: s.deals[`conv${cc[0]}`] ? 'In pipeline' : 'Add to pipeline',
+        msgs: ccMsgs.map(([dir, t, meta]) => ({ t, meta, align: dir === 'in' ? 'flex-start' : 'flex-end', bg: dir === 'in' ? '#fff' : '#141414', fg: dir === 'in' ? '#141414' : '#fff', radius: dir === 'in' ? '4px 18px 18px 18px' : '18px 4px 18px 18px' })) },
+      reply: s.reply, setReply: e => this.setState({ reply: e.target.value }), waTpl: s.waTpl, setWaTpl: e => this.setState({ waTpl: e.target.value }),
+      waTemplatesOk: WA_TPL.filter(t => t[3] === 'Approved').map(t => ({ id: t[0], name: `${t[1]} · ${t[2]}` })),
+      setAssignee: e => { const v = e.target.value; this.setState(x => ({ assignee: { ...x.assignee, [cc[0]]: v } })); },
+      toDeal: () => { this.setState(x => ({ deals: { ...x.deals, [`conv${cc[0]}`]: 1 } })); this.toast(`${cc[1]} added to ${stagesL[0]}`); },
+      sendReply: () => { const t = waClosed ? WA_TPL.find(x => x[0] === s.waTpl)[4].replace('{{name}}', cc[1].split(' ')[0]).replace('{{location}}', L0.name).replace('{{time}}', '9:00 am').replace('{{order}}', '1046') : s.reply.trim(); if (!t) return; this.setState(x => ({ reply: '', sent: { ...x.sent, [cc[0]]: [...(x.sent[cc[0]] || []), ['out', t, `Just now · ${hq ? 'HQ' : 'You'}`]] } })); },
+
+      stages: stagesL.map((label, si) => { const ds = DEALS.map((d, i) => ({ d, i })).filter(({ d, i }) => !s.lost[`${s.ind}${i}`] && dealStage(i, d) === si);
+        return { label, color: colors[si % 5], count: ds.length, deals: ds.map(({ d, i }) => ({ name: d[0], img: IMG[d[1]], what: WHAT[s.ind], loc: locs[i % locs.length].name, src: CH[d[2]][0], value: VALUE[s.ind] || '', canBack: si > 0, canFwd: si < stagesL.length - 1, canLose: si < stagesL.length - 1, fwdLabel: `→ ${stagesL[si + 1] || ''}`,
+          back: () => this.setState(x => ({ deals: { ...x.deals, [`${s.ind}${i}`]: si - 1 } })), fwd: () => { this.setState(x => ({ deals: { ...x.deals, [`${s.ind}${i}`]: si + 1 } })); if (si + 1 === stagesL.length - 1) this.toast(`${d[0]} won · added to customers`); }, lose: () => { this.setState(x => ({ lost: { ...x.lost, [`${s.ind}${i}`]: true } })); this.toast(`${d[0]} marked lost`); } })) }; }),
+
+      segRules, segCount: segCount.toLocaleString(), addRule: () => this.setState(x => ({ segN: Math.min(4, x.segN + 1) })), saveSeg: () => this.toast('Segment saved. Use it in email, SMS, WhatsApp and automations.'),
+      contacts: DEALS.slice(0, 7).map((d, i) => ({ name: d[0], img: IMG[d[1]], stage: stagesL[dealStage(i, d)], loc: locs[i % locs.length].name, src: CH[d[2]][0], bg: i % 2 ? '#fff' : '#FAFAF7',
+        consent: [['Email', 'mail', i !== 3], ['SMS', 'phone', i % 2 === 0], ['WA', 'message', i % 3 === 0]].map(([l, icon, on]) => ({ l, icon: on ? icon : 'x', bg: on ? '#E2F5A6' : '#F3F2EE', title: `${l}: ${on ? 'opted in' : 'no consent'}` })), tags: [['Intro offer'], ['Member', 'VIP'], ['Lead'], ['Intro offer'], ['Member'], ['Lapsed'], ['Lead']][i] })),
+
+      forms: [['Website enquiry', 'Every location page', 'mail', I.pastel, 212], ['Meta lead form', `${I.brand} network campaign`, 'target', P.aqua, 164], [`${I.cta} form`, 'Location pages · booking', I.icon, P.butter, 98], ['Franchise enquiry', `${domain}/franchise`, 'briefcase', P.blush, 11]].map(([name, where, icon, pastel, n]) => ({ name, where, icon, pastel, n })),
+      rules: [['interest is Franchise enquiry', 'HQ franchise development · Lucia Reyes'], ['interest is Corporate / group', 'HQ sales team, then nearest location'], ['postal code is near a location', 'Nearest operating location · front desk'], ['no match', `${I.brand} HQ inbox`]].map(([iff, then], i) => ({ n: i + 1, if: iff, then, bg: '#F8F7F3' })),
+      testPc: s.testPc, testInt: s.testInt, setTestPc: e => this.setState({ testPc: e.target.value }), setTestInt: e => this.setState({ testInt: e.target.value }),
+      testResult: s.testInt === 'Franchise enquiry' ? 'Rule 1 → HQ franchise development (Lucia Reyes)' : s.testInt === 'Corporate / group' ? 'Rule 2 → HQ sales team' : s.testPc.trim() ? `Rule 3 → ${I.brand} ${(I.locs.find(l => l.addr.toLowerCase().includes(s.testPc.trim().toLowerCase().slice(0, 3))) || L0).name}` : 'Enter a postal code to test',
+
+      em: { list: s.em === 'list', builder: s.em === 'builder', report: s.em === 'report', sAud: s.emStep === 0, sContent: s.emStep === 1, sSettings: s.emStep === 2, sReview: s.emStep === 3 },
+      emailCampaigns: [['Monthly newsletter', 'All subscribers · 4,820', 'Sent', [['44%', 'opened'], ['6.1%', 'clicked'], ['0.3%', 'unsub']], I.imgs[0]], [`${L0.name} reopening`, `${L0.name} subscribers · 812`, 'Scheduled', [['Thu', '9:00 am'], ['—', ''], ['—', '']], I.imgs[1]], ['Holiday hours', 'All subscribers', 'Draft', [['—', ''], ['—', ''], ['—', '']], I.imgs[2]], ...(s.sentEmail ? [[subject, `${audN.toLocaleString()} contacts`, 'Sending', [['0%', 'opened'], ['', ''], ['', '']], I.hero]] : [])].map(([name, aud, status, stats, img], i) => ({ name, aud, status, stats: stats.map(([v, l]) => ({ v, l })), img: IMG[img], stBg: status === 'Sent' ? '#E2F5A6' : status === 'Draft' ? '#F3F2EE' : P.aqua, open: () => this.setState(status === 'Sent' ? { em: 'report' } : { em: 'builder', emStep: 0 }) })),
+      emBack: () => this.setState({ em: 'list' }),
+      emSteps: ['Audience', 'Content', 'Settings', 'Review'].map((label, i) => ({ label, n: i < s.emStep ? '✓' : i + 1, bg: s.emStep === i ? '#141414' : '#fff', fg: s.emStep === i ? '#fff' : '#141414', dot: s.emStep === i ? '#D6F26B' : i < s.emStep ? '#E2F5A6' : '#F3F2EE', pick: () => this.setState({ emStep: i }) })),
+      audOpts: audOpts.map(([k, name, desc, n]) => ({ name, desc, n: (hq ? n : Math.round(n / 6)).toLocaleString(), bd: s.aud === k ? '#141414' : '#EEEDE8', bg: s.aud === k ? '#F3F2EE' : '#fff', pick: () => this.setState({ aud: k }) })),
+      emLocs: locs.map(l => { const on = !s.emLocsOff[l.id]; return { name: l.name, locked: !hq, bd: on ? '#141414' : '#D8D6CF', bg: on ? '#F3F2EE' : '#fff', toggle: () => this.setState(x => ({ emLocsOff: { ...x.emLocsOff, [l.id]: on } })) }; }),
+      emExcl: `${hq ? '412' : '68'} contacts without email consent are left out automatically. Each location's subscribers get the email from that location.`,
+      blocks: blocks.map((b, i) => { const d = BLOCK_DEFS[b]; return { kind: d[0], icon: d[1], lock: d[2], lockIcon: d[2] === 'Locked' ? 'lock' : d[2] === 'Editable' ? 'edit' : 'image', lockBg: d[2] === 'Locked' ? '#F3F2EE' : '#E2F5A6', text: btxt(b, i) || (b === 'image' ? 'From Brand center' : b === 'footer' ? 'Address and unsubscribe' : 'Logo'), bd: s.selBlock === i ? '#141414' : '#EEEDE8', canRemove: d[2] !== 'Locked', pick: () => this.setState({ selBlock: i }),
+        up: () => this.setState(x => { if (i === 0) return {}; const a = [...x.blocks]; [a[i - 1], a[i]] = [a[i], a[i - 1]]; return { blocks: a }; }), remove: () => this.setState(x => ({ blocks: x.blocks.filter((_, j) => j !== i), selBlock: 0 })) }; }),
+      addBlocks: [['heading', 'Heading'], ['text', 'Text'], ['image', 'Image'], ['button', 'Button']].map(([k, label]) => ({ label, add: () => this.setState(x => { const a = [...x.blocks]; a.splice(a.length - 1, 0, k); return { blocks: a, selBlock: a.length - 2 }; }) })),
+      selBlock: (() => { const b = blocks[s.selBlock]; return b ? { kind: BLOCK_DEFS[b][0], editable: BLOCK_DEFS[b][2] === 'Editable', text: btxt(b, s.selBlock) } : { editable: false }; })(),
+      setBlockText: e => { const v = e.target.value; this.setState(x => ({ blockText: { ...x.blockText, [x.selBlock]: v } })); },
+      blocksPreview: blocks.map((b, i) => ({ isHeader: b === 'header', isImage: b === 'image', isText: b === 'text', isHeading: b === 'heading', isButton: b === 'button', isFooter: b === 'footer', text: btxt(b, i), img: IMG[I.hero] })),
+      devices: [['desktop', 'Desktop'], ['mobile', 'Mobile']].map(([k, label]) => ({ label, bg: s.device === k ? '#141414' : 'transparent', fg: s.device === k ? '#fff' : '#141414', pick: () => this.setState({ device: k }) })), previewW: s.device === 'mobile' ? '320px' : '460px',
+      emSubject: subject, emSubjectB: s.subjectB || `New at ${I.brand} ${L0.name} this month`, setSubject: e => this.setState({ subject: e.target.value }), setSubjectB: e => this.setState({ subjectB: e.target.value }), previewSubject: subject,
+      emAB: s.ab, toggleAB: () => this.setState({ ab: !s.ab }), abTrack: s.ab ? '#141414' : '#D8D6CF', abKnob: s.ab ? '21px' : '3px',
+      emReview: [['Audience', `${audOpts.find(a => a[0] === s.aud)[1]} · ${(hq ? audN : Math.round(audN / 6)).toLocaleString()} contacts`], ['Locations', emLocsOn.map(l => l.name).join(', ')], ['Subject', s.ab ? `A/B test · "${subject}"` : subject], ['Content', `${blocks.length} blocks · brand template v4`]].map(([k, v]) => ({ k, v })),
+      emSendLabel: hq ? 'Schedule for Thu 9:00 am local time' : (L0.tier === 'standard' ? 'Send to HQ for approval' : 'Schedule'),
+      emSend: () => { this.setState({ em: 'list', sentEmail: true }); this.toast(hq ? 'Scheduled. Each location sends at 9:00 am in its own timezone.' : 'Sent to HQ for approval'); }, emTest: () => this.toast('Test sent to your inbox'),
+      emReport: { name: 'Monthly newsletter', kpis: [['Delivered', '4,781', I.pastel], ['Opened', '44.2%', '#fff'], ['Clicked', '6.1%', '#fff'], ['Bookings', '38', P.butter], ['Unsubscribed', '14', '#fff']].map(([l, v, bg]) => ({ l, v, bg })), locs: locs.map((l, i) => { const v = [48, 44, 41, 39, 36, 33][i % 6]; return { name: l.name, v: `${v}%`, w: `${v * 2}%` }; }) },
+
+      smsAud: s.smsAud, setSmsAud: e => this.setState({ smsAud: e.target.value }), smsText, setSmsText: e => this.setState({ smsText: e.target.value }), smsChars: chars, smsSegs: segs, smsCountColor: segs > 1 ? '#8A5A00' : '#5D5D58',
+      smsPreview: `${smsText} Reply STOP to opt out.`, smsReach: `${hq ? '1,840' : '310'} people opted in · about ${segs * (hq ? 1840 : 310)} segments`,
+      smsCta: s.smsSent ? 'Scheduled' : 'Schedule for tomorrow 10:00 am', smsSend: () => { this.setState({ smsSent: true }); this.toast('Scheduled. Quiet hours respected in each timezone.'); },
+      smsNumbers: locs.map((l, i) => ({ loc: l.name, num: l.cur === 'USD' ? `+1 ${l.phone.replace(/[()]/g, '')}` : `+1 ${l.phone.replace(/[()]/g, '')}`, st: l.cur === 'USD' ? (i % 2 ? 'Registration pending' : 'Registered') : 'Active', bg: l.cur === 'USD' && i % 2 ? P.butter : '#E2F5A6' })),
+
+      waKpis: [['Business account', 'Verified', 'Display name approved', '#E2F5A6'], ['Numbers', `${Math.max(1, locs.length - 1)} of ${locs.length}`, 'Locations connected', '#fff'], ['Opted in', hq ? '1,210' : '204', 'Can receive marketing', P.aqua], ['Open conversations', '18', 'Replies within 24 h are free-form', '#fff']].map(([l, v, n, bg]) => ({ l, v, n, bg })),
+      waTemplates: WA_TPL.map(t => ({ name: t[1], cat: t[2], lang: 'English', st: t[3], stBg: t[3] === 'Approved' ? '#E2F5A6' : P.butter, bd: s.waSel === t[0] ? '#141414' : '#EEEDE8', pick: () => this.setState({ waSel: t[0], waSent: false }) })),
+      waSel: (() => { const t = WA_TPL.find(x => x[0] === s.waSel); return { body: t[4].replace('{{name}}', 'Hana').replace('{{location}}', `${I.brand} ${L0.name}`).replace('{{time}}', '9:00 am').replace('{{order}}', '1046'), buttons: t[5], img: t[6] ? IMG[I.hero] : '', cantSend: t[3] !== 'Approved' || s.waSent, cta: t[3] !== 'Approved' ? 'Waiting for Meta review' : s.waSent ? 'Broadcast scheduled' : t[2] === 'Marketing' ? `Send to ${hq ? '1,210' : '204'} opted-in contacts` : 'Used by automations' }; })(),
+      waBroadcast: () => { this.setState({ waSent: true }); this.toast('WhatsApp broadcast scheduled'); }, newWaTpl: () => this.toast('New template sent to Meta for review'),
+
+      autoList: AUTOS.map((a, i) => { const on = s.autoOn[i] ?? true; return { name: a[0], dot: on ? '#2F8F5B' : '#B9B9B3', bg: s.auto === i ? '#141414' : '#fff', fg: s.auto === i ? '#fff' : '#141414', pick: () => this.setState({ auto: i }) }; }),
+      flow: steps.map((st, i) => st[0] === 'COND' ? { isBranch: true, isStep: false, t: st[1], yes: st[2], no: st[3], remove: () => this.setState(x => ({ autoSteps: { ...x.autoSteps, [x.auto]: steps.filter((_, j) => j !== i) } })) } : { isBranch: false, isStep: true, kind: st[0], t: st[1], icon: st[2], bg: STEP_BG[st[0]] || '#F3F2EE', canRemove: i > 0, remove: () => this.setState(x => ({ autoSteps: { ...x.autoSteps, [x.auto]: steps.filter((_, j) => j !== i) } })) }),
+      addSteps: [['EMAIL', 'Email', 'mail', 'Send email'], ['SMS', 'SMS', 'phone', 'Send text'], ['WHATSAPP', 'WhatsApp', 'message', 'Send WhatsApp template'], ['WAIT', 'Wait', 'clock', '2 days'], ['COND', 'Condition', 'filter', 'Opened last message?'], ['TASK', 'Task', 'users', 'Location follows up'], ['UPDATE CONTACT', 'Update', 'tag', 'Add tag']].map(([k, label, icon, def]) => ({ label, icon, bg: STEP_BG[k] || '#F7EDA8', add: () => this.setState(x => ({ autoSteps: { ...x.autoSteps, [x.auto]: [...steps, k === 'COND' ? ['COND', def, 'Continue', 'Stop'] : [k, def, icon]] } })) })),
+      autoOn, toggleAuto: () => this.setState(x => ({ autoOn: { ...x.autoOn, [x.auto]: !autoOn } })), autoTrack: autoOn ? '#141414' : '#D8D6CF', autoKnob: autoOn ? '26px' : '4px',
+      autoStatus: autoOn ? `Running · ${hq ? 128 : 21} people in this automation now` : 'Paused · nobody new enters. People already in it finish their current step.',
+      autoLocs: locs.map(l => { const on = !s.autoLocsOff[`${s.auto}${l.id}`]; return { name: l.name, bd: on ? '#141414' : '#D8D6CF', bg: on ? '#E2F5A6' : '#fff', toggle: () => this.setState(x => ({ autoLocsOff: { ...x.autoLocsOff, [`${x.auto}${l.id}`]: on } })) }; }),
+      testAuto: () => this.toast('Test started. Messages go to your email, phone and WhatsApp.'),
+      runLog: [['check-circle', 'Priya N. · WhatsApp sent', '10:02', '#2F6B3A'], ['check-circle', 'Aaron P. · entered automation', '9:48', '#2F6B3A'], ['minus', 'Lena F. · skipped SMS (no consent)', '9:30', '#5D5D58'], ['x', 'Omar H. · stopped (booked a trial)', 'Yesterday', '#5D5D58']].map(([icon, t, at, fg]) => ({ icon, t, at, fg })),
+
+      ownRows: chanKeys.map(k => ({ name: CH[k][0], mark: CH[k][1], color: CH[k][2], opts: ownOpts(k).map(([v, label, desc]) => { const on = s.own[k] === v; return { label, desc, bd: on ? '#141414' : '#EEEDE8', bg: on ? '#F3F2EE' : '#fff', dot: on ? '#141414' : 'transparent', pick: () => this.setState(x => ({ own: { ...x.own, [k]: v } })) }; }) })),
+      chanHeads: chanKeys.map(k => CH[k][0]),
+      socialMatrix: I.locs.map((l, i) => { const needs = l.status !== 'Operating' && !s.setupDone[l.id]; return { name: l.name, owner: l.owner, bg: i % 2 ? '#fff' : '#FAFAF7', cells: chanKeys.map(k => { const [label, icon, bg] = cellFor(l, k, i); return { label, icon, bg, title: label }; }),
+        cta: s.setupDone[l.id] ? 'Resend access' : needs ? 'Set up accounts' : 'Manage', btnBg: needs ? '#141414' : '#fff', btnFg: needs ? '#fff' : '#141414', btnBd: needs ? 'none' : '1.5px solid #141414',
+        setup: () => this.setState({ wizLoc: l.id, wizStep: 0, created: false, ownerEmail: `${l.owner.split(' ')[0].toLowerCase()}@${l.owner.toLowerCase().replace(/[^a-z]+/g, '')}.com`, note: `Welcome to ${I.brand}! Your accounts are ready. Read the social policy first and ping me with any questions. – ${D.AMS[l.am].name.split(' ')[0]}` }) }; }),
+      wiz: wl ? { open: true, loc: `${I.brand} ${wl.name}`, s0: s.wizStep === 0, s1: s.wizStep === 1, s2: s.wizStep === 2, s3: s.wizStep === 3, canBack: s.wizStep > 0, creating: s.creating, ownerEmail: s.ownerEmail, level: s.level, note: s.note, training: s.training, ownerFirst: ownerName.split(' ')[0],
+          trTrack: s.training ? '#141414' : '#D8D6CF', trKnob: s.training ? '21px' : '3px',
+          steps: ['Choose accounts', 'Create under HQ', 'Give owner access', 'Send to owner'].map((label, i) => ({ label, n: i < s.wizStep ? '✓' : i + 1, bg: s.wizStep === i ? '#141414' : '#F3F2EE', fg: s.wizStep === i ? '#fff' : '#141414', dot: s.wizStep === i ? '#D6F26B' : i < s.wizStep ? '#E2F5A6' : '#fff' })),
+          chans: wizChanList.map(k => { const on = !!s.wizChans[k]; return { name: CH[k][0], mark: CH[k][1], color: CH[k][2], plan: `${ownOpts(k).find(o => o[0] === s.own[k])[1]} · ${handleFor(k)}`, on, bd: on ? '#141414' : '#EEEDE8', bg: on ? '#F8F7F3' : '#fff', box: on ? '#141414' : '#fff', toggle: () => this.setState(x => ({ wizChans: { ...x.wizChans, [k]: !on } })) }; }),
+          create: wizSelected.map((k, i) => { const st = s.created ? (k === 'gbp' ? 'Verification sent' : 'Created') : s.creating ? (i === 0 ? 'Creating…' : 'Queued') : 'Ready to create'; return { name: CH[k][0], mark: CH[k][1], color: CH[k][2], handle: handleFor(k), how: createHow[k], st, stIcon: st === 'Created' ? 'check' : st === 'Verification sent' ? 'clock' : st === 'Creating…' ? 'refresh' : 'minus', stBg: st === 'Created' ? '#E2F5A6' : st === 'Verification sent' ? P.butter : '#fff' }; }),
+          createCta: s.created ? 'Created' : s.creating ? 'Creating…' : `Create ${wizSelected.length} accounts`,
+          access: wizSelected.map(k => ({ name: `${CH[k][0]} · ${handleFor(k)}`, mark: CH[k][1], color: CH[k][2], how: accessHow[k] })),
+          nextDisabled: (s.wizStep === 1 && !s.created) || (s.wizStep === 0 && !wizSelected.length), nextLabel: s.wizStep === 3 ? `Send to ${ownerName}` : 'Continue' } : { open: false },
+      closeWiz: () => this.setState({ wizLoc: null }), wizBack: () => this.setState({ wizStep: s.wizStep - 1 }),
+      wizNext: () => { if (s.wizStep === 3) { this.setState(x => ({ setupDone: { ...x.setupDone, [x.wizLoc]: true }, wizLoc: null })); this.toast(`Access sent to ${ownerName}. You'll see when each invite is accepted.`); return; } this.setState({ wizStep: s.wizStep + 1 }); },
+      runCreate: () => { this.setState({ creating: true }); this.later(() => this.setState({ creating: false, created: true }), 1600); },
+      setOwnerEmail: e => this.setState({ ownerEmail: e.target.value }), setLevel: e => this.setState({ level: e.target.value }), setNote: e => this.setState({ note: e.target.value }), toggleTraining: () => this.setState({ training: !s.training }),
+
+      tmPolicy: ['managed', 'standard', 'flexible'].map(t => ({ name: D.TIERS[t].name, pastel: D.TIERS[t].pastel, opts: Object.keys(MODELS).map(m => ({ label: MODELS[m][0], on: TIER_POL[t].includes(m), icon: TIER_POL[t].includes(m) ? 'check' : 'lock', bg: TIER_POL[t].includes(m) ? '#fff' : 'transparent', fg: TIER_POL[t].includes(m) ? '#141414' : '#7C7C76' })) })),
+      hqTeam: HQTEAM.map(([name, img, role], i) => ({ name, img: IMG[img], role, load: `${[I.locs.length, 3, I.locs.length - 1, 2][i]} locations` })),
+      tmRows: I.locs.map((l, i) => { const m = locModel(l); return { name: l.name, owner: l.owner, tierName: D.TIERS[l.tier].name, tierBg: D.TIERS[l.tier].pastel, model: MODELS[m][0], modelIcon: MODELS[m][2], people: m === 'hq' ? 'HQ: Ines (social), Marcus (sales)' : m === 'both' ? `HQ campaigns + ${1 + i % 2} local` : `${2 + i % 2} local · ${i % 2 ? 'agency' : 'in-house'}`, bg: i % 2 ? '#fff' : '#FAFAF7', fee: m === 'hq' ? 'Included in marketing fund' : m === 'both' ? 'Included' : '—' }; }),
+      myModelName: MODELS[myModel][0], myModelDesc: MODELS[myModel][1],
+      modelOpts: Object.keys(MODELS).map(m => { const ok = allowed.includes(m), on = myModel === m; return { label: MODELS[m][0], desc: MODELS[m][1], icon: MODELS[m][2], disabled: !ok, note: ok ? '' : 'Not on your tier', bd: on ? '#141414' : '#EEEDE8', bg: on ? '#F3F2EE' : '#fff', dot: on ? '#141414' : 'transparent', pick: () => { this.setState(x => ({ model: { ...x.model, [L0.id]: m } })); this.toast(`Switched to "${MODELS[m][0]}". HQ has been notified.`); } }; }),
+      showOwnTeam: myModel !== 'hq', showHqTeam: myModel !== 'own',
+      locTeam: locTeam.map(([name, img, role, st], i) => ({ name, img: IMG[img] || IMG.pM4, role, st, stBg: st === 'Active' ? '#E2F5A6' : '#F7EDA8', remove: () => this.setState(x => ({ locTeam: { ...x.locTeam, [L0.id]: locTeam.filter((_, j) => j !== i) } })) })),
+      roleOpts: ROLES.map(([r, d]) => ({ r, d, on: s.newRole === r, bd: s.newRole === r ? '#141414' : '#EEEDE8', bg: s.newRole === r ? '#F3F2EE' : '#fff', pick: () => this.setState({ newRole: r }) })),
+      newMember: s.newMember, setNewMember: e => this.setState({ newMember: e.target.value }),
+      addMember: () => { const v = s.newMember.trim(); if (!/^\S+@\S+\.\S+$/.test(v)) { this.toast('Enter a valid email'); return; } this.setState(x => ({ newMember: '', locTeam: { ...x.locTeam, [L0.id]: [...locTeam, [v, 'pM4', x.newRole, 'Invited']] } })); this.toast(`Invite sent. Access is limited to ${L0.name}.`); },
+      myHqTeam: HQTEAM.slice(1, 3).map(([name, img, role]) => ({ name, img: IMG[img], role })),
+      reqType: s.reqType, setReqType: e => this.setState({ reqType: e.target.value }), reqText: s.reqText, setReqText: e => this.setState({ reqText: e.target.value }),
+      sendReq: () => { if (!s.reqText.trim()) { this.toast('Add a short description'); return; } this.setState(x => ({ reqs: [[x.reqType, x.reqText.trim(), 'New'], ...x.reqs], reqText: '' })); this.toast('Request sent to the HQ marketing team'); },
+      reqs: [...s.reqs, ['Social posts', 'Promote our community open day on 2 Nov', 'In progress'], ['Lead follow-up', 'Call back 6 corporate enquiries from last week', 'Done']].map(([type, t, st]) => ({ type, t, st, stBg: st === 'Done' ? '#E2F5A6' : st === 'New' ? '#F7EDA8' : '#CDEEEE' })),
+      hqReqs: [[I.locs[0].name, 'Social posts', 'Promote community open day on 2 Nov', 'Ines Duarte', 'In progress'], [I.locs[1 % I.locs.length].name, 'Local campaign', 'Spring offer for weekday mornings', 'Unassigned', 'New'], [I.locs[2 % I.locs.length].name, 'Lead follow-up', 'Call back 6 corporate enquiries', 'Marcus Bell', 'Done']].map(([loc, type, t, who, st]) => ({ loc, type, t, who, st, stBg: st === 'Done' ? '#E2F5A6' : st === 'New' ? '#F7EDA8' : '#CDEEEE' })),
+      myAccounts: ['fbpage', 'igacct', 'ttacct', 'gbp'].map(k => { const done = !!s.accepted[k]; return { name: CH[k][0], mark: CH[k][1], color: CH[k][2], handle: k === 'fbpage' ? `${I.brand} ${L0.name}` : k === 'gbp' ? `${I.brand} ${L0.name}` : `@${slugB}.${L0.id}`, role: accessHow[k], done, cta: done ? 'Access active' : 'Accept invite', btnBg: done ? '#fff' : '#141414', btnFg: done ? '#141414' : '#fff', btnBd: done ? '1.5px solid #141414' : 'none', accept: () => { this.setState(x => ({ accepted: { ...x.accepted, [k]: true } })); this.toast(`${CH[k][0]} access accepted. HQ has been notified.`); } }; }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

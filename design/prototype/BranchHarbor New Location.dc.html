@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="newloc"></bh-topbar>
+<div style="max-width:1280px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px">
+  <header style="background:#141414;color:#fff;border-radius:28px;padding:14px 16px 14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+    <bh-logo size="34" dark="true"></bh-logo>
+    <div style="flex:1;min-width:200px"><div style="font-size:17px;font-weight:800">Open a new location</div><div style="font-size:12px;color:#B9B9B3">{{ ind.brand }} {{ loc.name }} · {{ loc.city }}</div></div>
+    <div style="display:flex;gap:3px;padding:4px;border-radius:16px;background:#262626">
+      <sc-for list="{{ indSwitch }}" as="i" hint-placeholder-count="6"><button onClick="{{ i.pick }}" title="{{ i.name }}" aria-label="{{ i.name }}" style="width:36px;height:34px;border-radius:11px;border:none;background:{{ i.bg }};color:{{ i.fg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ i.icon }}" size="16"></bh-icon></button></sc-for>
+    </div>
+    <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#262626">
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="2"><button onClick="{{ v.pick }}" style="height:36px;padding:0 16px;border-radius:999px;border:none;background:{{ v.bg }};color:{{ v.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ v.label }}</button></sc-for>
+    </div>
+  </header>
+
+  <div style="background:#fff;border-radius:24px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+    <sc-for list="{{ journey }}" as="j" hint-placeholder-count="6"><span style="display:flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 5px;border-radius:999px;background:{{ j.bg }};font-size:12px;font-weight:700;color:{{ j.fg }}"><span style="width:26px;height:26px;border-radius:13px;background:{{ j.dot }};color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ j.icon }}" size="13"></bh-icon></span>{{ j.label }}</span></sc-for>
+  </div>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div role="status" style="align-self:flex-start;display:flex;align-items:center;gap:10px;background:#D6F26B;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:700"><bh-icon name="check-circle" size="17"></bh-icon>{{ toast }}</div></sc-if>
+
+  <!-- HQ VIEW -->
+  <sc-if value="{{ isHQ }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+      <aside style="flex:0 0 260px;max-width:100%;background:#fff;border-radius:28px;padding:14px;display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ hqSteps }}" as="h" hint-placeholder-count="4"><button onClick="{{ h.go }}" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:18px;border:none;background:{{ h.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:34px;height:34px;border-radius:17px;background:{{ h.dot }};color:{{ h.dotFg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ h.icon }}" size="16"></bh-icon></span><span><span style="display:block;font-size:14px;font-weight:700">{{ h.label }}</span><span style="font-size:11px;color:{{ h.stFg }};font-weight:600">{{ h.st }}</span></span></button></sc-for>
+        <div style="margin-top:8px;padding:12px;border-radius:18px;background:#F3F2EE;display:flex;gap:10px;align-items:center"><img src="{{ am.img }}" alt="" style="width:36px;height:36px;border-radius:18px;object-fit:cover"><span style="font-size:12px"><strong>{{ am.name }}</strong><br><span style="color:#5D5D58">Account manager</span></span></div>
+      </aside>
+      <main style="flex:1 1 560px;min-width:0;background:#fff;border-radius:28px;padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+
+        <sc-if value="{{ h.create }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:12px;align-items:center;background:#E2F5A6;border-radius:20px;padding:12px 16px;font-size:13px"><bh-icon name="flag" size="17"></bh-icon><span style="flex:1"><strong>From franchise development:</strong> {{ loc.owner }} signed on 14 Aug. Details below are filled in from their file.</span></div>
+          <h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.03em">Location details</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+            <sc-for list="{{ fields }}" as="f" hint-placeholder-count="8"><label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">{{ f.label }}<input value="{{ f.value }}" onChange="{{ f.set }}" style="height:46px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 18px;font-size:14px"></label></sc-for>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Autonomy tier<select value="{{ tier }}" onChange="{{ setTier }}" style="height:46px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:14px;background:#fff"><option value="managed">Managed</option><option value="standard">Standard</option><option value="flexible">Flexible</option></select></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Website template<select style="height:46px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:14px;background:#fff"><option>{{ ind.name }} location · v15</option></select></label>
+          </div>
+          <div style="background:{{ tierPastel }};border-radius:18px;padding:14px 16px;font-size:13px;line-height:1.55"><strong>{{ tierName }}:</strong> {{ tierDesc }}</div>
+        </sc-if>
+
+        <sc-if value="{{ h.provision }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><h2 style="margin:0;flex:1;min-width:220px;font-size:26px;font-weight:700;letter-spacing:-.03em">Set up everything from templates</h2><button onClick="{{ runProvision }}" disabled="{{ provBusy }}" style="height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ provCta }}</button></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ prov }}" as="p" hint-placeholder-count="10"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:{{ p.bg }}"><span style="width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ p.icon }}" size="17"></bh-icon></span><span style="flex:1 1 240px;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ p.t }}</span><span style="font-size:12px;color:#3E3E3A;line-height:1.45">{{ p.sub }}</span></span><span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:{{ p.stBg }}"><bh-icon name="{{ p.stIcon }}" size="11"></bh-icon>{{ p.st }}</span><sc-if value="{{ p.link }}" hint-placeholder-val="{{ false }}"><a href="{{ p.link }}" style="font-size:12px;font-weight:700">Open</a></sc-if></div></sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ h.invite }}" hint-placeholder-val="{{ false }}">
+          <h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.03em">Invite the owner and team</h2>
+          <sc-for list="{{ invites }}" as="iv" hint-placeholder-count="3"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#F8F7F3"><img src="{{ iv.img }}" alt="" style="width:40px;height:40px;border-radius:20px;object-fit:cover"><span style="flex:1 1 200px"><span style="display:block;font-size:14px;font-weight:700">{{ iv.name }}</span><span style="font-size:12px;color:#5D5D58">{{ iv.email }} · {{ iv.role }}</span></span><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:{{ iv.stBg }}">{{ iv.st }}</span></div></sc-for>
+          <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.55"><bh-icon name="shield" size="16"></bh-icon>The owner gets the franchise owner role for {{ loc.name }} only. They can invite their own staff after accepting.</div>
+          <button onClick="{{ sendInvites }}" disabled="{{ invitesSent }}" style="align-self:flex-start;height:46px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ inviteCta }}</button>
+        </sc-if>
+
+        <sc-if value="{{ h.golive }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><h2 style="margin:0;flex:1;min-width:220px;font-size:26px;font-weight:700;letter-spacing:-.03em">Opening readiness</h2><span style="font-size:14px;font-weight:800">{{ readyN }} of {{ readyTotal }} ready</span></div>
+          <div style="height:12px;border-radius:6px;background:#F3F2EE;overflow:hidden"><div style="height:100%;width:{{ readyPct }};background:#141414"></div></div>
+          <sc-for list="{{ gates }}" as="g" hint-placeholder-count="7"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:{{ g.bg }}"><span style="color:{{ g.fg }}"><bh-icon name="{{ g.icon }}" size="18"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ g.t }}</span><span style="font-size:12px;color:#3E3E3A">{{ g.who }}</span></span><sc-if value="{{ g.canDo }}" hint-placeholder-val="{{ false }}"><button onClick="{{ g.act }}" style="height:36px;padding:0 14px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">{{ g.actLabel }}</button></sc-if></div></sc-for>
+          <sc-if value="{{ notOpened }}" hint-placeholder-val="{{ true }}"><button onClick="{{ approveOpening }}" disabled="{{ notReady }}" style="align-self:flex-start;display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ openCta }}<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="17"></bh-icon></span></button></sc-if>
+          <sc-if value="{{ opened }}" hint-placeholder-val="{{ false }}"><div role="status" style="background:#D6F26B;border-radius:22px;padding:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center"><bh-icon name="check-circle" size="22"></bh-icon><span style="flex:1;font-size:15px;font-weight:700">{{ ind.brand }} {{ loc.name }} is open. Website published, bookings live and the location appears in the finder.</span><a href="{{ siteHref }}" style="height:40px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700;text-decoration:none">View website</a></div></sc-if>
+        </sc-if>
+
+        <sc-if value="{{ hqFooter }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px;border-top:1px solid #EEEDE8;padding-top:16px"><button onClick="{{ hqNext }}" style="margin-left:auto;display:flex;align-items:center;gap:10px;height:48px;padding:0 6px 0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ hqNextLabel }}<span style="width:36px;height:36px;border-radius:18px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="16"></bh-icon></span></button></div></sc-if>
+      </main>
+    </div>
+  </sc-if>
+
+  <!-- OWNER VIEW -->
+  <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ ownerLocked }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border-radius:28px;padding:28px;display:flex;flex-wrap:wrap;gap:14px;align-items:center"><bh-icon name="mail" size="26"></bh-icon><span style="flex:1;min-width:220px;font-size:15px;line-height:1.55">The owner hasn't been invited yet. Switch to the HQ view and send the invite from step 3.</span></div></sc-if>
+    <sc-if value="{{ ownerOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px">
+        <div style="position:relative;border-radius:28px;overflow:hidden;min-height:260px;display:flex;align-items:flex-end"><img src="{{ img.loc }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:relative;margin:16px;background:rgba(255,255,255,.93);border-radius:22px;padding:16px 18px"><div style="font-size:24px;font-weight:700;letter-spacing:-.02em">Welcome to {{ ind.brand }}, {{ ownerFirst }}</div><div style="font-size:13px;color:#3E3E3A">{{ loc.name }} · planned opening {{ openDate }}</div></div></div>
+        <div style="background:#fff;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px"><img src="{{ am.img }}" alt="" style="width:52px;height:52px;border-radius:26px;object-fit:cover"><div><div style="font-size:15px;font-weight:700">{{ am.name }} is your account manager</div><div style="font-size:12px;color:#5D5D58">Weekly check-ins until you open</div></div></div>
+          <div style="font-size:14px;line-height:1.6;color:#3E3E3A">HQ has already set up your website, {{ opsWord }}, email, text and social accounts from {{ ind.brand }} templates. You need to finish the items below. Your progress saves automatically.</div>
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px"><span>Your setup</span><span>{{ ownerN }} of {{ ownerTotal }}</span></div><div style="height:10px;border-radius:5px;background:#F3F2EE;overflow:hidden"><div style="height:100%;width:{{ ownerPct }};background:#141414"></div></div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:12px">
+        <sc-for list="{{ ownerTasks }}" as="t" hint-placeholder-count="7">
+          <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px;border:2px solid {{ t.bd }}">
+            <div style="display:flex;align-items:center;gap:12px"><span style="width:42px;height:42px;border-radius:14px;background:{{ t.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ t.icon }}" size="19"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ t.t }}</span><span style="font-size:12px;color:#5D5D58">{{ t.est }}</span></span><sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}"><span style="color:#2F6B3A"><bh-icon name="check-circle" size="22"></bh-icon></span></sc-if></div>
+            <div style="font-size:13px;line-height:1.55;color:#3E3E3A">{{ t.desc }}</div>
+            <sc-if value="{{ t.hasItems }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:4px"><sc-for list="{{ t.items }}" as="i" hint-placeholder-count="3"><button onClick="{{ i.toggle }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:none;background:#F8F7F3;cursor:pointer;text-align:left;font-size:13px;color:#141414"><span style="width:20px;height:20px;border-radius:6px;border:2px solid #141414;background:{{ i.box }};color:#D6F26B;display:flex;align-items:center;justify-content:center;flex-shrink:0"><sc-if value="{{ i.on }}" hint-placeholder-val="{{ false }}"><bh-icon name="check" size="12" stroke="3"></bh-icon></sc-if></span>{{ i.t }}</button></sc-for></div></sc-if>
+            <sc-if value="{{ t.canAct }}" hint-placeholder-val="{{ true }}"><button onClick="{{ t.act }}" disabled="{{ t.busy }}" style="align-self:flex-start;height:42px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ t.cta }}</button></sc-if>
+            <sc-if value="{{ t.link }}" hint-placeholder-val="{{ false }}"><a href="{{ t.link }}" style="font-size:12px;font-weight:700">{{ t.linkLabel }}</a></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#141414;color:#fff;border-radius:28px;padding:22px;display:flex;flex-wrap:wrap;gap:14px;align-items:center"><div style="flex:1;min-width:240px"><div style="font-size:18px;font-weight:700">{{ requestTitle }}</div><div style="font-size:13px;color:#C9C9C3">{{ requestSub }}</div></div><button onClick="{{ requestOpening }}" disabled="{{ cantRequest }}" style="height:50px;padding:0 22px;border-radius:999px;background:#D6F26B;color:#141414;border:none;font-size:14px;font-weight:800;cursor:pointer">{{ requestCta }}</button></div>
+    </sc-if>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ind: 'studios', view: 'hq', step: 0, vals: {}, tier: null, prov: {}, provBusy: false, invited: false, own: {}, items: {}, busy: '', requested: false, hqChecks: {}, opened: false, toast: '' };
+  componentDidMount() { if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50); try { const h = new URLSearchParams(location.hash.slice(1)); if (h.get('ind')) this.setState({ ind: h.get('ind') }); } catch (e) {} }
+  componentWillUnmount() { clearInterval(this.poll); clearTimeout(this.tt); (this.t || []).forEach(clearTimeout); }
+  later(fn, ms) { (this.t = this.t || []).push(setTimeout(fn, ms)); }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2800); }
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {}, P = D.P;
+    const base = I.locs.find(l => l.status !== 'Operating') || I.locs[I.locs.length - 1];
+    const L = { ...base, ...s.vals };
+    const tier = s.tier || base.tier, T = D.TIERS[tier];
+    const am = D.AMS[base.am];
+    const slugB = I.brand.toLowerCase().replace(/[^a-z]+/g, '');
+    const opsWord = { studios: 'class schedule', sports: 'programmes', health: 'services', commerce: 'shop and catalogue', foods: 'menu and pickup ordering', realty: 'listings feed' }[s.ind];
+    const PROV = [
+      ['web', 'globe', 'Website from template', `Draft at sites.branchharbor.com/${slugB}/${L.id || 'new'} · not public yet`],
+      ['ops', I.icon, `${opsWord[0].toUpperCase() + opsWord.slice(1)} from HQ catalogue`, 'Inherited items. Local changes follow the tier rules.'],
+      ['pay', 'card', 'Payment account invite', `Owner completes identity checks for ${L.owner}`, 'owner'],
+      ['email', 'mail', 'Email sender and subscriber list', `Sends as "${I.brand} ${L.name}" from mail.${slugB}.com`],
+      ['sms', 'phone', 'Text message number', L.cur === 'USD' ? 'Local number reserved · carrier registration submitted' : 'Local number reserved'],
+      ['wa', 'message', 'WhatsApp number', 'Added to HQ\u2019s WhatsApp Business account'],
+      ['social', 'share', 'Social accounts', 'Facebook, Instagram, TikTok and Business Profile under HQ ownership', 'social'],
+      ['autos', 'workflow', 'Automations', 'Lead follow-up, reminders and win-back switched on for this location'],
+      ['policies', 'scale', 'Policies to confirm', 'Operations manual, brand standards, social policy'],
+      ['training', 'book', 'Training plan', '4 modules for the owner, 2 for staff'],
+    ];
+    const provDone = k => s.prov[k] === 'done';
+    const STEPS = [['create', 'Location details', 'pin'], ['provision', 'Provision', 'layers'], ['invite', 'Invite owner', 'send'], ['golive', 'Go live', 'flag']];
+    const stepDone = [true, PROV.every(p => provDone(p[0])), s.invited, s.opened];
+
+    const OT = [
+      ['policies', 'scale', P.lilac, 'Read and confirm policies', '10 min', 'Required before opening.', [['Operations manual v7.2'], ['Brand standards v4.0'], ['Social media & advertising policy v1.3']]],
+      ['pay', 'card', P.butter, 'Set up your payment account', '15 min', `Payments for ${L.name} go to ${L.owner}'s bank account. The provider checks identity and business details.`, null, 'Start payment setup', 'Verifying…'],
+      ['local', 'clock', P.aqua, 'Add hours and local details', '5 min', 'Opening hours, phone, parking notes and your team bios.', [['Opening hours'], ['Phone and email'], ['Team bios and photos']]],
+      ['social', 'share', P.blush, 'Accept your social media invites', '5 min', 'HQ created your accounts. Accept each invite with your own login. No shared passwords.', null, 'Open social accounts', '', `BranchHarbor Marketing.dc.html#ind=${s.ind}&role=loc&screen=social`],
+      ['team', 'users', P.sage, 'Invite your team', '5 min', `Add ${I.staffRole.toLowerCase()}s and front-desk staff. They only see ${L.name}.`, [['Location manager'], [`2 × ${I.staffRole}`], ['Front desk']]],
+      ['mkt', 'megaphone', P.butter, 'Choose who runs marketing & sales', '3 min', `Your ${T.name} tier allows: ${tier === 'managed' ? 'HQ team only' : tier === 'standard' ? 'HQ team, or HQ plus your own people' : 'HQ team, your own team or an agency'}. You can change this later in the Marketing suite.`, [[tier === 'managed' ? 'Confirm HQ team runs marketing & sales' : 'Pick a set-up'], ...(tier === 'managed' ? [] : [['Invite my marketer or sales rep']])]],
+      ['training', 'book', P.lilac, 'Complete owner training', '45 min', 'Short videos with a quick check at the end of each.', [['Running your day in BranchHarbor'], ['Brand and marketing basics'], ['Payments and refunds'], ['Customer privacy']]],
+      ['test', 'play', '#E2F5A6', `Run a test ${s.ind === 'commerce' || s.ind === 'foods' ? 'order' : 'booking'}`, '3 min', 'We create a test, then cancel and refund it automatically.', null, 'Run test', 'Testing…'],
+    ];
+    const taskDone = t => t[6] ? t[6].every((_, i) => s.items[`${t[0]}${i}`]) : !!s.own[t[0]];
+    const ownerN = OT.filter(taskDone).length;
+    const GATES = [
+      ['Provisioning complete', 'HQ', stepDone[1]], ['Owner accepted invite', 'Owner', s.invited && ownerN > 0], ['Policies confirmed', 'Owner', taskDone(OT[0])], ['Payment account enabled', 'Owner · provider', !!s.own.pay], ['Owner training done', 'Owner', taskDone(OT.find(t => t[0] === 'training'))], ['Marketing set-up chosen', 'Owner', taskDone(OT.find(t => t[0] === 'mkt'))],
+      ['Test transaction passed', 'Owner', !!s.own.test], ['Website reviewed by HQ', 'HQ · brand team', !!s.hqChecks.web, 'Approve website'], ['Business Profile verified', 'Google · location', !!s.hqChecks.gbp, 'Mark verified'],
+    ];
+    const readyN = GATES.filter(g => g[2]).length;
+
+    return {
+      ind: I, loc: L, am: { ...am, img: IMG[am.img] }, toast: s.toast, img: { loc: IMG[L.img] }, opsWord, openDate: L.hours && L.hours.startsWith('Opens') ? L.hours.replace('Opens ', '') : '15 Nov',
+      indSwitch: Object.values(D.IND).map(x => ({ name: x.name, icon: x.icon, bg: x.key === s.ind ? x.pastel : 'transparent', fg: x.key === s.ind ? '#141414' : '#B9B9B3', pick: () => this.setState({ ind: x.key, vals: {}, tier: null }) })),
+      views: [['hq', 'HQ'], ['owner', 'New owner']].map(([k, label]) => ({ label, bg: s.view === k ? '#D6F26B' : 'transparent', fg: s.view === k ? '#141414' : '#E6E6E3', pick: () => this.setState({ view: k }) })),
+      journey: [['Agreement signed', 'signature', true], ['Location created', 'pin', true], ['Provisioned', 'layers', stepDone[1]], ['Owner onboarding', 'user', ownerN === OT.length], ['Opening approved', 'check', s.opened], ['Live', 'globe', s.opened]].map(([label, icon, done]) => ({ label, icon: done ? 'check' : icon, bg: done ? '#F1F8E0' : '#F3F2EE', fg: '#141414', dot: done ? '#D6F26B' : '#fff' })),
+      isHQ: s.view === 'hq', isOwner: s.view === 'owner',
+      hqSteps: STEPS.map(([k, label, icon], i) => ({ label, icon: stepDone[i] && i < 3 ? 'check' : icon, st: stepDone[i] ? 'Done' : s.step === i ? 'In progress' : 'To do', stFg: stepDone[i] ? '#2F6B3A' : '#5D5D58', bg: s.step === i ? '#F3F2EE' : 'transparent', dot: stepDone[i] ? '#141414' : s.step === i ? '#D6F26B' : '#F3F2EE', dotFg: stepDone[i] ? '#D6F26B' : '#141414', go: () => this.setState({ step: i }) })),
+      h: { create: s.step === 0, provision: s.step === 1, invite: s.step === 2, golive: s.step === 3 },
+      fields: [['name', 'Location name', base.name], ['city', 'City', base.city], ['addr', 'Address', base.addr], ['owner', 'Owner group', base.owner], ['cur', 'Currency', base.cur], ['phone', 'Phone', base.phone], ['region', 'Region', base.region], ['open', 'Planned opening', '15 Nov 2026']].map(([k, label, def]) => ({ label, value: s.vals[k] ?? def, set: e => { const v = e.target.value; this.setState(x => ({ vals: { ...x.vals, [k]: v } })); } })),
+      tier, setTier: e => this.setState({ tier: e.target.value }), tierName: T.name, tierDesc: T.desc, tierPastel: T.pastel,
+      prov: PROV.map(([k, icon, t, sub, special]) => { const st = s.prov[k]; const lbl = st === 'done' ? (special === 'owner' ? 'Invite ready' : 'Done') : st === 'run' ? 'Setting up…' : 'Waiting'; return { icon, t, sub, st: lbl, stIcon: st === 'done' ? 'check' : st === 'run' ? 'refresh' : 'clock', stBg: st === 'done' ? '#E2F5A6' : st === 'run' ? P.aqua : '#fff', bg: st === 'done' ? '#F8FBF0' : '#F8F7F3', link: special === 'social' && st === 'done' ? `BranchHarbor Marketing.dc.html#ind=${s.ind}&screen=social` : '' }; }),
+      provBusy: s.provBusy, provCta: stepDone[1] ? 'All set up' : s.provBusy ? 'Setting up…' : 'Run setup',
+      runProvision: () => { this.setState({ provBusy: true }); PROV.forEach(([k], i) => { this.later(() => this.setState(x => ({ prov: { ...x.prov, [k]: 'run' } })), i * 350); this.later(() => this.setState(x => ({ prov: { ...x.prov, [k]: 'done' }, provBusy: i < PROV.length - 1 })), i * 350 + 500); }); },
+      invites: [[L.owner, I.staffImg, `owner@${L.owner.toLowerCase().replace(/[^a-z]+/g, '')}.com`, 'Franchise owner'], ['Taylor Brooks', 'pW2', 'taylor@example.com', 'Location manager']].map(([name, img, email, role]) => ({ name, img: IMG[img], email, role, st: s.invited ? 'Invite sent' : 'Not sent', stBg: s.invited ? P.aqua : '#fff' })),
+      invitesSent: s.invited, inviteCta: s.invited ? 'Invites sent' : 'Send invites', sendInvites: () => { this.setState({ invited: true }); this.toast(`Invites sent. ${am.name} is copied.`); },
+      gates: GATES.map(([t, who, ok, act], i) => ({ t, who, icon: ok ? 'check-circle' : 'clock', fg: ok ? '#2F6B3A' : '#8A5A00', bg: ok ? '#F1F8E0' : '#FFF7DC', canDo: !ok && !!act, actLabel: act || '', act: () => this.setState(x => ({ hqChecks: { ...x.hqChecks, [i === 6 ? 'web' : 'gbp']: true } })) })),
+      readyN, readyTotal: GATES.length, readyPct: `${Math.round(readyN / GATES.length * 100)}%`, notReady: readyN < GATES.length, notOpened: !s.opened, opened: s.opened,
+      openCta: readyN < GATES.length ? `${GATES.length - readyN} items left before opening` : `Approve opening of ${L.name}`,
+      approveOpening: () => { this.setState({ opened: true }); this.toast('Opening approved. Owner and team notified.'); }, siteHref: `BranchHarbor Location Sites.dc.html#ind=${s.ind}&loc=${base.id}`,
+      hqFooter: s.step < 3, hqNextLabel: ['Save and provision', 'Continue to invites', 'Continue to go-live'][s.step] || '', hqNext: () => this.setState({ step: s.step + 1 }),
+
+      ownerLocked: !s.invited, ownerOpen: s.invited, ownerFirst: L.owner.split(' ')[0], ownerN, ownerTotal: OT.length, ownerPct: `${Math.round(ownerN / OT.length * 100)}%`,
+      ownerTasks: OT.map(t => { const done = taskDone(t); const busy = s.busy === t[0]; return { icon: t[1], pastel: t[2], t: t[3], est: done ? 'Done' : t[4], desc: t[5], done, bd: done ? '#D6F26B' : 'transparent', hasItems: !!t[6],
+        items: (t[6] || []).map(([it], i) => { const on = !!s.items[`${t[0]}${i}`]; return { t: it, on, box: on ? '#141414' : '#fff', toggle: () => this.setState(x => ({ items: { ...x.items, [`${t[0]}${i}`]: !on } })) }; }),
+        canAct: !t[6] && !done && !t[9], cta: busy ? t[8] : t[7], busy, link: t[9] || '', linkLabel: done ? 'Accepted' : t[7],
+        act: () => { this.setState({ busy: t[0] }); this.later(() => { this.setState(x => ({ busy: '', own: { ...x.own, [t[0]]: true } })); this.toast(t[0] === 'pay' ? 'Payment account enabled' : 'Test passed and refunded'); }, 1400); } }; }).map((t, i) => (OT[i][0] === 'social' ? { ...t, canAct: !s.own.social, cta: 'Mark invites accepted', act: () => this.setState(x => ({ own: { ...x.own, social: true } })) } : t)),
+      requestTitle: s.requested ? 'Opening requested' : ownerN === OT.length ? 'Everything\u2019s done' : `${OT.length - ownerN} items left`, requestSub: s.requested ? `${am.name} will review and approve your opening.` : 'When you\u2019re ready, ask HQ to approve your opening.',
+      cantRequest: ownerN < OT.length || s.requested, requestCta: s.requested ? 'Requested' : 'Request opening', requestOpening: () => { this.setState({ requested: true }); this.toast('Request sent to HQ'); },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#E9E7E1;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+img{display:block}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="custapp"></bh-topbar>
+
+<div style="max-width:1200px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+    <div style="display:flex;gap:12px;align-items:center"><bh-logo size="40"></bh-logo><div><div style="font-size:22px;font-weight:800;letter-spacing:-.02em">Customer flows</div><div style="font-size:13px;color:#5D5D58">What customers see on each industry's site · sample data</div></div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:5px;border-radius:999px;background:#fff">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="display:flex;gap:8px;align-items:center;height:42px;padding:0 16px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="{{ t.icon }}" size="16"></bh-icon>{{ t.name }}</button></sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;justify-content:center">
+    <!-- PHONE -->
+    <div style="width:390px;max-width:100%;height:820px;background:#141414;border-radius:54px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.22);flex-shrink:0">
+      <div style="height:100%;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;position:relative;background:{{ ph.bg }};color:{{ ph.fg }}">
+        <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700;flex-shrink:0"><span>9:41</span><span style="width:100px;height:28px;border-radius:14px;background:#000"></span><span style="display:flex;gap:4px;align-items:center"><bh-icon name="activity" size="13"></bh-icon><bh-icon name="zap" size="13"></bh-icon></span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 12px;flex-shrink:0">
+          <sc-if value="{{ ph.canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" aria-label="Back" style="width:46px;height:46px;border-radius:16px;border:1.5px solid {{ ph.line }};background:transparent;color:{{ ph.fg }};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="arrow-left" size="18"></bh-icon></button></sc-if>
+          <div style="flex:1;min-width:0"><div style="font-size:12px;opacity:.65">{{ ph.brand }}</div><div style="font-size:17px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ph.title }}</div></div>
+          <sc-if value="{{ ph.hasCart }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ph.cartGo }}" aria-label="Cart" style="position:relative;width:46px;height:46px;border-radius:16px;border:none;background:{{ ph.chip }};color:{{ ph.fg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="cart" size="18"></bh-icon><span style="position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:#141414;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ ph.cartN }}</span></button></sc-if>
+        </div>
+        <div style="flex:1;overflow:auto;padding:0 18px 18px;display:flex;flex-direction:column;gap:12px">
+
+<!-- ===== STUDIOS ===== -->
+<sc-if value="{{ f.studios }}" hint-placeholder-val="{{ true }}">
+  <sc-if value="{{ st.s.loc }}" hint-placeholder-val="{{ true }}">
+    <h2 style="margin:4px 0;font-size:30px;line-height:1.1;font-weight:400;letter-spacing:-.02em">Find your<br><strong style="font-weight:800">Stillwater studio</strong></h2>
+    <sc-for list="{{ st.locs }}" as="l" hint-placeholder-count="4"><button onClick="{{ l.pick }}" style="text-align:left;min-height:64px;padding:12px;border-radius:22px;border:none;background:#2A2A2A;cursor:pointer;color:#fff;display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:14px;background:{{ l.c }};color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="pin" size="18"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ l.n }}</span><span style="font-size:12px;color:#A3A39D">{{ l.tz }}</span></span><bh-icon name="chevron-right" size="18"></bh-icon></button></sc-for>
+  </sc-if>
+  <sc-if value="{{ st.s.classes }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;gap:8px"><sc-for list="{{ st.days }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.pick }}" style="flex:1;height:44px;border-radius:16px;border:{{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ d.l }}</button></sc-for></div>
+    <div style="font-size:12px;color:#A3A39D">Times in {{ st.tz }}</div>
+    <sc-for list="{{ st.classes }}" as="c" hint-placeholder-count="4">
+      <div style="position:relative;border-radius:28px;background:{{ c.pastel }};color:#141414;min-height:168px;overflow:hidden">
+        <img src="{{ c.img }}" alt="" style="position:absolute;right:0;top:0;bottom:0;width:44%;height:100%;object-fit:cover">
+        <div style="position:relative;padding:16px 18px;display:flex;flex-direction:column;gap:4px;width:60%;min-height:168px">
+          <span style="font-size:12px;font-weight:600">{{ c.inst }} · {{ c.time }}</span>
+          <div style="margin-top:auto;font-size:20px;font-weight:800;line-height:1.1">{{ c.name }}</div>
+          <div style="font-size:12px;font-weight:700">{{ c.spots }}</div>
+          <button onClick="{{ c.pick }}" style="align-self:flex-start;margin-top:6px;height:40px;padding:0 18px;border-radius:999px;border:none;background:{{ c.btnBg }};color:{{ c.btnFg }};font-size:13px;font-weight:700;cursor:pointer">{{ c.cta }}</button>
+        </div>
+      </div>
+    </sc-for>
+  </sc-if>
+  <sc-if value="{{ st.s.details }}" hint-placeholder-val="{{ false }}">
+    <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-.025em;line-height:1.08">{{ st.cls.name }}</h2>
+    <div style="background:{{ st.cls.pastel }};color:#141414;border-radius:24px;padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div><div style="font-size:11px">Starts</div><strong>{{ st.cls.time }}</strong></div><div><div style="font-size:11px">With</div><strong>{{ st.cls.inst }}</strong></div><div><div style="font-size:11px">Spots</div><strong>{{ st.spotsShort }}</strong></div></div>
+    <sc-if value="{{ st.full }}" hint-placeholder-val="{{ false }}"><div style="background:#F7EDA8;color:#3D3500;border-radius:20px;padding:14px;font-size:13px;line-height:1.5"><strong>This class is full.</strong> Join the waitlist and we'll email you if a spot opens. You won't be charged unless your spot is confirmed.</div></sc-if>
+    <sc-if value="{{ st.hold }}" hint-placeholder-val="{{ false }}"><div role="timer" style="display:flex;justify-content:space-between;align-items:center;border-radius:999px;background:#2A2A2A;padding:10px 16px;font-size:13px"><span style="display:flex;gap:6px;align-items:center;color:#D6F26B"><bh-icon name="clock" size="14"></bh-icon>Spot held</span><strong style="font-variant-numeric:tabular-nums">{{ st.holdLabel }}</strong></div><div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#A3A39D">Drop-in</span><strong>{{ st.price }}</strong></div></sc-if>
+    <sc-if value="{{ st.expired }}" hint-placeholder-val="{{ false }}"><div role="alert" style="background:#F8D6D8;color:#5C1414;border-radius:20px;padding:14px;font-size:13px;line-height:1.5"><strong>Your hold expired.</strong> The spot was released; you haven't been charged.<button onClick="{{ st.recheck }}" style="display:block;margin-top:8px;height:36px;padding:0 14px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Check availability again</button></div></sc-if>
+    <input placeholder="Full name" aria-label="Full name" value="{{ st.name }}" onChange="{{ st.onName }}" style="height:52px;border:none;border-radius:18px;padding:0 18px;font-size:15px;background:#2A2A2A;color:#fff">
+    <input placeholder="Email" aria-label="Email" value="{{ st.email }}" onChange="{{ st.onEmail }}" style="height:52px;border:none;border-radius:18px;padding:0 18px;font-size:15px;background:#2A2A2A;color:#fff">
+    <button onClick="{{ st.expire }}" style="align-self:flex-start;height:30px;padding:0 10px;border-radius:999px;border:1px dashed #555;background:transparent;color:#A3A39D;font-size:11px;cursor:pointer">Simulate: hold expires</button>
+    <button onClick="{{ st.submit }}" disabled="{{ st.cant }}" style="margin-top:auto;height:58px;border-radius:999px;background:#fff;color:#141414;border:none;font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0">{{ st.cta }}</button>
+  </sc-if>
+  <sc-if value="{{ st.s.done }}" hint-placeholder-val="{{ false }}">
+    <div style="width:72px;height:72px;border-radius:36px;background:{{ st.done.bg }};color:#141414;display:flex;align-items:center;justify-content:center;margin-top:30px"><bh-icon name="{{ st.done.icon }}" size="32" stroke="2.4"></bh-icon></div>
+    <h2 style="margin:0;font-size:30px;font-weight:800">{{ st.done.t }}</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#C9C9C3">{{ st.done.d }}</p>
+    <button onClick="{{ reset }}" style="margin-top:auto;height:56px;border-radius:999px;border:1.5px solid #3A3A3A;background:transparent;color:#fff;font-size:15px;font-weight:700;cursor:pointer">{{ st.done.manage }}</button>
+  </sc-if>
+</sc-if>
+
+<!-- ===== SPORTS (scenario 7) ===== -->
+<sc-if value="{{ f.sports }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ sp.s.prog }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;height:170px;border-radius:26px;overflow:hidden"><img src="{{ img.sportKids }}" alt="" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:12px;bottom:12px;padding:8px 12px;border-radius:14px;background:rgba(255,255,255,.9);font-size:13px;font-weight:700">Autumn season · registration open</div></div>
+    <sc-for list="{{ sp.progs }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.pick }}" disabled="{{ p.closed }}" style="text-align:left;padding:14px;border-radius:22px;border:none;background:#fff;cursor:pointer;display:flex;gap:12px;align-items:center;color:#141414"><span style="width:44px;height:44px;border-radius:14px;background:{{ p.c }};display:flex;align-items:center;justify-content:center"><bh-icon name="trophy" size="20"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ p.n }}</span><span style="font-size:12px;color:#5D5D58">{{ p.d }}</span></span><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ p.stBg }}">{{ p.st }}</span></button></sc-for>
+  </sc-if>
+  <sc-if value="{{ sp.s.who }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#E2F5A6;border-radius:22px;padding:14px;font-size:13px;line-height:1.5"><strong>U10 Autumn · Riverside Park</strong><br>For players born in 2016 (age on 31 Dec 2026). Tue &amp; Thu 17:00. $240 CAD.</div>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Participant's name<input value="{{ sp.child }}" onChange="{{ sp.onChild }}" style="height:50px;border:1.5px solid #141414;border-radius:16px;padding:0 16px;font-size:15px"></label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Date of birth<input type="date" value="{{ sp.dob }}" onChange="{{ sp.onDob }}" style="height:50px;border:1.5px solid {{ sp.dobBd }};border-radius:16px;padding:0 16px;font-size:15px"></label>
+    <sc-if value="{{ sp.dobBad }}" hint-placeholder-val="{{ false }}"><div role="alert" style="background:#FDE7E5;border-radius:16px;padding:12px;font-size:13px;line-height:1.5;color:#8A1D16;display:flex;gap:8px"><bh-icon name="alert" size="16"></bh-icon><span>Born {{ sp.dobYear }} isn't eligible for U10. <button onClick="{{ sp.toU12 }}" style="background:none;border:none;padding:0;text-decoration:underline;color:#8A1D16;font-size:13px;cursor:pointer">See U12 Camp</button></span></div></sc-if>
+    <div style="font-size:13px;font-weight:600">Your relationship</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ sp.rels }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.pick }}" style="height:42px;padding:0 16px;border-radius:999px;border:1.5px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }};font-size:13px;font-weight:600;cursor:pointer">{{ r.l }}</button></sc-for></div>
+    <sc-if value="{{ sp.relOther }}" hint-placeholder-val="{{ false }}"><div style="background:#F7EDA8;border-radius:16px;padding:12px;font-size:12px;line-height:1.5">We'll ask a parent with authority to confirm before this registration is reviewed.</div></sc-if>
+    <button onClick="{{ sp.next }}" disabled="{{ sp.cantWho }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">Continue</button>
+  </sc-if>
+  <sc-if value="{{ sp.s.forms }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:14px;color:#5D5D58">Only what the academy needs to run sessions safely.</div>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Emergency contact phone<input value="{{ sp.phone }}" onChange="{{ sp.onPhone }}" style="height:50px;border:1.5px solid #141414;border-radius:16px;padding:0 16px;font-size:15px"></label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Medical notes for coaches <span style="font-weight:400;color:#5D5D58">optional · visible to assigned coaches only</span><textarea rows="2" style="border:1.5px solid #E4E2DC;border-radius:16px;padding:12px 16px;font-size:14px"></textarea></label>
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;padding:12px;border-radius:16px;background:#fff"><input type="checkbox" checked="{{ sp.consent }}" onChange="{{ sp.onConsent }}" style="width:20px;height:20px;accent-color:#141414;margin-top:1px">I agree to the participation terms and photo policy (v4).</label>
+    <div style="background:#fff;border-radius:18px;padding:14px;font-size:13px;line-height:1.5"><strong>Withdrawal &amp; refunds</strong><br>Full refund before 1 Nov. 50% until the third session. None after.</div>
+    <div style="font-size:13px;font-weight:600">Payment</div>
+    <div style="display:flex;flex-direction:column;gap:6px"><button onClick="{{ sp.payFull }}" style="text-align:left;padding:12px 14px;border-radius:16px;border:1.5px solid #141414;background:#fff;font-size:13px;cursor:pointer"><strong>Pay in full · $240.00 CAD</strong></button><div style="padding:12px 14px;border-radius:16px;border:1.5px dashed #D8D6CF;font-size:13px;color:#5D5D58;display:flex;justify-content:space-between">Instalments<span style="font-size:11px;font-weight:700">Later</span></div></div>
+    <button onClick="{{ sp.pay }}" disabled="{{ sp.cantPay }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">{{ sp.payLabel }}</button>
+  </sc-if>
+  <sc-if value="{{ sp.s.done }}" hint-placeholder-val="{{ false }}">
+    <div style="width:72px;height:72px;border-radius:36px;background:#F7EDA8;display:flex;align-items:center;justify-content:center;margin-top:24px"><bh-icon name="clock" size="32"></bh-icon></div>
+    <h2 style="margin:0;font-size:28px;font-weight:800;line-height:1.15">Registration received, pending review</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#3E3E3A">Payment of $240.00 CAD succeeded. {{ sp.childName }} isn't on a team yet: the academy reviews registrations and assigns groups, then emails you.</p>
+    <div style="background:#fff;border-radius:18px;padding:14px;font-size:13px;line-height:1.7"><div style="display:flex;gap:8px;align-items:center"><bh-icon name="check-circle" size="15"></bh-icon>Forms complete</div><div style="display:flex;gap:8px;align-items:center"><bh-icon name="check-circle" size="15"></bh-icon>Paid · refundable before 1 Nov</div><div style="display:flex;gap:8px;align-items:center"><bh-icon name="clock" size="15"></bh-icon>Group assignment pending</div></div>
+    <button onClick="{{ reset }}" style="margin-top:auto;height:54px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:15px;font-weight:700;cursor:pointer">Register another participant</button>
+  </sc-if>
+</sc-if>
+
+<!-- ===== WELLNESS (scenario 8) ===== -->
+<sc-if value="{{ f.wellness }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ we.s.svc }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;height:160px;border-radius:26px;overflow:hidden"><img src="{{ img.spaStones }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+    <div style="display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600"><bh-icon name="pin" size="14"></bh-icon>Harbourfront · times in Eastern time</div>
+    <sc-for list="{{ we.svcs }}" as="sv" hint-placeholder-count="3"><button onClick="{{ sv.pick }}" style="text-align:left;padding:14px;border-radius:22px;border:none;background:#fff;cursor:pointer;display:flex;gap:12px;align-items:center;color:#141414"><span style="width:44px;height:44px;border-radius:14px;background:#D4E6D9;display:flex;align-items:center;justify-content:center"><bh-icon name="leaf" size="20"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:15px;font-weight:700">{{ sv.n }}</span><span style="font-size:12px;color:#5D5D58">{{ sv.d }}</span></span><strong style="font-size:14px">{{ sv.p }}</strong></button></sc-for>
+  </sc-if>
+  <sc-if value="{{ we.s.slot }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:13px;font-weight:600">Practitioner</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ we.pracs }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.pick }}" style="height:42px;padding:0 16px;border-radius:999px;border:1.5px solid {{ p.bd }};background:{{ p.bg }};color:{{ p.fg }};font-size:13px;font-weight:600;cursor:pointer">{{ p.l }}</button></sc-for></div>
+    <div style="font-size:13px;font-weight:600">Thu 15 Oct</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ we.slots }}" as="sl" hint-placeholder-count="6"><button onClick="{{ sl.pick }}" disabled="{{ sl.off }}" style="height:48px;border-radius:16px;border:1.5px solid {{ sl.bd }};background:{{ sl.bg }};color:{{ sl.fg }};font-size:14px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums">{{ sl.t }}</button></sc-for></div>
+    <div style="background:#fff;border-radius:18px;padding:14px;font-size:13px;line-height:1.55"><strong>Deposit $40.00 CAD today</strong>, balance at the appointment. Free changes up to 24 h before; within 24 h the deposit is kept.</div>
+    <button onClick="{{ we.book }}" disabled="{{ we.noSlot }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">{{ we.bookLabel }}</button>
+  </sc-if>
+  <sc-if value="{{ we.s.booked }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#D4E6D9;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:6px"><span style="display:flex;gap:6px;align-items:center;font-size:12px;font-weight:700"><bh-icon name="check-circle" size="14"></bh-icon>{{ we.bookedLabel }}</span><div style="font-size:22px;font-weight:800">Deep tissue · 60 min</div><div style="font-size:14px">{{ we.curSlot }} · {{ we.prac }}</div><div style="font-size:13px;color:#3E3E3A">Harbourfront · Room A · Deposit paid $40.00 CAD</div></div>
+    <sc-if value="{{ we.notice }}" hint-placeholder-val="{{ false }}"><div role="{{ we.noticeRole }}" style="border-radius:18px;padding:14px;font-size:13px;line-height:1.55;background:{{ we.noticeBg }};display:flex;gap:8px"><bh-icon name="{{ we.noticeIcon }}" size="16"></bh-icon><span>{{ we.notice }}</span></div></sc-if>
+    <sc-if value="{{ we.resched }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:13px;font-weight:600">Choose a new time</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ we.rslots }}" as="sl" hint-placeholder-count="3"><button onClick="{{ sl.pick }}" style="height:48px;border-radius:16px;border:1.5px solid {{ sl.bd }};background:{{ sl.bg }};color:{{ sl.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ sl.t }}</button></sc-for></div>
+      <label style="display:flex;gap:8px;align-items:center;font-size:12px;color:#5D5D58"><input type="checkbox" checked="{{ we.failSim }}" onChange="{{ we.toggleFail }}" style="width:18px;height:18px;accent-color:#141414">Simulate: the 15:30 slot is taken during confirm</label>
+      <button onClick="{{ we.confirmR }}" disabled="{{ we.noR }}" style="height:54px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer">{{ we.confirmLabel }}</button>
+    </sc-if>
+    <sc-if value="{{ we.canResched }}" hint-placeholder-val="{{ true }}"><button onClick="{{ we.startR }}" style="margin-top:auto;height:54px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;gap:8px;align-items:center;justify-content:center"><bh-icon name="refresh" size="16"></bh-icon>Reschedule</button></sc-if>
+  </sc-if>
+</sc-if>
+
+<!-- ===== COMMERCE ===== -->
+<sc-if value="{{ f.commerce }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ co.s.browse }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;gap:8px;align-items:center;height:48px;padding:0 16px;border-radius:999px;background:#fff"><bh-icon name="search" size="16"></bh-icon><span style="font-size:14px;color:#9C9C96">Search products</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:16px;background:#F7EDA8;font-size:13px"><span style="display:flex;gap:6px;align-items:center"><bh-icon name="store" size="15"></bh-icon>Shopping <strong>Portland store</strong></span><span style="font-weight:700;text-decoration:underline">Change</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><sc-for list="{{ co.prods }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.pick }}" style="text-align:left;border:none;background:#fff;border-radius:22px;padding:8px;cursor:pointer;display:flex;flex-direction:column;gap:6px;color:#141414"><div style="height:140px;border-radius:16px;overflow:hidden;background:#F3F2EE"><img src="{{ p.img }}" alt="" style="width:100%;height:100%;object-fit:cover"></div><span style="font-size:13px;font-weight:700;padding:0 4px">{{ p.n }}</span><span style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 4px"><strong style="font-size:14px">{{ p.p }}</strong><span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ p.stBg }}">{{ p.st }}</span></span></button></sc-for></div>
+  </sc-if>
+  <sc-if value="{{ co.s.product }}" hint-placeholder-val="{{ false }}">
+    <div style="height:260px;border-radius:26px;overflow:hidden"><img src="{{ img.shopRacks }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+    <div><div style="font-size:24px;font-weight:800">Linen overshirt</div><div style="font-size:18px;font-weight:700;margin-top:2px">$98.00 USD</div></div>
+    <div style="font-size:13px;font-weight:600">Size</div>
+    <div style="display:flex;gap:6px"><sc-for list="{{ co.sizes }}" as="z" hint-placeholder-count="4"><button onClick="{{ z.pick }}" disabled="{{ z.off }}" style="flex:1;height:46px;border-radius:14px;border:1.5px solid {{ z.bd }};background:{{ z.bg }};color:{{ z.fg }};font-size:14px;font-weight:700;cursor:pointer">{{ z.l }}</button></sc-for></div>
+    <div style="font-size:13px;font-weight:600">How you'll get it</div>
+    <sc-for list="{{ co.fuls }}" as="fu" hint-placeholder-count="2"><button onClick="{{ fu.pick }}" style="text-align:left;display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;border:1.5px solid {{ fu.bd }};background:#fff;cursor:pointer;font-size:13px;color:#141414"><bh-icon name="{{ fu.icon }}" size="18"></bh-icon><span style="flex:1"><strong>{{ fu.l }}</strong><span style="display:block;color:#5D5D58;font-size:12px">{{ fu.d }}</span></span></button></sc-for>
+    <button onClick="{{ co.add }}" disabled="{{ co.noSize }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">Add to cart</button>
+  </sc-if>
+  <sc-if value="{{ co.s.cart }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:22px;background:#fff"><div style="width:76px;height:76px;border-radius:16px;overflow:hidden"><img src="{{ img.shopRacks }}" alt="" style="width:100%;height:100%;object-fit:cover"></div><div style="flex:1"><div style="font-size:14px;font-weight:700">Linen overshirt · {{ co.size }}</div><div style="font-size:12px;color:#5D5D58">{{ co.fulLabel }}</div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><button onClick="{{ co.minus }}" aria-label="Decrease" style="width:30px;height:30px;border-radius:15px;border:1px solid #E4E2DC;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="minus" size="13"></bh-icon></button><strong>{{ co.qty }}</strong><button onClick="{{ co.plus }}" disabled="{{ co.maxed }}" aria-label="Increase" style="width:30px;height:30px;border-radius:15px;border:none;background:#141414;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="plus" size="13"></bh-icon></button></div></div><strong>{{ co.line }}</strong></div>
+    <sc-if value="{{ co.maxed }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5A4300;background:#FFF3C9;border-radius:14px;padding:10px">Only {{ co.stock }} in stock at Portland.</div></sc-if>
+    <div style="background:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;font-size:14px"><div style="display:flex;justify-content:space-between"><span style="color:#5D5D58">Subtotal</span><span>{{ co.line }}</span></div><div style="display:flex;justify-content:space-between"><span style="color:#5D5D58">Shipping</span><span>{{ co.ship }}</span></div><div style="display:flex;justify-content:space-between"><span style="color:#5D5D58">Tax (Oregon)</span><span>$0.00</span></div><div style="display:flex;justify-content:space-between;border-top:1px solid #EEEDE8;padding-top:8px;font-weight:800"><span>Total</span><span>{{ co.total }}</span></div></div>
+    <div style="font-size:12px;color:#5D5D58;line-height:1.5">Checkout is handled by the store's existing WooCommerce payment gateway.</div>
+    <button onClick="{{ co.pay }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">{{ co.payLabel }}</button>
+  </sc-if>
+  <sc-if value="{{ co.s.done }}" hint-placeholder-val="{{ false }}">
+    <div style="width:72px;height:72px;border-radius:36px;background:#D6F26B;display:flex;align-items:center;justify-content:center;margin-top:20px"><bh-icon name="check" size="32" stroke="2.4"></bh-icon></div>
+    <h2 style="margin:0;font-size:28px;font-weight:800">Order #5530 confirmed</h2>
+    <div style="background:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ co.track }}" as="t" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="width:26px;height:26px;border-radius:13px;background:{{ t.bg }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ t.icon }}" size="13"></bh-icon></span><span style="flex:1;font-weight:{{ t.w }}">{{ t.l }}</span><span style="font-size:11px;color:#5D5D58">{{ t.t }}</span></div></sc-for>
+    </div>
+    <button onClick="{{ co.advance }}" style="height:44px;border-radius:999px;border:1px dashed #9C9C96;background:transparent;font-size:13px;font-weight:600;cursor:pointer">Simulate: store updates status</button>
+    <button onClick="{{ reset }}" style="margin-top:auto;height:54px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:15px;font-weight:700;cursor:pointer">Request a return</button>
+  </sc-if>
+</sc-if>
+
+<!-- ===== FOODS (scenario 10 customer) ===== -->
+<sc-if value="{{ f.foods }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ fo.s.time }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;height:170px;border-radius:26px;overflow:hidden"><img src="{{ img.foodPizza }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+    <div style="display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600"><bh-icon name="pin" size="14"></bh-icon>Seattle – Ballard · open until 21:00</div>
+    <div style="font-size:13px;font-weight:600">Pickup time · today</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ fo.slots }}" as="sl" hint-placeholder-count="6"><button onClick="{{ sl.pick }}" disabled="{{ sl.off }}" style="height:56px;border-radius:16px;border:1.5px solid {{ sl.bd }};background:{{ sl.bg }};color:{{ sl.fg }};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center"><strong style="font-size:14px;font-variant-numeric:tabular-nums">{{ sl.t }}</strong><span style="font-size:10px;font-weight:600">{{ sl.n }}</span></button></sc-for></div>
+    <button onClick="{{ fo.toMenu }}" disabled="{{ fo.noSlot }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">See menu</button>
+  </sc-if>
+  <sc-if value="{{ fo.s.menu }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:16px;background:#F8D6D8;font-size:13px"><span style="display:flex;gap:6px;align-items:center"><bh-icon name="clock" size="14"></bh-icon>Pickup <strong>{{ fo.slot }}</strong></span><button onClick="{{ fo.toTime }}" style="background:none;border:none;font-weight:700;text-decoration:underline;font-size:13px;cursor:pointer">Change</button></div>
+    <sc-for list="{{ fo.items }}" as="m" hint-placeholder-count="4"><button onClick="{{ m.pick }}" disabled="{{ m.sold }}" style="text-align:left;display:flex;gap:12px;align-items:center;padding:8px;border-radius:22px;border:none;background:#fff;cursor:pointer;color:#141414"><div style="width:84px;height:84px;border-radius:16px;overflow:hidden;flex-shrink:0;background:#F3F2EE"><img src="{{ m.img }}" alt="" style="width:100%;height:100%;object-fit:cover"></div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ m.n }}</div><div style="font-size:12px;color:#5D5D58">{{ m.d }}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><strong>{{ m.p }}</strong><span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ m.tagBg }}">{{ m.tag }}</span></div></div></button></sc-for>
+  </sc-if>
+  <sc-if value="{{ fo.s.item }}" hint-placeholder-val="{{ false }}">
+    <div style="height:200px;border-radius:26px;overflow:hidden"><img src="{{ img.foodCook }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+    <div><div style="font-size:24px;font-weight:800">Ember chicken bowl</div><div style="font-size:13px;color:#5D5D58;margin-top:2px">Gluten-free option · dietary info from Maple &amp; Ember</div></div>
+    <div style="font-size:13px;font-weight:600">Base <span style="font-weight:400;color:#5D5D58">· required</span></div>
+    <div style="display:flex;gap:6px"><sc-for list="{{ fo.bases }}" as="b" hint-placeholder-count="2"><button onClick="{{ b.pick }}" style="flex:1;height:44px;border-radius:14px;border:1.5px solid {{ b.bd }};background:{{ b.bg }};color:{{ b.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ b.l }}</button></sc-for></div>
+    <div style="font-size:13px;font-weight:600">Add-ons</div>
+    <sc-for list="{{ fo.adds }}" as="a" hint-placeholder-count="3"><label style="display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;background:#fff;font-size:13px;opacity:{{ a.op }}"><input type="checkbox" checked="{{ a.on }}" disabled="{{ a.sold }}" onChange="{{ a.toggle }}" style="width:20px;height:20px;accent-color:#141414"><span style="flex:1">{{ a.l }}</span><span style="color:#5D5D58">{{ a.p }}</span></label></sc-for>
+    <button onClick="{{ fo.addToCart }}" disabled="{{ fo.noBase }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">Add · {{ fo.itemPrice }}</button>
+  </sc-if>
+  <sc-if value="{{ fo.s.cart }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border-radius:20px;padding:14px;font-size:14px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between"><strong>{{ fo.cartLine }}</strong><span>{{ fo.itemPrice }}</span></div><div style="font-size:12px;color:#5D5D58">{{ fo.cartMods }}</div></div>
+    <input placeholder="Name for pickup" aria-label="Name" value="{{ fo.name }}" onChange="{{ fo.onName }}" style="height:50px;border:1.5px solid #141414;border-radius:16px;padding:0 16px;font-size:15px">
+    <input placeholder="Mobile for order updates" aria-label="Mobile" value="{{ fo.phone }}" onChange="{{ fo.onPhone }}" style="height:50px;border:1.5px solid #141414;border-radius:16px;padding:0 16px;font-size:15px">
+    <input placeholder="Order note (optional)" aria-label="Note" style="height:50px;border:1.5px solid #E4E2DC;border-radius:16px;padding:0 16px;font-size:15px">
+    <div style="background:#fff;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:6px;font-size:13px"><div style="display:flex;justify-content:space-between"><span style="color:#5D5D58">Items</span><span>{{ fo.itemPrice }}</span></div><div style="display:flex;justify-content:space-between"><span style="color:#5D5D58">Sales tax (configured: 10.35%)</span><span>{{ fo.tax }}</span></div><div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;border-top:1px solid #EEEDE8;padding-top:6px"><span>Total</span><span>{{ fo.total }}</span></div></div>
+    <button onClick="{{ fo.pay }}" disabled="{{ fo.cantPay }}" style="margin-top:auto;height:56px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0">{{ fo.payLabel }}</button>
+  </sc-if>
+  <sc-if value="{{ fo.s.status }}" hint-placeholder-val="{{ false }}">
+    <div style="width:72px;height:72px;border-radius:36px;background:{{ fo.stBg }};display:flex;align-items:center;justify-content:center;margin-top:16px"><bh-icon name="{{ fo.stIcon }}" size="30"></bh-icon></div>
+    <h2 style="margin:0;font-size:28px;font-weight:800;line-height:1.15">{{ fo.stTitle }}</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#3E3E3A">{{ fo.stText }}</p>
+    <div style="background:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px"><sc-for list="{{ fo.track }}" as="t" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="width:26px;height:26px;border-radius:13px;background:{{ t.bg }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ t.icon }}" size="13"></bh-icon></span><span style="flex:1;font-weight:{{ t.w }}">{{ t.l }}</span></div></sc-for></div>
+    <button onClick="{{ fo.advance }}" disabled="{{ fo.final }}" style="height:44px;border-radius:999px;border:1px dashed #9C9C96;background:transparent;font-size:13px;font-weight:600;cursor:pointer">Simulate: restaurant updates status</button>
+    <button onClick="{{ reset }}" style="margin-top:auto;height:54px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:15px;font-weight:700;cursor:pointer">New order</button>
+  </sc-if>
+</sc-if>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOW RAIL -->
+    <div style="flex:1 1 360px;max-width:520px;display:flex;flex-direction:column;gap:12px">
+      <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:12px;align-items:center"><span style="width:48px;height:48px;border-radius:16px;background:{{ rail.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ rail.icon }}" size="22"></bh-icon></span><div><div style="font-size:12px;color:#5D5D58">{{ rail.scenario }}</div><div style="font-size:20px;font-weight:700">{{ rail.title }}</div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ rail.steps }}" as="s" hint-placeholder-count="5"><div style="display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;background:{{ s.bg }}"><span style="width:28px;height:28px;border-radius:14px;background:{{ s.dot }};color:{{ s.dotFg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">{{ s.n }}</span><span style="font-size:14px;font-weight:{{ s.w }}">{{ s.l }}</span></div></sc-for>
+        </div>
+      </div>
+      <div style="background:#141414;color:#fff;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:14px;font-weight:700;display:flex;gap:8px;align-items:center"><bh-icon name="shield" size="16"></bh-icon>Edge cases covered here</div>
+        <sc-for list="{{ rail.edges }}" as="e" hint-placeholder-count="3"><div style="display:flex;gap:10px;font-size:13px;line-height:1.5;color:#E0E0DA"><bh-icon name="check" size="15"></bh-icon>{{ e }}</div></sc-for>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="BranchHarbor App.dc.html" style="display:flex;gap:8px;align-items:center;height:44px;padding:0 18px;border-radius:999px;background:#fff;font-size:13px;font-weight:600;text-decoration:none"><bh-icon name="grid" size="15"></bh-icon>Staff side in the app</a><button onClick="{{ reset }}" style="display:flex;gap:8px;align-items:center;height:44px;padding:0 18px;border-radius:999px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer"><bh-icon name="refresh" size="15"></bh-icon>Restart flow</button></div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const U = (id, w) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w || 700}&q=70`;
+const IMG = { sportKids: U('1622659097509-4d56de14539e', 900), spaStones: U('1600334089648-b0d9d3028eb2', 900), shopRacks: U('1555529771-835f59fc5efe', 900), foodPizza: U('1651981075280-9a9e01acbff0', 900), foodCook: U('1640583342012-4622f31b650d', 900),
+  y1: U('1588286840104-8957b019727f', 500), y2: U('1697274834392-04ff3b76ef20', 500), y3: U('1625865020971-581242d0ead6', 500), y4: U('1761035005546-62b8018b212a', 500),
+  shopClothes: U('1567401893414-76b7b1e5a7a5', 500), shopLabels: U('1526152505827-d2f3b5b4a52a', 500), shopBoutique: U('1441984904996-e0b6ba687e04', 500), foodChef: U('1622021142947-da7dedc7c39a', 500), foodTomato: U('1554997433-8e233c02c751', 500) };
+const P = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE', ok: '#D6F26B', grey: '#F3F2EE' };
+const pad = n => String(n).padStart(2, '0');
+const money = n => `$${n.toFixed(2)}`;
+const FLOWS = {
+  studios: { name: 'Studios', icon: 'lotus', pastel: P.lilac, scenario: 'Scenario 6', title: 'Book a class or join the waitlist', steps: ['Choose studio', 'Browse classes', 'Details, hold & pay', 'Confirmation'], edges: ['Full class offers a waitlist, not a booking', 'Spot held for 5 minutes; expiry releases it without charge', 'Times shown in the studio’s timezone'] },
+  sports: { name: 'Sports', icon: 'trophy', pastel: P.lime, scenario: 'Scenario 7', title: 'Guardian registers a participant', steps: ['Choose programme', 'Participant & eligibility', 'Forms, terms & payment', 'Pending review'], edges: ['Age checked against the boundary date', 'Non-parent relationship triggers verification', 'Payment doesn’t mean team selection'] },
+  wellness: { name: 'Wellness', icon: 'leaf', pastel: P.sage, scenario: 'Scenario 8', title: 'Book, then reschedule safely', steps: ['Choose service', 'Practitioner & time', 'Booked', 'Reschedule'], edges: ['Deposit and cancellation terms before paying', 'Original slot kept if the new one fails', 'Released only after the replacement is secured'] },
+  commerce: { name: 'Commerce', icon: 'bag', pastel: P.butter, scenario: 'Commerce journey', title: 'Shop a store and track the order', steps: ['Browse store', 'Variant & fulfilment', 'Cart & checkout', 'Order status'], edges: ['Stock shown for the chosen store', 'Quantity capped by local stock', 'Existing WooCommerce checkout, no second checkout'] },
+  foods: { name: 'Foods', icon: 'utensils', pastel: P.blush, scenario: 'Scenario 10', title: 'Order pickup and follow its status', steps: ['Pickup time', 'Menu', 'Item & modifiers', 'Details & pay', 'Awaiting acceptance → ready'], edges: ['Full slots can’t be chosen', 'Sold-out items and modifiers disabled', 'Clear difference between awaiting and accepted'] },
+};
+const CLASSES = [['c1', '7:00 am', 'Morning Vinyasa', 'Maya Rao', 4, P.aqua, 'y1'], ['c2', '9:00 am', 'Slow Flow', 'Sam Tran', 0, P.blush, 'y2'], ['c3', '12:15 pm', 'Lunchtime Pilates', 'Ana Silva', 9, P.butter, 'y4'], ['c4', '6:30 pm', 'Yin & Restore', 'Jordan Lee', 1, P.lilac, 'y3']].map(([id, time, name, inst, left, pastel, img]) => ({ id, time, name, inst, left, pastel, img: IMG[img] }));
+const fresh = () => ({
+  st: { step: 'loc', loc: null, day: 0, cls: null, hold: 300, expired: false, busy: false, name: '', email: '', result: null },
+  sp: { step: 'prog', child: '', dob: '', rel: 'Parent', phone: '', consent: false, busy: false },
+  we: { step: 'svc', prac: 'Any available', slot: null, busy: false, booked: null, resched: false, rslot: null, fail: true, phase: 'idle', notice: '' },
+  co: { step: 'browse', size: null, ful: 'pickup', qty: 1, busy: false, track: 0 },
+  fo: { step: 'time', slot: null, base: null, adds: {}, name: '', phone: '', busy: false, status: 0 } });
+
+class Component extends DCLogic {
+  state = { flow: 'studios', ...fresh() };
+  componentWillUnmount() { clearInterval(this.holdT); (this.ts || []).forEach(clearTimeout); }
+  later(fn, ms) { (this.ts = this.ts || []).push(setTimeout(fn, ms)); }
+  set(k, p) { this.setState(s => ({ [k]: { ...s[k], ...p } })); }
+  startHold() { clearInterval(this.holdT); this.holdT = setInterval(() => this.setState(s => { const h = s.st.hold - 1; if (h <= 0) { clearInterval(this.holdT); return { st: { ...s.st, hold: 0, expired: true } }; } return { st: { ...s.st, hold: h } }; }), 1000); }
+  backMap() { const s = this.state, f = s.flow;
+    const m = { studios: { classes: 'loc', details: 'classes' }, sports: { who: 'prog', forms: 'who' }, wellness: { slot: 'svc' }, commerce: { product: 'browse', cart: 'product' }, foods: { menu: 'time', item: 'menu', cart: 'item' } };
+    const key = { studios: 'st', sports: 'sp', wellness: 'we', commerce: 'co', foods: 'fo' }[f];
+    return { key, to: m[f][s[key].step] }; }
+
+  renderVals() {
+    const s = this.state, fl = s.flow, F = FLOWS[fl];
+    const bm = this.backMap();
+    const dark = fl === 'studios';
+    const stepIdx = { studios: { loc: 0, classes: 1, details: 2, done: 3 }, sports: { prog: 0, who: 1, forms: 2, done: 3 }, wellness: { svc: 0, slot: 1, booked: s.we.resched ? 3 : 2 }, commerce: { browse: 0, product: 1, cart: 2, done: 3 }, foods: { time: 0, menu: 1, item: 2, cart: 3, status: 4 } }[fl][s[bm.key].step];
+
+    // studios
+    const st = s.st, cls = CLASSES.find(c => c.id === st.cls) || CLASSES[0], full = cls.left === 0;
+    const loc = st.loc || { n: 'Toronto – Queen West', tz: 'Eastern time', cur: 'CAD' };
+    const price = loc.cur === 'CAD' ? '$28.00 CAD' : '$26.00 USD';
+    const stV = { s: { loc: st.step === 'loc', classes: st.step === 'classes', details: st.step === 'details', done: st.step === 'done' }, tz: loc.tz, cls, full, hold: !full && !st.expired, expired: !full && st.expired, price, name: st.name, email: st.email, spotsShort: full ? 'Full' : `${cls.left} left`,
+      locs: [['Toronto – Queen West', 'Eastern time', 'CAD', P.lilac], ['Toronto – Leslieville', 'Eastern time', 'CAD', P.butter], ['Vancouver – Kitsilano', 'Pacific time', 'CAD', P.aqua], ['Seattle – Capitol Hill', 'Pacific time', 'USD', P.blush]].map(([n, tz, cur, c]) => ({ n, tz, c, pick: () => this.set('st', { loc: { n, tz, cur }, step: 'classes' }) })),
+      days: ['Sat 17', 'Sun 18', 'Mon 19'].map((l, i) => ({ l, bg: st.day === i ? '#fff' : '#2A2A2A', fg: st.day === i ? '#141414' : '#fff', bd: st.day === i ? 'none' : '1.5px solid #3A3A3A', pick: () => this.set('st', { day: i }) })),
+      classes: CLASSES.map(c => ({ ...c, spots: c.left === 0 ? 'Full · waitlist open' : c.left === 1 ? '1 spot left' : `${c.left} spots left`, cta: c.left === 0 ? 'Join waitlist' : 'Book', btnBg: c.left === 0 ? '#141414' : '#fff', btnFg: c.left === 0 ? '#fff' : '#141414', pick: () => { this.set('st', { cls: c.id, step: 'details', hold: 300, expired: false }); if (c.left > 0) this.startHold(); } })),
+      holdLabel: `${Math.floor(st.hold / 60)}:${pad(st.hold % 60)}`, recheck: () => { this.set('st', { hold: 300, expired: false }); this.startHold(); }, expire: () => { clearInterval(this.holdT); this.set('st', { hold: 0, expired: true }); },
+      onName: e => this.set('st', { name: e.target.value }), onEmail: e => this.set('st', { email: e.target.value }),
+      cant: st.busy || !st.name.trim() || !/\S+@\S+\.\S+/.test(st.email) || (!full && st.expired), cta: st.busy ? 'Processing…' : full ? 'Join waitlist' : `Book · ${price}`,
+      submit: () => { this.set('st', { busy: true }); this.later(() => { clearInterval(this.holdT); this.set('st', { busy: false, step: 'done', result: full ? 'wait' : 'ok' }); }, 900); },
+      done: st.result === 'wait' ? { icon: 'clock', bg: P.butter, t: 'You’re on the waitlist', d: `You’re number 3 for ${cls.name}. We’ll email ${st.email} if a spot opens; no charge unless it’s confirmed.`, manage: 'Leave waitlist' } : { icon: 'check', bg: P.ok, t: 'You’re booked', d: `${cls.name}, ${cls.time} at ${loc.n}. Paid ${price}. Cancel up to 12 hours before for a full refund.`, manage: 'Manage or cancel booking' } };
+
+    // sports
+    const sp = s.sp, yr = sp.dob ? +sp.dob.slice(0, 4) : null, dobBad = !!yr && yr !== 2016;
+    const spV = { s: { prog: sp.step === 'prog', who: sp.step === 'who', forms: sp.step === 'forms', done: sp.step === 'done' },
+      progs: [['U10 Autumn', 'Born 2016 · Riverside Park · $240 CAD', 'Open', P.ok, P.lime, false], ['U12 Camp', 'Born 2014 · 5 days · $180 CAD', '2 spots', P.butter, P.aqua, false], ['U8 Fundamentals', 'Born 2018 · Hillcrest Dome', 'Closed', P.grey, P.grey, true]].map(([n, d, st2, stBg, c, closed]) => ({ n, d, st: st2, stBg, c, closed, pick: () => this.set('sp', { step: 'who' }) })),
+      child: sp.child, dob: sp.dob, onChild: e => this.set('sp', { child: e.target.value }), onDob: e => this.set('sp', { dob: e.target.value }), dobBad, dobYear: yr, dobBd: dobBad ? '#B3261E' : '#141414', toU12: () => this.set('sp', { dob: '' }),
+      rels: ['Parent', 'Legal guardian', 'Other relative'].map(l => ({ l, bg: sp.rel === l ? '#141414' : '#fff', fg: sp.rel === l ? '#fff' : '#141414', bd: sp.rel === l ? '#141414' : '#E4E2DC', pick: () => this.set('sp', { rel: l }) })), relOther: sp.rel === 'Other relative',
+      cantWho: !sp.child.trim() || !sp.dob || dobBad, next: () => this.set('sp', { step: 'forms' }),
+      phone: sp.phone, onPhone: e => this.set('sp', { phone: e.target.value }), consent: sp.consent, onConsent: () => this.set('sp', { consent: !sp.consent }), payFull: () => {},
+      cantPay: !sp.consent || !sp.phone.trim() || sp.busy, payLabel: sp.busy ? 'Processing payment…' : 'Pay $240.00 CAD', pay: () => { this.set('sp', { busy: true }); this.later(() => this.set('sp', { busy: false, step: 'done' }), 1000); }, childName: sp.child || 'Your participant' };
+
+    // wellness
+    const we = s.we;
+    const slotsW = ['9:00', '10:00', '11:30', '13:00', '15:30', '17:00'];
+    const offW = { '11:30': true, '13:00': true };
+    const weV = { s: { svc: we.step === 'svc', slot: we.step === 'slot', booked: we.step === 'booked' },
+      svcs: [['Deep tissue', '60 min · Room A or B', '$120'], ['Hot stone', '90 min', '$165'], ['Facial', '45 min', '$95']].map(([n, d, p2]) => ({ n, d, p: p2, pick: () => this.set('we', { step: 'slot' }) })),
+      pracs: ['Any available', 'Rina K.', 'Ana L.'].map(l => ({ l, bg: we.prac === l ? '#141414' : '#fff', fg: we.prac === l ? '#fff' : '#141414', bd: we.prac === l ? '#141414' : '#E4E2DC', pick: () => this.set('we', { prac: l }) })),
+      slots: slotsW.map(t => ({ t, off: !!offW[t], bg: we.slot === t ? '#141414' : '#fff', fg: we.slot === t ? '#fff' : '#141414', bd: we.slot === t ? '#141414' : '#E4E2DC', pick: () => this.set('we', { slot: t }) })),
+      noSlot: !we.slot || we.busy, bookLabel: we.busy ? 'Paying deposit…' : 'Pay $40.00 deposit & book', book: () => { this.set('we', { busy: true }); this.later(() => this.set('we', { busy: false, step: 'booked', booked: `Thu 15 Oct · ${we.slot}` }), 900); },
+      curSlot: we.booked, prac: we.prac === 'Any available' ? 'Rina K.' : we.prac, bookedLabel: we.phase === 'ok' ? 'Rescheduled' : 'Booked',
+      resched: we.resched, canResched: !we.resched, startR: () => this.set('we', { resched: true, rslot: null, notice: '', phase: 'idle' }),
+      rslots: ['15:30 Thu', '17:00 Thu', '10:00 Fri'].map(t => ({ t, bg: we.rslot === t ? '#141414' : '#fff', fg: we.rslot === t ? '#fff' : '#141414', bd: we.rslot === t ? '#141414' : '#E4E2DC', pick: () => this.set('we', { rslot: t }) })),
+      failSim: we.fail, toggleFail: () => this.set('we', { fail: !we.fail }), noR: !we.rslot || we.phase === 'working', confirmLabel: we.phase === 'working' ? 'Securing new time… your current one is still held' : 'Confirm new time',
+      confirmR: () => { this.set('we', { phase: 'working' }); this.later(() => this.setState(x => { const w = x.we; if (w.fail && w.rslot === '15:30 Thu') return { we: { ...w, phase: 'failed', notice: '15:30 was booked moments ago. Your appointment is still ' + w.booked + '. Pick another time.' } }; return { we: { ...w, phase: 'ok', resched: false, booked: w.rslot.replace(' Thu', ' · Thu 15 Oct').replace(' Fri', ' · Fri 16 Oct'), notice: 'Moved. Your old time was released after the new one was confirmed. No change to price.' } }; }), 1200); },
+      notice: we.notice, noticeBg: we.phase === 'failed' ? '#FDE7E5' : '#E2F5A6', noticeIcon: we.phase === 'failed' ? 'alert' : 'check-circle', noticeRole: we.phase === 'failed' ? 'alert' : 'status' };
+
+    // commerce
+    const co = s.co, stock = { S: 4, M: 12, L: 1, XL: 0 };
+    const sub = 98 * co.qty, ship = co.ful === 'ship' ? 8 : 0;
+    const trackL = ['Order placed', 'Payment confirmed', co.ful === 'ship' ? 'Shipped' : 'Ready for pickup', co.ful === 'ship' ? 'Delivered' : 'Collected'];
+    const coV = { s: { browse: co.step === 'browse', product: co.step === 'product', cart: co.step === 'cart', done: co.step === 'done' },
+      prods: [['Linen overshirt', '$98', 'In stock', P.ok, IMG.shopRacks], ['Merino crew', '$89', 'Low', P.butter, IMG.shopClothes], ['Canvas tote', '$34', 'Online only', P.grey, IMG.shopLabels], ['Field jacket', '$168', 'Out at Portland', P.blush, IMG.shopBoutique]].map(([n, p2, st2, stBg, img]) => ({ n, p: p2, st: st2, stBg, img, pick: () => this.set('co', { step: 'product' }) })),
+      sizes: Object.keys(stock).map(l => ({ l, off: stock[l] === 0, bg: co.size === l ? '#141414' : '#fff', fg: co.size === l ? '#fff' : '#141414', bd: co.size === l ? '#141414' : '#E4E2DC', pick: () => this.set('co', { size: l, qty: 1 }) })),
+      fuls: [['pickup', 'store', 'Pick up at Portland store', co.size ? `${stock[co.size]} in stock · ready in 2 h` : 'Choose a size to see stock'], ['ship', 'truck', 'Ship to me', '$8.00 · 3–5 business days']].map(([k, icon, l, d]) => ({ icon, l, d, bd: co.ful === k ? '#141414' : '#E4E2DC', pick: () => this.set('co', { ful: k }) })),
+      noSize: !co.size, add: () => this.set('co', { step: 'cart' }), size: co.size, qty: co.qty, stock: co.size ? stock[co.size] : 0, maxed: co.size ? co.qty >= stock[co.size] : false,
+      minus: () => this.set('co', { qty: Math.max(1, co.qty - 1) }), plus: () => this.set('co', { qty: co.qty + 1 }), line: money(sub), ship: money(ship), total: money(sub + ship), fulLabel: co.ful === 'ship' ? 'Ship to me' : 'Pickup · Portland store',
+      payLabel: co.busy ? 'Processing with WooCommerce…' : `Pay ${money(sub + ship)} USD`, pay: () => { this.set('co', { busy: true }); this.later(() => this.set('co', { busy: false, step: 'done', track: 1 }), 1000); },
+      track: trackL.map((l, i) => ({ l, icon: i <= co.track ? 'check' : 'clock', bg: i <= co.track ? P.ok : P.grey, w: i === co.track ? 800 : 500, t: i <= co.track ? 'Done' : '' })), advance: () => this.set('co', { track: Math.min(3, co.track + 1) }) };
+
+    // foods
+    const fo = s.fo;
+    const fslots = [['12:00', 8], ['12:15', 6], ['12:30', 8], ['12:45', 3], ['13:00', 1], ['13:15', 0]];
+    const addsDef = [['Extra chicken', 4, false], ['Avocado', 2.5, true], ['Pickled onions', 0.75, false]];
+    const itemP = 16.5 + (fo.base === 'Brown rice' ? 0 : 0) + addsDef.reduce((a, [l, p2]) => a + (fo.adds[l] ? p2 : 0), 0);
+    const tax = Math.round(itemP * 0.1035 * 100) / 100;
+    const stSteps = [['Order sent', 'send'], ['Accepted by restaurant', 'check'], ['Preparing', 'chef'], ['Ready for pickup', 'bag']];
+    const foStat = [{ t: 'Waiting for the restaurant to accept', d: 'Your payment is authorised. Ballard will confirm shortly; if they can’t, it’s voided automatically.', icon: 'clock', bg: P.butter }, { t: 'Accepted · pickup at ' + fo.slot, d: 'Maple & Ember Ballard accepted your order. We’ll text you when it’s ready.', icon: 'check', bg: P.ok }, { t: 'Being prepared', d: 'The kitchen is on it.', icon: 'chef', bg: P.aqua }, { t: 'Ready for pickup', d: 'Head to the pickup shelf and give your name.', icon: 'bag', bg: P.ok }][fo.status];
+    const foV = { s: { time: fo.step === 'time', menu: fo.step === 'menu', item: fo.step === 'item', cart: fo.step === 'cart', status: fo.step === 'status' }, slot: fo.slot,
+      slots: fslots.map(([t, left]) => ({ t, n: left === 0 ? 'Full' : `${left} left`, off: left === 0, bg: fo.slot === t ? '#141414' : '#fff', fg: fo.slot === t ? '#fff' : '#141414', bd: fo.slot === t ? '#141414' : '#E4E2DC', pick: () => this.set('fo', { slot: t }) })),
+      noSlot: !fo.slot, toMenu: () => this.set('fo', { step: 'menu' }), toTime: () => this.set('fo', { step: 'time' }),
+      items: [['Ember chicken bowl', 'Rice, greens, ember sauce', '$16.50', 'GF option', P.lime, IMG.foodCook, false], ['Smoked brisket sandwich', 'Pickles, slaw', '$18.00', 'Sold out', P.blush, IMG.foodChef, true], ['Wood-fired flatbread', 'Seasonal toppings', '$15.00', 'Vegetarian', P.lime, IMG.foodPizza, false], ['Garden tomato salad', 'Herbs, sherry vinegar', '$11.00', 'Vegan', P.lime, IMG.foodTomato, false]].map(([n, d, p2, tag, tagBg, img, sold]) => ({ n, d, p: p2, tag, tagBg, img, sold, pick: () => this.set('fo', { step: 'item' }) })),
+      bases: ['Jasmine rice', 'Brown rice'].map(l => ({ l, bg: fo.base === l ? '#141414' : '#fff', fg: fo.base === l ? '#fff' : '#141414', bd: fo.base === l ? '#141414' : '#E4E2DC', pick: () => this.set('fo', { base: l }) })),
+      adds: addsDef.map(([l, p2, sold]) => ({ l: sold ? `${l} · sold out` : l, p: `+${money(p2)}`, on: !!fo.adds[l], sold, op: sold ? 0.5 : 1, toggle: () => this.set('fo', { adds: { ...fo.adds, [l]: !fo.adds[l] } }) })),
+      noBase: !fo.base, itemPrice: money(itemP), addToCart: () => this.set('fo', { step: 'cart' }), cartLine: '1× Ember chicken bowl', cartMods: [fo.base, ...Object.keys(fo.adds).filter(k => fo.adds[k])].filter(Boolean).join(' · '),
+      name: fo.name, phone: fo.phone, onName: e => this.set('fo', { name: e.target.value }), onPhone: e => this.set('fo', { phone: e.target.value }), tax: money(tax), total: money(itemP + tax),
+      cantPay: !fo.name.trim() || !fo.phone.trim() || fo.busy, payLabel: fo.busy ? 'Checking slot & paying…' : `Pay ${money(itemP + tax)}`, pay: () => { this.set('fo', { busy: true }); this.later(() => this.set('fo', { busy: false, step: 'status', status: 0 }), 1000); },
+      stTitle: foStat.t, stText: foStat.d, stIcon: foStat.icon, stBg: foStat.bg, final: fo.status >= 3,
+      track: stSteps.map(([l, icon], i) => ({ l, icon: i <= fo.status ? 'check' : icon, bg: i <= fo.status ? P.ok : P.grey, w: i === fo.status ? 800 : 500 })), advance: () => this.set('fo', { status: Math.min(3, fo.status + 1) }) };
+
+    const titles = { studios: { loc: 'Book a class', classes: loc.n, details: 'Your booking', done: 'Done' }, sports: { prog: 'Programmes', who: 'Participant', forms: 'Forms & payment', done: 'Registration' }, wellness: { svc: 'Book a treatment', slot: 'Deep tissue · 60 min', booked: 'Your appointment' }, commerce: { browse: 'Fieldnote Goods', product: 'Product', cart: 'Your cart', done: 'Order' }, foods: { time: 'Order pickup', menu: 'Menu', item: 'Customise', cart: 'Checkout', status: 'Order #1048' } };
+    const brands = { studios: 'Stillwater Yoga', sports: 'North Shore FA', wellness: 'Tidewater Wellness', commerce: 'Portland store', foods: 'Maple & Ember · Ballard' };
+    const cur = s[bm.key].step;
+
+    return {
+      img: IMG,
+      tabs: Object.keys(FLOWS).map(k => ({ name: FLOWS[k].name, icon: FLOWS[k].icon, on: fl === k, bg: fl === k ? '#141414' : 'transparent', fg: fl === k ? '#fff' : '#141414', pick: () => { clearInterval(this.holdT); this.setState({ flow: k }); } })),
+      f: { studios: fl === 'studios', sports: fl === 'sports', wellness: fl === 'wellness', commerce: fl === 'commerce', foods: fl === 'foods' },
+      ph: { bg: dark ? '#1E1E1E' : '#F6F5F1', fg: dark ? '#fff' : '#141414', line: dark ? '#3A3A3A' : '#D8D6CF', chip: dark ? '#2A2A2A' : '#fff', canBack: !!bm.to, title: titles[fl][cur], brand: brands[fl], hasCart: fl === 'commerce' && (cur === 'browse' || cur === 'product'), cartN: cur === 'cart' ? s.co.qty : 0, cartGo: () => {} },
+      back: () => { if (bm.key === 'st') clearInterval(this.holdT); this.set(bm.key, { step: bm.to }); },
+      reset: () => { clearInterval(this.holdT); this.setState(fresh()); },
+      st: stV, sp: spV, we: weV, co: coV, fo: foV,
+      rail: { ...F, steps: F.steps.map((l, i) => ({ l, n: i < stepIdx ? '✓' : i + 1, bg: i === stepIdx ? F.pastel : '#FAFAF7', dot: i <= stepIdx ? '#141414' : '#fff', dotFg: i <= stepIdx ? '#fff' : '#141414', w: i === stepIdx ? 700 : 500 })) },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-shell.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button{font-family:inherit}
+</style>
+</helmet>
+<bh-topbar active="brand"></bh-topbar>
+<div style="max-width:1280px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+
+  <section data-screen-label="01 Cover" style="background:#141414;color:#fff;border-radius:36px;padding:clamp(28px,5vw,64px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:center;min-height:520px">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-size:13px;font-weight:700;color:#D6F26B;letter-spacing:.08em">BRAND GUIDELINES · V1.0 · OCTOBER 2026</div>
+      <h1 style="margin:0;font-size:clamp(48px,7vw,92px);line-height:.95;font-weight:800;letter-spacing:-.05em">BranchHarbor</h1>
+      <p style="margin:0;font-size:18px;line-height:1.55;color:#C9C9C3;max-width:460px;text-wrap:pretty">One harbour for every branch. The operating system for franchise networks, from headquarters to the front desk.</p>
+    </div>
+    <div style="display:flex;justify-content:center">
+      <svg viewBox="0 0 40 40" style="width:min(100%,340px);height:auto;display:block" aria-label="BranchHarbor mark"><rect width="40" height="40" rx="12" fill="#fff"></rect><path d="M11 11v18M29 11v18M11 20h18" stroke="#141414" stroke-width="3.4" stroke-linecap="round" fill="none"></path><path d="M20 20 20 11" stroke="#141414" stroke-width="3.4" stroke-linecap="round" opacity=".35"></path><circle cx="20" cy="20" r="4.2" fill="#D6F26B"></circle></svg>
+    </div>
+  </section>
+
+  <section data-screen-label="02 Logo" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end"><div style="flex:1;min-width:260px"><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">01 · LOGO</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">The harbour mark</h2></div><p style="margin:0;flex:1;min-width:260px;font-size:15px;line-height:1.6;color:#3E3E3A;text-wrap:pretty">Two posts are headquarters and the location, joined by one shared line. The faint stem is a branch still growing. The lime hub is where they meet: the platform.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:28px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;position:relative">
+        <span style="position:absolute;top:16px;left:18px;font-size:11px;font-weight:800;color:#5D5D58">PRIMARY LOCKUP</span>
+        <div style="display:flex;align-items:center;gap:16px"><bh-logo size="72"></bh-logo><span style="font-size:44px;font-weight:800;letter-spacing:-.04em">BranchHarbor</span></div>
+      </div>
+      <div style="background:#141414;color:#fff;border-radius:28px;min-height:280px;display:flex;align-items:center;justify-content:center;padding:28px;position:relative">
+        <span style="position:absolute;top:16px;left:18px;font-size:11px;font-weight:800;color:#9C9C96">REVERSED</span>
+        <div style="display:flex;align-items:center;gap:16px"><bh-logo size="72" dark="true"></bh-logo><span style="font-size:44px;font-weight:800;letter-spacing:-.04em">BranchHarbor</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:24px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><bh-logo size="84"></bh-logo><span style="font-size:11px;font-weight:800;color:#5D5D58">MARK</span></div>
+      <div style="background:#F3F2EE;border-radius:24px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><div style="display:flex;flex-direction:column;align-items:center;gap:10px"><bh-logo size="60"></bh-logo><span style="font-size:22px;font-weight:800;letter-spacing:-.03em">BranchHarbor</span></div><span style="font-size:11px;font-weight:800;color:#5D5D58">STACKED</span></div>
+      <div style="background:#D6F26B;border-radius:24px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><span style="font-size:30px;font-weight:800;letter-spacing:-.04em">BranchHarbor</span><span style="font-size:11px;font-weight:800">WORDMARK ON LIME</span></div>
+      <div style="background:#5E7D68;border-radius:24px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff"><bh-logo size="84" dark="true"></bh-logo><span style="font-size:11px;font-weight:800">ON SAGE</span></div>
+    </div>
+  </section>
+
+  <section data-screen-label="03 Construction" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">02 · CONSTRUCTION</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">Grid, clear space and size</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:center">
+        <svg viewBox="-4 -4 48 48" style="width:100%;max-width:300px;height:auto;display:block" aria-label="Mark on a 40-unit grid">
+          <sc-if value="{{ showGuides }}" hint-placeholder-val="{{ true }}"><g stroke="#C9C7BF" stroke-width=".12"><sc-for list="{{ gridLines }}" as="g" hint-placeholder-count="9"><line x1="{{ g.x1 }}" y1="{{ g.y1 }}" x2="{{ g.x2 }}" y2="{{ g.y2 }}"></line></sc-for></g></sc-if>
+          <rect width="40" height="40" rx="12" fill="#141414"></rect>
+          <path d="M11 11v18M29 11v18M11 20h18" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path d="M20 20 20 11" stroke="#fff" stroke-width="3.4" stroke-linecap="round" opacity=".35"></path>
+          <circle cx="20" cy="20" r="4.2" fill="#D6F26B"></circle>
+          <sc-if value="{{ showGuides }}" hint-placeholder-val="{{ true }}"><g stroke="#C2502C" stroke-width=".18" fill="none" stroke-dasharray=".8 .6"><circle cx="20" cy="20" r="4.2"></circle><line x1="11" y1="-3" x2="11" y2="43"></line><line x1="29" y1="-3" x2="29" y2="43"></line><line x1="-3" y1="20" x2="43" y2="20"></line></g></sc-if>
+        </svg>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"><sc-for list="{{ specs }}" as="sp" hint-placeholder-count="4"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 10px;border-radius:999px;background:#fff">{{ sp }}</span></sc-for></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#F3F2EE;border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:14px;align-items:center;flex:1;justify-content:center">
+          <div style="position:relative;padding:36px;border:1.5px dashed #C2502C;border-radius:8px"><div style="display:flex;align-items:center;gap:12px"><bh-logo size="48"></bh-logo><span style="font-size:28px;font-weight:800;letter-spacing:-.04em">BranchHarbor</span></div><span style="position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;color:#C2502C">½ mark</span></div>
+          <div style="font-size:13px;color:#3E3E3A;text-align:center;max-width:360px;line-height:1.55">Keep clear space of half the mark's height on every side. Nothing else enters this area.</div>
+        </div>
+        <div style="background:#F3F2EE;border-radius:28px;padding:22px 28px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:28px;justify-content:center">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><bh-logo size="16"></bh-logo><span style="font-family:'JetBrains Mono',monospace;font-size:10px">16 px min · mark</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:6px"><bh-logo size="20"></bh-logo><span style="font-size:13px;font-weight:800;letter-spacing:-.03em">BranchHarbor</span></div><span style="font-family:'JetBrains Mono',monospace;font-size:10px">20 px min · lockup</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><span style="font-size:0"><svg viewBox="0 0 40 40" width="20" height="20"><rect width="40" height="40" rx="12" fill="#141414"></rect><path d="M11 11v18M29 11v18M11 20h18" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"></path><circle cx="20" cy="20" r="5" fill="#D6F26B"></circle></svg></span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">favicon · no stem</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+      <sc-for list="{{ donts }}" as="d" hint-placeholder-count="5">
+        <div style="background:#F3F2EE;border-radius:22px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div style="height:90px;display:flex;align-items:center;justify-content:center;position:relative;width:100%">
+            <div style="transform:{{ d.transform }};filter:{{ d.filter }};display:flex;align-items:center;gap:8px;background:{{ d.bg }};padding:10px;border-radius:12px"><bh-logo size="48" dark="{{ d.dark }}"></bh-logo><sc-if value="{{ d.text }}" hint-placeholder-val="{{ false }}"><span style="font-size:18px;font-weight:{{ d.weight }};font-family:{{ d.font }};letter-spacing:-.02em;color:{{ d.textColor }}">{{ d.text }}</span></sc-if></div>
+            <span style="position:absolute;top:0;right:0;width:24px;height:24px;border-radius:12px;background:#C2502C;color:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="13" stroke="2.6"></bh-icon></span>
+          </div>
+          <span style="font-size:12px;font-weight:700;text-align:center">{{ d.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="04 Colour" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end"><div style="flex:1;min-width:260px"><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">03 · COLOUR</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">Ink, lime and warm canvas</h2></div><p style="margin:0;flex:1;min-width:260px;font-size:15px;line-height:1.6;color:#3E3E3A;text-wrap:pretty">Ink carries text and actions. Lime is the signal: one highlight per view, never used for text. Pastels identify industries and soften cards.</p></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;min-height:280px">
+      <sc-for list="{{ core }}" as="c" hint-placeholder-count="3"><div style="background:{{ c.hex }};color:{{ c.fg }};border-radius:28px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;border:{{ c.bd }}"><span style="font-size:22px;font-weight:800">{{ c.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ c.hex }} · {{ c.rgb }}</span><span style="font-size:12px;opacity:.8">{{ c.use }}</span></div></sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+      <sc-for list="{{ support }}" as="c" hint-placeholder-count="8"><div style="border-radius:22px;overflow:hidden;background:#F8F7F3"><div style="height:96px;background:{{ c.hex }};display:flex;align-items:flex-end;padding:10px;color:{{ c.fg }}"><sc-if value="{{ c.icon }}" hint-placeholder-val="{{ false }}"><bh-icon name="{{ c.icon }}" size="20"></bh-icon></sc-if></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:700">{{ c.name }}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5D5D58">{{ c.hex }}</div><div style="font-size:11px;color:#5D5D58">{{ c.use }}</div></div></div></sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <sc-for list="{{ pairs }}" as="p" hint-placeholder-count="5"><span style="display:flex;align-items:center;gap:10px;height:46px;padding:0 16px;border-radius:999px;background:{{ p.bg }};color:{{ p.fg }};font-size:14px;font-weight:700;border:1px solid #EEEDE8">Aa {{ p.label }}<span style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:999px;background:{{ p.badgeBg }};color:#141414">{{ p.ratio }}</span></span></sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="05 Typography" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">04 · TYPOGRAPHY</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">Plus Jakarta Sans</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:28px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:320px">
+        <div style="font-size:clamp(120px,16vw,200px);line-height:.85;font-weight:800;letter-spacing:-.06em">Aa</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:15px;font-weight:500;letter-spacing:.02em;word-break:break-all">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div><div style="font-size:15px;font-weight:500;letter-spacing:.02em">abcdefghijklmnopqrstuvwxyz 0123456789 $ € £ %</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><sc-for list="{{ weights }}" as="w" hint-placeholder-count="4"><span style="font-size:13px;font-weight:{{ w.n }};padding:5px 12px;border-radius:999px;background:#fff">{{ w.l }} {{ w.n }}</span></sc-for></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ scale }}" as="t" hint-placeholder-count="6"><div style="display:flex;align-items:baseline;gap:16px;padding:12px 4px;border-bottom:1px solid #EEEDE8"><span style="width:96px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:#5D5D58">{{ t.spec }}</span><span style="font-size:{{ t.size }};font-weight:{{ t.w }};letter-spacing:{{ t.ls }};line-height:1.15;min-width:0;text-wrap:pretty">{{ t.sample }}</span></div></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="06 Iconography" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end"><div style="flex:1;min-width:260px"><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">05 · ICONOGRAPHY</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">Rounded line icons</h2></div><p style="margin:0;flex:1;min-width:260px;font-size:15px;line-height:1.6;color:#3E3E3A;text-wrap:pretty">24 px grid, 1.9 px stroke, round caps and joins, no fills. Icons sit in pastel tiles or pills, never alone in colour.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px">
+      <sc-for list="{{ icons }}" as="i" hint-placeholder-count="24"><div style="background:#F8F7F3;border-radius:18px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px"><bh-icon name="{{ i }}" size="26"></bh-icon><span style="font-size:10px;color:#5D5D58;font-family:'JetBrains Mono',monospace">{{ i }}</span></div></sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+      <sc-for list="{{ industries }}" as="n" hint-placeholder-count="6"><div style="background:{{ n.hex }};border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:22px"><span style="width:48px;height:48px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ n.icon }}" size="22"></bh-icon></span><span><span style="display:block;font-size:16px;font-weight:700">{{ n.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px">{{ n.hex }}</span></span></div></sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="07 Shape and UI" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">06 · SHAPE & UI</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">Soft corners, pill actions</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:12px;font-weight:800;color:#5D5D58">BUTTONS</div>
+        <button style="align-self:flex-start;display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:700">Start free trial<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="17"></bh-icon></span></button>
+        <button style="align-self:flex-start;height:48px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:700">Book a demo</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:#E2F5A6">Live</span><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:#F7EDA8">Needs approval</span><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:#F3F2EE">Draft</span><span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:#F8D6D8">Overdue</span></div>
+      </div>
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:12px;font-weight:800;color:#5D5D58">RADII</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap"><sc-for list="{{ radii }}" as="r" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:64px;height:64px;background:#fff;border:2px solid #141414;border-radius:{{ r.v }}"></span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">{{ r.l }}</span></div></sc-for></div>
+        <div style="font-size:12px;color:#3E3E3A;line-height:1.55">Large surfaces 28–36 px, cards 20–24 px, tiles 12–16 px, actions and tags fully round.</div>
+      </div>
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:800;color:#5D5D58">CARD</div>
+        <div style="background:#E9DDF8;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:700">Bookings today</span><bh-icon name="calendar" size="16"></bh-icon></div><div style="font-size:32px;font-weight:700;letter-spacing:-.02em">57</div><div style="font-size:11px;color:#3E3E3A">Queen West · from booking connection</div></div>
+        <div style="background:#141414;color:#fff;border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px"><bh-icon name="megaphone" size="17"></bh-icon><span style="flex:1;font-size:13px;font-weight:600">From headquarters</span><span style="width:8px;height:8px;border-radius:4px;background:#D6F26B"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="08 Applications" style="background:#fff;border-radius:36px;padding:clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:24px">
+    <div><div style="font-size:12px;font-weight:800;color:#5D5D58;letter-spacing:.08em">07 · APPLICATIONS</div><h2 style="margin:6px 0 0;font-size:40px;font-weight:700;letter-spacing:-.035em">In use</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:300px">
+        <div style="display:flex;gap:18px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><span style="width:96px;height:96px;border-radius:24px;background:#141414;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.18)"><bh-logo size="72"></bh-logo></span><span style="font-size:12px;font-weight:600">BranchHarbor</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><span style="width:72px;height:72px;border-radius:18px;background:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-logo size="52"></bh-logo></span><span style="font-size:11px;font-weight:600">Staff</span></div>
+        </div>
+        <span style="font-size:11px;font-weight:800;color:#5D5D58">APP ICONS</span>
+      </div>
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:300px">
+        <div style="width:100%;max-width:300px;aspect-ratio:1.75;background:#141414;color:#fff;border-radius:14px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 14px 30px rgba(0,0,0,.18);transform:rotate(-3deg)">
+          <div style="display:flex;align-items:center;gap:8px"><bh-logo size="24" dark="true"></bh-logo><span style="font-size:13px;font-weight:800">BranchHarbor</span></div>
+          <div><div style="font-size:15px;font-weight:700">Jamie Morgan</div><div style="font-size:10px;color:#C9C9C3">Head of Network Marketing</div><div style="font-size:10px;color:#D6F26B;margin-top:6px">jamie@branchharbor.com</div></div>
+        </div>
+        <span style="font-size:11px;font-weight:800;color:#5D5D58">BUSINESS CARD</span>
+      </div>
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:300px">
+        <div style="width:100%;max-width:300px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.06)">
+          <div style="height:64px;background:#D6F26B"></div>
+          <div style="padding:0 14px 14px;margin-top:-28px;display:flex;flex-direction:column;gap:6px"><span style="width:56px;height:56px;border-radius:28px;background:#141414;border:3px solid #fff;display:flex;align-items:center;justify-content:center"><bh-logo size="34"></bh-logo></span><div style="font-size:14px;font-weight:800">BranchHarbor</div><div style="font-size:11px;color:#5D5D58">Franchise operating system · Toronto</div></div>
+        </div>
+        <span style="font-size:11px;font-weight:800;color:#5D5D58">SOCIAL PROFILE</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:11px;font-weight:800;color:#5D5D58">CO-BRANDING · POWERED BY</span>
+        <div style="background:#fff;border-radius:20px;padding:16px 18px;display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:12px;background:#E9DDF8;display:flex;align-items:center;justify-content:center"><bh-icon name="lotus" size="19"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:15px;font-weight:800">Stillwater Yoga</span><span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#5D5D58">Powered by <bh-logo size="12"></bh-logo> BranchHarbor</span></span></div>
+        <div style="font-size:12px;color:#3E3E3A;line-height:1.55">Franchise brands lead. BranchHarbor appears small, after the client's brand, in admin tools only. Customer-facing sites carry no BranchHarbor branding unless the client opts in.</div>
+      </div>
+      <div style="background:#F3F2EE;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:11px;font-weight:800;color:#5D5D58">EMAIL SIGNATURE</span>
+        <div style="background:#fff;border-radius:20px;padding:16px 18px;display:flex;gap:14px;align-items:center"><bh-logo size="44"></bh-logo><div style="border-left:2px solid #D6F26B;padding-left:14px"><div style="font-size:14px;font-weight:800">Priya Anand</div><div style="font-size:12px;color:#3E3E3A">Franchise Account Manager</div><div style="font-size:12px;color:#5E7D68;font-weight:600">branchharbor.com</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="09 Voice" style="background:#D6F26B;border-radius:36px;padding:clamp(24px,4vw,48px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px">
+    <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:12px;font-weight:800;letter-spacing:.08em">08 · VOICE</div><h2 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-.035em">Clear, calm, on your side</h2><p style="margin:0;font-size:15px;line-height:1.6;text-wrap:pretty">We write like an experienced operations lead: short sentences, plain words, real numbers, and the next step spelled out.</p></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ voice }}" as="v" hint-placeholder-count="3"><div style="background:#fff;border-radius:20px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;line-height:1.5"><span><span style="display:block;font-size:10px;font-weight:800;color:#2F6B3A;margin-bottom:3px">WE SAY</span>{{ v.yes }}</span><span style="color:#5D5D58"><span style="display:block;font-size:10px;font-weight:800;color:#C2502C;margin-bottom:3px">NOT</span>{{ v.no }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:6px 10px 24px;font-size:12px;color:#5D5D58"><span style="display:flex;align-items:center;gap:8px"><bh-logo size="18"></bh-logo>BranchHarbor brand guidelines v1.0</span><span>Questions: brand@branchharbor.com</span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showGuides&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Construction&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const g = [];
+    for (let i = 0; i <= 40; i += 5) { g.push({ x1: i, y1: -3, x2: i, y2: 43 }); g.push({ x1: -3, y1: i, x2: 43, y2: i }); }
+    return {
+      showGuides: this.props.showGuides ?? true,
+      gridLines: g,
+      specs: ['40 × 40 unit grid', 'Corner radius 12', 'Stroke 3.4, round caps', 'Hub r 4.2 · lime', 'Stem 35% opacity'],
+      donts: [
+        { label: "Don't stretch", transform: 'scaleX(1.5)', filter: 'none', bg: 'transparent', dark: 'false', text: '' },
+        { label: "Don't rotate", transform: 'rotate(18deg)', filter: 'none', bg: 'transparent', dark: 'false', text: '' },
+        { label: "Don't recolour", transform: 'none', filter: 'hue-rotate(160deg) saturate(3)', bg: '#3A5BD9', dark: 'true', text: '' },
+        { label: "Don't use low-contrast grounds", transform: 'none', filter: 'none', bg: '#3E3E3A', dark: 'false', text: '' },
+        { label: "Don't change the wordmark font", transform: 'none', filter: 'none', bg: 'transparent', dark: 'false', text: 'BranchHarbor', weight: 400, font: 'Georgia, serif', textColor: '#141414' },
+      ],
+      core: [
+        { name: 'Ink', hex: '#141414', rgb: '20 20 20', use: 'Text, primary buttons, dark surfaces', fg: '#fff', bd: 'none' },
+        { name: 'Signal lime', hex: '#D6F26B', rgb: '214 242 107', use: 'One highlight per view. Never text.', fg: '#141414', bd: 'none' },
+        { name: 'Warm canvas', hex: '#F3F2EE', rgb: '243 242 238', use: 'Page backgrounds', fg: '#141414', bd: '1px solid #E4E2DC' },
+      ],
+      support: [
+        ['Sage', '#5E7D68', 'Links, secondary actions', '#fff'], ['Graphite', '#3E3E3A', 'Secondary text', '#fff'], ['Stone', '#5D5D58', 'Captions, metadata', '#fff'], ['Line', '#D8D6CF', 'Borders, dividers', '#141414'],
+        ['Alert', '#C2502C', 'Errors and overdue', '#fff'], ['Success tint', '#E2F5A6', 'Live, done', '#141414'], ['Warning tint', '#F7EDA8', 'Needs attention', '#141414'], ['Error tint', '#F8D6D8', 'Problems', '#141414'],
+      ].map(([name, hex, use, fg]) => ({ name, hex, use, fg, icon: '' })),
+      pairs: [['Ink on canvas', '#F3F2EE', '#141414', '16.9:1'], ['White on ink', '#141414', '#fff', '18.1:1'], ['Ink on lime', '#D6F26B', '#141414', '14.8:1'], ['White on sage', '#5E7D68', '#fff', '4.8:1'], ['Stone on white', '#fff', '#5D5D58', '6.6:1']].map(([label, bg, fg, ratio]) => ({ label, bg, fg, ratio, badgeBg: '#E2F5A6' })),
+      weights: [['Regular', 400], ['Medium', 500], ['Bold', 700], ['ExtraBold', 800]].map(([l, n]) => ({ l, n })),
+      scale: [
+        ['Display 72/800', '72px', 800, '-.05em', 'Every branch.'], ['H1 40/700', '40px', 700, '-.035em', 'One harbour.'], ['H2 26/700', '26px', 700, '-.025em', 'Locations at a glance'],
+        ['Body L 18/500', '18px', 500, '0', 'Run every location from one place.'], ['Body 14/500', '14px', 500, '0', 'Bookings sync from your connected system every minute.'], ['Label 12/800', '12px', 800, '.08em', 'NEEDS YOUR ATTENTION'],
+      ].map(([spec, size, w, ls, sample]) => ({ spec, size, w, ls, sample })),
+      icons: ['home', 'grid', 'building', 'store', 'pin', 'calendar', 'clock', 'users', 'user', 'message', 'mail', 'phone', 'megaphone', 'target', 'share', 'workflow', 'wallet', 'card', 'receipt', 'chart', 'box', 'book', 'shield', 'lock', 'globe', 'palette', 'scale', 'sliders', 'bell', 'search', 'check-circle', 'help'],
+      industries: [['Studios', 'lotus', '#E9DDF8'], ['Sports', 'trophy', '#E2F5A6'], ['Health & Wellness', 'stethoscope', '#D4E6D9'], ['Commerce', 'bag', '#F7EDA8'], ['Foods', 'utensils', '#F8D6D8'], ['Real Estate', 'house', '#CDEEEE']].map(([name, icon, hex]) => ({ name, icon, hex })),
+      radii: [['36', '36px'], ['28', '28px'], ['20', '20px'], ['12', '12px'], ['pill', '999px']].map(([l, v]) => ({ l, v })),
+      voice: [
+        ['Your payout arrives Tuesday.', 'Funds are being processed and will be disbursed shortly!'],
+        ['2 locations haven\u2019t confirmed the policy. Remind them?', 'Compliance alert: action required immediately.'],
+        ['HQ approves local ads over $500.', 'Unleash your marketing superpowers.'],
+      ].map(([yes, no]) => ({ yes, no })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

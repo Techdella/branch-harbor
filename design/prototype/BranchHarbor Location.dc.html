@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="location"></bh-topbar>
+
+<div style="display:flex;gap:12px;padding:12px;min-height:100vh;align-items:flex-start">
+  <aside style="width:244px;flex-shrink:0;background:#fff;border-radius:28px;padding:16px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto">
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:2px 6px 12px"><span style="width:36px;height:36px;border-radius:12px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ ind.icon }}" size="18"></bh-icon></span><div style="min-width:0"><div style="font-size:14px;font-weight:800;letter-spacing:-.01em">{{ ind.brand }}</div><div style="font-size:11px;color:#5D5D58">Powered by BranchHarbor</div></div></div>
+    <label style="flex-shrink:0;display:flex;flex-direction:column;gap:4px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#5D5D58;padding:0 6px 10px">LOCATION
+      <select value="{{ locId }}" onChange="{{ setLoc }}" style="height:42px;border-radius:14px;border:1.5px solid #141414;padding:0 10px;font-size:13px;font-weight:700;background:#fff;color:#141414">
+        <sc-for list="{{ myLocs }}" as="l" hint-placeholder-count="2"><option value="{{ l.id }}">{{ l.name }}</option></sc-for>
+      </select>
+    </label>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="14">
+      <sc-if value="{{ n.head }}" hint-placeholder-val="{{ false }}"><div style="flex-shrink:0;font-size:10px;font-weight:800;color:#9C9C96;padding:12px 12px 4px;letter-spacing:.08em">{{ n.label }}</div></sc-if>
+      <sc-if value="{{ n.item }}" hint-placeholder-val="{{ true }}"><button onClick="{{ n.go }}" style="height:38px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:999px;border:none;font-size:13px;font-weight:{{ n.w }};background:{{ n.bg }};color:#141414;cursor:pointer;text-align:left;width:100%"><bh-icon name="{{ n.icon }}" size="16"></bh-icon><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;border-radius:10px;background:#141414;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px">{{ n.badge }}</span></sc-if></button></sc-if>
+    </sc-for>
+    <div style="flex-shrink:0;margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:6px">
+      <a href="{{ links.biz }}" style="display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:700;text-decoration:none"><bh-icon name="wallet" size="15"></bh-icon>Business suite</a>
+      <a href="{{ links.mkt }}" style="display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700;text-decoration:none"><bh-icon name="megaphone" size="15"></bh-icon>Marketing & sales suite</a>
+      <button onClick="{{ goAM }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px;border-radius:18px;border:none;background:#F3F2EE;cursor:pointer;text-align:left;color:#141414"><img src="{{ am.img }}" alt="" style="width:36px;height:36px;border-radius:18px;object-fit:cover"><span style="min-width:0"><span style="display:block;font-size:12px;font-weight:700">{{ am.name }}</span><span style="font-size:10px;color:#5D5D58">Your account manager</span></span></button>
+    </div>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+    <div style="background:#fff;border-radius:24px;padding:10px 12px 10px 18px;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+      <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE">
+        <sc-for list="{{ roles }}" as="r" hint-placeholder-count="2"><button onClick="{{ r.pick }}" style="height:34px;padding:0 14px;border-radius:999px;border:none;background:{{ r.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414">{{ r.label }}</button></sc-for>
+      </div>
+      <span style="display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;background:{{ tier.pastel }};font-size:12px;font-weight:800"><bh-icon name="sliders" size="13"></bh-icon>{{ tier.name }} autonomy</span>
+      <span style="font-size:12px;color:#5D5D58">{{ loc.owner }}</span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:600;color:#5D5D58">View as</span>
+        <a href="{{ links.hq }}" style="height:34px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;font-size:12px;font-weight:700;text-decoration:none">HQ</a>
+        <span style="height:34px;display:flex;align-items:center;padding:0 12px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">Location</span>
+        <a href="{{ links.staff }}" style="height:34px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;font-size:12px;font-weight:700;text-decoration:none">Staff</a>
+        <a href="{{ links.site }}" style="height:34px;display:flex;align-items:center;gap:6px;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;font-size:12px;font-weight:700;text-decoration:none"><bh-icon name="globe" size="13"></bh-icon>My website</a>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding:6px 6px 0">
+      <div style="flex:1;min-width:240px"><div style="font-size:13px;font-weight:600;color:#5D5D58">{{ ind.brand }} {{ loc.name }}</div><h1 style="margin:2px 0 0;font-size:34px;font-weight:700;letter-spacing:-.035em">{{ page.title }}</h1></div>
+      <sc-if value="{{ page.cap }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;background:{{ page.capBg }};font-size:12px;font-weight:700"><bh-icon name="{{ page.capIcon }}" size="14"></bh-icon>{{ page.capLabel }}</span></sc-if>
+    </div>
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div role="status" style="align-self:flex-start;display:flex;align-items:center;gap:10px;background:#D6F26B;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:700"><bh-icon name="check-circle" size="17"></bh-icon>{{ toast }}</div></sc-if>
+
+    <!-- TODAY -->
+    <sc-if value="{{ v.today }}" hint-placeholder-val="{{ true }}">
+      <div style="position:relative;border-radius:28px;overflow:hidden;min-height:200px;display:flex;align-items:flex-end">
+        <img src="{{ img.loc }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div style="position:relative;margin:16px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:22px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+          <div><div style="font-size:22px;font-weight:700;letter-spacing:-.02em">Good morning, {{ me.first }}</div><div style="font-size:13px;color:#3E3E3A">{{ loc.addr }} · {{ loc.hours }}</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:{{ k.bg }};border-radius:24px;padding:18px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:700">{{ k.label }}</span><bh-icon name="{{ k.icon }}" size="16"></bh-icon></div><div style="font-size:28px;font-weight:700;font-variant-numeric:tabular-nums">{{ k.value }}</div><div style="font-size:11px;color:#3E3E3A">{{ k.note }}</div></div></sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:17px;font-weight:700">To do</div>
+          <sc-for list="{{ todos }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.go }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:none;background:{{ t.bg }};cursor:pointer;text-align:left;color:#141414"><bh-icon name="{{ t.icon }}" size="17"></bh-icon><span style="flex:1"><span style="display:block;font-size:13px;font-weight:700">{{ t.t }}</span><span style="font-size:12px;color:#3E3E3A">{{ t.sub }}</span></span><bh-icon name="chevron-right" size="15"></bh-icon></button></sc-for>
+        </div>
+        <div style="background:#141414;color:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><bh-icon name="megaphone" size="18"></bh-icon><span style="font-size:16px;font-weight:700;flex:1">From headquarters</span><span style="font-size:11px;color:#B9B9B3">Mon 9:02</span></div>
+          <div style="font-size:14px;line-height:1.6;color:#E6E6E3">Brand standards v4.0 is live. The main changes are photography rules and the new {{ ind.brand }} lockup. Please read and confirm by 31 Oct.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ goPolicies }}" style="height:42px;padding:0 18px;border-radius:999px;background:#D6F26B;color:#141414;border:none;font-size:13px;font-weight:800;cursor:pointer">Read and confirm</button><button onClick="{{ goCommunity }}" style="height:42px;padding:0 18px;border-radius:999px;border:1.5px solid #444;background:transparent;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Ask a question</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- OPS: rows -->
+    <sc-if value="{{ v.opsRows }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ ops.note }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:20px;padding:12px 16px;font-size:13px;line-height:1.55"><bh-icon name="info" size="16"></bh-icon>{{ ops.note }}</div></sc-if>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ ops.filters }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="height:36px;padding:0 14px;border-radius:999px;border:none;background:{{ f.bg }};color:{{ f.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ f.label }} · {{ f.n }}</button></sc-for></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ ops.rows }}" as="r" hint-placeholder-count="5">
+          <div style="background:#fff;border-radius:22px;padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+            <span style="min-width:64px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums">{{ r.lead }}</span>
+            <sc-if value="{{ r.img }}" hint-placeholder-val="{{ false }}"><img src="{{ r.img }}" alt="" style="width:48px;height:48px;border-radius:14px;object-fit:cover"></sc-if>
+            <span style="flex:1 1 220px;min-width:0"><span style="display:block;font-size:15px;font-weight:700">{{ r.title }}</span><span style="font-size:12px;color:#5D5D58">{{ r.sub }}</span></span>
+            <sc-if value="{{ r.meter }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700"><span style="width:80px;height:6px;border-radius:3px;background:#F3F2EE;overflow:hidden"><span style="display:block;height:100%;width:{{ r.meter }};background:#141414"></span></span>{{ r.meterLabel }}</span></sc-if>
+            <sc-if value="{{ r.src }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:#F3F2EE">{{ r.src }}</span></sc-if>
+            <span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:{{ r.stBg }}">{{ r.status }}</span>
+            <sc-if value="{{ r.canAct }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.act }}" style="height:40px;padding:0 16px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">{{ r.actLabel }}</button></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- OPS: cards -->
+    <sc-if value="{{ v.opsCards }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ ops.note }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:20px;padding:12px 16px;font-size:13px;line-height:1.55"><bh-icon name="info" size="16"></bh-icon>{{ ops.note }}</div></sc-if>
+      <sc-if value="{{ ops.live }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;background:#141414;color:#fff;border-radius:28px;padding:16px">
+          <div style="position:relative;border-radius:20px;overflow:hidden;min-height:220px"><img src="{{ img.online }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><span style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:{{ liveBadge.bg }};color:#141414;font-size:11px;font-weight:800"><bh-icon name="video" size="12"></bh-icon>{{ liveBadge.label }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px;justify-content:center;padding:8px">
+            <div style="font-size:12px;font-weight:700;color:#D6F26B">NEXT LIVE CLASS</div>
+            <div style="font-size:24px;font-weight:700;letter-spacing:-.02em">Evening Flow · live online</div>
+            <div style="font-size:13px;color:#C9C9C3;line-height:1.55">Tonight 7:00 pm Eastern · Maya Rao · 38 registered · Members and online pass holders</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ toggleLive }}" style="height:46px;padding:0 20px;border-radius:999px;background:#D6F26B;color:#141414;border:none;font-size:13px;font-weight:800;cursor:pointer">{{ liveCta }}</button><button style="height:46px;padding:0 18px;border-radius:999px;border:1.5px solid #444;background:transparent;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Copy join link</button></div>
+            <div style="font-size:11px;color:#9C9C96">Replays save to the library automatically. Access follows each member's plan.</div>
+          </div>
+        </div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
+        <sc-for list="{{ ops.cards }}" as="c" hint-placeholder-count="6">
+          <div style="background:#fff;border-radius:24px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="position:relative;height:150px"><img src="{{ c.img }}" alt="" style="width:100%;height:100%;object-fit:cover"><span style="position:absolute;top:10px;left:10px;font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:{{ c.stBg }}">{{ c.status }}</span><sc-if value="{{ c.src }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:#fff">{{ c.src }}</span></sc-if></div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:6px;flex:1">
+              <div style="font-size:15px;font-weight:700">{{ c.title }}</div>
+              <div style="font-size:12px;color:#5D5D58">{{ c.sub }}</div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800">{{ c.price }}<sc-if value="{{ c.lockNote }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:#F3F2EE;color:#5D5D58"><bh-icon name="lock" size="10"></bh-icon>{{ c.lockNote }}</span></sc-if></div>
+              <button onClick="{{ c.act }}" style="margin-top:auto;height:38px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:12px;font-weight:700;cursor:pointer">{{ c.actLabel }}</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- WEBSITE -->
+    <sc-if value="{{ v.website }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ sections }}" as="sct" hint-placeholder-count="6">
+            <div style="background:#fff;border-radius:22px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;border:1.5px solid {{ sct.bd }}">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="width:38px;height:38px;border-radius:12px;background:{{ sct.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ sct.icon }}" size="17"></bh-icon></span>
+                <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ sct.name }}</span><span style="font-size:12px;color:#5D5D58;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">{{ sct.value }}</span></span>
+                <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:{{ sct.bg }}"><bh-icon name="{{ sct.stIcon }}" size="11"></bh-icon>{{ sct.st }}</span>
+                <sc-if value="{{ sct.canEdit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ sct.edit }}" aria-label="Edit {{ sct.name }}" style="width:36px;height:36px;border-radius:18px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="edit" size="15"></bh-icon></button></sc-if>
+              </div>
+              <sc-if value="{{ sct.editing }}" hint-placeholder-val="{{ false }}">
+                <textarea aria-label="{{ sct.name }}" rows="2" value="{{ sct.draft }}" onChange="{{ sct.setDraft }}" style="border:1.5px solid #141414;border-radius:16px;padding:10px 14px;font-size:13px;line-height:1.5;resize:vertical"></textarea>
+                <div style="display:flex;gap:8px"><button onClick="{{ sct.save }}" style="height:40px;padding:0 16px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">{{ sct.saveLabel }}</button><button onClick="{{ sct.cancel }}" style="height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#141414">Cancel</button></div>
+              </sc-if>
+              <sc-if value="{{ sct.lockedNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5D5D58">{{ sct.lockedNote }}</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border-radius:28px;overflow:hidden;position:sticky;top:12px">
+          <div style="display:flex;align-items:center;gap:6px;padding:10px 14px;background:#F3F2EE;font-size:12px"><bh-icon name="lock" size="12"></bh-icon><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ siteUrl }}</span><a href="{{ links.site }}" style="font-weight:700">Open</a></div>
+          <div style="position:relative;height:220px"><img src="{{ img.loc }}" alt="" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:14px;bottom:14px;right:14px;background:rgba(255,255,255,.92);border-radius:18px;padding:12px 14px"><div style="font-size:18px;font-weight:800;letter-spacing:-.02em">{{ ind.brand }} {{ loc.name }}</div><div style="font-size:12px;color:#3E3E3A">{{ webVals.hours }}</div></div></div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="background:#F7EDA8;border-radius:16px;padding:12px 14px;font-size:13px;font-weight:700">{{ webVals.offer }}</div>
+            <div style="font-size:13px;line-height:1.6;color:#3E3E3A">{{ webVals.about }}</div>
+            <span style="align-self:flex-start;height:40px;display:flex;align-items:center;padding:0 18px;border-radius:999px;background:#141414;color:#fff;font-size:13px;font-weight:700">{{ ind.cta }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- MARKETING -->
+    <sc-if value="{{ v.marketing }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ mktTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="{{ t.icon }}" size="15"></bh-icon>{{ t.label }}<span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:{{ t.capBg }};color:#141414">{{ t.cap }}</span></button></sc-for></div>
+
+      <sc-if value="{{ mk.social }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ capSocialLocked }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;background:#fff;border-radius:20px;padding:16px;font-size:14px;line-height:1.55"><bh-icon name="lock" size="18"></bh-icon>HQ posts to your location's pages on your tier. You can suggest posts to your account manager.</div></sc-if>
+        <sc-if value="{{ capSocialOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px">
+            <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:16px;font-weight:700">Start from an HQ template</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ tmpls }}" as="tp" hint-placeholder-count="3"><button onClick="{{ tp.pick }}" style="padding:0;border:3px solid {{ tp.bd }};border-radius:16px;overflow:hidden;cursor:pointer;height:96px;background:#F3F2EE"><img src="{{ tp.img }}" alt="{{ tp.name }}" style="width:100%;height:100%;object-fit:cover"></button></sc-for></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ myChannels }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.toggle }}" aria-pressed="{{ c.on }}" style="display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414"><span style="width:18px;height:18px;border-radius:6px;background:{{ c.color }};color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ c.mark }}</span>{{ c.name }}</button></sc-for></div>
+              <textarea aria-label="Caption" rows="3" value="{{ caption }}" onChange="{{ setCaption }}" style="border:1.5px solid #D8D6CF;border-radius:18px;padding:12px 14px;font-size:14px;line-height:1.5;resize:vertical"></textarea>
+              <div style="font-size:12px;color:#5D5D58">Brand check: no price claims or customer photos without consent.</div>
+              <button onClick="{{ postSocial }}" style="align-self:flex-start;height:44px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ socialCta }}</button>
+            </div>
+            <div style="display:flex;justify-content:center;align-items:flex-start"><div style="width:280px;background:#fff;border-radius:22px;overflow:hidden"><div style="display:flex;align-items:center;gap:8px;padding:10px 12px"><span style="width:28px;height:28px;border-radius:14px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ ind.icon }}" size="14"></bh-icon></span><span style="font-size:12px;font-weight:700">{{ handle }}</span></div><img src="{{ tmplImg }}" alt="" style="width:100%;height:280px;object-fit:cover;display:block"><div style="padding:12px;font-size:12px;line-height:1.5"><strong>{{ handle }}</strong> {{ caption }}</div></div></div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ mk.ads }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:16px;font-weight:700">Local ad budget · {{ loc.cur }}</div>
+            <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:32px;font-weight:700;font-variant-numeric:tabular-nums">{{ budget.used }}</span><span style="font-size:13px;color:#5D5D58">of {{ budget.cap }} this month</span></div>
+            <div style="height:10px;border-radius:5px;background:#F3F2EE;overflow:hidden"><div style="height:100%;width:{{ budget.pct }};background:#141414"></div></div>
+            <div style="font-size:12px;color:#5D5D58">Network co-op campaigns are paid from your co-op contribution and don't count here.</div>
+          </div>
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:16px;font-weight:700">Running here</div>
+            <sc-for list="{{ myAds }}" as="a" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:#F8F7F3;font-size:13px"><span style="width:24px;height:24px;border-radius:8px;background:{{ a.color }};color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ a.mark }}</span><span style="flex:1"><strong>{{ a.name }}</strong><br><span style="font-size:11px;color:#5D5D58">{{ a.by }} · {{ a.stats }}</span></span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ a.stBg }}">{{ a.status }}</span></div></sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ adsLocked }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;background:#fff;border-radius:20px;padding:16px;font-size:14px;line-height:1.55"><bh-icon name="lock" size="18"></bh-icon>On the Managed tier, HQ plans and runs ads for your location. Ask your account manager if you'd like a local campaign.</div></sc-if>
+        <sc-if value="{{ adsOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:16px;font-weight:700">New local ad</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Goal<select value="{{ adGoal }}" onChange="{{ setAdGoal }}" style="height:44px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:13px;background:#fff"><option>Get enquiries</option><option>Promote an event</option><option>Drive visits</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Budget<input inputmode="numeric" value="{{ adBudget }}" onChange="{{ setAdBudget }}" style="height:44px;border-radius:999px;border:1.5px solid {{ adBd }};padding:0 16px;font-size:13px"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700">Platform<select style="height:44px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:13px;background:#fff"><option>Meta (Facebook & Instagram)</option><option>Google Ads</option></select></label>
+            </div>
+            <div role="alert" style="font-size:12px;font-weight:600;color:#B3261E">{{ adErr }}</div>
+            <button onClick="{{ submitAd }}" style="align-self:flex-start;height:44px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ adCta }}</button>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ mk.email }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ myEmails }}" as="e" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#F8F7F3"><bh-icon name="mail" size="17"></bh-icon><span style="flex:1"><span style="display:block;font-size:14px;font-weight:700">{{ e.name }}</span><span style="font-size:12px;color:#5D5D58">{{ e.sub }}</span></span><span style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:{{ e.stBg }}">{{ e.status }}</span></div></sc-for>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid #EEEDE8;padding-top:12px"><span style="flex:1;min-width:200px;font-size:13px;color:#3E3E3A">{{ emailCapNote }}</span><button onClick="{{ newEmail }}" disabled="{{ emailLocked }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">{{ emailCta }}</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ mk.autos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ myAutos }}" as="a" hint-placeholder-count="3"><div style="background:#fff;border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:12px;background:{{ a.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="workflow" size="18"></bh-icon></span><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ a.name }}</span><span style="font-size:12px;color:#5D5D58">{{ a.sub }}</span></span><span style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:{{ a.stBg }}">{{ a.by }}</span></div></sc-for>
+          <div style="background:#fff;border-radius:22px;padding:14px 16px;font-size:13px;color:#3E3E3A;display:flex;gap:10px;align-items:center"><bh-icon name="{{ autoIcon }}" size="16"></bh-icon>{{ autoNote }}</div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- BRAND CENTER -->
+    <sc-if value="{{ v.brand }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+        <sc-for list="{{ brandAssets }}" as="a" hint-placeholder-count="8">
+          <div style="background:#fff;border-radius:24px;overflow:hidden"><div style="position:relative;height:140px;background:{{ a.bg }};display:flex;align-items:center;justify-content:center"><sc-if value="{{ a.img }}" hint-placeholder-val="{{ true }}"><img src="{{ a.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></sc-if><sc-if value="{{ a.noImg }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px;color:{{ a.fg }}"><bh-icon name="{{ a.icon }}" size="28"></bh-icon><span style="font-size:17px;font-weight:800">{{ a.label }}</span></span></sc-if><span style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;background:#fff;font-size:10px;font-weight:800"><bh-icon name="{{ a.lockIcon }}" size="10"></bh-icon>{{ a.usage }}</span></div><div style="padding:12px 14px;display:flex;align-items:center;gap:8px"><span style="flex:1;min-width:0"><span style="display:block;font-size:13px;font-weight:700">{{ a.name }}</span><span style="font-size:11px;color:#5D5D58">{{ a.meta }}</span></span><button onClick="{{ a.dl }}" aria-label="Download" style="width:34px;height:34px;border-radius:17px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="download" size="15"></bh-icon></button></div></div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- POLICIES -->
+    <sc-if value="{{ v.policies }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ myDocs }}" as="d" hint-placeholder-count="5">
+          <div style="background:#fff;border-radius:22px;padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+            <span style="width:40px;height:40px;border-radius:12px;background:{{ d.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ d.icon }}" size="18"></bh-icon></span>
+            <span style="flex:1 1 240px;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ d.name }} <span style="font-weight:500;color:#5D5D58">v{{ d.ver }}</span></span><span style="font-size:12px;color:#5D5D58">{{ d.sub }}</span></span>
+            <span style="font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:{{ d.stBg }}">{{ d.status }}</span>
+            <sc-if value="{{ d.needsAck }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.ack }}" style="height:40px;padding:0 16px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">I've read this</button></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:15px;font-weight:700">What your tier allows</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px"><sc-for list="{{ capList }}" as="c" hint-placeholder-count="8"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:{{ c.bg }};font-size:13px"><bh-icon name="{{ c.icon }}" size="14"></bh-icon><span style="flex:1;font-weight:600">{{ c.label }}</span><span style="font-size:11px;font-weight:800">{{ c.v }}</span></div></sc-for></div>
+      </div>
+    </sc-if>
+
+    <!-- COMMUNITY -->
+    <sc-if value="{{ v.community }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border-radius:28px;display:flex;flex-direction:column;overflow:hidden;min-height:480px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid #EEEDE8"><sc-for list="{{ comChans }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;border:none;background:{{ c.bg }};color:{{ c.fg }};font-size:12px;font-weight:700;cursor:pointer"><bh-icon name="{{ c.icon }}" size="13"></bh-icon>{{ c.name }}</button></sc-for></div>
+        <div style="flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ comMsgs }}" as="m" hint-placeholder-count="3"><div style="display:flex;gap:12px"><img src="{{ m.img }}" alt="" style="width:36px;height:36px;border-radius:18px;object-fit:cover"><div style="flex:1;display:flex;flex-direction:column;gap:4px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong style="font-size:13px">{{ m.who }}</strong><span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;background:{{ m.roleBg }}">{{ m.role }}</span><span style="font-size:11px;color:#5D5D58">{{ m.at }}</span></div><div style="font-size:14px;line-height:1.55;background:{{ m.bubble }};border-radius:4px 18px 18px 18px;padding:10px 14px">{{ m.t }}</div></div></div></sc-for>
+        </div>
+        <div style="padding:12px;border-top:1px solid #EEEDE8;display:flex;gap:8px"><input aria-label="Message" placeholder="Write a message" value="{{ draft }}" onChange="{{ setDraft }}" style="flex:1;height:46px;border:none;border-radius:999px;padding:0 18px;font-size:14px;background:#F3F2EE"><button onClick="{{ sendMsg }}" aria-label="Send" style="width:46px;height:46px;border-radius:23px;border:none;background:#141414;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="send" size="17"></bh-icon></button></div>
+      </div>
+    </sc-if>
+
+    <!-- ACCOUNT MANAGER -->
+    <sc-if value="{{ v.am }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;align-items:start">
+        <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+          <img src="{{ am.img }}" alt="" style="width:88px;height:88px;border-radius:44px;object-fit:cover">
+          <div><div style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ am.name }}</div><div style="font-size:13px;color:#5D5D58">{{ am.title }} · {{ ind.org }}</div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ bookCall }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="calendar" size="15"></bh-icon>{{ callCta }}</button><button onClick="{{ goCommunity }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414"><bh-icon name="message" size="15"></bh-icon>Message</button></div>
+          <div style="width:100%;background:#F3F2EE;border-radius:18px;padding:14px;font-size:13px;line-height:1.6"><strong>Next visit</strong><br>Thu 17 Oct, 10:00 am · quarterly business review at {{ loc.name }}</div>
+        </div>
+        <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px;font-weight:700">Action plan</div>
+          <sc-for list="{{ plan }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.toggle }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:none;background:{{ p.bg }};cursor:pointer;text-align:left;color:#141414"><span style="width:24px;height:24px;border-radius:8px;border:2px solid #141414;background:{{ p.box }};color:#D6F26B;display:flex;align-items:center;justify-content:center;flex-shrink:0"><sc-if value="{{ p.done }}" hint-placeholder-val="{{ false }}"><bh-icon name="check" size="14" stroke="3"></bh-icon></sc-if></span><span style="flex:1"><span style="display:block;font-size:13px;font-weight:700;text-decoration:{{ p.strike }}">{{ p.t }}</span><span style="font-size:11px;color:#5D5D58">{{ p.d }}</span></span></button></sc-for>
+          <div style="font-size:13px;font-weight:700;margin-top:6px">Visit notes · 12 Jul</div>
+          <div style="font-size:13px;line-height:1.6;color:#3E3E3A;background:#F8F7F3;border-radius:16px;padding:12px 14px">Strong retention, weekday mornings under capacity. Agreed to test a local morning offer and refresh photos with the new brand guide.</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- TEAM -->
+    <sc-if value="{{ v.team }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+        <sc-for list="{{ teamKpis }}" as="k" hint-placeholder-count="4"><div style="background:{{ k.bg }};border-radius:24px;padding:16px"><div style="font-size:12px;font-weight:700">{{ k.l }}</div><div style="font-size:26px;font-weight:700">{{ k.v }}</div><div style="font-size:11px;color:#3E3E3A">{{ k.n }}</div></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ fns }}" as="f" hint-placeholder-count="6">
+          <div style="background:#fff;border-radius:26px;padding:18px;display:flex;flex-direction:column;gap:12px;border:2px solid {{ f.bd }}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+              <span style="width:42px;height:42px;border-radius:14px;background:{{ f.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ f.icon }}" size="19"></bh-icon></span>
+              <span style="flex:1 1 220px;min-width:0"><span style="display:block;font-size:16px;font-weight:700">{{ f.name }}</span><span style="font-size:12px;color:#5D5D58">{{ f.desc }}</span></span>
+              <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE;flex-wrap:wrap">
+                <sc-for list="{{ f.models }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.pick }}" disabled="{{ m.disabled }}" title="{{ m.title }}" style="display:flex;align-items:center;gap:5px;height:32px;padding:0 12px;border-radius:999px;border:none;background:{{ m.bg }};color:{{ m.fg }};font-size:12px;font-weight:700;cursor:pointer"><sc-if value="{{ m.disabled }}" hint-placeholder-val="{{ false }}"><bh-icon name="lock" size="11"></bh-icon></sc-if>{{ m.label }}</button></sc-for>
+              </div>
+              <button onClick="{{ f.toggle }}" aria-label="Show people" style="width:36px;height:36px;border-radius:18px;border:none;background:#F3F2EE;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ f.chev }}" size="16"></bh-icon></button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+              <sc-for list="{{ f.faces }}" as="p" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:999px;background:{{ p.bg }};font-size:12px;font-weight:600"><img src="{{ p.img }}" alt="" style="width:24px;height:24px;border-radius:12px;object-fit:cover">{{ p.name }}<sc-if value="{{ p.hq }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;background:#141414;color:#fff">HQ</span></sc-if></span></sc-for>
+              <span style="font-size:12px;color:#5D5D58">{{ f.summary }}</span>
+            </div>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+              <div style="border-top:1px solid #EEEDE8;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ f.people }}" as="p" hint-placeholder-count="2"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:#F8F7F3"><img src="{{ p.img }}" alt="" style="width:38px;height:38px;border-radius:19px;object-fit:cover"><span style="flex:1 1 180px;min-width:0"><span style="display:block;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span><span style="font-size:12px;color:#5D5D58">{{ p.role }} · {{ p.access }}</span></span><span style="font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ p.stBg }}">{{ p.st }}</span><sc-if value="{{ p.canRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ p.remove }}" aria-label="Remove {{ p.name }}" style="width:30px;height:30px;border-radius:15px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="13"></bh-icon></button></sc-if></div></sc-for>
+                <sc-if value="{{ f.canInvite }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap"><select aria-label="Role" value="{{ f.invRole }}" onChange="{{ f.setInvRole }}" style="height:44px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 14px;font-size:13px;background:#fff"><sc-for list="{{ f.roles }}" as="r" hint-placeholder-count="2"><option>{{ r }}</option></sc-for></select><input aria-label="Email" placeholder="name@email.com" value="{{ f.invEmail }}" onChange="{{ f.setInvEmail }}" style="flex:1;min-width:180px;height:44px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 16px;font-size:14px"><button onClick="{{ f.invite }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Invite</button></div>
+                </sc-if>
+                <sc-if value="{{ f.usesHq }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#F1F8E0;border-radius:16px;padding:10px 14px;font-size:13px"><bh-icon name="building" size="15"></bh-icon><span style="flex:1;min-width:200px">{{ f.hqNote }}</span><button onClick="{{ f.request }}" style="height:36px;padding:0 14px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">{{ f.reqLabel }}</button></div></sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:20px;padding:14px 18px;font-size:13px;line-height:1.55"><bh-icon name="shield" size="16"></bh-icon>Everyone only sees {{ loc.name }}{{ ownerScopeNote }}. Locked options come from your {{ tier.name }} autonomy tier. Removing someone ends their access straight away.</div>
+    </sc-if>
+
+    <!-- PAYMENTS -->
+    <sc-if value="{{ v.payments }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <sc-for list="{{ payKpis }}" as="k" hint-placeholder-count="4"><div style="background:{{ k.bg }};border-radius:24px;padding:18px"><div style="font-size:12px;font-weight:700">{{ k.label }}</div><div style="font-size:26px;font-weight:700;font-variant-numeric:tabular-nums">{{ k.value }}</div><div style="font-size:11px;color:#3E3E3A">{{ k.note }}</div></div></sc-for>
+      </div>
+      <div style="background:#fff;border-radius:24px;padding:16px 18px;font-size:13px;line-height:1.6;display:flex;gap:10px"><bh-icon name="info" size="16"></bh-icon>Payments go to {{ loc.owner }}'s own merchant account. Royalty and marketing fund invoices from HQ are listed separately under Agreement.</div>
+    </sc-if>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CH = { meta: ['Meta', 'M', '#3A5BD9'], gbp: ['Business Profile', 'GB', '#C2502C'], tiktok: ['TikTok', 'T', '#141414'], linkedin: ['LinkedIn', 'in', '#1F5F99'], google: ['Google Ads', 'G', '#2F7D4E'] };
+const CAPDEF = { // managed, standard, flexible
+  hours: ['allow', 'allow', 'allow'], prices: ['locked', 'approve', 'allow'], pages: ['locked', 'approve', 'allow'], images: ['locked', 'allow', 'allow'], social: ['locked', 'allow', 'allow'], ads: ['locked', 'approve', 'allow'], email: ['locked', 'approve', 'allow'], autos: ['locked', 'locked', 'allow'], products: ['locked', 'approve', 'allow'], refunds: ['approve', 'approve', 'allow'],
+};
+const CAPLBL = { hours: ['Edit hours, photos and bios', 'edit'], prices: ['Change local prices', 'tag'], pages: ['Add local pages', 'file'], social: ['Post to social pages', 'share'], ads: ['Run local ads', 'target'], email: ['Send local email', 'mail'], autos: ['Create automations', 'workflow'], products: ['Add local products/services', 'plus'], refunds: ['Refunds over $200', 'receipt'] };
+const TI = { managed: 0, standard: 1, flexible: 2 };
+const VAL = { allow: ['Allowed', '#E2F5A6', 'check'], approve: ['Needs HQ approval', '#F7EDA8', 'clock'], locked: ['Locked by HQ', '#F3F2EE', 'lock'] };
+const BUDGET = { managed: 0, standard: 1500, flexible: 5000 };
+const OPS = {
+  studios: [
+    ['schedule', 'Schedule & bookings', 'calendar', 'rows', 'Bookings come from your connected booking system. Changes here sync back within a minute.', [['7:00 am', 'Morning Vinyasa', 'Maya Rao · Studio A', 'Open', 16, 20, 'Request cover', 'Cover requested'], ['9:00 am', 'Slow Flow', 'Sam Tran · Studio A', 'Full', 16, 16, 'View waitlist', 'Waitlist: 4'], ['12:15 pm', 'Lunchtime Pilates', 'Ana Silva · Studio B', 'Open', 6, 15, 'Cancel class', 'Cancelled'], ['6:30 pm', 'Yin & Restore', 'Jordan Lee · Studio A', 'Open', 19, 20, 'Request cover', 'Cover requested']]],
+    ['online', 'Online classes', 'video', 'cards', '', [['Evening Flow replay', '45 min · Maya Rao', 'Members', 'Published', 'onlineYoga', 'Unpublish', 'Draft'], ['Breathwork basics', '20 min · Jordan Lee', 'Free', 'Published', 'yogaMeditate', 'Unpublish', 'Draft'], ['Pilates core series · 1', '30 min · Ana Silva', 'Online pass', 'Draft', 'yogaPink', 'Publish', 'Published'], ['Desk stretch', '15 min · Sam Tran', 'Free', 'Draft', 'yogaRed', 'Publish', 'Published']], true],
+    ['members', 'Members', 'users', 'rows', 'You see members of this location only. Shared members show their home studio.', [['', 'Hana Suzuki', '10-class pack · 3 left · last visit Sat', 'Active', 0, 0, 'Send renewal', 'Renewal sent'], ['', 'Leo Martins', 'Unlimited monthly · renews 1 Nov', 'Active', 0, 0, '', ''], ['', 'Priya Nair', 'Intro week · ends Wed', 'Trial', 0, 0, 'Offer membership', 'Offer sent'], ['', 'Chris Wong', 'Pack expired 2 Oct', 'Expired', 0, 0, 'Send win-back', 'Win-back sent']]],
+  ],
+  sports: [
+    ['programmes', 'Programmes', 'flag', 'rows', '', [['Sat', 'U8 Fundamentals', 'Ages 6–8 · Coach Marcus · Field 2', 'Open', 18, 24, 'Close registration', 'Closed'], ['Sat', 'U10 Skills', 'Ages 8–10 · Coach Ines · Field 1', 'Full', 22, 22, 'Open waitlist', 'Waitlist open'], ['Tue/Thu', 'U12 Development', 'Ages 10–12 · Coach Marcus', 'Open', 17, 20, 'Close registration', 'Closed']]],
+    ['registrations', 'Registrations', 'file', 'rows', 'Payment doesn\u2019t place a child on a team. Accept the registration first.', [['', 'Ella Brooks · U8', 'Guardian: Sam Brooks · paid $240', 'Awaiting review', 0, 0, 'Accept', 'Accepted'], ['', 'Noah Singh · U10', 'Guardian: Ravi Singh · waitlist', 'Waitlisted', 0, 0, 'Offer spot', 'Spot offered'], ['', 'Mia Chen · U12', 'Guardian: Lin Chen · age check needed', 'Awaiting review', 0, 0, 'Accept', 'Accepted'], ['', 'Leo Park · U8', 'Guardian: June Park · accepted', 'Accepted', 0, 0, '', '']]],
+    ['attendance', 'Attendance', 'check-circle', 'rows', '', [['4:30 pm', 'U12 Development · Session 6', 'Coach Marcus · 17 on roster', 'Upcoming', 0, 17, 'Take attendance', 'Recorded'], ['Sat', 'U8 Fundamentals · Session 5', 'Coach Marcus · 16 of 18 present', 'Recorded', 16, 18, '', '']]],
+  ],
+  health: [
+    ['appointments', 'Appointments', 'calendar', 'rows', 'Administrative scheduling only. Clinical notes stay in your clinic or pharmacy system.', [['9:00 am', 'Physiotherapy assessment', 'J.R. · Dr. Arjun Mehta · Room 2', 'Checked in', 0, 0, '', ''], ['9:45 am', 'Relaxation massage', 'A.T. · Kim Lau, RMT · Room 4', 'Booked', 0, 0, 'Check in', 'Checked in'], ['10:30 am', 'Medication review', 'S.O. · Pharmacist Ruth Ade', 'Booked', 0, 0, 'Check in', 'Checked in'], ['11:00 am', 'Flu shot', 'Walk-in · Pharmacy counter', 'Booked', 0, 0, 'Check in', 'Checked in']]],
+    ['pickup', 'Pharmacy pickup', 'pill', 'rows', 'Names and medications are hidden on shared screens. Verify identity at the counter.', [['#4471', 'Order ready', 'Customer notified by SMS · 2 items', 'Ready', 0, 0, 'Mark collected', 'Collected'], ['#4469', 'Order in preparation', 'Ready by 2:00 pm', 'Preparing', 0, 0, 'Mark ready', 'Ready'], ['#4462', 'Order ready', 'Waiting 3 days · reminder sent', 'Ready', 0, 0, 'Mark collected', 'Collected']]],
+    ['services', 'Services', 'leaf', 'cards', '', [['Physiotherapy assessment', '45 min · in clinic', '$110', 'Active', 'hcConsult', 'Pause', 'Paused'], ['Relaxation massage', '60 min · RMT', '$120', 'Active', 'spaMassage', 'Pause', 'Paused'], ['Flu shot', '10 min · pharmacy', 'Covered', 'Active', 'hcPharmacy', 'Pause', 'Paused'], ['Hydrating facial', '45 min', '$95', 'Paused', 'spaFace', 'Activate', 'Active']]],
+  ],
+  commerce: [
+    ['orders', 'Shop orders', 'receipt', 'rows', 'Orders come from WooCommerce, which stays the official record. Status changes sync back.', [['#10482', 'Mara J. · 2 items', 'Pickup in store · paid', 'Processing', 0, 0, 'Ready for pickup', 'Ready for pickup'], ['#10479', 'Theo K. · 1 item', 'Ship to customer · paid', 'Processing', 0, 0, 'Mark shipped', 'Shipped'], ['#10471', 'Ada L. · 3 items', 'Pickup · collected yesterday', 'Completed', 0, 0, '', ''], ['#10466', 'Ben R. · 1 item', 'Partial refund $25.00 recorded', 'Refunded', 0, 0, '', '']], false, 'WooCommerce'],
+    ['products', 'Products & stock', 'box', 'cards', 'Product details come from HQ. You manage stock and availability for this store.', null],
+    ['returns', 'Returns', 'undo', 'rows', '', [['#R-221', 'Everyday sneaker · size 9', 'Wrong size · requested online', 'Requested', 0, 0, 'Authorise', 'Authorised'], ['#R-219', 'Sunglasses', 'Received in store', 'Received', 0, 0, 'Refund', 'Refunded']]],
+  ],
+  foods: [
+    ['forders', 'Orders', 'receipt', 'rows', 'The kitchen screen shows the same orders in large cards.', [['12:10', '#1046 · Mei L.', '2 items · pickup', 'New', 0, 0, 'Accept', 'Preparing'], ['12:05', '#1045 · Daniel K.', '2 items · pickup', 'Preparing', 0, 0, 'Mark ready', 'Ready'], ['11:58', '#1041 · Priya S.', '3 items · pickup', 'Ready', 0, 0, 'Collected', 'Collected']]],
+    ['menu', 'Menu', 'list', 'cards', 'Items, photos and dietary details come from HQ. You set availability and allowed local prices.', null],
+    ['catering', 'Catering', 'users', 'rows', '', [['Fri 25', 'Office lunch · 40 people', 'Harbour Tech · quote needed', 'Enquiry', 0, 0, 'Send quote', 'Quote sent'], ['Sat 2', 'Birthday · 18 people', 'Deposit paid', 'Confirmed', 0, 0, '', '']]],
+  ],
+  realty: [
+    ['listings', 'Listings', 'house', 'cards', 'Listings sync from your listing service. Edits to descriptions go through HQ advertising checks.', null],
+    ['leads', 'Leads', 'users', 'rows', '', [['New', 'Aaron Patel', 'Buyer · 3 bed under $1.2M · Meta lead form', 'New', 0, 0, 'Assign to me', 'Contacted'], ['New', 'Lena Fischer', 'Seller · valuation request · website', 'New', 0, 0, 'Assign to me', 'Contacted'], ['2d', 'Omar & Sara Haddad', 'Buyer · viewing booked Sat', 'Contacted', 0, 0, '', '']], false, 'Lead source'],
+    ['viewings', 'Viewings & open houses', 'key', 'rows', '', [['Sat 11:00', '42 Birchmount Cres', 'Open house · Nadia Hassan · 14 RSVPs', 'Confirmed', 0, 0, '', ''], ['Sat 2:30', '1806 – 88 Harbour St', 'Private viewing · Omar & Sara Haddad', 'Confirmed', 0, 0, 'Reschedule', 'Reschedule sent'], ['Sun 1:00', '9 Maple Grove Ave', 'Open house · 6 RSVPs', 'Draft', 0, 0, 'Publish', 'Confirmed']]],
+  ],
+};
+const STBG = { Open: '#E2F5A6', Full: '#F7EDA8', Active: '#E2F5A6', Published: '#E2F5A6', Accepted: '#E2F5A6', Confirmed: '#E2F5A6', Ready: '#E2F5A6', 'Ready for pickup': '#E2F5A6', Completed: '#D4E6D9', Collected: '#D4E6D9', Recorded: '#D4E6D9', 'Checked in': '#CDEEEE', Processing: '#CDEEEE', Preparing: '#CDEEEE', Booked: '#F3F2EE', New: '#F7EDA8', Enquiry: '#F7EDA8', 'Awaiting review': '#F7EDA8', Requested: '#F7EDA8', Trial: '#E9DDF8', Draft: '#F3F2EE', Expired: '#F8D6D8', Cancelled: '#F8D6D8', Refunded: '#F8D6D8', Waitlisted: '#E9DDF8' };
+
+class Component extends DCLogic {
+  state = { ind: 'studios', loc: null, role: 'owner', screen: 'today', status: {}, filter: 'All', webEdit: null, webDraft: '', webVals: {}, webPending: {}, mkTab: 'social', tmpl: 0, chOn: { meta: true, gbp: true }, caption: '', adGoal: 'Get enquiries', adBudget: '450', adErr: '', adSent: false, acked: {}, fnModel: {}, fnPeople: {}, fnOpen: 'delivery', invRole: {}, invEmail: {}, fnReq: {}, comChan: 'all', draft: '', sent: [], plan: {}, called: false, live: false, toast: '', stock: {} };
+  componentDidMount() {
+    if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50);
+    try { const h = new URLSearchParams(location.hash.slice(1)); const p = {}; if (h.get('ind')) p.ind = h.get('ind'); if (h.get('loc')) p.loc = h.get('loc'); this.setState(p); } catch (e) {}
+  }
+  componentWillUnmount() { clearInterval(this.poll); clearTimeout(this.tt); }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  go(screen) { this.setState({ screen, filter: 'All', webEdit: null }); window.scrollTo(0, 0); }
+
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, P = D.P, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {};
+    const L = I.locs.find(l => l.id === s.loc) || I.locs[0];
+    const tierKey = L.tier, T = D.TIERS[tierKey], ti = TI[tierKey];
+    const cap = k => CAPDEF[k][ti];
+    const am = D.AMS[L.am];
+    const owner = s.role === 'owner';
+    const ops = OPS[s.ind] || OPS.studios;
+    const NAV = [['today', 'Today', 'home'], ['h', I.name.toUpperCase()], ...ops.map(o => [o[0], o[1], o[2]]), ['h', 'GROW'], ['website', 'My website', 'globe'], ['marketing', 'Local marketing', 'megaphone'], ['brand', 'Brand center', 'palette'], ['h', 'NETWORK'], ['community', 'Community', 'message'], ['policies', 'Policies', 'scale'], ['am', 'Account manager', 'briefcase'], ['team', 'Team', 'users'], ...(owner ? [['payments', 'Payments', 'wallet']] : [])];
+    const cur = NAV.find(n => n[0] === s.screen) || NAV[0];
+    const opDef = ops.find(o => o[0] === s.screen);
+    const docsAck = ['ops', 'brand', 'social'].filter(k => !s.acked[k]).length;
+
+    // ops rows/cards
+    const stOf = (key, i, def) => s.status[`${s.ind}-${L.id}-${key}-${i}`] || def;
+    const setSt = (key, i, v) => this.setState(x => ({ status: { ...x.status, [`${s.ind}-${L.id}-${key}-${i}`]: v } }));
+    let opsOut = { rows: [], cards: [], filters: [], note: '', live: false };
+    if (opDef) {
+      const [key, , , kind, note, data, live, src] = opDef;
+      opsOut.note = note; opsOut.live = !!live;
+      if (kind === 'rows') {
+        const rows = data.map((r, i) => { const st = stOf(key, i, r[3]); const acted = st !== r[3]; return { lead: r[0], title: r[1], sub: r[2], status: st, stBg: STBG[st] || '#F3F2EE', meter: r[5] ? `${Math.round(r[4] / r[5] * 100)}%` : '', meterLabel: r[5] ? `${r[4]}/${r[5]}` : '', src: src || '', canAct: !!r[6] && !acted, actLabel: r[6], img: '', act: () => { setSt(key, i, r[7]); this.toast(`${r[1]}: ${r[7]}`); } }; });
+        const stats = ['All', ...new Set(rows.map(r => r.status))];
+        const f = stats.includes(s.filter) ? s.filter : 'All';
+        opsOut.filters = stats.map(x => ({ label: x, n: x === 'All' ? rows.length : rows.filter(r => r.status === x).length, bg: f === x ? '#141414' : '#fff', fg: f === x ? '#fff' : '#141414', pick: () => this.setState({ filter: x }) }));
+        opsOut.rows = rows.filter(r => f === 'All' || r.status === f);
+      } else {
+        let items = data;
+        if (!items) items = I.items.map((it, i) => {
+          if (s.ind === 'commerce') { const stock = s.stock[`${L.id}${i}`] ?? it[3]; return [it[0], `${it[1]} · ${stock} in stock here`, it[2], stock === 0 ? 'Out of stock' : stock < 4 ? 'Low stock' : 'In stock', it[4], 'Receive +5', null, 'HQ price', i]; }
+          if (s.ind === 'foods') return [it[0], it[1], it[2], 'Available', I.imgs[i % 5], 'Mark sold out', 'Sold out', cap('prices') === 'allow' ? '' : 'HQ price'];
+          if (s.ind === 'realty') return [it[0], it[1], it[2], i === 1 ? 'Conditional' : 'Active', it[4], 'Mark sold', 'Sold'];
+          return [it[0], it[1], it[2], 'Active', I.imgs[i % 5], 'Pause', 'Paused'];
+        });
+        opsOut.cards = items.map((c, i) => { const st = s.ind === 'commerce' && !data ? c[3] : stOf(key, i, c[3]); return { title: c[0], sub: c[1], price: c[2], status: st, stBg: st === 'Out of stock' || st === 'Sold out' || st === 'Sold' ? '#F8D6D8' : st === 'Low stock' || st === 'Conditional' || st === 'Draft' || st === 'Paused' ? '#F7EDA8' : '#E2F5A6', img: IMG[c[4]] || IMG[I.hero], src: s.ind === 'commerce' ? 'WooCommerce' : s.ind === 'realty' ? 'Listing service' : '', lockNote: c[7] || '',
+          actLabel: st === c[6] && c[6] ? (c[3] === 'Published' ? 'Publish' : c[3] === 'Available' ? 'Mark available' : 'Undo') : c[5],
+          act: () => { if (s.ind === 'commerce' && !data) { this.setState(x => ({ stock: { ...x.stock, [`${L.id}${i}`]: (x.stock[`${L.id}${i}`] ?? I.items[i][3]) + 5 } })); this.toast(`Stock adjusted: +5 ${c[0]} · reason: delivery received`); return; } setSt(key, i, st === c[6] ? c[3] : c[6]); } }; });
+      }
+    }
+
+    // website sections
+    const wv = { hours: L.hours, offer: { studios: 'First week unlimited for $39', sports: 'Free trial session for new players', health: 'Book online and skip the wait', commerce: 'Free pickup in store', foods: 'Order ahead, skip the line', realty: 'Free home valuation' }[s.ind], about: `${I.brand} ${L.name} is run by ${L.owner}. ${I.tagline}`, ...s.webVals };
+    const secDefs = [['hours', 'Opening hours', 'clock', cap('hours'), wv.hours], ['offer', 'Local offer', 'gift', cap('prices'), wv.offer], ['about', 'About this location', 'edit', cap('hours'), wv.about], ['hero', 'Hero photo', 'image', cap('images'), 'From Brand center photography'], ['nav', 'Header & navigation', 'list', 'locked', 'Shared across all locations'], ['legal', 'Legal pages', 'scale', 'locked', 'Privacy, terms and refund policy from HQ']];
+    const sections = secDefs.map(([k, name, icon, c, value]) => { const pend = s.webPending[k]; const [lbl, bg, stIcon] = pend ? ['Awaiting HQ approval', '#F7EDA8', 'clock'] : VAL[c]; const editing = s.webEdit === k;
+      return { name, icon, value: pend ? pend : value, st: c === 'allow' && !pend ? 'You can edit' : lbl, bg, stIcon: c === 'allow' && !pend ? 'edit' : stIcon, canEdit: c !== 'locked' && !editing && !pend && k !== 'hero', editing, bd: editing ? '#141414' : 'transparent', draft: s.webDraft,
+        lockedNote: c === 'locked' ? (k === 'nav' || k === 'legal' ? 'Managed by headquarters for every location.' : 'Locked on your autonomy tier.') : '',
+        saveLabel: c === 'approve' ? 'Submit for approval' : 'Publish', setDraft: e => this.setState({ webDraft: e.target.value }), edit: () => this.setState({ webEdit: k, webDraft: value }), cancel: () => this.setState({ webEdit: null }),
+        save: () => { if (c === 'approve') { this.setState(x => ({ webPending: { ...x.webPending, [k]: x.webDraft }, webEdit: null })); this.toast('Sent to HQ for approval. The live site keeps the current version.'); } else { this.setState(x => ({ webVals: { ...x.webVals, [k]: x.webDraft }, webEdit: null })); this.toast(`${name} published`); } } }; });
+
+    // marketing
+    const tmpls = I.imgs.slice(0, 3).map((k, i) => ({ img: IMG[k], name: `Template ${i + 1}`, bd: s.tmpl === i ? '#141414' : 'transparent', pick: () => this.setState({ tmpl: i }) }));
+    const capTag = c => c === 'allow' ? ['Allowed', '#D6F26B'] : c === 'approve' ? ['Approval', '#F7EDA8'] : ['HQ', '#E4E2DC'];
+    const budCap = BUDGET[tierKey], used = s.adSent ? 450 : 0;
+    const adNum = parseInt(s.adBudget, 10) || 0;
+
+    // community
+    const CM = { all: [['Jamie Morgan', 'pW1', 'HQ', 'Mon', 'Reminder: the network call is Thursday at 1 pm Eastern. Agenda is pinned in Announcements.'], [L.owner, I.staffImg, 'Franchisee', 'Tue', 'Has anyone tried the referral offer yet? We had 9 sign-ups from it.'], [am.name, am.img, 'Account manager', 'Tue', 'Great result. I\u2019ll share your version as a template for other locations.']], hq: [[am.name, am.img, 'Account manager', 'Wed', `Hi ${L.owner}, I\u2019ve booked our quarterly review for Thursday. Anything you want added?`]], region: [[I.locs[1 % I.locs.length].owner, 'pM2', 'Franchisee', 'Mon', `Anyone in ${L.region} want to share a booth at next month\u2019s community fair?`]] };
+    const roleBg = { HQ: '#D6F26B', 'Account manager': P.aqua, Franchisee: P.butter, You: P.lilac };
+    const comMsgs = [...(CM[s.comChan] || []), ...s.sent.filter(m => m[5] === s.comChan)].map(([who, img, role, at, t]) => ({ who, img: IMG[img], role, at, t, roleBg: roleBg[role], bubble: role === 'HQ' ? '#F1F8E0' : '#F8F7F3' }));
+
+    const docs = [['ops', 'Operations manual', '7.2', 'book', P.lilac, true], ['brand', 'Brand standards', '4.0', 'palette', P.blush, true], ['social', 'Social media & advertising policy', '1.3', 'share', P.lilac, true], ['privacy', 'Privacy policy', '3.1', 'shield', P.aqua, false], ['refund', 'Refund & cancellation policy', '2.0', 'receipt', P.butter, false], ...(s.ind === 'health' ? [['phi', 'Patient information handling', '1.1', 'cross', P.sage, true]] : []), ...(s.ind === 'realty' ? [['fair', 'Fair housing & advertising standards', '2.0', 'house', P.aqua, true]] : []), ...(s.ind === 'foods' ? [['allergen', 'Allergen & food safety standards', '3.0', 'utensils', P.blush, true]] : [])];
+
+    const staffNames = [[I.staffName, I.staffImg, I.staffRole], ['Sam Tran', 'pM2', I.staffRole], ['Ana Silva', 'pW3', I.staffRole], ['Jordan Lee', 'pM4', 'Front desk'], [owner ? 'Taylor Brooks' : L.owner, 'pW2', owner ? 'Location manager' : 'Franchise owner']];
+    const sym = L.cur === 'CAD' ? 'CA$' : '$';
+
+    return {
+      ind: I, loc: L, tier: T, am: { ...am, img: IMG[am.img] }, me: { first: owner ? (L.owner.split(' ')[0] === 'Company-owned' ? 'Taylor' : L.owner.split(' ')[0]) : 'Taylor' }, toast: s.toast,
+      img: { loc: IMG[L.img], online: IMG.onlineCall },
+      locId: L.id, myLocs: I.locs.filter(l => l.owner === L.owner).map(l => ({ id: l.id, name: l.name })),
+      setLoc: e => this.setState({ loc: e.target.value }),
+      roles: [['owner', 'Franchise owner'], ['manager', 'Location manager']].map(([k, label]) => ({ label, bg: s.role === k ? '#fff' : 'transparent', pick: () => this.setState({ role: k, screen: k === 'manager' && s.screen === 'payments' ? 'today' : s.screen }) })),
+      links: { biz: `BranchHarbor Business.dc.html#ind=${s.ind}&loc=${L.id}&role=loc`, mkt: `BranchHarbor Marketing.dc.html#ind=${s.ind}&role=loc`, hq: `BranchHarbor HQ.dc.html#ind=${s.ind}`, staff: `BranchHarbor Staff.dc.html#ind=${s.ind}&loc=${L.id}`, site: `BranchHarbor Location Sites.dc.html#ind=${s.ind}&loc=${L.id}` },
+      nav: NAV.map(n => n[0] === 'h' ? { head: true, item: false, label: n[1] } : { head: false, item: true, label: n[1], icon: n[2], w: s.screen === n[0] ? 800 : 500, bg: s.screen === n[0] ? '#D6F26B' : 'transparent', badge: n[0] === 'policies' ? docsAck : n[0] === 'community' ? 1 : 0, go: () => this.go(n[0]) }),
+      page: (() => { const map = { website: 'pages', marketing: 'social' }; const c = map[s.screen] ? cap(map[s.screen]) : null; return { title: cur[1], cap: !!c, capLabel: c ? (s.screen === 'website' ? `Local pages: ${VAL[c][0]}` : `Social: ${VAL[c][0]}`) : '', capBg: c ? VAL[c][1] : '#fff', capIcon: c ? VAL[c][2] : 'info' }; })(),
+      v: { today: s.screen === 'today', opsRows: !!opDef && opDef[3] === 'rows', opsCards: !!opDef && opDef[3] === 'cards', website: s.screen === 'website', marketing: s.screen === 'marketing', brand: s.screen === 'brand', policies: s.screen === 'policies', community: s.screen === 'community', am: s.screen === 'am', team: s.screen === 'team', payments: s.screen === 'payments' },
+      goAM: () => this.go('am'), goPolicies: () => this.go('policies'), goCommunity: () => this.go('community'),
+
+      kpis: ({ studios: [['Bookings today', '57', 'Booking connection'], ['Occupancy', '72%', 'This week'], ['New enquiries', '11', 'Last 7 days · website'], ['Online views', '214', 'Last 7 days']], sports: [['Enrolled', '57', 'Autumn season'], ['Awaiting review', '2', 'Registrations'], ['Sessions today', '3', 'Schedule'], ['Attendance', '91%', 'Last 4 weeks']], health: [['Appointments today', '24', 'Calendar'], ['Pickups waiting', '2', 'Pharmacy'], ['Utilisation', '81%', 'This week'], ['No-shows', '1', 'Today']], commerce: [['Orders · 7 days', '64', 'WooCommerce'], ['Low stock', '2 items', 'This store'], ['Pickups waiting', '3', 'In store'], [`Revenue · ${L.cur}`, `${sym}6,120`, '7 days · WooCommerce']], foods: [['Open orders', '3', 'Pickup'], ['Sold out', '1 item', 'Menu'], ['Pickup capacity', '62%', 'Next hour'], ['Catering', '1 enquiry', 'This week']], realty: [['Active listings', '3', 'Listing service'], ['New leads', '2', 'Last 24 hours'], ['Viewings this week', '7', 'Calendar'], ['Agents', String(L.agents || 10), 'At this office']] }[s.ind]).map(([label, value, note], i) => ({ label, value, note, icon: ['calendar', 'activity', 'mail', 'video'][i], bg: [I.pastel, '#fff', '#fff', P.butter][i] })),
+      todos: [['scale', `Confirm ${docsAck} policy updates`, 'Due 31 Oct', 'policies', P.butter], ['calendar', `Quarterly review with ${am.name}`, 'Thu 17 Oct, 10:00 am', 'am', P.aqua], ['message', 'Reply from HQ in Community', 'All locations', 'community', '#F3F2EE'], ['globe', s.webPending.offer ? 'Local offer awaiting HQ approval' : 'Update your local offer', s.webPending.offer ? 'Submitted' : VAL[cap('prices')][0], 'website', '#F3F2EE']].map(([icon, t, sub, to, bg]) => ({ icon, t, sub, bg, go: () => this.go(to) })),
+
+      ops: opsOut, liveBadge: s.live ? { label: 'LIVE NOW', bg: '#F8D6D8' } : { label: 'Tonight 7:00 pm', bg: '#D6F26B' }, liveCta: s.live ? 'End live class' : 'Go live', toggleLive: () => { this.setState({ live: !s.live }); this.toast(s.live ? 'Class ended. Replay is processing.' : 'You\u2019re live. 38 people can join.'); },
+
+      sections, webVals: wv, siteUrl: `sites.branchharbor.com/${I.brand.toLowerCase().replace(/[^a-z]+/g, '-')}/${L.id}`,
+
+      mktTabs: [['social', 'Social', 'share', cap('social')], ['ads', 'Ads', 'target', cap('ads')], ['email', 'Email', 'mail', cap('email')], ['autos', 'Automations', 'workflow', cap('autos')]].map(([k, label, icon, c]) => { const [t, b] = capTag(c); return { label, icon, cap: t, capBg: b, bg: s.mkTab === k ? '#141414' : '#fff', fg: s.mkTab === k ? '#fff' : '#141414', pick: () => this.setState({ mkTab: k }) }; }),
+      mk: { social: s.mkTab === 'social', ads: s.mkTab === 'ads', email: s.mkTab === 'email', autos: s.mkTab === 'autos' },
+      capSocialLocked: cap('social') === 'locked', capSocialOpen: cap('social') !== 'locked',
+      tmpls, tmplImg: tmpls[s.tmpl].img, handle: `${I.brand.toLowerCase().replace(/[^a-z]+/g, '')}.${L.id}`,
+      myChannels: ['meta', 'gbp', 'tiktok'].map(k => { const on = !!s.chOn[k]; const dis = k === 'tiktok'; return { name: CH[k][0] + (dis ? ' · not connected' : ''), mark: CH[k][1], color: CH[k][2], on, bd: on ? '#141414' : '#D8D6CF', bg: on ? '#F3F2EE' : '#fff', toggle: () => !dis && this.setState(x => ({ chOn: { ...x.chOn, [k]: !on } })) }; }),
+      caption: s.caption || `This week at ${I.brand} ${L.name}: ${wv.offer.toLowerCase()}. See you soon.`, setCaption: e => this.setState({ caption: e.target.value }),
+      socialCta: 'Schedule for tomorrow 9:00 am', postSocial: () => this.toast('Scheduled. HQ can see it in the network calendar.'),
+      budget: { used: `${sym}${used}`, cap: budCap ? `${sym}${budCap.toLocaleString()}` : 'HQ managed', pct: budCap ? `${Math.round(used / budCap * 100)}%` : '0%' },
+      myAds: [[`${I.brand} network campaign`, 'meta', 'HQ · co-op', '41 leads here', 'Live'], [`${I.brand} brand search`, 'google', 'HQ', '18 leads here', 'Live'], ...(s.adSent ? [[`${L.name} · ${s.adGoal.toLowerCase()}`, 'meta', 'You', `${sym}${adNum}`, cap('ads') === 'approve' ? 'Awaiting HQ' : 'Live']] : [])].map(([name, ch, by, stats, status]) => ({ name, mark: CH[ch][1], color: CH[ch][2], by, stats, status, stBg: status === 'Live' ? '#D6F26B' : P.butter })),
+      adsLocked: cap('ads') === 'locked', adsOpen: cap('ads') !== 'locked', adGoal: s.adGoal, adBudget: s.adBudget, adErr: s.adErr, adBd: s.adErr ? '#B3261E' : '#D8D6CF',
+      setAdGoal: e => this.setState({ adGoal: e.target.value }), setAdBudget: e => this.setState({ adBudget: e.target.value, adErr: '' }),
+      adCta: s.adSent ? 'Request sent' : cap('ads') === 'approve' ? 'Send to HQ for approval' : 'Launch ad',
+      submitAd: () => { if (s.adSent) return; if (!adNum) { this.setState({ adErr: 'Enter a budget.' }); return; } if (adNum > budCap) { this.setState({ adErr: `Your tier allows up to ${sym}${budCap.toLocaleString()} a month.` }); return; } this.setState({ adSent: true }); this.toast(cap('ads') === 'approve' ? 'Sent to HQ. You\u2019ll get a notification when it\u2019s reviewed.' : 'Ad launched on Meta'); },
+      myEmails: [['Monthly newsletter', 'From HQ · sent to your subscribers · 44% opened', 'Sent', '#E2F5A6'], [`${L.name} reopening`, 'Local · scheduled Thu 9:00 am', 'Scheduled', P.aqua]].map(([name, sub, status, stBg]) => ({ name, sub, status, stBg })),
+      emailLocked: cap('email') === 'locked', emailCta: cap('email') === 'approve' ? 'New email · needs approval' : 'New local email', emailCapNote: cap('email') === 'locked' ? 'HQ sends email to your subscribers on your tier.' : 'Local emails use HQ templates and go only to people who agreed to hear from this location.', newEmail: () => this.toast('Opens the email editor with HQ templates'),
+      myAutos: [['Intro offer follow-up', 'Running · 23 people in it now', 'HQ'], ['Win-back after 30 days', 'Running · 8 people', 'HQ'], ...(cap('autos') === 'allow' ? [['Birthday treat', 'Your automation · draft', 'You']] : [])].map(([name, sub, by]) => ({ name, sub, by: by === 'HQ' ? 'From HQ' : 'Yours', pastel: by === 'HQ' ? P.lilac : P.lime, stBg: by === 'HQ' ? '#F3F2EE' : '#D6F26B' })),
+      autoNote: cap('autos') === 'allow' ? 'Your tier lets you copy HQ automations and create your own.' : 'Automations are set up by HQ on your tier. You can pause one for your location if needed.', autoIcon: cap('autos') === 'allow' ? 'check-circle' : 'lock',
+
+      brandAssets: [['Primary lockup', 'SVG · PNG', 'Locked', '', '#fff', '#141414', 'star'], ['Reversed lockup', 'SVG · PNG', 'Locked', '', '#141414', '#fff', 'star'], ...I.imgs.slice(0, 4).map((k, i) => [`${['Hero', 'Interior', 'Team', 'Detail'][i]} photo`, 'JPG · licensed', i < 2 ? 'Locked' : 'Editable', IMG[k]]), ['Instagram template', 'Canva link', 'Editable', IMG[I.hero]], ['Brand book', 'PDF · 42 pages', 'Read only', '', P.lilac, '#141414', 'book']].map(([name, meta, usage, img, bg, fg, icon]) => ({ name, meta, usage, img: img || '', noImg: !img, bg: bg || '#F3F2EE', fg: fg || '#141414', icon: icon || 'file', label: icon === 'star' ? I.brand : '', lockIcon: usage === 'Editable' ? 'edit' : 'lock', dl: () => this.toast(`Downloaded ${name}`) })),
+
+      myDocs: docs.map(([k, name, ver, icon, pastel, ack]) => { const done = !ack || s.acked[k]; return { name, ver, icon, pastel, sub: ack ? (done ? 'Confirmed by you' : 'Read and confirm by 31 Oct') : 'Published on your website by HQ', status: ack ? (done ? 'Confirmed' : 'Action needed') : 'Live on site', stBg: ack && !done ? P.butter : '#E2F5A6', needsAck: ack && !done, ack: () => { this.setState(x => ({ acked: { ...x.acked, [k]: true } })); this.toast(`${name} confirmed`); } }; }),
+      capList: Object.keys(CAPDEF).filter(k => CAPLBL[k]).map(k => { const c = cap(k); return { label: CAPLBL[k][0], icon: CAPLBL[k][1], v: VAL[c][0], bg: VAL[c][1] }; }),
+
+      comChans: [['all', 'All locations', 'hash'], ['hq', `${am.name} (direct)`, 'briefcase'], ['region', `Region: ${L.region}`, 'pin']].map(([k, name, icon]) => ({ name, icon, bg: s.comChan === k ? '#141414' : '#F3F2EE', fg: s.comChan === k ? '#fff' : '#141414', pick: () => this.setState({ comChan: k }) })),
+      comMsgs, draft: s.draft, setDraft: e => this.setState({ draft: e.target.value }),
+      sendMsg: () => { const t = s.draft.trim(); if (!t) return; this.setState(x => ({ draft: '', sent: [...x.sent, [L.owner, I.staffImg, 'You', 'Just now', t, x.comChan]] })); },
+
+      plan: [['Launch weekday morning offer', 'Agreed 12 Jul'], ['Refresh photos with brand guide v4', 'Due 31 Oct'], ['Connect Google Business Profile', 'Done 2 Aug'], ['Train new front-desk staff on refunds', 'Due 15 Nov']].map(([t, d], i) => { const done = s.plan[i] ?? i === 2; return { t, d, done, bg: done ? '#F1F8E0' : '#F8F7F3', box: done ? '#141414' : '#fff', strike: done ? 'line-through' : 'none', toggle: () => this.setState(x => ({ plan: { ...x.plan, [i]: !done } })) }; }),
+      bookCall: () => { this.setState({ called: true }); this.toast(`Call requested with ${am.name}`); }, callCta: s.called ? 'Call requested' : 'Book a call',
+
+      ...(() => {
+        const MODEL = { own: 'In-house', hq: 'HQ team', both: 'Shared', agency: 'Agency' };
+        const FNS = [
+          ['ops', 'Operations', 'Managers, front desk and opening hours cover', 'building', P.lilac, { managed: ['own'], standard: ['own'], flexible: ['own'] }, ['Location manager', 'Front desk', 'Assistant manager'], [[owner ? 'Taylor Brooks' : L.owner, 'pW2', owner ? 'Location manager' : 'Franchise owner'], ['Jordan Lee', 'pM4', 'Front desk']]],
+          ['delivery', I.staffRole + 's', { studios: 'Teach classes and run online sessions', sports: 'Coach sessions and take attendance', health: 'Practitioners and pharmacists (administrative access only)', commerce: 'Serve customers, pick orders and manage stock', foods: 'Kitchen and counter team', realty: 'Licensed agents working from this office' }[s.ind], I.icon, I.pastel, { managed: ['own', 'hq'], standard: ['own', 'hq'], flexible: ['own', 'hq'] }, [I.staffRole, 'Lead ' + I.staffRole.toLowerCase(), 'Trainee'], [[I.staffName, I.staffImg, 'Lead ' + I.staffRole.toLowerCase()], ['Sam Tran', 'pM2', I.staffRole], ['Ana Silva', 'pW3', I.staffRole]]],
+          ['marketing', 'Marketing', 'Social, email, ads and local events', 'megaphone', P.blush, { managed: ['hq'], standard: ['hq', 'both'], flexible: ['hq', 'both', 'own', 'agency'] }, ['Marketing manager', 'Marketing contributor', 'Agency (external)'], [['Taylor Brooks', 'pW2', 'Marketing manager']], [['Ines Duarte', 'pW3', 'Social & content']]],
+          ['sales', 'Sales & enquiries', 'Inbox, follow-ups, ' + ({ studios: 'trials and memberships', sports: 'trials and registrations', health: 'new patient enquiries', commerce: 'group and corporate orders', foods: 'catering', realty: 'buyer and seller leads' }[s.ind]), 'trending', P.aqua, { managed: ['hq', 'both'], standard: ['hq', 'both', 'own'], flexible: ['hq', 'both', 'own'] }, ['Sales rep', 'Sales lead'], [['Ben Okafor', 'pM2', 'Sales rep']], [['Marcus Bell', 'pM2', 'Sales lead']]],
+          ['finance', 'Finance & bookkeeping', 'Payouts, refunds, reconciliation and royalty invoices', 'wallet', P.butter, { managed: ['hq'], standard: ['hq', 'own'], flexible: ['hq', 'own', 'agency'] }, ['Finance user', 'Bookkeeper (external)'], [['Leah Park', 'pW4', 'Finance user']], [['HQ finance desk', 'pM1', 'Reconciliation & royalties']]],
+          ['hr', 'Hiring & HR', 'Job posts, onboarding new staff and training records', 'users', P.sage, { managed: ['hq', 'both'], standard: ['hq', 'both', 'own'], flexible: ['hq', 'both', 'own'] }, ['HR coordinator'], [], [['HQ people team', 'pW1', 'Recruiting & onboarding']]],
+        ];
+        const modelOf = f => s.fnModel[L.id + f[0]] || f[5][tierKey][0];
+        const peopleOf = f => s.fnPeople[L.id + f[0]] || f[7].map(([n, img, role]) => [n, img, role, 'Active']);
+        const out = FNS.map(f => { const m = modelOf(f); const allowed = f[5][tierKey]; const own = peopleOf(f); const hqP = (f[8] || []).map(([n, img, role]) => ({ name: n, img: IMG[img], role, access: 'HQ shared service', st: 'HQ', stBg: '#D6F26B', canRemove: false, hq: true }));
+          const showOwn = m !== 'hq'; const showHq = m === 'hq' || m === 'both';
+          const ppl = [...(showOwn ? own.map(([n, img, role, st], i) => ({ name: n, img: IMG[img] || IMG.pM4, role, access: L.name + ' only', st, stBg: st === 'Active' ? '#E2F5A6' : '#F7EDA8', canRemove: true, hq: false, remove: () => this.setState(x => ({ fnPeople: { ...x.fnPeople, [L.id + f[0]]: own.filter((_, j) => j !== i) } })) })) : []), ...(showHq ? hqP : [])];
+          const open = s.fnOpen === f[0];
+          return { name: f[1], desc: f[2], icon: f[3], pastel: f[4], open, chev: open ? 'chevron-down' : 'chevron-right', bd: open ? '#141414' : 'transparent',
+            models: ['own', 'hq', 'both', 'agency'].filter(k => k !== 'agency' || allowed.includes('agency')).filter(k => k !== 'both' || f[8]).map(k => { const ok = allowed.includes(k); return { label: f[0] === 'delivery' && k === 'hq' ? 'HQ cover pool' : MODEL[k], disabled: !ok, title: ok ? '' : 'Not on your tier', bg: m === k ? '#141414' : 'transparent', fg: m === k ? '#fff' : ok ? '#141414' : '#9C9C96', pick: () => { this.setState(x => ({ fnModel: { ...x.fnModel, [L.id + f[0]]: k }, fnOpen: f[0] })); this.toast(f[1] + ': ' + (f[0] === 'delivery' && k === 'hq' ? 'HQ cover pool' : MODEL[k])); } }; }),
+            faces: ppl.slice(0, 4).map(p => ({ name: p.name.split(' ')[0], img: p.img, hq: p.hq, bg: p.hq ? '#F1F8E0' : '#F3F2EE' })),
+            summary: ppl.length ? (ppl.length > 4 ? '+' + (ppl.length - 4) + ' more' : '') : 'Nobody assigned yet',
+            people: ppl, canInvite: showOwn, usesHq: showHq, roles: f[6], invRole: s.invRole[f[0]] || f[6][0], invEmail: s.invEmail[f[0]] || '',
+            setInvRole: e => { const v = e.target.value; this.setState(x => ({ invRole: { ...x.invRole, [f[0]]: v } })); }, setInvEmail: e => { const v = e.target.value; this.setState(x => ({ invEmail: { ...x.invEmail, [f[0]]: v } })); },
+            invite: () => { const v = (s.invEmail[f[0]] || '').trim(); if (!/^\S+@\S+\.\S+$/.test(v)) { this.toast('Enter a valid email'); return; } this.setState(x => ({ invEmail: { ...x.invEmail, [f[0]]: '' }, fnPeople: { ...x.fnPeople, [L.id + f[0]]: [...own, [v, 'pM4', s.invRole[f[0]] || f[6][0], 'Invited']] } })); this.toast('Invite sent. Access limited to ' + L.name + '.'); },
+            hqNote: f[0] === 'delivery' ? 'HQ keeps a pool of approved ' + I.staffRole.toLowerCase() + 's who can cover shifts at short notice.' : 'HQ ' + f[1].toLowerCase() + ' works for ' + L.name + '. Their activity shows in your reports.', reqLabel: s.fnReq[f[0]] ? 'Request sent' : 'Ask HQ for help', request: () => { this.setState(x => ({ fnReq: { ...x.fnReq, [f[0]]: true } })); this.toast('Request sent to HQ ' + f[1].toLowerCase()); } };
+        });
+        const total = out.reduce((a, f) => a + f.people.filter(p => !p.hq).length, 0);
+        const hqN = out.filter(f => f.usesHq).length;
+        return { fns: out, ownerScopeNote: owner ? ' unless you give them access to other locations in ' + L.owner : '', teamKpis: [['Your team', String(total), 'People at ' + L.name, I.pastel], ['HQ services used', String(hqN) + ' of 6', 'Functions HQ helps with', '#D6F26B'], ['Pending invites', String(out.reduce((a, f) => a + f.people.filter(p => p.st === 'Invited').length, 0)), 'Waiting to accept', '#fff'], ['Training complete', '86%', 'Required modules', '#fff']].map(([l, v, n, bg]) => ({ l, v, n, bg })) };
+      })(),
+      team: staffNames.map(([name, img, role], i) => ({ name, img: IMG[img], role, access: i === 4 ? 'All locations in owner group' : `${L.name} only` })),
+      payKpis: [[`Payments · ${L.cur}`, `${sym}18,420`, 'Last 30 days', I.pastel], ['Refunds', `${sym}312`, '4 refunds · separate from payments', '#fff'], ['Next payout', `${sym}4,180`, 'Tue 15 Oct · your bank', P.butter], ['Royalty invoice', `${sym}1,105`, 'October · due 10 Nov', '#fff']].map(([label, value, note, bg]) => ({ label, value, note, bg })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

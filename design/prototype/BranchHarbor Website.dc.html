@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+img{display:block}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</helmet>
+
+<div style="max-width:1360px;margin:0 auto;padding:12px">
+<div style="background:#fff;border-radius:32px;overflow:hidden">
+
+<!-- HEADER -->
+<header style="position:relative;display:flex;align-items:center;gap:20px;padding:18px 28px;border-bottom:1px solid #F0EFEA">
+  <button onClick="{{ go.home }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;color:#141414;flex-shrink:0">
+    <bh-logo size="36"></bh-logo><span style="font-size:19px;font-weight:800;letter-spacing:-.02em">BranchHarbor</span>
+  </button>
+  <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Main" style="margin:0 auto;display:flex;gap:2px;padding:4px;border-radius:999px;background:#F3F2EE">
+      <button onClick="{{ toggleInd }}" aria-expanded="{{ indOpen }}" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:none;background:{{ navBg.industries }};font-size:14px;font-weight:600;color:#141414;cursor:pointer">Industries<bh-icon name="chevron-down" size="14"></bh-icon></button>
+      <button onClick="{{ go.franchises }}" style="padding:8px 14px;border-radius:999px;border:none;background:{{ navBg.franchises }};font-size:14px;font-weight:600;color:#141414;cursor:pointer">For franchises</button>
+      <button onClick="{{ go.wordpress }}" style="padding:8px 14px;border-radius:999px;border:none;background:{{ navBg.wordpress }};font-size:14px;font-weight:600;color:#141414;cursor:pointer">WordPress &amp; integrations</button>
+      <button onClick="{{ go.pricing }}" style="padding:8px 14px;border-radius:999px;border:none;background:{{ navBg.pricing }};font-size:14px;font-weight:600;color:#141414;cursor:pointer">Pricing</button>
+      <button onClick="{{ go.resources }}" style="padding:8px 14px;border-radius:999px;border:none;background:{{ navBg.resources }};font-size:14px;font-weight:600;color:#141414;cursor:pointer">Resources</button>
+    </nav>
+    <div style="display:flex;gap:14px;align-items:center;flex-shrink:0">
+      <a href="BranchHarbor Onboarding.dc.html" style="font-size:14px;font-weight:600;text-decoration:none">Sign in</a>
+      <button onClick="{{ go.demo }}" style="display:flex;align-items:center;gap:10px;height:46px;padding:0 6px 0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer">Request a demo<span style="width:34px;height:34px;border-radius:17px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="16"></bh-icon></span></button>
+    </div>
+  </sc-if>
+  <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ toggleMenu }}" aria-label="Menu" aria-expanded="{{ menuOpen }}" style="margin-left:auto;width:46px;height:46px;border-radius:23px;border:1.5px solid #141414;background:#fff;color:#141414;display:flex;align-items:center;justify-content:center;cursor:pointer"><bh-icon name="{{ menuIcon }}" size="20"></bh-icon></button>
+  </sc-if>
+
+  <sc-if value="{{ showIndMenu }}" hint-placeholder-val="{{ false }}">
+    <div role="menu" style="position:absolute;top:76px;left:50%;transform:translateX(-50%);z-index:20;width:min(760px,94vw);background:#fff;border-radius:28px;box-shadow:0 24px 60px rgba(20,20,20,.16);padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px">
+      <sc-for list="{{ industries }}" as="i" hint-placeholder-count="5">
+        <button onClick="{{ i.open }}" role="menuitem" style="display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px;border-radius:18px;border:none;background:#fff;cursor:pointer;color:#141414" style-hover="background:#F3F2EE">
+          <span style="width:40px;height:40px;border-radius:14px;background:{{ i.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ i.icon }}" size="20"></bh-icon></span>
+          <span><span style="display:flex;gap:8px;align-items:center;font-size:15px;font-weight:700">{{ i.name }}<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:#F3F2EE">{{ i.avail }}</span></span><span style="display:block;font-size:12px;color:#5D5D58;margin-top:2px;line-height:1.45">{{ i.who }}</span></span>
+        </button>
+      </sc-for>
+      <button onClick="{{ go.independent }}" style="display:flex;gap:12px;align-items:center;text-align:left;padding:12px;border-radius:18px;border:1.5px dashed #D8D6CF;background:#fff;cursor:pointer;color:#141414"><span style="width:40px;height:40px;border-radius:14px;background:#F3F2EE;display:flex;align-items:center;justify-content:center"><bh-icon name="store" size="20"></bh-icon></span><span style="font-size:14px;font-weight:700">Single-location businesses</span></button>
+    </div>
+  </sc-if>
+</header>
+
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <nav aria-label="Mobile" style="padding:12px 20px 24px;border-bottom:1px solid #F0EFEA;display:flex;flex-direction:column;gap:4px">
+    <div style="font-size:12px;font-weight:700;color:#5D5D58;padding:8px 4px">Industries</div>
+    <sc-for list="{{ industries }}" as="i" hint-placeholder-count="5">
+      <button onClick="{{ i.open }}" style="display:flex;gap:12px;align-items:center;min-height:52px;padding:6px 10px;border-radius:16px;border:none;background:#F8F7F3;color:#141414;cursor:pointer;font-size:15px;font-weight:600"><span style="width:36px;height:36px;border-radius:12px;background:{{ i.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ i.icon }}" size="18"></bh-icon></span>{{ i.name }}</button>
+    </sc-for>
+    <sc-for list="{{ mobileLinks }}" as="m" hint-placeholder-count="6">
+      <button onClick="{{ m.go }}" style="display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 12px;border-radius:16px;border:none;background:transparent;color:#141414;cursor:pointer;font-size:16px;font-weight:600">{{ m.label }}<bh-icon name="chevron-right" size="18"></bh-icon></button>
+    </sc-for>
+    <button onClick="{{ go.demo }}" style="margin-top:8px;height:54px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer">Request a demo</button>
+  </nav>
+</sc-if>
+
+<!-- ============ HOME ============ -->
+<sc-if value="{{ p.home }}" hint-placeholder-val="{{ true }}">
+  <section style="padding:48px 28px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;border:1px solid #E4E2DC;font-size:13px;font-weight:600"><bh-icon name="sparkles" size="14"></bh-icon>Studios pilot now forming · Foods next</span>
+    <h1 style="margin:0;font-size:clamp(44px,6.6vw,88px);line-height:1.0;font-weight:700;letter-spacing:-.045em;max-width:980px;text-wrap:balance">One home for <span style="color:#5E7D68">every location.</span></h1>
+    <p style="margin:0;font-size:18px;line-height:1.6;color:#5D5D58;max-width:620px;text-wrap:pretty">Connect your websites, customer activity and industry workflows. Give headquarters visibility and local teams the control they need.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button onClick="{{ scrollTo.industries }}" style="display:flex;align-items:center;gap:10px;height:54px;padding:0 6px 0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">Explore your industry<span style="width:42px;height:42px;border-radius:21px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-down" size="18"></bh-icon></span></button>
+      <button onClick="{{ scrollTo.how }}" style="display:flex;align-items:center;gap:8px;height:54px;padding:0 24px;border-radius:999px;background:#fff;color:#141414;border:1.5px solid #141414;font-size:15px;font-weight:600;cursor:pointer"><bh-icon name="play" size="14"></bh-icon>See how it works</button>
+    </div>
+  </section>
+
+  <section style="padding:20px 28px 56px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;align-items:stretch">
+      <div style="position:relative;min-height:460px;border-radius:28px;overflow:hidden;background:#E9DDF8;grid-column:span 1">
+        <img src="{{ img.yogaStudio }}" alt="Students practising in a sunlit studio" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div style="position:absolute;left:14px;right:14px;bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.86);backdrop-filter:blur(10px)">
+          <div style="text-align:left"><div style="font-size:15px;font-weight:700">Toronto – Queen West</div><div style="font-size:12px;color:#3E3E3A">Studio · 9 classes today</div></div>
+          <span style="width:34px;height:34px;border-radius:17px;background:#141414;color:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="15"></bh-icon></span>
+        </div>
+      </div>
+      <div style="border-radius:28px;background:#5E7D68;padding:16px;grid-column:span 2;min-width:0">
+        <div style="background:#fff;border-radius:20px;overflow:hidden;height:100%;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #EEEDE8">
+            <bh-icon name="grid" size="18"></bh-icon><span style="font-size:15px;font-weight:700">Overview</span>
+            <span style="font-size:12px;color:#5D5D58;display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#F3F2EE"><bh-icon name="layers" size="13"></bh-icon>All authorised locations (6)</span>
+            <span style="margin-left:auto;font-size:10px;font-weight:800;letter-spacing:.06em;padding:5px 10px;border-radius:999px;border:1px solid #E4E2DC;color:#5D5D58">SAMPLE DATA</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));flex:1">
+            <div style="padding:10px;display:flex;flex-direction:column;gap:2px">
+              <sc-for list="{{ previewRows }}" as="r" hint-placeholder-count="6">
+                <button onClick="{{ r.pick }}" style="display:flex;width:100%;text-align:left;gap:10px;align-items:center;padding:9px 12px;border-radius:14px;border:none;background:{{ r.bg }};cursor:pointer;color:#141414">
+                  <span style="width:32px;height:32px;border-radius:10px;background:{{ r.dot }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="pin" size="15"></bh-icon></span>
+                  <span style="display:flex;flex-direction:column;min-width:0;flex:1"><span style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="font-size:11px;color:{{ r.syncColor }};display:flex;align-items:center;gap:4px"><bh-icon name="{{ r.syncIcon }}" size="11"></bh-icon>{{ r.sync }}</span></span>
+                  <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums">{{ r.enq }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="padding:16px;background:#FAFAF7;border-left:1px solid #EEEDE8;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="text-align:left"><div style="font-size:12px;color:#5D5D58">{{ previewLoc.region }}</div><div style="font-size:17px;font-weight:700;letter-spacing:-.01em">{{ previewLoc.name }}</div></div><bh-icon name="x" size="16"></bh-icon></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="background:#E2F5A6;border-radius:16px;padding:12px;text-align:left"><div style="font-size:11px;font-weight:600;display:flex;gap:4px;align-items:center"><bh-icon name="mail" size="12"></bh-icon>Enquiries · 7d</div><div style="font-size:28px;font-weight:700;font-variant-numeric:tabular-nums">{{ previewLoc.enq }}</div></div>
+                <div style="background:#E9DDF8;border-radius:16px;padding:12px;text-align:left"><div style="font-size:11px;font-weight:600;display:flex;gap:4px;align-items:center"><bh-icon name="calendar" size="12"></bh-icon>Classes today</div><div style="font-size:28px;font-weight:700;font-variant-numeric:tabular-nums">{{ previewLoc.classes }}</div></div>
+              </div>
+              <div style="background:#fff;border:1px solid #EEEDE8;border-radius:16px;padding:12px;text-align:left"><div style="font-size:11px;font-weight:600;color:#5D5D58">Occupancy · this week</div><div style="font-size:22px;font-weight:700">{{ previewLoc.occ }}</div></div>
+              <div style="font-size:12px;font-weight:600;color:{{ previewLoc.syncColor }};display:flex;gap:6px;align-items:center"><bh-icon name="{{ previewLoc.syncIcon }}" size="13"></bh-icon>{{ previewLoc.sync }}</div>
+              <div style="font-size:11px;color:#5D5D58;text-align:left;line-height:1.5">Enquiries from website forms. Classes from the connected booking system.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="bh-industries" style="padding:24px 28px 56px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+      <div style="background:#5E7D68;color:#fff;border-radius:28px;padding:28px;min-height:380px;display:flex;flex-direction:column;justify-content:space-between">
+        <h2 style="margin:0;font-size:34px;line-height:1.08;font-weight:600;letter-spacing:-.03em">Choose your industry</h2>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#E6EEE7">One shared platform, shaped around how your business works. Studios is in pilot; the others are designed and on the roadmap.</p>
+      </div>
+      <sc-for list="{{ industries }}" as="ind" hint-placeholder-count="5">
+        <button onClick="{{ ind.open }}" style="position:relative;border-radius:28px;overflow:hidden;min-height:380px;background:{{ ind.pastel }};border:none;padding:0;cursor:pointer;text-align:left;color:#141414">
+          <img src="{{ ind.img }}" alt="{{ ind.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+          <span style="position:absolute;top:14px;left:14px;display:flex;gap:6px;align-items:center;padding:6px 12px;border-radius:999px;background:#141414;color:#fff;font-size:11px;font-weight:700"><bh-icon name="{{ ind.icon }}" size="13"></bh-icon>{{ ind.avail }}</span>
+          <span style="position:absolute;left:12px;right:12px;bottom:12px;padding:14px;border-radius:20px;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:6px">
+            <span style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:18px;font-weight:700;letter-spacing:-.01em">{{ ind.name }}</span><span style="width:34px;height:34px;border-radius:17px;background:#141414;color:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="15"></bh-icon></span></span>
+            <span style="font-size:12px;line-height:1.5;color:#3E3E3A">{{ ind.who }}</span>
+            <span style="font-size:12px;font-weight:600">{{ ind.flow }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:24px 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:14px">
+    <div style="background:#141414;color:#fff;border-radius:28px;padding:36px;display:flex;flex-direction:column;gap:14px">
+      <span style="align-self:flex-start;display:flex;gap:6px;align-items:center;padding:6px 12px;border-radius:999px;background:#D6F26B;color:#141414;font-size:12px;font-weight:700"><bh-icon name="building" size="14"></bh-icon>Headquarters</span>
+      <h3 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em">Shared controls</h3>
+      <p style="margin:0;font-size:15px;line-height:1.65;color:#C9C9C3">Lock brand content, publish templates to chosen locations and see network reports. Customer details stay with the location unless your policy allows sharing.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+        <span style="display:flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;background:#262626;font-size:12px;font-weight:600"><bh-icon name="lock" size="13"></bh-icon>Locked brand content</span>
+        <span style="display:flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;background:#262626;font-size:12px;font-weight:600"><bh-icon name="layers" size="13"></bh-icon>Group publishing</span>
+        <span style="display:flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;background:#262626;font-size:12px;font-weight:600"><bh-icon name="chart" size="13"></bh-icon>Network reports</span>
+      </div>
+    </div>
+    <div style="background:#E9DDF8;border-radius:28px;padding:36px;display:flex;flex-direction:column;gap:14px">
+      <span style="align-self:flex-start;display:flex;gap:6px;align-items:center;padding:6px 12px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700"><bh-icon name="pin" size="14"></bh-icon>Locations</span>
+      <h3 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.02em">Local autonomy</h3>
+      <p style="margin:0;font-size:15px;line-height:1.65;color:#3E3550">Update hours, prices and local offers where headquarters allows it. Every field shows whether it is shared, local or needs approval.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+        <span style="display:flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;background:#fff;font-size:12px;font-weight:600"><bh-icon name="edit" size="13"></bh-icon>Editable locally</span>
+        <span style="display:flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;background:#fff;font-size:12px;font-weight:600"><bh-icon name="shield" size="13"></bh-icon>Approval required</span>
+        <span style="display:flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;background:#fff;font-size:12px;font-weight:600"><bh-icon name="undo" size="13"></bh-icon>Reset to HQ default</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="bh-how" style="padding:56px 28px;background:#F8F7F3">
+    <h2 style="margin:0 0 8px;text-align:center;font-size:clamp(32px,4vw,48px);font-weight:700;letter-spacing:-.035em">Get started in three steps</h2>
+    <p style="margin:0 auto 36px;text-align:center;font-size:16px;color:#5D5D58;max-width:520px">Start with one location and add the rest when you're ready.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+      <sc-for list="{{ steps3 }}" as="s" hint-placeholder-count="3">
+        <div style="background:#fff;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="width:48px;height:48px;border-radius:16px;background:{{ s.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ s.icon }}" size="22"></bh-icon></span><span style="font-size:13px;font-weight:800;color:#9C9C96">0{{ s.n }}</span></div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.01em">{{ s.title }}</div>
+          <div style="font-size:14px;line-height:1.6;color:#5D5D58">{{ s.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:56px 28px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:28px">
+      <h2 style="margin:0;font-size:clamp(32px,4vw,48px);font-weight:700;letter-spacing:-.035em;max-width:620px">What's included</h2>
+      <span style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;font-weight:600;color:#5D5D58"><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:5px;background:#D6F26B"></span>At launch</span><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:5px;background:#141414"></span>Preview</span><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:5px;background:#E4E2DC"></span>Requires setup</span></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+      <sc-for list="{{ capabilities }}" as="c" hint-placeholder-count="6">
+        <div style="border:1px solid #EEEDE8;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="width:44px;height:44px;border-radius:14px;background:{{ c.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ c.icon }}" size="20"></bh-icon></span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ c.tagBg }};color:{{ c.tagFg }}">{{ c.tag }}</span></div>
+          <div style="font-size:18px;font-weight:700;letter-spacing:-.01em">{{ c.name }}</div>
+          <div style="font-size:14px;line-height:1.55;color:#5D5D58">{{ c.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:0 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:14px">
+    <div style="background:#CDEEEE;border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:12px">
+      <span style="width:52px;height:52px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="globe" size="24"></bh-icon></span>
+      <h3 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Start with a BranchHarbor site</h3>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#1F3535">We host your website and dashboard. Use an included address or connect your own domain when you're ready.</p>
+      <button onClick="{{ go.pricing }}" style="align-self:flex-start;margin-top:4px;display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer">See hosted plans<bh-icon name="arrow-right" size="15"></bh-icon></button>
+    </div>
+    <div style="background:#F7EDA8;border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:12px">
+      <span style="width:52px;height:52px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="wordpress" size="24"></bh-icon></span>
+      <h3 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Keep your WordPress site</h3>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#3D3A20">Add BranchHarbor forms, schedules and connections to the site you already have. Your hosting stays the same.</p>
+      <button onClick="{{ go.wordpress }}" style="align-self:flex-start;margin-top:4px;display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer">How the connector works<bh-icon name="arrow-right" size="15"></bh-icon></button>
+    </div>
+  </section>
+
+  <section style="padding:56px 28px;background:#F8F7F3">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:24px">
+      <div><h2 style="margin:0 0 6px;font-size:clamp(30px,3.6vw,44px);font-weight:700;letter-spacing:-.035em">Works with what you use</h2><p style="margin:0;font-size:15px;color:#5D5D58">Every connection carries a status. Planned means not available yet.</p></div>
+      <button onClick="{{ go.integrations }}" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">All integrations<bh-icon name="arrow-right" size="15"></bh-icon></button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      <sc-for list="{{ intPreview }}" as="it" hint-placeholder-count="8">
+        <div style="background:#fff;border-radius:20px;padding:16px;display:flex;align-items:center;gap:12px">
+          <span style="width:40px;height:40px;border-radius:12px;background:{{ it.pastel }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">{{ it.mono }}</span>
+          <div style="min-width:0"><div style="font-size:14px;font-weight:700">{{ it.name }}</div><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ it.stBg }};color:{{ it.stFg }}">{{ it.status }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:56px 28px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+      <div style="border-radius:28px;background:#FAFAF7;border:1px solid #EEEDE8;padding:32px;display:flex;flex-direction:column;gap:14px">
+        <span style="align-self:flex-start;padding:6px 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:700">Evidence</span>
+        <h3 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em">Pilot results will be published here</h3>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#5D5D58">We don't show customer logos or performance claims before we have them. Until pilot studios report back, explore the workflows themselves.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ industries }}" as="i" hint-placeholder-count="5"><button onClick="{{ i.open }}" style="display:flex;gap:6px;align-items:center;height:40px;padding:0 14px;border-radius:999px;border:none;background:{{ i.pastel }};color:#141414;font-size:13px;font-weight:600;cursor:pointer"><bh-icon name="{{ i.icon }}" size="14"></bh-icon>{{ i.name }} workflow</button></sc-for>
+        </div>
+      </div>
+      <div style="border-radius:28px;background:#141414;color:#fff;padding:32px;display:flex;flex-direction:column;gap:14px">
+        <span style="align-self:flex-start;padding:6px 12px;border-radius:999px;background:#D6F26B;color:#141414;font-size:12px;font-weight:700">Pricing preview</span>
+        <h3 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em">Billed per location</h3>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#C9C9C3">Pay for the locations you authorise. Keep your existing booking or commerce software where we connect to it. Networks get onboarding help.</p>
+        <button onClick="{{ go.pricing }}" style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:46px;padding:0 6px 0 20px;border-radius:999px;border:none;background:#fff;color:#141414;font-size:14px;font-weight:700;cursor:pointer">View pricing<span style="width:34px;height:34px;border-radius:17px;background:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="15"></bh-icon></span></button>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:0 28px 56px">
+    <h2 style="margin:0 0 20px;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">Questions</h2>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ homeFaqs }}" as="f" hint-placeholder-count="4">
+        <div style="border-radius:22px;background:{{ f.bg }}">
+          <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 22px;border:none;background:transparent;text-align:left;font-size:16px;font-weight:700;color:#141414;cursor:pointer">{{ f.q }}<span style="width:32px;height:32px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ f.icon }}" size="15"></bh-icon></span></button>
+          <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}"><div style="padding:0 22px 20px;font-size:15px;line-height:1.65;color:#3E3E3A;max-width:780px">{{ f.a }}</div></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</sc-if>
+
+<!-- ============ INDUSTRY ============ -->
+<sc-if value="{{ p.industry }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:24px 28px 40px">
+    <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#5D5D58;margin-bottom:20px"><button onClick="{{ go.home }}" style="background:none;border:none;padding:0;color:#5D5D58;cursor:pointer;font-size:13px">Home</button><bh-icon name="chevron-right" size="13"></bh-icon><span>Industries</span><bh-icon name="chevron-right" size="13"></bh-icon><strong style="color:#141414">{{ ind.name }}</strong></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+      <div style="background:{{ ind.pastel }};border-radius:28px;padding:clamp(28px,4vw,48px);display:flex;flex-direction:column;gap:18px;justify-content:center">
+        <span style="align-self:flex-start;display:flex;gap:8px;align-items:center;padding:7px 14px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700"><bh-icon name="{{ ind.icon }}" size="14"></bh-icon>BranchHarbor {{ ind.name }} · {{ ind.avail }}</span>
+        <h1 style="margin:0;font-size:clamp(36px,4.6vw,60px);line-height:1.04;font-weight:700;letter-spacing:-.04em;text-wrap:balance">{{ ind.headline }}</h1>
+        <p style="margin:0;font-size:17px;line-height:1.6;color:#2E2E2A;max-width:540px">{{ ind.intro }}</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onClick="{{ ind.demo }}" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">{{ ind.cta }}<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="16"></bh-icon></span></button>
+          <button onClick="{{ scrollTo.workflow }}" style="height:52px;padding:0 22px;border-radius:999px;background:transparent;color:#141414;border:1.5px solid #141414;font-size:15px;font-weight:600;cursor:pointer">See the workflow</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-rows:2fr 1fr;gap:14px;min-height:520px">
+        <div style="position:relative;border-radius:28px;overflow:hidden;background:#E4E2DC"><img src="{{ ind.img }}" alt="{{ ind.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="position:relative;border-radius:24px;overflow:hidden;background:#E4E2DC"><img src="{{ ind.img2 }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+          <div style="border-radius:24px;background:#141414;color:#fff;padding:18px;display:flex;flex-direction:column;justify-content:space-between"><bh-icon name="activity" size="22"></bh-icon><div><div style="font-size:12px;color:#B9B9B3">Main workflow</div><div style="font-size:15px;font-weight:700;line-height:1.35">{{ ind.flow }}</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:24px 28px 56px">
+    <h2 style="margin:0 0 20px;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">What gets in the way today</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+      <sc-for list="{{ ind.problems }}" as="pr" hint-placeholder-count="3">
+        <div style="border:1px solid #EEEDE8;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:10px"><span style="width:44px;height:44px;border-radius:14px;background:#F3F2EE;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ pr.icon }}" size="20"></bh-icon></span><div style="font-size:17px;font-weight:700">{{ pr.t }}</div><div style="font-size:14px;line-height:1.6;color:#5D5D58">{{ pr.d }}</div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="bh-workflow" style="padding:56px 28px;background:#F8F7F3">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:24px">
+      <h2 style="margin:0;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">The {{ ind.name }} workflow</h2>
+      <span style="font-size:11px;font-weight:800;letter-spacing:.06em;padding:6px 12px;border-radius:999px;border:1px solid #D8D6CF;color:#5D5D58">CONCEPTUAL PREVIEW · SAMPLE DATA</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <sc-for list="{{ wfTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 18px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:14px;font-weight:700;cursor:pointer"><span style="width:24px;height:24px;border-radius:12px;background:{{ t.numBg }};color:#141414;display:flex;align-items:center;justify-content:center;font-size:12px">{{ t.n }}</span>{{ t.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px">
+      <div style="background:#fff;border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:14px">
+        <span style="width:52px;height:52px;border-radius:18px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ wf.icon }}" size="24"></bh-icon></span>
+        <h3 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">{{ wf.title }}</h3>
+        <p style="margin:0;font-size:15px;line-height:1.65;color:#3E3E3A">{{ wf.desc }}</p>
+        <div style="display:flex;gap:8px;margin-top:auto">
+          <button onClick="{{ wfPrev }}" disabled="{{ wfFirst }}" aria-label="Previous step" style="width:46px;height:46px;border-radius:23px;border:1.5px solid #141414;background:#fff;color:#141414;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-left" size="18"></bh-icon></button>
+          <button onClick="{{ wfNext }}" disabled="{{ wfLast }}" aria-label="Next step" style="width:46px;height:46px;border-radius:23px;border:none;background:#141414;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="18"></bh-icon></button>
+        </div>
+      </div>
+      <div style="background:{{ ind.pastel }};border-radius:28px;padding:18px">
+        <div style="background:#fff;border-radius:20px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #EEEDE8"><bh-icon name="{{ wf.icon }}" size="16"></bh-icon><span style="font-size:14px;font-weight:700">{{ wf.screen }}</span><span style="margin-left:auto;font-size:11px;color:#5D5D58">{{ wf.scope }}</span></div>
+          <div style="padding:10px">
+            <sc-for list="{{ wf.rows }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:{{ r.bg }}">
+                <span style="width:34px;height:34px;border-radius:12px;background:#F3F2EE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ r.icon }}" size="15"></bh-icon></span>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">{{ r.a }}</div><div style="font-size:12px;color:#5D5D58">{{ r.b }}</div></div>
+                <span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ r.tagBg }};white-space:nowrap">{{ r.tag }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:56px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px">
+    <div style="background:#141414;color:#fff;border-radius:28px;padding:32px"><div style="display:flex;gap:10px;align-items:center;margin-bottom:16px"><bh-icon name="building" size="22"></bh-icon><h3 style="margin:0;font-size:22px;font-weight:700">Headquarters controls</h3></div>
+      <sc-for list="{{ ind.hq }}" as="h" hint-placeholder-count="3"><div style="display:flex;gap:10px;padding:10px 0;border-top:1px solid #2A2A2A;font-size:14px;line-height:1.5;color:#E0E0DA"><bh-icon name="lock" size="16"></bh-icon>{{ h }}</div></sc-for>
+    </div>
+    <div style="background:#E2F5A6;border-radius:28px;padding:32px"><div style="display:flex;gap:10px;align-items:center;margin-bottom:16px"><bh-icon name="pin" size="22"></bh-icon><h3 style="margin:0;font-size:22px;font-weight:700">Location teams</h3></div>
+      <sc-for list="{{ ind.local }}" as="h" hint-placeholder-count="3"><div style="display:flex;gap:10px;padding:10px 0;border-top:1px solid rgba(0,0,0,.08);font-size:14px;line-height:1.5"><bh-icon name="edit" size="16"></bh-icon>{{ h }}</div></sc-for>
+    </div>
+  </section>
+
+  <section style="padding:0 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px">
+    <div style="border:1px solid #EEEDE8;border-radius:28px;padding:28px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="margin:0;font-size:20px;font-weight:700">First release</h3><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#D6F26B">{{ ind.avail }}</span></div>
+      <sc-for list="{{ ind.first }}" as="x" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:14px;line-height:1.5"><span style="color:#2F6B3A"><bh-icon name="check-circle" size="17"></bh-icon></span>{{ x }}</div></sc-for>
+    </div>
+    <div style="border:1px solid #EEEDE8;border-radius:28px;padding:28px"><h3 style="margin:0 0 14px;font-size:20px;font-weight:700">Connected systems</h3>
+      <sc-for list="{{ ind.connected }}" as="x" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #F3F2EE;font-size:14px"><span style="display:flex;gap:8px;align-items:center"><bh-icon name="plug" size="15"></bh-icon>{{ x.n }}</span><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ x.bg }}">{{ x.s }}</span></div></sc-for>
+    </div>
+    <div style="border:1.5px dashed #D8D6CF;border-radius:28px;padding:28px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="margin:0;font-size:20px;font-weight:700">Later</h3><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#F3F2EE">Planned</span></div>
+      <sc-for list="{{ ind.later }}" as="x" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:14px;line-height:1.5;color:#5D5D58"><bh-icon name="clock" size="16"></bh-icon>{{ x }}</div></sc-for>
+    </div>
+  </section>
+
+  <section style="padding:0 28px 56px">
+    <div style="background:#F3F2EE;border-radius:28px;padding:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:14px;align-items:center"><span style="width:52px;height:52px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="wallet" size="22"></bh-icon></span><div><div style="font-size:18px;font-weight:700">Pricing for {{ ind.name }}</div><div style="font-size:14px;color:#5D5D58">Per authorised location. Networks can request a quote.</div></div></div>
+      <button onClick="{{ go.pricing }}" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">See pricing<bh-icon name="arrow-right" size="15"></bh-icon></button>
+    </div>
+  </section>
+
+  <section style="padding:0 28px 56px">
+    <h2 style="margin:0 0 20px;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">{{ ind.name }} questions</h2>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ indFaqs }}" as="f" hint-placeholder-count="3">
+        <div style="border-radius:22px;background:{{ f.bg }}">
+          <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 22px;border:none;background:transparent;text-align:left;font-size:16px;font-weight:700;color:#141414;cursor:pointer">{{ f.q }}<span style="width:32px;height:32px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ f.icon }}" size="15"></bh-icon></span></button>
+          <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}"><div style="padding:0 22px 20px;font-size:15px;line-height:1.65;color:#3E3E3A;max-width:780px">{{ f.a }}</div></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</sc-if>
+
+<!-- ============ SOLUTIONS ============ -->
+<sc-if value="{{ p.solution }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+    <div style="padding:clamp(8px,2vw,24px);display:flex;flex-direction:column;gap:18px;justify-content:center">
+      <span style="align-self:flex-start;display:flex;gap:8px;align-items:center;padding:7px 14px;border-radius:999px;background:{{ sol.pastel }};font-size:12px;font-weight:700"><bh-icon name="{{ sol.icon }}" size="14"></bh-icon>{{ sol.kicker }}</span>
+      <h1 style="margin:0;font-size:clamp(36px,4.8vw,64px);line-height:1.03;font-weight:700;letter-spacing:-.04em;text-wrap:balance">{{ sol.headline }}</h1>
+      <p style="margin:0;font-size:17px;line-height:1.6;color:#5D5D58;max-width:540px">{{ sol.intro }}</p>
+      <button onClick="{{ go.demo }}" style="align-self:flex-start;display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">{{ sol.cta }}<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="16"></bh-icon></span></button>
+    </div>
+    <div style="position:relative;min-height:460px;border-radius:28px;overflow:hidden;background:#E4E2DC"><img src="{{ sol.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+  </section>
+  <section style="padding:0 28px 56px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <sc-for list="{{ sol.points }}" as="pt" hint-placeholder-count="4">
+        <div style="background:{{ pt.bg }};border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:10px"><span style="width:46px;height:46px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ pt.icon }}" size="21"></bh-icon></span><div style="font-size:18px;font-weight:700">{{ pt.t }}</div><div style="font-size:14px;line-height:1.6;color:#3E3E3A">{{ pt.d }}</div></div>
+      </sc-for>
+    </div>
+  </section>
+  <section style="padding:56px 28px;background:#F8F7F3">
+    <h2 style="margin:0 0 24px;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">{{ sol.stepsTitle }}</h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ sol.steps }}" as="s" hint-placeholder-count="4">
+        <div style="background:#fff;border-radius:22px;padding:20px 22px;display:flex;gap:16px;align-items:center"><span style="width:40px;height:40px;border-radius:20px;background:#141414;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">{{ s.n }}</span><div><div style="font-size:16px;font-weight:700">{{ s.t }}</div><div style="font-size:14px;color:#5D5D58;line-height:1.5">{{ s.d }}</div></div></div>
+      </sc-for>
+    </div>
+  </section>
+</sc-if>
+
+<!-- ============ WORDPRESS ============ -->
+<sc-if value="{{ p.wordpress }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <span style="align-self:flex-start;display:flex;gap:8px;align-items:center;padding:7px 14px;border-radius:999px;background:#F7EDA8;font-size:12px;font-weight:700"><bh-icon name="wordpress" size="14"></bh-icon>WordPress connector</span>
+      <h1 style="margin:0;font-size:clamp(36px,4.8vw,64px);line-height:1.03;font-weight:700;letter-spacing:-.04em">Keep your site. Add what's missing.</h1>
+      <p style="margin:0;font-size:17px;line-height:1.6;color:#5D5D58;max-width:540px">The free BranchHarbor plugin adds blocks, forms and supported connections to your existing WordPress site. Your hosting, theme and editor stay as they are.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onClick="{{ go.integrations }}" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 22px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">View supported connections<span style="width:40px;height:40px;border-radius:20px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="16"></bh-icon></span></button>
+        <a href="BranchHarbor WordPress Plugin.dc.html" style="display:flex;align-items:center;gap:8px;height:52px;padding:0 22px;border-radius:999px;border:1.5px solid #141414;color:#141414;font-size:15px;font-weight:600;text-decoration:none"><bh-icon name="eye" size="16"></bh-icon>Preview the plugin</a>
+      </div>
+    </div>
+    <div style="background:#1D2327;border-radius:28px;padding:18px;color:#fff">
+      <div style="display:flex;gap:6px;margin-bottom:12px"><span style="width:10px;height:10px;border-radius:5px;background:#3C434A"></span><span style="width:10px;height:10px;border-radius:5px;background:#3C434A"></span><span style="width:10px;height:10px;border-radius:5px;background:#3C434A"></span></div>
+      <div style="background:#fff;color:#141414;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><bh-logo size="28"></bh-logo><strong style="font-size:15px">BranchHarbor · Connections</strong></div>
+        <sc-for list="{{ wpPreview }}" as="w" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#F8F7F3"><bh-icon name="{{ w.icon }}" size="16"></bh-icon><span style="flex:1;font-size:13px;font-weight:600">{{ w.n }}</span><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ w.bg }}">{{ w.s }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  <section style="padding:48px 28px;background:#F8F7F3">
+    <h2 style="margin:0 0 24px;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">How connecting works</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+      <sc-for list="{{ wpSteps }}" as="s" hint-placeholder-count="6">
+        <div style="background:#fff;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between"><span style="width:42px;height:42px;border-radius:14px;background:{{ s.bg }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ s.icon }}" size="19"></bh-icon></span><span style="font-size:12px;font-weight:800;color:#9C9C96">0{{ s.n }}</span></div><div style="font-size:16px;font-weight:700">{{ s.t }}</div><div style="font-size:13px;line-height:1.55;color:#5D5D58">{{ s.d }}</div></div>
+      </sc-for>
+    </div>
+  </section>
+  <section style="padding:48px 28px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px"><h2 style="margin:0;font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.035em">Compatibility matrix</h2><span style="font-size:13px;color:#5D5D58">Tested versions are sample values for the prototype.</span></div>
+    <div style="border:1px solid #EEEDE8;border-radius:24px;overflow:auto">
+      <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(130px,.8fr) minmax(110px,.6fr) minmax(220px,1.6fr) minmax(220px,1.6fr);min-width:900px;font-size:12px;font-weight:700;color:#5D5D58;background:#FAFAF7"><div style="padding:14px 16px">Category</div><div style="padding:14px">Status</div><div style="padding:14px">Tested</div><div style="padding:14px">What it does</div><div style="padding:14px">Known limits</div></div>
+      <sc-for list="{{ matrix }}" as="m" hint-placeholder-count="9">
+        <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(130px,.8fr) minmax(110px,.6fr) minmax(220px,1.6fr) minmax(220px,1.6fr);min-width:900px;font-size:13px;line-height:1.5;border-top:1px solid #F3F2EE;align-items:center">
+          <div style="padding:14px 16px;font-weight:700;display:flex;gap:8px;align-items:center"><bh-icon name="{{ m.icon }}" size="15"></bh-icon>{{ m.cat }}</div>
+          <div style="padding:14px"><span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:{{ m.bg }};color:{{ m.fg }}">{{ m.status }}</span></div>
+          <div style="padding:14px;color:#5D5D58;font-variant-numeric:tabular-nums">{{ m.ver }}</div>
+          <div style="padding:14px">{{ m.does }}</div>
+          <div style="padding:14px;color:#5D5D58">{{ m.limit }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  <section style="padding:0 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px">
+    <div style="background:#E2F5A6;border-radius:28px;padding:30px"><h3 style="margin:0 0 14px;font-size:22px;font-weight:700">Before you install</h3>
+      <sc-for list="{{ wpPrereq }}" as="x" hint-placeholder-count="4"><div style="display:flex;gap:10px;padding:8px 0;font-size:14px;line-height:1.5"><bh-icon name="check-circle" size="17"></bh-icon>{{ x }}</div></sc-for></div>
+    <div style="background:#F8D6D8;border-radius:28px;padding:30px"><h3 style="margin:0 0 14px;font-size:22px;font-weight:700">What the plugin will never do</h3>
+      <sc-for list="{{ wpNever }}" as="x" hint-placeholder-count="4"><div style="display:flex;gap:10px;padding:8px 0;font-size:14px;line-height:1.5"><bh-icon name="x" size="17"></bh-icon>{{ x }}</div></sc-for></div>
+  </section>
+</sc-if>
+
+<!-- ============ INTEGRATIONS ============ -->
+<sc-if value="{{ p.integrations }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 20px">
+    <h1 style="margin:0 0 8px;font-size:clamp(36px,4.6vw,56px);font-weight:700;letter-spacing:-.04em">Integrations</h1>
+    <p style="margin:0 0 20px;font-size:16px;color:#5D5D58;max-width:620px">Each connection lists its status, data direction and which system stays authoritative.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <label style="flex:1 1 280px;max-width:420px;height:50px;display:flex;align-items:center;gap:10px;padding:0 18px;border-radius:999px;background:#F3F2EE"><bh-icon name="search" size="17"></bh-icon><input value="{{ intQ }}" onChange="{{ setIntQ }}" placeholder="Search integrations" aria-label="Search integrations" style="flex:1;border:none;background:transparent;font-size:15px;outline:none;min-width:0"></label>
+      <sc-for list="{{ intCats }}" as="c" hint-placeholder-count="6">
+        <button onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" style="height:42px;padding:0 16px;border-radius:999px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+      <sc-for list="{{ intStatuses }}" as="c" hint-placeholder-count="5">
+        <button onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" style="height:32px;padding:0 12px;border-radius:999px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};color:#141414;font-size:12px;font-weight:700;cursor:pointer">{{ c.label }}</button>
+      </sc-for>
+    </div>
+  </section>
+  <section style="padding:12px 28px 56px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+    <div style="flex:1 1 480px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px">
+      <sc-for list="{{ intList }}" as="it" hint-placeholder-count="9">
+        <button onClick="{{ it.pick }}" style="text-align:left;background:{{ it.cardBg }};border:1.5px solid {{ it.cardBd }};border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;cursor:pointer;color:#141414">
+          <span style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:14px;background:{{ it.pastel }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ it.mono }}</span><span><span style="display:block;font-size:15px;font-weight:700">{{ it.name }}</span><span style="font-size:12px;color:#5D5D58">{{ it.cat }}</span></span></span>
+          <span style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ it.stBg }};color:{{ it.stFg }}">{{ it.status }}</span><span style="display:flex;gap:4px;align-items:center;font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;background:#F3F2EE"><bh-icon name="refresh" size="11"></bh-icon>{{ it.dir }}</span></span>
+        </button>
+      </sc-for>
+      <sc-if value="{{ intEmpty }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1/-1;border:2px dashed #E4E2DC;border-radius:22px;padding:32px;text-align:center;color:#5D5D58;font-size:15px">No integrations match. <button onClick="{{ clearInt }}" style="background:none;border:none;text-decoration:underline;font-size:15px;cursor:pointer;color:#141414">Clear filters</button></div></sc-if>
+    </div>
+    <sc-if value="{{ intSel }}" hint-placeholder-val="{{ false }}">
+      <aside style="flex:0 1 380px;min-width:300px;position:sticky;top:12px;background:#141414;color:#fff;border-radius:28px;padding:26px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="width:52px;height:52px;border-radius:16px;background:{{ intD.pastel }};color:#141414;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800">{{ intD.mono }}</span><button onClick="{{ closeInt }}" aria-label="Close" style="width:38px;height:38px;border-radius:19px;border:1px solid #333;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="16"></bh-icon></button></div>
+        <div><div style="font-size:24px;font-weight:700">{{ intD.name }}</div><div style="font-size:13px;color:#B9B9B3">{{ intD.cat }}</div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ intD.stBg }};color:{{ intD.stFg }}">{{ intD.status }}</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#262626">{{ intD.dir }}</span></div>
+        <div style="font-size:14px;line-height:1.6;color:#E0E0DA">{{ intD.desc }}</div>
+        <div style="background:#262626;border-radius:18px;padding:14px;font-size:13px;line-height:1.6"><div style="font-weight:700;margin-bottom:4px;display:flex;gap:6px;align-items:center"><bh-icon name="shield" size="14"></bh-icon>Source of truth</div>{{ intD.truth }}</div>
+        <div style="background:#262626;border-radius:18px;padding:14px;font-size:13px;line-height:1.6"><div style="font-weight:700;margin-bottom:4px;display:flex;gap:6px;align-items:center"><bh-icon name="alert" size="14"></bh-icon>Limitations</div>{{ intD.limit }}</div>
+        <button onClick="{{ go.demo }}" style="height:48px;border-radius:999px;border:none;background:#D6F26B;color:#141414;font-size:14px;font-weight:700;cursor:pointer">Ask about this connection</button>
+      </aside>
+    </sc-if>
+  </section>
+</sc-if>
+
+<!-- ============ PRICING ============ -->
+<sc-if value="{{ p.pricing }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:40px 28px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <h1 style="margin:0;font-size:clamp(36px,4.8vw,60px);font-weight:700;letter-spacing:-.04em">Pricing per location</h1>
+    <p style="margin:0;font-size:16px;color:#5D5D58;max-width:560px">Sample prices for the prototype. Final pricing will be confirmed with pilot businesses.</p>
+    <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE">
+      <button onClick="{{ setMonthly }}" aria-pressed="{{ monthly }}" style="height:40px;padding:0 18px;border-radius:999px;border:none;background:{{ billBg.m }};color:{{ billFg.m }};font-size:14px;font-weight:700;cursor:pointer">Monthly</button>
+      <button onClick="{{ setAnnual }}" aria-pressed="{{ annual }}" style="height:40px;padding:0 18px;border-radius:999px;border:none;background:{{ billBg.a }};color:{{ billFg.a }};font-size:14px;font-weight:700;cursor:pointer">Annual · 2 months free</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600">Locations
+      <button onClick="{{ locMinus }}" aria-label="Fewer locations" style="width:40px;height:40px;border-radius:20px;border:1.5px solid #141414;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="minus" size="16"></bh-icon></button>
+      <span style="min-width:40px;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums">{{ locCount }}</span>
+      <button onClick="{{ locPlus }}" aria-label="More locations" style="width:40px;height:40px;border-radius:20px;border:none;background:#141414;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="plus" size="16"></bh-icon></button>
+    </div>
+  </section>
+  <section style="padding:12px 28px 48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px">
+    <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="3">
+      <div style="background:{{ pl.bg }};color:{{ pl.fg }};border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:16px;border:1.5px solid {{ pl.bd }}">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="width:48px;height:48px;border-radius:16px;background:{{ pl.iconBg }};color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ pl.icon }}" size="22"></bh-icon></span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ pl.tagBg }};color:#141414">{{ pl.tag }}</span></div>
+        <div><div style="font-size:22px;font-weight:700">{{ pl.name }}</div><div style="font-size:14px;opacity:.75;margin-top:2px">{{ pl.for }}</div></div>
+        <div><span style="font-size:44px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums">{{ pl.price }}</span><span style="font-size:14px;opacity:.7"> {{ pl.unit }}</span><div style="font-size:13px;opacity:.75;margin-top:4px;font-variant-numeric:tabular-nums">{{ pl.total }}</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid {{ pl.line }};padding-top:14px">
+          <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="5"><div style="display:flex;gap:10px;font-size:14px;line-height:1.45"><bh-icon name="check" size="16"></bh-icon>{{ f }}</div></sc-for>
+        </div>
+        <button onClick="{{ go.demo }}" style="margin-top:auto;height:50px;border-radius:999px;border:{{ pl.btnBd }};background:{{ pl.btnBg }};color:{{ pl.btnFg }};font-size:15px;font-weight:700;cursor:pointer">{{ pl.cta }}</button>
+      </div>
+    </sc-for>
+  </section>
+  <section style="padding:0 28px 56px">
+    <div style="background:#F3F2EE;border-radius:24px;padding:22px;display:flex;gap:14px;align-items:flex-start;font-size:14px;line-height:1.6"><bh-icon name="info" size="20"></bh-icon><div><strong>Customer payments are separate.</strong> Card processing fees come from the payment provider you connect. BranchHarbor plan billing covers the platform only. Domain registration, when available, is billed and renewed separately.</div></div>
+  </section>
+</sc-if>
+
+<!-- ============ DEMO ============ -->
+<sc-if value="{{ p.demo }}" hint-placeholder-val="{{ false }}">
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));min-height:780px">
+    <div style="position:relative;background:#F7EDA8;padding:40px;display:flex;flex-direction:column;gap:24px;overflow:hidden">
+      <div style="position:relative;flex:1;min-height:300px;border-radius:24px;overflow:hidden"><img src="{{ demoImg }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+      <div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:10px">What happens next</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px"><span style="width:30px;height:30px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="eye" size="14"></bh-icon></span>A product specialist reviews your answers.</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px"><span style="width:30px;height:30px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="mail" size="14"></bh-icon></span>We email you to arrange a time.</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px"><span style="width:30px;height:30px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="play" size="14"></bh-icon></span>The demo uses your industry and location setup.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:48px clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center">
+      <sc-if value="{{ demoForm }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submitDemo }}" novalidate="novalidate" style="display:flex;flex-direction:column;gap:20px;max-width:560px;width:100%;margin:0 auto">
+          <div><h1 style="margin:0 0 6px;font-size:44px;font-weight:700;letter-spacing:-.04em">Request a demo</h1><p style="margin:0;font-size:16px;color:#5D5D58">We'll show you the workflow for your industry and how it fits the tools you already use.</p></div>
+          <sc-if value="{{ hasErrors }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="border-radius:18px;background:#FDE7E5;padding:14px 18px;font-size:14px;line-height:1.55;color:#8A1D16;display:flex;gap:10px"><bh-icon name="alert" size="18"></bh-icon><div><div style="font-weight:700;margin-bottom:2px">Please check {{ errorCount }} fields</div><sc-for list="{{ errorList }}" as="e" hint-placeholder-count="2"><div>· {{ e }}</div></sc-for></div></div>
+          </sc-if>
+          <div><div style="font-size:14px;font-weight:600;margin-bottom:8px">Industry</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ industryChips }}" as="ch" hint-placeholder-count="5"><button type="button" onClick="{{ ch.pick }}" aria-pressed="{{ ch.on }}" style="display:flex;gap:6px;align-items:center;height:42px;padding:0 16px;border-radius:999px;border:1.5px solid {{ ch.bd }};background:{{ ch.bg }};color:{{ ch.fg }};font-size:14px;font-weight:600;cursor:pointer"><bh-icon name="{{ ch.icon }}" size="15"></bh-icon>{{ ch.name }}</button></sc-for></div></div>
+          <div><div style="font-size:14px;font-weight:600;margin-bottom:8px">Business type</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="2"><button type="button" onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="text-align:left;padding:14px 18px;border-radius:20px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};cursor:pointer;color:#141414;display:flex;gap:10px;align-items:center"><bh-icon name="{{ o.icon }}" size="20"></bh-icon><span><span style="display:block;font-size:14px;font-weight:700">{{ o.name }}</span><span style="font-size:12px;color:#5D5D58">{{ o.desc }}</span></span></button></sc-for></div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Name<input value="{{ form.name }}" onChange="{{ on.name }}" style="height:50px;border:1.5px solid {{ bd.name }};border-radius:999px;padding:0 20px;font-size:15px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.name }}</span></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Work email<input type="email" value="{{ form.email }}" onChange="{{ on.email }}" style="height:50px;border:1.5px solid {{ bd.email }};border-radius:999px;padding:0 20px;font-size:15px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.email }}</span></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Business name<input value="{{ form.business }}" onChange="{{ on.business }}" style="height:50px;border:1.5px solid {{ bd.business }};border-radius:999px;padding:0 20px;font-size:15px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.business }}</span></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Number of locations<input inputmode="numeric" value="{{ form.locations }}" onChange="{{ on.locations }}" style="height:50px;border:1.5px solid {{ bd.locations }};border-radius:999px;padding:0 20px;font-size:15px"><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.locations }}</span></label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">Existing website<select value="{{ form.website }}" onChange="{{ on.website }}" style="height:50px;border:1.5px solid {{ bd.website }};border-radius:999px;padding:0 18px;font-size:15px;background:#fff"><option value="">Choose…</option><option>Yes, on WordPress</option><option>Yes, on another platform</option><option>No website yet</option><option>Not sure</option></select><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.website }}</span></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600">What's the main difficulty you want to solve?<textarea rows="3" value="{{ form.difficulty }}" onChange="{{ on.difficulty }}" style="border:1.5px solid {{ bd.difficulty }};border-radius:24px;padding:14px 20px;font-size:15px;line-height:1.5;resize:vertical"></textarea><span style="font-size:12px;font-weight:500;color:#B3261E">{{ errors.difficulty }}</span></label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600"><span>Phone <span style="font-weight:400;color:#5D5D58">· optional</span></span><input value="{{ form.phone }}" onChange="{{ on.phone }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600"><span>Systems you use now <span style="font-weight:400;color:#5D5D58">· optional</span></span><input value="{{ form.systems }}" onChange="{{ on.systems }}" style="height:50px;border:1.5px solid #D8D6CF;border-radius:999px;padding:0 20px;font-size:15px"></label>
+          </div>
+          <button type="submit" disabled="{{ sending }}" style="align-self:center;height:54px;padding:0 44px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:16px;font-weight:600;cursor:pointer">{{ submitLabel }}</button>
+        </form>
+      </sc-if>
+      <sc-if value="{{ demoDone }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display:flex;flex-direction:column;gap:18px;max-width:520px;margin:0 auto">
+          <div style="width:64px;height:64px;border-radius:32px;background:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-icon name="check" size="30" stroke="2.5"></bh-icon></div>
+          <h2 style="margin:0;font-size:38px;font-weight:700;letter-spacing:-.035em">Thanks, {{ form.name }}. Your request is in.</h2>
+          <p style="margin:0;font-size:16px;line-height:1.65;color:#5D5D58">A product specialist will email <strong style="color:#141414">{{ form.email }}</strong> to arrange a time. The demo will cover {{ form.industry }} workflows for {{ sizeSummary }}.</p>
+          <div style="background:#F3F2EE;border-radius:20px;padding:18px;font-size:14px;line-height:1.8"><div><strong>Business:</strong> {{ form.business }}</div><div><strong>Existing website:</strong> {{ form.website }}</div></div>
+          <button onClick="{{ go.home }}" style="align-self:flex-start;height:48px;padding:0 22px;border-radius:999px;border:1.5px solid #141414;background:#fff;color:#141414;font-size:14px;font-weight:600;cursor:pointer">Back to home</button>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+</sc-if>
+
+<!-- ============ RESOURCES / DOCS ============ -->
+<sc-if value="{{ p.resources }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 20px">
+    <h1 style="margin:0 0 8px;font-size:clamp(36px,4.6vw,56px);font-weight:700;letter-spacing:-.04em">Resources &amp; docs</h1>
+    <p style="margin:0 0 20px;font-size:16px;color:#5D5D58">Guides for owners and managers, and reference docs for setup.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <label style="flex:1 1 280px;max-width:420px;height:50px;display:flex;align-items:center;gap:10px;padding:0 18px;border-radius:999px;background:#F3F2EE"><bh-icon name="search" size="17"></bh-icon><input value="{{ resQ }}" onChange="{{ setResQ }}" placeholder="Search guides" aria-label="Search guides" style="flex:1;border:none;background:transparent;font-size:15px;outline:none;min-width:0"></label>
+      <sc-for list="{{ resCats }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" style="height:42px;padding:0 16px;border-radius:999px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for>
+    </div>
+  </section>
+  <sc-if value="{{ noArticle }}" hint-placeholder-val="{{ true }}">
+    <section style="padding:12px 28px 56px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+      <sc-for list="{{ resList }}" as="r" hint-placeholder-count="8">
+        <button onClick="{{ r.open }}" style="text-align:left;border:1px solid #EEEDE8;border-radius:24px;padding:0;background:#fff;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;color:#141414">
+          <div style="height:120px;background:{{ r.pastel }};display:flex;align-items:flex-end;justify-content:space-between;padding:16px"><bh-icon name="{{ r.icon }}" size="28"></bh-icon><span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:#fff">{{ r.cat }}</span></div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:6px"><div style="font-size:16px;font-weight:700;line-height:1.35">{{ r.title }}</div><div style="font-size:13px;color:#5D5D58;line-height:1.5">{{ r.sum }}</div><div style="font-size:12px;color:#5D5D58;display:flex;gap:6px;align-items:center;margin-top:4px"><bh-icon name="clock" size="12"></bh-icon>{{ r.mins }} min read</div></div>
+        </button>
+      </sc-for>
+    </section>
+  </sc-if>
+  <sc-if value="{{ hasArticle }}" hint-placeholder-val="{{ false }}">
+    <section style="padding:12px 28px 56px;display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+      <aside style="flex:0 1 240px;min-width:200px;position:sticky;top:12px;display:flex;flex-direction:column;gap:4px">
+        <button onClick="{{ closeArticle }}" style="display:flex;gap:8px;align-items:center;height:42px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;align-self:flex-start"><bh-icon name="arrow-left" size="15"></bh-icon>All guides</button>
+        <div style="font-size:12px;font-weight:700;color:#5D5D58;padding:4px 10px">On this page</div>
+        <sc-for list="{{ art.sections }}" as="s" hint-placeholder-count="4"><div style="padding:8px 10px;border-radius:12px;font-size:14px;color:#3E3E3A">{{ s.h }}</div></sc-for>
+      </aside>
+      <article style="flex:1 1 520px;max-width:760px">
+        <span style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;background:{{ art.pastel }}">{{ art.cat }}</span>
+        <h1 style="margin:14px 0 10px;font-size:clamp(30px,3.6vw,44px);font-weight:700;letter-spacing:-.035em;line-height:1.1">{{ art.title }}</h1>
+        <p style="margin:0 0 24px;font-size:17px;line-height:1.6;color:#5D5D58">{{ art.sum }}</p>
+        <sc-for list="{{ art.sections }}" as="s" hint-placeholder-count="4">
+          <h2 style="margin:28px 0 8px;font-size:22px;font-weight:700">{{ s.h }}</h2>
+          <p style="margin:0;font-size:16px;line-height:1.75;color:#2E2E2A">{{ s.p }}</p>
+        </sc-for>
+        <div style="margin-top:32px;background:#F3F2EE;border-radius:20px;padding:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="font-size:14px;font-weight:600">Was this helpful?</span><button onClick="{{ rateYes }}" style="height:38px;padding:0 16px;border-radius:999px;border:1.5px solid #141414;background:{{ rateBg.y }};font-size:13px;font-weight:600;cursor:pointer">Yes</button><button onClick="{{ rateNo }}" style="height:38px;padding:0 16px;border-radius:999px;border:1.5px solid #141414;background:{{ rateBg.n }};font-size:13px;font-weight:600;cursor:pointer">No</button><span style="font-size:13px;color:#5D5D58">{{ rateMsg }}</span></div>
+      </article>
+    </section>
+  </sc-if>
+</sc-if>
+
+<!-- ============ SUPPORT ============ -->
+<sc-if value="{{ p.support }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:40px 28px;background:#CDEEEE;margin:12px;border-radius:28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+    <span style="width:56px;height:56px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="help" size="26"></bh-icon></span>
+    <h1 style="margin:0;font-size:clamp(34px,4.4vw,54px);font-weight:700;letter-spacing:-.04em">How can we help?</h1>
+    <label style="width:min(560px,100%);height:56px;display:flex;align-items:center;gap:10px;padding:0 20px;border-radius:999px;background:#fff"><bh-icon name="search" size="18"></bh-icon><input placeholder="Search help articles" aria-label="Search help" style="flex:1;border:none;font-size:16px;outline:none;min-width:0"></label>
+  </section>
+  <section style="padding:28px 28px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+    <sc-for list="{{ supportTopics }}" as="t" hint-placeholder-count="6">
+      <button onClick="{{ go.resources }}" style="text-align:left;border:1px solid #EEEDE8;border-radius:22px;padding:20px;background:#fff;cursor:pointer;display:flex;gap:14px;align-items:center;color:#141414"><span style="width:44px;height:44px;border-radius:14px;background:{{ t.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ t.icon }}" size="20"></bh-icon></span><span><span style="display:block;font-size:15px;font-weight:700">{{ t.t }}</span><span style="font-size:12px;color:#5D5D58">{{ t.d }}</span></span></button>
+    </sc-for>
+  </section>
+  <section style="padding:20px 28px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px">
+    <div style="background:#141414;color:#fff;border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:24px;font-weight:700">Contact support</h2>
+      <sc-if value="{{ supNotSent }}" hint-placeholder-val="{{ true }}">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Topic<select value="{{ sup.topic }}" onChange="{{ supTopic }}" style="height:48px;border:none;border-radius:999px;padding:0 16px;font-size:14px"><option>Bookings or orders</option><option>Website or domain</option><option>WordPress connector</option><option>Payments</option><option>Something else</option></select></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">What happened?<textarea rows="4" value="{{ sup.msg }}" onChange="{{ supMsg }}" style="border:none;border-radius:20px;padding:12px 16px;font-size:14px;resize:vertical"></textarea></label>
+        <div style="font-size:12px;color:#B9B9B3;line-height:1.5">Support can only view your account if you grant time-limited access. Every access is logged.</div>
+        <button onClick="{{ supSend }}" disabled="{{ supEmpty }}" style="height:50px;border-radius:999px;border:none;background:#D6F26B;color:#141414;font-size:15px;font-weight:700;cursor:pointer">Send message</button>
+      </sc-if>
+      <sc-if value="{{ supSent }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:12px;align-items:center;background:#262626;border-radius:20px;padding:16px;font-size:14px;line-height:1.5"><bh-icon name="check-circle" size="22"></bh-icon>Message sent. We'll reply by email; you can follow the thread in Settings › Support.</div></sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="background:#E2F5A6;border-radius:24px;padding:22px;display:flex;gap:14px;align-items:center"><bh-icon name="activity" size="22"></bh-icon><div><div style="font-size:16px;font-weight:700">Service status</div><div style="font-size:13px;color:#2E3A12">All systems operating normally (sample)</div></div></div>
+      <div style="background:#F3F2EE;border-radius:24px;padding:22px;display:flex;gap:14px;align-items:center"><bh-icon name="book" size="22"></bh-icon><div><div style="font-size:16px;font-weight:700">Documentation</div><div style="font-size:13px;color:#5D5D58">Setup guides and connection references</div></div></div>
+      <div style="background:#F3F2EE;border-radius:24px;padding:22px;display:flex;gap:14px;align-items:center"><bh-icon name="users" size="22"></bh-icon><div><div style="font-size:16px;font-weight:700">Community &amp; resources</div><div style="font-size:13px;color:#5D5D58">Inside the app for network members</div></div></div>
+    </div>
+  </section>
+</sc-if>
+
+<!-- ============ ABOUT ============ -->
+<sc-if value="{{ p.about }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:40px 28px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px">
+    <div style="display:flex;flex-direction:column;gap:18px;justify-content:center">
+      <span style="align-self:flex-start;padding:7px 14px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:700">About</span>
+      <h1 style="margin:0;font-size:clamp(36px,4.8vw,60px);line-height:1.04;font-weight:700;letter-spacing:-.04em">Individual branches. One shared home.</h1>
+      <p style="margin:0;font-size:17px;line-height:1.65;color:#5D5D58;max-width:540px">BranchHarbor helps independent businesses and multi-location networks run their websites, customers and daily workflows together, without taking control away from the people who run each location.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:420px">
+      <div style="position:relative;border-radius:28px;overflow:hidden"><img src="{{ img.foodTeam }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:14px"><div style="position:relative;border-radius:24px;overflow:hidden"><img src="{{ img.shopOpen }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div><div style="position:relative;border-radius:24px;overflow:hidden"><img src="{{ img.sportCoach }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div></div>
+    </div>
+  </section>
+  <section style="padding:0 28px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+    <sc-for list="{{ principles }}" as="pr" hint-placeholder-count="4"><div style="background:{{ pr.bg }};border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:10px"><bh-icon name="{{ pr.icon }}" size="24"></bh-icon><div style="font-size:17px;font-weight:700">{{ pr.t }}</div><div style="font-size:14px;line-height:1.6;color:#3E3E3A">{{ pr.d }}</div></div></sc-for>
+  </section>
+  <section style="padding:0 28px 56px">
+    <div style="border:1.5px dashed #D8D6CF;border-radius:24px;padding:24px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center"><div><div style="font-size:17px;font-weight:700">Team and company details</div><div style="font-size:14px;color:#5D5D58">To be added once the operating entity is confirmed.</div></div><button onClick="{{ go.support }}" style="height:46px;padding:0 20px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Contact the team</button></div>
+  </section>
+</sc-if>
+
+<!-- ============ LEGAL ============ -->
+<sc-if value="{{ p.legal }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+    <aside style="flex:0 1 220px;min-width:200px;display:flex;flex-direction:column;gap:4px">
+      <sc-for list="{{ legalTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="display:flex;gap:10px;align-items:center;height:46px;padding:0 16px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:14px;font-weight:600;cursor:pointer;text-align:left"><bh-icon name="{{ t.icon }}" size="16"></bh-icon>{{ t.label }}</button></sc-for>
+    </aside>
+    <article style="flex:1 1 520px;max-width:760px">
+      <h1 style="margin:0 0 10px;font-size:clamp(30px,3.6vw,44px);font-weight:700;letter-spacing:-.035em">{{ legal.title }}</h1>
+      <div style="display:flex;gap:10px;align-items:center;background:#FFF3C9;border-radius:18px;padding:14px 16px;font-size:14px;color:#5A4300;margin-bottom:20px"><bh-icon name="info" size="18"></bh-icon>Outline only. This page will publish BranchHarbor's actual policy once reviewed by counsel.</div>
+      <sc-for list="{{ legal.sections }}" as="s" hint-placeholder-count="5"><div style="border-top:1px solid #EEEDE8;padding:18px 0"><h2 style="margin:0 0 6px;font-size:19px;font-weight:700">{{ s.h }}</h2><p style="margin:0;font-size:15px;line-height:1.7;color:#3E3E3A">{{ s.p }}</p></div></sc-for>
+    </article>
+  </section>
+</sc-if>
+
+<!-- CLOSING CTA + FOOTER -->
+<sc-if value="{{ showCta }}" hint-placeholder-val="{{ true }}">
+  <section style="padding:0 28px 28px">
+    <div style="position:relative;background:#D6F26B;border-radius:28px;padding:56px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden">
+      <h2 style="margin:0;font-size:clamp(30px,4vw,48px);font-weight:700;letter-spacing:-.035em;max-width:700px">See BranchHarbor with your workflow</h2>
+      <p style="margin:0;font-size:16px;color:#2E3A12;max-width:520px">Tell us about your locations and we'll walk you through the relevant setup.</p>
+      <button onClick="{{ go.demo }}" style="display:flex;align-items:center;gap:10px;height:54px;padding:0 6px 0 24px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer">Request a demo<span style="width:42px;height:42px;border-radius:21px;background:#fff;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-up-right" size="17"></bh-icon></span></button>
+    </div>
+  </section>
+</sc-if>
+<footer style="padding:40px 28px 28px;background:#141414;color:#fff">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:28px">
+    <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;gap:10px;align-items:center"><bh-logo size="34" dark="true"></bh-logo><span style="font-size:18px;font-weight:800">BranchHarbor</span></div><div style="font-size:13px;line-height:1.6;color:#B9B9B3">One home for every location.</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:700;color:#8E8E88;margin-bottom:4px">Industries</div><sc-for list="{{ industries }}" as="i" hint-placeholder-count="5"><button onClick="{{ i.open }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">{{ i.name }}</button></sc-for></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:700;color:#8E8E88;margin-bottom:4px">Product</div><button onClick="{{ go.franchises }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">For franchises</button><button onClick="{{ go.independent }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Independent businesses</button><button onClick="{{ go.wordpress }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">WordPress</button><button onClick="{{ go.integrations }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Integrations</button><button onClick="{{ go.pricing }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Pricing</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:700;color:#8E8E88;margin-bottom:4px">Company</div><button onClick="{{ go.resources }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Resources &amp; docs</button><button onClick="{{ go.support }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Support</button><button onClick="{{ go.about }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">About</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:700;color:#8E8E88;margin-bottom:4px">Policies</div><button onClick="{{ go.privacy }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Privacy</button><button onClick="{{ go.terms }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Terms</button><button onClick="{{ go.security }}" style="background:none;border:none;padding:0;text-align:left;color:#fff;font-size:14px;cursor:pointer">Security</button></div>
+  </div>
+  <div style="margin-top:32px;padding-top:18px;border-top:1px solid #2A2A2A;font-size:11px;line-height:1.6;color:#8E8E88">Prototype · proposed routes, not deployed URLs · {{ credits }}</div>
+</footer>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const U = (id, w) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w || 1200}&q=70`;
+const IMG = {
+  yogaStudio: U('1761035190790-aa1a3472f7fc'), yogaStretch: U('1761035005546-62b8018b212a'), yogaGroup: U('1677741447985-da1d90c00742'), yogaRoom: U('1676496962536-d8ef110ff6f0'), yogaMeditate: U('1697274834392-04ff3b76ef20', 900),
+  sportKids: U('1622659097509-4d56de14539e'), sportChildren: U('1526232761682-d26e03ac148e'), sportCoach: U('1574772135913-d519461c3996', 900), sportCones: U('1650897877790-0e171d2207dc', 900),
+  spaProne: U('1544161515-4ab6ce6db874'), spaStones: U('1600334089648-b0d9d3028eb2', 900), spaDiffuser: U('1620733723572-11c53f73a416', 900),
+  shopInterior: U('1441986300917-64674bd600d8'), shopBoutique: U('1441984904996-e0b6ba687e04', 900), shopPay: U('1556740738-b6a63e27c4df'), shopOpen: U('1472851294608-062f824d29cc', 900),
+  foodChef: U('1622021142947-da7dedc7c39a'), foodCook: U('1640583342012-4622f31b650d', 900), foodTeam: U('1651977560788-98792cd34da0'), foodPizza: U('1651981075280-9a9e01acbff0', 900),
+};
+const P = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE' };
+const ST = { Tested: ['#D6F26B', '#141414'], 'Limited support': [P.butter, '#141414'], 'Requires setup': [P.aqua, '#141414'], Planned: ['#F3F2EE', '#3E3E3A'], Unsupported: [P.blush, '#5C1414'] };
+const LOCS = [
+  { id: 'qw', name: 'Toronto – Queen West', region: 'Ontario', enq: 14, classes: 9, occ: '78%', sync: 'Connected · 4 min ago', ok: true, dot: P.lilac },
+  { id: 'ls', name: 'Toronto – Leslieville', region: 'Ontario', enq: 9, classes: 7, occ: '64%', sync: 'Connected · 6 min ago', ok: true, dot: P.butter },
+  { id: 'kt', name: 'Vancouver – Kitsilano', region: 'British Columbia', enq: 11, classes: 8, occ: 'Unavailable', sync: 'Degraded · last sync 2 h ago', ok: false, dot: P.aqua },
+  { id: 'ch', name: 'Seattle – Capitol Hill', region: 'Washington', enq: 6, classes: 6, occ: '71%', sync: 'Connected · 3 min ago', ok: true, dot: P.blush },
+  { id: 'pd', name: 'Portland – Pearl District', region: 'Oregon', enq: 8, classes: 5, occ: '59%', sync: 'Connected · 9 min ago', ok: true, dot: P.sage },
+  { id: 'dv', name: 'Denver – LoHi', region: 'Colorado', enq: 3, classes: 4, occ: 'Not connected', sync: 'Booking system not connected', ok: false, dot: P.lime },
+];
+const R = (icon, a, b, tag, tagBg) => ({ icon, a, b, tag, tagBg: tagBg || '#F3F2EE' });
+const IND = {
+  studios: { name: 'Studios', icon: 'lotus', pastel: P.lilac, avail: 'Pilot', img: IMG.yogaGroup, img2: IMG.yogaMeditate, alt: 'Group yoga class in a studio', who: 'Yoga, Pilates, dance, barre, cycling and boutique fitness', flow: 'Enquiry → trial → class → membership', cta: 'Request a studio demo',
+    headline: 'Keep every studio connected, from first enquiry to the next class.', intro: 'Websites, schedules, enquiries and instructor cover in one place, with each studio keeping its own calendar and members.',
+    problems: [{ icon: 'globe', t: 'One site per studio, all slightly different', d: 'Schedules, prices and intro offers drift between locations and nobody is sure which page is current.' }, { icon: 'mail', t: 'Enquiries land in different inboxes', d: 'Trial requests sit unanswered because they went to a shared address nobody owns.' }, { icon: 'users', t: 'Cover requests by group chat', d: 'Instructor swaps happen in messages and the public schedule shows the wrong name.' }],
+    wf: [{ label: 'Enquiry', icon: 'mail', title: 'An enquiry reaches the right studio', desc: 'Website forms route to the studio the visitor chose. Managers see new enquiries with their source and can reply or book a trial.', screen: 'Enquiries', scope: 'Toronto – Queen West', rows: [R('user', 'Priya S. · Intro offer', 'Website form · 12 min ago', 'New', P.butter), R('user', 'Daniel K. · Prenatal question', 'Website form · 1 h ago', 'Replied'), R('user', 'Mei L. · Corporate class', 'Phone · yesterday', 'Assigned', P.aqua)] },
+      { label: 'Trial', icon: 'gift', title: 'Trial booked with an eligible offer', desc: 'The intro offer applies only to new members at that studio. The booking system remains authoritative where it is connected.', screen: 'Offers', scope: 'Toronto – Queen West', rows: [R('tag', 'New Year Intro · 3 for $39 CAD', 'New members only · 2–31 Jan', 'Active', '#D6F26B'), R('tag', 'First class free', 'Local override', 'Local', P.lilac), R('tag', 'Friends week', 'Requires HQ approval', 'Pending', P.butter)] },
+      { label: 'Class', icon: 'calendar', title: 'Classes, capacity and waitlists', desc: 'Week and day views per studio. Edit one occurrence or a whole series, with a preview of who is affected.', screen: 'Classes · Sat 17 Oct', scope: 'Toronto – Queen West', rows: [R('clock', '7:00 Morning Vinyasa · Maya Rao', '16 of 20 booked', 'Cover requested', P.blush), R('clock', '9:00 Slow Flow · Sam Tran', '20 of 20 · 3 waitlisted', 'Full', P.butter), R('clock', '12:15 Lunchtime Pilates · Ana Silva', '11 of 20 booked', 'Open', '#D6F26B')] },
+      { label: 'Membership', icon: 'card', title: 'Members, packs and attendance', desc: 'Searchable member records with pack balance, membership state and consent. Other studios cannot see these details unless policy allows.', screen: 'Members', scope: 'Toronto – Queen West', rows: [R('user', 'Ava Chen · Unlimited monthly', 'Renews 1 Nov · 14 classes this month', 'Active', '#D6F26B'), R('user', 'Liam Ortiz · 10-class pack', '3 classes left · expires 30 Nov', 'Low balance', P.butter), R('user', 'Noor Haddad · Intro offer', '2 of 3 used', 'Trial', P.lilac)] }],
+    hq: ['Shared class types, descriptions and brand pages', 'Intro offers that studios can opt into', 'Network reports on enquiries and attendance where connected'], local: ['Studio schedule, rooms and instructors', 'Local prices where HQ allows overrides', 'Cover approvals and member communication'],
+    first: ['Websites and studio schedules', 'Enquiry forms and lead routing', 'Selected booking-system connection', 'Network overview with data freshness'], connected: [{ n: 'Mindbody', s: 'Planned' }, { n: 'Momence', s: 'Planned' }, { n: 'Google Calendar', s: 'Requires setup' }], later: ['Native bookings and checkout', 'Class packs and memberships', 'Instructor cover requests', 'Online classes and on-demand library'],
+    faqs: [{ q: 'Do we have to replace our booking software?', a: 'No. In the first release, a supported booking system stays authoritative and BranchHarbor shows its schedule and links to it. Native booking comes later and only replaces your system if you choose it.' }, { q: 'Can headquarters see member details at every studio?', a: 'Not automatically. Network reports show totals. Member records stay with the studio unless your business policy allows sharing for a stated purpose.' }, { q: 'What happens with daylight-saving changes?', a: 'Classes are stored in UTC and shown in each studio’s local timezone, so recurring times stay correct across the change.' }] },
+  sports: { name: 'Sports', icon: 'trophy', pastel: P.lime, avail: 'Planned', img: IMG.sportKids, img2: IMG.sportCones, alt: 'Children playing soccer on a grass field', who: 'Academies, clubs, training programmes and camps', flow: 'Registration → group assignment → attendance', cta: 'Request a sports demo',
+    headline: 'Bring programmes, teams and venues into one organised home.', intro: 'Registrations, rosters, schedules and attendance for every venue, with guardians seeing only the participants they represent.',
+    problems: [{ icon: 'file', t: 'Registration forms everywhere', d: 'Paper, spreadsheets and form tools that don’t talk to the roster.' }, { icon: 'calendar', t: 'Venue clashes found on the day', d: 'Two groups booked on the same pitch because schedules live in different places.' }, { icon: 'user', t: 'Guardian access is messy', d: 'Parents get updates for the wrong group, or none at all.' }],
+    wf: [{ label: 'Register', icon: 'file', title: 'Guardians register a participant', desc: 'Choose programme and venue, confirm eligibility by age-boundary date, link the participant to the guardian and complete required forms.', screen: 'Registrations', scope: 'North Academy', rows: [R('user', 'Ella M. · U10 Autumn', 'Guardian: Sara M. · forms complete', 'Awaiting review', P.butter), R('user', 'Jonah P. · U12 Camp', 'Payment received', 'Accepted', '#D6F26B'), R('user', 'Leo R. · U10 Autumn', 'Capacity reached', 'Waitlisted', P.aqua)] },
+      { label: 'Assign', icon: 'users', title: 'Review and assign groups', desc: 'Payment never equals selection. Administrators review registrations and assign groups and coaches.', screen: 'Teams & groups', scope: 'North Academy', rows: [R('users', 'U10 Blue · Coach Ortiz', '14 of 16', 'Open', '#D6F26B'), R('users', 'U10 Green · Coach Ahmed', '16 of 16', 'Full', P.butter), R('users', 'U12 Camp · Coach Lee', '22 of 24', 'Open', '#D6F26B')] },
+      { label: 'Schedule', icon: 'calendar', title: 'Schedules with venue conflicts flagged', desc: 'Training and fixtures by venue, with clashes highlighted before they reach families.', screen: 'Schedule · Tue', scope: 'Riverside Park', rows: [R('clock', '17:00 U10 Blue · Pitch 2', 'Coach Ortiz', 'Scheduled'), R('alert', '17:00 U12 Camp · Pitch 2', 'Same pitch as U10 Blue', 'Conflict', P.blush), R('clock', '18:30 U14 · Pitch 1', 'Coach Lee', 'Scheduled')] },
+      { label: 'Attendance', icon: 'check-circle', title: 'Fast check-in for coaches', desc: 'Coaches open their session, see the authorised roster and record attendance in a few taps.', screen: 'Attendance · U10 Blue', scope: 'Coach Ortiz', rows: [R('user', 'Ella M.', 'Checked in 16:58', 'Present', '#D6F26B'), R('user', 'Sam K.', 'Guardian notified', 'Absent', P.blush), R('user', 'Ivy T.', '—', 'Not marked')] }],
+    hq: ['Programme templates, fees and registration forms', 'Season structure and eligibility rules', 'Cross-venue reports'], local: ['Venue schedules and coach assignments', 'Registration review and group placement', 'Session updates to affected groups only'],
+    first: ['Programme registration', 'Rosters and coach assignments', 'Scheduling with conflict indicators', 'Announcements to groups'], connected: [{ n: 'Stripe payments', s: 'Requires setup' }, { n: 'Google Calendar', s: 'Requires setup' }, { n: 'TeamSnap', s: 'Planned' }], later: ['Instalment plans', 'Fixtures and results', 'Selection workflows', 'Expanded guardian portal'],
+    faqs: [{ q: 'Does paying mean a child is on the team?', a: 'No. Where approval is required, the confirmation says the registration is pending review. Payment and selection are separate steps.' }, { q: 'Can a coach see every participant?', a: 'Coaches see only the rosters for sessions they are assigned to.' }, { q: 'Will AI choose players?', a: 'No. AI can draft programme descriptions and summarise enrolment. It never selects children based on inferred ability or sensitive characteristics.' }] },
+  wellness: { name: 'Wellness', icon: 'leaf', pastel: P.sage, avail: 'Planned', img: IMG.spaProne, img2: IMG.spaDiffuser, alt: 'Client relaxing during a spa treatment', who: 'Spas, massage, wellness centres and appointment services', flow: 'Service → practitioner → appointment', cta: 'Request a wellness demo',
+    headline: 'Make service booking simpler for clients and local teams.', intro: 'Services, practitioners, rooms and repeat appointments, with buffers enforced and the original slot kept safe during rescheduling.',
+    problems: [{ icon: 'room', t: 'Rooms double-booked', d: 'Two calendars promise the same treatment room.' }, { icon: 'refresh', t: 'Rescheduling loses the slot', d: 'Clients cancel to rebook and the original time is gone if the new one fails.' }, { icon: 'lock', t: 'Notes in the wrong hands', d: 'Administrative notes are visible to staff who don’t need them.' }],
+    wf: [{ label: 'Service', icon: 'leaf', title: 'Clients choose a service', desc: 'Each service sets duration, price, buffers, eligible practitioners and the resources it needs.', screen: 'Services', scope: 'Harbourfront', rows: [R('leaf', 'Deep tissue · 60 min', '$120 · 15 min buffer · Room A/B', 'Active', '#D6F26B'), R('leaf', 'Hot stone · 90 min', '$165 · needs stone heater', 'Active', '#D6F26B'), R('leaf', 'Facial · 45 min', '$95 · Room C', 'Paused')] },
+      { label: 'Practitioner', icon: 'user', title: 'Practitioner or any available', desc: 'Availability respects location assignments, service eligibility and room capacity together.', screen: 'Practitioners', scope: 'Harbourfront', rows: [R('user', 'Rina K.', 'Deep tissue, hot stone', 'Available', '#D6F26B'), R('user', 'Tom B.', 'Facial', 'Off today'), R('user', 'Ana L.', 'Deep tissue', 'Fully booked', P.butter)] },
+      { label: 'Appointment', icon: 'calendar', title: 'Practitioner and room secured together', desc: 'A reservation holds both the practitioner and the room. Deposits and cancellation terms are shown before payment.', screen: 'Calendar · Thu', scope: 'Harbourfront', rows: [R('clock', '10:00 Deep tissue · Rina K.', 'Room A · Jordan P.', 'Confirmed', '#D6F26B'), R('clock', '11:30 Hot stone · Rina K.', 'Room B · Kai S.', 'Deposit paid', P.aqua), R('clock', '14:00 Facial · Tom B.', 'Room C', 'Cancelled', P.blush)] },
+      { label: 'Repeat', icon: 'refresh', title: 'Packages and safe rescheduling', desc: 'The old slot is released only after the new one is secured. If the change fails, the original appointment stays.', screen: 'Packages', scope: 'Harbourfront', rows: [R('gift', 'Jordan P. · 5-massage package', '2 remaining · expires 15 Jan', 'Active', '#D6F26B'), R('gift', 'Kai S. · Facial trio', '1 remaining · expires 2 Nov', 'Expiring', P.butter)] }],
+    hq: ['Service catalogue and policy text', 'Package rules and cancellation terms', 'Utilisation reports'], local: ['Practitioner availability and rooms', 'Local prices where allowed', 'Scoped administrative notes'],
+    first: ['Service pages', 'Availability and booking', 'Reminders', 'Deposits through a connected account'], connected: [{ n: 'Stripe payments', s: 'Requires setup' }, { n: 'Google Calendar', s: 'Limited support' }, { n: 'Jane App', s: 'Planned' }], later: ['Packages and memberships', 'Resource scheduling across locations', 'Retention campaigns'],
+    faqs: [{ q: 'Is this a clinical records system?', a: 'No. The first release is administrative. Diagnosis, clinical records and treatment recommendations are out of scope.' }, { q: 'Does AI read intake forms?', a: 'Sensitive form responses are excluded from general AI context by default.' }, { q: 'What if a reschedule fails?', a: 'Your existing appointment stays in place. Nothing is released until the replacement is confirmed.' }] },
+  commerce: { name: 'Commerce', icon: 'bag', pastel: P.butter, avail: 'Planned', img: IMG.shopInterior, img2: IMG.shopPay, alt: 'Boutique clothing store interior', who: 'Retail groups and franchise stores', flow: 'Product discovery → order → fulfilment', cta: 'Request a commerce demo',
+    headline: 'Coordinate your catalogue. Let every store serve its customers.', intro: 'A shared catalogue with local stock and pricing, a WooCommerce connection, and an inventory history instead of a single number.',
+    problems: [{ icon: 'box', t: 'Stock you can’t trust', d: 'The site says in stock; the shelf says otherwise.' }, { icon: 'tag', t: 'Local prices overwrite the master', d: 'A store edit silently changes product content for everyone.' }, { icon: 'receipt', t: 'Duplicate orders on retry', d: 'A failed sync creates the same order twice.' }],
+    wf: [{ label: 'Catalogue', icon: 'layers', title: 'Master products with editable fields', desc: 'HQ creates products and variants, sets which fields stores can edit, and previews before distribution.', screen: 'Catalogue', scope: 'All stores', rows: [R('box', 'Linen overshirt · 4 variants', 'Published to 8 stores', 'Synced', '#D6F26B'), R('box', 'Merino crew · 6 variants', '2 stores failed', 'Partial', P.butter), R('box', 'Canvas tote', 'Draft', 'Draft')] },
+      { label: 'Assortment', icon: 'store', title: 'Local stock and permitted prices', desc: 'Stores adjust availability and stock with a reason. Override origin is always visible.', screen: 'Local assortment', scope: 'Portland store', rows: [R('box', 'Linen overshirt · M', '12 on hand · HQ price', 'In stock', '#D6F26B'), R('box', 'Linen overshirt · L', '1 on hand · reorder', 'Low', P.butter), R('box', 'Merino crew · S', 'Local price $79', 'Override', P.lilac)] },
+      { label: 'Order', icon: 'cart', title: 'Orders with clear payment and fulfilment', desc: 'Every order shows its source system, payment state and fulfilment state separately.', screen: 'Orders', scope: 'Portland store', rows: [R('receipt', '#5521 · Linen overshirt ×2', 'WooCommerce · Paid', 'To fulfil', P.aqua), R('receipt', '#5519 · Merino crew', 'Partial refund $20', 'Fulfilled', '#D6F26B'), R('receipt', '#5517 · Canvas tote', 'Payment failed', 'On hold', P.blush)] },
+      { label: 'Returns', icon: 'undo', title: 'Returns, reviewed and resolved', desc: 'Requested, reviewed, authorised, received and resolved, with refunds recorded against the original payment.', screen: 'Returns', scope: 'Portland store', rows: [R('undo', 'RMA-204 · Merino crew', 'Wrong size', 'Authorised', P.aqua), R('undo', 'RMA-203 · Overshirt', 'Received', 'Resolved', '#D6F26B')] }],
+    hq: ['Master product identifiers and content', 'Editable-field rules per product', 'Revenue reports by currency'], local: ['Stock adjustments with reasons', 'Permitted local prices', 'Fulfilment and authorised returns'],
+    first: ['Shared catalogue', 'Local availability', 'WooCommerce connection', 'Sync results by store'], connected: [{ n: 'WooCommerce', s: 'Tested' }, { n: 'Shopify', s: 'Planned' }, { n: 'Square POS', s: 'Planned' }], later: ['Native storefront ordering', 'Inventory transfers', 'Returns portal'],
+    faqs: [{ q: 'Does BranchHarbor replace WooCommerce checkout?', a: 'No. Your existing gateways and checkout stay. We never insert a second checkout automatically.' }, { q: 'What if a store edits a product?', a: 'Only fields HQ marked editable can change, and the change is stored as a local override that never touches master content.' }, { q: 'Will a retry duplicate an order?', a: 'Retries are idempotent. Each order carries a stable external ID, so a retry updates rather than duplicates.' }] },
+  foods: { name: 'Foods', icon: 'utensils', pastel: P.blush, avail: 'Planned next', img: IMG.foodChef, img2: IMG.foodPizza, alt: 'Chef preparing vegetables in a restaurant kitchen', who: 'Restaurants, cafés, bakeries, meal prep and food franchises', flow: 'Location → menu → order → pickup', cta: 'Request a food-business demo',
+    headline: 'One brand menu. Local control. Clear ordering.', intro: 'Master menus with local overrides, pickup ordering with real slot capacity, and a kitchen view built for a busy line.',
+    problems: [{ icon: 'list', t: 'Menus out of sync', d: 'A price change reaches some locations and not others.' }, { icon: 'clock', t: 'Pickup times that can’t be met', d: 'Online orders ignore how busy the kitchen already is.' }, { icon: 'alert', t: 'Orders lost on a bad connection', d: 'The tablet shows stale orders as if they were current.' }],
+    wf: [{ label: 'Menu', icon: 'list', title: 'Brand menu, published to locations', desc: 'HQ manages items, modifiers and business-supplied dietary details, then publishes with per-location results.', screen: 'Master menu', scope: 'All locations', rows: [R('utensils', 'Ember chicken bowl', 'Dietary: gluten-free option', 'Published', '#D6F26B'), R('utensils', 'Smoked brisket sandwich', '1 location failed', 'Partial', P.butter), R('utensils', 'Maple lemonade', 'Local price allowed', 'Published', '#D6F26B')] },
+      { label: 'Pickup', icon: 'clock', title: 'Pickup slots with real capacity', desc: 'Customers choose a pickup time first. Slots, cutoffs and preparation buffers are checked on the server before confirmation.', screen: 'Pickup settings', scope: 'Seattle – Ballard', rows: [R('clock', '12:00–12:15', '6 of 8 orders', 'Open', '#D6F26B'), R('clock', '12:15–12:30', '8 of 8 orders', 'Full', P.butter), R('clock', 'Cutoff', '20 min before close', 'Set')] },
+      { label: 'Order', icon: 'receipt', title: 'Awaiting acceptance vs accepted', desc: 'Customers see clearly whether the restaurant has accepted their order. Rejection triggers a void or refund and a notice.', screen: 'Orders', scope: 'Seattle – Ballard', rows: [R('receipt', '#1046 · Mei L.', 'Pickup 12:25', 'New', P.butter), R('receipt', '#1044 · Ana P.', 'Pickup 12:14', 'Preparing'), R('receipt', '#1039 · Tom R.', 'Pickup 11:58', 'Ready', '#D6F26B')] },
+      { label: 'Kitchen', icon: 'chef', title: 'A kitchen view for a busy line', desc: 'Large cards sorted by promised time, overdue markers, optional alerts and a clear warning when the connection drops.', screen: 'Kitchen', scope: 'Seattle – Ballard', rows: [R('alert', '#1041 · Overdue 6 min', '1× bowl · no onions', 'Preparing', P.blush), R('chef', '#1045 · Due 12:18', 'Gluten-free bun', 'New', P.butter)] }],
+    hq: ['Menu items, modifiers and dietary details', 'Which fields locations can change', 'Publish results by location'], local: ['Hours, cutoffs and slot capacity', 'Sold-out items and local prices', 'Order acceptance and kitchen status'],
+    first: ['Master menus with local overrides', 'Pickup ordering', 'Kitchen view', 'Payments through a connected account'], connected: [{ n: 'Stripe payments', s: 'Requires setup' }, { n: 'Square POS', s: 'Planned' }, { n: 'Toast POS', s: 'Planned' }], later: ['Delivery', 'Catering quotes', 'Recurring meal plans', 'Ingredient inventory'],
+    faqs: [{ q: 'Can AI write allergen information?', a: 'No. Allergen and dietary information comes from your business. AI can draft menu copy but can’t change ingredients, dietary labels, prices or order acceptance.' }, { q: 'What happens if the kitchen tablet loses connection?', a: 'The screen shows the last refresh time and pauses status changes so stale orders aren’t presented as current.' }, { q: 'What if a payment arrives but the order doesn’t?', a: 'Payment and order mismatches appear in a recovery queue for staff to resolve.' }] },
+};
+const IND_KEYS = ['studios', 'sports', 'wellness', 'commerce', 'foods'];
+const SOL = {
+  franchises: { kicker: 'For franchises & networks', icon: 'building', pastel: P.lilac, img: IMG.yogaStudio, headline: 'Coordinate the brand. Trust each location.', intro: 'Headquarters, regions, owner groups and locations, each with scoped roles. Shared templates go out with a review table; locations run their day.', cta: 'Discuss your network',
+    points: [{ icon: 'layers', bg: P.lilac, t: 'Organisation → regions → locations', d: 'Owner groups can operate several locations. Users can hold more than one assignment.' }, { icon: 'lock', bg: P.butter, t: 'Locked, editable or approval required', d: 'Every template field shows its origin, and local overrides can be reset to HQ defaults.' }, { icon: 'shield', bg: P.aqua, t: 'Customer data stays local', d: 'Network reports don’t grant access to customer details. Cross-location sharing needs an explicit policy.' }, { icon: 'refresh', bg: P.lime, t: 'Partial failures shown honestly', d: 'Group publishing reports per location, with version snapshots and rollback.' }],
+    stepsTitle: 'Rolling out to a network', steps: [{ n: 1, t: 'Model your hierarchy', d: 'Import locations with row-level validation and assign owner groups.' }, { n: 2, t: 'Set inherited settings', d: 'Choose what is shared, what is local and what needs approval.' }, { n: 3, t: 'Invite with scoped roles', d: 'Regional managers, franchise owners and staff see only their assignments.' }, { n: 4, t: 'Publish and monitor', d: 'Review tables before every shared change and per-location results after.' }] },
+  independent: { kicker: 'Single-location businesses', icon: 'store', pastel: P.butter, img: IMG.shopOpen, headline: 'Everything in one place, without network complexity.', intro: 'One location means no scopes or approvals to manage. Add more locations later and the network tools appear when you need them.', cta: 'Explore setup',
+    points: [{ icon: 'zap', bg: P.butter, t: 'Set up in an afternoon', d: 'A checklist rather than a wizard you can’t leave. Save progress at each step.' }, { icon: 'globe', bg: P.aqua, t: 'Hosted site or WordPress', d: 'Launch a site with an included address or keep yours.' }, { icon: 'plug', bg: P.lime, t: 'Keep your tools', d: 'Connect a supported booking or commerce system instead of replacing it.' }, { icon: 'sparkles', bg: P.lilac, t: 'AI that drafts, not decides', d: 'Copy and summaries for your review. Nothing publishes without you.' }],
+    stepsTitle: 'Setup in six steps', steps: [{ n: 1, t: 'Choose your industry', d: 'We set up the relevant workflows.' }, { n: 2, t: 'Add your business details', d: 'Timezone and currency included.' }, { n: 3, t: 'Pick hosted or WordPress', d: 'Change your mind later.' }, { n: 4, t: 'Add your classes, services, products or menu', d: 'Import or enter.' }, { n: 5, t: 'Connect payments', d: 'Purchasing stays off until the account is enabled.' }, { n: 6, t: 'Preview, test and publish', d: 'Run a test booking or order first.' }] },
+};
+const INTS = [
+  { name: 'WooCommerce', mono: 'Wo', cat: 'Commerce', status: 'Tested', dir: 'Bidirectional', pastel: P.lilac, desc: 'Products, stock and orders through supported APIs, with HPOS handling and declared checkout compatibility.', truth: 'WooCommerce owns orders and checkout. BranchHarbor owns the master catalogue when you choose it.', limit: 'Custom checkout fields need mapping. Subscriptions extension not supported yet.' },
+  { name: 'Stripe', mono: 'St', cat: 'Payments', status: 'Requires setup', dir: 'Import', pastel: P.aqua, desc: 'Connected accounts per business or location for hosted payments. Eligibility and fees to be confirmed.', truth: 'Stripe owns payment state. BranchHarbor records references and reconciles.', limit: 'Independently owned franchises may need separate accounts.' },
+  { name: 'Gutenberg blocks', mono: 'Gb', cat: 'Page builders', status: 'Tested', dir: 'Export', pastel: P.butter, desc: 'BranchHarbor schedules, forms and menus as native blocks.', truth: 'WordPress owns page content.', limit: 'Full-site editing templates tested on default themes only.' },
+  { name: 'Elementor', mono: 'El', cat: 'Page builders', status: 'Limited support', dir: 'Export', pastel: P.blush, desc: 'Shortcode and embed widgets inside Elementor layouts.', truth: 'Elementor owns layout.', limit: 'No native widget yet; styling inherits from the theme.' },
+  { name: 'Yoast SEO', mono: 'Yo', cat: 'SEO', status: 'Tested', dir: 'None', pastel: P.lime, desc: 'Coexists without writing metadata. BranchHarbor pages defer to Yoast for titles and sitemaps.', truth: 'Yoast owns metadata, canonical URLs and sitemaps.', limit: '—' },
+  { name: 'Gravity Forms', mono: 'Gf', cat: 'Forms', status: 'Requires setup', dir: 'Import', pastel: P.sage, desc: 'Map form fields to BranchHarbor leads and route by location.', truth: 'Gravity Forms owns the submission; BranchHarbor stores the lead.', limit: 'Duplicate prevention by email only.' },
+  { name: 'WPML', mono: 'Wm', cat: 'Multilingual', status: 'Limited support', dir: 'Bidirectional', pastel: P.aqua, desc: 'Language mapping for translated pages and records.', truth: 'WPML owns translations.', limit: 'Menus and schedules translated manually.' },
+  { name: 'WordPress Multisite', mono: 'Ms', cat: 'Sites', status: 'Requires setup', dir: 'Bidirectional', pastel: P.lilac, desc: 'Network authorisation plus an explicit connection per site and location.', truth: 'Each site keeps its own content.', limit: 'Each sub-site connects separately.' },
+  { name: 'WP Rocket', mono: 'Wr', cat: 'Cache & security', status: 'Tested', dir: 'None', pastel: P.butter, desc: 'Coexists with documented exclusions for dynamic and authenticated paths.', truth: '—', limit: 'Add the listed exclusions after install.' },
+  { name: 'Mindbody', mono: 'Mb', cat: 'Booking', status: 'Planned', dir: 'Import', pastel: P.blush, desc: 'Class schedules and bookings from Mindbody.', truth: 'Mindbody would remain authoritative.', limit: 'Not available. API rights under review.' },
+  { name: 'Square POS', mono: 'Sq', cat: 'Commerce', status: 'Planned', dir: 'Import', pastel: P.lime, desc: 'In-store sales and catalogue for retail and food.', truth: 'Square would own POS transactions.', limit: 'Not available.' },
+  { name: 'Google Calendar', mono: 'Gc', cat: 'Booking', status: 'Limited support', dir: 'Export', pastel: P.sage, desc: 'Publish staff schedules to calendars.', truth: 'BranchHarbor owns the schedule.', limit: 'One-way only; edits in Google are not imported.' },
+  { name: 'MemberPress', mono: 'Mp', cat: 'Memberships', status: 'Unsupported', dir: '—', pastel: P.blush, desc: 'Not compatible with BranchHarbor memberships.', truth: 'Choose one membership owner.', limit: 'Running both causes conflicting access rules.' },
+  { name: 'Mailchimp', mono: 'Mc', cat: 'Marketing', status: 'Requires setup', dir: 'Export', pastel: P.butter, desc: 'Export consented contacts by location.', truth: 'BranchHarbor owns consent; Mailchimp owns sends.', limit: 'Only contacts with recorded consent export.' },
+];
+const RES = [
+  { cat: 'Getting started', icon: 'zap', pastel: P.lime, title: 'Set up your first location', sum: 'Business details, timezone, currency and what is inherited from headquarters.', mins: 6 },
+  { cat: 'Websites', icon: 'globe', pastel: P.aqua, title: 'Connect your own domain', sum: 'DNS records, verification, certificates and keeping email working.', mins: 8 },
+  { cat: 'WordPress', icon: 'wordpress', pastel: P.butter, title: 'Install the connector', sum: 'Requirements, least-privilege authorisation and location mapping.', mins: 7 },
+  { cat: 'Networks', icon: 'building', pastel: P.lilac, title: 'Locked, editable and approval fields', sum: 'How template ownership works and how to reset a local override.', mins: 5 },
+  { cat: 'Payments', icon: 'card', pastel: P.blush, title: 'Reconcile a payment with no order', sum: 'Using the recovery queue when payment and fulfilment records disagree.', mins: 4 },
+  { cat: 'Networks', icon: 'layers', pastel: P.lilac, title: 'Publish a shared change safely', sum: 'Review tables, partial failures, retries and rollback.', mins: 6 },
+  { cat: 'Getting started', icon: 'users', pastel: P.lime, title: 'Invite staff with the right scope', sum: 'Roles, multiple assignments and revoking access.', mins: 5 },
+  { cat: 'Payments', icon: 'receipt', pastel: P.blush, title: 'Partial refunds explained', sum: 'Refund states, approvals and what customers see.', mins: 4 },
+];
+const LEGAL = {
+  privacy: { title: 'Privacy', sections: ['What we collect and why', 'Customer data held for businesses', 'Cross-location sharing policies', 'AI processing and model providers', 'Retention and deletion', 'Your rights in the US and Canada'] },
+  terms: { title: 'Terms', sections: ['Accounts and authorised users', 'Plans, locations and billing', 'Connected services and third parties', 'Acceptable use', 'Liability', 'Changes to these terms'] },
+  security: { title: 'Security', sections: ['Tenant isolation and access control', 'Support access: authorised, time-limited, logged', 'Payment data handling (tokenised, no raw cards)', 'Integration credentials and scopes', 'Incident response', 'Reporting a vulnerability'] },
+};
+const pad = n => String(n).padStart(2, '0');
+const emailOk = v => /^\S+@\S+\.\S+$/.test(v || '');
+const freshForm = () => ({ industry: 'Studios', size: 'Network', name: '', email: '', business: '', locations: '', website: '', difficulty: '', phone: '', systems: '' });
+const HOME_FAQS = [
+  { q: 'How does per-location billing work?', a: 'You pay for each location you authorise in BranchHarbor. Adding a location doesn’t publish its website automatically, and removing one stops billing from the next period.' },
+  { q: 'Do I have to replace my existing software?', a: 'No. Where we support a connection, your booking or commerce system stays authoritative and BranchHarbor works alongside it. Every module says whether it replaces, embeds or only reports on a workflow.' },
+  { q: 'How much control do locations keep?', a: 'Headquarters decides which fields are locked, editable or need approval. Locations see that origin on every field and can request changes.' },
+  { q: 'What does onboarding include?', a: 'A setup checklist that saves as you go, help importing locations, and for networks a guided rollout with your team.' },
+];
+
+class Component extends DCLogic {
+  state = { page: 'home', ind: 'studios', sol: 'franchises', legal: 'privacy', wf: 0, indOpen: false, menuOpen: false, w: typeof window !== 'undefined' ? window.innerWidth : 1300,
+    previewLoc: 'qw', faqOpen: 0, indFaqOpen: -1, form: freshForm(), errors: {}, submitted: false, demoState: 'form',
+    intQ: '', intCat: 'All', intStatus: 'All', intSel: null, monthly: true, locs: 6, resQ: '', resCat: 'All', article: null, rate: null, sup: { topic: 'Bookings or orders', msg: '' }, supSent: false };
+  componentDidMount() { this.onR = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this.onR); }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); clearTimeout(this.t); }
+  nav(page, extra) { this.setState({ page, indOpen: false, menuOpen: false, wf: 0, indFaqOpen: -1, article: null, ...(extra || {}) }); window.scrollTo(0, 0); }
+  scrollId(id) { const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth' }); }
+  validate(f) {
+    const e = {};
+    if (!f.name.trim()) e.name = 'Enter your name.';
+    if (!emailOk(f.email)) e.email = 'Enter a work email, like name@business.com.';
+    if (!f.business.trim()) e.business = 'Enter your business name.';
+    if (!(parseInt(f.locations, 10) >= 1)) e.locations = 'Enter how many locations you have (1 or more).';
+    if (!f.website) e.website = 'Choose an option for your existing website.';
+    if (!f.difficulty.trim()) e.difficulty = 'Tell us the main difficulty you want to solve.';
+    return e;
+  }
+  setForm(k, v) { this.setState(s => { const form = { ...s.form, [k]: v }; return { form, errors: s.submitted ? this.validate(form) : s.errors }; }); }
+  chip(on) { return { bg: on ? '#141414' : '#fff', fg: on ? '#fff' : '#141414', bd: on ? '#141414' : '#E4E2DC' }; }
+
+  renderVals() {
+    const s = this.state, pg = s.page;
+    const wide = s.w >= 1020;
+    const go = {}; ['home', 'pricing', 'wordpress', 'integrations', 'demo', 'resources', 'support', 'about'].forEach(k => go[k] = () => this.nav(k));
+    go.franchises = () => this.nav('solution', { sol: 'franchises' }); go.independent = () => this.nav('solution', { sol: 'independent' });
+    ['privacy', 'terms', 'security'].forEach(k => go[k] = () => this.nav('legal', { legal: k }));
+    const navKey = pg === 'industry' ? 'industries' : pg === 'solution' && s.sol === 'franchises' ? 'franchises' : (pg === 'wordpress' || pg === 'integrations') ? 'wordpress' : pg;
+    const navBg = {}; ['industries', 'franchises', 'wordpress', 'pricing', 'resources'].forEach(k => navBg[k] = (navKey === k || (k === 'industries' && s.indOpen)) ? '#fff' : 'transparent');
+
+    const industries = IND_KEYS.map(k => ({ ...IND[k], key: k, open: () => this.nav('industry', { ind: k }) }));
+    const ind = IND[s.ind];
+    const wf = ind.wf[s.wf];
+
+    const f = s.form, er = s.errors;
+    const on = {}; Object.keys(freshForm()).forEach(k => on[k] = e => this.setForm(k, e.target.value));
+    const bd = {}; ['name', 'email', 'business', 'locations', 'website', 'difficulty'].forEach(k => bd[k] = er[k] ? '#B3261E' : '#141414');
+    const pl = LOCS.find(l => l.id === s.previewLoc);
+
+    const q = s.intQ.trim().toLowerCase();
+    const intList = INTS.filter(i => (s.intCat === 'All' || i.cat === s.intCat) && (s.intStatus === 'All' || i.status === s.intStatus) && (!q || (i.name + i.cat).toLowerCase().includes(q)))
+      .map(i => ({ ...i, stBg: ST[i.status][0], stFg: ST[i.status][1], cardBg: s.intSel === i.name ? '#F8F7F3' : '#fff', cardBd: s.intSel === i.name ? '#141414' : '#EEEDE8', pick: () => this.setState({ intSel: i.name }) }));
+    const intDraw = INTS.find(i => i.name === s.intSel) || INTS[0];
+
+    const per = { connector: 29, hosted: 59, network: 89 };
+    const mult = s.monthly ? 1 : 10 / 12;
+    const price = k => `$${Math.round(per[k] * mult)}`;
+    const total = k => `$${(Math.round(per[k] * mult) * s.locs).toLocaleString()} / month for ${s.locs} location${s.locs > 1 ? 's' : ''}${s.monthly ? '' : ', billed annually'}`;
+
+    const rq = s.resQ.trim().toLowerCase();
+    const resList = RES.map((r, i) => ({ ...r, i })).filter(r => (s.resCat === 'All' || r.cat === s.resCat) && (!rq || (r.title + r.sum).toLowerCase().includes(rq)))
+      .map(r => ({ ...r, open: () => { this.setState({ article: r.i, rate: null }); window.scrollTo(0, 0); } }));
+    const artBase = s.article != null ? RES[s.article] : RES[0];
+    const art = { ...artBase, sections: [{ h: 'Before you start', p: `This guide covers ${artBase.title.toLowerCase()}. You'll need permission for the location you're working in; the active scope is shown in the top bar.` }, { h: 'Step by step', p: 'Open the relevant screen from the left navigation, follow the checklist on the right, and save as you go. Each step shows whether the setting is shared from headquarters or local to this location.' }, { h: 'What customers see', p: 'Nothing changes for customers until you publish. Use Preview to see the exact page or booking flow first.' }, { h: 'If something goes wrong', p: 'Errors appear next to the field with a repair action. Connection problems show the last successful sync and what is affected.' }] };
+
+    const legal = LEGAL[s.legal];
+    const faqMap = (list, openIdx, setter) => list.map((x, i) => ({ ...x, open: openIdx === i, icon: openIdx === i ? 'minus' : 'plus', bg: openIdx === i ? '#F3F2EE' : '#FAFAF7', toggle: () => setter(openIdx === i ? -1 : i) }));
+
+    return {
+      img: IMG, credits: 'Photos: Unsplash contributors', wide, narrow: !wide, menuOpen: s.menuOpen && !wide, menuIcon: s.menuOpen ? 'x' : 'menu',
+      toggleMenu: () => this.setState(x => ({ menuOpen: !x.menuOpen })), indOpen: s.indOpen, showIndMenu: s.indOpen && wide,
+      toggleInd: () => this.setState(x => ({ indOpen: !x.indOpen })), go, navBg,
+      mobileLinks: [['For franchises', go.franchises], ['WordPress & integrations', go.wordpress], ['Pricing', go.pricing], ['Resources', go.resources], ['Support', go.support], ['Sign in', () => { window.location.href = 'BranchHarbor Onboarding.dc.html'; }]].map(([label, g]) => ({ label, go: g })),
+      p: { home: pg === 'home', industry: pg === 'industry', solution: pg === 'solution', wordpress: pg === 'wordpress', integrations: pg === 'integrations', pricing: pg === 'pricing', demo: pg === 'demo', resources: pg === 'resources', support: pg === 'support', about: pg === 'about', legal: pg === 'legal' },
+      showCta: !['demo', 'legal'].includes(pg),
+      scrollTo: { industries: () => this.scrollId('bh-industries'), how: () => this.scrollId('bh-how'), workflow: () => this.scrollId('bh-workflow') },
+      industries,
+      previewRows: LOCS.map(l => ({ ...l, sync: l.sync, syncIcon: l.ok ? 'check-circle' : 'alert', syncColor: l.ok ? '#5D5D58' : '#8A5A00', bg: l.id === s.previewLoc ? '#F3F2EE' : 'transparent', pick: () => this.setState({ previewLoc: l.id }) })),
+      previewLoc: { ...pl, syncColor: pl.ok ? '#2F6B3A' : '#8A5A00', syncIcon: pl.ok ? 'check-circle' : 'alert' },
+      steps3: [{ n: 1, icon: 'grid', pastel: P.butter, title: 'Choose your industry', desc: 'Start with workflows built for studios, sports, wellness, retail or food.' }, { n: 2, icon: 'plug', pastel: P.aqua, title: 'Connect or launch', desc: 'Launch a hosted site, or keep your WordPress site and connect supported tools.' }, { n: 3, icon: 'layers', pastel: P.blush, title: 'Coordinate locations', desc: 'Share what should be consistent and let each team manage the rest.' }],
+      capabilities: [['Websites', 'globe', P.aqua, 'At launch', 'Hosted sites or WordPress blocks, shared templates and local pages.'], ['Customers', 'users', P.lilac, 'At launch', 'Enquiries, members and participants, kept with the right location.'], ['Marketing', 'megaphone', P.blush, 'At launch', 'Campaign pages, forms and lead routing to each location.'], ['Payments', 'card', P.butter, 'Requires setup', 'Through a connected payment account for each business or location.'], ['BranchHarbor AI', 'sparkles', P.lilac, 'Preview', 'Drafts and summaries within your permissions. Changes need approval.'], ['Connections', 'plug', P.sage, 'Selected systems', 'Supported booking and commerce tools, each with a clear status.']]
+        .map(([name, icon, pastel, tag, desc]) => ({ name, icon, pastel, tag, desc, tagBg: tag === 'At launch' ? '#D6F26B' : tag === 'Preview' ? '#141414' : '#F3F2EE', tagFg: tag === 'Preview' ? '#fff' : '#141414' })),
+      intPreview: INTS.slice(0, 8).map(i => ({ ...i, stBg: ST[i.status][0], stFg: ST[i.status][1] })),
+      homeFaqs: faqMap(HOME_FAQS, s.faqOpen, v => this.setState({ faqOpen: v })),
+
+      ind: { ...ind, demo: () => { this.setForm('industry', ind.name); this.nav('demo'); }, connected: ind.connected.map(c => ({ ...c, bg: ST[c.s][0] })) },
+      wf, wfTabs: ind.wf.map((w, i) => ({ n: i + 1, label: w.label, on: s.wf === i, bg: s.wf === i ? '#141414' : '#fff', fg: s.wf === i ? '#fff' : '#141414', numBg: s.wf === i ? '#D6F26B' : ind.pastel, pick: () => this.setState({ wf: i }) })),
+      wfPrev: () => this.setState(x => ({ wf: Math.max(0, x.wf - 1) })), wfNext: () => this.setState(x => ({ wf: Math.min(ind.wf.length - 1, x.wf + 1) })), wfFirst: s.wf === 0, wfLast: s.wf === ind.wf.length - 1,
+      indFaqs: faqMap(ind.faqs, s.indFaqOpen, v => this.setState({ indFaqOpen: v })),
+
+      sol: SOL[s.sol],
+
+      wpPreview: [['wordpress', 'Site authorised', 'Connected', '#D6F26B'], ['pin', 'Location mapping', '1 needs attention', P.butter], ['bag', 'WooCommerce', 'Tested', '#D6F26B'], ['file', 'Gravity Forms', 'Requires setup', P.aqua]].map(([icon, n, st, bg]) => ({ icon, n, s: st, bg })),
+      wpSteps: [['search', 'Detect', 'We list relevant plugins we found and tell you what we checked.', P.butter], ['plug', 'Choose adapters', 'Select only supported connections you want.', P.aqua], ['key', 'Authorise', 'Least-privilege access with an application password, never your login.', P.lilac], ['pin', 'Map locations', 'Match this site to one or more BranchHarbor locations.', P.lime], ['refresh', 'Pick direction', 'Import, export or both, with conflict rules.', P.blush], ['check-circle', 'Test & go live', 'Run a test sync and see the status.', P.sage]].map(([icon, t, d, bg], i) => ({ n: i + 1, icon, t, d, bg })),
+      matrix: [['bag', 'WooCommerce', 'Tested', '9.x', 'Products, stock and orders via public APIs; HPOS aware', 'Subscriptions extension not supported'], ['layers', 'Page builders', 'Limited support', '—', 'Blocks, shortcodes and embeds', 'Native Elementor widget planned'], ['calendar', 'Booking systems', 'Planned', '—', 'Selected adapters with documented API rights', 'None available yet'], ['search', 'SEO', 'Tested', 'Yoast 23', 'Defers to your SEO plugin for metadata and sitemaps', 'BranchHarbor-hosted pages manage their own'], ['file', 'Forms', 'Requires setup', 'GF 2.8', 'Field mapping and location routing', 'Duplicate check by email only'], ['card', 'Memberships', 'Unsupported', '—', 'One owner for access rules', 'Pick one membership system'], ['shield', 'Cache & security', 'Tested', 'WP Rocket 3', 'Documented exclusions for dynamic paths', 'Add exclusions manually'], ['globe', 'Multilingual', 'Limited support', 'WPML 4.6', 'Language mapping', 'Schedules translated manually'], ['building', 'Multisite', 'Requires setup', '6.6', 'Network authorisation plus per-site connections', 'Each site connects separately']]
+        .map(([icon, cat, status, ver, does, limit]) => ({ icon, cat, status, ver, does, limit, bg: ST[status][0], fg: ST[status][1] })),
+      wpPrereq: ['WordPress 6.4 or later, PHP 8.1 or later', 'Administrator access to create an application password', 'A BranchHarbor account with at least one location', 'Consent to send the listed data to BranchHarbor'],
+      wpNever: ['Disable or modify other plugins', 'Overwrite your pages or theme', 'Copy all customer records without a mapped purpose', 'Insert a second checkout or inject ads'],
+
+      intQ: s.intQ, setIntQ: e => this.setState({ intQ: e.target.value }),
+      intCats: ['All', 'Commerce', 'Payments', 'Page builders', 'Booking', 'SEO', 'Forms', 'Marketing'].map(c => ({ label: c, on: s.intCat === c, ...this.chip(s.intCat === c), pick: () => this.setState({ intCat: c }) })),
+      intStatuses: ['All', 'Tested', 'Limited support', 'Requires setup', 'Planned', 'Unsupported'].map(c => ({ label: c, on: s.intStatus === c, bg: c === 'All' ? (s.intStatus === c ? '#141414' : '#fff') : ST[c][0], bd: s.intStatus === c ? '#141414' : 'transparent', pick: () => this.setState({ intStatus: c }) })).map(c => ({ ...c, bg: c.label === 'All' && s.intStatus === 'All' ? '#F3F2EE' : c.bg })),
+      intList, intEmpty: intList.length === 0, clearInt: () => this.setState({ intQ: '', intCat: 'All', intStatus: 'All' }),
+      intSel: !!s.intSel, intD: { ...intDraw, stBg: ST[intDraw.status][0], stFg: ST[intDraw.status][1] }, closeInt: () => this.setState({ intSel: null }),
+
+      monthly: s.monthly, annual: !s.monthly, setMonthly: () => this.setState({ monthly: true }), setAnnual: () => this.setState({ monthly: false }),
+      billBg: { m: s.monthly ? '#141414' : 'transparent', a: s.monthly ? 'transparent' : '#141414' }, billFg: { m: s.monthly ? '#fff' : '#141414', a: s.monthly ? '#141414' : '#fff' },
+      locCount: s.locs, locMinus: () => this.setState(x => ({ locs: Math.max(1, x.locs - 1) })), locPlus: () => this.setState(x => ({ locs: Math.min(500, x.locs + 1) })),
+      plans: [
+        { name: 'Connector', icon: 'wordpress', for: 'Keep your WordPress site', tag: 'Free plugin + service', price: price('connector'), unit: '/ location / month', total: total('connector'), features: ['WordPress blocks and forms', 'Supported connections', 'Lead routing by location', 'BranchHarbor dashboard'], cta: 'Start with the connector', bg: '#fff', fg: '#141414', bd: '#EEEDE8', iconBg: P.butter, tagBg: '#F3F2EE', line: '#EEEDE8', btnBg: '#fff', btnFg: '#141414', btnBd: '1.5px solid #141414' },
+        { name: 'Hosted', icon: 'globe', for: 'Launch a BranchHarbor site', tag: 'Most chosen', price: price('hosted'), unit: '/ location / month', total: total('hosted'), features: ['Hosted website and dashboard', 'Included address or your domain', 'Industry workflows', 'BranchHarbor AI (200 requests)'], cta: 'Choose Hosted', bg: '#141414', fg: '#fff', bd: '#141414', iconBg: '#D6F26B', tagBg: '#D6F26B', line: '#2A2A2A', btnBg: '#D6F26B', btnFg: '#141414', btnBd: 'none' },
+        { name: 'Network', icon: 'building', for: 'Franchises and groups', tag: 'Quote available', price: price('network'), unit: '/ location / month', total: total('network'), features: ['Regions and owner groups', 'Locked / editable / approval templates', 'Group publishing with rollback', 'Guided onboarding'], cta: 'Request a quote', bg: P.lilac, fg: '#141414', bd: P.lilac, iconBg: '#fff', tagBg: '#fff', line: 'rgba(0,0,0,.08)', btnBg: '#141414', btnFg: '#fff', btnBd: 'none' },
+      ],
+
+      demoImg: IMG.yogaStretch, demoForm: s.demoState !== 'done', demoDone: s.demoState === 'done',
+      industryChips: IND_KEYS.map(k => { const o = f.industry === IND[k].name; return { name: IND[k].name, icon: IND[k].icon, on: o, bg: o ? '#141414' : IND[k].pastel, fg: o ? '#fff' : '#141414', bd: o ? '#141414' : IND[k].pastel, pick: () => this.setForm('industry', IND[k].name) }; }),
+      sizeOpts: [['Single business', 'One location', 'store'], ['Network', 'Several locations or franchises', 'building']].map(([n, d, icon]) => { const o = f.size === n; return { name: n, desc: d, icon, on: o, bg: o ? '#F3F2EE' : '#fff', bd: o ? '#141414' : '#D8D6CF', pick: () => this.setState(x => ({ form: { ...x.form, size: n, locations: n === 'Single business' ? '1' : (x.form.locations === '1' ? '' : x.form.locations) } })) }; }),
+      form: f, errors: er, on, bd, hasErrors: Object.keys(er).length > 0, errorCount: Object.keys(er).length, errorList: Object.values(er),
+      submitDemo: e => { if (e) e.preventDefault(); const errs = this.validate(f); if (Object.keys(errs).length) { this.setState({ errors: errs, submitted: true }); window.scrollTo(0, 0); return; } this.setState({ demoState: 'sending' }); this.t = setTimeout(() => { this.setState({ demoState: 'done' }); window.scrollTo(0, 0); }, 900); },
+      sending: s.demoState === 'sending', submitLabel: s.demoState === 'sending' ? 'Sending…' : 'Request demo', sizeSummary: f.size === 'Network' ? `a network of ${f.locations} locations` : 'a single location',
+
+      resQ: s.resQ, setResQ: e => this.setState({ resQ: e.target.value, article: null }),
+      resCats: ['All', 'Getting started', 'Websites', 'WordPress', 'Networks', 'Payments'].map(c => ({ label: c, on: s.resCat === c, ...this.chip(s.resCat === c), pick: () => this.setState({ resCat: c, article: null }) })),
+      resList, noArticle: s.article == null, hasArticle: s.article != null, art, closeArticle: () => this.setState({ article: null }),
+      rateYes: () => this.setState({ rate: 'y' }), rateNo: () => this.setState({ rate: 'n' }), rateBg: { y: s.rate === 'y' ? '#D6F26B' : '#fff', n: s.rate === 'n' ? P.blush : '#fff' }, rateMsg: s.rate ? 'Thanks for the feedback.' : '',
+
+      supportTopics: [['calendar', 'Bookings & classes', 'Schedules, waitlists, cover', P.lilac], ['globe', 'Websites & domains', 'DNS, publishing, templates', P.aqua], ['wordpress', 'WordPress connector', 'Install, mapping, sync', P.butter], ['card', 'Payments', 'Refunds, reconciliation', P.blush], ['users', 'Team & permissions', 'Roles and access', P.lime], ['sparkles', 'BranchHarbor AI', 'Scope and approvals', P.sage]].map(([icon, t, d, bg]) => ({ icon, t, d, bg })),
+      sup: s.sup, supTopic: e => { const v = e.target.value; this.setState(x => ({ sup: { ...x.sup, topic: v } })); }, supMsg: e => { const v = e.target.value; this.setState(x => ({ sup: { ...x.sup, msg: v } })); },
+      supEmpty: !s.sup.msg.trim(), supSend: () => this.setState({ supSent: true }), supSent: s.supSent, supNotSent: !s.supSent,
+
+      principles: [['heart', 'Calm and capable', 'Plain language for owners, consequences explained before broad changes.', P.blush], ['pin', 'Locations stay distinct', 'Each branch keeps its identity while drawing on a shared home.', P.lilac], ['shield', 'Honest about limits', 'Planned features are labelled. No invented customers or claims.', P.butter], ['users', 'Built with pilots', 'We release one complete vertical at a time, measured with real businesses.', P.lime]].map(([icon, t, d, bg]) => ({ icon, t, d, bg })),
+
+      legalTabs: [['privacy', 'Privacy', 'eye'], ['terms', 'Terms', 'file'], ['security', 'Security', 'shield']].map(([k, label, icon]) => ({ label, icon, bg: s.legal === k ? '#141414' : 'transparent', fg: s.legal === k ? '#fff' : '#141414', pick: () => this.setState({ legal: k }) })),
+      legal: { title: legal.title, sections: legal.sections.map(h => ({ h, p: 'Section outline. Final wording to be provided after legal review.' })) },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

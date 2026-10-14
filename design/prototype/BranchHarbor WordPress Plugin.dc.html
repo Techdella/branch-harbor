@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#EDEDEA;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="web"></bh-topbar>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <div style="height:40px;background:#1F2124;color:#E6E6E3;display:flex;align-items:center;gap:18px;padding:0 14px;font-size:13px;flex-shrink:0">
+    <bh-icon name="wordpress" size="18"></bh-icon>
+    <button onClick="{{ goFront }}" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:#E6E6E3;font-size:13px;font-weight:600;cursor:pointer;padding:0"><bh-icon name="home" size="14"></bh-icon>Stillwater Yoga <span style="color:#9C9C96;font-weight:500">(sample WordPress site)</span></button>
+    <span style="display:flex;align-items:center;gap:6px;color:#C9C9C3"><bh-icon name="plus" size="14"></bh-icon>New</span>
+    <span style="display:flex;align-items:center;gap:8px;margin-left:auto;padding:4px 10px;border-radius:999px;background:{{ barBadge.bg }};color:#141414;font-weight:700;font-size:12px"><bh-logo size="16"></bh-logo>{{ barBadge.label }}</span>
+    <span style="color:#C9C9C3">Howdy, Jamie</span>
+  </div>
+  <div style="flex:1;display:flex;min-height:0">
+    <nav aria-label="WordPress admin" style="width:200px;flex-shrink:0;background:#2A2C30;color:#E6E6E3;padding:8px 0">
+      <sc-for list="{{ wpMenu }}" as="m" hint-placeholder-count="9">
+        <button onClick="{{ m.go }}" style="width:100%;display:flex;align-items:center;gap:10px;height:38px;padding:0 14px;border:none;background:{{ m.bg }};color:{{ m.fg }};font-size:13px;font-weight:{{ m.w }};cursor:pointer;text-align:left"><bh-icon name="{{ m.icon }}" size="16"></bh-icon>{{ m.label }}</button>
+        <sc-if value="{{ m.isBH }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1F2124;padding:4px 0 8px">
+            <sc-for list="{{ bhSub }}" as="b" hint-placeholder-count="5">
+              <button onClick="{{ b.go }}" style="width:100%;display:flex;align-items:center;gap:8px;height:32px;padding:0 14px 0 40px;border:none;background:transparent;color:{{ b.fg }};font-size:13px;font-weight:{{ b.w }};cursor:pointer;text-align:left">{{ b.label }}<sc-if value="{{ b.dot }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border-radius:4px;background:#F2A33A"></span></sc-if></button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </sc-for>
+    </nav>
+
+    <main style="flex:1;min-width:0;padding:24px clamp(16px,3vw,36px) 48px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- PLUGINS -->
+      <sc-if value="{{ v.plugins }}" hint-placeholder-val="{{ true }}">
+        <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Plugins</h1>
+        <sc-if value="{{ justActivated }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;background:#fff;border-left:4px solid #5E7D68;border-radius:8px;padding:14px 18px">
+            <bh-logo size="32"></bh-logo>
+            <div style="flex:1;min-width:220px"><div style="font-size:15px;font-weight:700">BranchHarbor Connector is active</div><div style="font-size:13px;color:#5D5D58">Nothing is sent to BranchHarbor until you connect and agree to data processing.</div></div>
+            <button onClick="{{ goConnect }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 6px 0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">Connect to BranchHarbor<span style="width:32px;height:32px;border-radius:16px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="15"></bh-icon></span></button>
+          </div>
+        </sc-if>
+        <div style="background:#fff;border-radius:8px;overflow:auto">
+          <div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,2fr);min-width:560px;padding:10px 16px;font-size:12px;font-weight:700;color:#5D5D58;border-bottom:1px solid #E4E2DC"><span>Plugin</span><span>Description</span></div>
+          <sc-for list="{{ pluginRows }}" as="p" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,2fr);min-width:560px;padding:14px 16px;border-bottom:1px solid #F0EFEB;background:{{ p.bg }};border-left:4px solid {{ p.bar }}">
+              <div><div style="font-size:14px;font-weight:700">{{ p.name }}</div><div style="display:flex;gap:10px;margin-top:4px;font-size:12px"><sc-if value="{{ p.canActivate }}" hint-placeholder-val="{{ false }}"><button onClick="{{ activate }}" style="background:none;border:none;padding:0;color:#2F6B3A;font-weight:700;cursor:pointer;font-size:12px">Activate</button></sc-if><sc-if value="{{ p.isBHActive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goOverview }}" style="background:none;border:none;padding:0;color:#2F6B3A;font-weight:700;cursor:pointer;font-size:12px">Settings</button></sc-if><span style="color:#5D5D58">{{ p.state }}</span></div></div>
+              <div style="font-size:13px;line-height:1.5;color:#3E3E3A">{{ p.desc }}<div style="font-size:12px;color:#5D5D58;margin-top:2px">Version {{ p.ver }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- CONNECT WIZARD -->
+      <sc-if value="{{ v.connect }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px"><bh-logo size="38"></bh-logo><div><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Connect to BranchHarbor</h1><div style="font-size:13px;color:#5D5D58">Your WordPress hosting, theme and editor stay as they are.</div></div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ wizSteps }}" as="w" hint-placeholder-count="7">
+            <button onClick="{{ w.go }}" disabled="{{ w.locked }}" style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 6px;border-radius:999px;border:none;background:{{ w.bg }};color:{{ w.fg }};font-size:13px;font-weight:700;cursor:pointer"><span style="width:26px;height:26px;border-radius:13px;background:{{ w.dotBg }};color:{{ w.dotFg }};display:flex;align-items:center;justify-content:center;font-size:12px">{{ w.n }}</span>{{ w.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border-radius:28px;padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:18px">
+          <sc-if value="{{ w.consent }}" hint-placeholder-val="{{ true }}">
+            <h2 style="margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em">Before anything is shared</h2>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#3E3E3A;max-width:680px">The connector uses BranchHarbor's hosted service. When you connect, this site will send the data below to BranchHarbor. You can disconnect at any time from Settings.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+              <div style="background:#CDEEEE;border-radius:20px;padding:16px"><div style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;margin-bottom:6px"><bh-icon name="send" size="16"></bh-icon>Sent to BranchHarbor</div><div style="font-size:13px;line-height:1.7">Form submissions from BranchHarbor blocks<br>Site URL, timezone and site names<br>Order events you choose to connect</div></div>
+              <div style="background:#E9DDF8;border-radius:20px;padding:16px"><div style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;margin-bottom:6px"><bh-icon name="download" size="16"></bh-icon>Shown on this site</div><div style="font-size:13px;line-height:1.7">Class schedules and offers<br>Location details and hours</div></div>
+              <div style="background:#F3F2EE;border-radius:20px;padding:16px"><div style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;margin-bottom:6px"><bh-icon name="lock" size="16"></bh-icon>Never sent</div><div style="font-size:13px;line-height:1.7">WordPress user passwords<br>Existing customer lists, unless you choose to<br>Card details</div></div>
+            </div>
+            <label style="display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer"><input type="checkbox" checked="{{ consent }}" onChange="{{ toggleConsent }}" style="width:20px;height:20px;margin-top:1px;accent-color:#141414">I agree that this site sends the data above to BranchHarbor for processing, as described in the <a href="BranchHarbor Website.dc.html">privacy policy</a>.</label>
+          </sc-if>
+
+          <sc-if value="{{ w.detect }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><h2 style="margin:0;flex:1;min-width:220px;font-size:22px;font-weight:700;letter-spacing:-.02em">Check what's on this site</h2><button onClick="{{ scan }}" disabled="{{ scanning }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="search" size="15"></bh-icon>{{ scanLabel }}</button></div>
+            <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:18px;padding:12px 16px;font-size:13px;line-height:1.55"><bh-icon name="info" size="16"></bh-icon>We read the list of active plugins and their versions. We won't disable, change or copy anything from them.</div>
+            <sc-if value="{{ scanned }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ detected }}" as="d" hint-placeholder-count="6">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-radius:20px;background:#F8F7F3">
+                    <span style="width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ d.icon }}" size="18"></bh-icon></span>
+                    <span style="flex:1 1 220px;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ d.name }} <span style="font-weight:500;color:#5D5D58">{{ d.ver }}</span></span><span style="font-size:12px;color:#3E3E3A;line-height:1.5">{{ d.what }}</span></span>
+                    <span style="font-size:11px;font-weight:800;padding:5px 12px;border-radius:999px;background:{{ d.bg }};color:{{ d.fg }}">{{ d.status }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ w.auth }}" hint-placeholder-val="{{ false }}">
+            <h2 style="margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em">Sign in and approve access</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px;align-items:start">
+              <div style="border:1.5px solid #141414;border-radius:24px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.08)">
+                <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#F3F2EE;font-size:12px"><bh-icon name="lock" size="12"></bh-icon>app.branchharbor.com/authorise</div>
+                <div style="padding:22px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;align-items:center;gap:10px"><bh-logo size="30"></bh-logo><span style="font-size:15px;font-weight:800">BranchHarbor</span></div>
+                  <sc-if value="{{ notAuthed }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size:18px;font-weight:700;letter-spacing:-.01em">Stillwater Yoga (WordPress) wants to connect to <span style="color:#5E7D68">Stillwater Yoga Collective</span></div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:#F3F2EE"><span style="width:32px;height:32px;border-radius:16px;background:#E9DDF8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">JM</span><span style="flex:1;font-size:13px"><strong>Jamie Morgan</strong><br><span style="color:#5D5D58">Headquarters admin</span></span></div>
+                    <div style="font-size:13px;font-weight:700">This connection can:</div>
+                    <sc-for list="{{ scopes }}" as="sc" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5"><span style="color:{{ sc.c }}"><bh-icon name="{{ sc.icon }}" size="15"></bh-icon></span>{{ sc.t }}</div></sc-for>
+                    <div style="display:flex;gap:8px"><button onClick="{{ approve }}" disabled="{{ authing }}" style="flex:1;height:48px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ approveLabel }}</button><button onClick="{{ backStep }}" style="height:48px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:700;cursor:pointer;color:#141414">Cancel</button></div>
+                  </sc-if>
+                  <sc-if value="{{ authed }}" hint-placeholder-val="{{ false }}">
+                    <div role="status" style="display:flex;gap:10px;align-items:center;font-size:16px;font-weight:700;color:#2F6B3A"><bh-icon name="check-circle" size="22"></bh-icon>Access approved</div>
+                    <div style="font-size:13px;color:#5D5D58;line-height:1.55">You can return to WordPress.</div>
+                  </sc-if>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:10px;align-items:flex-start;background:#CDEEEE;border-radius:20px;padding:16px;font-size:13px;line-height:1.55"><bh-icon name="key" size="17"></bh-icon><span><strong>No primary password is shared.</strong> WordPress creates a separate application password named "BranchHarbor connector". You can revoke it in Users → Profile.</span></div>
+                <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:20px;padding:16px;font-size:13px;line-height:1.55"><bh-icon name="shield" size="17"></bh-icon><span>BranchHarbor only gets the permissions listed. It can't install plugins, change themes or edit pages you didn't add blocks to.</span></div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ w.map }}" hint-placeholder-val="{{ false }}">
+            <h2 style="margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em">Match sites to locations</h2>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#3E3E3A">This is a multisite network with 3 sites. Each site is connected to one BranchHarbor location.</p>
+            <sc-if value="{{ mapHasError }}" hint-placeholder-val="{{ true }}">
+              <div role="alert" style="display:flex;gap:12px;align-items:flex-start;background:#F8D6D8;border-radius:20px;padding:14px 18px;font-size:14px;line-height:1.55;color:#5C1414"><bh-icon name="alert" size="18"></bh-icon><span><strong>1 site needs attention.</strong> Fix it to continue, or leave that site unconnected.</span></div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ mapRows }}" as="m" hint-placeholder-count="3">
+                <div style="border-radius:22px;background:{{ m.bg }};padding:16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+                    <span style="width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="wordpress" size="18"></bh-icon></span>
+                    <span style="flex:1 1 200px;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ m.site }}</span><span style="font-size:12px;color:#5D5D58">{{ m.path }} · {{ m.tz }}</span></span>
+                    <bh-icon name="arrow-right" size="16"></bh-icon>
+                    <select aria-label="Location for {{ m.site }}" value="{{ m.loc }}" onChange="{{ m.set }}" style="flex:1 1 220px;height:44px;border-radius:999px;border:1.5px solid {{ m.selBd }};padding:0 14px;font-size:13px;font-weight:600;background:#fff">
+                      <option value="org">Organisation (shared pages only)</option><option value="qw">Toronto – Queen West · Eastern</option><option value="ls">Toronto – Leslieville · Eastern</option><option value="kt">Vancouver – Kitsilano · Pacific</option><option value="none">Don't connect this site</option>
+                    </select>
+                    <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:{{ m.stFg }}"><bh-icon name="{{ m.stIcon }}" size="15"></bh-icon>{{ m.st }}</span>
+                  </div>
+                  <sc-if value="{{ m.err }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:1.55;color:#5C1414;padding-left:50px">{{ m.errText }}</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ w.data }}" hint-placeholder-val="{{ false }}">
+            <h2 style="margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em">Choose what syncs, and which way</h2>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ dirRows }}" as="d" hint-placeholder-count="5">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-radius:20px;background:#F8F7F3">
+                  <span style="width:38px;height:38px;border-radius:12px;background:{{ d.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ d.icon }}" size="18"></bh-icon></span>
+                  <span style="flex:1 1 200px;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ d.name }}</span><span style="font-size:12px;color:#3E3E3A;line-height:1.5">{{ d.note }}</span></span>
+                  <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#fff;flex-wrap:wrap">
+                    <sc-for list="{{ d.opts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" disabled="{{ o.disabled }}" aria-pressed="{{ o.on }}" style="height:34px;padding:0 12px;border-radius:999px;border:none;background:{{ o.bg }};color:{{ o.fg }};font-size:12px;font-weight:700;cursor:pointer">{{ o.label }}</button></sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;background:#F3F2EE;border-radius:18px;padding:12px 16px;font-size:13px;line-height:1.55"><bh-icon name="info" size="16"></bh-icon>If the same record changes in both places, the system marked as the owner wins and the other change is listed under Overview for review.</div>
+          </sc-if>
+
+          <sc-if value="{{ w.test }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><h2 style="margin:0;flex:1;min-width:220px;font-size:22px;font-weight:700;letter-spacing:-.02em">Test the connection</h2><button onClick="{{ runTests }}" disabled="{{ testing }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="play" size="14"></bh-icon>{{ testBtn }}</button></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ tests }}" as="t" hint-placeholder-count="4">
+                <div style="border-radius:20px;background:{{ t.bg }};padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:center;gap:12px"><span style="color:{{ t.fg }}"><bh-icon name="{{ t.icon }}" size="19"></bh-icon></span><span style="flex:1;font-size:14px;font-weight:700">{{ t.name }}</span><span style="font-size:12px;font-weight:700;color:{{ t.fg }}">{{ t.st }}</span></div>
+                  <sc-if value="{{ t.failed }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:13px;line-height:1.55;color:#5C1414;padding-left:31px">WP Rocket is caching <code>/wp-json/branchharbor/v1/events</code>, so order events arrive late or not at all. Add one exclusion rule to WP Rocket's "Never cache" list. Nothing else in WP Rocket changes.</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;padding-left:31px"><button onClick="{{ fixCache }}" style="height:40px;padding:0 16px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Add exclusion rule</button><button onClick="{{ showManual }}" style="height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #5C1414;background:transparent;color:#5C1414;font-size:13px;font-weight:700;cursor:pointer">I'll do it myself</button></div>
+                    <sc-if value="{{ manualOpen }}" hint-placeholder-val="{{ false }}"><div style="margin-left:31px;background:#fff;border-radius:14px;padding:12px;font-size:12px;line-height:1.6">WP Rocket → Settings → Advanced Rules → Never cache URL(s): add <code>/wp-json/branchharbor/(.*)</code>, save, then run the tests again.</div></sc-if>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ w.done }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px">
+              <div style="background:#D6F26B;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:10px">
+                <span style="width:54px;height:54px;border-radius:27px;background:#141414;color:#D6F26B;display:flex;align-items:center;justify-content:center"><bh-icon name="check" size="26" stroke="2.6"></bh-icon></span>
+                <div style="font-size:26px;font-weight:700;letter-spacing:-.03em">Connected</div>
+                <div style="font-size:14px;line-height:1.55">{{ connectedSummary }}</div>
+              </div>
+              <div style="background:#F8F7F3;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:14px;font-weight:700">Initial sync</div>
+                <div style="height:10px;border-radius:5px;background:#fff;overflow:hidden"><div style="height:100%;width:{{ syncPct }};background:#141414"></div></div>
+                <div style="font-size:13px;color:#3E3E3A">{{ syncLabel }}</div>
+                <div style="font-size:12px;color:#5D5D58">Runs in the background. It doesn't slow down your pages.</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto"><button onClick="{{ goBlocks }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Add blocks to a page</button><button onClick="{{ goOverview }}" style="height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414">View status</button></div>
+              </div>
+            </div>
+          </sc-if>
+
+          <div role="alert" style="font-size:13px;font-weight:600;color:#B3261E">{{ wizErr }}</div>
+          <sc-if value="{{ wizFooter }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:10px;border-top:1px solid #EEEDE8;padding-top:18px">
+              <sc-if value="{{ wizCanBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ backStep }}" style="display:flex;align-items:center;gap:8px;height:48px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:700;cursor:pointer;color:#141414"><bh-icon name="arrow-left" size="15"></bh-icon>Back</button></sc-if>
+              <button onClick="{{ nextStep }}" disabled="{{ nextDisabled }}" style="margin-left:auto;display:flex;align-items:center;gap:10px;height:50px;padding:0 6px 0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ nextLabel }}<span style="width:38px;height:38px;border-radius:19px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="arrow-right" size="16"></bh-icon></span></button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- OVERVIEW -->
+      <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><bh-logo size="38"></bh-logo><h1 style="margin:0;flex:1;font-size:26px;font-weight:700;letter-spacing:-.02em">BranchHarbor overview</h1>
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#5D5D58">Simulate state<select value="{{ connState }}" onChange="{{ setConnState }}" style="height:38px;border-radius:999px;border:1.5px dashed #5D5D58;padding:0 12px;font-size:12px;font-weight:700;background:#fff"><option value="connected">Connected</option><option value="initial">Initial sync</option><option value="degraded">Degraded</option><option value="expired">Authorisation expired</option><option value="disconnected">Disconnected</option></select></label>
+        </div>
+        <sc-if value="{{ notConnectedYet }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:#fff;border-radius:24px;padding:20px"><bh-icon name="plug" size="22"></bh-icon><span style="flex:1;min-width:200px;font-size:14px">This site isn't connected yet. Overview shows sample status until you finish setup.</span><button onClick="{{ goConnect }}" style="height:44px;padding:0 18px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Connect</button></div>
+        </sc-if>
+        <div style="background:{{ cs.bg }};border-radius:28px;padding:24px;display:flex;flex-wrap:wrap;gap:18px;align-items:center">
+          <span style="width:56px;height:56px;border-radius:28px;background:#141414;color:{{ cs.iconFg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ cs.icon }}" size="26"></bh-icon></span>
+          <div style="flex:1;min-width:240px"><div style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ cs.title }}</div><div style="font-size:14px;line-height:1.55;margin-top:2px">{{ cs.text }}</div></div>
+          <sc-if value="{{ cs.hasAction }}" hint-placeholder-val="{{ false }}"><button onClick="{{ cs.act }}" style="height:48px;padding:0 20px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">{{ cs.action }}</button></sc-if>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+          <sc-for list="{{ ovStats }}" as="o" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:6px"><span style="width:36px;height:36px;border-radius:12px;background:{{ o.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ o.icon }}" size="17"></bh-icon></span><div style="font-size:12px;font-weight:600;color:#5D5D58">{{ o.label }}</div><div style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums">{{ o.value }}</div><div style="font-size:11px;color:#5D5D58">{{ o.note }}</div></div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px;align-items:start">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:16px;font-weight:700">Sites</div>
+            <sc-for list="{{ siteRows }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#F8F7F3"><bh-icon name="wordpress" size="17"></bh-icon><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ r.site }}</span><span style="font-size:12px;color:#5D5D58">{{ r.loc }}</span></span><span style="font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:{{ r.bg }}">{{ r.st }}</span></div>
+            </sc-for>
+          </div>
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:16px;font-weight:700">Sync activity</div>
+            <sc-for list="{{ syncLog }}" as="l" hint-placeholder-count="5">
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.5;padding:6px 0;border-bottom:1px solid #F3F2EE"><span style="color:{{ l.fg }};margin-top:1px"><bh-icon name="{{ l.icon }}" size="15"></bh-icon></span><span style="flex:1">{{ l.t }}</span><span style="color:#5D5D58;font-size:12px;white-space:nowrap">{{ l.at }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- BLOCKS -->
+      <sc-if value="{{ v.blocks }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:640px">
+          <div style="height:56px;border-bottom:1px solid #E4E2DC;display:flex;align-items:center;gap:10px;padding:0 12px">
+            <button onClick="{{ toggleInserter }}" aria-pressed="{{ inserterOpen }}" aria-label="Add block" style="width:36px;height:36px;border-radius:8px;border:none;background:{{ inserterBg }};color:{{ inserterFg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="plus" size="18"></bh-icon></button>
+            <span style="font-size:13px;font-weight:600;color:#5D5D58">Editing page: <strong style="color:#141414">Classes</strong></span>
+            <span style="margin-left:auto;font-size:12px;color:#5D5D58">{{ saveState }}</span>
+            <button onClick="{{ previewPage }}" style="height:36px;padding:0 14px;border-radius:8px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414">Preview</button>
+            <button onClick="{{ savePage }}" style="height:36px;padding:0 14px;border-radius:8px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Update</button>
+          </div>
+          <div style="flex:1;display:flex;min-height:0">
+            <sc-if value="{{ inserterOpen }}" hint-placeholder-val="{{ true }}">
+              <aside style="width:260px;flex-shrink:0;border-right:1px solid #E4E2DC;padding:14px;display:flex;flex-direction:column;gap:8px;overflow:auto">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.04em;color:#5D5D58"><bh-logo size="18"></bh-logo>BRANCHHARBOR BLOCKS</div>
+                <sc-for list="{{ blockLib }}" as="b" hint-placeholder-count="5">
+                  <button onClick="{{ b.add }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid #EEEDE8;background:#fff;cursor:pointer;text-align:left;color:#141414"><span style="width:34px;height:34px;border-radius:10px;background:{{ b.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ b.icon }}" size="16"></bh-icon></span><span style="flex:1"><span style="display:block;font-size:13px;font-weight:700">{{ b.name }}</span><span style="font-size:11px;color:#5D5D58">{{ b.desc }}</span></span></button>
+                </sc-for>
+                <div style="font-size:11px;color:#5D5D58;line-height:1.5;margin-top:4px">Also available as shortcodes for Elementor and other builders.</div>
+              </aside>
+            </sc-if>
+            <div style="flex:1;min-width:0;background:#F6F6F4;padding:28px clamp(12px,3vw,40px);overflow:auto">
+              <div style="max-width:760px;margin:0 auto;background:#fff;padding:32px;display:flex;flex-direction:column;gap:16px;min-height:100%">
+                <div style="font-size:34px;font-weight:700;letter-spacing:-.02em;font-family:Georgia,serif">Classes</div>
+                <p style="margin:0;font-size:16px;line-height:1.7;color:#3E3E3A;font-family:Georgia,serif">Drop in to any class at Queen West. New to Stillwater? Try your first week on us.</p>
+                <sc-for list="{{ pageBlocks }}" as="pb" hint-placeholder-count="1">
+                  <div onClick="{{ pb.select }}" style="position:relative;border:2px solid {{ pb.bd }};border-radius:6px;padding:18px;cursor:pointer">
+                    <sc-if value="{{ pb.selected }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-34px;left:-2px;display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;background:#141414;color:#fff;border-radius:6px 6px 0 0;font-size:12px;font-weight:700"><bh-icon name="{{ pb.icon }}" size="14"></bh-icon>{{ pb.name }}<button onClick="{{ pb.remove }}" aria-label="Remove block" style="margin-left:8px;background:none;border:none;color:#fff;cursor:pointer;display:flex"><bh-icon name="x" size="14"></bh-icon></button></div></sc-if>
+                    <sc-if value="{{ pb.isSchedule }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;flex-direction:column;gap:8px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:16px">{{ blockCfg.locLabel }}</strong><span style="font-size:12px;color:#5D5D58">Times in Eastern time · from BranchHarbor</span></div>
+                        <sc-if value="{{ blockCfg.filters }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="padding:5px 12px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">All</span><span style="padding:5px 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:700">Vinyasa</span><span style="padding:5px 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:700">Pilates</span><span style="padding:5px 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:700">Restore</span></div></sc-if>
+                        <sc-for list="{{ blockClasses }}" as="c" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#F8F7F3;font-size:14px"><span style="width:70px;font-weight:800">{{ c.time }}</span><span style="flex:1"><strong>{{ c.name }}</strong><br><span style="font-size:12px;color:#5D5D58">{{ c.inst }} · {{ c.spots }}</span></span><span style="height:34px;display:flex;align-items:center;padding:0 14px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">{{ c.cta }}</span></div></sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ pb.isForm }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:8px"><strong style="font-size:16px">Ask us anything</strong><div style="height:40px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 16px;display:flex;align-items:center;font-size:13px;color:#9C9C96">Name</div><div style="height:40px;border-radius:999px;border:1.5px solid #D8D6CF;padding:0 16px;display:flex;align-items:center;font-size:13px;color:#9C9C96">Email</div><span style="align-self:flex-start;height:38px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">Send enquiry</span><span style="font-size:11px;color:#5D5D58">Goes to {{ blockCfg.locLabel }}</span></div>
+                    </sc-if>
+                    <sc-if value="{{ pb.isOther }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:14px;background:{{ pb.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ pb.icon }}" size="20"></bh-icon></span><span><strong style="font-size:15px">{{ pb.name }}</strong><br><span style="font-size:12px;color:#5D5D58">{{ pb.desc }}</span></span></div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ noBlocks }}" hint-placeholder-val="{{ false }}"><div style="border:2px dashed #D8D6CF;border-radius:6px;padding:24px;text-align:center;font-size:14px;color:#5D5D58">Add a BranchHarbor block from the panel on the left.</div></sc-if>
+              </div>
+            </div>
+            <aside style="width:280px;flex-shrink:0;border-left:1px solid #E4E2DC;padding:16px;display:flex;flex-direction:column;gap:14px;overflow:auto">
+              <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:10px;background:{{ selBlock.pastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ selBlock.icon }}" size="16"></bh-icon></span><div><div style="font-size:14px;font-weight:700">{{ selBlock.name }}</div><div style="font-size:11px;color:#5D5D58">BranchHarbor block</div></div></div>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700">Location<select value="{{ blockCfg.loc }}" onChange="{{ setBlockLoc }}" style="height:40px;border-radius:10px;border:1.5px solid #D8D6CF;padding:0 10px;font-size:13px;background:#fff"><option value="qw">Toronto – Queen West</option><option value="ls">Toronto – Leslieville</option><option value="site">Use this site's location</option></select></label>
+                <sc-if value="{{ selIsSchedule }}" hint-placeholder-val="{{ true }}">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700">Show<select value="{{ blockCfg.days }}" onChange="{{ setBlockDays }}" style="height:40px;border-radius:10px;border:1.5px solid #D8D6CF;padding:0 10px;font-size:13px;background:#fff"><option value="1">Today</option><option value="7">Next 7 days</option></select></label>
+                  <button onClick="{{ toggleFilters }}" role="switch" aria-checked="{{ blockCfg.filters }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;cursor:pointer;font-size:13px;font-weight:600;color:#141414"><span style="width:36px;height:22px;border-radius:11px;background:{{ fTrack }};position:relative"><span style="position:absolute;top:3px;left:{{ fKnob }};width:16px;height:16px;border-radius:8px;background:#fff"></span></span>Show class filters</button>
+                </sc-if>
+                <div style="font-size:12px;line-height:1.55;color:#5D5D58;background:#F3F2EE;border-radius:12px;padding:10px 12px">Booking buttons open your connected booking system. This block doesn't add a second checkout.</div>
+              </sc-if>
+              <sc-if value="{{ noSel }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#5D5D58">Select a block to see its settings.</div></sc-if>
+            </aside>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- COMPATIBILITY -->
+      <sc-if value="{{ v.compat }}" hint-placeholder-val="{{ false }}">
+        <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Compatibility</h1>
+        <p style="margin:0;font-size:14px;color:#5D5D58;max-width:700px;line-height:1.6">What we've tested, what needs setup and what isn't supported yet. Sample data for the prototype.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ compatFilters }}" as="f" hint-placeholder-count="6"><button onClick="{{ f.pick }}" style="height:38px;padding:0 14px;border-radius:999px;border:1.5px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ f.label }}</button></sc-for>
+        </div>
+        <div style="background:#fff;border-radius:24px;overflow:auto">
+          <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(120px,.7fr) minmax(200px,1.5fr) minmax(200px,1.5fr) 130px;min-width:900px;padding:12px 18px;font-size:12px;font-weight:700;color:#5D5D58;border-bottom:1px solid #EEEDE8"><span>Plugin or category</span><span>Tested with</span><span>What works</span><span>Limits</span><span>Status</span></div>
+          <sc-for list="{{ compatRows }}" as="c" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(120px,.7fr) minmax(200px,1.5fr) minmax(200px,1.5fr) 130px;min-width:900px;padding:14px 18px;font-size:13px;line-height:1.5;border-bottom:1px solid #F3F2EE;align-items:start">
+              <span><strong>{{ c.name }}</strong><br><span style="font-size:12px;color:#5D5D58">{{ c.cat }}</span></span><span style="color:#3E3E3A">{{ c.ver }}</span><span>{{ c.works }}</span><span style="color:#3E3E3A">{{ c.limits }}</span>
+              <span style="justify-self:start;font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:{{ c.bg }};color:{{ c.fg }}">{{ c.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{ v.settings }}" hint-placeholder-val="{{ false }}">
+        <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">BranchHarbor settings</h1>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:820px">
+          <sc-for list="{{ settingRows }}" as="r" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:22px;padding:18px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+              <span style="width:40px;height:40px;border-radius:12px;background:{{ r.pastel }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ r.icon }}" size="18"></bh-icon></span>
+              <span style="flex:1 1 260px;min-width:0"><span style="display:block;font-size:15px;font-weight:700">{{ r.name }}</span><span style="font-size:13px;color:#5D5D58;line-height:1.5">{{ r.desc }}</span></span>
+              <button onClick="{{ r.toggle }}" role="switch" aria-checked="{{ r.on }}" aria-label="{{ r.name }}" style="width:48px;height:28px;border-radius:14px;border:none;background:{{ r.track }};position:relative;cursor:pointer;flex-shrink:0"><span style="position:absolute;top:4px;left:{{ r.knob }};width:20px;height:20px;border-radius:10px;background:#fff"></span></button>
+            </div>
+          </sc-for>
+          <div style="background:#fff;border-radius:22px;padding:18px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+            <span style="width:40px;height:40px;border-radius:12px;background:#F8D6D8;display:flex;align-items:center;justify-content:center"><bh-icon name="logout" size="18"></bh-icon></span>
+            <span style="flex:1 1 260px"><span style="display:block;font-size:15px;font-weight:700">Disconnect this site</span><span style="font-size:13px;color:#5D5D58;line-height:1.5">Blocks stop showing live data and display a short message instead. Your pages and WordPress content stay untouched.</span></span>
+            <sc-if value="{{ notConfirmDisc }}" hint-placeholder-val="{{ true }}"><button onClick="{{ askDisc }}" style="height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #9E1B12;background:#fff;color:#9E1B12;font-size:13px;font-weight:700;cursor:pointer">Disconnect</button></sc-if>
+            <sc-if value="{{ confirmDisc }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px"><button onClick="{{ doDisc }}" style="height:44px;padding:0 18px;border-radius:999px;background:#9E1B12;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Disconnect 3 sites</button><button onClick="{{ cancelDisc }}" style="height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer;color:#141414">Keep connected</button></div></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- FRONT END -->
+      <sc-if value="{{ v.front }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:12px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:22px;padding:18px 28px;border-bottom:1px solid #EEEDE8;font-family:Georgia,serif"><span style="font-size:22px;font-weight:700">Stillwater Yoga</span><span style="font-size:14px;color:#5D5D58">Classes</span><span style="font-size:14px;color:#5D5D58">Pricing</span><span style="font-size:14px;color:#5D5D58">Teachers</span><span style="font-size:14px;color:#5D5D58">Contact</span><button onClick="{{ goBlocks }}" style="margin-left:auto;height:34px;padding:0 14px;border-radius:8px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#141414">Back to editor</button></div>
+          <div style="position:relative;height:280px"><img src="{{ heroImg }}" alt="" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:28px;bottom:28px;color:#fff;font-family:Georgia,serif;font-size:42px;font-weight:700;text-shadow:0 2px 20px rgba(0,0,0,.4)">Classes</div></div>
+          <div style="max-width:760px;margin:0 auto;padding:32px 20px 48px;display:flex;flex-direction:column;gap:12px">
+            <p style="margin:0;font-size:16px;line-height:1.7;color:#3E3E3A;font-family:Georgia,serif">Drop in to any class at Queen West. New to Stillwater? Try your first week on us.</p>
+            <sc-if value="{{ frontDisconnected }}" hint-placeholder-val="{{ false }}"><div style="background:#F3F2EE;border-radius:14px;padding:16px;font-size:14px">The class schedule is temporarily unavailable. Call (416) 555-0142 to book.</div></sc-if>
+            <sc-if value="{{ frontLive }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ blockClasses }}" as="c" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#F8F7F3;font-size:14px"><span style="width:70px;font-weight:800">{{ c.time }}</span><span style="flex:1"><strong>{{ c.name }}</strong><br><span style="font-size:12px;color:#5D5D58">{{ c.inst }} · {{ c.spots }}</span></span><span style="height:36px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:#141414;color:#fff;font-size:12px;font-weight:700">{{ c.cta }}</span></div></sc-for>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE' };
+const STATUS = { 'Tested': ['#D6F26B', '#141414'], 'Limited support': [P.butter, '#141414'], 'Requires setup': [P.aqua, '#141414'], 'Planned': ['#F3F2EE', '#3E3E3A'], 'Unsupported': [P.blush, '#5C1414'] };
+const WIZ = [['consent', 'Consent'], ['detect', 'Detect'], ['auth', 'Authorise'], ['map', 'Map sites'], ['data', 'Data'], ['test', 'Test'], ['done', 'Done']];
+const DETECTED = [
+  ['WooCommerce', '9.3', 'box', 'Reads products and orders through WooCommerce APIs. Works with high-performance order storage. Your checkout stays as it is.', 'Tested'],
+  ['Elementor', '3.24', 'layers', 'Add BranchHarbor content with shortcodes or the HTML widget. No native Elementor widgets yet.', 'Limited support'],
+  ['Yoast SEO', '23.5', 'search', 'Yoast stays in charge of page titles, canonical links and sitemaps. BranchHarbor won\u2019t add its own.', 'Limited support'],
+  ['WP Rocket', '3.17', 'zap', 'Live schedules and event delivery need one cache exclusion. We\u2019ll check this in the test step.', 'Requires setup'],
+  ['WPML', '4.6', 'globe', 'Blocks show in the site\u2019s default language only for now.', 'Planned'],
+  ['Contact Form 7', '5.9', 'mail', 'Keep using it. Its submissions aren\u2019t routed to BranchHarbor.', 'Unsupported'],
+];
+const COMPAT = [
+  ['WooCommerce', 'Commerce', '8.9 – 9.3', 'Products, orders and refunds via public APIs; HPOS declared compatible', 'Uses your checkout; no second checkout added', 'Tested'],
+  ['Block editor', 'Page builders', 'WordPress 6.5 – 6.7', '5 native blocks with settings', 'Full-site editing templates not tested', 'Tested'],
+  ['Elementor', 'Page builders', '3.20 – 3.24', 'Shortcodes and HTML widget', 'No native widgets yet', 'Limited support'],
+  ['Yoast SEO', 'SEO', '22 – 23', 'Yoast owns titles, canonical URLs and sitemaps', 'Location pages need Yoast templates set manually', 'Limited support'],
+  ['WP Rocket', 'Cache', '3.15 – 3.17', 'Works after excluding /wp-json/branchharbor/', 'Exclusion required for live data', 'Requires setup'],
+  ['Wordfence', 'Security', '7.11', 'Allow BranchHarbor event requests', 'Rate limiting may delay events', 'Requires setup'],
+  ['MemberPress', 'Memberships', '—', 'Planned: read membership status', 'One system must own access rules', 'Planned'],
+  ['WPML', 'Multilingual', '—', 'Planned: map translated pages to locations', 'Default language only today', 'Planned'],
+  ['Multisite', 'Network', 'WordPress 6.5+', 'Network authorisation plus per-site location mapping', 'Each site maps to one location', 'Tested'],
+  ['Contact Form 7', 'Forms', '—', 'Coexists; not integrated', 'Submissions aren\u2019t routed', 'Unsupported'],
+];
+const BLOCKS = [
+  ['schedule', 'Class schedule', 'Upcoming classes with booking links', 'calendar', P.lilac],
+  ['form', 'Enquiry form', 'Sends leads to the right location', 'mail', P.aqua],
+  ['finder', 'Location finder', 'Map and list of locations', 'pin', P.butter],
+  ['offer', 'Intro offer', 'Current offer for this location', 'gift', P.blush],
+  ['team', 'Instructor list', 'Teachers at this location', 'users', P.sage],
+];
+const CLASSES = [['7:00 am', 'Morning Vinyasa', 'Maya Rao', '4 spots left', 'Book'], ['9:00 am', 'Slow Flow', 'Sam Tran', 'Full', 'Join waitlist'], ['12:15 pm', 'Lunchtime Pilates', 'Ana Silva', '9 spots left', 'Book'], ['6:30 pm', 'Yin & Restore', 'Jordan Lee', '1 spot left', 'Book']];
+const LOCN = { qw: 'Toronto – Queen West', ls: 'Toronto – Leslieville', kt: 'Vancouver – Kitsilano', org: 'Organisation', none: 'Not connected', site: 'Toronto – Queen West' };
+
+class Component extends DCLogic {
+  state = {
+    screen: 'plugins', active: false, justActivated: false,
+    wiz: 0, maxWiz: 0, consent: false, scanning: false, scanned: false, authing: false, authed: false,
+    map: { main: 'org', qw: 'qw', kt: 'ls' }, dir: { forms: 'out', schedule: 'in', woo: 'in', customers: 'off', seo: 'yoast' },
+    tests: null, testing: false, cacheFixed: false, manualOpen: false, connected: false, syncPct: 0, wizErr: '',
+    connState: 'connected', blocks: [{ id: 1, type: 'schedule' }], sel: 1, nextId: 2, inserter: true, cfg: { loc: 'qw', days: '7', filters: true }, saved: true,
+    settings: { credits: false, debug: false, keepData: true, consentLog: true }, confirmDisc: false,
+  };
+  componentWillUnmount() { (this.t || []).forEach(clearTimeout); clearInterval(this.syncT); }
+  later(fn, ms) { (this.t = this.t || []).push(setTimeout(fn, ms)); }
+  go(screen) { this.setState({ screen }); window.scrollTo(0, 0); }
+  canNext() {
+    const s = this.state, k = WIZ[s.wiz][0];
+    if (k === 'consent') return s.consent;
+    if (k === 'detect') return s.scanned;
+    if (k === 'auth') return s.authed;
+    if (k === 'map') return s.map.kt !== 'ls';
+    if (k === 'test') return s.tests && s.tests.every(t => t === 'ok');
+    return true;
+  }
+  nextStep() {
+    const s = this.state;
+    if (!this.canNext()) { this.setState({ wizErr: { consent: 'Agree to data processing to continue.', detect: 'Scan the site first.', auth: 'Approve access to continue.', map: 'Fix the site mapping or choose "Don\u2019t connect this site".', test: 'All tests need to pass.' }[WIZ[s.wiz][0]] || '' }); return; }
+    const w = s.wiz + 1;
+    this.setState({ wiz: w, maxWiz: Math.max(s.maxWiz, w), wizErr: '' });
+    if (WIZ[w][0] === 'done') this.startSync();
+  }
+  startSync() {
+    this.setState({ connected: true, syncPct: 5 });
+    clearInterval(this.syncT);
+    this.syncT = setInterval(() => this.setState(x => { const p = Math.min(100, x.syncPct + 11); if (p >= 100) clearInterval(this.syncT); return { syncPct: p }; }), 400);
+  }
+  runTests() {
+    const fixed = this.state.cacheFixed;
+    this.setState({ testing: true, tests: ['run', 'wait', 'wait', 'wait'] });
+    [0, 1, 2, 3].forEach(i => {
+      this.later(() => this.setState(x => { const t = [...x.tests]; t[i] = i === 2 && !fixed ? 'fail' : 'ok'; if (t[i + 1]) t[i + 1] = 'run'; return { tests: t, testing: i < 3 }; }), 700 * (i + 1));
+    });
+  }
+
+  renderVals() {
+    const s = this.state, k = WIZ[s.wiz][0], img = window.BH_IMG || {};
+    const bhScreens = ['overview', 'connect', 'blocks', 'compat', 'settings'];
+    const inBH = bhScreens.includes(s.screen);
+    const badge = !s.active ? { label: 'Not active', bg: '#D8D6CF' } : !s.connected ? { label: 'Not connected', bg: P.butter } : { label: { connected: 'Connected', initial: 'Initial sync', degraded: 'Degraded', expired: 'Reconnect needed', disconnected: 'Disconnected' }[s.connState], bg: s.connState === 'connected' ? '#D6F26B' : s.connState === 'initial' ? P.aqua : P.blush };
+    const menu = [['dash', 'Dashboard', 'grid'], ['posts', 'Posts', 'edit'], ['media', 'Media', 'eye'], ['pages', 'Pages', 'file'], ...(s.active ? [['bh', 'BranchHarbor', 'link']] : []), ['appearance', 'Appearance', 'layers'], ['plugins', 'Plugins', 'plug'], ['users', 'Users', 'users'], ['settings-wp', 'Settings', 'settings']];
+    const mapErr = s.map.kt === 'ls';
+    const testDefs = ['Enquiry form sends to the right location', 'Class schedule loads', 'WooCommerce order events arrive', 'Pages load without slowing down'];
+    const tests = (s.tests || testDefs.map(() => 'idle')).map((st, i) => ({ name: testDefs[i], failed: st === 'fail', icon: st === 'ok' ? 'check-circle' : st === 'fail' ? 'alert' : st === 'run' ? 'refresh' : 'clock',
+      st: { ok: i === 3 ? 'Passed · +4 ms' : 'Passed', fail: 'Failed', run: 'Running…', wait: 'Waiting', idle: 'Not run' }[st], bg: st === 'fail' ? '#FDECEC' : st === 'ok' ? '#F1F8E0' : '#F8F7F3', fg: st === 'fail' ? '#9E1B12' : st === 'ok' ? '#2F6B3A' : '#5D5D58' }));
+    const cs = {
+      connected: { title: 'Connected', text: 'Last successful sync 2 minutes ago. All 3 sites are up to date.', icon: 'check', iconFg: '#D6F26B', bg: '#D6F26B' },
+      initial: { title: 'Initial sync in progress', text: '412 of 1,280 records processed. Blocks show live data as each location finishes.', icon: 'refresh', iconFg: '#fff', bg: P.aqua },
+      degraded: { title: 'Degraded · order events delayed', text: 'Last successful sync 47 minutes ago. 6 WooCommerce orders from Kitsilano are waiting. Schedules still load.', icon: 'alert', iconFg: '#F7EDA8', bg: P.butter, action: 'Retry 6 orders' },
+      expired: { title: 'Authorisation expired', text: 'The application password was revoked on 9 Oct. Blocks show cached schedules from 9 Oct, 4:12 pm and enquiries are queued on this site.', icon: 'key', iconFg: '#F8D6D8', bg: P.blush, action: 'Reconnect' },
+      disconnected: { title: 'Disconnected', text: 'Blocks show a short "temporarily unavailable" message. Your pages and WordPress content are untouched.', icon: 'x', iconFg: '#F8D6D8', bg: '#E4E2DC', action: 'Connect again' },
+    }[s.connState];
+    const selBlock = s.blocks.find(b => b.id === s.sel);
+    const selDef = selBlock && BLOCKS.find(b => b[0] === selBlock.type);
+    const frontDisc = s.connState === 'disconnected' || s.connState === 'expired';
+
+    return {
+      barBadge: badge, goFront: () => this.go('front'),
+      wpMenu: menu.map(([key, label, icon]) => { const on = key === 'bh' ? inBH : s.screen === key; return { label, icon, isBH: key === 'bh' && inBH, bg: on ? (key === 'bh' ? '#5E7D68' : '#3A3C40') : 'transparent', fg: '#E6E6E3', w: on ? 700 : 500, go: () => key === 'bh' ? this.go(s.connected ? 'overview' : 'connect') : key === 'plugins' ? this.go('plugins') : null }; }),
+      bhSub: [['overview', 'Overview'], ['connect', 'Connect'], ['blocks', 'Blocks'], ['compat', 'Compatibility'], ['settings', 'Settings']].map(([key, label]) => ({ label, fg: s.screen === key ? '#fff' : '#B9B9B3', w: s.screen === key ? 700 : 500, dot: key === 'connect' && !s.connected, go: () => this.go(key) })),
+      v: { plugins: s.screen === 'plugins' || !['connect', 'overview', 'blocks', 'compat', 'settings', 'front'].includes(s.screen), connect: s.screen === 'connect', overview: s.screen === 'overview', blocks: s.screen === 'blocks', compat: s.screen === 'compat', settings: s.screen === 'settings', front: s.screen === 'front' },
+      justActivated: s.justActivated && !s.connected,
+      pluginRows: [['Akismet Anti-spam', 'Spam protection for comments and forms.', '5.3', true], ['BranchHarbor Connector', 'Connect this site to BranchHarbor for schedules, enquiry routing and location pages.', '1.0.0', s.active, true], ['Elementor', 'Page builder.', '3.24', true], ['WooCommerce', 'Online store.', '9.3', true], ['WP Rocket', 'Caching.', '3.17', true], ['Yoast SEO', 'Search engine optimisation.', '23.5', true]].map(([name, desc, ver, on, isBH]) => ({ name, desc, ver, canActivate: isBH && !on, isBHActive: isBH && on, state: on ? 'Active' : 'Inactive', bg: isBH ? '#FAFBF5' : '#fff', bar: on ? (isBH ? '#5E7D68' : '#C9C9C3') : 'transparent' })),
+      activate: () => this.setState({ active: true, justActivated: true }), goConnect: () => this.go('connect'), goOverview: () => this.go('overview'), goBlocks: () => this.go('blocks'),
+
+      wizSteps: WIZ.map(([key, label], i) => { const on = i === s.wiz, d = i < s.wiz || (key === 'done' && s.connected); return { label, n: d && !on ? '✓' : i + 1, locked: i > s.maxWiz, bg: on ? '#141414' : '#fff', fg: on ? '#fff' : '#141414', dotBg: on ? '#D6F26B' : d ? '#141414' : '#F3F2EE', dotFg: on ? '#141414' : d ? '#fff' : '#141414', go: () => this.setState({ wiz: i, wizErr: '' }) }; }),
+      w: { consent: k === 'consent', detect: k === 'detect', auth: k === 'auth', map: k === 'map', data: k === 'data', test: k === 'test', done: k === 'done' },
+      consent: s.consent, toggleConsent: () => this.setState({ consent: !s.consent, wizErr: '' }),
+      scan: () => { this.setState({ scanning: true }); this.later(() => this.setState({ scanning: false, scanned: true, wizErr: '' }), 1100); }, scanning: s.scanning, scanned: s.scanned, scanLabel: s.scanning ? 'Scanning…' : s.scanned ? 'Scan again' : 'Scan this site',
+      detected: DETECTED.map(([name, ver, icon, what, st]) => ({ name, ver, icon, what, status: st, bg: STATUS[st][0], fg: STATUS[st][1] })),
+      notAuthed: !s.authed, authed: s.authed, authing: s.authing, approveLabel: s.authing ? 'Approving…' : 'Approve',
+      approve: () => { this.setState({ authing: true }); this.later(() => this.setState({ authing: false, authed: true, wizErr: '' }), 900); },
+      scopes: [['check', 'Read site name, URL and timezone', '#2F6B3A'], ['check', 'Send form submissions from BranchHarbor blocks', '#2F6B3A'], ['check', 'Read WooCommerce products and orders', '#2F6B3A'], ['x', 'Can\u2019t create users, install plugins or edit other content', '#9E1B12']].map(([icon, t, c]) => ({ icon, t, c })),
+      mapHasError: mapErr,
+      mapRows: [['main', 'Stillwater Yoga', 'stillwater-sample.ca/', 'America/Toronto'], ['qw', 'Queen West', '/queen-west', 'America/Toronto'], ['kt', 'Kitsilano', '/kitsilano', 'America/Vancouver']].map(([id, site, path, tz]) => {
+        const loc = s.map[id], err = id === 'kt' && loc === 'ls';
+        return { site, path, tz, loc, err, errText: 'This site uses Pacific time, but Toronto – Leslieville uses Eastern time. Class times would show 3 hours off. Choose Vancouver – Kitsilano, or leave this site unconnected.',
+          bg: err ? '#FDECEC' : '#F8F7F3', selBd: err ? '#9E1B12' : '#D8D6CF', st: err ? 'Mapping error' : loc === 'none' ? 'Not connected' : 'Matched', stIcon: err ? 'alert' : loc === 'none' ? 'minus' : 'check-circle', stFg: err ? '#9E1B12' : loc === 'none' ? '#5D5D58' : '#2F6B3A',
+          set: e => { const v = e.target.value; this.setState(x => ({ map: { ...x.map, [id]: v }, wizErr: '' })); } };
+      }),
+      dirRows: [
+        ['forms', 'Enquiry forms', 'mail', P.aqua, 'Submissions from BranchHarbor blocks go to the matching location.', [['out', 'WordPress → BranchHarbor'], ['off', 'Don\u2019t sync']]],
+        ['schedule', 'Class schedule', 'calendar', P.lilac, 'Shown on this site from BranchHarbor. Your booking provider stays the official record.', [['in', 'BranchHarbor → WordPress'], ['off', 'Don\u2019t show']]],
+        ['woo', 'Products & orders', 'box', P.butter, 'WooCommerce is the official record. BranchHarbor reads for reports.', [['in', 'Read from WooCommerce'], ['both', 'Two-way', true], ['off', 'Don\u2019t sync']]],
+        ['customers', 'Customer records', 'users', P.blush, 'Existing customer lists aren\u2019t copied unless you choose to.', [['off', 'Don\u2019t sync'], ['in', 'Import with review']]],
+        ['seo', 'SEO metadata', 'search', P.sage, 'Yoast SEO owns titles, canonical links and sitemaps.', [['yoast', 'Yoast owns it'], ['bh', 'BranchHarbor owns it', true]]],
+      ].map(([key, name, icon, pastel, note, opts]) => ({ name, icon, pastel, note, opts: opts.map(([v, label, disabled]) => { const on = s.dir[key] === v; return { label: disabled ? label + ' · later' : label, disabled: !!disabled, on, bg: on ? '#141414' : 'transparent', fg: on ? '#fff' : '#141414', pick: () => this.setState(x => ({ dir: { ...x.dir, [key]: v } })) }; }) })),
+      tests, testing: s.testing, testBtn: s.testing ? 'Testing…' : s.tests ? 'Run tests again' : 'Run tests', runTests: () => this.runTests(),
+      fixCache: () => { this.setState({ cacheFixed: true, manualOpen: false }); this.later(() => this.runTests(), 300); }, showManual: () => this.setState({ manualOpen: !s.manualOpen }), manualOpen: s.manualOpen,
+      connectedSummary: `3 sites linked to Stillwater Yoga Collective. ${s.map.kt === 'none' ? 'Kitsilano was left unconnected.' : 'Kitsilano maps to Vancouver – Kitsilano.'} Forms send, schedules show and WooCommerce orders are read.`,
+      syncPct: `${s.syncPct}%`, syncLabel: s.syncPct >= 100 ? 'Finished · 1,280 records' : `${Math.round(s.syncPct * 12.8)} of 1,280 records`,
+      wizErr: s.wizErr, wizFooter: k !== 'done', wizCanBack: s.wiz > 0, nextDisabled: false, nextLabel: k === 'test' ? 'Finish' : 'Continue',
+      nextStep: () => this.nextStep(), backStep: () => this.setState({ wiz: Math.max(0, s.wiz - 1), wizErr: '' }),
+
+      connState: s.connState, setConnState: e => this.setState({ connState: e.target.value }), notConnectedYet: !s.connected,
+      cs: { ...cs, hasAction: !!cs.action, act: () => s.connState === 'degraded' ? this.setState({ connState: 'connected' }) : this.setState({ screen: 'connect', wiz: 2, authed: false, connState: 'connected' }) },
+      ovStats: [['clock', 'Last successful sync', s.connState === 'degraded' ? '47 min ago' : frontDisc ? '9 Oct, 4:12 pm' : '2 min ago', 'All data types', P.aqua], ['mail', 'Enquiries sent', '38', 'Last 7 days', P.lilac], ['box', 'Orders read', s.connState === 'degraded' ? '112 · 6 waiting' : '118', 'Last 7 days', P.butter], ['zap', 'Page load impact', '+4 ms', 'Median, cached pages', P.lime]].map(([icon, label, value, note, pastel]) => ({ icon, label, value, note, pastel })),
+      siteRows: [['Stillwater Yoga', 'Organisation'], ['Queen West', LOCN[s.map.qw]], ['Kitsilano', LOCN[s.map.kt === 'ls' ? 'kt' : s.map.kt]]].map(([site, loc], i) => ({ site, loc, st: frontDisc ? 'Paused' : s.connState === 'degraded' && i === 2 ? 'Degraded' : 'Connected', bg: frontDisc || (s.connState === 'degraded' && i === 2) ? P.blush : '#D6F26B' })),
+      syncLog: [['check-circle', 'Schedule refreshed for Queen West', '2 min ago', '#2F6B3A'], ['check-circle', '3 enquiries sent to Toronto – Queen West', '18 min ago', '#2F6B3A'], [s.connState === 'degraded' ? 'alert' : 'check-circle', s.connState === 'degraded' ? 'Kitsilano order events timed out · 6 waiting, retrying every 10 min' : 'WooCommerce orders read for all sites', '47 min ago', s.connState === 'degraded' ? '#8A5A00' : '#2F6B3A'], ['info', 'Conflict: class description edited in both places. BranchHarbor version kept.', 'Yesterday', '#5D5D58'], ['check-circle', 'Connection created by Jamie Morgan', '3 Oct', '#2F6B3A']].map(([icon, t, at, fg]) => ({ icon, t, at, fg })),
+
+      inserterOpen: s.inserter, inserterBg: s.inserter ? '#141414' : '#F3F2EE', inserterFg: s.inserter ? '#fff' : '#141414', toggleInserter: () => this.setState({ inserter: !s.inserter }),
+      saveState: s.saved ? 'Saved' : 'Unsaved changes', savePage: () => this.setState({ saved: true }), previewPage: () => this.go('front'),
+      blockLib: BLOCKS.map(([type, name, desc, icon, pastel]) => ({ name, desc, icon, pastel, add: () => this.setState(x => ({ blocks: [...x.blocks, { id: x.nextId, type }], sel: x.nextId, nextId: x.nextId + 1, saved: false })) })),
+      pageBlocks: s.blocks.map(b => { const d = BLOCKS.find(x => x[0] === b.type); const sel = b.id === s.sel; return { name: d[1], desc: d[2], icon: d[3], pastel: d[4], selected: sel, bd: sel ? '#141414' : 'transparent', isSchedule: b.type === 'schedule', isForm: b.type === 'form', isOther: !['schedule', 'form'].includes(b.type), select: () => this.setState({ sel: b.id }), remove: e => { e.stopPropagation(); this.setState(x => ({ blocks: x.blocks.filter(y => y.id !== b.id), sel: null, saved: false })); } }; }),
+      noBlocks: !s.blocks.length, hasSel: !!selDef, noSel: !selDef, selIsSchedule: selBlock && selBlock.type === 'schedule',
+      selBlock: selDef ? { name: selDef[1], icon: selDef[3], pastel: selDef[4] } : { name: '', icon: 'info', pastel: '#fff' },
+      blockCfg: { ...s.cfg, locLabel: LOCN[s.cfg.loc] }, fTrack: s.cfg.filters ? '#141414' : '#D8D6CF', fKnob: s.cfg.filters ? '17px' : '3px',
+      setBlockLoc: e => { const v = e.target.value; this.setState(x => ({ cfg: { ...x.cfg, loc: v }, saved: false })); }, setBlockDays: e => { const v = e.target.value; this.setState(x => ({ cfg: { ...x.cfg, days: v }, saved: false })); },
+      toggleFilters: () => this.setState(x => ({ cfg: { ...x.cfg, filters: !x.cfg.filters }, saved: false })),
+      blockClasses: CLASSES.slice(0, s.cfg.days === '1' ? 2 : 4).map(([time, name, inst, spots, cta]) => ({ time, name, inst, spots, cta })),
+      heroImg: img.yogaGroup || img.yogaStudio, frontDisconnected: frontDisc, frontLive: !frontDisc,
+
+      compatFilters: ['All', 'Tested', 'Limited support', 'Requires setup', 'Planned', 'Unsupported'].map(label => { const on = (s.cf || 'All') === label; return { label, bd: on ? '#141414' : '#D8D6CF', bg: on ? '#141414' : '#fff', fg: on ? '#fff' : '#141414', pick: () => this.setState({ cf: label }) }; }),
+      compatRows: COMPAT.filter(r => !s.cf || s.cf === 'All' || r[5] === s.cf).map(([name, cat, ver, works, limits, status]) => ({ name, cat, ver, works, limits, status, bg: STATUS[status][0], fg: STATUS[status][1] })),
+
+      settingRows: [['consentLog', 'Data processing consent', 'Agreed by Jamie Morgan on 3 Oct. Required while connected.', 'shield', P.aqua], ['credits', 'Show "Powered by BranchHarbor"', 'Adds a small credit under BranchHarbor blocks. Off by default.', 'star', P.butter], ['keepData', 'Keep settings if the plugin is deleted', 'Turn off to remove all BranchHarbor settings from WordPress on uninstall.', 'download', P.lilac], ['debug', 'Debug logging', 'Writes connection details to a local log for support. Contains no customer data.', 'code', P.sage]].map(([key, name, desc, icon, pastel]) => { const on = !!s.settings[key]; return { name, desc, icon, pastel, on, track: on ? '#141414' : '#D8D6CF', knob: on ? '24px' : '4px', toggle: () => key !== 'consentLog' && this.setState(x => ({ settings: { ...x.settings, [key]: !on } })) }; }),
+      confirmDisc: s.confirmDisc, notConfirmDisc: !s.confirmDisc, askDisc: () => this.setState({ confirmDisc: true }), cancelDisc: () => this.setState({ confirmDisc: false }),
+      doDisc: () => this.setState({ confirmDisc: false, connState: 'disconnected', screen: 'overview' }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

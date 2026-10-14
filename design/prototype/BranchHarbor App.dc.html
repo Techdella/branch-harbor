@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="ops"></bh-topbar>
+
+<div style="display:flex;gap:12px;padding:12px;min-height:100vh;align-items:flex-start">
+  <!-- SIDEBAR -->
+  <aside style="width:{{ sideW }};flex-shrink:0;background:#fff;border-radius:28px;padding:16px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto">
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:2px 6px 14px">
+      <bh-logo size="34"></bh-logo>
+      <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><div style="min-width:0"><div style="font-size:15px;font-weight:800;letter-spacing:-.02em">BranchHarbor</div><div style="font-size:12px;color:#5D5D58">{{ indName }}</div></div></sc-if>
+    </div>
+    <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:4px;border-radius:18px;background:#F3F2EE;margin-bottom:12px">
+        <sc-for list="{{ indSwitch }}" as="i" hint-placeholder-count="5">
+          <button onClick="{{ i.pick }}" title="{{ i.name }}" aria-label="{{ i.name }}" aria-pressed="{{ i.on }}" style="height:36px;border-radius:12px;border:none;background:{{ i.bg }};color:#141414;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ i.icon }}" size="17"></bh-icon></button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="14">
+      <sc-if value="{{ n.isHead }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:700;color:#9C9C96;padding:12px 12px 4px;letter-spacing:.04em">{{ n.label }}</div></sc-if>
+      <sc-if value="{{ n.isItem }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ n.go }}" title="{{ n.label }}" style="height:40px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:999px;border:none;font-size:14px;font-weight:{{ n.weight }};background:{{ n.bg }};color:{{ n.fg }};cursor:pointer;text-align:left;width:100%"><bh-icon name="{{ n.icon }}" size="17"></bh-icon><sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.label }}</span><sc-if value="{{ n.later }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#F3F2EE;color:#5D5D58">Later</span></sc-if><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;border-radius:10px;background:#141414;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px">{{ n.badge }}</span></sc-if></sc-if></button>
+      </sc-if>
+    </sc-for>
+    <div style="flex-shrink:0;margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:6px">
+      <a href="BranchHarbor Hub.dc.html" title="Prototype hub" style="display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600;color:#5D5D58;text-decoration:none"><bh-icon name="grid" size="16"></bh-icon><sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">Prototype hub</sc-if></a>
+      <a href="BranchHarbor Website.dc.html" title="Public website" style="display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600;color:#5D5D58;text-decoration:none"><bh-icon name="globe" size="16"></bh-icon><sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">Public website</sc-if></a>
+      <button onClick="{{ toggleSide }}" aria-label="Collapse navigation" style="display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:999px;border:none;background:transparent;color:#5D5D58;font-size:13px;font-weight:600;cursor:pointer"><bh-icon name="{{ sideIcon }}" size="16"></bh-icon><sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">Collapse</sc-if></button>
+    </div>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+    <!-- TOP BAR -->
+    <div style="background:#fff;border-radius:24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 14px">
+      <label style="display:flex;align-items:center;gap:8px;height:44px;padding:0 6px 0 14px;border-radius:999px;border:1.5px solid #141414;font-size:13px;font-weight:600;min-width:0"><bh-icon name="layers" size="16"></bh-icon>
+        <select value="{{ scope }}" onChange="{{ setScope }}" aria-label="Scope" style="border:none;background:transparent;font-size:14px;font-weight:700;color:#141414;max-width:240px;min-width:0;height:40px">
+          <sc-for list="{{ scopeOpts }}" as="so" hint-placeholder-count="4"><option value="{{ so.id }}">{{ so.label }}</option></sc-for>
+        </select>
+      </label>
+      <label style="flex:1;min-width:140px;max-width:380px;height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;background:#F3F2EE"><bh-icon name="search" size="16"></bh-icon><input placeholder="Search records you can access" aria-label="Search" style="flex:1;border:none;background:transparent;font-size:14px;outline:none;min-width:0"></label>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <label style="display:flex;align-items:center;gap:6px;height:44px;padding:0 6px 0 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:600;color:#5D5D58">Viewing as
+          <select value="{{ role }}" onChange="{{ setRole }}" aria-label="Role" style="border:none;background:transparent;font-size:13px;font-weight:700;color:#141414;height:40px"><option value="hq">HQ admin</option><option value="local">Location manager</option><option value="coach">Staff / coach</option></select>
+        </label>
+        <button onClick="{{ toggleAI }}" aria-pressed="{{ aiOpen }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;border:none;background:{{ aiBtnBg }};color:{{ aiBtnFg }};font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="sparkles" size="16"></bh-icon>AI</button>
+        <button aria-label="Notifications" style="position:relative;width:44px;height:44px;border-radius:22px;border:1px solid #EEEDE8;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="bell" size="18"></bh-icon><span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:4px;background:#E25B45"></span></button>
+        <span style="width:44px;height:44px;border-radius:22px;background:{{ indPastel }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">{{ initials }}</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:flex-start">
+    <main style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+      <!-- PAGE HEADER -->
+      <div style="background:#fff;border-radius:28px;padding:24px 26px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between">
+        <div style="display:flex;gap:14px;align-items:center">
+          <span style="width:52px;height:52px;border-radius:18px;background:{{ indPastel }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ cur.icon }}" size="24"></bh-icon></span>
+          <div><div style="font-size:13px;color:#5D5D58">{{ cur.crumb }}</div><h1 style="margin:0;font-size:30px;font-weight:700;letter-spacing:-.035em">{{ cur.label }}</h1></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="display:flex;gap:6px;align-items:center;height:36px;padding:0 12px;border-radius:999px;background:#F3F2EE;font-size:12px;font-weight:600"><bh-icon name="pin" size="13"></bh-icon>{{ scopeLabel }}</span>
+          <sc-if value="{{ cur.action }}" hint-placeholder-val="{{ false }}"><button style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="plus" size="15"></bh-icon>{{ cur.action }}</button></sc-if>
+        </div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+          <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="4">
+            <div style="background:{{ m.bg }};border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="{{ m.icon }}" size="18"></bh-icon></span><span title="{{ m.def }}" style="font-size:11px;font-weight:600;color:#3E3E3A">{{ m.range }}</span></div>
+              <div style="font-size:13px;font-weight:600">{{ m.label }}</div>
+              <div style="font-size:{{ m.size }};font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums">{{ m.value }}</div>
+              <div style="font-size:11px;color:#3E3E3A;display:flex;gap:4px;align-items:center"><bh-icon name="info" size="11"></bh-icon>{{ m.src }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px">
+          <div style="background:#fff;border-radius:28px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="margin:0;font-size:18px;font-weight:700">{{ ov.upTitle }}</h2><span style="font-size:12px;color:#5D5D58">Today</span></div>
+            <sc-for list="{{ ov.upcoming }}" as="u" hint-placeholder-count="4">
+              <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:16px;background:{{ u.bg }};margin-bottom:4px">
+                <span style="width:56px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums">{{ u.time }}</span>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">{{ u.a }}</div><div style="font-size:12px;color:#5D5D58">{{ u.b }}</div></div>
+                <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:{{ u.tagBg }}">{{ u.tag }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:#fff;border-radius:28px;padding:20px">
+              <h2 style="margin:0 0 10px;font-size:18px;font-weight:700">Needs attention</h2>
+              <sc-for list="{{ ov.alerts }}" as="a" hint-placeholder-count="3">
+                <button onClick="{{ a.go }}" style="width:100%;display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;border:none;background:{{ a.bg }};margin-bottom:6px;text-align:left;cursor:pointer;color:#141414"><bh-icon name="{{ a.icon }}" size="18"></bh-icon><div style="flex:1"><div style="font-size:14px;font-weight:700">{{ a.t }}</div><div style="font-size:12px;color:#3E3E3A">{{ a.d }}</div></div><bh-icon name="chevron-right" size="16"></bh-icon></button>
+              </sc-for>
+            </div>
+            <div style="background:#141414;color:#fff;border-radius:28px;padding:20px;display:flex;gap:14px;align-items:center"><span style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#7B4FD6,#E8835A);display:flex;align-items:center;justify-content:center"><bh-icon name="sparkles" size="20"></bh-icon></span><div style="flex:1"><div style="font-size:15px;font-weight:700">{{ ov.aiPrompt }}</div><div style="font-size:12px;color:#B9B9B3">Drafts only · uses data in {{ scopeLabel }}</div></div><button onClick="{{ toggleAI }}" style="height:40px;padding:0 16px;border-radius:999px;border:none;background:#fff;color:#141414;font-size:13px;font-weight:700;cursor:pointer">Ask</button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- GENERIC TABLE -->
+      <sc-if value="{{ v.table }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:14px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:4px 4px 12px">
+            <sc-for list="{{ tbl.filters }}" as="f" hint-placeholder-count="4"><button onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="height:36px;padding:0 14px;border-radius:999px;border:1.5px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }};font-size:13px;font-weight:600;cursor:pointer">{{ f.label }}</button></sc-for>
+            <span style="margin-left:auto;font-size:12px;color:#5D5D58">{{ tbl.count }}</span>
+          </div>
+          <div style="overflow:auto">
+            <div style="display:grid;grid-template-columns:{{ tbl.grid }};min-width:{{ tbl.minW }};font-size:12px;font-weight:600;color:#5D5D58">
+              <sc-for list="{{ tbl.cols }}" as="c" hint-placeholder-count="5"><div style="padding:10px 14px">{{ c }}</div></sc-for>
+            </div>
+            <sc-for list="{{ tbl.rows }}" as="r" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:{{ tbl.grid }};min-width:{{ tbl.minW }};align-items:center;border-radius:16px;background:{{ r.bg }};margin-bottom:4px">
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+                  <div style="padding:12px 14px;min-width:0">
+                    <sc-if value="{{ c.isPill }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;gap:5px;align-items:center;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ c.bg }};white-space:nowrap"><bh-icon name="{{ c.icon }}" size="11"></bh-icon>{{ c.t }}</span></sc-if>
+                    <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:14px;font-weight:{{ c.w }};font-variant-numeric:tabular-nums">{{ c.t }}</div><div style="font-size:12px;color:#5D5D58">{{ c.sub }}</div></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- LATER (not in first release) -->
+      <sc-if value="{{ v.later }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:48px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+          <span style="width:64px;height:64px;border-radius:22px;background:#F3F2EE;display:flex;align-items:center;justify-content:center"><bh-icon name="clock" size="28"></bh-icon></span>
+          <h2 style="margin:0;font-size:24px;font-weight:700">{{ cur.label }} isn't in the first release</h2>
+          <p style="margin:0;font-size:15px;line-height:1.6;color:#5D5D58;max-width:520px">{{ cur.laterNote }}</p>
+          <button style="height:46px;padding:0 20px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:14px;font-weight:600;cursor:pointer">Tell me when it's available</button>
+        </div>
+      </sc-if>
+
+      <!-- STUDIOS: CLASSES -->
+      <sc-if value="{{ v.classes }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:14px;overflow:auto">
+          <div style="display:flex;gap:8px;align-items:center;padding:4px 4px 12px;flex-wrap:wrap"><button style="width:38px;height:38px;border-radius:19px;border:1px solid #EEEDE8;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="chevron-left" size="16"></bh-icon></button><strong style="font-size:15px">12 – 18 Oct</strong><button style="width:38px;height:38px;border-radius:19px;border:1px solid #EEEDE8;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="chevron-right" size="16"></bh-icon></button><span style="margin-left:auto;display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE"><span style="padding:6px 14px;border-radius:999px;background:#fff;font-size:12px;font-weight:700">Week</span><span style="padding:6px 14px;font-size:12px;font-weight:600">Day</span><span style="padding:6px 14px;font-size:12px;font-weight:600">List</span></span><span style="font-size:12px;color:#5D5D58">Eastern time</span></div>
+          <div style="display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:8px;min-width:960px">
+            <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="padding:8px 10px;border-radius:14px;background:{{ d.headBg }};font-size:12px;font-weight:700">{{ d.label }}</div>
+                <sc-for list="{{ d.items }}" as="c" hint-placeholder-count="3">
+                  <button onClick="{{ c.open }}" style="text-align:left;padding:10px;border-radius:16px;border:none;background:{{ c.bg }};cursor:pointer;color:#141414;display:flex;flex-direction:column;gap:3px">
+                    <span style="font-size:11px;font-weight:700;font-variant-numeric:tabular-nums">{{ c.time }}</span><span style="font-size:13px;font-weight:700;line-height:1.25">{{ c.name }}</span><span style="font-size:11px;color:#3E3E3A">{{ c.inst }}</span>
+                    <span style="height:5px;border-radius:3px;background:rgba(0,0,0,.08);margin-top:4px;overflow:hidden"><span style="display:block;height:5px;width:{{ c.fill }};background:#141414"></span></span><span style="font-size:10px;font-weight:700;color:#3E3E3A">{{ c.cap }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- STUDIOS: COVER -->
+      <sc-if value="{{ v.cover }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
+            <div style="background:#CDEEEE;border-radius:20px;padding:16px;font-size:13px;line-height:1.5"><div style="font-size:11px;font-weight:600">Class</div><div style="font-size:16px;font-weight:800">Morning Vinyasa</div>Sat 17 Oct · 7:00 am</div>
+            <div style="background:#F8D6D8;border-radius:20px;padding:16px;font-size:13px;line-height:1.5"><div style="font-size:11px;font-weight:600">Requested by</div><div style="font-size:16px;font-weight:800">Maya Rao</div>Unavailable</div>
+            <div style="background:#F7EDA8;border-radius:20px;padding:16px;font-size:13px;line-height:1.5"><div style="font-size:11px;font-weight:600">Status</div><div style="font-size:16px;font-weight:800">{{ coverTag }}</div>16 booked customers</div>
+          </div>
+          <sc-for list="{{ coverStaff }}" as="p" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:999px;background:#F3F2EE;font-size:14px"><span style="width:36px;height:36px;border-radius:18px;background:{{ p.pastel }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">{{ p.init }}</span><div style="flex:1"><strong>{{ p.name }}</strong><div style="font-size:12px;color:#5D5D58">{{ p.note }}</div></div><span style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;background:{{ p.bg }}">{{ p.state }}</span></div>
+          </sc-for>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-if value="{{ coverOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ coverAccept }}" style="height:46px;padding:0 18px;border-radius:999px;border:1.5px dashed #5D5D58;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Simulate: Sam Tran accepts</button></sc-if>
+            <sc-if value="{{ coverAccepted }}" hint-placeholder-val="{{ false }}"><button onClick="{{ coverApprove }}" style="display:flex;gap:8px;align-items:center;height:46px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="check" size="15"></bh-icon>Approve · updates schedule and class page</button></sc-if>
+            <sc-if value="{{ coverDone }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:#2F6B3A"><bh-icon name="check-circle" size="18"></bh-icon>Confirmed. Schedule, class page and 16 customers updated.</div><button onClick="{{ coverReset }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Restart</button></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SPORTS: REGISTRATIONS -->
+      <sc-if value="{{ v.registrations }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ regTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.pick }}" style="height:40px;padding:0 16px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ t.label }} · {{ t.n }}</button></sc-for></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+          <sc-for list="{{ regs }}" as="r" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="display:flex;gap:10px;align-items:center"><span style="width:42px;height:42px;border-radius:21px;background:#E2F5A6;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">{{ r.init }}</span><div><div style="font-size:15px;font-weight:700">{{ r.name }}</div><div style="font-size:12px;color:#5D5D58">Age {{ r.age }} · {{ r.prog }}</div></div></div><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ r.stBg }}">{{ r.status }}</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px"><div style="background:#F3F2EE;border-radius:12px;padding:8px 10px"><div style="color:#5D5D58">Guardian</div><strong>{{ r.guardian }}</strong></div><div style="background:#F3F2EE;border-radius:12px;padding:8px 10px"><div style="color:#5D5D58">Payment</div><strong>{{ r.pay }}</strong></div></div>
+              <div style="font-size:12px;color:#5D5D58;display:flex;gap:6px;align-items:center"><bh-icon name="{{ r.formIcon }}" size="13"></bh-icon>{{ r.forms }}</div>
+              <sc-if value="{{ r.canAct }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:6px">
+                  <select value="{{ r.group }}" onChange="{{ r.setGroup }}" aria-label="Assign group" style="flex:1;height:40px;border:1.5px solid #E4E2DC;border-radius:999px;padding:0 12px;font-size:13px;background:#fff"><option value="">Assign group…</option><option>U10 Blue · 14/16</option><option>U10 Green · Full</option></select>
+                  <button onClick="{{ r.accept }}" disabled="{{ r.noGroup }}" style="height:40px;padding:0 14px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Accept</button>
+                  <button onClick="{{ r.waitlist }}" style="height:40px;padding:0 12px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Waitlist</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- SPORTS: ATTENDANCE -->
+      <sc-if value="{{ v.attendance }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px;align-items:start">
+          <div style="background:#141414;color:#fff;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:12px;align-items:center"><span style="width:48px;height:48px;border-radius:16px;background:#D6F26B;color:#141414;display:flex;align-items:center;justify-content:center"><bh-icon name="whistle" size="22"></bh-icon></span><div><div style="font-size:18px;font-weight:700">U10 Blue · Training</div><div style="font-size:13px;color:#B9B9B3">Tue 17:00 · Riverside Park, Pitch 2 · Coach Ortiz</div></div></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div style="background:#262626;border-radius:16px;padding:12px"><div style="font-size:11px;color:#B9B9B3">Present</div><div style="font-size:24px;font-weight:800">{{ att.present }}</div></div><div style="background:#262626;border-radius:16px;padding:12px"><div style="font-size:11px;color:#B9B9B3">Absent</div><div style="font-size:24px;font-weight:800">{{ att.absent }}</div></div><div style="background:#262626;border-radius:16px;padding:12px"><div style="font-size:11px;color:#B9B9B3">Not marked</div><div style="font-size:24px;font-weight:800">{{ att.unmarked }}</div></div></div>
+            <div style="font-size:12px;color:#B9B9B3;line-height:1.5">You see this roster because you're assigned to this session. Guardian contact details are hidden.</div>
+            <sc-if value="{{ att.notSubmitted }}" hint-placeholder-val="{{ true }}"><button onClick="{{ attSubmit }}" disabled="{{ att.cantSubmit }}" style="height:52px;border-radius:999px;border:none;background:#D6F26B;color:#141414;font-size:15px;font-weight:800;cursor:pointer">{{ att.submitLabel }}</button></sc-if>
+            <sc-if value="{{ att.submitted }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:10px;align-items:center;background:#262626;border-radius:18px;padding:14px;font-size:14px"><bh-icon name="check-circle" size="20"></bh-icon>Attendance saved. Guardians of absent participants were notified.</div><button onClick="{{ attReset }}" style="height:42px;border-radius:999px;border:1px solid #444;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Restart</button></sc-if>
+          </div>
+          <div style="background:#fff;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:6px">
+            <sc-for list="{{ att.list }}" as="a" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 8px 8px 12px;border-radius:18px;background:{{ a.bg }}">
+                <span style="width:38px;height:38px;border-radius:19px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">{{ a.init }}</span>
+                <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ a.name }}</div><div style="font-size:12px;color:#3E3E3A">{{ a.note }}</div></div>
+                <button onClick="{{ a.present }}" disabled="{{ a.locked }}" aria-pressed="{{ a.isP }}" aria-label="Present" style="width:48px;height:48px;border-radius:24px;border:none;background:{{ a.pBg }};color:{{ a.pFg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="check" size="20" stroke="2.4"></bh-icon></button>
+                <button onClick="{{ a.absent }}" disabled="{{ a.locked }}" aria-pressed="{{ a.isA }}" aria-label="Absent" style="width:48px;height:48px;border-radius:24px;border:none;background:{{ a.aBg }};color:{{ a.aFg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="20" stroke="2.4"></bh-icon></button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- WELLNESS: CALENDAR + RESCHEDULE -->
+      <sc-if value="{{ v.calendar }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:14px;overflow:auto">
+          <div style="display:flex;gap:8px;align-items:center;padding:4px 4px 12px;flex-wrap:wrap"><strong style="font-size:15px">Thu 15 Oct</strong><span style="font-size:12px;color:#5D5D58">Harbourfront · Eastern time</span><span style="margin-left:auto;display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE"><span style="padding:6px 14px;border-radius:999px;background:#fff;font-size:12px;font-weight:700">Practitioners</span><span style="padding:6px 14px;font-size:12px;font-weight:600">Rooms</span><span style="padding:6px 14px;font-size:12px;font-weight:600">List</span></span></div>
+          <div style="display:grid;grid-template-columns:70px repeat(3,minmax(200px,1fr));gap:8px;min-width:720px">
+            <div></div>
+            <sc-for list="{{ cal.heads }}" as="h" hint-placeholder-count="3"><div style="padding:10px;border-radius:14px;background:#F3F2EE;display:flex;gap:8px;align-items:center"><span style="width:30px;height:30px;border-radius:15px;background:{{ h.bg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">{{ h.init }}</span><span style="font-size:13px;font-weight:700">{{ h.name }}</span></div></sc-for>
+            <sc-for list="{{ cal.rows }}" as="row" hint-placeholder-count="6">
+              <div style="font-size:12px;font-weight:700;color:#5D5D58;padding-top:10px;font-variant-numeric:tabular-nums">{{ row.time }}</div>
+              <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.open }}" disabled="{{ c.empty }}" style="min-height:62px;text-align:left;padding:10px;border-radius:16px;border:{{ c.bd }};background:{{ c.bg }};cursor:pointer;color:#141414;display:flex;flex-direction:column;gap:2px;opacity:1"><span style="font-size:13px;font-weight:700">{{ c.a }}</span><span style="font-size:11px;color:#3E3E3A">{{ c.b }}</span></button>
+              </sc-for>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- COMMERCE: ORDERS -->
+      <sc-if value="{{ v.corders }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:28px;padding:10px">
+          <sc-for list="{{ corders }}" as="o" hint-placeholder-count="5">
+            <button onClick="{{ o.open }}" style="width:100%;display:grid;grid-template-columns:minmax(110px,.7fr) minmax(160px,1.4fr) minmax(110px,.8fr) minmax(120px,.8fr) minmax(120px,.8fr) 24px;gap:8px;align-items:center;padding:12px 14px;border-radius:16px;border:none;background:{{ o.bg }};margin-bottom:4px;text-align:left;cursor:pointer;color:#141414;font-size:14px">
+              <span style="font-weight:800">#{{ o.id }}</span><span><span style="display:block;font-weight:600">{{ o.items }}</span><span style="font-size:12px;color:#5D5D58">{{ o.cust }}</span></span><span style="font-weight:700;font-variant-numeric:tabular-nums">{{ o.total }}</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ o.payBg }};justify-self:start">{{ o.pay }}</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ o.fulBg }};justify-self:start">{{ o.ful }}</span><bh-icon name="chevron-right" size="16"></bh-icon>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- FOODS: MASTER MENU -->
+      <sc-if value="{{ v.menu }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:13px;font-weight:600;color:#5D5D58;margin-right:4px">Show as</span><sc-for list="{{ menuViews }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.pick }}" style="display:flex;gap:6px;align-items:center;height:40px;padding:0 16px;border-radius:999px;border:none;background:{{ m.bg }};color:{{ m.fg }};font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="{{ m.icon }}" size="14"></bh-icon>{{ m.label }}</button></sc-for></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+          <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:24px;overflow:hidden;display:flex;flex-direction:column">
+              <div style="position:relative;height:150px;background:#F8D6D8"><img src="{{ m.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"><span style="position:absolute;top:10px;left:10px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ m.stBg }}">{{ m.status }}</span></div>
+              <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:17px;font-weight:700">{{ m.name }}</div>
+                <sc-for list="{{ m.fields }}" as="f" hint-placeholder-count="3">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:#F8F7F3;font-size:13px">
+                    <span style="color:#5D5D58">{{ f.k }}</span><span style="display:flex;gap:6px;align-items:center"><strong style="font-variant-numeric:tabular-nums">{{ f.v }}</strong><span style="display:flex;gap:4px;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ f.oBg }}"><bh-icon name="{{ f.oIcon }}" size="10"></bh-icon>{{ f.origin }}</span><sc-if value="{{ f.canReset }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.reset }}" title="Reset to HQ default" aria-label="Reset to HQ default" style="width:26px;height:26px;border-radius:13px;border:1px solid #E4E2DC;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="undo" size="12"></bh-icon></button></sc-if></span>
+                  </div>
+                </sc-for>
+                <div style="font-size:11px;color:#5D5D58;display:flex;gap:4px;align-items:center"><bh-icon name="info" size="11"></bh-icon>Dietary details supplied by the business, not generated.</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- WEBSITES: TEMPLATE EDITOR (scenario 5) -->
+      <sc-if value="{{ v.websites }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;align-items:start">
+          <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div><div style="font-size:12px;color:#5D5D58">Page · Home</div><div style="font-size:18px;font-weight:700">{{ webLoc }}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="display:flex;gap:4px;align-items:center;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#141414;color:#fff"><bh-icon name="lock" size="11"></bh-icon>Locked</span><span style="display:flex;gap:4px;align-items:center;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#E2F5A6"><bh-icon name="edit" size="11"></bh-icon>Editable</span><span style="display:flex;gap:4px;align-items:center;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#F7EDA8"><bh-icon name="shield" size="11"></bh-icon>Approval</span></div></div>
+            <sc-if value="{{ webToast }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:8px;align-items:center;padding:12px 14px;border-radius:16px;background:#E2F5A6;font-size:13px;font-weight:600"><bh-icon name="check-circle" size="16"></bh-icon>{{ webToast }}</div></sc-if>
+            <sc-for list="{{ webFields }}" as="f" hint-placeholder-count="5">
+              <div style="border:1.5px solid {{ f.bd }};border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:13px;font-weight:700">{{ f.label }}</span><span style="display:flex;gap:4px;align-items:center;font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ f.oBg }};color:{{ f.oFg }}"><bh-icon name="{{ f.oIcon }}" size="10"></bh-icon>{{ f.origin }}</span></div>
+                <sc-if value="{{ f.editing }}" hint-placeholder-val="{{ false }}">
+                  <input value="{{ f.draft }}" onChange="{{ f.onDraft }}" aria-label="{{ f.label }}" style="height:46px;border:1.5px solid #141414;border-radius:14px;padding:0 14px;font-size:14px">
+                  <sc-if value="{{ f.needsApproval }}" hint-placeholder-val="{{ false }}"><input value="{{ f.comment }}" onChange="{{ f.onComment }}" placeholder="Reason for headquarters (required)" aria-label="Reason" style="height:42px;border:1.5px solid #E4E2DC;border-radius:14px;padding:0 14px;font-size:13px"></sc-if>
+                  <div style="display:flex;gap:6px"><button onClick="{{ f.save }}" disabled="{{ f.cantSave }}" style="height:40px;padding:0 16px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:700;cursor:pointer">{{ f.saveLabel }}</button><button onClick="{{ f.cancel }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Cancel</button></div>
+                </sc-if>
+                <sc-if value="{{ f.viewing }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:14px;color:#2E2E2A">{{ f.value }}</span>
+                    <span style="display:flex;gap:6px">
+                      <sc-if value="{{ f.canEdit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.edit }}" style="display:flex;gap:6px;align-items:center;height:34px;padding:0 12px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer"><bh-icon name="{{ f.editIcon }}" size="12"></bh-icon>{{ f.editLabel }}</button></sc-if>
+                      <sc-if value="{{ f.canReset }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.reset }}" title="Reset to HQ default" style="display:flex;gap:6px;align-items:center;height:34px;padding:0 12px;border-radius:999px;border:1px solid #E4E2DC;background:#fff;font-size:12px;font-weight:600;cursor:pointer"><bh-icon name="undo" size="12"></bh-icon>Reset</button></sc-if>
+                    </span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ f.pending }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#FFF3C9;border-radius:14px;padding:10px 12px;font-size:12px;line-height:1.5;color:#5A4300"><strong>Pending approval:</strong> “{{ f.pendingValue }}”<br>Reason: {{ f.pendingComment }}</div>
+                  <sc-if value="{{ f.canApprove }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px;flex-wrap:wrap"><input value="{{ f.hqComment }}" onChange="{{ f.onHq }}" placeholder="Comment (optional)" style="flex:1;min-width:140px;height:38px;border:1.5px solid #E4E2DC;border-radius:999px;padding:0 14px;font-size:12px"><button onClick="{{ f.approve }}" style="height:38px;padding:0 14px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Approve</button><button onClick="{{ f.reject }}" style="height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Reject</button></div></sc-if>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:{{ indPastel }};border-radius:28px;padding:14px">
+              <div style="background:#fff;border-radius:20px;overflow:hidden">
+                <div style="display:flex;gap:6px;align-items:center;padding:10px 14px;border-bottom:1px solid #EEEDE8;font-size:12px;color:#5D5D58"><bh-icon name="eye" size="14"></bh-icon>Preview · draft</div>
+                <div style="padding:22px;display:flex;flex-direction:column;gap:10px"><div style="font-size:12px;font-weight:700;color:#5D5D58">{{ webBrand }}</div><div style="font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1">{{ webPreview.headline }}</div><div style="font-size:14px;color:#3E3E3A">{{ webPreview.offer }}</div><div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px"><span style="display:flex;gap:4px;align-items:center;padding:6px 10px;border-radius:999px;background:#F3F2EE"><bh-icon name="clock" size="12"></bh-icon>{{ webPreview.hours }}</span><span style="display:flex;gap:4px;align-items:center;padding:6px 10px;border-radius:999px;background:#F3F2EE"><bh-icon name="phone" size="12"></bh-icon>{{ webPreview.phone }}</span></div></div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:28px;padding:20px"><h3 style="margin:0 0 10px;font-size:16px;font-weight:700">Activity</h3><sc-for list="{{ webLog }}" as="l" hint-placeholder-count="2"><div style="display:flex;gap:10px;font-size:13px;line-height:1.7"><span style="color:#5D5D58;width:52px;flex-shrink:0">{{ l.t }}</span><span>{{ l.e }}</span></div></sc-for></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PAYMENTS (scenario 12) -->
+      <sc-if value="{{ v.payments }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ payTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="display:flex;gap:6px;align-items:center;height:42px;padding:0 16px;border-radius:999px;border:none;background:{{ t.bg }};color:{{ t.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ t.label }}<sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;border-radius:10px;background:#E25B45;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 6px">{{ t.badge }}</span></sc-if></button></sc-for></div>
+        <sc-if value="{{ payTx }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            <div style="background:#E2F5A6;border-radius:24px;padding:18px"><div style="font-size:12px;font-weight:600">Succeeded · this week · CAD</div><div style="font-size:28px;font-weight:800;font-variant-numeric:tabular-nums">$4,812.00</div><div style="font-size:11px">Stripe · Toronto, Vancouver</div></div>
+            <div style="background:#CDEEEE;border-radius:24px;padding:18px"><div style="font-size:12px;font-weight:600">Succeeded · this week · USD</div><div style="font-size:28px;font-weight:800;font-variant-numeric:tabular-nums">$3,960.50</div><div style="font-size:11px">Stripe · Seattle, Portland, Denver</div></div>
+            <div style="background:#F3F2EE;border-radius:24px;padding:18px"><div style="font-size:12px;font-weight:600">Combined total</div><div style="font-size:20px;font-weight:800">Not shown</div><div style="font-size:11px">No conversion method defined for CAD + USD</div></div>
+          </div>
+          <div style="background:#fff;border-radius:28px;padding:10px">
+            <sc-for list="{{ txRows }}" as="t" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(120px,.9fr) minmax(160px,1.3fr) minmax(100px,.7fr) minmax(110px,.8fr) minmax(110px,.8fr);gap:8px;align-items:center;padding:12px 14px;border-radius:16px;background:#FAFAF7;margin-bottom:4px;font-size:13px"><span><strong>{{ t.ref }}</strong><span style="display:block;font-size:11px;color:#5D5D58">{{ t.when }}</span></span><span>{{ t.what }}<span style="display:block;font-size:11px;color:#5D5D58">{{ t.loc }}</span></span><strong style="font-variant-numeric:tabular-nums">{{ t.amt }}</strong><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ t.pBg }};justify-self:start">{{ t.pay }}</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ t.rBg }};justify-self:start">{{ t.ref2 }}</span></div></sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ payRec }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px;align-items:start">
+            <div style="background:#fff;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ recRows }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.pick }}" style="width:100%;text-align:left;display:flex;gap:12px;align-items:center;padding:14px;border-radius:18px;border:1.5px solid {{ r.bd }};background:{{ r.bg }};cursor:pointer;color:#141414"><span style="width:40px;height:40px;border-radius:14px;background:{{ r.iconBg }};display:flex;align-items:center;justify-content:center"><bh-icon name="{{ r.icon }}" size="18"></bh-icon></span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">{{ r.type }}</div><div style="font-size:12px;color:#5D5D58">{{ r.d }}</div></div><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ r.stBg }}">{{ r.st }}</span></button></sc-for>
+            </div>
+            <div style="background:#fff;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:12px;color:#5D5D58">Paid without fulfilled record</div><div style="font-size:20px;font-weight:700">pi_3QX…9Fk · $34.65 USD</div></div><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ rec.stBg }}">{{ rec.st }}</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px"><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div style="color:#5D5D58">Location</div><strong>Seattle – Ballard</strong></div><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div style="color:#5D5D58">Customer</div><strong>Lena W.</strong></div><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div style="color:#5D5D58">Payment</div><strong>Succeeded</strong></div><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div style="color:#5D5D58">Order record</div><strong>{{ rec.orderState }}</strong></div></div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:8px">Timeline</div>
+                <sc-for list="{{ rec.timeline }}" as="t" hint-placeholder-count="4"><div style="display:flex;gap:10px;padding:6px 0;font-size:13px"><span style="width:24px;height:24px;border-radius:12px;background:{{ t.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ t.icon }}" size="12"></bh-icon></span><span style="width:62px;color:#5D5D58;font-variant-numeric:tabular-nums">{{ t.t }}</span><span style="flex:1">{{ t.e }}</span></div></sc-for>
+              </div>
+              <sc-if value="{{ rec.open }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ recRecreate }}" style="display:flex;gap:8px;align-items:center;height:46px;padding:0 18px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><bh-icon name="refresh" size="15"></bh-icon>Recreate order from payment</button><button onClick="{{ recRefundAsk }}" style="height:46px;padding:0 18px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Refund instead</button></div></sc-if>
+              <sc-if value="{{ rec.confirmRefund }}" hint-placeholder-val="{{ false }}"><div style="background:#FDE7E5;border-radius:18px;padding:14px;font-size:13px;line-height:1.5;color:#5C1414"><strong>Refund $34.65 USD to Lena W.?</strong><br>Seattle – Ballard · Stripe connected account. This needs finance permission.<div style="display:flex;gap:6px;margin-top:10px"><button onClick="{{ recRefund }}" style="height:40px;padding:0 14px;border-radius:999px;border:none;background:#9E1B12;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Refund $34.65 USD</button><button onClick="{{ recCancel }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Back</button></div></div></sc-if>
+              <sc-if value="{{ rec.working }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:8px;align-items:center;padding:12px;border-radius:16px;background:#CDEEEE;font-size:13px;font-weight:600"><bh-icon name="refresh" size="15"></bh-icon>{{ rec.workingLabel }}</div></sc-if>
+              <sc-if value="{{ rec.done }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:8px;align-items:center;padding:12px;border-radius:16px;background:#E2F5A6;font-size:13px;font-weight:600"><bh-icon name="check-circle" size="16"></bh-icon>{{ rec.doneLabel }}</div><button onClick="{{ recReset }}" style="align-self:flex-start;height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Restart</button></sc-if>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ paySetup }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+            <sc-for list="{{ payAccounts }}" as="a" hint-placeholder-count="4"><div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;gap:8px;align-items:center;font-size:15px;font-weight:700"><bh-icon name="card" size="17"></bh-icon>{{ a.loc }}</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ a.bg }}">{{ a.st }}</span></div><div style="font-size:12px;color:#5D5D58">{{ a.d }}</div></div></sc-for>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <!-- CONNECTIONS -->
+      <sc-if value="{{ v.connections }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+          <sc-for list="{{ conns }}" as="c" hint-placeholder-count="5">
+            <div style="background:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:14px;background:{{ c.pastel }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">{{ c.mono }}</span><div style="flex:1"><div style="font-size:15px;font-weight:700">{{ c.name }}</div><div style="font-size:12px;color:#5D5D58">{{ c.role }}</div></div><span style="display:flex;gap:4px;align-items:center;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ c.bg }}"><bh-icon name="{{ c.icon }}" size="11"></bh-icon>{{ c.state }}</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px"><div style="background:#F3F2EE;border-radius:12px;padding:8px 10px"><div style="color:#5D5D58">Last successful sync</div><strong>{{ c.last }}</strong></div><div style="background:#F3F2EE;border-radius:12px;padding:8px 10px"><div style="color:#5D5D58">Direction</div><strong>{{ c.dir }}</strong></div></div>
+              <sc-if value="{{ c.hasIssue }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;line-height:1.5;padding:10px 12px;border-radius:14px;background:#FFF3C9;color:#5A4300">{{ c.issue }}</div><button onClick="{{ c.fix }}" style="height:40px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:12px;font-weight:700;cursor:pointer">{{ c.fixLabel }}</button></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- REPORTS -->
+      <sc-if value="{{ v.reports }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px">
+          <sc-for list="{{ reports }}" as="r" hint-placeholder-count="4">
+            <div style="background:#fff;border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:16px;font-weight:700">{{ r.title }}</h3><span style="font-size:11px;color:#5D5D58;display:flex;gap:4px;align-items:center"><bh-icon name="clock" size="11"></bh-icon>{{ r.fresh }}</span></div>
+              <div style="display:flex;align-items:flex-end;gap:8px;height:140px">
+                <sc-for list="{{ r.bars }}" as="b" hint-placeholder-count="6"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end"><span style="font-size:10px;font-weight:700;font-variant-numeric:tabular-nums">{{ b.v }}</span><div style="width:100%;height:{{ b.h }};border-radius:10px;background:{{ b.bg }}"></div><span style="font-size:10px;color:#5D5D58;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ b.l }}</span></div></sc-for>
+              </div>
+              <div style="font-size:11px;color:#5D5D58;line-height:1.5">{{ r.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- LOCATIONS -->
+      <sc-if value="{{ v.locations }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+          <sc-for list="{{ locCards }}" as="l" hint-placeholder-count="6">
+            <button onClick="{{ l.open }}" style="text-align:left;background:#fff;border:1.5px solid {{ l.bd }};border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px;cursor:pointer;color:#141414">
+              <div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:14px;background:{{ l.dot }};display:flex;align-items:center;justify-content:center"><bh-icon name="pin" size="19"></bh-icon></span><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ l.name }}</div><div style="font-size:12px;color:#5D5D58">{{ l.region }} · {{ l.cur }} · {{ l.tz }}</div></div></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:#F3F2EE">{{ l.owner }}</span><span style="display:flex;gap:4px;align-items:center;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ l.syncBg }}"><bh-icon name="{{ l.syncIcon }}" size="10"></bh-icon>{{ l.syncShort }}</span><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ l.siteBg }}">{{ l.site }}</span></div>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </main>
+
+    <!-- DRAWER -->
+    <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+      <aside aria-label="Details" style="width:min(440px,42vw);min-width:340px;flex-shrink:0;background:#fff;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:14px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:12px;color:#5D5D58">{{ dr.kicker }}</div><div style="font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.2">{{ dr.title }}</div></div><button onClick="{{ closeDrawer }}" aria-label="Close" style="width:40px;height:40px;border-radius:20px;border:1px solid #EEEDE8;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="x" size="16"></bh-icon></button></div>
+
+        <!-- class detail -->
+        <sc-if value="{{ dr.isClass }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px"><div style="background:#E9DDF8;border-radius:14px;padding:10px"><div>Capacity</div><strong style="font-size:16px">{{ drClass.cap }}</strong></div><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div>Instructor</div><strong style="font-size:14px">{{ drClass.inst }}</strong></div><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div>Room</div><strong style="font-size:14px">Studio A</strong></div><div style="background:#F3F2EE;border-radius:14px;padding:10px"><div>Booking source</div><strong style="font-size:14px">BranchHarbor</strong></div></div>
+          <div><div style="font-size:13px;font-weight:700;margin-bottom:6px">Attendees</div><sc-for list="{{ drClass.att }}" as="a" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid #F3F2EE"><span style="width:28px;height:28px;border-radius:14px;background:#F3F2EE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">{{ a.i }}</span><span style="flex:1">{{ a.n }}</span><span style="font-size:11px;color:#5D5D58">{{ a.s }}</span></div></sc-for></div>
+          <div style="font-size:13px;font-weight:700">Edit time</div>
+          <div style="display:flex;gap:6px"><sc-for list="{{ editScope }}" as="e" hint-placeholder-count="2"><button onClick="{{ e.pick }}" style="flex:1;padding:10px;border-radius:16px;border:1.5px solid {{ e.bd }};background:{{ e.bg }};cursor:pointer;text-align:left;font-size:12px;color:#141414"><strong style="display:block;font-size:13px">{{ e.label }}</strong>{{ e.d }}</button></sc-for></div>
+          <div style="background:#FFF3C9;border-radius:16px;padding:12px;font-size:12px;line-height:1.5;color:#5A4300;display:flex;gap:8px"><bh-icon name="info" size="14"></bh-icon>{{ editImpact }}</div>
+        </sc-if>
+
+        <!-- reschedule -->
+        <sc-if value="{{ dr.isAppt }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#D4E6D9;border-radius:18px;padding:14px;font-size:13px;line-height:1.6"><strong>Current:</strong> {{ appt.cur }}</div>
+          <div style="font-size:13px;font-weight:700">Move to</div>
+          <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ appt.slots }}" as="sl" hint-placeholder-count="3"><button onClick="{{ sl.pick }}" disabled="{{ appt.locked }}" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:16px;border:1.5px solid {{ sl.bd }};background:{{ sl.bg }};cursor:pointer;font-size:13px;color:#141414"><span><strong>{{ sl.t }}</strong> · {{ sl.who }}</span><span style="font-size:11px;color:#5D5D58">{{ sl.room }}</span></button></sc-for></div>
+          <label style="display:flex;gap:8px;align-items:center;font-size:12px;color:#5D5D58"><input type="checkbox" checked="{{ appt.failSim }}" onChange="{{ appt.toggleFail }}" style="width:18px;height:18px;accent-color:#141414">Simulate: room taken by another booking during confirm</label>
+          <div style="font-size:12px;color:#5D5D58;line-height:1.5">Price and policy: no change. Free reschedule more than 24 h ahead.</div>
+          <sc-if value="{{ appt.idle }}" hint-placeholder-val="{{ true }}"><button onClick="{{ appt.confirm }}" disabled="{{ appt.noSlot }}" style="height:48px;border-radius:999px;border:none;background:#141414;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Confirm new time</button></sc-if>
+          <sc-if value="{{ appt.working }}" hint-placeholder-val="{{ false }}"><div role="status" style="padding:12px;border-radius:16px;background:#CDEEEE;font-size:13px;font-weight:600">Securing practitioner and room… original slot still held.</div></sc-if>
+          <sc-if value="{{ appt.failed }}" hint-placeholder-val="{{ false }}"><div role="alert" style="padding:12px;border-radius:16px;background:#FDE7E5;font-size:13px;line-height:1.5;color:#5C1414"><strong>Couldn't move the appointment.</strong> Room B was booked moments ago. The original time is unchanged and the client hasn't been notified.</div><button onClick="{{ appt.retry }}" style="height:42px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Choose another time</button></sc-if>
+          <sc-if value="{{ appt.ok }}" hint-placeholder-val="{{ false }}"><div role="status" style="padding:12px;border-radius:16px;background:#E2F5A6;font-size:13px;line-height:1.5"><strong>Moved.</strong> New time secured, then the original slot was released. Client emailed.</div></sc-if>
+        </sc-if>
+
+        <!-- commerce order -->
+        <sc-if value="{{ dr.isOrder }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#F3F2EE">Source: WooCommerce #8841</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:#F3F2EE">Portland store</span><span style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;background:{{ ord.refBg }}">{{ ord.refundState }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ ord.lines }}" as="l" hint-placeholder-count="2"><label style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:#F8F7F3;font-size:13px"><sc-if value="{{ ord.picking }}" hint-placeholder-val="{{ false }}"><input type="checkbox" checked="{{ l.sel }}" onChange="{{ l.toggle }}" style="width:18px;height:18px;accent-color:#141414"></sc-if><span style="flex:1">{{ l.n }}</span><strong style="font-variant-numeric:tabular-nums">{{ l.p }}</strong></label></sc-for></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:0 4px"><span>Subtotal · tax (OR: none configured) · total</span><strong>$198.00 USD</strong></div>
+          <div><div style="font-size:13px;font-weight:700;margin-bottom:6px">Sync timeline</div><sc-for list="{{ ord.timeline }}" as="t" hint-placeholder-count="4"><div style="display:flex;gap:10px;padding:5px 0;font-size:12px"><span style="width:22px;height:22px;border-radius:11px;background:{{ t.bg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><bh-icon name="{{ t.icon }}" size="11"></bh-icon></span><span style="width:56px;color:#5D5D58">{{ t.t }}</span><span style="flex:1">{{ t.e }}</span></div></sc-for></div>
+          <sc-if value="{{ ord.canStart }}" hint-placeholder-val="{{ true }}"><button onClick="{{ ordStart }}" style="height:46px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:13px;font-weight:700;cursor:pointer">Partial refund</button></sc-if>
+          <sc-if value="{{ ord.picking }}" hint-placeholder-val="{{ false }}"><div style="background:#FDE7E5;border-radius:18px;padding:14px;font-size:13px;line-height:1.5;color:#5C1414"><strong>Refund {{ ord.amt }} USD</strong> to the original card via WooCommerce gateway · Portland store.<div style="display:flex;gap:6px;margin-top:10px"><button onClick="{{ ordRefund }}" disabled="{{ ord.none }}" style="height:40px;padding:0 14px;border-radius:999px;border:none;background:#9E1B12;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Refund {{ ord.amt }}</button><button onClick="{{ ordCancel }}" style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:#fff;font-size:12px;font-weight:600;cursor:pointer">Cancel</button></div></div></sc-if>
+        </sc-if>
+
+        <!-- location detail -->
+        <sc-if value="{{ dr.isLoc }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#5D5D58">Inherited from headquarters vs set locally</div>
+          <sc-for list="{{ locFields }}" as="f" hint-placeholder-count="6"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:#F8F7F3;font-size:13px"><span style="color:#5D5D58">{{ f.k }}</span><span style="display:flex;gap:6px;align-items:center;text-align:right"><strong>{{ f.v }}</strong><span style="display:flex;gap:4px;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ f.bg }}"><bh-icon name="{{ f.icon }}" size="10"></bh-icon>{{ f.o }}</span></span></div></sc-for>
+          <div style="font-size:12px;color:#5D5D58;line-height:1.5">Adding or editing a location doesn't publish its website.</div>
+        </sc-if>
+      </aside>
+    </sc-if>
+
+    <!-- AI PANEL -->
+    <sc-if value="{{ aiOpen }}" hint-placeholder-val="{{ false }}">
+      <aside aria-label="BranchHarbor AI" style="width:min(380px,40vw);min-width:320px;flex-shrink:0;background:#fff;border-radius:28px;overflow:hidden;display:flex;flex-direction:column;position:sticky;top:12px;max-height:calc(100vh - 24px)">
+        <div style="padding:18px;background:linear-gradient(135deg,#F1E7FB,#FDEDE4);display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;gap:10px;align-items:center;font-size:16px;font-weight:700;white-space:nowrap"><span style="width:32px;height:32px;border-radius:16px;background:linear-gradient(135deg,#7B4FD6,#E8835A);color:#fff;display:flex;align-items:center;justify-content:center"><bh-icon name="sparkles" size="15"></bh-icon></span>BranchHarbor AI</span><button onClick="{{ toggleAI }}" aria-label="Close" style="width:34px;height:34px;border-radius:17px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><bh-icon name="x" size="14"></bh-icon></button></div>
+          <div style="display:flex;gap:6px;align-items:center;font-size:12px;background:#fff;border-radius:999px;padding:7px 12px"><bh-icon name="layers" size="12"></bh-icon>Scope: <strong>{{ scopeLabel }}</strong></div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55">
+          <div style="color:#5D5D58">I can draft and summarise using data you're allowed to see. Publishing, sending or price changes need your approval.</div>
+          <sc-for list="{{ aiSuggest }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.ask }}" style="text-align:left;padding:12px 14px;border-radius:16px;border:1px solid #EEEDE8;background:#fff;cursor:pointer;font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center;color:#141414"><bh-icon name="sparkles" size="13"></bh-icon>{{ s.q }}</button></sc-for>
+          <sc-if value="{{ aiAns }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self:flex-end;max-width:88%;background:#141414;color:#fff;border-radius:20px 20px 6px 20px;padding:10px 14px;font-size:13px">{{ aiQ }}</div>
+            <div style="background:#F8F7F3;border-radius:18px;padding:14px;font-size:13px;line-height:1.6">{{ aiA }}<div style="margin-top:8px;font-size:11px;color:#5D5D58">Sources: {{ aiSrc }}</div></div>
+          </sc-if>
+        </div>
+      </aside>
+    </sc-if>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P = { lilac: '#E9DDF8', lime: '#E2F5A6', sage: '#D4E6D9', butter: '#F7EDA8', blush: '#F8D6D8', aqua: '#CDEEEE', grey: '#F3F2EE', ok: '#D6F26B' };
+const U = (id, w) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w || 700}&q=70`;
+const tx = (t, sub, w) => ({ t, sub: sub || '', w: w || 600, isText: true });
+const pill = (t, bg, icon) => ({ t, bg: bg || P.grey, icon: icon || 'info', isPill: true });
+const OK = (t) => pill(t, P.ok, 'check'), WARN = (t) => pill(t, P.butter, 'alert'), BAD = (t) => pill(t, P.blush, 'x'), INFO = (t) => pill(t, P.aqua, 'info'), NEU = (t) => pill(t, P.grey, 'minus');
+
+const INDS = {
+  studios: { name: 'Studios', icon: 'lotus', pastel: P.lilac, org: 'Stillwater Yoga Collective', brand: 'Stillwater Yoga', custLabel: 'Members',
+    scopes: [['all', 'All authorised locations', 6], ['on', 'Region: Ontario', 2], ['pnw', 'Owner group: Pacific NW', 2], ['qw', 'Toronto – Queen West', 1]],
+    ops: [['classes', 'Classes', 'calendar', 'bespoke', 'New class'], ['cover', 'Instructor cover', 'users', 'bespoke'], ['offers', 'Offers', 'tag', 'table', 'New offer'], ['online', 'Online classes', 'play', 'later']],
+    later: { online: 'Registration, access and content library permissions arrive after native bookings. Your connected booking provider stays authoritative for now.' },
+    metrics: [['mail', 'Enquiries', '47', '7 days', 'Website forms', P.lime], ['calendar', 'Classes today', '39', 'Today', 'Booking connection', P.lilac], ['users', 'Occupancy', '68%', 'This week', 'Booking connection · 5 of 6 locations', P.aqua], ['card', 'Membership activity', 'Unavailable', '30 days', 'Not connected at Denver', P.grey]],
+    upTitle: 'Upcoming classes', upcoming: [['7:00', 'Morning Vinyasa · Maya Rao', 'Queen West · 16/20', 'Cover requested', P.blush], ['9:00', 'Slow Flow · Sam Tran', 'Queen West · 20/20 · 3 waitlisted', 'Full', P.butter], ['12:15', 'Lunchtime Pilates · Ana Silva', 'Leslieville · 11/20', 'Open', P.ok], ['18:30', 'Yin & Restore · Jordan Lee', 'Kitsilano · 19/20', '1 spot', P.lime]],
+    alerts: [['alert', 'Kitsilano booking sync degraded', 'Last successful sync 2 h ago · occupancy unavailable', 'connections', P.butter], ['users', '1 open cover request', 'Morning Vinyasa, Sat 7:00', 'cover', P.blush], ['shield', '1 page change awaiting approval', 'Leslieville · Home hero', 'websites', P.lilac]],
+    aiPrompt: 'Summarise attendance changes this month' },
+  sports: { name: 'Sports', icon: 'trophy', pastel: P.lime, org: 'North Shore Football Academy', brand: 'North Shore FA', custLabel: 'Participants',
+    scopes: [['all', 'All authorised venues', 3], ['rp', 'Riverside Park', 1], ['hc', 'Hillcrest Dome', 1]],
+    ops: [['programmes', 'Programmes', 'flag', 'table', 'New programme'], ['registrations', 'Registrations', 'file', 'bespoke'], ['teams', 'Teams & groups', 'users', 'table'], ['schedule', 'Schedule', 'calendar', 'table'], ['attendance', 'Attendance', 'check-circle', 'bespoke'], ['guardian', 'Guardian portal', 'user', 'later']],
+    later: { guardian: 'Guardians can already register and receive group messages. The expanded portal with balances and schedules comes later.' },
+    metrics: [['users', 'Enrolled', '214', 'Autumn season', 'Registrations', P.lime], ['file', 'Awaiting review', '9', 'Now', 'Registrations', P.butter], ['calendar', 'Sessions today', '12', 'Today', 'Schedule', P.aqua], ['alert', 'Venue conflicts', '1', 'Next 7 days', 'Schedule', P.blush]],
+    upTitle: 'Today’s sessions', upcoming: [['16:00', 'U8 Red · Coach Diaz', 'Hillcrest Dome', 'Scheduled', P.grey], ['17:00', 'U10 Blue · Coach Ortiz', 'Riverside Park · Pitch 2', 'Conflict', P.blush], ['17:00', 'U12 Camp · Coach Lee', 'Riverside Park · Pitch 2', 'Conflict', P.blush], ['18:30', 'U14 · Coach Lee', 'Riverside Park · Pitch 1', 'Scheduled', P.grey]],
+    alerts: [['alert', 'Pitch 2 double-booked at 17:00', 'U10 Blue and U12 Camp', 'schedule', P.blush], ['file', '9 registrations awaiting review', 'Autumn U10 and U12', 'registrations', P.butter], ['card', '3 unpaid instalments', 'Instalments are a later feature · shown from Stripe', 'payments', P.grey]],
+    aiPrompt: 'Suggest a fix for the Pitch 2 clash' },
+  wellness: { name: 'Wellness', icon: 'leaf', pastel: P.sage, org: 'Tidewater Wellness', brand: 'Tidewater Wellness', custLabel: 'Clients',
+    scopes: [['all', 'All authorised locations', 3], ['hf', 'Harbourfront', 1], ['yv', 'Yorkville', 1]],
+    ops: [['calendar', 'Calendar', 'calendar', 'bespoke', 'New appointment'], ['services', 'Services', 'leaf', 'table', 'New service'], ['practitioners', 'Practitioners', 'user', 'table'], ['packages', 'Packages', 'gift', 'later'], ['forms', 'Forms', 'file', 'table']],
+    later: { packages: 'Packages with included sessions, balances and expiry arrive in a later release.' },
+    metrics: [['calendar', 'Appointments today', '28', 'Today', 'Calendar', P.sage], ['x', 'Cancellations', '3', 'Today', 'Calendar', P.blush], ['activity', 'Utilisation', '81%', 'This week', 'Practitioner hours', P.aqua], ['card', 'Deposits held', '$640.00 CAD', 'Upcoming', 'Stripe', P.butter]],
+    upTitle: 'Next appointments', upcoming: [['10:00', 'Deep tissue · Rina K.', 'Jordan P. · Room A', 'Confirmed', P.ok], ['11:30', 'Hot stone · Rina K.', 'Kai S. · Room B', 'Deposit paid', P.aqua], ['13:00', 'Facial · Tom B.', 'Mira D. · Room C', 'Confirmed', P.ok], ['14:00', 'Facial · Tom B.', 'Room C', 'Cancelled', P.blush]],
+    alerts: [['refresh', 'Reschedule request', 'Jordan P. wants Thu 10:00 moved', 'calendar', P.butter], ['user', 'Ana L. absent Friday', '4 appointments need reassigning', 'calendar', P.blush]],
+    aiPrompt: 'Draft a reply using our cancellation policy' },
+  commerce: { name: 'Commerce', icon: 'bag', pastel: P.butter, org: 'Fieldnote Goods', brand: 'Fieldnote Goods', custLabel: 'Customers',
+    scopes: [['all', 'All authorised stores', 8], ['pd', 'Portland store', 1], ['sf', 'San Francisco store', 1]],
+    ops: [['catalogue', 'Catalogue', 'layers', 'table', 'New product'], ['assortment', 'Local assortment', 'store', 'table'], ['corders', 'Orders', 'receipt', 'bespoke'], ['inventory', 'Inventory', 'box', 'table'], ['returns', 'Returns', 'undo', 'later']],
+    later: { returns: 'Return requests and authorisation arrive in a later release. Refunds on orders are available now.' },
+    metrics: [['receipt', 'Orders', '86', '7 days', 'WooCommerce', P.butter], ['alert', 'Stock warnings', '5', 'Now', 'Inventory', P.blush], ['wallet', 'Revenue · USD', '$9,412.00', '7 days', 'WooCommerce · refunds excluded', P.lime], ['refresh', 'Sync health', '7 of 8', 'Now', 'Connections', P.aqua]],
+    upTitle: 'To fulfil today', upcoming: [['10:20', '#5521 · Linen overshirt ×2', 'Portland · ship', 'To fulfil', P.aqua], ['11:05', '#5524 · Merino crew', 'SF · pickup', 'To fulfil', P.aqua], ['11:40', '#5517 · Canvas tote', 'Portland', 'Payment failed', P.blush]],
+    alerts: [['alert', 'Merino crew failed to sync to 2 stores', 'Variant mismatch on size XS', 'catalogue', P.butter], ['box', 'Linen overshirt L low at Portland', '1 on hand', 'inventory', P.blush]],
+    aiPrompt: 'Explain this week’s stock trend' },
+  foods: { name: 'Foods', icon: 'utensils', pastel: P.blush, org: 'Maple & Ember', brand: 'Maple & Ember', custLabel: 'Customers',
+    scopes: [['all', 'All authorised locations', 4], ['bl', 'Seattle – Ballard', 1], ['fr', 'Seattle – Fremont', 1]],
+    ops: [['menu', 'Menus', 'list', 'bespoke', 'New item'], ['forders', 'Orders', 'receipt', 'table'], ['kitchen', 'Kitchen view', 'chef', 'link'], ['pickup', 'Pickup settings', 'clock', 'table'], ['catering', 'Preorders & catering', 'gift', 'later']],
+    later: { catering: 'Preorders with cooking dates, catering quotes and production summaries arrive after pickup ordering.' },
+    metrics: [['receipt', 'Open orders', '5', 'Now', 'Pickup ordering', P.blush], ['clock', 'Pickup capacity', '62%', 'Next hour', 'Slot settings', P.butter], ['x', 'Sold out', '1 item', 'Now', 'Ballard', P.grey], ['wifi-off', 'Kitchen screens', '3 of 4 live', 'Now', 'Device heartbeat', P.aqua]],
+    upTitle: 'Next pickups', upcoming: [['12:08', '#1039 · Tom R.', 'Ballard', 'Ready', P.ok], ['12:14', '#1044 · Ana P.', 'Ballard', 'Preparing', P.grey], ['12:18', '#1045 · Daniel K.', 'Ballard', 'New', P.butter], ['12:25', '#1046 · Mei L.', 'Ballard', 'New', P.butter]],
+    alerts: [['alert', 'Order #1041 overdue 6 min', 'Ballard kitchen', 'forders', P.blush], ['card', 'Payment without order', 'Lena W. · $34.65 · recovery queue', 'payments', P.butter], ['wifi-off', 'Fremont kitchen offline', 'Last heartbeat 11:42', 'connections', P.grey]],
+    aiPrompt: 'Summarise today’s production by item' },
+};
+
+const TABLES = {
+  offers: { cols: ['Offer', 'Eligibility', 'Locations', 'Valid', 'Status'], grid: '1.4fr 1.3fr 1fr .9fr .8fr', filters: ['All', 'Active', 'Pending'], rows: [[tx('New Year Intro', '3 classes for $39 CAD / $35 USD', 700), tx('New members only'), tx('All 6'), tx('2–31 Jan'), OK('Active')], [tx('First class free', 'Local override', 700), tx('New members'), tx('Queen West'), tx('Ongoing'), INFO('Local')], [tx('Friends week', 'Bring a friend', 700), tx('Members'), tx('Leslieville'), tx('9–15 Nov'), WARN('Needs approval')]] },
+  members: { cols: ['Member', 'Plan', 'Home studio', 'Attendance (30d)', 'Consent', 'State'], grid: '1.3fr 1.2fr 1fr .9fr .8fr .8fr', filters: ['All', 'Active', 'Low balance', 'Trial'], rows: [[tx('Ava Chen', 'ava@…', 700), tx('Unlimited monthly'), tx('Queen West'), tx('14'), OK('Email'), OK('Active')], [tx('Liam Ortiz', 'liam@…', 700), tx('10-class pack', '3 left · exp 30 Nov'), tx('Queen West'), tx('6'), OK('Email'), WARN('Low balance')], [tx('Noor Haddad', 'noor@…', 700), tx('Intro offer', '2 of 3 used'), tx('Leslieville'), tx('2'), NEU('None'), INFO('Trial')], [tx('Ben Ross', 'ben@…', 700), tx('Unlimited monthly'), tx('Kitsilano'), tx('Unavailable', 'Sync degraded'), OK('Email'), BAD('Payment failed')]] },
+  programmes: { cols: ['Programme', 'Ages', 'Venue', 'Fee', 'Registration', 'Capacity'], grid: '1.3fr .7fr 1fr .8fr 1fr .8fr', filters: ['All', 'Open', 'Closed'], rows: [[tx('U10 Autumn', 'Season · 12 weeks', 700), tx('Born 2016'), tx('Riverside Park'), tx('$240 CAD'), OK('Open to 25 Oct'), tx('30 / 32')], [tx('U12 Camp', 'Half-term · 5 days', 700), tx('Born 2014'), tx('Riverside Park'), tx('$180 CAD'), OK('Open'), tx('22 / 24')], [tx('U8 Fundamentals', 'Season', 700), tx('Born 2018'), tx('Hillcrest Dome'), tx('$190 CAD'), NEU('Closed'), tx('20 / 20')]] },
+  teams: { cols: ['Group', 'Coach', 'Programme', 'Roster', 'Next session'], grid: '1fr 1fr 1fr .8fr 1.2fr', filters: ['All', 'Open', 'Full'], rows: [[tx('U10 Blue', '', 700), tx('Coach Ortiz'), tx('U10 Autumn'), tx('14 / 16'), tx('Tue 17:00 · Pitch 2')], [tx('U10 Green', '', 700), tx('Coach Ahmed'), tx('U10 Autumn'), WARN('16 / 16'), tx('Wed 17:00 · Pitch 1')], [tx('U12 Camp', '', 700), tx('Coach Lee'), tx('U12 Camp'), tx('22 / 24'), tx('Tue 17:00 · Pitch 2')]] },
+  schedule: { cols: ['When', 'Group', 'Venue', 'Coach', 'Check'], grid: '1fr 1fr 1.2fr 1fr 1fr', filters: ['This week', 'Conflicts'], rows: [[tx('Tue 16:00', ''), tx('U8 Red', '', 700), tx('Hillcrest Dome'), tx('Coach Diaz'), OK('Clear')], [tx('Tue 17:00'), tx('U10 Blue', '', 700), tx('Riverside · Pitch 2'), tx('Coach Ortiz'), BAD('Venue clash')], [tx('Tue 17:00'), tx('U12 Camp', '', 700), tx('Riverside · Pitch 2'), tx('Coach Lee'), BAD('Venue clash')], [tx('Tue 18:30'), tx('U14', '', 700), tx('Riverside · Pitch 1'), tx('Coach Lee'), OK('Clear')]] },
+  participants: { cols: ['Participant', 'Age', 'Group', 'Guardian', 'Status'], grid: '1.2fr .6fr 1fr 1.2fr .8fr', filters: ['All', 'Active', 'Waitlisted'], rows: [[tx('Ella M.', '', 700), tx('9'), tx('U10 Blue'), tx('Sara M.', 'Verified'), OK('Active')], [tx('Jonah P.', '', 700), tx('11'), tx('U12 Camp'), tx('Dev P.', 'Verified'), OK('Active')], [tx('Leo R.', '', 700), tx('9'), tx('—'), tx('Kim R.', 'Invitation pending'), INFO('Waitlisted')]] },
+  services: { cols: ['Service', 'Duration', 'Price', 'Buffer', 'Needs', 'Status'], grid: '1.3fr .7fr .7fr .7fr 1fr .7fr', filters: ['All', 'Active', 'Paused'], rows: [[tx('Deep tissue', '', 700), tx('60 min'), tx('$120 CAD'), tx('15 min'), tx('Room A or B'), OK('Active')], [tx('Hot stone', '', 700), tx('90 min'), tx('$165 CAD'), tx('20 min'), tx('Room B · stone heater'), OK('Active')], [tx('Facial', '', 700), tx('45 min'), tx('$95 CAD'), tx('10 min'), tx('Room C'), NEU('Paused')]] },
+  practitioners: { cols: ['Practitioner', 'Services', 'Locations', 'This week'], grid: '1.2fr 1.6fr 1fr 1fr', filters: ['All', 'Available today'], rows: [[tx('Rina K.', '', 700), tx('Deep tissue, hot stone'), tx('Harbourfront'), tx('31 h booked')], [tx('Tom B.', '', 700), tx('Facial'), tx('Harbourfront, Yorkville'), tx('18 h booked')], [tx('Ana L.', '', 700), tx('Deep tissue'), tx('Yorkville'), WARN('Absent Fri')]] },
+  forms: { cols: ['Form', 'Used by', 'Consent version', 'AI access'], grid: '1.4fr 1.2fr 1fr 1fr', filters: ['All'], rows: [[tx('New client intake', '', 700), tx('All services'), tx('v3 · Sep 2026'), BAD('Excluded')], [tx('Hot stone screening', '', 700), tx('Hot stone'), tx('v1'), BAD('Excluded')]] },
+  clients: { cols: ['Client', 'Last visit', 'Next', 'Preferences', 'Notes'], grid: '1.2fr .9fr 1fr 1.2fr .9fr', filters: ['All', 'Upcoming'], rows: [[tx('Jordan P.', '', 700), tx('2 Oct'), tx('Thu 10:00'), tx('Medium pressure'), INFO('Scoped')], [tx('Kai S.', '', 700), tx('20 Sep'), tx('Thu 11:30'), tx('Quiet room'), NEU('None')]] },
+  catalogue: { cols: ['Product', 'Variants', 'Editable locally', 'Stores', 'Sync'], grid: '1.4fr .7fr 1.2fr .7fr 1fr', filters: ['All', 'Published', 'Draft', 'Failed'], rows: [[tx('Linen overshirt', 'SKU FN-LO', 700), tx('4'), tx('Price ±10%, availability'), tx('8'), OK('Synced')], [tx('Merino crew', 'SKU FN-MC', 700), tx('6'), tx('Availability'), tx('6 of 8'), WARN('2 failed · XS mismatch')], [tx('Canvas tote', 'SKU FN-CT', 700), tx('1'), tx('—'), tx('0'), NEU('Draft')]] },
+  assortment: { cols: ['Item', 'On hand', 'Price', 'Origin', 'Availability'], grid: '1.4fr .7fr .8fr .9fr .9fr', filters: ['All', 'Low', 'Overrides'], rows: [[tx('Linen overshirt · M', '', 700), tx('12'), tx('$98'), NEU('HQ'), OK('In stock')], [tx('Linen overshirt · L', '', 700), tx('1'), tx('$98'), NEU('HQ'), WARN('Low')], [tx('Merino crew · S', '', 700), tx('7'), tx('$79'), INFO('Local override'), OK('In stock')]] },
+  inventory: { cols: ['When', 'Item', 'Change', 'Reason', 'By'], grid: '.9fr 1.3fr .6fr 1.2fr .9fr', filters: ['All', 'Adjustments', 'Sales'], rows: [[tx('Today 9:12'), tx('Linen overshirt · L', '', 700), tx('−1'), tx('Sale · #5521'), tx('WooCommerce')], [tx('Yesterday'), tx('Merino crew · S', '', 700), tx('+12'), tx('Delivery received'), tx('Kim (Portland)')], [tx('Yesterday'), tx('Canvas tote', '', 700), tx('−2'), tx('Damaged · adjustment'), tx('Kim (Portland)')]] },
+  shoppers: { cols: ['Customer', 'Orders', 'Store', 'Consent'], grid: '1.3fr .6fr 1fr .8fr', filters: ['All'], rows: [[tx('Riley A.', '', 700), tx('4'), tx('Portland'), OK('Email')], [tx('Sam T.', '', 700), tx('1'), tx('San Francisco'), NEU('None')]] },
+  forders: { cols: ['Order', 'Customer', 'Pickup', 'Total', 'Payment', 'Status'], grid: '.7fr 1fr .8fr .8fr .9fr .9fr', filters: ['All', 'New', 'Preparing', 'Ready'], rows: [[tx('#1046', '', 800), tx('Mei L.'), tx('12:25'), tx('$41.20'), OK('Paid'), WARN('Awaiting acceptance')], [tx('#1045', '', 800), tx('Daniel K.'), tx('12:18'), tx('$22.40'), OK('Paid'), WARN('Awaiting acceptance')], [tx('#1044', '', 800), tx('Ana P.'), tx('12:14'), tx('$47.85'), OK('Paid'), INFO('Preparing')], [tx('#1041', '', 800), tx('Priya S.'), tx('12:02'), tx('$29.10'), OK('Paid'), BAD('Overdue 6 min')]] },
+  pickup: { cols: ['Setting', 'Ballard', 'Fremont', 'Origin'], grid: '1.3fr 1fr 1fr .9fr', filters: ['All'], rows: [[tx('Opening hours', '', 700), tx('11:00–21:00'), tx('11:00–20:00'), INFO('Local')], [tx('Slot length', '', 700), tx('15 min'), tx('15 min'), NEU('HQ')], [tx('Orders per slot', '', 700), tx('8'), tx('6'), INFO('Local')], [tx('Order cutoff', '', 700), tx('20 min before close'), tx('20 min before close'), NEU('HQ')], [tx('Prep buffer', '', 700), tx('12 min'), tx('15 min'), INFO('Local')]] },
+  foodcust: { cols: ['Customer', 'Orders', 'Location', 'Consent'], grid: '1.3fr .6fr 1fr .8fr', filters: ['All'], rows: [[tx('Mei L.', '', 700), tx('9'), tx('Ballard'), OK('SMS')], [tx('Tom R.', '', 700), tx('3'), tx('Ballard'), NEU('None')]] },
+  team: { cols: ['Person', 'Role', 'Scope', 'Last active'], grid: '1.2fr 1fr 1.4fr .9fr', filters: ['All', 'HQ', 'Locations'], rows: [[tx('Jamie Morgan', 'jamie@…', 700), tx('HQ admin'), tx('All authorised locations'), tx('Now')], [tx('Priya Nair', '', 700), tx('Regional manager'), tx('Region: Ontario'), tx('1 h ago')], [tx('Kim Lau', '', 700), tx('Location manager'), tx('Leslieville'), tx('Today')], [tx('Sam Tran', '', 700), tx('Staff'), tx('Queen West, Leslieville'), tx('Yesterday')], [tx('BranchHarbor Support', 'Time-limited', 700), tx('Support access'), tx('Expires in 2 h · logged'), WARN('Active')]] },
+  marketing: { cols: ['Campaign', 'Scope', 'Channel', 'Status', 'Updated'], grid: '1.4fr 1.2fr .8fr .8fr .7fr', filters: ['All', 'Draft', 'Scheduled'], rows: [[tx('New year, new practice', '', 700), tx('Canadian locations (3)'), tx('Web + email'), INFO('Draft'), tx('Today')], [tx('Teacher training info night', '', 700), tx('Queen West'), tx('Web'), OK('Scheduled'), tx('2 Oct')], [tx('Spring open house', '', 700), tx('All'), tx('Web + email'), NEU('Completed'), tx('12 Apr')]] },
+  settings: { cols: ['Setting', 'Value', 'Owner'], grid: '1.3fr 1.5fr 1fr', filters: ['Business', 'Policies', 'Subscription'], rows: [[tx('Default timezone', '', 700), tx('America/Toronto'), NEU('Organisation')], [tx('Currencies', '', 700), tx('CAD, USD · no conversion'), NEU('Organisation')], [tx('Cross-location customer sharing', '', 700), tx('Off · totals only'), WARN('Policy')], [tx('AI training on customer data', '', 700), tx('Off'), NEU('Organisation')], [tx('Plan', '', 700), tx('Network · 6 authorised locations'), NEU('Owner')]] },
+};
+const CUST_TABLE = { studios: 'members', sports: 'participants', wellness: 'clients', commerce: 'shoppers', foods: 'foodcust' };
+
+const LOCS = {
+  studios: [['Toronto – Queen West', 'Ontario', 'CAD', 'ET', 'Company-owned', true, 'Live', P.lilac], ['Toronto – Leslieville', 'Ontario', 'CAD', 'ET', 'Company-owned', true, 'Live', P.butter], ['Vancouver – Kitsilano', 'BC', 'CAD', 'PT', 'Franchise · Coast Group', false, 'Live', P.aqua], ['Seattle – Capitol Hill', 'Washington', 'USD', 'PT', 'Franchise · PNW Group', true, 'Live', P.blush], ['Portland – Pearl District', 'Oregon', 'USD', 'PT', 'Franchise · PNW Group', true, 'Live', P.sage], ['Denver – LoHi', 'Colorado', 'USD', 'MT', 'Company-owned', false, 'Not published', P.lime]],
+  sports: [['Riverside Park', 'Vancouver', 'CAD', 'PT', 'Venue', true, 'Live', P.lime], ['Hillcrest Dome', 'Vancouver', 'CAD', 'PT', 'Venue', true, 'Live', P.aqua], ['Lynn Valley Fields', 'North Van', 'CAD', 'PT', 'Partner venue', false, 'Not published', P.butter]],
+  wellness: [['Harbourfront', 'Toronto', 'CAD', 'ET', 'Company-owned', true, 'Live', P.sage], ['Yorkville', 'Toronto', 'CAD', 'ET', 'Company-owned', true, 'Live', P.lilac], ['Oakville', 'Ontario', 'CAD', 'ET', 'Franchise', false, 'Not published', P.butter]],
+  commerce: [['Portland store', 'Oregon', 'USD', 'PT', 'Company-owned', true, 'Live', P.butter], ['San Francisco store', 'California', 'USD', 'PT', 'Company-owned', true, 'Live', P.aqua], ['Austin store', 'Texas', 'USD', 'CT', 'Franchise', false, 'Live', P.blush]],
+  foods: [['Seattle – Ballard', 'Washington', 'USD', 'PT', 'Company-owned', true, 'Live', P.blush], ['Seattle – Fremont', 'Washington', 'USD', 'PT', 'Company-owned', false, 'Live', P.butter], ['Tacoma', 'Washington', 'USD', 'PT', 'Franchise', true, 'Live', P.lime], ['Bellevue', 'Washington', 'USD', 'PT', 'Franchise', true, 'Not published', P.aqua]],
+};
+const CONNS = {
+  studios: [['Mm', 'Momence (booking)', 'Authoritative for bookings', 'Degraded', 'alert', P.butter, '2 h ago', 'Import', 'Kitsilano: API rate limit. 8 class occurrences may be out of date.', 'Retry sync'], ['St', 'Stripe', 'Payments', 'Connected', 'check', P.ok, '4 min ago', 'Import', '', ''], ['Gc', 'Google Calendar', 'Staff schedules', 'Authorisation expired', 'key', P.blush, '3 days ago', 'Export', 'Instructor calendars stopped updating 8 Oct.', 'Reauthorise'], ['Mc', 'Mailchimp', 'Consented contacts', 'Initial sync', 'refresh', P.aqua, 'In progress · 62%', 'Export', '', '']],
+  sports: [['St', 'Stripe', 'Registration payments', 'Connected', 'check', P.ok, '6 min ago', 'Import', '', ''], ['Gc', 'Google Calendar', 'Coach schedules', 'Connected', 'check', P.ok, '1 h ago', 'Export', '', '']],
+  wellness: [['St', 'Stripe', 'Deposits', 'Connected', 'check', P.ok, '2 min ago', 'Import', '', ''], ['Gc', 'Google Calendar', 'Practitioner calendars', 'Degraded', 'alert', P.butter, '45 min ago', 'Export', 'Tom B.’s calendar rejected 2 events.', 'View affected']],
+  commerce: [['Wo', 'WooCommerce', 'Authoritative for orders', 'Connected', 'check', P.ok, '1 min ago', 'Bidirectional', '', ''], ['Wo', 'WooCommerce (Austin)', 'Authoritative for orders', 'Disconnected', 'x', P.blush, 'Yesterday 18:02', 'Bidirectional', 'Site unreachable. Orders placed there are not imported until it reconnects.', 'Test connection']],
+  foods: [['St', 'Stripe', 'Pickup payments', 'Connected', 'check', P.ok, 'Now', 'Import', '', ''], ['Kv', 'Fremont kitchen screen', 'Device', 'Disconnected', 'wifi-off', P.blush, '11:42', '—', 'Screen offline. Orders still arrive here and by email.', 'Send test order']],
+};
+const MENU = [
+  { name: 'Ember chicken bowl', img: U('1640583342012-4622f31b650d'), status: 'Published', price: 16.5, local: 17.25, diet: 'Gluten-free option', mods: 'Rice, sauce, extra protein' },
+  { name: 'Smoked brisket sandwich', img: U('1622021142947-da7dedc7c39a'), status: '1 location failed', price: 18, local: null, diet: 'Contains gluten', mods: 'Bun, pickles' },
+  { name: 'Wood-fired flatbread', img: U('1651981075280-9a9e01acbff0'), status: 'Published', price: 15, local: null, diet: 'Vegetarian', mods: 'Toppings' },
+  { name: 'Garden tomato salad', img: U('1554997433-8e233c02c751'), status: 'Draft', price: 11, local: null, diet: 'Vegan', mods: 'Dressing' },
+];
+const ROSTER = ['Ella M.', 'Sam K.', 'Ivy T.', 'Noah B.', 'Ari P.', 'Mila J.', 'Owen C.', 'Zoe W.', 'Kai R.', 'Lena H.', 'Theo S.', 'Ruby A.', 'Max D.', 'Isla F.'];
+const pad = n => String(n).padStart(2, '0');
+const freshWeb = () => ({
+  fields: { brand: { v: 'Stillwater Yoga', o: 'locked' }, nav: { v: 'Classes · Offers · Studios · About', o: 'locked' }, headline: { v: 'Find your practice in Leslieville', o: 'approval' }, offer: { v: 'New members: 3 classes for $39', o: 'approval' }, hours: { v: 'Mon–Fri 6:30–21:00 · Sat–Sun 8:00–18:00', o: 'editable', hq: 'Mon–Fri 6:30–21:00 · Sat–Sun 8:00–18:00' }, phone: { v: '(416) 555-0142', o: 'editable', hq: '(416) 555-0100' } },
+  editing: null, draft: '', comment: '', pending: {}, toast: '', log: [{ t: '09:02', e: 'Version 15 published by HQ' }], hqComment: '' });
+
+class Component extends DCLogic {
+  state = { ind: 'studios', screen: 'overview', scope: 'all', role: 'hq', sideOpen: true, aiOpen: false, ai: null, filter: 0, drawer: null,
+    cover: 'open', regFilter: 'Awaiting review', regs: [
+      { id: 1, name: 'Ella M.', init: 'EM', age: 9, prog: 'U10 Autumn', guardian: 'Sara M. · verified', pay: 'Paid $240 CAD', forms: 'Medical + consent complete', ok: true, status: 'Awaiting review', group: '' },
+      { id: 2, name: 'Leo R.', init: 'LR', age: 9, prog: 'U10 Autumn', guardian: 'Kim R. · invitation pending', pay: 'Not taken', forms: 'Consent missing', ok: false, status: 'Awaiting review', group: '' },
+      { id: 3, name: 'Aya N.', init: 'AN', age: 10, prog: 'U10 Autumn', guardian: 'Hiro N. · verified', pay: 'Paid $240 CAD', forms: 'Complete', ok: true, status: 'Awaiting review', group: '' },
+      { id: 4, name: 'Jonah P.', init: 'JP', age: 11, prog: 'U12 Camp', guardian: 'Dev P. · verified', pay: 'Paid $180 CAD', forms: 'Complete', ok: true, status: 'Accepted', group: 'U12 Camp' } ],
+    att: {}, attDone: false, attBusy: false, classEdit: 'one', appt: { slot: null, phase: 'idle', fail: true }, ord: { phase: 'idle', sel: { a: true, b: false }, refunded: false },
+    payTab: 'rec', rec: 'open', web: freshWeb(), menuView: 'hq' };
+  componentWillUnmount() { (this.ts || []).forEach(clearTimeout); }
+  later(fn, ms) { (this.ts = this.ts || []).push(setTimeout(fn, ms)); }
+  go(screen) { this.setState({ screen, drawer: null, filter: 0 }); window.scrollTo(0, 0); }
+  webSet(p) { this.setState(s => ({ web: { ...s.web, ...p } })); }
+
+  renderVals() {
+    const s = this.state, I = INDS[s.ind], role = s.role;
+    const scopeO = I.scopes.find(x => x[0] === s.scope) || I.scopes[0];
+    const scopeLabel = `${scopeO[1]} (${scopeO[2]})`;
+    const common1 = [['overview', 'Overview', 'grid', 'bespoke'], ['locations', 'Locations', 'pin', 'bespoke']];
+    const common2 = [['customers', I.custLabel, 'users', 'table'], ['websites', 'Websites', 'globe', 'bespoke'], ['marketing', 'Marketing', 'megaphone', 'table'], ['payments', 'Payments', 'card', 'bespoke'], ['team', 'Team', 'user', 'table'], ['reports', 'Reports', 'chart', 'bespoke'], ['connections', 'Connections', 'plug', 'bespoke'], ['settings', 'Settings', 'settings', 'table']];
+    const all = [...common1, ...I.ops, ...common2];
+    const curDef = all.find(x => x[0] === s.screen) || all[0];
+    const badges = { payments: s.rec === 'open' ? 1 : 0, connections: (CONNS[s.ind] || []).filter(c => c[8]).length, registrations: s.regs.filter(r => r.status === 'Awaiting review').length };
+    const mk = ([key, label, icon, kind]) => { const on = s.screen === key; return { isItem: true, isHead: false, key, label, icon, later: kind === 'later', badge: badges[key] || 0, bg: on ? '#D6F26B' : 'transparent', fg: on ? '#141414' : (kind === 'later' ? '#9C9C96' : '#3E3E3A'), weight: on ? 700 : 500,
+      go: kind === 'link' ? () => { window.location.href = 'BranchHarbor Prototypes v2.dc.html'; } : () => this.go(key) }; };
+    const head = label => ({ isHead: true, isItem: false, label, key: label });
+    const navItems = [...common1.map(mk), head(I.name.toUpperCase()), ...I.ops.map(mk), head('SHARED'), ...common2.map(mk)];
+
+    const kind = curDef[3];
+    let tblKey = null;
+    if (kind === 'table') tblKey = s.screen === 'customers' ? CUST_TABLE[s.ind] : s.screen;
+    const T = tblKey && TABLES[tblKey];
+    const tbl = T ? { cols: T.cols, grid: T.grid.split(' ').map(x => `minmax(110px,${x})`).join(' '), minW: `${T.cols.length * 150}px`, count: `${T.rows.length} records · ${scopeLabel}`,
+      filters: T.filters.map((f, i) => ({ label: f, on: s.filter === i, bg: s.filter === i ? '#141414' : '#fff', fg: s.filter === i ? '#fff' : '#141414', bd: s.filter === i ? '#141414' : '#E4E2DC', pick: () => this.setState({ filter: i }) })),
+      rows: T.rows.map((r, i) => ({ bg: i % 2 ? '#fff' : '#FAFAF7', cells: r.map(c => ({ isPill: !!c.isPill, isText: !c.isPill, t: c.t, sub: c.sub || '', w: c.w || 600, bg: c.bg, icon: c.icon || 'info' })) })) } : { cols: [], rows: [], filters: [], grid: '1fr', minW: '0', count: '' };
+
+    const v = { overview: s.screen === 'overview', table: kind === 'table', later: kind === 'later', classes: s.screen === 'classes', cover: s.screen === 'cover', registrations: s.screen === 'registrations', attendance: s.screen === 'attendance', calendar: s.screen === 'calendar', corders: s.screen === 'corders', menu: s.screen === 'menu', websites: s.screen === 'websites', payments: s.screen === 'payments', connections: s.screen === 'connections', reports: s.screen === 'reports', locations: s.screen === 'locations' };
+
+    // studios week
+    const days = ['Mon 12', 'Tue 13', 'Wed 14', 'Thu 15', 'Fri 16', 'Sat 17', 'Sun 18'];
+    const base = [['7:00', 'Morning Vinyasa', 'Maya Rao', 16, P.lilac], ['12:15', 'Lunchtime Pilates', 'Ana Silva', 11, P.butter], ['18:30', 'Yin & Restore', 'Jordan Lee', 19, P.aqua]];
+    const week = days.map((d, di) => ({ label: d, headBg: di === 5 ? '#D6F26B' : '#F3F2EE', items: base.filter((_, bi) => (di + bi) % 4 !== 3).map(([time, name, inst, b, bg], bi) => { const booked = Math.min(20, b + ((di * 3 + bi) % 5)); return { time, name, inst, bg: di === 5 && bi === 0 ? P.blush : bg, cap: `${booked}/20`, fill: `${booked * 5}%`, open: () => this.setState({ drawer: { type: 'class', title: `${name} · ${d} ${time}`, inst, cap: `${booked} / 20` } }) }; }) }));
+
+    // cover
+    const cv = s.cover;
+    const coverStaff = [['ST', P.blush, 'Sam Tran', 'Available · teaches Vinyasa', cv === 'accepted' ? 'Accepted' : cv === 'done' ? 'Assigned' : 'Notified', cv === 'done' ? P.ok : cv === 'accepted' ? P.aqua : '#fff'], ['AS', P.butter, 'Ana Silva', 'Available', 'Notified', '#fff'], ['JL', P.lilac, 'Jordan Lee', 'Teaching at Leslieville', 'Unavailable', '#fff']].map(([init, pastel, name, note, state, bg]) => ({ init, pastel, name, note, state, bg }));
+
+    // regs
+    const regStatuses = ['Awaiting review', 'Accepted', 'Waitlisted'];
+    const regs = s.regs.filter(r => r.status === s.regFilter).map(r => ({ ...r, stBg: r.status === 'Accepted' ? P.ok : r.status === 'Waitlisted' ? P.aqua : P.butter, formIcon: r.ok ? 'check-circle' : 'alert', canAct: r.status === 'Awaiting review', noGroup: !r.group || !r.ok,
+      setGroup: e => { const g = e.target.value; this.setState(x => ({ regs: x.regs.map(y => y.id === r.id ? { ...y, group: g } : y) })); },
+      accept: () => this.setState(x => ({ regs: x.regs.map(y => y.id === r.id ? { ...y, status: 'Accepted' } : y) })),
+      waitlist: () => this.setState(x => ({ regs: x.regs.map(y => y.id === r.id ? { ...y, status: 'Waitlisted' } : y) })) }));
+
+    // attendance
+    const att = s.att, marked = ROSTER.filter(n => att[n]);
+    const attList = ROSTER.map(n => { const st = att[n]; return { name: n, init: n.split(' ').map(x => x[0]).join(''), note: st === 'P' ? 'Present' : st === 'A' ? 'Absent · guardian will be notified' : 'Not marked', isP: st === 'P', isA: st === 'A', locked: s.attDone,
+      bg: st === 'P' ? P.lime : st === 'A' ? P.blush : '#F8F7F3', pBg: st === 'P' ? '#141414' : '#fff', pFg: st === 'P' ? '#fff' : '#141414', aBg: st === 'A' ? '#9E1B12' : '#fff', aFg: st === 'A' ? '#fff' : '#141414',
+      present: () => this.setState(x => ({ att: { ...x.att, [n]: 'P' } })), absent: () => this.setState(x => ({ att: { ...x.att, [n]: 'A' } })) }; });
+
+    // wellness calendar
+    const heads = [['RK', 'Rina K.', P.sage], ['TB', 'Tom B.', P.lilac], ['AL', 'Ana L.', P.butter]].map(([init, name, bg]) => ({ init, name, bg }));
+    const appts = { '10:00-0': ['Deep tissue', 'Jordan P. · Room A', 'jordan'], '11:30-0': ['Hot stone', 'Kai S. · Room B', 'kai'], '13:00-1': ['Facial', 'Mira D. · Room C', ''], '10:00-2': ['Deep tissue', 'Lou F. · Room B', ''], '14:00-2': ['Deep tissue', 'Pat G. · Room A', ''] };
+    const movedTo = s.appt.phase === 'ok' ? s.appt.slot : null;
+    const cal = { heads, rows: ['10:00', '11:30', '13:00', '14:00', '15:30', '17:00'].map(t => ({ time: t, cells: [0, 1, 2].map(ci => { let a = appts[`${t}-${ci}`]; if (movedTo && a && a[2] === 'jordan') a = null; if (movedTo && movedTo.t.startsWith(t) && ci === 0) a = ['Deep tissue', 'Jordan P. · ' + movedTo.room, 'jordan']; return a ? { a: a[0], b: a[1], bg: a[2] === 'jordan' ? P.butter : P.sage, bd: a[2] === 'jordan' ? '1.5px solid #141414' : 'none', empty: false, open: () => this.setState({ drawer: { type: 'appt', title: `${a[0]} · ${a[1]}` } }) } : { a: '', b: 'Available', bg: '#FAFAF7', bd: '1px dashed #E4E2DC', empty: true, open: () => {} }; }) })) };
+    const slots = [{ t: '15:30 Thu', who: 'Rina K.', room: 'Room B' }, { t: '17:00 Thu', who: 'Rina K.', room: 'Room A' }, { t: '10:00 Fri', who: 'Rina K.', room: 'Room A' }];
+    const ap = s.appt;
+    const appt = { cur: movedTo ? `${movedTo.t} · Rina K. · ${movedTo.room}` : 'Thu 10:00 · Deep tissue 60 min · Rina K. · Room A', locked: ap.phase === 'working' || ap.phase === 'ok', failSim: ap.fail, noSlot: !ap.slot,
+      slots: slots.map(sl => ({ ...sl, bg: ap.slot === sl ? '#F3F2EE' : '#fff', bd: ap.slot === sl ? '#141414' : '#E4E2DC', pick: () => this.setState(x => ({ appt: { ...x.appt, slot: sl, phase: 'idle' } })) })),
+      toggleFail: () => this.setState(x => ({ appt: { ...x.appt, fail: !x.appt.fail } })), idle: ap.phase === 'idle', working: ap.phase === 'working', failed: ap.phase === 'failed', ok: ap.phase === 'ok',
+      confirm: () => { this.setState(x => ({ appt: { ...x.appt, phase: 'working' } })); this.later(() => this.setState(x => ({ appt: { ...x.appt, phase: x.appt.fail && x.appt.slot.room === 'Room B' ? 'failed' : 'ok' } })), 1200); },
+      retry: () => this.setState(x => ({ appt: { ...x.appt, phase: 'idle', slot: null } })) };
+
+    // commerce orders
+    const o = s.ord;
+    const corders = [['5521', 'Linen overshirt ×2', 'Riley A. · Portland', '$198.00 USD', o.refunded ? 'Partially refunded' : 'Paid', o.refunded ? P.lilac : P.ok, 'To fulfil', P.aqua, true], ['5519', 'Merino crew', 'Sam T. · SF', '$89.00 USD', 'Paid', P.ok, 'Fulfilled', P.ok], ['5517', 'Canvas tote', 'Jo M. · Portland', '$34.00 USD', 'Failed', P.blush, 'On hold', P.grey], ['5512', 'Merino crew ×2', 'Ren K. · Austin', '—', 'Not imported', P.butter, 'Store disconnected', P.butter]]
+      .map(([id, items, cust, total, pay, payBg, ful, fulBg, main]) => ({ id, items, cust, total, pay, payBg, ful, fulBg, bg: s.drawer && s.drawer.type === 'order' && main ? '#F3F2EE' : '#FAFAF7', open: () => main ? this.setState({ drawer: { type: 'order', title: `Order #${id}` } }) : null }));
+    const amt = (o.sel.a ? 99 : 0) + (o.sel.b ? 99 : 0);
+    const ordTl = [['check', P.ok, '10:14', 'Order created in WooCommerce'], ['refresh', P.aqua, '10:14', 'Imported to BranchHarbor (event wc_8841_created)'], ['refresh', P.grey, '10:15', 'Retry received · same external ID, no duplicate']];
+    if (o.phase === 'pending' || o.refunded) ordTl.push(['undo', P.butter, '10:42', 'Partial refund $99.00 requested by Jamie M.']);
+    if (o.refunded) ordTl.push(['check', P.ok, '10:42', 'Refund complete · WooCommerce gateway confirmed']);
+    const ord = { refundState: o.refunded ? 'Refund: partial · complete' : o.phase === 'pending' ? 'Refund: pending' : 'Refund: none', refBg: o.refunded ? P.lilac : o.phase === 'pending' ? P.butter : P.grey, picking: o.phase === 'pick', canStart: o.phase === 'idle' && !o.refunded, amt: `$${amt.toFixed(2)}`, none: amt === 0,
+      lines: [['a', 'Linen overshirt · M', '$99.00'], ['b', 'Linen overshirt · L', '$99.00']].map(([k, n, p]) => ({ n, p, sel: !!o.sel[k], toggle: () => this.setState(x => ({ ord: { ...x.ord, sel: { ...x.ord.sel, [k]: !x.ord.sel[k] } } })) })),
+      timeline: ordTl.map(([icon, bg, t, e]) => ({ icon, bg, t, e })) };
+
+    // menu
+    const local = s.menuView !== 'hq';
+    const menuItems = MENU.map((m, mi) => { const ov = local && s.menuView === 'bl' && m.local != null && !(s.menuReset || {})[mi]; return { ...m, stBg: m.status === 'Published' ? P.ok : m.status === 'Draft' ? P.grey : P.butter,
+      fields: [{ k: 'Price', v: `$${(ov ? m.local : m.price).toFixed(2)}`, origin: ov ? 'Local override' : local ? 'Inherited' : 'HQ', oBg: ov ? P.lilac : P.grey, oIcon: ov ? 'edit' : 'lock', canReset: ov, reset: () => this.setState(x => ({ menuReset: { ...(x.menuReset || {}), [mi]: true } })) },
+        { k: 'Dietary', v: m.diet, origin: local ? 'Inherited' : 'HQ', oBg: P.grey, oIcon: 'lock', canReset: false, reset: () => {} }, { k: 'Modifiers', v: m.mods, origin: local ? 'Inherited' : 'HQ', oBg: P.grey, oIcon: 'lock', canReset: false, reset: () => {} },
+        ...(local ? [{ k: 'Availability', v: s.menuView === 'bl' && mi === 1 ? 'Sold out' : 'Available', origin: 'Local', oBg: P.lime, oIcon: 'edit', canReset: false, reset: () => {} }] : [])] }; });
+
+    // websites (scenario 5)
+    const W = s.web, F = W.fields;
+    const isHQ = role === 'hq';
+    const labels = { brand: 'Brand name', nav: 'Header navigation', headline: 'Hero headline', offer: 'Intro offer line', hours: 'Opening hours', phone: 'Phone number' };
+    const webFields = Object.keys(F).map(k => { const f = F[k], pend = W.pending[k], editing = W.editing === k;
+      const origin = f.o === 'locked' ? 'Locked · HQ' : f.o === 'approval' ? 'Approval required' : (f.hq && f.v !== f.hq ? 'Local override' : 'Editable · inherited');
+      const canEdit = !pend && (isHQ || f.o !== 'locked') && role !== 'coach';
+      const needsApproval = !isHQ && f.o === 'approval';
+      return { label: labels[k], value: f.v, origin, oBg: f.o === 'locked' ? '#141414' : f.o === 'approval' ? P.butter : (f.hq && f.v !== f.hq ? P.lilac : P.lime), oFg: f.o === 'locked' ? '#fff' : '#141414', oIcon: f.o === 'locked' ? 'lock' : f.o === 'approval' ? 'shield' : 'edit',
+        bd: editing ? '#141414' : pend ? '#E7C66B' : '#EEEDE8', editing, viewing: !editing, canEdit, editLabel: needsApproval ? 'Request change' : 'Edit', editIcon: needsApproval ? 'shield' : 'edit',
+        canReset: !editing && !pend && f.hq && f.v !== f.hq && role !== 'coach', needsApproval, draft: W.draft, comment: W.comment,
+        onDraft: e => this.webSet({ draft: e.target.value }), onComment: e => this.webSet({ comment: e.target.value }),
+        cantSave: !W.draft.trim() || (needsApproval && !W.comment.trim()), saveLabel: needsApproval ? 'Submit for approval' : 'Save',
+        edit: () => this.webSet({ editing: k, draft: f.v, comment: '', toast: '' }), cancel: () => this.webSet({ editing: null }),
+        save: () => { const now = new Date(); const t = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+          if (needsApproval) this.webSet({ editing: null, pending: { ...W.pending, [k]: { v: W.draft, c: W.comment } }, toast: `${labels[k]} sent to headquarters for approval. The live page is unchanged.`, log: [{ t, e: `Kim L. requested change to ${labels[k]}` }, ...W.log] });
+          else this.webSet({ editing: null, fields: { ...F, [k]: { ...f, v: W.draft } }, toast: `${labels[k]} saved as a local draft. Publish when ready.`, log: [{ t, e: `${isHQ ? 'Jamie M.' : 'Kim L.'} edited ${labels[k]}` }, ...W.log] }); },
+        reset: () => this.webSet({ fields: { ...F, [k]: { ...f, v: f.hq } }, toast: `${labels[k]} reset to the headquarters default.` }),
+        pending: !!pend, pendingValue: pend ? pend.v : '', pendingComment: pend ? pend.c : '', canApprove: isHQ && !!pend, hqComment: W.hqComment, onHq: e => this.webSet({ hqComment: e.target.value }),
+        approve: () => { const p2 = { ...W.pending }; delete p2[k]; this.webSet({ pending: p2, fields: { ...F, [k]: { ...f, v: pend.v } }, toast: `Approved. ${labels[k]} will publish with the next Leslieville release.`, log: [{ t: 'now', e: `Jamie M. approved ${labels[k]}${W.hqComment ? ' · “' + W.hqComment + '”' : ''}` }, ...W.log], hqComment: '' }); },
+        reject: () => { const p2 = { ...W.pending }; delete p2[k]; this.webSet({ pending: p2, toast: `Rejected. Kim L. was notified with your comment.`, log: [{ t: 'now', e: `Jamie M. rejected ${labels[k]}${W.hqComment ? ' · “' + W.hqComment + '”' : ''}` }, ...W.log], hqComment: '' }); } }; });
+
+    // payments
+    const rec = s.rec;
+    const recTl = [['card', P.ok, '11:48:02', 'Stripe payment_intent.succeeded · $34.65 USD (signed event)'], ['x', P.blush, '11:48:03', 'Order creation failed at Ballard: slot 12:00 full at confirm']];
+    if (rec === 'recreating' || rec === 'recreated') recTl.push(['refresh', P.aqua, 'now', 'Jamie M. recreated order in next available slot 12:15']);
+    if (rec === 'recreated') recTl.push(['check', P.ok, 'now', 'Order #1047 created · customer notified of 12:15 pickup']);
+    if (rec === 'refunding' || rec === 'refunded') recTl.push(['undo', P.butter, 'now', 'Refund $34.65 requested by Jamie M. (finance)']);
+    if (rec === 'refunded') recTl.push(['check', P.ok, 'now', 'Refund complete · customer emailed']);
+    const recD = { st: rec === 'recreated' || rec === 'refunded' ? 'Resolved' : 'Needs action', stBg: rec === 'recreated' || rec === 'refunded' ? P.ok : P.blush, orderState: rec === 'recreated' ? '#1047 created' : 'Missing', open: rec === 'open', confirmRefund: rec === 'confirm',
+      working: rec === 'recreating' || rec === 'refunding', workingLabel: rec === 'recreating' ? 'Creating order and checking slot capacity…' : 'Refund pending with Stripe…', done: rec === 'recreated' || rec === 'refunded',
+      doneLabel: rec === 'recreated' ? 'Resolved: order #1047 created and linked to the payment.' : 'Resolved: payment refunded in full.', timeline: recTl.map(([icon, bg, t, e]) => ({ icon, bg, t, e })) };
+
+    // reports
+    const bars = (vals, labels2, bg, fmt) => { const mx = Math.max(...vals.filter(x => x != null)); return vals.map((x, i) => ({ v: x == null ? 'n/a' : fmt(x), h: x == null ? '6px' : `${Math.max(8, Math.round(x / mx * 100))}px`, bg: x == null ? '#F3F2EE' : bg, l: labels2[i] })); };
+    const L6 = LOCS[s.ind].map(l => l[0].split(' – ').pop().split(' ')[0]);
+    const reports = [
+      { title: 'Enquiries by location · 30 days', fresh: 'Updated 4 min ago', bars: bars(LOCS[s.ind].map((_, i) => [42, 31, 28, 19, 24, 9][i % 6]), L6, '#141414', x => x), note: 'Source: website forms. Attribution beyond form source is not measured.' },
+      { title: 'Revenue · CAD', fresh: 'Stripe · 6 min ago', bars: bars([4812, 3940, null], ['This wk', 'Last wk', 'Kitsilano'], '#D6F26B', x => `$${(x / 1000).toFixed(1)}k`), note: 'Refunds shown separately. Kitsilano unavailable while sync is degraded.' },
+      { title: 'Revenue · USD', fresh: 'Stripe · 6 min ago', bars: bars([3960, 4120, 2210], ['This wk', 'Last wk', 'Denver'], P.aqua, x => `$${(x / 1000).toFixed(1)}k`), note: 'Not combined with CAD. No conversion method is defined.' },
+      { title: 'Occupancy where connected', fresh: 'Booking system · 2 h for Kitsilano', bars: bars([78, 64, null, 71, 59, null], ['QW', 'Lesl.', 'Kits.', 'Cap. Hill', 'Pearl', 'Denver'], P.lilac, x => `${x}%`), note: 'Missing bars mean Unavailable or Not connected, never zero.' },
+    ];
+
+    const dr = s.drawer || {};
+    const scope = I.scopes;
+    const conns = (CONNS[s.ind] || []).map(([mono, name, r2, state, icon, bg, last, dir, issue, fixLabel], i) => ({ mono, name, role: r2, state, icon, bg, last, dir, issue, fixLabel, hasIssue: !!issue && !(s.fixed || {})[name], pastel: [P.lilac, P.aqua, P.butter, P.lime][i % 4],
+      fix: () => { this.setState(x => ({ fixed: { ...(x.fixed || {}), [name]: true } })); } }))
+      .map(c => (s.fixed || {})[c.name] ? { ...c, state: 'Connected', icon: 'check', bg: P.ok, last: 'Just now' } : c);
+
+    const AISUG = { studios: ['Summarise attendance changes this month', 'Draft a class description for Slow Flow', 'Who should get the January intro offer?'], sports: ['Suggest a fix for the Pitch 2 clash', 'Summarise U10 enrolment', 'Draft the camp announcement'], wellness: ['Draft a reply using our cancellation policy', 'Summarise utilisation by practitioner', 'Write copy for Hot stone'], commerce: ['Explain this week’s stock trend', 'Draft copy for Canvas tote from its spec sheet', 'Which stores failed the last sync?'], foods: ['Summarise today’s production by item', 'Draft menu copy for the flatbread', 'Plan a lunch promotion for Tacoma'] };
+    const AIA = { studios: ['Occupancy rose at Queen West (+6 pts) and Leslieville (+3) versus September. Kitsilano can’t be compared: its booking sync has been degraded since 9:40. I can’t tell why attendance changed from occupancy alone.', 'Booking connection, 1–11 Oct'], sports: ['Move U12 Camp to Pitch 1 at 17:00 (free until 18:30), or shift U10 Blue to 16:00 at Hillcrest Dome. Both only affect those two groups. Want me to draft the notice for the group you choose?', 'Schedule, venue bookings'], wellness: ['Draft: “Hi Jordan, you can move your appointment free of charge up to 24 hours before. I’ve held Thu 17:00 with Rina if that suits.” I didn’t use any intake form details.', 'Policies › Cancellation v2'], commerce: ['Linen overshirt L sold 9 units at Portland in 7 days against 3 the week before; stock is 1. Merino crew is flat. This is based on WooCommerce orders only; in-store sales aren’t connected.', 'Orders, Inventory history'], foods: ['Ballard so far: 14 Ember bowls, 8 brisket sandwiches, 6 flatbreads, 11 lemonades. Fremont is missing because its kitchen screen is offline, though orders still arrived there.', 'Orders, 11:00–12:10'] };
+
+    return {
+      sideOpen: s.sideOpen, sideW: s.sideOpen ? '248px' : '72px', sideIcon: s.sideOpen ? 'chevron-left' : 'chevron-right', toggleSide: () => this.setState(x => ({ sideOpen: !x.sideOpen })),
+      indName: I.name, indPastel: I.pastel, initials: role === 'hq' ? 'JM' : role === 'local' ? 'KL' : 'CO',
+      indSwitch: Object.keys(INDS).map(k => ({ name: INDS[k].name, icon: INDS[k].icon, on: s.ind === k, bg: s.ind === k ? '#fff' : 'transparent', pick: () => this.setState({ ind: k, screen: 'overview', scope: 'all', drawer: null, filter: 0 }) })),
+      navItems, cur: { label: curDef[1], icon: curDef[2], crumb: `${I.org} (sample) · ${I.name}`, action: curDef[4] || '', laterNote: (I.later || {})[s.screen] || '' },
+      scope: s.scope, scopeOpts: scope.map(([id, label, n]) => ({ id, label: `${label} (${n})` })), scopeLabel, setScope: e => this.setState({ scope: e.target.value }),
+      role, setRole: e => this.setState({ role: e.target.value }),
+      aiOpen: s.aiOpen, toggleAI: () => this.setState(x => ({ aiOpen: !x.aiOpen, drawer: null })), aiBtnBg: s.aiOpen ? '#141414' : '#F1E7FB', aiBtnFg: s.aiOpen ? '#fff' : '#4A2E8A',
+      aiSuggest: AISUG[s.ind].map(q => ({ q, ask: () => this.setState({ ai: q }) })), aiAns: !!s.ai, aiQ: s.ai || '', aiA: AIA[s.ind][0], aiSrc: AIA[s.ind][1],
+      v, tbl,
+      metrics: I.metrics.map(([icon, label, value, range, src, bg]) => ({ icon, label, value, range, src, bg, def: `${label} · ${range} · ${src}`, size: value.length > 8 ? '20px' : '30px' })),
+      ov: { upTitle: I.upTitle, aiPrompt: I.aiPrompt, upcoming: I.upcoming.map(([time, a, b, tag, tagBg], i) => ({ time, a, b, tag, tagBg, bg: i % 2 ? '#fff' : '#FAFAF7' })), alerts: I.alerts.map(([icon, t, d, to, bg]) => ({ icon, t, d, bg, go: () => this.go(to) })) },
+      week, editScope: [['one', 'This occurrence', 'Sat 17 Oct only'], ['series', 'Whole series', 'Every Saturday from 17 Oct']].map(([k, label, d]) => ({ label, d, bg: s.classEdit === k ? '#F3F2EE' : '#fff', bd: s.classEdit === k ? '#141414' : '#E4E2DC', pick: () => this.setState({ classEdit: k }) })),
+      editImpact: s.classEdit === 'one' ? 'Changing this occurrence affects 16 booked customers. They’ll be emailed if they consented.' : 'Changing the series affects 9 future occurrences and 112 existing bookings. Each customer is emailed once.',
+      drClass: { cap: dr.cap || '', inst: dr.inst || '', att: [['AC', 'Ava Chen', 'Unlimited'], ['LO', 'Liam Ortiz', 'Pack · 3 left'], ['NH', 'Noor Haddad', 'Intro offer'], ['+13', '13 more', '']].map(([i, n, st]) => ({ i, n, s: st })) },
+      coverTag: { open: 'Open', accepted: 'Accepted · needs approval', done: 'Confirmed' }[cv], coverStaff, coverOpen: cv === 'open', coverAccepted: cv === 'accepted', coverDone: cv === 'done',
+      coverAccept: () => this.setState({ cover: 'accepted' }), coverApprove: () => this.setState({ cover: 'done' }), coverReset: () => this.setState({ cover: 'open' }),
+      regTabs: regStatuses.map(st => ({ label: st, n: s.regs.filter(r => r.status === st).length, bg: s.regFilter === st ? '#141414' : '#fff', fg: s.regFilter === st ? '#fff' : '#141414', pick: () => this.setState({ regFilter: st }) })), regs,
+      att: { list: attList, present: marked.filter(n => att[n] === 'P').length, absent: marked.filter(n => att[n] === 'A').length, unmarked: ROSTER.length - marked.length, notSubmitted: !s.attDone, submitted: s.attDone, cantSubmit: marked.length === 0 || s.attBusy, submitLabel: s.attBusy ? 'Saving…' : marked.length < ROSTER.length ? `Save · ${ROSTER.length - marked.length} not marked` : 'Save attendance' },
+      attSubmit: () => { this.setState({ attBusy: true }); this.later(() => this.setState({ attBusy: false, attDone: true }), 800); }, attReset: () => this.setState({ att: {}, attDone: false }),
+      cal, appt, corders, ord,
+      ordStart: () => this.setState(x => ({ ord: { ...x.ord, phase: 'pick' } })), ordCancel: () => this.setState(x => ({ ord: { ...x.ord, phase: 'idle' } })),
+      ordRefund: () => { this.setState(x => ({ ord: { ...x.ord, phase: 'pending' } })); this.later(() => this.setState(x => ({ ord: { ...x.ord, phase: 'idle', refunded: true } })), 1200); },
+      menuViews: [['hq', 'Master menu', 'building'], ['bl', 'Ballard', 'pin'], ['fr', 'Fremont', 'pin']].map(([k, label, icon]) => ({ label, icon, bg: s.menuView === k ? '#141414' : '#fff', fg: s.menuView === k ? '#fff' : '#141414', pick: () => this.setState({ menuView: k }) })), menuItems,
+      webFields, webToast: W.toast, webLog: W.log.slice(0, 6), webLoc: 'Toronto – Leslieville', webBrand: F.brand.v,
+      webPreview: { headline: (W.editing === 'headline' ? W.draft : F.headline.v), offer: (W.editing === 'offer' ? W.draft : F.offer.v), hours: (W.editing === 'hours' ? W.draft : F.hours.v), phone: (W.editing === 'phone' ? W.draft : F.phone.v) },
+      payTabs: [['tx', 'Transactions', 0], ['rec', 'Reconciliation', rec === 'open' || rec === 'confirm' ? 1 : 0], ['setup', 'Payment setup', 0]].map(([k, label, badge]) => ({ label, badge, bg: s.payTab === k ? '#141414' : '#fff', fg: s.payTab === k ? '#fff' : '#141414', pick: () => this.setState({ payTab: k }) })),
+      payTx: s.payTab === 'tx', payRec: s.payTab === 'rec', paySetup: s.payTab === 'setup',
+      txRows: [['pi_3QX…9Fk', '11:48', 'Pickup order', 'Seattle – Ballard', '$34.65 USD', 'Succeeded', P.ok, rec === 'refunded' ? 'Refunded' : 'No refund', rec === 'refunded' ? P.lilac : P.grey], ['pi_3QX…2Ab', '10:20', 'Intro offer', 'Toronto – Queen West', '$39.00 CAD', 'Succeeded', P.ok, 'No refund', P.grey], ['pi_3QX…7Cd', '09:05', 'Monthly membership', 'Vancouver – Kitsilano', '$149.00 CAD', 'Failed', P.blush, '—', P.grey], ['pi_3QX…4Ef', 'Yesterday', 'Order #5519', 'Portland store', '$89.00 USD', 'Succeeded', P.ok, 'Partial · complete', P.lilac], ['pi_3QX…8Gh', 'Yesterday', 'Deposit', 'Harbourfront', '$40.00 CAD', 'Processing', P.aqua, '—', P.grey]]
+        .map(([ref, when, what, loc, amt2, pay, pBg, ref2, rBg]) => ({ ref, when, what, loc, amt: amt2, pay, pBg, ref2, rBg })),
+      recRows: [['card', 'Paid without fulfilled record', 'pi_3QX…9Fk · $34.65 USD · Ballard', rec === 'recreated' || rec === 'refunded' ? 'Resolved' : 'Needs action', rec === 'recreated' || rec === 'refunded' ? P.ok : P.blush, true], ['receipt', 'Unpaid but confirmed record', 'Order #5517 · Portland', 'Reviewing', P.butter, false], ['alert', 'Amount mismatch', 'Booking QW-3391 · $39 vs $35', 'Resolved', P.ok, false]]
+        .map(([icon, type, d, st, stBg, sel]) => ({ icon, type, d, st, stBg, iconBg: sel ? P.blush : P.grey, bg: sel ? '#FAFAF7' : '#fff', bd: sel ? '#141414' : '#EEEDE8', pick: () => {} })),
+      rec: recD,
+      recRecreate: () => { this.setState({ rec: 'recreating' }); this.later(() => this.setState({ rec: 'recreated' }), 1200); }, recRefundAsk: () => this.setState({ rec: 'confirm' }), recCancel: () => this.setState({ rec: 'open' }),
+      recRefund: () => { this.setState({ rec: 'refunding' }); this.later(() => this.setState({ rec: 'refunded' }), 1200); }, recReset: () => this.setState({ rec: 'open' }),
+      payAccounts: LOCS[s.ind].map(l => ({ loc: l[0], st: l[4].startsWith('Franchise') ? 'Own account · enabled' : 'Shared account', bg: l[5] ? P.ok : P.butter, d: l[4].startsWith('Franchise') ? 'Independently owned: separate Stripe account, owner-authorised' : 'Company-owned: shared account with reporting allocation' })),
+      conns, reports,
+      locCards: LOCS[s.ind].map(([name, region, cur, tz, owner, ok, site, dot]) => ({ name, region, cur, tz, owner, dot, site, siteBg: site === 'Live' ? P.ok : P.grey, syncShort: ok ? 'Synced' : 'Attention', syncIcon: ok ? 'check' : 'alert', syncBg: ok ? P.lime : P.butter, bd: dr.title === name ? '#141414' : 'transparent',
+        open: () => this.setState({ drawer: { type: 'loc', title: name, cur, tz, owner } }) })),
+      locFields: [['Template', 'Studio standard v15', 'HQ', 'lock', P.grey], ['Timezone', dr.tz === 'ET' ? 'America/Toronto' : dr.tz === 'MT' ? 'America/Denver' : dr.tz === 'CT' ? 'America/Chicago' : 'America/Vancouver', 'Local', 'edit', P.lime], ['Currency', dr.cur || '', 'Local', 'edit', P.lime], ['Owner group', dr.owner || '', 'HQ', 'lock', P.grey], ['Opening hours', 'Mon–Fri 6:30–21:00', 'Local override', 'edit', P.lilac], ['Intro offer', 'New Year Intro', 'Approval required', 'shield', P.butter], ['Brand colours & logo', 'Locked', 'HQ', 'lock', P.grey]].map(([k, val, o2, icon, bg]) => ({ k, v: val, o: o2, icon, bg })),
+      drawerOpen: !!s.drawer && !s.aiOpen, closeDrawer: () => this.setState({ drawer: null }),
+      dr: { kicker: { class: 'Class detail', appt: 'Reschedule appointment', order: 'Order', loc: 'Location' }[dr.type] || '', title: dr.title || '', isClass: dr.type === 'class', isAppt: dr.type === 'appt', isOrder: dr.type === 'order', isLoc: dr.type === 'loc' },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

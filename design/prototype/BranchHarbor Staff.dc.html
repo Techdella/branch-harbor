@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./bh-shared.js"></script>
+<script src="./bh-data.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F3F2EE;color:#141414;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#141414}
+a:hover{color:#5E7D68}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid #5E7D68;outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="./bh-shell.js"></script>
+</helmet>
+<bh-topbar active="staff"></bh-topbar>
+<div style="max-width:1240px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px">
+  <header style="background:#fff;border-radius:28px;padding:14px 16px 14px 22px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+    <bh-logo size="34"></bh-logo>
+    <div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:800;letter-spacing:-.02em">Staff app</div><div style="font-size:12px;color:#5D5D58">What team members see on their phone</div></div>
+    <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#F3F2EE;flex-wrap:wrap">
+      <sc-for list="{{ indSwitch }}" as="i" hint-placeholder-count="6"><button onClick="{{ i.pick }}" style="display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:none;background:{{ i.bg }};font-size:12px;font-weight:700;cursor:pointer;color:#141414"><bh-icon name="{{ i.icon }}" size="14"></bh-icon>{{ i.name }}</button></sc-for>
+    </div>
+    <div style="display:flex;gap:6px"><a href="{{ links.hq }}" style="height:36px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;font-size:12px;font-weight:700;text-decoration:none">HQ</a><a href="{{ links.loc }}" style="height:36px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;font-size:12px;font-weight:700;text-decoration:none">Location</a><a href="{{ links.site }}" style="height:36px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1.5px solid #D8D6CF;font-size:12px;font-weight:700;text-decoration:none">Customer</a></div>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;justify-content:center">
+    <div style="width:390px;max-width:100%;height:820px;background:#161616;border-radius:52px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.22);flex-shrink:0">
+      <div style="height:100%;background:#F3F2EE;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;position:relative">
+        <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700;flex-shrink:0;background:#fff"><span>9:41</span><span style="width:100px;height:28px;border-radius:14px;background:#000"></span><span style="font-size:11px">●●● ▮</span></div>
+        <div style="background:#fff;padding:6px 20px 14px;display:flex;align-items:center;gap:12px">
+          <img src="{{ me.img }}" alt="" style="width:44px;height:44px;border-radius:22px;object-fit:cover">
+          <div style="flex:1;min-width:0"><div style="font-size:17px;font-weight:800;letter-spacing:-.01em">{{ me.name }}</div><div style="font-size:12px;color:#5D5D58">{{ me.role }} · {{ ind.brand }} {{ loc.name }}</div></div>
+          <span style="width:38px;height:38px;border-radius:19px;background:#F3F2EE;display:flex;align-items:center;justify-content:center;position:relative"><bh-icon name="bell" size="17"></bh-icon><span style="position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:4px;background:#C2502C"></span></span>
+        </div>
+        <div style="flex:1;overflow:auto;padding:14px 16px 90px;display:flex;flex-direction:column;gap:12px">
+          <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div role="status" style="background:#D6F26B;border-radius:16px;padding:10px 14px;font-size:13px;font-weight:700">{{ toast }}</div></sc-if>
+
+          <sc-if value="{{ t.today }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#141414;color:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:12px;font-weight:700;color:#D6F26B">YOUR SHIFT</div>
+              <div style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ shift.time }}</div>
+              <div style="font-size:13px;color:#C9C9C3">{{ shift.where }}</div>
+              <button onClick="{{ clockIn }}" style="align-self:flex-start;margin-top:4px;height:44px;padding:0 20px;border-radius:999px;background:{{ clock.bg }};color:#141414;border:none;font-size:14px;font-weight:800;cursor:pointer">{{ clock.label }}</button>
+            </div>
+            <div style="font-size:15px;font-weight:700;padding:4px 4px 0">Up next</div>
+            <sc-for list="{{ next }}" as="n" hint-placeholder-count="3"><div style="background:#fff;border-radius:20px;padding:12px 14px;display:flex;align-items:center;gap:12px"><span style="width:56px;font-size:14px;font-weight:800">{{ n.time }}</span><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ n.t }}</span><span style="font-size:12px;color:#5D5D58">{{ n.sub }}</span></span></div></sc-for>
+            <div style="background:{{ ind.pastel }};border-radius:20px;padding:14px;display:flex;gap:10px;align-items:flex-start"><bh-icon name="megaphone" size="17"></bh-icon><span style="font-size:13px;line-height:1.5"><strong>From HQ:</strong> Brand standards v4.0 is live. Your manager will walk through the changes at Thursday's team huddle.</span></div>
+          </sc-if>
+
+          <sc-if value="{{ t.work }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:0 4px"><div><div style="font-size:12px;color:#5D5D58;font-weight:600">{{ work.kicker }}</div><div style="font-size:20px;font-weight:700;letter-spacing:-.02em">{{ work.title }}</div></div><span style="font-size:13px;font-weight:800">{{ work.count }}</span></div>
+            <sc-if value="{{ work.hasHero }}" hint-placeholder-val="{{ false }}"><div style="position:relative;height:120px;border-radius:20px;overflow:hidden"><img src="{{ work.hero }}" alt="" style="width:100%;height:100%;object-fit:cover"></div></sc-if>
+            <sc-for list="{{ work.items }}" as="w" hint-placeholder-count="5">
+              <button onClick="{{ w.toggle }}" style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:12px 14px;border:2px solid {{ w.bd }};cursor:pointer;text-align:left;color:#141414">
+                <sc-if value="{{ w.img }}" hint-placeholder-val="{{ false }}"><img src="{{ w.img }}" alt="" style="width:42px;height:42px;border-radius:21px;object-fit:cover;flex-shrink:0"></sc-if>
+                <sc-if value="{{ w.noImg }}" hint-placeholder-val="{{ true }}"><span style="width:42px;height:42px;border-radius:21px;background:{{ ind.pastel }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">{{ w.init }}</span></sc-if>
+                <span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:700">{{ w.t }}</span><span style="font-size:12px;color:#5D5D58">{{ w.sub }}</span></span>
+                <span style="height:32px;display:flex;align-items:center;gap:5px;padding:0 12px;border-radius:999px;background:{{ w.stBg }};font-size:11px;font-weight:800;flex-shrink:0"><bh-icon name="{{ w.icon }}" size="12"></bh-icon>{{ w.st }}</span>
+              </button>
+            </sc-for>
+            <button onClick="{{ workPrimary }}" disabled="{{ work.primaryDisabled }}" style="height:54px;border-radius:999px;background:#141414;color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer">{{ work.primary }}</button>
+            <sc-if value="{{ work.secondary }}" hint-placeholder-val="{{ false }}"><button onClick="{{ workSecondary }}" style="height:48px;border-radius:999px;border:1.5px solid #141414;background:transparent;color:#141414;font-size:14px;font-weight:700;cursor:pointer">{{ work.secondary }}</button></sc-if>
+            <div style="font-size:11px;color:#5D5D58;text-align:center;line-height:1.5;padding:0 8px">{{ work.privacy }}</div>
+          </sc-if>
+
+          <sc-if value="{{ t.msgs }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="4"><div style="background:#fff;border-radius:20px;padding:12px 14px;display:flex;gap:12px"><img src="{{ m.img }}" alt="" style="width:38px;height:38px;border-radius:19px;object-fit:cover;flex-shrink:0"><span style="flex:1;min-width:0"><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><strong style="font-size:13px">{{ m.who }}</strong><span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:{{ m.bg }}">{{ m.tag }}</span><span style="font-size:11px;color:#5D5D58">{{ m.at }}</span></span><span style="display:block;font-size:13px;line-height:1.5;margin-top:3px">{{ m.t }}</span></span></div></sc-for>
+          </sc-if>
+
+          <sc-if value="{{ t.me }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:15px;font-weight:700">My availability</div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"><sc-for list="{{ avail }}" as="a" hint-placeholder-count="7"><button onClick="{{ a.toggle }}" style="height:56px;border-radius:14px;border:none;background:{{ a.bg }};color:{{ a.fg }};font-size:11px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">{{ a.d }}<span style="font-size:9px;font-weight:600">{{ a.s }}</span></button></sc-for></div>
+            </div>
+            <div style="background:#fff;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:15px;font-weight:700">What I can access</div>
+              <sc-for list="{{ access }}" as="a" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:{{ a.fg }}"><bh-icon name="{{ a.icon }}" size="15"></bh-icon></span>{{ a.t }}</div></sc-for>
+            </div>
+            <div style="background:#fff;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:15px;font-weight:700">Training</div>
+              <sc-for list="{{ training }}" as="tr" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:center;font-size:13px;padding:8px 10px;border-radius:12px;background:#F8F7F3"><bh-icon name="{{ tr.icon }}" size="15"></bh-icon><span style="flex:1;font-weight:600">{{ tr.t }}</span><span style="font-size:11px;color:#5D5D58">{{ tr.s }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <nav style="position:absolute;left:12px;right:12px;bottom:14px;height:66px;background:#141414;border-radius:33px;display:flex;align-items:center;justify-content:space-around;padding:0 8px">
+          <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="4"><button onClick="{{ tb.pick }}" aria-label="{{ tb.label }}" style="height:50px;min-width:50px;padding:0 14px;border-radius:25px;border:none;background:{{ tb.bg }};color:{{ tb.fg }};display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;cursor:pointer"><bh-icon name="{{ tb.icon }}" size="19"></bh-icon><sc-if value="{{ tb.on }}" hint-placeholder-val="{{ false }}">{{ tb.label }}</sc-if></button></sc-for>
+        </nav>
+      </div>
+    </div>
+
+    <div style="flex:1 1 380px;max-width:560px;display:flex;flex-direction:column;gap:12px">
+      <div style="background:#fff;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:12px">
+        <span style="align-self:flex-start;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:{{ ind.pastel }};font-size:12px;font-weight:800"><bh-icon name="{{ ind.icon }}" size="14"></bh-icon>{{ ind.name }} · {{ me.role }}</span>
+        <h1 style="margin:0;font-size:34px;line-height:1.08;font-weight:700;letter-spacing:-.035em">{{ side.title }}</h1>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#3E3E3A">{{ side.text }}</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:#E2F5A6;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:800;display:flex;gap:6px;align-items:center"><bh-icon name="eye" size="14"></bh-icon>Can see</div><sc-for list="{{ side.can }}" as="c" hint-placeholder-count="3"><div style="font-size:13px;line-height:1.5">{{ c }}</div></sc-for></div>
+        <div style="background:#F3F2EE;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:800;display:flex;gap:6px;align-items:center"><bh-icon name="lock" size="14"></bh-icon>Can't see</div><sc-for list="{{ side.cant }}" as="c" hint-placeholder-count="3"><div style="font-size:13px;line-height:1.5">{{ c }}</div></sc-for></div>
+      </div>
+      <div style="position:relative;border-radius:28px;overflow:hidden;height:220px"><img src="{{ side.img }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const WORK = {
+  studios: { tab: ['Roster', 'users'], kicker: '7:00 am · Studio A', title: 'Morning Vinyasa', hero: 'yogaStudio', states: ['Booked', 'Checked in'], icons: ['clock', 'check'], primary: 'Start class', done: 'Class started · late arrivals can still be checked in', secondary: 'Request cover for Sat', secDone: 'Cover requested · 3 eligible instructors notified',
+    items: [['Hana Suzuki', '10-class pack · 3 left', 'pW4'], ['Leo Martins', 'Unlimited monthly', 'pM2'], ['Priya Nair', 'First class · intro week', 'pW5'], ['Chris Wong', 'Drop-in · paid online', 'pM4'], ['Grace Liu', 'Waitlist → booked 6:42 am', 'pW2']], privacy: 'Members\u2019 contact details are hidden. Notes are visible to managers only.',
+    can: ['Today\u2019s classes and rosters', 'Check-in and waitlist', 'Live online class controls'], cant: ['Payments and refunds', 'Members at other studios', 'Marketing lists'], title: 'Check in a class and teach online', text: 'Instructors see their own classes, check people in with one tap and start live online classes. Cover requests go to eligible instructors and the manager approves.' },
+  sports: { tab: ['Attendance', 'check-circle'], kicker: '4:30 pm · Field 1', title: 'U12 Development · Session 6', hero: 'sportCoach', states: ['Not marked', 'Present'], icons: ['minus', 'check'], primary: 'Save attendance', done: 'Attendance saved · guardians of absent players notified', secondary: 'Message this group', secDone: 'Message sent to 17 guardians in U12 only',
+    items: [['Ella B.', 'Guardian: Sam B.', ''], ['Noah S.', 'Guardian: Ravi S. · inhaler on file', ''], ['Mia C.', 'Guardian: Lin C.', ''], ['Leo P.', 'Guardian: June P.', ''], ['Ava R.', 'Guardian: Tom R.', '']], privacy: 'Coaches see only their assigned groups. Medical flags show as a note, never full details.',
+    can: ['Assigned groups and rosters', 'Attendance and session notes', 'Messages to their groups'], cant: ['Other teams and venues', 'Fees and balances', 'Guardian contact details'], title: 'Take attendance in seconds', text: 'Coaches open the session, tap who\u2019s there and save. Guardians of absent players can be notified, and messages go only to that group.' },
+  health: { tab: ['Appointments', 'calendar'], kicker: 'Today · Room 2', title: 'Dr. Arjun Mehta', hero: 'hcConsult', states: ['Booked', 'Checked in'], icons: ['clock', 'check'], primary: 'Start next appointment', done: 'Appointment started · clinical notes open in your clinic system', secondary: 'Mark myself unavailable 3–5 pm', secDone: 'Front desk notified · 2 appointments to rebook',
+    items: [['9:00 · J.R.', 'Physiotherapy assessment · 45 min', ''], ['10:00 · M.K.', 'Follow-up · 30 min', ''], ['11:00 · A.L.', 'Physiotherapy assessment · 45 min', ''], ['1:30 · S.P.', 'Follow-up · 30 min', '']], privacy: 'Initials only on mobile. Clinical records stay in your clinic or pharmacy system of record.',
+    can: ['Own appointments and rooms', 'Check-in status', 'Availability'], cant: ['Clinical notes in BranchHarbor', 'Other practitioners\u2019 clients', 'Payments'], title: 'Run the day without exposing records', text: 'Practitioners and pharmacists see their schedule with initials only. Clinical notes stay in the clinic or pharmacy system; BranchHarbor handles the booking side.' },
+  commerce: { tab: ['Picking', 'box'], kicker: 'Order #10482 · pickup', title: 'Mara J. · 2 items', hero: 'shopRacks', states: ['To pick', 'Picked'], icons: ['box', 'check'], primary: 'Ready for pickup', done: 'Order ready · customer emailed · WooCommerce updated', secondary: 'Adjust stock', secDone: 'Stock adjusted −1 Sunglasses · reason: damaged',
+    items: [['Waxed canvas backpack', 'Olive · aisle 3, shelf B', 'shopP3'], ['Leather watch', 'Tan strap · counter case', 'shopP1'], ['Gift wrap', 'Requested at checkout', '']], privacy: 'Associates see order items and pickup name only. Payment details stay in WooCommerce.',
+    can: ['Orders for this store', 'Stock and adjustments with reasons', 'Pickup handover'], cant: ['Refunds over $50', 'Other stores\u2019 orders', 'Customer payment details'], title: 'Pick, pack and hand over', text: 'Store associates pick WooCommerce orders, mark them ready and record stock changes with a reason. Status syncs back to WooCommerce.' },
+  foods: { tab: ['Orders', 'chef'], kicker: 'Kitchen · pickup', title: 'Open orders', hero: 'foodCook', states: ['New', 'Ready'], icons: ['clock', 'check'], primary: 'Open kitchen screen', done: 'Kitchen screen opened on the pass display', secondary: 'Mark Cornbread sold out', secDone: 'Cornbread sold out · menu updated at Ballard only',
+    items: [['#1046 · 12:10', 'Ember chicken bowl ×2 · allergy: sesame', ''], ['#1045 · 12:05', 'Brisket sandwich · gluten-free bun', ''], ['#1044 · 12:00', 'Margherita · no basil', '']], privacy: 'First names only on kitchen screens. No phone numbers or payment details.',
+    can: ['Orders and modifiers', 'Sold-out toggles', 'Kitchen screen'], cant: ['Prices and menu content', 'Refunds', 'Customer contact details'], title: 'Orders, straight to the pass', text: 'Kitchen staff see orders with modifiers and allergy notes, mark items sold out for their location only, and open the full kitchen screen.' },
+  realty: { tab: ['Leads & viewings', 'key'], kicker: 'Saturday', title: 'Viewings and new leads', hero: 'reLiving', states: ['New', 'Contacted'], icons: ['clock', 'check'], primary: 'Start open house check-in', done: 'Open house check-in started at 42 Birchmount Cres', secondary: 'Log a call', secDone: 'Call logged with Aaron Patel',
+    items: [['Aaron Patel', 'Buyer · 3 bed under $1.2M · Meta lead', 'pM3'], ['Lena Fischer', 'Seller · valuation request', 'pW3'], ['11:00 · 42 Birchmount', 'Open house · 14 RSVPs', 'reHouse'], ['2:30 · 88 Harbour St', 'Private viewing · Haddad family', 'reApt']], privacy: 'Agents see leads assigned to them and the office pool. Seller details are limited to the listing agent.',
+    can: ['Assigned leads and office pool', 'Viewing calendar', 'Open house check-in'], cant: ['Other agents\u2019 clients', 'Commission and payouts', 'Brokerage settings'], title: 'Leads and viewings in your pocket', text: 'Agents pick up new leads, log calls, run open-house check-in and see their viewing calendar. Leads from Meta and the website arrive here with their source.' },
+};
+
+class Component extends DCLogic {
+  state = { ind: 'studios', loc: null, tab: 'work', done: {}, primaryDone: false, secDone: false, clocked: false, avail: { 0: 1, 1: 1, 2: 0, 3: 1, 4: 1, 5: 1, 6: 0 }, toast: '' };
+  componentDidMount() { if (!window.BH_DATA) this.poll = setInterval(() => { if (window.BH_DATA) { clearInterval(this.poll); this.forceUpdate(); } }, 50); try { const h = new URLSearchParams(location.hash.slice(1)); const p = {}; if (h.get('ind')) p.ind = h.get('ind'); if (h.get('loc')) p.loc = h.get('loc'); this.setState(p); } catch (e) {} }
+  componentWillUnmount() { clearInterval(this.poll); clearTimeout(this.tt); }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 3000); }
+  renderVals() {
+    const D = window.BH_DATA; if (!D) return {};
+    const s = this.state, I = D.IND[s.ind] || D.IND.studios, IMG = window.BH_IMG || {}, P = D.P, W = WORK[s.ind];
+    const L = I.locs.find(l => l.id === s.loc) || I.locs[0];
+    const doneN = W.items.filter((_, i) => s.done[`${s.ind}${i}`]).length;
+    return {
+      ind: I, loc: L, toast: s.toast, me: { name: I.staffName, role: I.staffRole, img: IMG[I.staffImg] },
+      links: { hq: `BranchHarbor HQ.dc.html#ind=${s.ind}`, loc: `BranchHarbor Location.dc.html#ind=${s.ind}&loc=${L.id}`, site: `BranchHarbor Location Sites.dc.html#ind=${s.ind}&loc=${L.id}` },
+      indSwitch: Object.values(D.IND).map(x => ({ name: x.name, icon: x.icon, bg: x.key === s.ind ? x.pastel : 'transparent', pick: () => this.setState({ ind: x.key, loc: null, done: {}, primaryDone: false, secDone: false }) })),
+      t: { today: s.tab === 'today', work: s.tab === 'work', msgs: s.tab === 'msgs', me: s.tab === 'me' },
+      tabs: [['today', 'Today', 'home'], ['work', W.tab[0], W.tab[1]], ['msgs', 'Messages', 'message'], ['me', 'Me', 'user']].map(([k, label, icon]) => ({ label, icon, on: s.tab === k, bg: s.tab === k ? '#D6F26B' : 'transparent', fg: s.tab === k ? '#141414' : '#fff', pick: () => this.setState({ tab: k }) })),
+      shift: { time: s.ind === 'foods' ? '10:30 am – 6:30 pm' : s.ind === 'sports' ? '3:30 pm – 8:00 pm' : '6:30 am – 2:00 pm', where: `${I.brand} ${L.name} · ${L.addr}` },
+      clock: s.clocked ? { label: 'Clocked in 6:28 am', bg: '#fff' } : { label: 'Clock in', bg: '#D6F26B' }, clockIn: () => this.setState({ clocked: true }),
+      next: W.items.slice(0, 3).map((it, i) => ({ time: ['7:00', '9:00', '12:15'][i], t: i === 0 ? W.title : it[0], sub: it[1] })),
+      work: { kicker: W.kicker, title: W.title, count: `${doneN}/${W.items.length}`, hasHero: !!W.hero, hero: IMG[W.hero], privacy: W.privacy,
+        primary: s.primaryDone ? 'Done' : W.primary, primaryDisabled: s.primaryDone, secondary: s.secDone ? '' : W.secondary,
+        items: W.items.map(([t, sub, img], i) => { const on = !!s.done[`${s.ind}${i}`]; return { t, sub, img: IMG[img] || '', noImg: !IMG[img], init: t.replace(/[^A-Z]/g, '').slice(0, 2) || t.slice(0, 2), st: W.states[on ? 1 : 0], icon: W.icons[on ? 1 : 0], stBg: on ? '#D6F26B' : '#F3F2EE', bd: on ? '#141414' : 'transparent', toggle: () => this.setState(x => ({ done: { ...x.done, [`${s.ind}${i}`]: !on } })) }; }) },
+      workPrimary: () => { this.setState({ primaryDone: true }); this.toast(W.done); }, workSecondary: () => { this.setState({ secDone: true }); this.toast(W.secDone); },
+      msgs: [['Jamie Morgan', 'pW1', 'HQ', 'Mon', 'Brand standards v4.0 is live. Thanks for everything you do.', '#D6F26B'], [L.owner, 'pW2', 'Owner', 'Tue', 'Team huddle Thursday 8:30 am. Coffee\u2019s on me.', P.butter], ['Team', 'pM2', 'Team chat', '10:02', 'Can someone swap Sunday afternoon? I\u2019ll take Wednesday.', '#F3F2EE'], ['BranchHarbor', 'pM1', 'System', '9:15', 'Your schedule for next week is published.', P.aqua]].map(([who, img, tag, at, t, bg]) => ({ who, img: IMG[img], tag, at, t, bg })),
+      avail: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => { const on = !!s.avail[i]; return { d, s: on ? 'Free' : 'Off', bg: on ? '#141414' : '#F3F2EE', fg: on ? '#fff' : '#5D5D58', toggle: () => this.setState(x => ({ avail: { ...x.avail, [i]: on ? 0 : 1 } })) }; }),
+      access: [...W.can.map(t => ({ t, icon: 'check-circle', fg: '#2F6B3A' })), ...W.cant.map(t => ({ t, icon: 'lock', fg: '#5D5D58' }))],
+      training: [['Brand standards v4.0', 'Due 31 Oct', 'palette'], ['Customer privacy basics', 'Completed', 'shield'], [`${I.name} service standards`, 'Completed', 'book']].map(([t, s2, icon]) => ({ t, s: s2, icon })),
+      side: { title: W.title, text: W.text, can: W.can, cant: W.cant, img: IMG[I.imgs[1]] },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

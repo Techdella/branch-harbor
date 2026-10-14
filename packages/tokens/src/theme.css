@@ -1,0 +1,101 @@
+/*
+ * BranchHarbor theme for Tailwind CSS v4. Import after `@import "tailwindcss";`
+ * Mirrors packages/tokens/src/index.ts — keep in sync.
+ */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-ink: #141414;
+  --color-ink-2: #2a2a2a;
+  --color-graphite: #3e3e3a;
+  --color-stone: #5d5d58;
+  --color-mute: #9c9c96;
+  --color-line: #d8d6cf;
+  --color-line-soft: #e4e2dc;
+  --color-canvas: #f3f2ee;
+  --color-canvas-raised: #f8f7f3;
+  --color-surface: #ffffff;
+  --color-lime: #d6f26b;
+  --color-lime-soft: #e2f5a6;
+  --color-sage: #5e7d68;
+  --color-sage-deep: #2f6b3a;
+  --color-focus: #2867aa;
+
+  --color-lilac: #e9ddf8;
+  --color-butter: #f7eda8;
+  --color-blush: #f8d6d8;
+  --color-aqua: #cdeeee;
+  --color-mint: #d4e6d9;
+  --color-sand: #efe3d3;
+
+  --color-success-bg: #f1f8e0;
+  --color-success: #2f6b3a;
+  --color-warning-bg: #fff3c9;
+  --color-warning: #5a4300;
+  --color-danger-bg: #fbe4e1;
+  --color-danger: #9e1b12;
+  --color-info-bg: #e6f0f8;
+  --color-info: #1f4e80;
+
+  --color-studios: #7460a8;
+  --color-sports: #2867aa;
+  --color-wellness: #56836c;
+  --color-commerce: #a66c26;
+  --color-foods: #b9543d;
+  --color-realty: #2c7a7b;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-card: 20px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+
+  --shadow-card: 0 1px 2px rgba(20, 20, 20, 0.04), 0 4px 16px rgba(20, 20, 20, 0.04);
+  --shadow-pop: 0 8px 32px rgba(20, 20, 20, 0.12);
+
+  --text-display: 72px;
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.05em;
+  --text-h1: 40px;
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.035em;
+  --text-h2: 26px;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h3: 20px;
+  --text-h3--line-height: 1.25;
+  --text-label: 12px;
+  --text-label--letter-spacing: 0.08em;
+
+  --ease-bh: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
