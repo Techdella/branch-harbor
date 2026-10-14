@@ -1,0 +1,1342 @@
+{
+  "common": {
+    "sample": "sample",
+    "later": "Later",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "continue": "Continue",
+    "retry": "Retry",
+    "edit": "Edit",
+    "reset": "Reset",
+    "approve": "Approve",
+    "reject": "Reject",
+    "confirm": "Confirm",
+    "restart": "Restart demo",
+    "optional": "Optional",
+    "required": "Required",
+    "records": "{count, plural, one {# record} other {# records}}",
+    "all": "All",
+    "location": "Location",
+    "status": "Status",
+    "openFullPage": "Open full page",
+    "learnMore": "Learn more",
+    "copy": "Copy",
+    "copied": "Copied",
+    "notifyMe": "Tell me when it's available",
+    "notifyThanks": "Thanks — we'll let you know when it's available.",
+    "comment": "Comment (optional)",
+    "noneConfigured": "None configured"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "overview": "Overview",
+    "locations": "Locations",
+    "customers": "Customers",
+    "websites": "Websites",
+    "marketing": "Marketing",
+    "payments": "Payments",
+    "team": "Team",
+    "community": "Community & resources",
+    "reports": "Reports",
+    "connections": "Connections",
+    "settings": "Settings",
+    "shared": "Shared",
+    "setup": "Setup checklist",
+    "restricted": "(not available for your role)",
+    "badge": "{count} need attention"
+  },
+  "industries": {
+    "studios": {
+      "name": "Studios",
+      "customers": "Members"
+    },
+    "sports": {
+      "name": "Sports",
+      "customers": "Participants"
+    },
+    "wellness": {
+      "name": "Wellness",
+      "customers": "Clients"
+    },
+    "commerce": {
+      "name": "Commerce",
+      "customers": "Customers"
+    },
+    "foods": {
+      "name": "Foods",
+      "customers": "Guests"
+    }
+  },
+  "shell": {
+    "skip": "Skip to content",
+    "navigation": "Navigation",
+    "openNav": "Open navigation",
+    "closeNav": "Close navigation",
+    "collapseNav": "Collapse",
+    "expandNav": "Expand navigation",
+    "industrySwitcher": "Industry (prototype switcher)",
+    "scope": "Scope",
+    "allLocations": "All authorised locations ({count})",
+    "scopeKind": {
+      "all": "All",
+      "region": "Region",
+      "owner_group": "Owner group",
+      "location": "Location"
+    },
+    "search": "Search",
+    "searchPlaceholder": "Search records you can access",
+    "searchEmpty": "No matching records you can access.",
+    "searchScoped": "Results respect your permissions and are grouped by record type.",
+    "notifications": "Notifications",
+    "notificationsCount": "Notifications ({count})",
+    "notificationsEmpty": "You're all caught up.",
+    "notificationKind": {
+      "action": "Action required",
+      "integration": "Integration failure",
+      "info": "Information"
+    },
+    "viewingAs": "Viewing as",
+    "roles": {
+      "hq": "HQ admin",
+      "local": "Location manager",
+      "staff": "Staff"
+    },
+    "profile": "Profile",
+    "profileOf": "Account menu for {name}",
+    "language": "Language",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "sample": "Sample data",
+    "sampleHint": "Showing built-in sample data (NEXT_PUBLIC_USE_MOCKS).",
+    "fallback": "Offline · sample data",
+    "fallbackTitle": "Couldn't reach the BranchHarbor service",
+    "fallbackHint": "You're seeing sample data until the connection returns. Changes here are not saved to your account."
+  },
+  "states": {
+    "loading": "Loading…",
+    "errorTitle": "This couldn't load",
+    "errorBody": "Something went wrong on our side. Your data is safe — try again.",
+    "errorCode": "Error code: {code}",
+    "retry": "Try again",
+    "deniedTitle": "You don't have access to this",
+    "deniedBody": "Your role doesn't include this area. Ask an organisation owner if you need it.",
+    "deniedPermission": "Needs: {permission}",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "This page doesn't exist or you don't have access to it.",
+    "backToOverview": "Back to overview",
+    "emptyTitle": "Nothing here yet",
+    "emptyFiltered": "No records match this filter in the current scope."
+  },
+  "overview": {
+    "title": "Overview",
+    "metrics": "Key metrics",
+    "notConnected": "Not connected",
+    "unavailable": "Unavailable",
+    "ratio": "{value} of {of}",
+    "definitionOf": "Definition of {label}",
+    "source": "Source: {source}",
+    "localTimes": "Each location's local time",
+    "nothingUpcoming": "Nothing scheduled in this scope today.",
+    "needsAttention": "Needs attention",
+    "allClear": "Nothing needs attention in this scope.",
+    "kind": {
+      "action": "Action required",
+      "integration": "Integration",
+      "info": "Information"
+    },
+    "aiNote": "Drafts only · uses data in {scope}",
+    "ask": "Ask"
+  },
+  "ai": {
+    "button": "AI",
+    "title": "BranchHarbor AI",
+    "close": "Close AI panel",
+    "scope": "Scope:",
+    "activeScope": "Active scope: {scope}",
+    "draftsOnly": "Drafts only",
+    "usage": "{used} of {limit} requests this month",
+    "statusOk": "Available",
+    "statusDown": "Unavailable",
+    "intro": "I can draft and summarise using data you're allowed to see. Publishing, sending or price changes need your approval.",
+    "assumptions": "Assumptions:",
+    "sources": "Sources",
+    "thinking": "Gathering authorised data…",
+    "askLabel": "Ask BranchHarbor AI",
+    "askPlaceholder": "Ask about this scope…",
+    "send": "Send",
+    "proposedAction": "Proposed action · needs approval",
+    "affected": "Affected ({count})",
+    "excluded": "Excluded",
+    "preview": "Preview affected records",
+    "approveDraft": "Approve · save as draft",
+    "approveSend": "Approve and send",
+    "discard": "Discard",
+    "discarded": "Discarded. Nothing was changed.",
+    "running": "Running through validated tools…",
+    "resultDraftSaved": "draft saved",
+    "doneNothingSent": "Done. Drafts saved per record; nothing was published or sent. See Activity for the audit trail.",
+    "needsPermission": "You can preview this, but approving needs {permission}. It will be sent to someone who has it."
+  },
+  "ops": {
+    "notInIndustry": "This screen belongs to another industry",
+    "notInIndustryBody": "Switch industry in the navigation, or go back to the overview.",
+    "laterTitle": "{name} isn't in the first release",
+    "laterBadge": "Planned · not available yet",
+    "studios": {
+      "classes": {
+        "title": "Classes",
+        "description": "Week and list views per location, in that location's time zone."
+      },
+      "cover": {
+        "title": "Instructor cover",
+        "description": "Requests, eligible instructors, acceptance and manager approval."
+      },
+      "offers": {
+        "title": "Offers"
+      },
+      "online": {
+        "title": "Online classes",
+        "later": "Registration, access and content library permissions arrive after native bookings. Your connected booking provider stays authoritative for now."
+      }
+    },
+    "sports": {
+      "programmes": {
+        "title": "Programmes"
+      },
+      "registrations": {
+        "title": "Registrations",
+        "description": "Review submissions, assign groups and accept. Payment never means selection."
+      },
+      "teams": {
+        "title": "Teams & groups"
+      },
+      "schedule": {
+        "title": "Schedule"
+      },
+      "attendance": {
+        "title": "Attendance",
+        "description": "Fast check-in for the session you're assigned to."
+      },
+      "guardian": {
+        "title": "Guardian portal",
+        "later": "Guardians can already register and receive group messages. The expanded portal with balances and schedules comes later."
+      }
+    },
+    "wellness": {
+      "calendar": {
+        "title": "Calendar",
+        "description": "Practitioner and room views. Rescheduling secures the new slot before releasing the old one."
+      },
+      "services": {
+        "title": "Services"
+      },
+      "practitioners": {
+        "title": "Practitioners"
+      },
+      "packages": {
+        "title": "Packages",
+        "later": "Packages with included sessions, balances and expiry arrive in a later release."
+      },
+      "forms": {
+        "title": "Forms"
+      }
+    },
+    "commerce": {
+      "catalogue": {
+        "title": "Catalogue"
+      },
+      "assortment": {
+        "title": "Local assortment"
+      },
+      "orders": {
+        "title": "Orders",
+        "description": "Payment, fulfilment and refund states, with the sync timeline from the authoritative store."
+      },
+      "inventory": {
+        "title": "Inventory"
+      },
+      "returns": {
+        "title": "Returns",
+        "later": "Return requests and authorisation arrive in a later release. Refunds on orders are available now."
+      }
+    },
+    "foods": {
+      "menu": {
+        "title": "Menus",
+        "description": "Master menu from headquarters and each location's permitted changes."
+      },
+      "orders": {
+        "title": "Orders",
+        "description": "Accept, prepare and hand over pickup orders. Status changes wait for the server to confirm."
+      },
+      "kitchen": {
+        "title": "Kitchen view",
+        "description": "Large cards, sorted by promised time. No unnecessary customer details."
+      },
+      "pickup": {
+        "title": "Pickup settings"
+      },
+      "catering": {
+        "title": "Preorders & catering",
+        "later": "Preorders with cooking dates, catering quotes and production summaries arrive after pickup ordering."
+      }
+    },
+    "switchTo": "Switch to {industry}",
+    "backToOverview": "Back to overview"
+  },
+  "later": {
+    "community": {
+      "title": "Community & resources",
+      "body": "Announcements, shared documents and support discussions between headquarters and locations arrive in a later release. For now, policies and brand documents live with headquarters."
+    }
+  },
+  "table": {
+    "source": "Source: {source}",
+    "count": "{count, plural, one {# record} other {# records}} · {scope}",
+    "filters": "Filters",
+    "emptyTitle": "No records in this scope",
+    "emptyBody": "Try another filter or widen the scope selector.",
+    "unavailable": "Unavailable",
+    "planned": "Creating records here is planned. Use the connected system for now.",
+    "searchTable": "Search this list",
+    "dismiss": "Dismiss"
+  },
+  "customers": {
+    "description": "Records at the locations you're assigned to. Consent is shown per channel.",
+    "denied": "Customer details aren't included in your role. Headquarters doesn't see customer records automatically just because it can see network reports."
+  },
+  "marketing": {
+    "description": "Campaigns, forms and lead routing. AI drafts stay drafts until an authorised person approves them."
+  },
+  "studios": {
+    "newClass": "New class",
+    "newClassPlanned": "Creating class types here is planned. Your connected booking provider stays authoritative for now.",
+    "location": "Location",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "timesIn": "Times in {zone}",
+    "week": "Week",
+    "list": "List",
+    "today": "today",
+    "staleTitle": "Booking sync degraded at this location",
+    "staleBody": "Bookings shown may be up to 2 hours old. Last successful sync 2 h ago.",
+    "emptyTitle": "No classes this week",
+    "emptyBody": "Nothing is scheduled at this location for the selected week.",
+    "booked": "{booked}/{capacity}",
+    "coverRequested": "Cover requested",
+    "fullWaitlistShort": "Full · {count} waitlisted",
+    "spots": "{count, plural, one {# spot} other {# spots}}",
+    "classDetail": "Class detail",
+    "saveEdit": "Save change",
+    "viewCover": "View cover request",
+    "capacity": "Capacity",
+    "waitlist": "Waitlist",
+    "instructor": "Instructor",
+    "room": "Room",
+    "bookingSource": "Booking source",
+    "timeZone": "Time zone",
+    "fullWaitlist": "This class is full. Customers are offered the waitlist instead of a booking.",
+    "attendees": "Attendees",
+    "more": "{count, plural, =0 {} one {+ # more} other {+ # more}}",
+    "editTime": "Edit time",
+    "editScope": {
+      "one": "This occurrence",
+      "series": "Whole series",
+      "seriesDetail": "Every {day} from this date"
+    },
+    "impactOne": "Changing this occurrence affects {count} booked customers. They're emailed only if they consented.",
+    "impactSeries": "Changing the series affects {occurrences} future occurrences and {bookings} existing bookings. Each customer is emailed once."
+  },
+  "cover": {
+    "class": "Class",
+    "requestedBy": "Requested by",
+    "status": "Status",
+    "state": {
+      "open": "Open",
+      "accepted": "Accepted · needs approval",
+      "confirmed": "Confirmed"
+    },
+    "booked": "{count} booked customers",
+    "eligible": "Eligible instructors",
+    "candidate": {
+      "notified": "Notified",
+      "accepted": "Accepted",
+      "assigned": "Assigned",
+      "unavailable": "Unavailable"
+    },
+    "recordAcceptance": "Simulate: accepts",
+    "simulateHint": "In the product, instructors accept from their phone. Use “Simulate” to play their part.",
+    "approve": "Approve · updates schedule and class page",
+    "managerOnly": "A manager confirms cover. You'll be notified when it's approved.",
+    "confirmed": "Confirmed. Schedule, class page and {count} customers updated together.",
+    "restart": "Restart demo",
+    "history": "Request history",
+    "historyNote": "History is kept for every request, including declined ones."
+  },
+  "registrations": {
+    "statusTabs": "Registration status",
+    "status": {
+      "awaiting_review": "Awaiting review",
+      "accepted": "Accepted",
+      "waitlisted": "Waitlisted",
+      "withdrawn": "Withdrawn"
+    },
+    "acceptedMsg": "{name} accepted. The guardian is notified with the group schedule.",
+    "waitlistedMsg": "{name} added to the waitlist. The guardian is notified.",
+    "coachReadOnly": "Coaches can see registrations for their sessions but can't accept or assign groups.",
+    "empty": "No registrations with this status.",
+    "ageProgramme": "Age {age} · {programme}",
+    "guardian": "Guardian",
+    "verified": "Verified",
+    "invitationPending": "Invitation pending",
+    "payment": "Payment",
+    "inGroup": "Group: {group}",
+    "assignGroup": "Assign group",
+    "assignGroupPlaceholder": "Assign group…",
+    "full": "Full",
+    "accept": "Accept",
+    "waitlist": "Waitlist",
+    "formsBlock": "Accepting is blocked until required forms are complete.",
+    "paymentNotSelection": "A successful payment never means selection. Approval rules still apply after payment retries."
+  },
+  "attendance": {
+    "present": "Present",
+    "absent": "Absent",
+    "unmarked": "Not marked",
+    "notMarked": "Not marked",
+    "absentNote": "Absent · guardian will be notified",
+    "scopedNote": "You see this roster because you're assigned to this session. Guardian contact details are hidden.",
+    "saving": "Saving…",
+    "save": "Save attendance",
+    "saveWithUnmarked": "Save · {count} not marked",
+    "saved": "Attendance saved. {count, plural, =0 {No guardians needed notifying.} one {# guardian of an absent participant was notified.} other {# guardians of absent participants were notified.}}",
+    "restart": "Restart demo",
+    "roster": "Roster",
+    "markPresent": "Mark {name} present",
+    "markAbsent": "Mark {name} absent"
+  },
+  "wellness": {
+    "timesIn": "Times in {zone}",
+    "oneLocationHint": "Showing the first location in scope; pick a single location to switch.",
+    "view": {
+      "practitioners": "Practitioners",
+      "rooms": "Rooms",
+      "list": "List"
+    },
+    "available": "Available",
+    "status": {
+      "confirmed": "Confirmed",
+      "deposit_paid": "Deposit paid",
+      "cancelled": "Cancelled"
+    },
+    "reschedule": "Reschedule appointment",
+    "current": "Current:",
+    "moveTo": "Move to",
+    "simulateConflict": "Simulate: Room B is taken by another booking while confirming",
+    "policy": "Price and policy: no change. Free reschedule more than 24 h ahead.",
+    "confirm": "Confirm new time",
+    "working": "Securing practitioner and room… the original slot is still held.",
+    "failedTitle": "Couldn't move the appointment",
+    "failedBody": "The original time is unchanged and the client hasn't been notified.",
+    "chooseAnother": "Choose another time",
+    "movedTitle": "Moved",
+    "movedBody": "New time secured, then the original slot was released. Client emailed."
+  },
+  "corders": {
+    "empty": "No orders in this scope.",
+    "payment": {
+      "succeeded": "Paid",
+      "failed": "Payment failed",
+      "processing": "Processing",
+      "not_imported": "Not imported"
+    },
+    "refund": {
+      "none": "Refund: none",
+      "pending": "Refund: pending",
+      "partial": "Partially refunded",
+      "complete": "Refunded",
+      "failed": "Refund failed"
+    },
+    "fulfilment": {
+      "to_fulfil": "To fulfil",
+      "fulfilled": "Fulfilled",
+      "on_hold": "On hold",
+      "store_disconnected": "Store disconnected"
+    },
+    "order": "Order",
+    "shareLink": "Link to this order",
+    "source": "Source: {source}",
+    "authoritative": "WooCommerce is the authoritative order system. BranchHarbor mirrors it and records refunds through its gateway.",
+    "lineRefunded": "Refunded",
+    "total": "Total",
+    "syncTimeline": "Sync timeline",
+    "partialRefund": "Partial refund",
+    "noRefundPermission": "Your role can't issue refunds.",
+    "refundConfirm": "Refund {amount}",
+    "refundTo": "to the original payment method via the WooCommerce gateway · {location}.",
+    "refundButton": "Refund {amount}",
+    "cancel": "Cancel",
+    "selectLines": "Select the items to refund.",
+    "refundPending": "Refund pending with the gateway…",
+    "refundRecorded": "Partial refund recorded and confirmed by the gateway.",
+    "lastUpdated": "Last event {time} ({local} local)"
+  },
+  "menu": {
+    "showAs": "Show as",
+    "master": "Master menu",
+    "origin": {
+      "hq": "HQ",
+      "inherited": "Inherited",
+      "local": "Local override"
+    },
+    "status": {
+      "published": "Published",
+      "draft": "Draft",
+      "partial_failure": "1 location failed"
+    },
+    "resetToHq": "Reset to HQ default",
+    "resetPriceOf": "Reset price of {name} to the headquarters default",
+    "resetDone": "{name} price reset to the headquarters default.",
+    "dietaryNote": "Dietary details supplied by the business, not generated.",
+    "publishTitle": "Publish menu changes",
+    "publishBody": "Preview which locations change, which local overrides are kept, then publish. Failures are reported per location.",
+    "previewAffected": "Preview affected locations",
+    "publishPreviewed": "Preview ready: 4 locations change, 2 local price overrides kept, 1 location (Berlin) staged only because it isn't open yet."
+  },
+  "forders": {
+    "status": {
+      "awaiting_acceptance": "Awaiting acceptance",
+      "accepted": "Accepted",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "collected": "Collected",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected"
+    },
+    "action": {
+      "accepted": "Accept",
+      "preparing": "Start preparing",
+      "ready": "Mark ready",
+      "collected": "Mark collected"
+    },
+    "none": "No orders.",
+    "pickup": "Pickup {time}",
+    "overdue": "Overdue {min} min",
+    "paid": "Paid",
+    "reject": "Reject",
+    "waitingAck": "Waiting for the server to confirm…",
+    "rejectReason": "Reason for rejecting (shared with the customer)",
+    "rejectConsequence": "Rejecting voids the order, refunds {amount} and notifies the customer.",
+    "confirmReject": "Reject and refund",
+    "cancel": "Cancel",
+    "notSaved": "Status not changed",
+    "ackNote": "Status buttons wait for the server to acknowledge. If a change fails, the order keeps its previous status — nothing is silently lost."
+  },
+  "kitchen": {
+    "location": "Kitchen",
+    "sound": "Audible alerts",
+    "simulateOffline": "Simulate lost connection",
+    "fullScreen": "Full screen",
+    "exitFull": "Exit full screen",
+    "staleTitle": "Connection lost — this screen is not current",
+    "staleBody": "Last refreshed at {time} ({ago}). Orders still arrive by email. Actions are paused until the connection returns.",
+    "live": "Live · refreshed {time}",
+    "empty": "No open orders right now.",
+    "promised": "Promised",
+    "overdue": "Overdue {min} min"
+  },
+  "locations": {
+    "title": "Locations",
+    "add": "Add location",
+    "denied": "The location directory is for managers and headquarters.",
+    "cards": "Cards",
+    "table": "Table",
+    "localTimeNote": "Times shown are each location's current local time.",
+    "emptyTitle": "No locations in this scope",
+    "emptyBody": "Widen the scope or add a location.",
+    "synced": "Synced",
+    "attention": "Attention",
+    "siteLive": "Site live",
+    "siteUnpublished": "Not published",
+    "col": {
+      "name": "Location",
+      "code": "Code",
+      "country": "Country",
+      "region": "Region",
+      "currency": "Currency",
+      "timeZone": "Time zone",
+      "localTime": "Local time",
+      "site": "Website"
+    },
+    "drawerKicker": "Location",
+    "editWebsite": "Edit website",
+    "shareLink": "Link to this location",
+    "inheritedVsLocal": "Inherited from headquarters vs set locally",
+    "field": {
+      "template": "Template",
+      "timeZone": "Time zone",
+      "currency": "Currency",
+      "language": "Customer language",
+      "ownerGroup": "Owner group",
+      "region": "Region",
+      "hours": "Opening hours",
+      "offer": "Intro offer",
+      "offerValue": "New Year Intro",
+      "brand": "Brand colours & logo",
+      "brandValue": "Locked"
+    },
+    "noAutoPublish": "Adding or editing a location doesn't publish its website.",
+    "readOnly": "You can view this location. Changes are made by headquarters.",
+    "close": "Close"
+  },
+  "wizard": {
+    "title": "Add location",
+    "description": "Choose what this location inherits from headquarters and what it can change.",
+    "backToLocations": "Back to locations",
+    "save": "Save location",
+    "savedTitle": "{name} saved",
+    "savedBody": "It isn't published or visible to customers yet. Publish its website when it's ready.",
+    "errorSummary": "{count, plural, one {Fix # field to continue} other {Fix # fields to continue}}",
+    "identity": "Location",
+    "name": "Location name",
+    "namePh": "e.g. London – Shoreditch",
+    "code": "Internal code",
+    "codeHint": "Capital letters, numbers and dashes.",
+    "ownerGroup": "Owner group",
+    "template": "Template",
+    "address": "Address",
+    "country": "Country",
+    "line1": "Street address",
+    "city": "City",
+    "region": "State, province or county",
+    "postalCode": "Postal code",
+    "postalHint": "Not every country uses one.",
+    "localSettings": "Local settings",
+    "timeZone": "Time zone",
+    "localNow": "Local time now: {time} {zone}",
+    "choose": "Choose…",
+    "suggested": "Suggested for {country}",
+    "allZones": "All time zones",
+    "currency": "Currency",
+    "currencyHint": "Amounts at this location keep this currency. Nothing is converted.",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": "Opening hours",
+    "hoursHint": "In local time.",
+    "overrides": "Permitted local overrides",
+    "overridesHint": "Headquarters chooses what this location can change. Everything else is inherited.",
+    "override": {
+      "hours": "Opening hours",
+      "prices": "Local prices",
+      "offers": "Local offers",
+      "images": "Hero images",
+      "staff": "Staff bios"
+    },
+    "sharedTitle": "Shared from headquarters",
+    "shared": {
+      "brand": "Logo, colours and fonts",
+      "nav": "Header navigation",
+      "legal": "Legal and policy pages",
+      "descriptions": "Brand descriptions"
+    },
+    "localTitle": "Managed locally",
+    "notPublished": "Saving a location doesn't publish its website or show it to customers.",
+    "errors": {
+      "name": "Enter a location name.",
+      "code": "Enter an internal code.",
+      "codeFormat": "Use 2–24 capital letters, numbers or dashes.",
+      "line1": "Enter a street address.",
+      "city": "Enter a city.",
+      "timeZone": "Choose a time zone.",
+      "email": "Enter a valid email."
+    }
+  },
+  "websites": {
+    "title": "Websites",
+    "description": "Pages, templates, approvals and domains. Each field shows where its value comes from.",
+    "tab": {
+      "editor": "Page editor",
+      "approvals": "Approval queue",
+      "publish": "Group publish",
+      "domains": "Domains"
+    },
+    "pageVersion": "Page · {page} · version {version}",
+    "location": "Location",
+    "legend": "Field policies",
+    "policy": {
+      "locked": "Locked",
+      "editable": "Editable",
+      "approval": "Approval"
+    },
+    "origin": {
+      "locked": "Locked · HQ",
+      "approval": "Approval required",
+      "local": "Local override",
+      "inherited": "Editable · inherited"
+    },
+    "reasonLabel": "Reason for headquarters (required)",
+    "reasonPh": "Why does this location need the change?",
+    "submitApproval": "Submit for approval",
+    "save": "Save",
+    "cancel": "Cancel",
+    "sentForApproval": "{field} sent to headquarters for approval. The live page is unchanged.",
+    "savedDraft": "{field} saved as a local draft. Publish when ready.",
+    "requestChange": "Request change",
+    "edit": "Edit",
+    "lockedHint": "Locked by headquarters",
+    "resetToHq": "Reset to HQ",
+    "resetDone": "{field} reset to the headquarters default.",
+    "hqDefault": "Headquarters default: {value}",
+    "pendingLabel": "Pending approval:",
+    "pendingReason": "Reason: {reason} · {who}, {when}",
+    "hqComment": "Comment (optional)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approvedMsg": "Approved. {field} will publish with the next {location} release.",
+    "rejectedMsg": "Rejected. {who} was notified with your comment.",
+    "liveUnchanged": "The live page stays unchanged until headquarters decides.",
+    "previewDraft": "Preview · draft",
+    "activity": "Activity",
+    "approvalsEmpty": "Nothing waiting for approval",
+    "approvalsEmptyBody": "Protected changes requested by locations appear here.",
+    "review": "Review",
+    "view": "View",
+    "versionFrom": "Version {from} → {to}",
+    "publishScope": "Scope: {scope}",
+    "reviewPublish": "Review and publish to {count, plural, one {# location} other {# locations}}",
+    "confirmTitle": "Publish to {count, plural, one {# location} other {# locations}}?",
+    "confirmBody": "Each location updates independently. Local overrides listed below are kept. Version {version} is snapshotted so you can roll back.",
+    "publishNow": "Publish now",
+    "publishing": "Publishing… each location reports its own result.",
+    "partialTitle": "{done} of {total} published · {failed} failed",
+    "partialBody": "This isn't a full success. Failed locations keep their previous version live. Retry them below.",
+    "allDone": "Published to all {total} locations",
+    "allDoneBody": "Every location confirmed the new version.",
+    "col": {
+      "location": "Location",
+      "pages": "Changed pages",
+      "excluded": "Excluded overrides",
+      "warnings": "Warnings",
+      "result": "Result"
+    },
+    "result": {
+      "pending": "Not started",
+      "publishing": "Publishing",
+      "published": "Published",
+      "failed": "Failed"
+    },
+    "retry": "Retry",
+    "rollbackNote": "Every group publish keeps a version snapshot. Rolling back affects only the locations you choose.",
+    "domainsIntro": "Every location has an included address. Connecting your own domain keeps the included address working during setup. Example domains below use the reserved .example suffix.",
+    "domainState": {
+      "ready": "Ready · certificate issued",
+      "awaiting_dns": "Awaiting DNS"
+    },
+    "includedOnly": "Included address",
+    "notPublic": "Not public yet",
+    "connectDomain": "Connect a domain",
+    "buyDomain": "Buy a domain",
+    "later": "Later"
+  },
+  "payments": {
+    "title": "Payments",
+    "description": "Customer payments per location and currency. BranchHarbor subscription billing is separate (Settings).",
+    "denied": "Payments are visible to managers, franchise owners and finance users.",
+    "tab": {
+      "transactions": "Transactions",
+      "reconciliation": "Reconciliation",
+      "setup": "Payment setup"
+    },
+    "needsAction": "{count} need action",
+    "totals": "Totals per currency",
+    "succeededIn": "Succeeded · this week · {currency}",
+    "totalSource": "Refunds excluded · {where}",
+    "combined": "Combined total",
+    "notShown": "Not shown",
+    "noConversion": "No conversion method defined for {currencies}",
+    "singleCurrency": "Only one currency in this scope",
+    "emptyTx": "No transactions in this scope",
+    "emptyTxBody": "Payments appear once a location's payment account is enabled.",
+    "txScope": "{count, plural, one {# transaction} other {# transactions}} · {scope}",
+    "col": {
+      "ref": "Reference",
+      "what": "For",
+      "amount": "Amount",
+      "payment": "Payment",
+      "refund": "Refund"
+    },
+    "payState": {
+      "created": "Created",
+      "requires_action": "Action required",
+      "processing": "Processing",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "refundState": {
+      "none": "No refund",
+      "requested": "Requested",
+      "pending": "Pending",
+      "partial": "Partial · complete",
+      "complete": "Refunded",
+      "failed": "Refund failed"
+    },
+    "settlementNote": "Settlement and payout status is tracked separately from payment success.",
+    "detail": "Payment detail",
+    "location": "Location",
+    "provider": "Provider",
+    "linked": "Linked record",
+    "missing": "Missing — see reconciliation",
+    "timeline": "Timeline",
+    "signedEvents": "Outcomes come from signed provider events. Retries are idempotent.",
+    "receipt": "View receipt",
+    "receiptLater": "Receipts open in the provider dashboard for now.",
+    "queue": "Reconciliation queue",
+    "recEmpty": "Nothing to reconcile in this scope.",
+    "recType": {
+      "paid_without_record": "Paid without fulfilled record",
+      "unpaid_confirmed": "Unpaid but confirmed record",
+      "amount_mismatch": "Amount mismatch"
+    },
+    "recStatus": {
+      "needs_action": "Needs action",
+      "reviewing": "Reviewing",
+      "resolved": "Resolved"
+    },
+    "customer": "Customer",
+    "recordState": "Record",
+    "recreate": "Recreate record from payment",
+    "refundInstead": "Refund instead",
+    "refundConfirm": "Refund {amount} to {customer}?",
+    "refundWhere": "{location} · connected payment account. This needs finance permission.",
+    "needsFinance": "Your role doesn't include refunds. Ask a finance user to complete this.",
+    "ackAmount": "I confirm the location, the amount and the currency: {amount}.",
+    "refundButton": "Refund {amount}",
+    "back": "Back",
+    "recreating": "Creating the record and checking capacity…",
+    "refunding": "Refund pending with the provider…",
+    "resolved": "Resolved: {resolution}",
+    "acctStatus": {
+      "enabled": "Enabled",
+      "pending_verification": "Pending verification",
+      "not_set_up": "Not set up"
+    },
+    "ownAccount": "Own account",
+    "sharedAccount": "Shared account",
+    "ownDetail": "Independently owned: separate account, authorised by the owner.",
+    "sharedDetail": "Company-owned: shared account with reporting allocation.",
+    "notPurchasable": "Payment-dependent bookings and orders stay unavailable here until the account is enabled.",
+    "subscriptionNote": "Your BranchHarbor subscription is billed separately from customer payments. See Settings › Billing."
+  },
+  "connections": {
+    "title": "Connections",
+    "description": "Supported integrations, their source-of-truth role and sync health.",
+    "denied": "Connection health is visible to managers and headquarters.",
+    "readOnly": "You can see sync health. Headquarters manages connections and recovery.",
+    "fixed": "{name} reconnected. A catch-up sync has started.",
+    "empty": "No connections yet.",
+    "state": {
+      "connected": "Connected",
+      "initial_sync": "Initial sync",
+      "degraded": "Degraded",
+      "disconnected": "Disconnected",
+      "authorization_expired": "Authorisation expired"
+    },
+    "lastSync": "Last successful sync",
+    "inProgress": "In progress · {pct}%",
+    "never": "Never",
+    "direction": "Direction",
+    "dir": {
+      "import": "Import",
+      "export": "Export",
+      "bidirectional": "Both ways"
+    },
+    "progress": "Initial sync progress",
+    "locations": "Locations: {list}",
+    "affected": "Affected: {what}",
+    "footer": "BranchHarbor never disables other plugins, overwrites content or copies all customer records automatically."
+  },
+  "team": {
+    "title": "Team",
+    "description": "People, scoped role assignments and invitations. Removing an assignment revokes access immediately.",
+    "invite": "Invite",
+    "inviteTitle": "Invite a team member",
+    "email": "Email",
+    "roleLabel": "Role",
+    "scope": "Scope",
+    "scopeHint": "The locations this role applies to.",
+    "wholeOrg": "All authorised locations",
+    "role": {
+      "org_owner": "Organisation owner",
+      "hq_admin": "Headquarters admin",
+      "regional_manager": "Regional manager",
+      "franchise_owner": "Franchise owner",
+      "location_manager": "Location manager",
+      "staff": "Staff / instructor / coach",
+      "marketing_contributor": "Marketing contributor",
+      "finance": "Finance user"
+    },
+    "roleHelp": {
+      "hq_admin": "Templates, locations, policies and authorised reports. Does not include customer details by default.",
+      "regional_manager": "Location oversight and approvals within assigned regions.",
+      "franchise_owner": "Local operations, permitted payments and staff for owned locations.",
+      "location_manager": "Daily management and local publishing for assigned locations.",
+      "staff": "Relevant schedules, attendance or orders for assigned work only.",
+      "marketing_contributor": "Drafts content; publishes only if authorised.",
+      "finance": "Payments, reconciliation and permitted refunds."
+    },
+    "send": "Send invitation",
+    "cancel": "Cancel",
+    "invited": "Invitation sent to {email}.",
+    "col": {
+      "person": "Person",
+      "assignments": "Role assignments",
+      "lastActive": "Last active",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Active",
+      "invited": "Invited",
+      "support": "Support access"
+    },
+    "footer": "Support access is authorised, time-limited and logged."
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "Network and location performance with data freshness. Missing data is never shown as zero.",
+    "empty": "No reports for this scope.",
+    "chartLabel": "{title}: {values}",
+    "unavailable": "unavailable",
+    "na": "n/a",
+    "notShown": "Not shown",
+    "scopeNote": "Reports use the active scope: {scope}. Observations only — causes aren't inferred."
+  },
+  "settings": {
+    "title": "Settings",
+    "personal": "Your preferences",
+    "languageHint": "Language for your BranchHarbor screens. Customer-facing pages use each location's language.",
+    "orgDenied": "Organisation settings are managed by the organisation owner.",
+    "saved": "Settings saved.",
+    "business": "Business details",
+    "businessName": "Business name",
+    "legalName": "Legal name",
+    "defaults": "Defaults for new locations",
+    "defaultsHint": "Existing locations keep their own settings.",
+    "defaultLanguage": "Default language",
+    "defaultCurrency": "Default currency",
+    "currencyHint": "Reports never combine currencies without a defined conversion method.",
+    "defaultTimeZone": "Default time zone",
+    "dataPolicies": "Data and policies",
+    "dataRegion": "Data region",
+    "dataRegionHint": "Chosen when the organisation was created. Contact support to discuss a move.",
+    "region": {
+      "us": "United States",
+      "eu": "European Union",
+      "apac": "Asia-Pacific"
+    },
+    "sharing": "Cross-location customer sharing",
+    "sharingHint": "Sharing needs an explicit business policy and permitted purpose.",
+    "sharingOpt": {
+      "off": "Off",
+      "totals_only": "Totals only (no personal details)",
+      "shared": "Shared with a documented purpose"
+    },
+    "aiTraining": "Allow AI training on customer data",
+    "aiTrainingHint": "Off by default. BranchHarbor does not train models on your customer data unless you turn this on.",
+    "save": "Save settings",
+    "billing": "Billing per location",
+    "separateBilling": "Separate from customer payments",
+    "billingHint": "{plan} · {price} per published location · next invoice {date}.",
+    "billed": "Billed · {price}",
+    "notBilled": "Not billed until published"
+  },
+  "auth": {
+    "legal": "Sample environment. Don't enter real customer data.",
+    "promise": "One home for every location.",
+    "promiseSub": "Manage your brand together. Run each location with confidence.",
+    "checkFields": "Check the highlighted fields.",
+    "signInTitle": "Welcome back",
+    "signInSub": "Sign in to BranchHarbor.",
+    "email": "Email",
+    "workEmail": "Work email",
+    "password": "Password",
+    "demoPassword": "Sample mode: any password of 10+ characters works.",
+    "forgot": "Forgot password?",
+    "signIn": "Sign in",
+    "noAccount": "New to BranchHarbor?",
+    "createAccount": "Create account",
+    "signUpTitle": "Set up BranchHarbor",
+    "signUpSub": "Create your account. You'll verify your email next.",
+    "name": "Your name",
+    "passwordHint": "At least 10 characters.",
+    "languageNote": "Your account uses the language selected above. You can change it any time.",
+    "haveAccount": "Already have an account?",
+    "verifyTitle": "Check your email",
+    "verifySub": "We sent a 6-digit code to {email}.",
+    "code": "Verification code",
+    "codeHint": "Sample mode: any 6 digits work; 000000 shows the expired-code state.",
+    "verify": "Verify email",
+    "resend": "Send a new code",
+    "resent": "A new code is on its way.",
+    "forgotTitle": "Reset your password",
+    "forgotSub": "We'll email you a link to choose a new password.",
+    "sendLink": "Send reset link",
+    "forgotSentTitle": "Check your email",
+    "forgotSent": "If an account exists for {email}, a reset link is on its way. It expires in 30 minutes.",
+    "backToSignIn": "Back to sign in"
+  },
+  "onboarding": {
+    "loading": "Loading your setup…",
+    "setupTitle": "Set up your business",
+    "exit": "Go to dashboard",
+    "saving": "Saving…",
+    "savedAgo": "Progress saved {when}",
+    "notSaved": "Not saved yet",
+    "checklist": "Setup checklist",
+    "checklistHint": "You can move between steps in any order. Progress is saved at each step.",
+    "progress": "{done} of {total} complete",
+    "done": "(complete)",
+    "skipped": "Skipped",
+    "optional": "Optional",
+    "stepOf": "Step {n} of {total}",
+    "back": "Back",
+    "skip": "Skip for now",
+    "continue": "Continue",
+    "saveContinue": "Save and continue",
+    "steps": {
+      "account": "Account",
+      "industry": "Industry & type",
+      "business": "Business details",
+      "location": "First location",
+      "website": "Website",
+      "data": "Industry data",
+      "connect": "Connections",
+      "team": "Invite team",
+      "publish": "Preview & publish"
+    },
+    "title": {
+      "account": "Create account",
+      "industry": "What kind of business is this?",
+      "business": "Business details",
+      "location": "Add your first location",
+      "website": "Choose your website",
+      "data": "Add your offering",
+      "connect": "Connect your systems",
+      "team": "Invite your team",
+      "publish": "Preview and publish"
+    },
+    "desc": {
+      "account": "Your account is ready.",
+      "industry": "We use this to set up the right workflows. You can add industries later.",
+      "business": "These become the defaults for new locations.",
+      "location": "Choose what this location inherits from headquarters and what it can change.",
+      "website": "Launch a hosted site or keep your WordPress site. Both use the same records.",
+      "data": "Add what customers can book, register for, buy or order. You can import more later.",
+      "connect": "Decide where official records live. Nothing is copied until you confirm.",
+      "team": "Give each person a role and the locations they work at.",
+      "publish": "Check what customers will see, run a test, then publish."
+    },
+    "account": {
+      "doneTitle": "Account created and email verified",
+      "doneBody": "You're signed in as the organisation owner.",
+      "note": "You can add more administrators in the Invite team step."
+    },
+    "industryLegend": "Industry",
+    "selfServe": "Self-service setup",
+    "pilotOnly": "Pilot by request",
+    "pilotOnlyBody": "{industry} is available through our pilot programme. You can explore setup, but publishing needs a pilot agreement — we'll be in touch.",
+    "industry": {
+      "studios": {
+        "name": "Studios",
+        "workflow": "Enquiry → trial → class → membership",
+        "itemsTitle": "Add your class types",
+        "itemSingular": "Class type",
+        "itemPh": "e.g. Hot Vinyasa · 60 min · 20 spots"
+      },
+      "sports": {
+        "name": "Sports",
+        "workflow": "Registration → group assignment → attendance",
+        "itemsTitle": "Add your programmes",
+        "itemSingular": "Programme",
+        "itemPh": "e.g. U10 Saturday Skills · Autumn"
+      },
+      "wellness": {
+        "name": "Wellness",
+        "workflow": "Service → practitioner → appointment",
+        "itemsTitle": "Add your services",
+        "itemSingular": "Service",
+        "itemPh": "e.g. Deep tissue massage · 60 min"
+      },
+      "commerce": {
+        "name": "Commerce",
+        "workflow": "Product discovery → order → fulfilment",
+        "itemsTitle": "Add your products",
+        "itemSingular": "Product",
+        "itemPh": "e.g. Linen overshirt · 3 sizes"
+      },
+      "foods": {
+        "name": "Foods",
+        "workflow": "Location → menu → order → pickup",
+        "itemsTitle": "Add menu items",
+        "itemSingular": "Menu item",
+        "itemPh": "e.g. Ember chicken bowl"
+      }
+    },
+    "modelLegend": "Business type",
+    "model": {
+      "independent": "Independent business",
+      "independentBody": "One location. Network concepts stay hidden until you add another.",
+      "network": "Network or franchise",
+      "networkBody": "Several locations with headquarters controls and local autonomy."
+    },
+    "biz": {
+      "name": "Business name",
+      "country": "Country",
+      "timeZone": "Default time zone",
+      "timeZoneHint": "New locations start with this; each can have its own.",
+      "currency": "Default currency",
+      "currencyHint": "Locations in other countries keep their own currency.",
+      "language": "Default language",
+      "dataRegion": "Data region",
+      "dataRegionHint": "Where your organisation's data is stored. Hard to change later."
+    },
+    "region": {
+      "us": "United States",
+      "eu": "European Union",
+      "apac": "Asia-Pacific"
+    },
+    "independentNote": "Independent businesses add one location now. You can import more later if you grow.",
+    "csv": {
+      "title": "Import more locations",
+      "body": "Upload a spreadsheet. Each row is checked before anything is created.",
+      "upload": "Upload CSV",
+      "hide": "Hide",
+      "added": "{count, plural, one {# location added} other {# locations added}}",
+      "chooseFile": "Choose CSV file",
+      "useSample": "Use sample file",
+      "paste": "Or paste CSV",
+      "columns": "Columns: name, code, country, timezone, currency",
+      "check": "Check rows",
+      "summary": "{total, plural, one {# row} other {# rows}} checked · {bad, plural, =0 {all ready} one {# needs attention} other {# need attention}}",
+      "row": "Row {n}",
+      "excluded": "Skipped",
+      "ready": "Ready",
+      "choose": "Choose…",
+      "fixTimeZone": "Choose time zone for row {row}",
+      "fixCurrency": "Choose currency for row {row}",
+      "include": "Include",
+      "skipRow": "Skip row",
+      "fixToContinue": "{count, plural, one {Fix # row to continue} other {Fix # rows to continue}}",
+      "addN": "{count, plural, one {Add # location} other {Add # locations}}",
+      "nothingCreated": "Nothing is created until you add. Imported locations aren't published."
+    },
+    "web": {
+      "siteLegend": "Website",
+      "hosted": "Hosted BranchHarbor site",
+      "hostedBody": "We host it. Use the included address or connect your domain.",
+      "wordpress": "Keep my WordPress site",
+      "wordpressBody": "Add BranchHarbor blocks and forms to your existing site.",
+      "addressLegend": "Website address",
+      "included": "Use the included address",
+      "connect": "Connect my domain",
+      "connectBody": "Point a domain you already own at your BranchHarbor site.",
+      "buy": "Buy a domain",
+      "buyBody": "Search, register and renew through BranchHarbor.",
+      "later": "Later",
+      "exampleNote": "Included address format is subject to final routing design.",
+      "wpStepsTitle": "Connect your WordPress site",
+      "wpStep1": "Install the free BranchHarbor connector plugin from WordPress.org.",
+      "wpStep2": "Authorise with a scoped application password — never your main password.",
+      "wpStep3": "Map the WordPress site to this location.",
+      "wpStep4": "Choose data direction, run a test, then check the status.",
+      "wpNote": "We never disable other plugins, overwrite content or copy all customer records automatically."
+    },
+    "domain": {
+      "hostname": "Your domain",
+      "hostnameHint": "For example www.yourbusiness.example",
+      "invalid": "Enter a domain like www.yourbusiness.example",
+      "continue": "Get DNS records",
+      "change": "Use a different domain",
+      "statusLabel": "Domain connection status",
+      "state": {
+        "awaiting_dns": "Awaiting DNS",
+        "verifying": "Verifying",
+        "certificate_pending": "Certificate pending",
+        "ready": "Ready",
+        "failed": "Failed"
+      },
+      "records": "Add these DNS records at your domain provider",
+      "type": "Type",
+      "name": "Name / host",
+      "value": "Value",
+      "found": "Found",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyValue": "Copy {type} value",
+      "yes": "Found",
+      "notYet": "Not yet",
+      "emailSafe": "We only ask for these two records. Your email (MX) records are untouched.",
+      "failedTitle": "Verification failed",
+      "verifying": "Verifying ownership…",
+      "verify": "Verify records",
+      "checkAgain": "Check again",
+      "readyTitle": "{host} is ready",
+      "makePrimary": "Make this the primary address",
+      "redirectNote": "When primary, {included} redirects here so existing links keep working.",
+      "keepsWorking": "Your included address keeps working during setup: {included}"
+    },
+    "addItem": "Add",
+    "removeItem": "Remove {item}",
+    "itemsNote": "You can add prices, schedules and photos after setup.",
+    "connectStep": {
+      "legend": {
+        "studios": "Booking system",
+        "sports": "Registration system",
+        "wellness": "Appointment system",
+        "commerce": "Store and checkout",
+        "foods": "Ordering"
+      },
+      "status": {
+        "available": "Available",
+        "requires_setup": "Requires setup",
+        "tested": "Tested",
+        "later": "Later"
+      },
+      "opt": {
+        "studios": {
+          "keep": {
+            "title": "Keep my current booking system",
+            "body": "Connect through a supported adapter. It stays the official record for bookings."
+          },
+          "native": {
+            "title": "BranchHarbor bookings",
+            "body": "Native classes, packs and memberships."
+          },
+          "none": {
+            "title": "No online booking yet",
+            "body": "Customers send an enquiry from each class."
+          }
+        },
+        "sports": {
+          "native": {
+            "title": "BranchHarbor registrations",
+            "body": "Programmes, forms and rosters in BranchHarbor."
+          },
+          "keep": {
+            "title": "Keep my current registration tool",
+            "body": "Selected adapters only."
+          }
+        },
+        "wellness": {
+          "native": {
+            "title": "BranchHarbor appointments",
+            "body": "Practitioner and room calendars in BranchHarbor."
+          },
+          "keep": {
+            "title": "Keep my current scheduler",
+            "body": "Selected adapters only."
+          }
+        },
+        "commerce": {
+          "keep": {
+            "title": "WooCommerce",
+            "body": "Keep your WooCommerce checkout. It stays the official record for orders."
+          },
+          "native": {
+            "title": "BranchHarbor storefront",
+            "body": "Native checkout and inventory."
+          }
+        },
+        "foods": {
+          "native": {
+            "title": "BranchHarbor pickup ordering",
+            "body": "Menus, pickup slots and kitchen view."
+          },
+          "keep": {
+            "title": "Point-of-sale connection",
+            "body": "Send orders to your POS."
+          }
+        }
+      },
+      "payTitle": "Customer payments",
+      "pay": {
+        "not": "Not set up",
+        "pending": "Waiting for account verification",
+        "enabled": "Enabled"
+      },
+      "payBody": "Anything that needs payment stays unavailable to customers until the location's payment account is enabled. Card details are collected by the provider, never stored by BranchHarbor.",
+      "payStart": "Set up payments",
+      "paySimulate": "Simulate: verification complete",
+      "nothingCopied": "Nothing is copied or changed in your existing systems until you confirm."
+    },
+    "teamStep": {
+      "email": "Email",
+      "role": "Role",
+      "add": "Add",
+      "invalid": "Enter a valid email.",
+      "remove": "Remove {email}",
+      "note": "Invitations are scoped to {location}. You can widen access later in Team."
+    },
+    "publish": {
+      "readiness": "Readiness",
+      "check": {
+        "location": "Location details",
+        "website": "Website address",
+        "items": "Offering",
+        "payments": "Customer payments",
+        "test": "Test workflow"
+      },
+      "viaWordPress": "Connected through WordPress",
+      "itemsCount": "{count} added",
+      "payOn": "Enabled for this location",
+      "payOff": "Not enabled — purchase buttons stay hidden",
+      "tested": "Test completed, then cancelled automatically",
+      "notTested": "Run a test from the preview to check the flow",
+      "runTest": "Run test",
+      "setUp": "Set up",
+      "fix": "Fix",
+      "blockedTitle": "Fix these before publishing",
+      "repair": "Repair",
+      "publish": "Publish",
+      "publishNote": "Publishing makes this location's site visible to customers. You can unpublish at any time.",
+      "previewHeadline": "Find your place in {location}",
+      "enquire": "Enquire",
+      "purchaseHidden": "Booking and checkout buttons appear once payments are enabled.",
+      "cta": {
+        "studios": "Book",
+        "sports": "Register",
+        "wellness": "Book",
+        "commerce": "Buy",
+        "foods": "Order"
+      },
+      "publishedTitle": "Published",
+      "publishedBody": "Your site is live at {address}.",
+      "goToDashboard": "Go to your dashboard"
+    },
+    "errors": {
+      "businessName": "Enter your business name.",
+      "items": "Add at least one item.",
+      "domain": "Enter a valid domain."
+    },
+    "wizardErrors": {
+      "name": "Enter a location name.",
+      "code": "Enter an internal code.",
+      "codeFormat": "Use 2–24 capital letters, numbers or dashes.",
+      "line1": "Enter a street address.",
+      "city": "Enter a city.",
+      "timeZone": "Choose a time zone.",
+      "email": "Enter a valid email."
+    },
+    "blockers": {
+      "location": "Save your first location",
+      "website": "Choose a website and address",
+      "items": "Add at least one item",
+      "industry": "{industry} publishing needs a pilot agreement"
+    }
+  }
+}

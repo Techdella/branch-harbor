@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+@import '@bh/ui/styles.css';
+
+@source '../';
+
+@theme {
+  --font-sans: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+}
+
+@keyframes bh-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.bh-skeleton {
+  background: linear-gradient(90deg, #eceae4 0%, #f6f5f1 50%, #eceae4 100%);
+  background-size: 800px 100%;
+  animation: bh-shimmer 1.4s linear infinite;
+}
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
