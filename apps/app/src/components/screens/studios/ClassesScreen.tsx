@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, Drawer, Icon, Tabs, cx } from '@bh/ui';
 import type { ClassOccurrence } from '@/lib/types';
 import { useApi } from '@/lib/useApi';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { addDays, cityOfZone, dateInZone, fmtDay, fmtTime, fmtYmd, weekStart, zoneLabel } from '@/lib/format';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
@@ -22,8 +21,8 @@ export function ClassesScreen() {
   const app = useApp();
   const router = useRouter();
   const params = useSearchParams();
-  const locs = FIXTURES.studios.locations.filter((l) => app.scope.locationIds.includes(l.id));
-  const [locId, setLocId] = useState<string>(locs[0]?.id ?? 'qw');
+  const locs = app.locations.filter((l) => app.scope.locationIds.includes(l.id));
+  const [locId, setLocId] = useState<string>(locs[0]?.id ?? '');
   const [view, setView] = useState<View>('week');
   const loc = locs.find((l) => l.id === locId) ?? locs[0];
   const tz = loc?.timeZone ?? 'UTC';

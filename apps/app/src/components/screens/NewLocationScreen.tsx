@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Banner, DeniedState } from '../ui/States';
@@ -39,7 +38,7 @@ export function NewLocationScreen() {
         </Banner>
       ) : (
         <section className="rounded-xl bg-surface p-5 md:p-7">
-          <LocationWizard value={draft} onChange={setDraft} errors={errors} ownerGroups={FIXTURES[app.industry].org.ownerGroups.map((g) => g.name)} />
+          <LocationWizard value={draft} onChange={setDraft} errors={errors} ownerGroups={app.org.ownerGroups.map((g) => g.name)} />
           <WizardSaveBar onSave={save} saving={saving} label={t('save')} />
         </section>
       )}

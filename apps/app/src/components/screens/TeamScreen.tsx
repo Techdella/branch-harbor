@@ -20,7 +20,7 @@ export function TeamScreen() {
   const [role, setRole] = useState<string>('location_manager');
   const [scopeId, setScopeId] = useState(app.scopes.find((s) => s.kind === 'location')?.id ?? 'all');
   const [ok, setOk] = useState('');
-  const invite = useMutation((api) => api.team.invite({ email, role: t(`role.${role}`), scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }));
+  const invite = useMutation((api) => api.team.invite({ email, role: t(`role.${role}`), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }));
   if (!app.can('members.manage')) return <DeniedState permission="members.manage" />;
 
   return (

@@ -49,7 +49,7 @@ const envSchema = z.object({
 
   // Email
   EMAIL_FROM: z.string().default('BranchHarbor <no-reply@branchharbor.com>'),
-  EMAIL_PROVIDER: z.enum(['postmark', 'resend', 'log']).optional(),
+  EMAIL_PROVIDER: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['postmark', 'resend', 'log']).optional()),
   POSTMARK_SERVER_TOKEN: optional,
   RESEND_API_KEY: optional,
   SALES_NOTIFICATION_EMAIL: z.string().default('sales@branchharbor.com'),

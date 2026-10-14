@@ -6,7 +6,6 @@ import { Badge, Button, Drawer, Tabs, cx } from '@bh/ui';
 import type { Appointment, RescheduleSlot, WellnessDay } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
 import { cityOfZone, fmtDay, fmtTime, fmtWall, fmtYmd, hhmmIn, zoneLabel } from '@/lib/format';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, LoadingBlock } from '../../ui/States';
@@ -22,7 +21,7 @@ export function CalendarScreen() {
   const [view, setView] = useState<View>('practitioners');
   const [open, setOpen] = useState<Appointment | null>(null);
   const res = useApi((api) => api.wellness.day(app.ctx), [app.role, app.scopeId]);
-  const locName = (d: WellnessDay) => FIXTURES.wellness.locations.find((l) => l.id === d.locationId)?.name ?? '';
+  const locName = (d: WellnessDay) => app.locations.find((l) => l.id === d.locationId)?.name ?? '';
 
   return (
     <>

@@ -1,11 +1,26 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { can, type Permission } from '@bh/shared';
-import type { IndustryKey, RequestContext, ScopeOptionT, Session, ViewRole } from '@/lib/types';
+import type { IndustryKey, Location, Organization, RequestContext, ScopeOptionT, Session, ViewRole } from '@/lib/types';
 import { APP_INDUSTRIES, VIEW_ROLES } from '@/lib/types';
-import { scopeOptions, sessionFor } from '@/lib/mock/orgs';
-import { apiMode, getApi, onApiMode } from '@/lib/api';
+import { FIXTURES, scopeOptions, sessionFor } from '@/lib/mock/orgs';
+import { apiMode, enterFallback, onApiMode } from '@/lib/api';
+import { ApiError } from '@/lib/errors';
+import {
+  availableRoles,
+  effectiveRole,
+  industriesAvailable,
+  loadWorkspace,
+  onWorkspace,
+  refreshWorkspace,
+  scopeOptionsOf,
+  sessionOf,
+  setActiveRole,
+  workspace,
+  type Workspace,
+} from '@/lib/http/workspace';
 
 interface AppState {
   industry: IndustryKey;
@@ -13,25 +28,37 @@ interface AppState {
   scopeId: string;
   aiOpen: boolean;
   navCollapsed: boolean;
+  /** Live mode: the selected organisation. */
+  orgId: string | null;
 }
 
-interface AppCtx extends AppState {
+interface AppCtx extends Omit<AppState, 'orgId'> {
   ready: boolean;
   ctx: RequestContext;
   session: Session;
   scopes: ScopeOptionT[];
   scope: ScopeOptionT;
   apiMode: 'live' | 'mock' | 'fallback';
+  /** True when data comes from the API (not mock or offline fallback). */
+  live: boolean;
+  org: Organization;
+  /** Location directory for the selected organisation (live) or the sample industry (mock). */
+  locations: Location[];
+  /** Industries the switcher offers: all five in sample mode; the user's organisations' industries when live. */
+  industries: IndustryKey[];
+  /** "Viewing as" options: all personas in sample mode; only the roles the user holds when live. */
+  roles: ViewRole[];
   can: (p: Permission) => boolean;
   setIndustry: (i: IndustryKey) => void;
   setRole: (r: ViewRole) => void;
   setScopeId: (id: string) => void;
   setAiOpen: (open: boolean) => void;
   toggleNav: () => void;
+  reloadWorkspace: () => Promise<void>;
 }
 
 const KEY = 'bh_app_state';
-const DEFAULTS: AppState = { industry: 'studios', role: 'hq', scopeId: 'all', aiOpen: false, navCollapsed: false };
+const DEFAULTS: AppState = { industry: 'studios', role: 'hq', scopeId: 'all', aiOpen: false, navCollapsed: false, orgId: null };
 
 const Ctx = createContext<AppCtx | null>(null);
 
@@ -46,6 +73,7 @@ function load(): AppState {
       scopeId: typeof v.scopeId === 'string' ? v.scopeId : 'all',
       aiOpen: !!v.aiOpen,
       navCollapsed: !!v.navCollapsed,
+      orgId: typeof v.orgId === 'string' ? v.orgId : null,
     };
   } catch {
     return DEFAULTS;
@@ -53,58 +81,138 @@ function load(): AppState {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const path = usePathname();
   const [state, setState] = useState<AppState>(DEFAULTS);
-  const [ready, setReady] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [mode, setMode] = useState(apiMode());
+  const [ws, setWs] = useState<Workspace | null>(workspace());
 
   useEffect(() => {
-    setState(load());
-    setReady(true);
-    getApi().then(() => setMode(apiMode()));
+    const initial = load();
+    setState(initial);
     const off = onApiMode(setMode);
+    const offWs = onWorkspace(setWs);
+    if (apiMode() !== 'live') {
+      setLoaded(true);
+    } else {
+      (async () => {
+        try {
+          const w = workspace() ?? (await loadWorkspace(initial.orgId));
+          if (!w.org) {
+            // Signed in but no organisation yet: finish onboarding first.
+            router.replace('/onboarding');
+            return;
+          }
+          setState((s) => ({ ...s, orgId: w.org!.id, industry: w.orgView!.industry }));
+          setLoaded(true);
+        } catch (e) {
+          if (e instanceof ApiError && e.isNetwork) {
+            enterFallback();
+            setLoaded(true);
+          } else if (e instanceof ApiError && e.isUnauthenticated) {
+            router.replace(`/sign-in?next=${encodeURIComponent(path)}`);
+          } else {
+            // Unexpected error: show the app so screens can surface their own error states.
+            setLoaded(true);
+          }
+        }
+      })();
+    }
     return () => {
       off();
+      offWs();
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!ready) return;
+    if (!loaded) return;
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
     } catch {
       /* ignore */
     }
-  }, [state, ready]);
+  }, [state, loaded]);
 
-  // Session and scopes are derived from the persona. With a live API these come from /v1/auth/session and /v1/scopes.
-  const session = useMemo(() => sessionFor(state.industry, state.role), [state.industry, state.role]);
-  const scopes = useMemo(() => scopeOptions(state.industry, state.role), [state.industry, state.role]);
-  const scope = scopes.find((s) => s.id === state.scopeId) ?? scopes[0]!;
+  const live = mode === 'live' && !!ws?.org;
 
-  const setIndustry = useCallback((industry: IndustryKey) => setState((s) => ({ ...s, industry, scopeId: 'all' })), []);
+  // Session, scopes and the directory come from /v1/auth/me + the org directory when live; from fixtures otherwise.
+  const derived = useMemo(() => {
+    if (live && ws) {
+      const role = effectiveRole(state.role, ws);
+      setActiveRole(role); // synchronously, so child screens' first requests use the right persona
+      return {
+        industry: ws.orgView!.industry,
+        role,
+        session: sessionOf(role, ws),
+        scopes: scopeOptionsOf(role, ws),
+        org: ws.orgView!,
+        locations: ws.locations,
+        industries: industriesAvailable(ws),
+        roles: availableRoles(ws),
+      };
+    }
+    return {
+      industry: state.industry,
+      role: state.role,
+      session: sessionFor(state.industry, state.role),
+      scopes: scopeOptions(state.industry, state.role),
+      org: FIXTURES[state.industry].org,
+      locations: FIXTURES[state.industry].locations as Location[],
+      industries: [...APP_INDUSTRIES],
+      roles: [...VIEW_ROLES],
+    };
+  }, [live, ws, state.industry, state.role]);
+  const scope = derived.scopes.find((s) => s.id === state.scopeId) ?? derived.scopes[0] ?? { id: 'all', kind: 'all' as const, label: 'All authorised locations', locationIds: [] };
+
+  const setIndustry = useCallback(
+    (industry: IndustryKey) => {
+      const w = workspace();
+      if (apiMode() === 'live' && w) {
+        const target = w.orgs.find((o) => o.industry === industry);
+        if (!target || target.id === w.org?.id) return;
+        void loadWorkspace(target.id).then(() => setState((s) => ({ ...s, industry, orgId: target.id, scopeId: 'all' })));
+        return;
+      }
+      setState((s) => ({ ...s, industry, scopeId: 'all' }));
+    },
+    [],
+  );
   const setRole = useCallback((role: ViewRole) => setState((s) => ({ ...s, role, scopeId: 'all' })), []);
   const setScopeId = useCallback((scopeId: string) => setState((s) => ({ ...s, scopeId })), []);
   const setAiOpen = useCallback((aiOpen: boolean) => setState((s) => ({ ...s, aiOpen })), []);
   const toggleNav = useCallback(() => setState((s) => ({ ...s, navCollapsed: !s.navCollapsed })), []);
+  const reloadWorkspace = useCallback(async () => {
+    if (apiMode() === 'live') await refreshWorkspace();
+  }, []);
 
   const value = useMemo<AppCtx>(
     () => ({
-      ...state,
+      industry: derived.industry,
+      role: derived.role,
+      aiOpen: state.aiOpen,
+      navCollapsed: state.navCollapsed,
       scopeId: scope.id,
-      ready,
-      ctx: { industry: state.industry, role: state.role, scopeId: scope.id },
-      session,
-      scopes,
+      ready: loaded,
+      ctx: { industry: derived.industry, role: derived.role, scopeId: scope.id },
+      session: derived.session,
+      scopes: derived.scopes,
       scope,
       apiMode: mode,
-      can: (p) => can(session.assignments, p),
+      live,
+      org: derived.org,
+      locations: derived.locations,
+      industries: derived.industries,
+      roles: derived.roles,
+      can: (p) => can(derived.session.assignments, p),
       setIndustry,
       setRole,
       setScopeId,
       setAiOpen,
       toggleNav,
+      reloadWorkspace,
     }),
-    [state, ready, session, scopes, scope, mode, setIndustry, setRole, setScopeId, setAiOpen, toggleNav],
+    [derived, state.aiOpen, state.navCollapsed, scope, loaded, mode, live, setIndustry, setRole, setScopeId, setAiOpen, toggleNav, reloadWorkspace],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

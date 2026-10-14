@@ -6,7 +6,6 @@ import { Badge, Button, Icon, Textarea, cx } from '@bh/ui';
 import type { FoodOrder, FoodOrderStatus } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
 import { fmtTime, moneyWithCode } from '@/lib/format';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, LoadingBlock } from '../../ui/States';
@@ -37,7 +36,7 @@ export function FoodOrdersScreen() {
   const [reason, setReason] = useState('');
   const update = (o: FoodOrder) => res.status === 'ready' && res.setData(res.data.map((x) => (x.id === o.id ? o : x)));
   const act = useOrderActions(update);
-  const locOf = (id: string) => FIXTURES.foods.locations.find((l) => l.id === id)!;
+  const locOf = (id: string) => app.locations.find((l) => l.id === id) ?? { name: '', timeZone: app.org.defaultTimeZone };
 
   return (
     <>

@@ -7,7 +7,7 @@ import { useApi, useMutation } from '@/lib/useApi';
 import { cityOfZone, fmtDay, fmtTime, relativeTime } from '@/lib/format';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
-import { Async, Banner, LoadingBlock } from '../../ui/States';
+import { Async, Banner, Empty, LoadingBlock } from '../../ui/States';
 
 export function CoverScreen() {
   const t = useTranslations('cover');
@@ -25,8 +25,8 @@ export function CoverScreen() {
   return (
     <>
       <PageHeader icon="users" title={tOps('title')} description={tOps('description')} />
-      <Async res={res} loading={<LoadingBlock variant="detail" />}>
-        {(c) => (
+      <Async res={res} loading={<LoadingBlock variant="detail" />} isEmpty={(d) => d === null} empty={<Empty icon="users" title={t('noneTitle')} body={t('noneBody')} />}>
+        {(c) => c && (
           <div className="grid items-start gap-3 lg:grid-cols-[1.4fr_1fr]">
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5">
               <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(160px,1fr))]">
@@ -69,7 +69,13 @@ export function CoverScreen() {
                   </li>
                 ))}
               </ul>
-              {c.status === 'open' && <p className="text-xs text-stone">{t('simulateHint')}</p>}
+              {c.status === 'open' && !app.live && <p className="text-xs text-stone">{t('simulateHint')}</p>}
+              {c.status === 'open' && app.live && (
+                <Button size="sm" icon="check" loading={accept.pending} onClick={async () => apply(await accept.run(c.id, app.session.user.id))} className="self-start">
+                  {t('acceptSelf')}
+                </Button>
+              )}
+              {accept.error && <Banner tone="danger" live="assertive">{accept.error.message}</Banner>}
               {c.status === 'accepted' &&
                 (canApprove ? (
                   <Button icon="check" loading={approve.pending} onClick={async () => apply(await approve.run(c.id))} className="self-start">
@@ -86,9 +92,11 @@ export function CoverScreen() {
                   <Banner tone="success" live="polite">
                     {t('confirmed', { count: c.bookedCustomers })}
                   </Banner>
-                  <Button size="sm" variant="secondary" icon="refresh" onClick={async () => apply(await reset.run(c.id))}>
-                    {t('restart')}
-                  </Button>
+                  {!app.live && (
+                    <Button size="sm" variant="secondary" icon="refresh" onClick={async () => apply(await reset.run(c.id))}>
+                      {t('restart')}
+                    </Button>
+                  )}
                 </div>
               )}
             </section>

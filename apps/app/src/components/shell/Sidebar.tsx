@@ -4,19 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon, LogoMark, cx } from '@bh/ui';
-import { APP_INDUSTRIES } from '@/lib/types';
 import { INDUSTRY_UI, NAV_SHARED, NAV_TOP, OPS, type NavItem } from '@/lib/nav';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from './AppContext';
 
 export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean; onNavigate?: () => void; mobile?: boolean }) {
   const t = useTranslations();
   const app = useApp();
   const path = usePathname();
-  const org = FIXTURES[app.industry].org;
+  const org = app.org;
 
   const opsItems: NavItem[] = OPS[app.industry].map((o) => ({ key: o.key, href: `/ops/${o.key}`, icon: o.icon, later: o.kind === 'later', perm: 'operations.read' }));
-  const badges: Record<string, number> = { payments: 1, connections: app.industry === 'studios' ? 2 : 1, registrations: 4, cover: 1 };
+  // Sample-mode badges illustrate counts; live counts come from the overview's "Needs attention" and notifications.
+  const badges: Record<string, number> = app.live ? {} : { payments: 1, connections: app.industry === 'studios' ? 2 : 1, registrations: 4, cover: 1 };
 
   const label = (it: NavItem, section: 'top' | 'ops' | 'shared') => {
     if (section === 'ops') return t(`ops.${app.industry}.${it.key}.title`);
@@ -75,9 +74,9 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
         )}
       </div>
 
-      {!collapsed && (
-        <div role="group" aria-label={t('shell.industrySwitcher')} className="mb-3 grid shrink-0 grid-cols-5 gap-1 rounded-[18px] bg-canvas p-1">
-          {APP_INDUSTRIES.map((k) => (
+      {!collapsed && app.industries.length > 1 && (
+        <div role="group" aria-label={t('shell.industrySwitcher')} className="mb-3 grid shrink-0 gap-1 rounded-[18px] bg-canvas p-1" style={{ gridTemplateColumns: `repeat(${app.industries.length}, minmax(0, 1fr))` }}>
+          {app.industries.map((k) => (
             <button
               key={k}
               type="button"

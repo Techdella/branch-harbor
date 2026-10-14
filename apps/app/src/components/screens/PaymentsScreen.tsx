@@ -7,7 +7,6 @@ import { Badge, Button, DataTable, Drawer, Icon, cx, type Tone } from '@bh/ui';
 import { totalsByCurrency } from '@bh/shared';
 import type { PaymentState, ReconciliationItem, RefundState, Transaction } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { fmtDateTime, moneyWithCode } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
@@ -54,6 +53,12 @@ export function PaymentsScreen() {
   );
 }
 
+/** Location lookup that never crashes on an unknown id (e.g. an org-level payment without a location). */
+function useLocLookup() {
+  const app = useApp();
+  return (id: string) => app.locations.find((l) => l.id === id) ?? { ...app.locations[0]!, id, name: app.org.name, address: { ...(app.locations[0]?.address ?? { line1: '', city: '', country: '' }), city: app.org.name }, timeZone: app.org.defaultTimeZone, currency: app.org.defaultCurrency };
+}
+
 function Transactions() {
   const t = useTranslations('payments');
   const locale = useLocale();
@@ -62,8 +67,7 @@ function Transactions() {
   const router = useRouter();
   const params = useSearchParams();
   const res = useApi((api) => api.payments.transactions(app.ctx), [app.industry, app.role, app.scopeId]);
-  const locs = FIXTURES[app.industry].locations;
-  const loc = (id: string) => locs.find((l) => l.id === id)!;
+  const loc = useLocLookup();
   const openId = params.get('tx');
   const setOpen = (id: string | null) => router.replace(id ? `?tab=transactions&tx=${id}` : '?tab=transactions', { scroll: false });
 
@@ -151,8 +155,7 @@ function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationI
   const [ack, setAck] = useState(false);
   const recreate = useMutation((api, id: string) => api.payments.recreateOrder(id));
   const refund = useMutation((api, id: string, amount: number, currency: string) => api.payments.refund(id, { amount, currency }));
-  const locs = FIXTURES[app.industry].locations;
-  const loc = (id: string) => locs.find((l) => l.id === id)!;
+  const loc = useLocLookup();
   const canRefund = app.can('payments.refund');
   const canRecreate = app.can('operations.write') || app.role === 'hq';
 
@@ -268,14 +271,14 @@ function Setup() {
   const t = useTranslations('payments');
   const app = useApp();
   const res = useApi((api) => api.payments.accounts(app.ctx), [app.industry, app.role]);
-  const locs = FIXTURES[app.industry].locations;
+  const loc = useLocLookup();
   return (
     <Async res={res} permission="payments.read" loading={<LoadingBlock variant="cards" rows={4} />}>
       {(accts) => (
         <>
           <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))]">
             {accts.map((a) => {
-              const l = locs.find((x) => x.id === a.locationId)!;
+              const l = loc(a.locationId);
               return (
                 <div key={a.locationId} className="flex flex-col gap-2 rounded-lg bg-surface p-4">
                   <div className="flex items-center justify-between gap-2">

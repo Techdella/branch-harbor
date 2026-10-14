@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, DataTable, Drawer, Icon, OriginTag, Tabs, cx } from '@bh/ui';
 import type { Location } from '@/lib/types';
 import { useApi } from '@/lib/useApi';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { cityOfZone, countryName, fmtTime, zoneLabel } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
@@ -33,7 +32,7 @@ export function LocationsScreen() {
   const res = useApi((api) => api.locations(app.ctx), [app.industry, app.role, app.scopeId]);
   const openId = params.get('open');
   const setOpen = (id: string | null) => router.replace(id ? `?open=${id}` : '?', { scroll: false });
-  const org = FIXTURES[app.industry].org;
+  const org = app.org;
   const ownerName = (id: string) => org.ownerGroups.find((g) => g.id === id)?.name ?? id;
   const regionName = (id: string) => org.regions.find((r) => r.id === id)?.name ?? id;
 

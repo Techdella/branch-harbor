@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, DataTable, Icon, Input, Tabs, cx } from '@bh/ui';
 import type { GroupPublish, PublishTarget, WebsiteField, WebsitePage } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { relativeTime } from '@/lib/format';
 import { INDUSTRY_UI } from '@/lib/nav';
 import { useApp } from '../shell/AppContext';
@@ -46,7 +45,7 @@ function Editor() {
   const t = useTranslations('websites');
   const locale = useLocale();
   const app = useApp();
-  const locs = FIXTURES[app.industry].locations.filter((l) => app.scope.locationIds.includes(l.id));
+  const locs = app.locations.filter((l) => app.scope.locationIds.includes(l.id));
   const preferred = locs.find((l) => l.id === 'ls') ?? locs[0];
   const [locId, setLocId] = useState(preferred?.id ?? '');
   const lid = locs.some((l) => l.id === locId) ? locId : (preferred?.id ?? '');
@@ -61,7 +60,7 @@ function Editor() {
   const decide = useMutation((api, key: string, d: 'approve' | 'reject', c: string) => api.websites.decide(lid, key, d, c));
   const reset = useMutation((api, key: string) => api.websites.resetField(lid, key));
   const isHq = app.role === 'hq';
-  const brand = FIXTURES[app.industry].org.brand;
+  const brand = app.org.brand;
 
   const apply = (p: WebsitePage | undefined, msg: string) => {
     if (!p) return;
@@ -414,38 +413,35 @@ function Publish() {
 function Domains() {
   const t = useTranslations('websites');
   const app = useApp();
-  const f = FIXTURES[app.industry];
-  const slug = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const locs = f.locations.filter((l) => app.scope.locationIds.includes(l.id));
+  const res = useApi((api) => api.websites.sites(app.ctx), [app.industry, app.role, app.scopeId]);
   return (
     <section className="flex flex-col gap-3 rounded-xl bg-surface p-5">
       <p className="text-sm text-stone">{t('domainsIntro')}</p>
-      <ul className="flex flex-col gap-2">
-        {locs.map((l, i) => {
-          const custom = i === 0 ? { host: `www.${slug(f.org.brand)}.example`, state: 'ready' } : i === 1 ? { host: `${slug(l.name.split(' – ').pop() ?? '')}.${slug(f.org.brand)}.example`, state: 'awaiting_dns' } : null;
-          return (
-            <li key={l.id} className="flex flex-wrap items-center gap-3 rounded-lg bg-canvas-raised p-4">
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold">{l.name}</div>
-                <div className="truncate font-mono text-xs text-stone">
-                  https://sites.branchharbor.com/{slug(f.org.brand)}/{slug(l.name)}
+      <Async res={res} loading={<LoadingBlock variant="table" rows={3} />}>
+        {(sites) => (
+          <ul className="flex flex-col gap-2">
+            {sites.map((s) => (
+              <li key={s.locationId} className="flex flex-wrap items-center gap-3 rounded-lg bg-canvas-raised p-4">
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-bold">{s.locationName}</div>
+                  {s.includedAddress && <div className="truncate font-mono text-xs text-stone">{s.includedAddress}</div>}
+                  {s.custom && <div className="truncate font-mono text-xs">https://{s.custom.host}</div>}
                 </div>
-                {custom && <div className="truncate font-mono text-xs">https://{custom.host}</div>}
-              </div>
-              {custom ? (
-                <Badge tone={custom.state === 'ready' ? 'success' : 'warning'} icon={custom.state === 'ready' ? 'shield' : 'clock'}>
-                  {t(`domainState.${custom.state}`)}
-                </Badge>
-              ) : (
-                <Badge tone="neutral" icon="globe">
-                  {t('includedOnly')}
-                </Badge>
-              )}
-              {l.site === 'unpublished' && <Badge tone="neutral" icon="eye">{t('notPublic')}</Badge>}
-            </li>
-          );
-        })}
-      </ul>
+                {s.custom ? (
+                  <Badge tone={s.custom.state === 'ready' ? 'success' : s.custom.state === 'failed' ? 'danger' : 'warning'} icon={s.custom.state === 'ready' ? 'shield' : 'clock'}>
+                    {t(`domainState.${s.custom.state === 'ready' ? 'ready' : 'awaiting_dns'}`)}
+                  </Badge>
+                ) : (
+                  <Badge tone="neutral" icon="globe">
+                    {t('includedOnly')}
+                  </Badge>
+                )}
+                {!s.live && <Badge tone="neutral" icon="eye">{t('notPublic')}</Badge>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Async>
       <div className="flex flex-wrap gap-2">
         <Link href="/onboarding?step=website" className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-bold text-white">
           <Icon name="link" size={16} />

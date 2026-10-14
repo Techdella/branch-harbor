@@ -663,6 +663,21 @@ const rawMockApi: BranchHarborApi = {
       t.error = undefined;
       return clone(s.plan);
     },
+    sites: (ctx) =>
+      read(() => {
+        const f = FIXTURES[ctx.industry];
+        const slug = (v: string) => v.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const ids = scopeIds(ctx);
+        return f.locations
+          .filter((l) => ids.includes(l.id))
+          .map((l, i) => ({
+            locationId: l.id,
+            locationName: l.name,
+            includedAddress: `https://sites.branchharbor.com/${slug(f.org.brand)}/${slug(l.name)}`,
+            custom: i === 0 ? { host: `www.${slug(f.org.brand)}.example`, state: 'ready' as const } : i === 1 ? { host: `${slug(l.name.split(' – ').pop() ?? '')}.${slug(f.org.brand)}.example`, state: 'awaiting_dns' as const } : null,
+            live: l.site === 'live',
+          }));
+      }, undefined, 150),
   },
 
   payments: {

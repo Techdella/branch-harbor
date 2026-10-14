@@ -115,7 +115,8 @@
     "sampleHint": "Showing built-in sample data (NEXT_PUBLIC_USE_MOCKS).",
     "fallback": "Offline · sample data",
     "fallbackTitle": "Couldn't reach the BranchHarbor service",
-    "fallbackHint": "You're seeing sample data until the connection returns. Changes here are not saved to your account."
+    "fallbackHint": "You're seeing sample data until the connection returns. Changes here are not saved to your account.",
+    "signedInAs": "Your role"
   },
   "states": {
     "loading": "Loading…",
@@ -376,7 +377,10 @@
     "confirmed": "Confirmed. Schedule, class page and {count} customers updated together.",
     "restart": "Restart demo",
     "history": "Request history",
-    "historyNote": "History is kept for every request, including declined ones."
+    "historyNote": "History is kept for every request, including declined ones.",
+    "noneTitle": "No open cover requests",
+    "noneBody": "When an instructor asks for cover on a class in this scope, it appears here for a substitute to accept and a manager to confirm.",
+    "acceptSelf": "I'll cover this class"
   },
   "registrations": {
     "statusTabs": "Registration status",
@@ -953,7 +957,9 @@
     "separateBilling": "Separate from customer payments",
     "billingHint": "{plan} · {price} per published location · next invoice {date}.",
     "billed": "Billed · {price}",
-    "notBilled": "Not billed until published"
+    "notBilled": "Not billed until published",
+    "billingPlanOnly": "{plan} · per-location pricing and invoice dates are shown in your billing provider.",
+    "billedNoPrice": "Billed"
   },
   "auth": {
     "legal": "Sample environment. Don't enter real customer data.",
@@ -988,7 +994,11 @@
     "sendLink": "Send reset link",
     "forgotSentTitle": "Check your email",
     "forgotSent": "If an account exists for {email}, a reset link is on its way. It expires in 30 minutes.",
-    "backToSignIn": "Back to sign in"
+    "backToSignIn": "Back to sign in",
+    "verifySubLink": "We sent a verification link to {email}. Open it on this device, or paste the link here.",
+    "linkLabel": "Verification link or token",
+    "linkHint": "Paste the full link from the email, or just the token after “token=”.",
+    "devToken": "Development: use the token returned by the API"
   },
   "onboarding": {
     "loading": "Loading your setup…",

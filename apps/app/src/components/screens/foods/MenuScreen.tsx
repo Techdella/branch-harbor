@@ -7,7 +7,6 @@ import { Badge, Button, Icon, cx } from '@bh/ui';
 import type { MenuField } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
 import { moneyWithCode } from '@/lib/format';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, LoadingBlock } from '../../ui/States';
@@ -29,7 +28,7 @@ export function MenuScreen() {
   const tOps = useTranslations('ops.foods.menu');
   const locale = useLocale();
   const app = useApp();
-  const locs = FIXTURES.foods.locations.filter((l) => app.scope.locationIds.includes(l.id));
+  const locs = app.locations.filter((l) => app.scope.locationIds.includes(l.id));
   const views = [...(app.role === 'hq' ? [{ id: 'hq', label: t('master'), icon: 'building' as const }] : []), ...locs.map((l) => ({ id: l.id, label: l.name, icon: 'pin' as const }))];
   const [view, setView] = useState(views[0]?.id ?? 'hq');
   const v = views.some((x) => x.id === view) ? view : (views[0]?.id ?? 'hq');

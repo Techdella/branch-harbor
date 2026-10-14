@@ -7,7 +7,6 @@ import { Badge, Button, Drawer, Icon, Tag, cx, type Tone } from '@bh/ui';
 import type { CommerceOrder } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
 import { fmtDateTime, fmtTime, moneyWithCode, relativeTime } from '@/lib/format';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, Empty, LoadingBlock } from '../../ui/States';
@@ -27,7 +26,7 @@ export function CommerceOrdersScreen() {
   const res = useApi((api) => api.commerce.orders(app.ctx), [app.role, app.scopeId]);
   const openId = params.get('open');
   const setOpen = (id: string | null) => router.replace(id ? `?open=${id}` : '?', { scroll: false });
-  const locName = (id: string) => FIXTURES.commerce.locations.find((l) => l.id === id)?.name ?? id;
+  const locName = (id: string) => app.locations.find((l) => l.id === id)?.name ?? id;
   const open = res.status === 'ready' ? res.data.find((o) => o.id === openId) : undefined;
 
   return (
@@ -73,7 +72,7 @@ function OrderDrawer({ o, locName, onClose, onUpdate }: { o: CommerceOrder; locN
   const [picking, setPicking] = useState(false);
   const [sel, setSel] = useState<Record<string, boolean>>({});
   const refund = useMutation((api, ids: string[]) => api.commerce.refund(o.id, ids));
-  const tz = FIXTURES.commerce.locations.find((l) => l.id === o.locationId)?.timeZone ?? 'UTC';
+  const tz = app.locations.find((l) => l.id === o.locationId)?.timeZone ?? 'UTC';
   const selected = o.lines.filter((l) => sel[l.id] && !l.refunded);
   const amt = { amount: selected.reduce((s, l) => s + l.unit.amount * l.qty, 0), currency: o.total.currency };
   const canRefund = o.payment === 'succeeded' && app.can('operations.write') && app.role !== 'staff' && o.lines.some((l) => !l.refunded);

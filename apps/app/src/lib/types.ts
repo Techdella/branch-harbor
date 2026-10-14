@@ -454,7 +454,8 @@ export interface OrgSettings {
   dataRegion: 'us' | 'eu' | 'apac';
   customerSharing: 'off' | 'totals_only' | 'shared';
   aiTraining: boolean;
-  billing: { plan: string; perLocation: Money; locations: { locationId: string; status: 'billed' | 'not_billed_until_published' }[]; nextInvoice: string };
+  /** `perLocation`/`nextInvoice` are null when the billing provider doesn't report them. */
+  billing: { plan: string; perLocation: Money | null; locations: { locationId: string; status: 'billed' | 'not_billed_until_published' }[]; nextInvoice: string | null };
 }
 
 /* ---------- Onboarding ---------- */

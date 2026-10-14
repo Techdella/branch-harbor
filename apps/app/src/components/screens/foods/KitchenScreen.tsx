@@ -6,7 +6,6 @@ import { Button, Icon, Toggle, cx } from '@bh/ui';
 import type { FoodOrder } from '@/lib/types';
 import { useApi } from '@/lib/useApi';
 import { fmtTime, relativeTime } from '@/lib/format';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, Empty, LoadingBlock } from '../../ui/States';
@@ -18,8 +17,8 @@ export function KitchenScreen() {
   const tf = useTranslations('forders');
   const locale = useLocale();
   const app = useApp();
-  const locs = FIXTURES.foods.locations.filter((l) => app.scope.locationIds.includes(l.id) && l.site === 'live');
-  const [locId, setLocId] = useState(locs[0]?.id ?? 'bl');
+  const locs = app.locations.filter((l) => app.scope.locationIds.includes(l.id) && l.site === 'live');
+  const [locId, setLocId] = useState(locs[0]?.id ?? '');
   const [sound, setSound] = useState(true);
   const [simulateOffline, setSimulateOffline] = useState(false);
   const [full, setFull] = useState(false);

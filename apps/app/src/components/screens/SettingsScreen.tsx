@@ -6,7 +6,6 @@ import { Badge, Button, Field, Input, Select, Toggle } from '@bh/ui';
 import { SUPPORTED_CURRENCIES } from '@bh/shared';
 import type { OrgSettings } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
-import { FIXTURES } from '@/lib/mock/orgs';
 import { currencyName, fmtYmd, moneyWithCode } from '@/lib/format';
 import { APP_LOCALES, APP_LOCALE_LABELS } from '@/i18n/config';
 import { useApp } from '../shell/AppContext';
@@ -130,14 +129,18 @@ export function SettingsScreen() {
                   </Button>
                 </div>
                 <SectionCard title={t('billing')} aside={<Badge tone="neutral" icon="info">{t('separateBilling')}</Badge>}>
-                  <p className="mb-3 text-sm text-stone">{t('billingHint', { plan: form.billing.plan, price: moneyWithCode(form.billing.perLocation, locale), date: fmtYmd(form.billing.nextInvoice, locale, { day: 'numeric', month: 'long', year: 'numeric' }) })}</p>
+                  <p className="mb-3 text-sm text-stone">
+                    {form.billing.perLocation && form.billing.nextInvoice
+                      ? t('billingHint', { plan: form.billing.plan, price: moneyWithCode(form.billing.perLocation, locale), date: fmtYmd(form.billing.nextInvoice, locale, { day: 'numeric', month: 'long', year: 'numeric' }) })
+                      : t('billingPlanOnly', { plan: form.billing.plan })}
+                  </p>
                   <ul className="flex flex-col gap-1.5">
                     {form.billing.locations.map((b) => {
-                      const l = FIXTURES[app.industry].locations.find((x) => x.id === b.locationId)!;
+                      const l = app.locations.find((x) => x.id === b.locationId)!;
                       return (
                         <li key={b.locationId} className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-canvas-raised px-3.5 py-2.5 text-sm">
                           <span className="font-semibold">{l.name}</span>
-                          {b.status === 'billed' ? <Badge tone="success">{t('billed', { price: moneyWithCode(form.billing.perLocation, locale) })}</Badge> : <Badge tone="neutral" icon="clock">{t('notBilled')}</Badge>}
+                          {b.status === 'billed' ? <Badge tone="success">{form.billing.perLocation ? t('billed', { price: moneyWithCode(form.billing.perLocation, locale) }) : t('billedNoPrice')}</Badge> : <Badge tone="neutral" icon="clock">{t('notBilled')}</Badge>}
                         </li>
                       );
                     })}

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Avatar, Icon, LogoMark, cx } from '@bh/ui';
-import { VIEW_ROLES, type ViewRole } from '@/lib/types';
+import type { ViewRole } from '@/lib/types';
 import { INDUSTRY_UI } from '@/lib/nav';
 import { getApi } from '@/lib/api';
 import { relativeTime } from '@/lib/format';
@@ -149,14 +149,22 @@ function Notifications() {
   );
 }
 
+/** "Viewing as": every persona in sample mode; with the API, only the roles the user actually holds. */
 function RoleSelect({ className }: { className?: string }) {
   const t = useTranslations('shell');
   const app = useApp();
+  if (app.roles.length <= 1)
+    return (
+      <span className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas px-3.5 text-xs font-semibold text-stone', className)}>
+        {t('signedInAs')}
+        <strong className="text-[13px] text-ink">{t(`roles.${app.role}`)}</strong>
+      </span>
+    );
   return (
     <label className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas pl-3.5 pr-2 text-xs font-semibold text-stone', className)}>
       {t('viewingAs')}
       <select value={app.role} onChange={(e) => app.setRole(e.target.value as ViewRole)} className="h-10 bg-transparent text-[13px] font-bold text-ink focus:outline-none">
-        {VIEW_ROLES.map((r) => (
+        {app.roles.map((r) => (
           <option key={r} value={r}>
             {t(`roles.${r}`)}
           </option>
