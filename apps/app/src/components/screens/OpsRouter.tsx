@@ -17,6 +17,7 @@ import { CommerceOrdersScreen } from './commerce/OrdersScreen';
 import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
 import { KitchenScreen } from './foods/KitchenScreen';
+import { RealtyScreen } from './realty/RealtyRouter';
 
 export function OpsRouter({ screen }: { screen: string }) {
   const t = useTranslations('ops');
@@ -65,5 +66,6 @@ export function OpsRouter({ screen }: { screen: string }) {
     case 'foods:kitchen':
       return <KitchenScreen />;
   }
+  if (app.industry === 'realty') return <RealtyScreen screen={def.key} />;
   return null;
 }

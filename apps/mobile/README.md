@@ -174,6 +174,14 @@ Money is always `{ amount: <integer minor units>, currency }`; times are UTC ISO
 - **Privacy**: notification consent per channel (push/email/SMS × updates/offers); data export and deletion requests.
 - **Accessibility**: labels/roles/states on all controls, ≥44pt targets, status = text + icon, live-region announcements, Dynamic Type (capped multipliers on headings), reduced-motion respected (skeleton pulse, sheet animation), start/end layout and mirrored directional icons for RTL.
 
+
+## Real Estate
+
+`app/realty/*` (feature code in `src/features/realty/`): buyer search, listing detail with save and book-a-viewing, saved homes and my
+viewings (`/realty`, `/realty/listing/[id]`, `/realty/saved`); agent day — today's viewings, confirm, log feedback, new enquiries, claim from
+the office pool (`/realty/agent`); owner pulse — funnel and sold/let volume per currency (`/realty/pulse`). Entry rows on the customer home,
+staff Today and owner Pulse. Live endpoints: `/v1/public/realty/*`, `/v1/me/realty/*`, `/v1/orgs/:orgId/realty/my-day|reports|viewings/*`
+(`EXPO_PUBLIC_REALTY_BRAND`, default `keystone-realty`).
 ## Payments
 
 `PaymentStep.native.tsx` wraps Stripe PaymentSheet (`initPaymentSheet` / `presentPaymentSheet`) using the client secret the API returns when the booking hold or order is created; outcomes are confirmed server-side by signed Stripe webhooks. Without `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` the screen says **Payments not configured**; mock, dev and sandbox-API builds offer "Simulate successful payment" so flows can be completed. Web (`PaymentStep.tsx`) never loads the native SDK. Stripe needs a development build (`eas build --profile development`) — not Expo Go — when the key is set.

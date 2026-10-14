@@ -1,7 +1,7 @@
 import type { IconName } from '@bh/icons';
 import { IMG, PASTEL, type PastelKey } from './images';
 
-export const INDUSTRY_KEYS = ['studios', 'sports', 'wellness', 'commerce', 'foods'] as const;
+export const INDUSTRY_KEYS = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
 export type IndustryKey = (typeof INDUSTRY_KEYS)[number];
 
 export function isIndustryKey(v: string): v is IndustryKey {
@@ -156,6 +156,29 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
       { name: 'São Paulo – Pinheiros', country: 'BR', currency: 'BRL', timeZone: 'America/Sao_Paulo', status: 'operating' },
       { name: 'Dublin – Portobello', country: 'IE', currency: 'EUR', timeZone: 'Europe/Dublin', status: 'operating' },
       { name: 'Seattle – Ballard', country: 'US', currency: 'USD', timeZone: 'America/Los_Angeles', status: 'openingSoon' },
+    ],
+  },
+  realty: {
+    key: 'realty',
+    icon: 'house',
+    pastel: PASTEL.aqua,
+    accent: '#2C7A7B',
+    availability: 'next',
+    image: IMG.realtyHouse,
+    image2: IMG.realtyLiving,
+    problemIcons: ['shield', 'mail', 'chart'],
+    workflow: [
+      { icon: 'house', rows: [r('house', 'signal'), r('shield', 'butter'), r('house', 'aqua')] },
+      { icon: 'mail', rows: [r('user', 'signal'), r('users', 'butter'), r('user')] },
+      { icon: 'key', rows: [r('clock', 'signal'), r('clock', 'butter'), r('check', 'aqua')] },
+      { icon: 'receipt', rows: [r('receipt', 'butter'), r('receipt', 'signal')] },
+    ],
+    connected: ['stripe', 'googlecalendar', 'mailchimp', 'wpml'],
+    sampleLocations: [
+      { name: 'Toronto – Midtown', country: 'CA', currency: 'CAD', timeZone: 'America/Toronto', status: 'operating' },
+      { name: 'London – Hampstead', country: 'GB', currency: 'GBP', timeZone: 'Europe/London', status: 'operating' },
+      { name: 'Madrid – Salamanca', country: 'ES', currency: 'EUR', timeZone: 'Europe/Madrid', status: 'operating' },
+      { name: 'Dubai – Marina', country: 'AE', currency: 'AED', timeZone: 'Asia/Dubai', status: 'openingSoon' },
     ],
   },
 };

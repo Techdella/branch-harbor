@@ -93,6 +93,19 @@ export const FIXTURES: Record<IndustryKey, IndustryFixture> = {
     ] as L[]).map(mk('Restaurant · v11')),
     localLocationId: 'bl', staffLocationId: 'bl', people: { hq: 'Jamie Morgan', local: 'Carlos Ortega', staff: 'Mei Lin' },
   },
+  realty: {
+    org: { id: 'org_keystone', name: 'Keystone Realty Network', brand: 'Keystone Realty', industry: 'realty', sample: true, defaultCurrency: 'CAD', defaultTimeZone: 'America/Toronto', defaultLocale: 'en', dataRegion: 'us', regions: [{ id: 'am', name: 'Americas' }, { id: 'emea', name: 'Europe & Middle East' }, { id: 'apac', name: 'Asia-Pacific' }],
+      ownerGroups: [{ id: 'og_midtown', name: 'Keystone Midtown Inc.' }, { id: 'og_shoreline', name: 'Shoreline Realty Group' }, { id: 'og_company', name: 'Company-owned' }] },
+    locations: ([
+      ['tor', 'TOR', 'Toronto Midtown', '2300 Yonge St', 'Toronto', 'ON', 'CA', 'am', 'og_midtown', 'franchise', 'CAD', 'America/Toronto', 'en-CA', '+1 416 555 0120', 'Mon–Sat 09:00–19:00', 'live', 'ok', P.aqua, 0],
+      ['van', 'VAN', 'North Vancouver', '150 Lonsdale Ave', 'North Vancouver', 'BC', 'CA', 'am', 'og_shoreline', 'franchise', 'CAD', 'America/Vancouver', 'en-CA', '+1 604 555 0171', 'Mon–Sat 09:00–18:00', 'live', 'ok', P.sage, 0],
+      ['lon', 'LON', 'London Hampstead', '27 Heath Street', 'London', undefined, 'GB', 'emea', 'og_company', 'company', 'GBP', 'Europe/London', 'en-GB', '+44 20 7946 0270', 'Mon–Sat 09:00–18:00', 'live', 'ok', P.lilac, 0],
+      ['mad', 'MAD', 'Madrid Salamanca', 'Calle de Serrano 41', 'Madrid', 'Madrid', 'ES', 'emea', 'og_company', 'company', 'EUR', 'Europe/Madrid', 'es-ES', '+34 910 555 041', 'L–V 9:30–19:30', 'live', 'ok', P.butter, 0],
+      ['dxb', 'DXB', 'Dubai Marina', 'Marina Plaza, Office 1402', 'Dubai Marina', 'Dubai', 'AE', 'emea', 'og_company', 'company', 'AED', 'Asia/Dubai', 'en-AE', '+971 4 555 0142', 'Sun–Fri 09:00–19:00', 'live', 'ok', P.sand, 0],
+      ['syd', 'SYD', 'Sydney Paddington', '312 Oxford St', 'Paddington', 'NSW', 'AU', 'apac', 'og_company', 'company', 'AUD', 'Australia/Sydney', 'en-AU', '+61 2 5550 0312', 'Mon–Sat 09:00–17:30', 'live', 'ok', P.blush, 0],
+    ] as L[]).map(mk('Office · v3')),
+    localLocationId: 'tor', staffLocationId: 'tor', people: { hq: 'Elena Vargas', local: 'Marcus Lee', staff: 'Nadia Hassan' },
+  },
 };
 
 export function fixture(ind: IndustryKey): IndustryFixture {

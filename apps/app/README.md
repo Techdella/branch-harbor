@@ -156,6 +156,14 @@ reschedule) `services` `practitioners` `forms` `packages`·Later · Commerce `or
 `catalogue` `assortment` `inventory` `returns`·Later · Foods `menu` (master/location, origins, reset) `orders`
 (board) `kitchen` (large cards, overdue, stale-connection banner, full screen) `pickup` `catering`·Later.
 
+
+### Real Estate (`realty`)
+
+Operations → Pulse, Listings (board by status, editor, HQ approval, AI description draft, portal opt-in), Enquiries (mine / office pool / all,
+claim and reassign), Viewings (confirm, cancel, feedback), Offers (visible only to listing agents, the buyer's agent and office managers;
+negotiation trail), Agents & offices (governance tier, area unit, lead routing, accepts leads) and Portal feeds (sandbox). Data layer:
+`src/lib/realty/` (live `/v1/orgs/:orgId/realty/*`, sample data in `mock.ts` with the same visibility rules per persona).
+
 ## Shell and prototype controls
 
 Left nav (248px; icon rail on tablet; drawer on mobile), top bar with the always-visible scope selector

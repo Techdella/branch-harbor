@@ -215,6 +215,8 @@ function overviewMetrics(ind: IndustryKey, r: ApiReport): Metric[] {
     foods: [
       metricOf('orders', 'Pickup orders', 'receipt', P.blush, M.foodOrders, (v) => ({ kind: 'count', value: sumRecord(v) })),
     ],
+    // Real Estate KPIs (listings, funnel, volume per currency) live on Operations → Pulse (/v1/orgs/:id/realty/reports).
+    realty: [],
   };
   const conns = r.connections;
   const sync: Metric = conns.length
@@ -271,6 +273,14 @@ async function upcoming(ctx: RequestContext): Promise<{ title: string; items: Up
       items: fo.filter((x) => scope.has(x.locationId)).sort((a, b) => a.promisedAt.localeCompare(b.promisedAt)).slice(0, 8).map((x) => ({ id: x.id, at: x.promisedAt, timeZone: tzOf(x.locationId), title: `#${x.orderNumber} · ${x.contact?.name ?? 'Guest'}`, detail: `${nameOfLoc(x.locationId)} · ${x.lines.reduce((a, l) => a + l.quantity, 0)} items`, status: { label: humanise(x.status), tone: (x.status === 'awaiting_acceptance' ? 'warning' : x.status === 'ready' ? 'success' : 'info') as Tone } })),
     };
   }
+  if (ind === 'realty') {
+    type RV = { id: string; startsAt: string; locationId: string; status: string; agentName: string | null; listing: { title: string } | null; officeName?: string; contact: { name: string } };
+    const vs = await maybe(http.get<{ items: RV[] }>(o('/realty/viewings'), { from: now(), to: new Date(Date.now() + 2 * 86400_000).toISOString(), status: 'requested,confirmed' }).then(items), [] as RV[]);
+    return {
+      title: 'Upcoming viewings',
+      items: vs.filter((x) => scope.has(x.locationId)).slice(0, 8).map((x) => ({ id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: x.listing?.title ?? 'Viewing', detail: `${nameOfLoc(x.locationId)} · ${x.agentName ?? 'Agent'}`, status: x.status === 'confirmed' ? { label: 'Confirmed', tone: 'success' as Tone } : { label: 'Awaiting confirmation', tone: 'warning' as Tone } })),
+    };
+  }
   if (ind === 'wellness') {
     const ap = await maybe(http.get<{ items: ApiAppointment[] }>(o('/wellness/appointments'), { from: now(), to: new Date(Date.now() + 86400_000).toISOString() }).then(items), [] as ApiAppointment[]);
     return { title: 'Upcoming appointments', items: ap.filter((x) => scope.has(x.locationId) && x.status === 'confirmed').slice(0, 8).map((x) => ({ id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: 'Appointment', detail: nameOfLoc(x.locationId), status: { label: 'Confirmed', tone: 'success' as Tone } })) };
@@ -284,6 +294,7 @@ const AI_SUGGESTIONS: Record<IndustryKey, string[]> = {
   wellness: ['Summarise appointments this week', 'Draft a reply using our cancellation policy', 'Which practitioners are fully booked?'],
   commerce: ['Explain this week’s order trend', 'Draft product copy', 'Which stores failed the last sync?'],
   foods: ['Summarise today’s orders by location', 'Draft menu copy', 'Plan a lunch promotion'],
+  realty: ['Which offices need attention?', 'Draft a campaign for new listings', 'Summarise enquiries this week'],
 };
 
 /* ------------------------------------------------------------------ */

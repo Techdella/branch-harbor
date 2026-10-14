@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Imobiliário",
-      "who": "Imobiliárias e redes de corretores"
+      "who": "Imobiliárias e redes de corretores",
+      "flow": "Imóvel → contato → visita → proposta",
+      "cta": "Solicitar demo imobiliária"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "Uma plataforma compartilhada, adaptada ao jeito como sua empresa funciona. Estúdios está em piloto; os demais estão desenhados e no roteiro.",
       "explore": "Explorar {name}",
       "independent": "Só uma unidade? Veja a configuração simplificada",
-      "realty": "Imobiliário · Previsto"
+      "realty": "Imobiliário · Em breve"
     },
     "hqLocal": {
       "title": "Matriz e unidades, cada uma com os controles certos",
@@ -1074,6 +1076,155 @@
           "a": "Divergências entre pagamento e pedido aparecem em uma fila de recuperação para a equipe resolver."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Imobiliário",
+      "imageAlt": "Casa moderna com grandes janelas",
+      "headline": "Cada escritório, cada imóvel, uma rede confiável.",
+      "intro": "Imóveis revisados pela matriz, contatos encaminhados ao corretor certo, visitas pela disponibilidade real e propostas com histórico completo — em vários países e moedas.",
+      "problems": [
+        {
+          "t": "Anúncios sem padrão",
+          "d": "Escritórios publicam textos e informações legais que a matriz nunca revisou."
+        },
+        {
+          "t": "Contatos sem resposta",
+          "d": "Contatos de portais e do site chegam a caixas compartilhadas sem responsável."
+        },
+        {
+          "t": "Relatórios que misturam moedas",
+          "d": "O volume da rede soma dólares, libras e euros como se fossem uma só moeda."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Imóveis",
+          "title": "Do rascunho à venda, com revisão",
+          "desc": "Escritórios gerenciados e padrão publicam após aprovação da matriz; alterações em anúncios ativos também. Informações legais vêm da empresa.",
+          "screen": "Imóveis",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "CA$ 1.649.000 · 2.350 pés²",
+              "tag": "Ativo"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "Aguardando a matriz",
+              "tag": "Pendente"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "CA$ 925.000 · 910 pés²",
+              "tag": "Ativo"
+            }
+          ]
+        },
+        {
+          "label": "Contatos",
+          "title": "Todo contato tem um responsável",
+          "desc": "Contatos vão ao corretor do imóvel, depois em rodízio, depois ao pool do escritório. Corretores veem os seus e o pool.",
+          "screen": "Contatos",
+          "scope": "Londres – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portal · 14 Flask Walk",
+              "tag": "Encaminhado"
+            },
+            {
+              "a": "Avaliação",
+              "b": "Site · pool do escritório",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Site · locação",
+              "tag": "Encaminhado"
+            }
+          ]
+        },
+        {
+          "label": "Visitas",
+          "title": "Visitas pela disponibilidade real",
+          "desc": "Compradores agendam horários livres no fuso do escritório. Um corretor nunca fica com duas visitas ao mesmo tempo.",
+          "screen": "Visitas",
+          "scope": "Madri – Salamanca",
+          "rows": [
+            {
+              "a": "Sáb 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Confirmada"
+            },
+            {
+              "a": "Sáb 12:00",
+              "b": "Ático Chamberí · solicitada",
+              "tag": "Solicitada"
+            },
+            {
+              "a": "Sex 17:00",
+              "b": "Feedback registrado · alto interesse",
+              "tag": "Feita"
+            }
+          ]
+        },
+        {
+          "label": "Propostas",
+          "title": "Propostas com histórico completo",
+          "desc": "Contrapropostas, aceites e recusas ficam registrados. Só os corretores envolvidos e gerentes veem as propostas.",
+          "screen": "Propostas",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Proposta · CA$ 1.625.000",
+              "b": "Contraproposta · vence em 2 dias",
+              "tag": "Contraproposta"
+            },
+            {
+              "a": "Proposta · CA$ 1.175.000",
+              "b": "Aceita · em negociação",
+              "tag": "Aceita"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Níveis de governança e revisão de anúncios",
+        "Relatórios da rede por moeda, sem dados de clientes",
+        "Formatos de feed para portais (sandbox)"
+      ],
+      "local": [
+        "Imóveis, fotos e informações legais da empresa",
+        "Encaminhamento de contatos e agenda dos corretores",
+        "Visitas, feedback e propostas"
+      ],
+      "first": [
+        "Imóveis com aprovação da matriz",
+        "Encaminhamento de contatos",
+        "Agendamento de visitas e lembretes",
+        "Propostas com histórico"
+      ],
+      "later": [
+        "Conexões ao vivo com portais",
+        "Importação de serviços de anúncios",
+        "Assinatura eletrônica",
+        "Relatórios de comissões"
+      ],
+      "faqs": [
+        {
+          "q": "A IA pode escrever descrições?",
+          "a": "A IA escreve só com os dados informados e nunca acrescenta características, vistas ou afirmações sobre o bairro. Ela recusa segmentar ou excluir pessoas por características protegidas, e todo rascunho precisa da sua aprovação."
+        },
+        {
+          "q": "Vocês enviam imóveis para portais?",
+          "a": "Ainda não. Os formatos de feed podem ser visualizados em sandbox, mas nenhuma conexão está ativa e nada é enviado."
+        },
+        {
+          "q": "Quem vê as propostas?",
+          "a": "Os corretores do imóvel, o corretor do comprador para a própria proposta e os gerentes do escritório. A matriz vê, por padrão, totais sem dados de clientes."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1624,7 +1775,7 @@
       "business": "Nome da empresa",
       "industry": "Segmento",
       "industryPlaceholder": "Escolha um segmento",
-      "realtyOption": "Imobiliário (previsto)",
+      "realtyOption": "Imobiliário (em breve)",
       "locationCount": "Número de unidades",
       "country": "País",
       "countryPlaceholder": "Escolha um país",

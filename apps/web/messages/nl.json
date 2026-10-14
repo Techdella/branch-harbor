@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Vastgoed",
-      "who": "Makelaarskantoren en makelaarsnetwerken"
+      "who": "Makelaarskantoren en makelaarsnetwerken",
+      "flow": "Woning → aanvraag → bezichtiging → bod",
+      "cta": "Vraag een vastgoeddemo aan"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "Eén gedeeld platform, afgestemd op hoe jouw bedrijf werkt. Studio’s zitten in de pilot; de andere branches zijn ontworpen en staan op de roadmap.",
       "explore": "{name} ontdekken",
       "independent": "Eén vestiging? Bekijk de eenvoudigere opzet",
-      "realty": "Vastgoed · Gepland"
+      "realty": "Vastgoed · Binnenkort"
     },
     "hqLocal": {
       "title": "Hoofdkantoor en vestigingen, elk met de juiste bevoegdheden",
@@ -1074,6 +1076,155 @@
           "a": "Verschillen tussen betaling en bestelling komen in een herstelwachtrij die het team afhandelt."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Vastgoed",
+      "imageAlt": "Moderne vrijstaande woning met grote ramen",
+      "headline": "Elk kantoor, elke woning, één betrouwbaar netwerk.",
+      "intro": "Woningen met controle door het hoofdkantoor, aanvragen bij de juiste makelaar, bezichtigingen op basis van echte beschikbaarheid en biedingen met volledige historie — in meerdere landen en valuta.",
+      "problems": [
+        {
+          "t": "Ongelijke advertentienormen",
+          "d": "Kantoren publiceren teksten en verplichte informatie zonder controle door het hoofdkantoor."
+        },
+        {
+          "t": "Onbeantwoorde aanvragen",
+          "d": "Aanvragen via portals en de website belanden in gedeelde inboxen zonder eigenaar."
+        },
+        {
+          "t": "Rapporten die valuta mengen",
+          "d": "Het netwerkvolume telt dollars, ponden en euro's op alsof het één valuta is."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Woningen",
+          "title": "Van concept tot verkocht, met controle",
+          "desc": "Beheerde en standaardkantoren publiceren na goedkeuring van het hoofdkantoor; wijzigingen aan live woningen ook. Verplichte informatie komt van het bedrijf.",
+          "screen": "Woningen",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "CA$ 1.649.000 · 2.350 sq ft",
+              "tag": "Actief"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "Wacht op controle",
+              "tag": "In afwachting"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "CA$ 925.000 · 910 sq ft",
+              "tag": "Actief"
+            }
+          ]
+        },
+        {
+          "label": "Aanvragen",
+          "title": "Elke aanvraag heeft een eigenaar",
+          "desc": "Aanvragen gaan naar de makelaar van de woning, dan om de beurt, dan naar de kantoorpool. Makelaars zien hun eigen aanvragen en de pool.",
+          "screen": "Aanvragen",
+          "scope": "Londen – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portal · 14 Flask Walk",
+              "tag": "Toegewezen"
+            },
+            {
+              "a": "Waardebepaling",
+              "b": "Website · kantoorpool",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Website · verhuur",
+              "tag": "Toegewezen"
+            }
+          ]
+        },
+        {
+          "label": "Bezichtigingen",
+          "title": "Bezichtigingen op echte beschikbaarheid",
+          "desc": "Kopers boeken vrije tijden in de tijdzone van het kantoor. Een makelaar wordt nooit dubbel geboekt.",
+          "screen": "Bezichtigingen",
+          "scope": "Madrid – Salamanca",
+          "rows": [
+            {
+              "a": "Za 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Bevestigd"
+            },
+            {
+              "a": "Za 12:00",
+              "b": "Ático Chamberí · aangevraagd",
+              "tag": "Aangevraagd"
+            },
+            {
+              "a": "Vr 17:00",
+              "b": "Feedback vastgelegd · grote interesse",
+              "tag": "Klaar"
+            }
+          ]
+        },
+        {
+          "label": "Biedingen",
+          "title": "Biedingen met volledige historie",
+          "desc": "Tegenbod, acceptatie of afwijzing: elke stap wordt vastgelegd. Alleen betrokken makelaars en kantoormanagers zien biedingen.",
+          "screen": "Biedingen",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Bod · CA$ 1.625.000",
+              "b": "Tegenbod · verloopt over 2 dagen",
+              "tag": "Tegenbod"
+            },
+            {
+              "a": "Bod · CA$ 1.175.000",
+              "b": "Geaccepteerd · onder bod",
+              "tag": "Geaccepteerd"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Governanceniveaus en advertentiecontroles",
+        "Netwerkrapporten per valuta, zonder klantgegevens",
+        "Portalfeedformaten (sandbox)"
+      ],
+      "local": [
+        "Woningen, foto's en verplichte informatie van het bedrijf",
+        "Toewijzing van aanvragen en beschikbaarheid van makelaars",
+        "Bezichtigingen, feedback en biedingen"
+      ],
+      "first": [
+        "Woningen met goedkeuring hoofdkantoor",
+        "Toewijzing van aanvragen",
+        "Bezichtigingen boeken en herinneringen",
+        "Biedingen met historie"
+      ],
+      "later": [
+        "Live portalkoppelingen",
+        "Import uit woningdatabases",
+        "Elektronisch ondertekenen",
+        "Courtagerapportage"
+      ],
+      "faqs": [
+        {
+          "q": "Kan AI woningteksten schrijven?",
+          "a": "AI schrijft alleen op basis van de ingevoerde feiten en voegt geen kenmerken, uitzicht of buurtclaims toe. Het weigert mensen te targeten of uit te sluiten op beschermde kenmerken, en elk concept vraagt uw goedkeuring."
+        },
+        {
+          "q": "Sturen jullie woningen naar portals?",
+          "a": "Nog niet. Feedformaten zijn in een sandbox te bekijken, maar er is geen live portalkoppeling en er wordt niets verzonden."
+        },
+        {
+          "q": "Wie ziet biedingen?",
+          "a": "De makelaars van de woning, de makelaar van de koper voor het eigen bod en kantoormanagers. Het hoofdkantoor ziet standaard totalen zonder klantgegevens."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1624,7 +1775,7 @@
       "business": "Bedrijfsnaam",
       "industry": "Branche",
       "industryPlaceholder": "Kies een branche",
-      "realtyOption": "Vastgoed (gepland)",
+      "realtyOption": "Vastgoed (binnenkort)",
       "locationCount": "Aantal vestigingen",
       "country": "Land",
       "countryPlaceholder": "Kies een land",

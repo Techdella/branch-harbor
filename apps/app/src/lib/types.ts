@@ -2,8 +2,8 @@ import type { Currency, Money, Permission, RoleAssignment } from '@bh/shared';
 import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
 
-/** The five verticals demonstrated in the business app. */
-export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods'] as const;
+/** The verticals demonstrated in the business app (realty: Real Estate, release "next"). */
+export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
 export type IndustryKey = (typeof APP_INDUSTRIES)[number];
 
 /** "Viewing as" personas used to demonstrate permission states. */

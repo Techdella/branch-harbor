@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Real Estate",
-      "who": "Brokerages and agent networks"
+      "who": "Brokerages and agent networks",
+      "flow": "Listing → enquiry → viewing → offer",
+      "cta": "Request a real-estate demo"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "One shared platform, shaped around how your business works. Studios is in pilot; the others are designed and on the roadmap.",
       "explore": "Explore {name}",
       "independent": "Single-location business? See the simpler setup",
-      "realty": "Real Estate · Planned"
+      "realty": "Real Estate · Coming next"
     },
     "hqLocal": {
       "title": "Headquarters and locations, each with the right controls",
@@ -1074,6 +1076,155 @@
           "a": "Payment and order mismatches appear in a recovery queue for staff to resolve."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Real Estate",
+      "imageAlt": "Modern detached house with large windows",
+      "headline": "Every office, every listing, one trusted network.",
+      "intro": "Listings with HQ advertising checks, enquiries routed to the right agent, viewings booked from real availability and offers with a full trail — across countries and currencies.",
+      "problems": [
+        {
+          "t": "Inconsistent listing standards",
+          "d": "Offices publish copy and disclosures that HQ never reviewed."
+        },
+        {
+          "t": "Leads that sit unanswered",
+          "d": "Portal and website enquiries land in shared inboxes with no owner."
+        },
+        {
+          "t": "Reports that mix currencies",
+          "d": "Network volume adds dollars, pounds and euros as if they were one."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Listings",
+          "title": "From draft to sold, with HQ checks",
+          "desc": "Managed and standard offices publish after HQ approval; changes to live listings wait for approval too. Disclosures come from the business.",
+          "screen": "Listings",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "CA$1,649,000 · 2,350 sq ft",
+              "tag": "Active"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "Waiting for HQ check",
+              "tag": "Pending"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "CA$925,000 · 910 sq ft",
+              "tag": "Active"
+            }
+          ]
+        },
+        {
+          "label": "Enquiries",
+          "title": "Every lead has an owner",
+          "desc": "Website and portal enquiries go to the listing agent, then round-robin, then the office pool. Agents see their own leads and the pool.",
+          "screen": "Enquiries",
+          "scope": "London – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portal · 14 Flask Walk",
+              "tag": "Routed"
+            },
+            {
+              "a": "New valuation",
+              "b": "Website · office pool",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Website · lettings",
+              "tag": "Routed"
+            }
+          ]
+        },
+        {
+          "label": "Viewings",
+          "title": "Viewings from real availability",
+          "desc": "Buyers book free slots from the agents' calendars in the office time zone. An agent can never be double-booked.",
+          "screen": "Viewings",
+          "scope": "Madrid – Salamanca",
+          "rows": [
+            {
+              "a": "Sat 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Confirmed"
+            },
+            {
+              "a": "Sat 12:00",
+              "b": "Ático Chamberí · requested",
+              "tag": "Requested"
+            },
+            {
+              "a": "Fri 17:00",
+              "b": "Feedback logged · high interest",
+              "tag": "Done"
+            }
+          ]
+        },
+        {
+          "label": "Offers",
+          "title": "Offers with a full trail",
+          "desc": "Counter, accept or reject with every step recorded. Only the listing agents, the buyer's agent and office managers see offers.",
+          "screen": "Offers",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Offer · CA$1,625,000",
+              "b": "Countered · expires in 2 days",
+              "tag": "Countered"
+            },
+            {
+              "a": "Offer · CA$1,175,000",
+              "b": "Accepted · under offer",
+              "tag": "Accepted"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Office governance tiers and advertising checks",
+        "Network reports per currency, without client details",
+        "Portal feed formats (sandbox)"
+      ],
+      "local": [
+        "Listings, photos and business-supplied disclosures",
+        "Lead routing and agent availability",
+        "Viewings, feedback and offers"
+      ],
+      "first": [
+        "Listings with HQ approval",
+        "Enquiry routing to agents",
+        "Viewing booking and reminders",
+        "Offers with an audit trail"
+      ],
+      "later": [
+        "Live portal connections",
+        "Listing-service (MLS) imports",
+        "E-signature integrations",
+        "Commission reporting"
+      ],
+      "faqs": [
+        {
+          "q": "Can AI write listing descriptions?",
+          "a": "AI drafts descriptions from the facts you enter and never adds features, views or neighbourhood claims. It refuses requests that target or exclude people by protected characteristics, and every draft needs your approval."
+        },
+        {
+          "q": "Do you send listings to property portals?",
+          "a": "Not yet. Portal feed formats can be previewed in a sandbox, but no portal connection is live and nothing is sent."
+        },
+        {
+          "q": "Who can see offers?",
+          "a": "The listing agents, the buyer's agent for their own offer, and office managers. Headquarters sees network totals without client details by default."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1624,7 +1775,7 @@
       "business": "Business name",
       "industry": "Industry",
       "industryPlaceholder": "Choose an industry",
-      "realtyOption": "Real Estate (planned)",
+      "realtyOption": "Real Estate (coming next)",
       "locationCount": "Number of locations",
       "country": "Country",
       "countryPlaceholder": "Choose a country",

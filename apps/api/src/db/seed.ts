@@ -206,6 +206,7 @@ async function main() {
   }
 
   const ops = await seedOperations({ db, today, upsertUser, demo, maya, carlos, priya, swId, meId });
+  const realty = await (await import('./seed-realty.ts')).seedRealty({ db, today, upsertUser, demo, sitesBaseUrl: cfg.SITES_BASE_URL });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
@@ -220,6 +221,7 @@ async function main() {
   console.log(`                Harbourline Wellness (${ops.orgs.harbourline}) — Toronto CAD, Dublin EUR, Melbourne AUD`);
   console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
+  console.log(` Real Estate:   Keystone Realty Network (${realty.orgId}) — Toronto/Vancouver CAD, London GBP, Madrid EUR, Dubai AED, Sydney AUD; ${realty.listings} listings · ${realty.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
   console.log('─────────────────────────────────────────────────\n');
 }

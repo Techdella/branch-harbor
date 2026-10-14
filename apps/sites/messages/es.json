@@ -53,7 +53,8 @@
   },
   "brand": {
     "ourLocations": "Nuestras sedes",
-    "morePages": "Más de {brand}"
+    "morePages": "Más de {brand}",
+    "searchProperties": "Buscar inmuebles"
   },
   "location": {
     "otherLocations": "Otras sedes",
@@ -85,7 +86,9 @@
     "sports": "Programas",
     "sportsCta": "Ver programas",
     "commerce": "Comprar en esta tienda",
-    "commerceCta": "Ver productos"
+    "commerceCta": "Ver productos",
+    "realty": "Inmuebles",
+    "realtyCta": "Ver inmuebles"
   },
   "schedule": {
     "title": "Horario de clases",
@@ -283,7 +286,11 @@
     "participantName": "Nombre completo del participante",
     "dob": "Fecha de nacimiento",
     "relationship": "Tu relación",
-    "rel": { "parent": "Madre/padre", "guardian": "Tutor legal", "other": "Otro familiar" },
+    "rel": {
+      "parent": "Madre/padre",
+      "guardian": "Tutor legal",
+      "other": "Otro familiar"
+    },
     "guardian": "Madre, padre o tutor",
     "refundPolicy": "Bajas y reembolsos",
     "acceptPolicy": "He leído la política de bajas y reembolsos.",
@@ -314,5 +321,185 @@
     "details": "Detalles",
     "essential": "Esenciales (siempre activas): idioma, elección de cookies, seguridad.",
     "analytics": "Analítica: no se usa en este sitio."
+  },
+  "realty": {
+    "per": {
+      "month": "mes",
+      "week": "semana"
+    },
+    "status": {
+      "coming_soon": "Próximamente",
+      "active": "Disponible",
+      "under_offer": "Reservado"
+    },
+    "transaction": {
+      "sale": "En venta",
+      "rent": "En alquiler"
+    },
+    "type": {
+      "house": "Casa",
+      "townhouse": "Adosado",
+      "apartment": "Piso",
+      "condo": "Condominio",
+      "land": "Terreno",
+      "commercial": "Local comercial",
+      "other": "Otro"
+    },
+    "viewingStatus": {
+      "requested": "Pendiente de confirmación",
+      "confirmed": "Confirmada",
+      "completed": "Realizada",
+      "no_show": "No asistida",
+      "cancelled": "Cancelada"
+    },
+    "search": {
+      "title": "Buscar inmuebles",
+      "subtitle": "Inmuebles de los agentes de {brand}.",
+      "transaction": "Comprar o alquilar",
+      "any": "Cualquiera",
+      "type": "Tipo de inmueble",
+      "office": "Oficina",
+      "allOffices": "Todas las oficinas",
+      "city": "Ciudad",
+      "price": "Precio",
+      "currency": "Moneda",
+      "min": "Mín.",
+      "max": "Máx.",
+      "needCurrency": "Elige una moneda para el rango de precio: los precios nunca se convierten.",
+      "beds": "Dormitorios",
+      "baths": "Baños",
+      "studio": "Estudio",
+      "minArea": "Superficie mínima",
+      "unit": "Unidad",
+      "officeUnit": "Unidad de la oficina",
+      "needUnit": "Elige m² o pies² para la superficie mínima.",
+      "sort": "Ordenar",
+      "newest": "Más recientes",
+      "priceAsc": "Precio (menor a mayor)",
+      "priceDesc": "Precio (mayor a menor)",
+      "submit": "Buscar",
+      "reset": "Borrar filtros",
+      "results": "{count, plural, =0 {Ningún inmueble} one {# inmueble} other {# inmuebles}}",
+      "otherCurrency": "{count, plural, one {# inmueble tiene} other {# inmuebles tienen}} precio en otra moneda y no se muestran, porque los precios nunca se convierten.",
+      "none": "Ningún inmueble coincide con estos filtros.",
+      "mapTitle": "Espacio para el mapa",
+      "mapBody": "El mapa interactivo aún no está activado en este sitio.",
+      "fairHousing": "La búsqueda usa solo datos del inmueble. Nunca filtramos por características personales.",
+      "allHomes": "Todos los inmuebles",
+      "bedsPlus": "{n}+ dormitorios"
+    },
+    "listing": {
+      "noPhoto": "Sin foto todavía",
+      "beds": "{count, plural, =0 {Estudio} one {# dormitorio} other {# dormitorios}}",
+      "baths": "{count, plural, one {# baño} other {# baños}}",
+      "bedsUnknown": "Dormitorios: no disponible",
+      "bathsUnknown": "Baños: no disponible",
+      "areaUnknown": "Superficie: no disponible",
+      "breadcrumb": "Ruta de navegación",
+      "gallery": "Fotos",
+      "photo": "foto {n}",
+      "photoCount": "{count} fotos · desliza para ver más",
+      "streetHidden": "dirección exacta bajo petición",
+      "bedrooms": "Dormitorios",
+      "bathrooms": "Baños",
+      "area": "Superficie útil",
+      "unknown": "No disponible",
+      "switchUnit": "ver en esta unidad",
+      "type": "Tipo",
+      "built": "Construido en {year}",
+      "about": "Sobre este inmueble",
+      "features": "Características",
+      "plansTour": "Planos y visita virtual",
+      "floorPlan": "Plano {n}",
+      "tour": "Visita virtual",
+      "openHouses": "Jornadas de puertas abiertas",
+      "location": "Ubicación",
+      "openMap": "Abrir en OpenStreetMap",
+      "disclosures": "Información legal",
+      "disclosuresNote": "La información legal la facilita la agencia.",
+      "agents": "Agentes del inmueble"
+    },
+    "book": {
+      "title": "Reservar una visita",
+      "comingSoon": "Las visitas se abrirán cuando se publique. Ya puedes enviar una consulta.",
+      "anAgent": "Un agente",
+      "requestedTitle": "Visita solicitada",
+      "requestedBody": "{agent} confirmará tu visita del {when} por correo.",
+      "manage": "Gestionar tu visita",
+      "slotTaken": "Esa hora acaba de ocuparse. Elige otra.",
+      "chooseDay": "Elige un día",
+      "chooseTime": "Elige una hora",
+      "timesIn": "horas en {zone}",
+      "noSlots": "No hay horas ese día. Prueba otro día o envía una consulta.",
+      "kind": "Tipo de visita",
+      "inPerson": "Presencial",
+      "virtual": "Videollamada",
+      "policy": "Un agente confirma por correo. Las visitas pueden compartirse con otros compradores.",
+      "request": "Solicitar {time}"
+    },
+    "form": {
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "message": "Mensaje",
+      "marketingConsent": "Quiero recibir novedades y ofertas de la agencia (opcional)",
+      "check": "Revisa tus datos"
+    },
+    "enquiry": {
+      "title": "Preguntar por este inmueble",
+      "kind": "Me interesa",
+      "kinds": {
+        "buyer": "Comprar",
+        "tenant": "Alquilar",
+        "valuation": "Tasar mi vivienda",
+        "general": "Otra cosa"
+      },
+      "privacy": "Solo usamos tus datos para responder a tu consulta.",
+      "send": "Enviar consulta",
+      "sent": "Gracias: un agente te responderá pronto."
+    },
+    "save": {
+      "open": "Guardar esta búsqueda",
+      "title": "Guardar búsqueda",
+      "name": "Nombre de la búsqueda",
+      "frequency": "Enviarme novedades",
+      "freq": {
+        "instant": "En cuanto se publiquen",
+        "daily": "Cada día",
+        "weekly": "Cada semana"
+      },
+      "consent": "Sí, enviadme por correo los nuevos inmuebles que coincidan. Puedo darme de baja cuando quiera.",
+      "fairHousing": "Las búsquedas guardadas usan solo datos del inmueble.",
+      "submit": "Guardar",
+      "saved": "Búsqueda guardada. Cada correo incluye un enlace para darte de baja.",
+      "savedNoAlerts": "Búsqueda guardada sin alertas por correo."
+    },
+    "office": {
+      "title": "Oficina de {office}",
+      "units": "Superficies en {unit} · precios en {currency}",
+      "homes": "Inmuebles de esta oficina",
+      "searchAll": "Buscar con filtros",
+      "noHomes": "No hay inmuebles publicados ahora mismo.",
+      "agents": "Agentes de esta oficina",
+      "languages": "Habla {list}",
+      "contactTitle": "Hablar con la oficina",
+      "contactBody": "¿Comprar, alquilar o vender? Envía un mensaje y la oficina te responderá."
+    },
+    "manageViewing": {
+      "title": "Tu visita",
+      "invalid": "Este enlace no es válido o ha caducado.",
+      "awaiting": "Pendiente de confirmación por el agente.",
+      "cancel": "Cancelar visita",
+      "question": "¿Cancelar esta visita?"
+    },
+    "manageSearch": {
+      "title": "Búsqueda guardada",
+      "invalid": "Este enlace no es válido o ha caducado. Usa el enlace de tu última alerta.",
+      "unnamed": "Búsqueda guardada",
+      "on": "Alertas por correo: {frequency}",
+      "off": "Las alertas por correo están desactivadas.",
+      "stop": "Dejar de recibir alertas",
+      "question": "¿Dejar de recibir novedades de esta búsqueda?"
+    }
   }
 }

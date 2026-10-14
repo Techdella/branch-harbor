@@ -53,7 +53,8 @@
   },
   "brand": {
     "ourLocations": "Our locations",
-    "morePages": "More from {brand}"
+    "morePages": "More from {brand}",
+    "searchProperties": "Search properties"
   },
   "location": {
     "otherLocations": "Other locations",
@@ -85,7 +86,9 @@
     "sports": "Programmes",
     "sportsCta": "See programmes",
     "commerce": "Shop this store",
-    "commerceCta": "Browse products"
+    "commerceCta": "Browse products",
+    "realty": "Properties",
+    "realtyCta": "Search homes"
   },
   "schedule": {
     "title": "Class schedule",
@@ -318,5 +321,185 @@
     "details": "Details",
     "essential": "Essential (always on): language preference, cookie choice, security.",
     "analytics": "Analytics: not used on this site."
+  },
+  "realty": {
+    "per": {
+      "month": "month",
+      "week": "week"
+    },
+    "status": {
+      "coming_soon": "Coming soon",
+      "active": "For sale or rent",
+      "under_offer": "Under offer"
+    },
+    "transaction": {
+      "sale": "For sale",
+      "rent": "To rent"
+    },
+    "type": {
+      "house": "House",
+      "townhouse": "Townhouse",
+      "apartment": "Apartment",
+      "condo": "Condo",
+      "land": "Land",
+      "commercial": "Commercial",
+      "other": "Other"
+    },
+    "viewingStatus": {
+      "requested": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "no_show": "Missed",
+      "cancelled": "Cancelled"
+    },
+    "search": {
+      "title": "Property search",
+      "subtitle": "Homes listed by {brand} agents.",
+      "transaction": "Buy or rent",
+      "any": "Any",
+      "type": "Property type",
+      "office": "Office",
+      "allOffices": "All offices",
+      "city": "City",
+      "price": "Price",
+      "currency": "Currency",
+      "min": "Min",
+      "max": "Max",
+      "needCurrency": "Choose a currency for a price range — prices are never converted between currencies.",
+      "beds": "Bedrooms",
+      "baths": "Bathrooms",
+      "studio": "Studio",
+      "minArea": "Minimum area",
+      "unit": "Unit",
+      "officeUnit": "Office unit",
+      "needUnit": "Choose m² or sq ft for a minimum area.",
+      "sort": "Sort",
+      "newest": "Newest",
+      "priceAsc": "Price (low to high)",
+      "priceDesc": "Price (high to low)",
+      "submit": "Search",
+      "reset": "Clear filters",
+      "results": "{count, plural, =0 {No homes} one {# home} other {# homes}}",
+      "otherCurrency": "{count, plural, one {# home is} other {# homes are}} priced in another currency and not shown, because prices are never converted.",
+      "none": "No homes match these filters.",
+      "mapTitle": "Map placeholder",
+      "mapBody": "An interactive map isn't enabled for this site yet.",
+      "fairHousing": "Search uses property details only. We never filter homes or buyers by personal characteristics.",
+      "allHomes": "All homes",
+      "bedsPlus": "{n}+ bedrooms"
+    },
+    "listing": {
+      "noPhoto": "No photo yet",
+      "beds": "{count, plural, =0 {Studio} one {# bedroom} other {# bedrooms}}",
+      "baths": "{count, plural, one {# bathroom} other {# bathrooms}}",
+      "bedsUnknown": "Bedrooms: unavailable",
+      "bathsUnknown": "Bathrooms: unavailable",
+      "areaUnknown": "Area: unavailable",
+      "breadcrumb": "Breadcrumb",
+      "gallery": "Photos",
+      "photo": "photo {n}",
+      "photoCount": "{count} photos · scroll to see more",
+      "streetHidden": "exact address on request",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "area": "Living area",
+      "unknown": "Unavailable",
+      "switchUnit": "show in this unit",
+      "type": "Type",
+      "built": "Built {year}",
+      "about": "About this home",
+      "features": "Features",
+      "plansTour": "Floor plans and tour",
+      "floorPlan": "Floor plan {n}",
+      "tour": "Virtual tour",
+      "openHouses": "Open houses",
+      "location": "Location",
+      "openMap": "Open in OpenStreetMap",
+      "disclosures": "Disclosures",
+      "disclosuresNote": "Disclosures are supplied by the agency.",
+      "agents": "Listing agents"
+    },
+    "book": {
+      "title": "Book a viewing",
+      "comingSoon": "Viewings open when this home is listed. You can make an enquiry now.",
+      "anAgent": "An agent",
+      "requestedTitle": "Viewing requested",
+      "requestedBody": "{agent} will confirm your viewing on {when} by email.",
+      "manage": "Manage your viewing",
+      "slotTaken": "That time was just taken. Please choose another.",
+      "chooseDay": "Choose a day",
+      "chooseTime": "Choose a time",
+      "timesIn": "times in {zone}",
+      "noSlots": "No times available that day. Try another day or make an enquiry.",
+      "kind": "Viewing type",
+      "inPerson": "In person",
+      "virtual": "Video call",
+      "policy": "An agent confirms by email. Viewings may be shared with other buyers.",
+      "request": "Request {time}"
+    },
+    "form": {
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "marketingConsent": "Send me news and offers from this agency (optional)",
+      "check": "Please check your details"
+    },
+    "enquiry": {
+      "title": "Ask about this home",
+      "kind": "I'm interested in",
+      "kinds": {
+        "buyer": "Buying",
+        "tenant": "Renting",
+        "valuation": "A valuation of my home",
+        "general": "Something else"
+      },
+      "privacy": "We use your details only to answer your enquiry.",
+      "send": "Send enquiry",
+      "sent": "Thanks — an agent will get back to you soon."
+    },
+    "save": {
+      "open": "Save this search",
+      "title": "Save search",
+      "name": "Name this search",
+      "frequency": "Email me new matches",
+      "freq": {
+        "instant": "As soon as they're listed",
+        "daily": "Daily",
+        "weekly": "Weekly"
+      },
+      "consent": "Yes, email me new listings that match this search. I can unsubscribe at any time.",
+      "fairHousing": "Saved searches use property details only.",
+      "submit": "Save search",
+      "saved": "Search saved. We'll email new matches — every email has an unsubscribe link.",
+      "savedNoAlerts": "Search saved without email alerts."
+    },
+    "office": {
+      "title": "{office} office",
+      "units": "Areas shown in {unit} · prices in {currency}",
+      "homes": "Homes listed by this office",
+      "searchAll": "Search with filters",
+      "noHomes": "No homes listed right now.",
+      "agents": "Agents at this office",
+      "languages": "Speaks {list}",
+      "contactTitle": "Talk to this office",
+      "contactBody": "Buying, renting, or thinking of selling? Send a message and the office will reply."
+    },
+    "manageViewing": {
+      "title": "Your viewing",
+      "invalid": "This link isn't valid or has expired.",
+      "awaiting": "Waiting for the agent to confirm.",
+      "cancel": "Cancel viewing",
+      "question": "Cancel this viewing?"
+    },
+    "manageSearch": {
+      "title": "Saved search",
+      "invalid": "This link isn't valid or has expired. Use the link in your latest alert email.",
+      "unnamed": "Saved search",
+      "on": "Email alerts: {frequency}",
+      "off": "Email alerts are off.",
+      "stop": "Stop email alerts",
+      "question": "Stop emailing new matches for this search?"
+    }
   }
 }

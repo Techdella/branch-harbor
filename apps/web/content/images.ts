@@ -22,6 +22,8 @@ export const IMG = {
   foodCook: U('1640583342012-4622f31b650d', 900),
   foodTeam: U('1651977560788-98792cd34da0'),
   foodPizza: U('1651981075280-9a9e01acbff0', 900),
+  realtyHouse: U('1600585154340-be6161a56a0c'),
+  realtyLiving: U('1600566753190-17f0baa2a6c3', 900),
   team: U('1522202176988-66273c2fd55f'),
   meeting: U('1556157382-97eda2d62296'),
 } as const;

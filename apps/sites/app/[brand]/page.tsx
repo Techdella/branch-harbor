@@ -84,6 +84,9 @@ export default async function BrandHome({ params, searchParams }: Props) {
             <input id="hero-q" name="q" defaultValue={q} placeholder={t('searchPlaceholder')} className="h-12 min-w-0 flex-1 rounded-full px-4 text-base outline-offset-0" />
             <button type="submit" className="btn btn-primary h-12">{t('title')}</button>
           </form>
+          {data.brand.industry === 'realty' && (
+            <a href={links.brand('/properties')} className="btn mt-4 border border-white/60 bg-white/10 text-on-brand"><Icon name="house" size={18} />{tb('searchProperties')}</a>
+          )}
         </div>
       </section>
 
