@@ -228,8 +228,26 @@ export const services = pgTable('services', {
   requiredResourceType: text('required_resource_type'),
   cancellationPolicy: text('cancellation_policy'),
   active: boolean('active').notNull().default(true),
+  /** Menu grouping on websites, e.g. "Massage", "Facials". */
+  category: text('category'),
+  /** Customers can book it online (staff can always book it). */
+  onlineBookable: boolean('online_bookable').notNull().default(true),
+  /** 1 = one practitioner; 2 = couples/duo (two practitioners, one shared room). */
+  practitionersRequired: integer('practitioners_required').notNull().default(1),
+  /** Extra resource types (equipment) reserved together with the practitioner and room, e.g. ["hot_stone_kit"]. */
+  equipmentTypes: jsonb('equipment_types').$type<string[]>().notNull().default([]),
+  /** Deposit rule; null = use depositMinor as a fixed amount. */
+  depositRule: jsonb('deposit_rule').$type<ServiceDepositRule | null>(),
+  /** Structured cancellation/no-show policy; the text policy above is what customers read. */
+  policy: jsonb('policy').$type<ServicePolicy | null>(),
+  /** Retention: suggest rebooking N weeks after a visit (consent-aware). */
+  rebookAfterWeeks: integer('rebook_after_weeks'),
   createdAt: createdAt(),
+  updatedAt: ts('updated_at').notNull().defaultNow(),
 });
+
+export type ServiceDepositRule = { kind: 'none' | 'fixed' | 'percent'; value: number };
+export type ServicePolicy = { freeCancelHours: number; lateCancelFeePercent: number; noShowFeePercent: number; depositRefundable: boolean };
 
 export type WeeklyAvailability = Array<{ weekday: number; start: string; end: string }>;
 
@@ -282,9 +300,27 @@ export const appointments = pgTable('appointments', {
   paymentId: uuid('payment_id'),
   manageTokenHash: text('manage_token_hash'),
   adminNotes: text('admin_notes'),
+  /** Service variant (e.g. 90 min) — duration and price come from it. */
+  variantId: uuid('variant_id'),
+  /** Couples/duo appointments share a group id (two practitioners, one room). */
+  groupId: uuid('group_id'),
+  /** Recurring series this occurrence belongs to. */
+  seriesId: uuid('series_id'),
+  /** web | staff | mobile | series | waitlist | rebook */
+  source: text('source').notNull().default('web'),
+  /** Deposit required at booking (minor units, appointment currency). */
+  depositMinor: minor('deposit_minor').notNull().default(0),
+  /** Gift-voucher value applied to this appointment. */
+  voucherAppliedMinor: minor('voucher_applied_minor').notNull().default(0),
+  /** Package the session was redeemed from. */
+  clientPackageId: uuid('client_package_id'),
+  checkedInAt: ts('checked_in_at'),
+  cancelledAt: ts('cancelled_at'),
+  /** free | late | no_show | business */
+  cancellationKind: text('cancellation_kind'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
-}, (t) => [index('appointments_loc_start_idx').on(t.locationId, t.startsAt)]);
+}, (t) => [index('appointments_loc_start_idx').on(t.locationId, t.startsAt), index('appointments_customer_idx').on(t.customerId), index('appointments_group_idx').on(t.groupId)]);
 
 // ───────────── Commerce ─────────────
 export const products = pgTable('products', {

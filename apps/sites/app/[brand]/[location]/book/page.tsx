@@ -38,6 +38,7 @@ export default async function Book({ params }: Props) {
         services={s.items}
         brandName={data.brand.name}
         manageBase={links.location(location, '/manage')}
+        packagesHref={links.location(location, '/packages')}
       />
     </main>
   );

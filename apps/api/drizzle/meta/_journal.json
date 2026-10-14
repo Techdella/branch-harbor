@@ -29,6 +29,20 @@
       "when": 1791996845930,
       "tag": "0003_ops_shifts_approvals_offers_intake_pickup",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791999940849,
+      "tag": "0004_wellness_full",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791999942065,
+      "tag": "0005_wellness_reservations",
+      "breakpoints": true
     }
   ]
 }

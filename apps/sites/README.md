@@ -44,7 +44,9 @@ Seeded examples: `/stillwater-yoga` (studios, 5 public locations; Leslieville is
 | `/{brand}/{location}/{slug}` | Other published location pages |
 | `…/classes`, `…/classes/{id}` | Studios: schedule by day; book (seat hold with countdown → pay → confirmed) or join the waitlist when full |
 | `…/order` → `…/orders/{id}?token=` | Foods: pickup slot → menu → modifiers → cart → server quote (tax only if configured) → details → pay → status page that polls and separates "awaiting acceptance" from "accepted" |
-| `…/book` | Wellness: service → practitioner or any → date → slot → terms → details → book (→ deposit) |
+| `…/book` | Wellness: service menu by category → length (variant) → practitioner or any (couples: two assigned) → date → slot → policy preview → details (+ second guest, voucher code or package reference, SMS reminder opt-in) → book (→ deposit); full day → join the waitlist for a time window |
+| `…/packages` | Wellness: buy session packages and gift vouchers (location currency, sandbox payment), voucher balance check |
+| `…/manage/appointment/{id}?token=` · `…/manage/package/{id}` · `…/manage/voucher/{id}` · `…/manage/wellness-waitlist/{id}` | Wellness self-service: policy preview, cancel (late fee acceptance), reschedule (new time secured first); package balance; voucher code + balance; claim an offered waitlist slot |
 | `…/programmes` | Sports: guardian + participant registration → review-pending confirmation (payment ≠ selection) |
 | `…/shop` | Commerce: products with this location's stock band; no native checkout — links out when an external store (e.g. WooCommerce) is authoritative |
 | `…/manage/booking/{id}?token=` · `…/manage/waitlist/{id}?token=` · `…/manage/appointment/{id}?token=` | Manage pages: cancel booking (refund/void reported from the server), leave waitlist, cancel appointment |

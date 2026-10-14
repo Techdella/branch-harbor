@@ -39,6 +39,7 @@ export default function Home() {
     { label: t('customer.quickBookings'), icon: 'receipt', go: () => router.push('/customer/bookings'), bg: color.surface },
     { label: t('customer.quickInbox'), icon: 'message', go: () => router.push('/customer/inbox'), bg: color.surface },
     { label: t('tabs.locations'), icon: 'pin', go: () => router.push('/customer/locations'), bg: color.surface },
+    { label: 'Spa & wellness', icon: 'leaf', go: () => router.push('/customer/wellness'), bg: color.surface },
   ];
 
   return (

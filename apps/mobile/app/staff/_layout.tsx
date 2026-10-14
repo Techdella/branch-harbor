@@ -4,7 +4,7 @@ import { TabBar, type IconName } from '@/components';
 import { useI18n } from '@/i18n';
 import { useSession } from '@/lib/session';
 
-const ICONS: Record<string, IconName> = { today: 'home', checkin: 'check-circle', kitchen: 'chef', messages: 'message', cover: 'repeat' };
+const ICONS: Record<string, IconName> = { today: 'home', checkin: 'check-circle', kitchen: 'chef', messages: 'message', cover: 'repeat', appointments: 'calendar' };
 
 export default function StaffTabs() {
   const { t } = useI18n();
@@ -17,6 +17,7 @@ export default function StaffTabs() {
       <Tabs.Screen name="kitchen" options={{ title: t('tabs.kitchen') }} />
       <Tabs.Screen name="messages" options={{ title: t('tabs.messages') }} />
       <Tabs.Screen name="cover" options={{ title: t('tabs.cover') }} />
+      <Tabs.Screen name="appointments" options={{ title: 'Appointments' }} />
     </Tabs>
   );
 }

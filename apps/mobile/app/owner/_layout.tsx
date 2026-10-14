@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { useSession } from '@/lib/session';
 import { useApi } from '@/lib/useApi';
 
-const ICONS: Record<string, IconName> = { pulse: 'activity', approvals: 'check-circle', locations: 'store', alerts: 'bell' };
+const ICONS: Record<string, IconName> = { pulse: 'activity', approvals: 'check-circle', locations: 'store', alerts: 'bell', utilisation: 'chart' };
 
 export default function OwnerTabs() {
   const { t } = useI18n();
@@ -20,6 +20,7 @@ export default function OwnerTabs() {
       <Tabs.Screen name="approvals" options={{ title: t('tabs.approvals'), tabBarBadge: pending || undefined }} />
       <Tabs.Screen name="locations" options={{ title: t('tabs.locations') }} />
       <Tabs.Screen name="alerts" options={{ title: t('tabs.alerts') }} />
+      <Tabs.Screen name="utilisation" options={{ title: 'Utilisation' }} />
     </Tabs>
   );
 }

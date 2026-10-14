@@ -163,6 +163,10 @@ default).
 
 Money is always `{ amount: <integer minor units>, currency }`; times are UTC ISO strings rendered in the location's IANA timezone.
 
+## Wellness (full product)
+
+`src/features/wellness/` (live + mock client, strings). Customer: `app/customer/wellness.tsx` (book with length, slot, voucher, sandbox deposit; my appointments with policy preview, cancel and reschedule; packages and vouchers) — reached from the Home quick actions; live mode uses `EXPO_PUBLIC_WELLNESS_SLUG` (default `harbourline-wellness`) and `/v1/me/wellness/*`. Staff: `app/staff/appointments.tsx` (today across locations via `/wellness/my-day`, check-in, administrative notes incl. confidential). Owner: `app/owner/utilisation.tsx` (7-day practitioner/room utilisation per location, "Unavailable" when no hours).
+
 ## Product rules implemented
 
 - **International**: locations in Toronto (CAD), Seattle/Denver (USD), Vancouver (CAD), London (GBP), Berlin (EUR), Sydney (AUD). Every time shows the location zone; money uses `Intl.NumberFormat` in the location currency; owner Pulse shows **per-currency** totals only and "Unavailable" (never 0) for missing data.

@@ -206,6 +206,7 @@ async function main() {
   }
 
   const ops = await seedOperations({ db, today, upsertUser, demo, maya, carlos, priya, swId, meId });
+  ops.users.push(...(await (await import('./seed-wellness.ts')).seedWellness({ db, today, orgId: ops.orgs.harbourline, demo, upsertUser })).users);
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');

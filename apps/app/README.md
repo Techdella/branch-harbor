@@ -150,9 +150,11 @@ content (metric names, record text) comes from the data layer and is English.
 | `/approvals` | One inbox: refunds over the threshold, local ad spend, shift swaps, website changes — consequence preview, approve/reject with comment, result after execution |
 | `/team`, `/reports`, `/connections`, `/settings`, `/community` | Members & roles + invite, and **Schedule** (week of shifts per location in local time, clock-in state, pending swaps; staff see it too); freshness-labelled charts; sync health + fix; org defaults, data region, customer sharing + AI training (saved), billing per location (price from the subscription); Later |
 
+Wellness (full product, `src/components/screens/wellness/*`, data layer `src/lib/wellness/*` with its own live client + stateful mock): `calendar` (practitioner / room & equipment / list views, drag to move with a conflict dry run, appointment drawer: check-in, complete, no-show and cancel with policy preview, voucher, keyboard move form; new booking with any-available, couples, voucher), `services` (variants with per-location prices, buffers, deposit rule, policy, eligible practitioners, room/equipment, online flag, AI copy draft with health-claim screening), `practitioners` (weekly hours per location without overlaps, leave/absence with affected appointments and per-appointment rebook), `clients` (history, packages, preferences, confidential/shared notes, intake restricted + excluded from AI, policy reply assistant), `packages` (plans, client packages, gift vouchers with ledger), `insights` (utilisation, cancellations, revenue per currency, liability, AI summary).
+
 Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `registrations`
 `attendance` `programmes` `teams` `schedule` `guardian`·Later · Wellness `calendar` (practitioner/room/list +
-reschedule) `services` `practitioners` `forms` `packages`·Later · Commerce `orders` (partial refund + sync timeline)
+reschedule) `services` `practitioners` `clients` `packages` `forms` `insights` (see Wellness above) · Commerce `orders` (partial refund + sync timeline)
 `catalogue` `assortment` `inventory` `returns`·Later · Foods `menu` (master/location, origins, reset) `orders`
 (board) `kitchen` (large cards, overdue, stale-connection banner, full screen) `pickup` `catering`·Later.
 
