@@ -28,7 +28,7 @@ const stepsFor = (model: 'independent' | 'network'): readonly OnboardingStep[] =
 const STEP_ICON: Record<OnboardingStep, IconName> = { account: 'user', industry: 'grid', business: 'building', location: 'pin', website: 'globe', data: 'list', connect: 'plug', team: 'users', publish: 'eye' };
 const OPTIONAL: OnboardingStep[] = ['connect', 'team'];
 const INDUSTRIES: IndustryKey[] = ['studios', 'sports', 'wellness', 'commerce', 'foods'];
-const SELF_SERVE: Record<IndustryKey, boolean> = { studios: true, sports: false, wellness: false, commerce: false, foods: false };
+const SELF_SERVE: Record<IndustryKey, boolean> = { studios: true, sports: false, wellness: false, commerce: false, foods: false, realty: false };
 
 const SAMPLE_CSV = `name,code,country,timezone,currency
 London – Shoreditch,LDN-SH,GB,Europe/London,GBP
@@ -818,6 +818,7 @@ const CONN_OPTS: Record<IndustryKey, [string, ConnStatus][]> = {
   wellness: [['native', 'available'], ['keep', 'later']],
   commerce: [['keep', 'tested'], ['native', 'later']],
   foods: [['native', 'available'], ['keep', 'later']],
+  realty: [['native', 'available'], ['keep', 'later']],
 };
 const CONN_TONE: Record<ConnStatus, 'success' | 'warning' | 'neutral'> = { available: 'success', tested: 'success', requires_setup: 'warning', later: 'neutral' };
 

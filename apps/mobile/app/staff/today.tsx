@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Avatar, Badge, Button, Card, DataStatus, EmptyState, ListItem, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, useToast } from '@/components';
+import { RealtyEntry } from '@/features/realty/RealtyEntry';
 import { ExperienceSwitch } from '@/features/shared/ExperienceSwitch';
 import { useLocations } from '@/features/shared/useLocations';
 import { useI18n } from '@/i18n';
@@ -98,6 +99,7 @@ export default function Today() {
           <Text variant="small" style={{ flex: 1 }}>{t('staff.privacy')}</Text>
         </View>
       </Card>
+      <RealtyEntry kind="agent" />
     </Screen>
   );
 }

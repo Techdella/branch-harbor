@@ -53,7 +53,8 @@
   },
   "brand": {
     "ourLocations": "Unsere Standorte",
-    "morePages": "Mehr von {brand}"
+    "morePages": "Mehr von {brand}",
+    "searchProperties": "Immobilien suchen"
   },
   "location": {
     "otherLocations": "Andere Standorte",
@@ -85,7 +86,9 @@
     "sports": "Programme",
     "sportsCta": "Programme ansehen",
     "commerce": "In diesem Geschäft einkaufen",
-    "commerceCta": "Produkte ansehen"
+    "commerceCta": "Produkte ansehen",
+    "realty": "Immobilien",
+    "realtyCta": "Objekte ansehen"
   },
   "schedule": {
     "title": "Kursplan",
@@ -283,7 +286,11 @@
     "participantName": "Vollständiger Name der teilnehmenden Person",
     "dob": "Geburtsdatum",
     "relationship": "Deine Beziehung",
-    "rel": { "parent": "Elternteil", "guardian": "Erziehungsberechtigte:r", "other": "Andere:r Verwandte:r" },
+    "rel": {
+      "parent": "Elternteil",
+      "guardian": "Erziehungsberechtigte:r",
+      "other": "Andere:r Verwandte:r"
+    },
     "guardian": "Elternteil oder Erziehungsberechtigte:r",
     "refundPolicy": "Abmeldung & Erstattung",
     "acceptPolicy": "Ich habe die Abmelde- und Erstattungsbedingungen gelesen.",
@@ -314,5 +321,185 @@
     "details": "Details",
     "essential": "Notwendig (immer aktiv): Sprachauswahl, Cookie-Auswahl, Sicherheit.",
     "analytics": "Analyse: auf dieser Website nicht verwendet."
+  },
+  "realty": {
+    "per": {
+      "month": "Monat",
+      "week": "Woche"
+    },
+    "status": {
+      "coming_soon": "Demnächst",
+      "active": "Verfügbar",
+      "under_offer": "Reserviert"
+    },
+    "transaction": {
+      "sale": "Zu verkaufen",
+      "rent": "Zu vermieten"
+    },
+    "type": {
+      "house": "Haus",
+      "townhouse": "Reihenhaus",
+      "apartment": "Wohnung",
+      "condo": "Eigentumswohnung",
+      "land": "Grundstück",
+      "commercial": "Gewerbe",
+      "other": "Sonstiges"
+    },
+    "viewingStatus": {
+      "requested": "Wartet auf Bestätigung",
+      "confirmed": "Bestätigt",
+      "completed": "Durchgeführt",
+      "no_show": "Nicht erschienen",
+      "cancelled": "Abgesagt"
+    },
+    "search": {
+      "title": "Immobiliensuche",
+      "subtitle": "Objekte der Makler von {brand}.",
+      "transaction": "Kaufen oder mieten",
+      "any": "Beliebig",
+      "type": "Objektart",
+      "office": "Büro",
+      "allOffices": "Alle Büros",
+      "city": "Stadt",
+      "price": "Preis",
+      "currency": "Währung",
+      "min": "Min.",
+      "max": "Max.",
+      "needCurrency": "Wählen Sie für eine Preisspanne eine Währung – Preise werden nie umgerechnet.",
+      "beds": "Schlafzimmer",
+      "baths": "Bäder",
+      "studio": "Studio",
+      "minArea": "Mindestfläche",
+      "unit": "Einheit",
+      "officeUnit": "Einheit des Büros",
+      "needUnit": "Wählen Sie m² oder sq ft für eine Mindestfläche.",
+      "sort": "Sortieren",
+      "newest": "Neueste",
+      "priceAsc": "Preis aufsteigend",
+      "priceDesc": "Preis absteigend",
+      "submit": "Suchen",
+      "reset": "Filter zurücksetzen",
+      "results": "{count, plural, =0 {Keine Objekte} one {# Objekt} other {# Objekte}}",
+      "otherCurrency": "{count, plural, one {# Objekt ist} other {# Objekte sind}} in einer anderen Währung ausgepreist und werden nicht angezeigt, da Preise nie umgerechnet werden.",
+      "none": "Keine Objekte passen zu diesen Filtern.",
+      "mapTitle": "Platzhalter für Karte",
+      "mapBody": "Eine interaktive Karte ist auf dieser Website noch nicht aktiviert.",
+      "fairHousing": "Die Suche nutzt nur Objektmerkmale. Wir filtern nie nach persönlichen Merkmalen.",
+      "allHomes": "Alle Objekte",
+      "bedsPlus": "{n}+ Schlafzimmer"
+    },
+    "listing": {
+      "noPhoto": "Noch kein Foto",
+      "beds": "{count, plural, =0 {Studio} one {# Schlafzimmer} other {# Schlafzimmer}}",
+      "baths": "{count, plural, one {# Bad} other {# Bäder}}",
+      "bedsUnknown": "Schlafzimmer: nicht verfügbar",
+      "bathsUnknown": "Bäder: nicht verfügbar",
+      "areaUnknown": "Fläche: nicht verfügbar",
+      "breadcrumb": "Navigationspfad",
+      "gallery": "Fotos",
+      "photo": "Foto {n}",
+      "photoCount": "{count} Fotos · scrollen für mehr",
+      "streetHidden": "genaue Adresse auf Anfrage",
+      "bedrooms": "Schlafzimmer",
+      "bathrooms": "Bäder",
+      "area": "Wohnfläche",
+      "unknown": "Nicht verfügbar",
+      "switchUnit": "in dieser Einheit anzeigen",
+      "type": "Art",
+      "built": "Baujahr {year}",
+      "about": "Über dieses Objekt",
+      "features": "Ausstattung",
+      "plansTour": "Grundrisse und Rundgang",
+      "floorPlan": "Grundriss {n}",
+      "tour": "Virtueller Rundgang",
+      "openHouses": "Besichtigungstermine",
+      "location": "Lage",
+      "openMap": "In OpenStreetMap öffnen",
+      "disclosures": "Pflichtangaben",
+      "disclosuresNote": "Pflichtangaben stammen vom Maklerbüro.",
+      "agents": "Zuständige Makler"
+    },
+    "book": {
+      "title": "Besichtigung buchen",
+      "comingSoon": "Besichtigungen sind ab der Veröffentlichung möglich. Sie können bereits eine Anfrage senden.",
+      "anAgent": "Ein Makler",
+      "requestedTitle": "Besichtigung angefragt",
+      "requestedBody": "{agent} bestätigt Ihre Besichtigung am {when} per E-Mail.",
+      "manage": "Besichtigung verwalten",
+      "slotTaken": "Dieser Termin wurde gerade vergeben. Bitte wählen Sie einen anderen.",
+      "chooseDay": "Tag wählen",
+      "chooseTime": "Uhrzeit wählen",
+      "timesIn": "Zeiten in {zone}",
+      "noSlots": "An diesem Tag sind keine Termine frei. Wählen Sie einen anderen Tag oder senden Sie eine Anfrage.",
+      "kind": "Art der Besichtigung",
+      "inPerson": "Vor Ort",
+      "virtual": "Videoanruf",
+      "policy": "Ein Makler bestätigt per E-Mail. Besichtigungen können mit anderen Interessenten stattfinden.",
+      "request": "{time} anfragen"
+    },
+    "form": {
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "message": "Nachricht",
+      "marketingConsent": "Neuigkeiten und Angebote des Maklerbüros erhalten (optional)",
+      "check": "Bitte prüfen Sie Ihre Angaben"
+    },
+    "enquiry": {
+      "title": "Frage zu diesem Objekt",
+      "kind": "Ich interessiere mich für",
+      "kinds": {
+        "buyer": "Kaufen",
+        "tenant": "Mieten",
+        "valuation": "Bewertung meiner Immobilie",
+        "general": "Etwas anderes"
+      },
+      "privacy": "Wir nutzen Ihre Angaben nur, um Ihre Anfrage zu beantworten.",
+      "send": "Anfrage senden",
+      "sent": "Danke – ein Makler meldet sich in Kürze."
+    },
+    "save": {
+      "open": "Suche speichern",
+      "title": "Suche speichern",
+      "name": "Name der Suche",
+      "frequency": "Neue Treffer per E-Mail",
+      "freq": {
+        "instant": "Sofort nach Veröffentlichung",
+        "daily": "Täglich",
+        "weekly": "Wöchentlich"
+      },
+      "consent": "Ja, senden Sie mir neue passende Objekte per E-Mail. Ich kann mich jederzeit abmelden.",
+      "fairHousing": "Gespeicherte Suchen nutzen nur Objektmerkmale.",
+      "submit": "Speichern",
+      "saved": "Suche gespeichert. Jede E-Mail enthält einen Abmeldelink.",
+      "savedNoAlerts": "Suche ohne E-Mail-Benachrichtigungen gespeichert."
+    },
+    "office": {
+      "title": "Büro {office}",
+      "units": "Flächen in {unit} · Preise in {currency}",
+      "homes": "Objekte dieses Büros",
+      "searchAll": "Mit Filtern suchen",
+      "noHomes": "Derzeit keine Objekte.",
+      "agents": "Makler in diesem Büro",
+      "languages": "Spricht {list}",
+      "contactTitle": "Büro kontaktieren",
+      "contactBody": "Kaufen, mieten oder verkaufen? Senden Sie eine Nachricht, das Büro antwortet Ihnen."
+    },
+    "manageViewing": {
+      "title": "Ihre Besichtigung",
+      "invalid": "Dieser Link ist ungültig oder abgelaufen.",
+      "awaiting": "Wartet auf Bestätigung durch den Makler.",
+      "cancel": "Besichtigung absagen",
+      "question": "Diese Besichtigung absagen?"
+    },
+    "manageSearch": {
+      "title": "Gespeicherte Suche",
+      "invalid": "Dieser Link ist ungültig oder abgelaufen. Nutzen Sie den Link aus Ihrer letzten Benachrichtigung.",
+      "unnamed": "Gespeicherte Suche",
+      "on": "E-Mail-Benachrichtigungen: {frequency}",
+      "off": "E-Mail-Benachrichtigungen sind aus.",
+      "stop": "Benachrichtigungen beenden",
+      "question": "Keine neuen Treffer für diese Suche mehr senden?"
+    }
   }
 }

@@ -53,7 +53,8 @@
   },
   "brand": {
     "ourLocations": "Nos établissements",
-    "morePages": "Plus de {brand}"
+    "morePages": "Plus de {brand}",
+    "searchProperties": "Rechercher un bien"
   },
   "location": {
     "otherLocations": "Autres établissements",
@@ -85,7 +86,9 @@
     "sports": "Programmes",
     "sportsCta": "Voir les programmes",
     "commerce": "Acheter dans ce magasin",
-    "commerceCta": "Voir les produits"
+    "commerceCta": "Voir les produits",
+    "realty": "Biens",
+    "realtyCta": "Voir les biens"
   },
   "schedule": {
     "title": "Planning des cours",
@@ -283,7 +286,11 @@
     "participantName": "Nom complet du participant",
     "dob": "Date de naissance",
     "relationship": "Votre lien",
-    "rel": { "parent": "Parent", "guardian": "Tuteur légal", "other": "Autre membre de la famille" },
+    "rel": {
+      "parent": "Parent",
+      "guardian": "Tuteur légal",
+      "other": "Autre membre de la famille"
+    },
     "guardian": "Parent ou tuteur",
     "refundPolicy": "Désistement et remboursement",
     "acceptPolicy": "J’ai lu les conditions de désistement et de remboursement.",
@@ -314,5 +321,185 @@
     "details": "Détails",
     "essential": "Essentiels (toujours actifs) : langue, choix des cookies, sécurité.",
     "analytics": "Mesure d’audience : non utilisée sur ce site."
+  },
+  "realty": {
+    "per": {
+      "month": "mois",
+      "week": "semaine"
+    },
+    "status": {
+      "coming_soon": "Bientôt disponible",
+      "active": "Disponible",
+      "under_offer": "Sous offre"
+    },
+    "transaction": {
+      "sale": "À vendre",
+      "rent": "À louer"
+    },
+    "type": {
+      "house": "Maison",
+      "townhouse": "Maison de ville",
+      "apartment": "Appartement",
+      "condo": "Condo",
+      "land": "Terrain",
+      "commercial": "Commercial",
+      "other": "Autre"
+    },
+    "viewingStatus": {
+      "requested": "En attente de confirmation",
+      "confirmed": "Confirmée",
+      "completed": "Effectuée",
+      "no_show": "Manquée",
+      "cancelled": "Annulée"
+    },
+    "search": {
+      "title": "Recherche de biens",
+      "subtitle": "Biens proposés par les agents {brand}.",
+      "transaction": "Acheter ou louer",
+      "any": "Indifférent",
+      "type": "Type de bien",
+      "office": "Agence",
+      "allOffices": "Toutes les agences",
+      "city": "Ville",
+      "price": "Prix",
+      "currency": "Devise",
+      "min": "Min",
+      "max": "Max",
+      "needCurrency": "Choisissez une devise pour une fourchette de prix — les prix ne sont jamais convertis.",
+      "beds": "Chambres",
+      "baths": "Salles de bain",
+      "studio": "Studio",
+      "minArea": "Surface minimale",
+      "unit": "Unité",
+      "officeUnit": "Unité de l’agence",
+      "needUnit": "Choisissez m² ou pi² pour une surface minimale.",
+      "sort": "Trier",
+      "newest": "Plus récents",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant",
+      "submit": "Rechercher",
+      "reset": "Effacer les filtres",
+      "results": "{count, plural, =0 {Aucun bien} one {# bien} other {# biens}}",
+      "otherCurrency": "{count, plural, one {# bien est affiché} other {# biens sont affichés}} dans une autre devise et non inclus, car les prix ne sont jamais convertis.",
+      "none": "Aucun bien ne correspond à ces filtres.",
+      "mapTitle": "Emplacement de la carte",
+      "mapBody": "La carte interactive n’est pas encore activée sur ce site.",
+      "fairHousing": "La recherche n’utilise que les caractéristiques des biens. Nous ne filtrons jamais selon des caractéristiques personnelles.",
+      "allHomes": "Tous les biens",
+      "bedsPlus": "{n}+ chambres"
+    },
+    "listing": {
+      "noPhoto": "Pas encore de photo",
+      "beds": "{count, plural, =0 {Studio} one {# chambre} other {# chambres}}",
+      "baths": "{count, plural, one {# salle de bain} other {# salles de bain}}",
+      "bedsUnknown": "Chambres : indisponible",
+      "bathsUnknown": "Salles de bain : indisponible",
+      "areaUnknown": "Surface : indisponible",
+      "breadcrumb": "Fil d’Ariane",
+      "gallery": "Photos",
+      "photo": "photo {n}",
+      "photoCount": "{count} photos · faites défiler",
+      "streetHidden": "adresse exacte sur demande",
+      "bedrooms": "Chambres",
+      "bathrooms": "Salles de bain",
+      "area": "Surface habitable",
+      "unknown": "Indisponible",
+      "switchUnit": "afficher dans cette unité",
+      "type": "Type",
+      "built": "Construit en {year}",
+      "about": "À propos de ce bien",
+      "features": "Caractéristiques",
+      "plansTour": "Plans et visite",
+      "floorPlan": "Plan {n}",
+      "tour": "Visite virtuelle",
+      "openHouses": "Portes ouvertes",
+      "location": "Emplacement",
+      "openMap": "Ouvrir dans OpenStreetMap",
+      "disclosures": "Mentions",
+      "disclosuresNote": "Les mentions sont fournies par l’agence.",
+      "agents": "Agents du bien"
+    },
+    "book": {
+      "title": "Réserver une visite",
+      "comingSoon": "Les visites ouvriront à la mise en vente. Vous pouvez déjà envoyer une demande.",
+      "anAgent": "Un agent",
+      "requestedTitle": "Visite demandée",
+      "requestedBody": "{agent} confirmera votre visite du {when} par e-mail.",
+      "manage": "Gérer votre visite",
+      "slotTaken": "Ce créneau vient d’être pris. Choisissez-en un autre.",
+      "chooseDay": "Choisissez un jour",
+      "chooseTime": "Choisissez une heure",
+      "timesIn": "heures en {zone}",
+      "noSlots": "Aucun créneau ce jour-là. Essayez un autre jour ou envoyez une demande.",
+      "kind": "Type de visite",
+      "inPerson": "Sur place",
+      "virtual": "Appel vidéo",
+      "policy": "Un agent confirme par e-mail. Les visites peuvent être partagées avec d’autres acheteurs.",
+      "request": "Demander {time}"
+    },
+    "form": {
+      "name": "Nom complet",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "message": "Message",
+      "marketingConsent": "Recevoir les actualités et offres de l’agence (facultatif)",
+      "check": "Vérifiez vos informations"
+    },
+    "enquiry": {
+      "title": "Poser une question",
+      "kind": "Je souhaite",
+      "kinds": {
+        "buyer": "Acheter",
+        "tenant": "Louer",
+        "valuation": "Faire estimer mon bien",
+        "general": "Autre chose"
+      },
+      "privacy": "Vos données servent uniquement à répondre à votre demande.",
+      "send": "Envoyer",
+      "sent": "Merci — un agent vous répondra rapidement."
+    },
+    "save": {
+      "open": "Enregistrer cette recherche",
+      "title": "Enregistrer la recherche",
+      "name": "Nom de la recherche",
+      "frequency": "M’envoyer les nouveaux biens",
+      "freq": {
+        "instant": "Dès leur publication",
+        "daily": "Chaque jour",
+        "weekly": "Chaque semaine"
+      },
+      "consent": "Oui, envoyez-moi par e-mail les nouveaux biens correspondants. Je peux me désabonner à tout moment.",
+      "fairHousing": "Les recherches enregistrées n’utilisent que les caractéristiques des biens.",
+      "submit": "Enregistrer",
+      "saved": "Recherche enregistrée. Chaque e-mail contient un lien de désabonnement.",
+      "savedNoAlerts": "Recherche enregistrée sans alertes e-mail."
+    },
+    "office": {
+      "title": "Agence {office}",
+      "units": "Surfaces en {unit} · prix en {currency}",
+      "homes": "Biens de cette agence",
+      "searchAll": "Rechercher avec filtres",
+      "noHomes": "Aucun bien pour le moment.",
+      "agents": "Agents de cette agence",
+      "languages": "Parle {list}",
+      "contactTitle": "Contacter l’agence",
+      "contactBody": "Achat, location ou projet de vente ? Envoyez un message, l’agence vous répondra."
+    },
+    "manageViewing": {
+      "title": "Votre visite",
+      "invalid": "Ce lien n’est pas valide ou a expiré.",
+      "awaiting": "En attente de confirmation par l’agent.",
+      "cancel": "Annuler la visite",
+      "question": "Annuler cette visite ?"
+    },
+    "manageSearch": {
+      "title": "Recherche enregistrée",
+      "invalid": "Ce lien n’est pas valide ou a expiré. Utilisez le lien de votre dernière alerte.",
+      "unnamed": "Recherche enregistrée",
+      "on": "Alertes e-mail : {frequency}",
+      "off": "Les alertes e-mail sont désactivées.",
+      "stop": "Arrêter les alertes",
+      "question": "Ne plus recevoir les nouveaux biens pour cette recherche ?"
+    }
   }
 }

@@ -50,7 +50,7 @@ function st(ind: IndustryKey): BizState {
   }
   return s;
 }
-const FIXTURES_STAFF: Record<IndustryKey, string> = { studios: 'Theo Marsh', sports: 'Coach Ortiz', wellness: 'Tom Becker', commerce: 'Kim Lau', foods: 'Mei Lin' };
+const FIXTURES_STAFF: Record<IndustryKey, string> = { studios: 'Theo Marsh', sports: 'Coach Ortiz', wellness: 'Tom Becker', commerce: 'Kim Lau', foods: 'Mei Lin', realty: 'Nadia Hassan' };
 
 export const mockBusiness: BusinessApi = {
   location: async (ctx) => (await sleep(200), clone(st(ctx.industry).location)),

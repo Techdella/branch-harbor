@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Immobiliare",
-      "who": "Agenzie e reti di agenti immobiliari"
+      "who": "Agenzie e reti di agenti immobiliari",
+      "flow": "Immobile → richiesta → visita → offerta",
+      "cta": "Richiedi una demo immobiliare"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "Un’unica piattaforma condivisa, modellata su come lavora la tua attività. Gli studi sono in fase pilota; gli altri settori sono progettati e in roadmap.",
       "explore": "Scopri {name}",
       "independent": "Hai una sola sede? Scopri la configurazione più semplice",
-      "realty": "Immobiliare · In programma"
+      "realty": "Immobiliare · Prossimamente"
     },
     "hqLocal": {
       "title": "Sede centrale e sedi locali, ognuna con i giusti controlli",
@@ -1075,6 +1077,155 @@
           "a": "Le discrepanze tra pagamento e ordine compaiono in una coda di recupero che il team può risolvere."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Immobiliare",
+      "imageAlt": "Villa moderna con grandi vetrate",
+      "headline": "Ogni agenzia, ogni immobile, una rete affidabile.",
+      "intro": "Annunci verificati dalla sede, richieste assegnate all'agente giusto, visite secondo la disponibilità reale e offerte con storico completo, in più paesi e valute.",
+      "problems": [
+        {
+          "t": "Standard di annuncio disomogenei",
+          "d": "Le agenzie pubblicano testi e informazioni obbligatorie mai verificati dalla sede."
+        },
+        {
+          "t": "Richieste senza risposta",
+          "d": "Le richieste da portali e sito finiscono in caselle condivise senza responsabile."
+        },
+        {
+          "t": "Report che mescolano valute",
+          "d": "Il volume della rete somma dollari, sterline ed euro come se fossero un'unica valuta."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Immobili",
+          "title": "Dalla bozza alla vendita, con verifica",
+          "desc": "Le agenzie gestite e standard pubblicano dopo l'approvazione della sede; anche le modifiche agli annunci online. Le informazioni obbligatorie arrivano dall'azienda.",
+          "screen": "Immobili",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "CA$ 1.649.000 · 2.350 sq ft",
+              "tag": "Attivo"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "In attesa della sede",
+              "tag": "In attesa"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "CA$ 925.000 · 910 sq ft",
+              "tag": "Attivo"
+            }
+          ]
+        },
+        {
+          "label": "Richieste",
+          "title": "Ogni richiesta ha un responsabile",
+          "desc": "Le richieste vanno all'agente dell'immobile, poi a rotazione, poi al pool dell'agenzia. Gli agenti vedono le proprie e il pool.",
+          "screen": "Richieste",
+          "scope": "Londra – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portale · 14 Flask Walk",
+              "tag": "Assegnata"
+            },
+            {
+              "a": "Valutazione",
+              "b": "Sito · pool dell'agenzia",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Sito · affitto",
+              "tag": "Assegnata"
+            }
+          ]
+        },
+        {
+          "label": "Visite",
+          "title": "Visite secondo la disponibilità reale",
+          "desc": "Gli acquirenti prenotano orari liberi nel fuso orario dell'agenzia. Un agente non ha mai due visite contemporanee.",
+          "screen": "Visite",
+          "scope": "Madrid – Salamanca",
+          "rows": [
+            {
+              "a": "Sab 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Confermata"
+            },
+            {
+              "a": "Sab 12:00",
+              "b": "Ático Chamberí · richiesta",
+              "tag": "Richiesta"
+            },
+            {
+              "a": "Ven 17:00",
+              "b": "Feedback registrato · interesse alto",
+              "tag": "Fatta"
+            }
+          ]
+        },
+        {
+          "label": "Offerte",
+          "title": "Offerte con storico completo",
+          "desc": "Controproposte, accettazioni e rifiuti vengono registrati. Solo gli agenti coinvolti e i responsabili d'agenzia vedono le offerte.",
+          "screen": "Offerte",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Offerta · CA$ 1.625.000",
+              "b": "Controproposta · scade tra 2 giorni",
+              "tag": "Controproposta"
+            },
+            {
+              "a": "Offerta · CA$ 1.175.000",
+              "b": "Accettata · in trattativa",
+              "tag": "Accettata"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Livelli di governance e verifiche pubblicitarie",
+        "Report di rete per valuta, senza dati dei clienti",
+        "Formati di feed per portali (sandbox)"
+      ],
+      "local": [
+        "Immobili, foto e informazioni obbligatorie dell'azienda",
+        "Assegnazione richieste e disponibilità degli agenti",
+        "Visite, feedback e offerte"
+      ],
+      "first": [
+        "Immobili con approvazione della sede",
+        "Assegnazione delle richieste",
+        "Prenotazione visite e promemoria",
+        "Offerte con storico"
+      ],
+      "later": [
+        "Connessioni live ai portali",
+        "Importazioni da servizi di annunci",
+        "Firma elettronica",
+        "Report sulle provvigioni"
+      ],
+      "faqs": [
+        {
+          "q": "L'IA può scrivere le descrizioni?",
+          "a": "L'IA scrive solo dai dati inseriti e non aggiunge caratteristiche, viste o affermazioni sul quartiere. Rifiuta di indirizzare o escludere persone in base a caratteristiche protette e ogni bozza richiede la tua approvazione."
+        },
+        {
+          "q": "Inviate gli immobili ai portali?",
+          "a": "Non ancora. I formati di feed si possono visualizzare in sandbox, ma nessuna connessione è attiva e nulla viene inviato."
+        },
+        {
+          "q": "Chi vede le offerte?",
+          "a": "Gli agenti dell'immobile, l'agente dell'acquirente per la propria offerta e i responsabili d'agenzia. La sede vede per impostazione totali senza dati dei clienti."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1667,7 +1818,7 @@
       "business": "Nome dell’attività",
       "industry": "Settore",
       "industryPlaceholder": "Scegli un settore",
-      "realtyOption": "Immobiliare (in programma)",
+      "realtyOption": "Immobiliare (prossimamente)",
       "locationCount": "Numero di sedi",
       "country": "Paese",
       "countryPlaceholder": "Scegli un paese",

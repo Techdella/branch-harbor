@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Inmobiliaria",
-      "who": "Agencias y redes de agentes"
+      "who": "Agencias y redes de agentes",
+      "flow": "Inmueble → consulta → visita → oferta",
+      "cta": "Solicitar una demo inmobiliaria"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "Una plataforma compartida, adaptada a cómo funciona tu negocio. Estudios está en piloto; los demás están diseñados y en la hoja de ruta.",
       "explore": "Explorar {name}",
       "independent": "¿Una sola sede? Descubre la configuración simplificada",
-      "realty": "Inmobiliaria · Planificado"
+      "realty": "Inmobiliaria · Próximamente"
     },
     "hqLocal": {
       "title": "Central y sedes, cada una con los controles adecuados",
@@ -1075,6 +1077,155 @@
           "a": "Las discrepancias entre pago y pedido aparecen en una cola de recuperación para que el equipo las resuelva."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Inmobiliaria",
+      "imageAlt": "Casa moderna con grandes ventanales",
+      "headline": "Cada oficina, cada inmueble, una red de confianza.",
+      "intro": "Inmuebles revisados por la central, consultas asignadas al agente correcto, visitas según la disponibilidad real y ofertas con historial completo, en varios países y monedas.",
+      "problems": [
+        {
+          "t": "Anuncios sin un estándar común",
+          "d": "Las oficinas publican textos e información legal que la central nunca revisó."
+        },
+        {
+          "t": "Consultas sin respuesta",
+          "d": "Las consultas de portales y de la web llegan a buzones compartidos sin responsable."
+        },
+        {
+          "t": "Informes que mezclan monedas",
+          "d": "El volumen de la red suma dólares, libras y euros como si fueran una sola moneda."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Inmuebles",
+          "title": "Del borrador a la venta, con revisión central",
+          "desc": "Las oficinas gestionadas y estándar publican tras la aprobación de la central; también los cambios en anuncios publicados. La información legal la aporta la empresa.",
+          "screen": "Inmuebles",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "1.649.000 CA$ · 2350 pies²",
+              "tag": "Activo"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "Pendiente de la central",
+              "tag": "Pendiente"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "925.000 CA$ · 910 pies²",
+              "tag": "Activo"
+            }
+          ]
+        },
+        {
+          "label": "Consultas",
+          "title": "Cada consulta tiene un responsable",
+          "desc": "Las consultas van al agente del inmueble, luego por turnos y luego al pool de la oficina. Cada agente ve las suyas y el pool.",
+          "screen": "Consultas",
+          "scope": "Londres – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portal · 14 Flask Walk",
+              "tag": "Asignada"
+            },
+            {
+              "a": "Tasación",
+              "b": "Web · pool de la oficina",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Web · alquiler",
+              "tag": "Asignada"
+            }
+          ]
+        },
+        {
+          "label": "Visitas",
+          "title": "Visitas según la disponibilidad real",
+          "desc": "Los compradores reservan huecos libres en la zona horaria de la oficina. Un agente nunca tiene dos visitas a la vez.",
+          "screen": "Visitas",
+          "scope": "Madrid – Salamanca",
+          "rows": [
+            {
+              "a": "Sáb 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Confirmada"
+            },
+            {
+              "a": "Sáb 12:00",
+              "b": "Ático Chamberí · solicitada",
+              "tag": "Solicitada"
+            },
+            {
+              "a": "Vie 17:00",
+              "b": "Opinión registrada · interés alto",
+              "tag": "Hecha"
+            }
+          ]
+        },
+        {
+          "label": "Ofertas",
+          "title": "Ofertas con historial completo",
+          "desc": "Contraofertas, aceptaciones y rechazos quedan registrados. Solo los agentes implicados y los responsables de oficina ven las ofertas.",
+          "screen": "Ofertas",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Oferta · 1.625.000 CA$",
+              "b": "Contraoferta · caduca en 2 días",
+              "tag": "Contraoferta"
+            },
+            {
+              "a": "Oferta · 1.175.000 CA$",
+              "b": "Aceptada · reservado",
+              "tag": "Aceptada"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Niveles de gobierno y revisiones publicitarias",
+        "Informes de red por moneda, sin datos de clientes",
+        "Formatos de feed para portales (sandbox)"
+      ],
+      "local": [
+        "Inmuebles, fotos e información legal de la empresa",
+        "Asignación de consultas y disponibilidad de agentes",
+        "Visitas, opiniones y ofertas"
+      ],
+      "first": [
+        "Inmuebles con aprobación central",
+        "Asignación de consultas a agentes",
+        "Reserva de visitas y recordatorios",
+        "Ofertas con historial"
+      ],
+      "later": [
+        "Conexiones en vivo con portales",
+        "Importación desde servicios de anuncios",
+        "Firma electrónica",
+        "Informes de comisiones"
+      ],
+      "faqs": [
+        {
+          "q": "¿Puede la IA redactar descripciones?",
+          "a": "La IA redacta a partir de los datos introducidos y nunca añade características, vistas ni afirmaciones sobre el barrio. Rechaza segmentar o excluir personas por características protegidas y cada borrador necesita tu aprobación."
+        },
+        {
+          "q": "¿Enviáis los inmuebles a los portales?",
+          "a": "Todavía no. Los formatos de feed se pueden previsualizar en sandbox, pero no hay ninguna conexión activa y no se envía nada."
+        },
+        {
+          "q": "¿Quién ve las ofertas?",
+          "a": "Los agentes del inmueble, el agente del comprador para su propia oferta y los responsables de oficina. La central ve por defecto totales sin datos de clientes."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1667,7 +1818,7 @@
       "business": "Nombre del negocio",
       "industry": "Sector",
       "industryPlaceholder": "Elige un sector",
-      "realtyOption": "Inmobiliaria (planificado)",
+      "realtyOption": "Inmobiliaria (próximamente)",
       "locationCount": "Número de sedes",
       "country": "País",
       "countryPlaceholder": "Elige un país",

@@ -6,3 +6,4 @@ export * from './verticals.ts';
 export * from './mobile.ts';
 export * from './operations.ts';
 export * from './sports-ext.ts';
+export * from './realty-ext.ts';

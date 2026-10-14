@@ -71,6 +71,10 @@
     "foods": {
       "name": "Foods",
       "customers": "Guests"
+    },
+    "realty": {
+      "name": "Real Estate",
+      "customers": "Clients"
     }
   },
   "shell": {
@@ -246,6 +250,10 @@
       "reports": {
         "title": "Sports reports",
         "description": "Enrolment, capacity, attendance rates and outstanding balances per currency."
+      },
+      "guardian": {
+        "title": "Guardian portal",
+        "later": "Guardians can already register and receive group messages. The expanded portal with balances and schedules comes later."
       }
     },
     "wellness": {
@@ -308,7 +316,37 @@
       }
     },
     "switchTo": "Switch to {industry}",
-    "backToOverview": "Back to overview"
+    "backToOverview": "Back to overview",
+    "realty": {
+      "pulse": {
+        "title": "Pulse",
+        "description": "Listings, days on market, the enquiry → viewing → offer funnel and closed volume per currency."
+      },
+      "listings": {
+        "title": "Listings",
+        "description": "From draft to sold or let. Managed and standard offices publish after HQ advertising checks."
+      },
+      "enquiries": {
+        "title": "Enquiries",
+        "description": "Website, portal and phone enquiries, routed to the listing agent, round-robin or the office pool."
+      },
+      "viewings": {
+        "title": "Viewings",
+        "description": "Requested and confirmed viewings in each office's time zone. Log feedback after each one."
+      },
+      "offers": {
+        "title": "Offers",
+        "description": "Negotiation with a full trail. Visible only to the listing agents, the buyer's agent and office managers."
+      },
+      "agents": {
+        "title": "Agents & offices",
+        "description": "Who takes leads, availability for viewings, and each office's governance and units."
+      },
+      "portals": {
+        "title": "Portal feeds",
+        "description": "Preview listing feeds for property portals. Sandbox only — nothing is sent."
+      }
+    }
   },
   "later": {
     "community": {
@@ -1247,7 +1285,8 @@
         "sports": "Registration system",
         "wellness": "Appointment system",
         "commerce": "Store and checkout",
-        "foods": "Ordering"
+        "foods": "Ordering",
+        "realty": "Listings and enquiries"
       },
       "status": {
         "available": "Available",
@@ -1308,6 +1347,16 @@
           "keep": {
             "title": "Point-of-sale connection",
             "body": "Send orders to your POS."
+          }
+        },
+        "realty": {
+          "native": {
+            "title": "BranchHarbor listings",
+            "body": "Listings, enquiries, viewings and offers."
+          },
+          "keep": {
+            "title": "Listing service connection",
+            "body": "Import listings from your listing service."
           }
         }
       },
@@ -2109,6 +2158,364 @@
       "unread": "{n} new",
       "reply": "Reply to the guardian",
       "send": "Send"
+    }
+  },
+  "realty": {
+    "unavailable": "Unavailable",
+    "per": {
+      "month": "month",
+      "week": "week"
+    },
+    "status": {
+      "draft": "Draft",
+      "coming_soon": "Coming soon",
+      "active": "Active",
+      "under_offer": "Under offer",
+      "sold": "Sold",
+      "let": "Let",
+      "withdrawn": "Withdrawn"
+    },
+    "action": {
+      "draft": "Back to draft",
+      "coming_soon": "Publish as coming soon",
+      "active": "Publish as active",
+      "under_offer": "Mark under offer",
+      "sold": "Mark sold",
+      "let": "Mark let",
+      "withdrawn": "Withdraw"
+    },
+    "approval": {
+      "pending": "Awaiting HQ approval",
+      "rejected": "Rejected",
+      "approved": "Approved and applied.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "comment": "Comment (required to reject)",
+      "hqCheck": "HQ advertising check",
+      "ownRequest": "You requested this change, so someone else must approve it.",
+      "publishRequest": "Requested: publish as {status}",
+      "changeRequest": "Changes to the live listing are waiting for approval",
+      "fields": "Fields: {fields}.",
+      "liveUnchanged": "Customers keep seeing the current version until HQ approves.",
+      "rejectedTitle": "HQ asked for changes"
+    },
+    "tier": {
+      "managed": "Managed office",
+      "standard": "Standard office",
+      "flexible": "Flexible office"
+    },
+    "tierHelp": {
+      "managed": "HQ approves every publish and change to live listings.",
+      "standard": "HQ approves publishing and changes to live listings.",
+      "flexible": "The office publishes directly."
+    },
+    "transaction": {
+      "sale": "For sale",
+      "rent": "For rent"
+    },
+    "type": {
+      "house": "House",
+      "townhouse": "Townhouse",
+      "apartment": "Apartment",
+      "condo": "Condo",
+      "land": "Land",
+      "commercial": "Commercial",
+      "other": "Other"
+    },
+    "units": {
+      "sqft": "sq ft",
+      "sqm": "m²"
+    },
+    "facts": {
+      "type": "Type",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "bedShort": "bd",
+      "bathShort": "ba",
+      "area": "Area",
+      "address": "Address",
+      "agents": "Agents",
+      "lead": "listing agent",
+      "noAgent": "No agent assigned",
+      "dom": "Days on market",
+      "vendor": "Vendor / landlord",
+      "restricted": "Restricted",
+      "disclosures": "Disclosures",
+      "disclosuresNote": "Disclosure texts are supplied by the business. BranchHarbor does not write legal text."
+    },
+    "fairHousing": {
+      "flag": "Check wording",
+      "title": "Fair-housing check",
+      "body": "This text may describe who should live here rather than the property: {phrases}. Describe the property, not people."
+    },
+    "listings": {
+      "new": "New listing",
+      "board": "Board",
+      "awaitingApproval": "Awaiting approval",
+      "mine": "My listings",
+      "emptyTitle": "No listings here yet",
+      "emptyBody": "Create a draft listing to get started.",
+      "emptyApproval": "Nothing is waiting for HQ approval.",
+      "columnEmpty": "None",
+      "noPhoto": "No photo yet",
+      "dom": "{count, plural, one {# day} other {# days}} on market",
+      "loading": "Listing",
+      "details": "Details",
+      "edit": "Edit",
+      "activity": "Activity",
+      "changeStatus": "Change status",
+      "sentForApproval": "Sent to HQ for approval. The listing stays unpublished until it is approved.",
+      "statusChanged": "Status changed to {status}.",
+      "viewingsCancelled": "{count, plural, one {# upcoming viewing was} other {# upcoming viewings were}} cancelled and the buyers notified.",
+      "approvalHint": "This office needs HQ approval before a listing goes live.",
+      "changesPending": "Saved. Changes to the live listing wait for HQ approval.",
+      "saved": "Saved.",
+      "governedEdit": "This listing is live. Your changes go to HQ for approval and customers keep seeing the current version meanwhile.",
+      "noOffices": "No offices in this scope.",
+      "newHint": "New listings start as drafts. Prices use the office currency; areas use the office unit.",
+      "createDraft": "Create draft",
+      "countEnquiries": "Enquiries",
+      "countViewings": "Upcoming viewings",
+      "countOffers": "Open offers"
+    },
+    "form": {
+      "title": "Headline",
+      "description": "Description",
+      "descriptionHint": "Describe the property, not who should live there.",
+      "type": "Property type",
+      "price": "Price ({currency})",
+      "priceHint": "In the office currency. Prices are never converted.",
+      "area": "Living area",
+      "areaUnit": "Area unit",
+      "features": "Features",
+      "featuresHint": "Comma-separated, e.g. Balcony, Parking",
+      "photos": "Photo URLs",
+      "photosHint": "One per line. The first photo is the cover.",
+      "tour": "Virtual tour URL",
+      "hideStreet": "Hide the street address on public pages",
+      "save": "Save listing",
+      "office": "Office",
+      "transaction": "Sale or rent",
+      "street": "Street address",
+      "city": "City",
+      "postalCode": "Postal code"
+    },
+    "ai": {
+      "title": "BranchHarbor AI",
+      "draftsOnly": "Drafts only",
+      "factsOnly": "Drafts use only this listing's facts. AI never adds features, views, schools or neighbourhood claims, and never targets or excludes people.",
+      "instructions": "Instructions",
+      "instructionsHint": "Tone or focus, e.g. “mention the renovated kitchen first”",
+      "draft": "Draft description",
+      "refused": "{count, plural, one {# draft was} other {# drafts were}} refused by the fair-housing check and rewritten.",
+      "apply": "Use this draft",
+      "dismiss": "Dismiss",
+      "applied": "Draft applied through the normal editor rules."
+    },
+    "portals": {
+      "title": "Portal feeds",
+      "sandboxNote": "Sandbox: feeds can be previewed, nothing is sent to portals.",
+      "issues": "{count, plural, one {# issue} other {# issues}}",
+      "names": {
+        "zillow_style": "Zillow-style XML (US)",
+        "realtor_ca_style": "Realtor.ca-style JSON (Canada)",
+        "rightmove_style": "Rightmove-style JSON (UK)",
+        "idealista_style": "Idealista-style XML (Spain, Portugal, Italy)"
+      },
+      "sandboxTitle": "Sandbox only",
+      "sandboxBody": "These adapters show the feed format each portal family expects. No portal account is connected and nothing is transmitted.",
+      "sandbox": "Sandbox",
+      "optedIn": "{count, plural, one {# listing opted in} other {# listings opted in}}",
+      "lastExport": "Last sandbox export {when}",
+      "neverExported": "Never exported",
+      "preview": "Preview feed",
+      "runSandbox": "Run sandbox export",
+      "exported": "Sandbox export recorded: {count} valid, {invalid} with issues. Nothing was sent.",
+      "previewTitle": "Feed preview",
+      "included": "{count, plural, one {# listing included} other {# listings included}}"
+    },
+    "enquiries": {
+      "all": "All",
+      "mine": "Mine",
+      "pool": "Office pool",
+      "emptyTitle": "No enquiries",
+      "emptyBody": "New website, portal and phone enquiries appear here.",
+      "noListing": "General enquiry",
+      "assignedTo": "Assigned to {name}",
+      "inPool": "Office pool",
+      "claim": "Claim",
+      "reassign": "Reassign",
+      "toPool": "Office pool",
+      "markContacted": "Mark contacted",
+      "markLost": "Mark lost",
+      "privacy": "Enquiries hold client details. Agents see their own and the office pool; office managers see their office; HQ sees totals only."
+    },
+    "enquiryStatus": {
+      "new": "New",
+      "contacted": "Contacted",
+      "viewing_booked": "Viewing booked",
+      "offer_made": "Offer made",
+      "closed": "Closed",
+      "lost": "Lost"
+    },
+    "kind": {
+      "buyer": "Buyer",
+      "tenant": "Tenant",
+      "valuation": "Valuation",
+      "landlord": "Landlord",
+      "general": "General"
+    },
+    "source": {
+      "website": "Website",
+      "mobile": "App",
+      "phone": "Phone",
+      "walk_in": "Walk-in",
+      "email": "Email",
+      "portal_zillow": "Zillow",
+      "portal_realtor_ca": "Realtor.ca",
+      "portal_rightmove": "Rightmove",
+      "portal_idealista": "Idealista",
+      "other": "Other"
+    },
+    "routing": {
+      "listing_agent": "Routed to the listing agent",
+      "co_listing_agent": "Routed to a co-listing agent",
+      "round_robin": "Round-robin",
+      "office_pool": "Office pool",
+      "manual": "Assigned manually"
+    },
+    "routingMode": {
+      "listing_agent": "Listing agent first",
+      "round_robin": "Round-robin",
+      "office_pool": "Office pool"
+    },
+    "viewings": {
+      "upcoming": "Upcoming",
+      "past": "Past 14 days",
+      "emptyTitle": "No viewings",
+      "emptyBody": "Viewings booked on the website, in the app or by staff appear here.",
+      "viewing": "Viewing",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "logFeedback": "Log feedback",
+      "feedbackLine": "Interest: {interest} · Rating: {rating}",
+      "outcome": "Outcome",
+      "interest": "Interest level",
+      "rating": "Rating (1–5)",
+      "notes": "Notes",
+      "notesHint": "About the property only. Don't record personal characteristics.",
+      "saveFeedback": "Save feedback"
+    },
+    "viewingStatus": {
+      "requested": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "interest": {
+      "none": "None",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "offers": {
+      "visibility": "You see offers on listings you list or co-list, offers you recorded for your buyers, and — as an office manager — every offer at your office.",
+      "emptyTitle": "No offers you can see",
+      "emptyBody": "Offers you are allowed to see appear here.",
+      "restricted": "Only the listing agents and office managers see offers",
+      "buyer": "Buyer: {name}",
+      "via": "via {name}",
+      "asking": "Asking {price}",
+      "title": "Offer",
+      "buyerLabel": "Buyer",
+      "deposit": "Deposit",
+      "conditions": "Conditions",
+      "expires": "Expires",
+      "amount": "Amount ({currency})",
+      "note": "Note",
+      "sides": "Counter, accept and reject respond for the vendor (listing agents). Revise and withdraw act for the buyer (the buyer's agent).",
+      "trail": "Negotiation trail"
+    },
+    "offerStatus": {
+      "submitted": "Submitted",
+      "countered": "Countered",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "offerAction": {
+      "counter": "Counter",
+      "revise": "Revise for buyer",
+      "accept": "Accept",
+      "reject": "Reject",
+      "withdraw": "Withdraw",
+      "note": "Add note"
+    },
+    "offerEvent": {
+      "submitted": "Submitted",
+      "countered": "Countered",
+      "revised": "Revised",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn",
+      "note": "Note"
+    },
+    "party": {
+      "buyer": "buyer",
+      "vendor": "vendor",
+      "agent": "agent"
+    },
+    "office": {
+      "tier": "Governance",
+      "areaUnit": "Area unit",
+      "routing": "Lead routing"
+    },
+    "agents": {
+      "emptyTitle": "No agents in this scope",
+      "you": "You",
+      "inactive": "Inactive",
+      "liveListings": "{count, plural, one {# live listing} other {# live listings}}",
+      "openEnquiries": "{count, plural, one {# open enquiry} other {# open enquiries}}",
+      "upcomingViewings": "{count, plural, one {# upcoming viewing} other {# upcoming viewings}}",
+      "noAvailability": "No viewing availability set",
+      "acceptsLeads": "Accepts new leads"
+    },
+    "weekday": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "pulse": {
+      "emptyTitle": "No report access in this scope",
+      "emptyBody": "Reports need report access for at least one office.",
+      "active": "Active listings",
+      "activeSub": "{underOffer} under offer · {comingSoon} coming soon",
+      "dom": "Median days on market",
+      "domSub": "Across {count} live listings",
+      "funnel": "Enquiries → viewings → offers",
+      "funnelSub": "Last 90 days",
+      "awaitingApproval": "Awaiting HQ approval",
+      "awaitingSub": "Listings or changes",
+      "volume": "Closed volume (last 90 days)",
+      "sold": "Sold",
+      "let": "Let",
+      "deals": "{count, plural, one {# deal} other {# deals}}",
+      "noneClosed": "None",
+      "combined": "Combined total: not shown — no currency conversion method is defined.",
+      "byOffice": "By office",
+      "office": "Office",
+      "domShort": "DOM (median)",
+      "enquiries": "Enquiries",
+      "viewings": "Viewings",
+      "offers": "Offers",
+      "conversion": "Enquiry → viewing",
+      "privacy": "Reports contain no client personal data.",
+      "freshness": "Generated {when} · {source}"
     }
   }
 }

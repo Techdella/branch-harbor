@@ -50,6 +50,15 @@ export const OPS: Record<IndustryKey, OpsDef[]> = {
     { key: 'pickup', icon: 'clock', kind: 'table' },
     { key: 'catering', icon: 'gift', kind: 'later' },
   ],
+  realty: [
+    { key: 'pulse', icon: 'grid', kind: 'screen' },
+    { key: 'listings', icon: 'house', kind: 'screen' },
+    { key: 'enquiries', icon: 'mail', kind: 'screen' },
+    { key: 'viewings', icon: 'key', kind: 'screen' },
+    { key: 'offers', icon: 'receipt', kind: 'screen' },
+    { key: 'agents', icon: 'users', kind: 'screen' },
+    { key: 'portals', icon: 'plug', kind: 'screen' },
+  ],
 };
 
 export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }> = {
@@ -58,6 +67,7 @@ export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }
   wellness: { icon: 'leaf', pastel: '#D4E6D9' },
   commerce: { icon: 'bag', pastel: '#F7EDA8' },
   foods: { icon: 'utensils', pastel: '#F8D6D8' },
+  realty: { icon: 'house', pastel: '#CDEEEE' },
 };
 
 export interface NavItem {

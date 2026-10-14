@@ -238,7 +238,7 @@ function freshPayments(ind: IndustryKey) {
   const f = FIXTURES[ind];
   const L = f.locations;
   const lp = loc(ind, f.localLocationId);
-  const what: Record<IndustryKey, [string, string]> = { studios: ['Class booking', 'Monthly membership'], sports: ['Registration · U10 Autumn', 'Camp registration'], wellness: ['Deposit · Hot stone', 'Deep tissue 60 min'], commerce: ['Order #5521', 'Order #5519'], foods: ['Pickup order', 'Pickup order'] };
+  const what: Record<IndustryKey, [string, string]> = { studios: ['Class booking', 'Monthly membership'], sports: ['Registration · U10 Autumn', 'Camp registration'], wellness: ['Deposit · Hot stone', 'Deep tissue 60 min'], commerce: ['Order #5521', 'Order #5519'], foods: ['Pickup order', 'Pickup order'], realty: ['Valuation fee', 'Marketing package'] };
   const ev = (mins: number, text: string, tone: 'success' | 'info' | 'danger' | 'warning' | 'neutral', icon: 'card' | 'check' | 'x' | 'refresh' | 'undo' | 'alert') => ({ at: minutesAgo(mins), text, tone, icon });
   const tx: Transaction[] = L.filter((l) => l.site === 'live').flatMap((l, i): Transaction[] => {
     const base = l.currency === 'GBP' ? 28 : l.currency === 'EUR' ? 32 : l.currency === 'AUD' ? 45 : l.currency === 'CAD' ? 39 : 34.65;
@@ -287,6 +287,10 @@ function freshConnections(ind: IndustryKey): Connection[] {
       { id: 'c_stripe', name: 'Stripe', monogram: 'St', role: 'Pickup payments', state: 'connected', lastSync: minutesAgo(0), direction: 'import', authoritative: 'Stripe confirms payment outcomes', locations: names },
       { id: 'c_kds_fr', name: 'Fremont kitchen screen', monogram: 'Kv', role: 'Kitchen display device', state: 'disconnected', lastSync: minutesAgo(28), direction: 'export', authoritative: 'Orders remain in BranchHarbor', locations: names.filter((n) => n.includes('Fremont')), issue: 'Screen offline. Orders still arrive here and by email.', affected: '1 device', fixAction: 'Send test order' },
       { id: 'c_pos', name: 'Square POS', monogram: 'Sq', role: 'Point of sale', state: 'initial_sync', lastSync: null, progress: 35, direction: 'export', authoritative: 'BranchHarbor sends orders; POS is not authoritative', locations: names.filter((n) => n.includes('London')) },
+    ],
+    realty: [
+      { id: 'c_gcal', name: 'Google Calendar', monogram: 'Gc', role: 'Agent viewing calendars', state: 'connected', lastSync: minutesAgo(9), direction: 'export', authoritative: 'BranchHarbor viewings are authoritative; calendars receive copies', locations: names },
+      { id: 'c_portal', name: 'Portal feeds (sandbox)', monogram: 'Pf', role: 'Listing syndication preview', state: 'initial_sync', lastSync: null, progress: 0, direction: 'export', authoritative: 'Sandbox only — nothing is sent to portals', locations: names },
     ],
   };
   return C[ind];
@@ -374,6 +378,7 @@ const SHIFT_PEOPLE: Record<IndustryKey, [string, string][]> = {
   wellness: [['Reception', 'Tom Becker'], ['Clinic manager', 'Rina Kapoor'], ['Reception', 'Ana Lima']],
   commerce: [['Sales associate', 'Kim Lau'], ['Store manager', 'Leah Park'], ['Sales associate', 'Sanne Visser']],
   foods: [['Kitchen lead', 'Mei Lin'], ['Shift manager', 'Carlos Ortega'], ['Line cook', 'Ren Ito']],
+  realty: [['Office duty agent', 'Nadia Hassan'], ['Office manager', 'Marcus Lee'], ['Office duty agent', 'Daniel Okafor']],
 };
 const SHIFT_TIMES: [string, string][] = [['07:00', '15:00'], ['14:00', '22:00'], ['09:00', '17:00']];
 

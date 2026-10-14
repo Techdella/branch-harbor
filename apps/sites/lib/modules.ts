@@ -5,14 +5,16 @@ export const MODULE_PATH: Record<string, string> = {
   wellness: '/book',
   sports: '/programmes',
   commerce: '/shop',
+  realty: '/properties',
 };
 
-export const MODULE_ICON: Record<string, 'lotus' | 'utensils' | 'leaf' | 'trophy' | 'bag'> = {
+export const MODULE_ICON: Record<string, 'lotus' | 'utensils' | 'leaf' | 'trophy' | 'bag' | 'house'> = {
   studios: 'lotus',
   foods: 'utensils',
   wellness: 'leaf',
   sports: 'trophy',
   commerce: 'bag',
+  realty: 'house',
 };
 
 /** schema.org type for LocalBusiness JSON-LD. */
@@ -22,6 +24,7 @@ export const SCHEMA_TYPE: Record<string, string> = {
   wellness: 'HealthAndBeautyBusiness',
   sports: 'SportsActivityLocation',
   commerce: 'Store',
+  realty: 'RealEstateAgent',
 };
 
 export function providerName(p: string | null): string {

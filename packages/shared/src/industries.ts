@@ -18,5 +18,5 @@ export const INDUSTRY_META: Record<Industry, IndustryMeta> = {
   wellness: { key: 'wellness', name: 'Health & Wellness', customerNoun: 'Clients', staffNoun: 'Practitioner', primaryCta: 'Book an appointment', workflow: 'Service → practitioner → appointment', release: 'next' },
   commerce: { key: 'commerce', name: 'Commerce', customerNoun: 'Customers', staffNoun: 'Store associate', primaryCta: 'Shop now', workflow: 'Discovery → order → fulfilment', release: 'next' },
   foods: { key: 'foods', name: 'Foods', customerNoun: 'Guests', staffNoun: 'Kitchen lead', primaryCta: 'Order pickup', workflow: 'Location → menu → order → pickup', release: 'next' },
-  realty: { key: 'realty', name: 'Real Estate', customerNoun: 'Buyers & sellers', staffNoun: 'Agent', primaryCta: 'Book a viewing', workflow: 'Listing → enquiry → viewing → offer', release: 'planned' },
+  realty: { key: 'realty', name: 'Real Estate', customerNoun: 'Buyers & sellers', staffNoun: 'Agent', primaryCta: 'Book a viewing', workflow: 'Listing → enquiry → viewing → offer', release: 'next' },
 };

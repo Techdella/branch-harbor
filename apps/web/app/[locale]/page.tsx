@@ -114,13 +114,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </Link>
           );
         })}
-        <div className="flex items-center gap-3 rounded-[28px] border-[1.5px] border-dashed border-line bg-canvas-raised p-6 sm:col-span-2 lg:col-span-3 md:rounded-2xl">
-          <PastelIcon name="house" bg={PASTEL.aqua} size={40} />
-          <p className="text-sm font-bold">
-            {t('industries.realty')}
-            <span className="ms-2 font-medium text-stone">{tm('realty.who')}</span>
-          </p>
-        </div>
       </section>
 
       {/* 5. Headquarters and locations */}

@@ -134,6 +134,27 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
     ],
     aiPrompt: 'Summarise today’s production by item',
   },
+  realty: {
+    metrics: [
+      { key: 'active', label: 'Active listings', definition: 'Listings currently active or under offer', range: 'Now', source: 'BranchHarbor listings', icon: 'house', pastel: P.aqua, perLoc: [4, 2, 2, 2, 1, 2], agg: 'sum', kind: 'count' },
+      { key: 'enquiries', label: 'New enquiries', definition: 'Website, portal and phone enquiries received', range: 'Last 7 days', source: 'Enquiries inbox', icon: 'mail', pastel: P.lime, perLoc: [6, 2, 2, 2, 1, 2], agg: 'sum', kind: 'count' },
+      { key: 'viewings', label: 'Viewings this week', definition: 'Requested and confirmed viewings, in each office’s time zone', range: 'This week', source: 'Viewings calendar', icon: 'key', pastel: P.lilac, perLoc: [7, 1, 2, 1, 0, 1], agg: 'sum', kind: 'count' },
+      { key: 'offers', label: 'Offers in negotiation', definition: 'Submitted or countered offers', range: 'Now', source: 'Offers', icon: 'receipt', pastel: P.butter, perLoc: [1, 0, 0, 0, null, 0], agg: 'sum', kind: 'count' },
+    ],
+    upcomingTitle: 'Upcoming viewings',
+    upcoming: [
+      ['tor', '11:00', '42 Birchmount Cres · Nadia Hassan', 'Toronto Midtown · Omar & Sara H.', 'Confirmed', 'success'],
+      ['tor', '14:30', 'Suite 1806 – 88 Harbour St · Nadia Hassan', 'Toronto Midtown · Grace L.', 'Awaiting confirmation', 'warning'],
+      ['lon', '10:30', '14 Flask Walk · James Whitfield', 'London Hampstead · Charlotte E.', 'Confirmed', 'success'],
+      ['mad', '12:00', 'Piso exterior, Salamanca · Lucía Romero', 'Madrid Salamanca · Carmen D.', 'Confirmed', 'success'],
+    ],
+    attention: [
+      { id: 'a1', icon: 'shield', title: '1 listing awaiting HQ approval', detail: 'Townhouse with rooftop terrace · Toronto Midtown', href: '/ops/listings', kind: 'action', locId: 'tor' },
+      { id: 'a2', icon: 'mail', title: '1 enquiry in the office pool', detail: 'Valuation request · Toronto Midtown', href: '/ops/enquiries', kind: 'action', locId: 'tor' },
+      { id: 'a3', icon: 'receipt', title: 'Offer countered — awaiting buyer', detail: '42 Birchmount Cres · expires in 2 days', href: '/ops/offers', kind: 'action', locId: 'tor' },
+    ],
+    aiPrompt: 'Summarise viewing feedback for 42 Birchmount Cres',
+  },
 };
 
 export function buildOverview(ind: IndustryKey, locIds: string[]) {
@@ -311,6 +332,15 @@ const TABLES: Record<string, TableSpec> = {
       ['g2', [], [tx('Tom R.', '', true), tx('3'), tx('Seattle – Ballard'), b('None', 'neutral', 'minus')], 'bl'],
       ['g3', [], [tx('Oliver P.', '', true), tx('5'), tx('London – Borough'), b('Email', 'success')], 'bo'],
     ] },
+  /* Real Estate */
+  realtyClients: { columns: [['client', 'Client'], ['kind', 'Type'], ['office', 'Office'], ['agent', 'Agent'], ['consent', 'Consent']], filters: [['all', 'All']], source: 'Enquiries and contacts',
+    description: 'Buyers, tenants, vendors and landlords. Agents see their own clients; office managers see their office. HQ reports never include client details.',
+    rows: [
+      ['rc1', [], [tx('Omar & Sara H.', '', true), tx('Buyer'), tx('Toronto Midtown'), tx('Nadia Hassan'), b('Email', 'success')], 'tor'],
+      ['rc2', [], [tx('Margaret & Paul L.', '', true), tx('Vendor'), tx('Toronto Midtown'), tx('Nadia Hassan'), b('None', 'neutral', 'minus')], 'tor'],
+      ['rc3', [], [tx('Charlotte E.', '', true), tx('Buyer'), tx('London Hampstead'), tx('James Whitfield'), b('Email', 'success')], 'lon'],
+      ['rc4', [], [tx('Carmen D.', '', true), tx('Buyer'), tx('Madrid Salamanca'), tx('Lucía Romero'), b('None', 'neutral', 'minus')], 'mad'],
+    ] },
   /* Shared */
   marketing: { columns: [['campaign', 'Campaign'], ['scope', 'Scope'], ['channel', 'Channel'], ['status', 'Status'], ['updated', 'Updated']], filters: [['all', 'All'], ['draft', 'Draft'], ['scheduled', 'Scheduled']], source: 'BranchHarbor campaigns', primaryAction: 'New campaign',
     description: 'Campaign reporting uses observed form and booking data only. Attribution beyond the form source is not measured.',
@@ -322,7 +352,7 @@ const TABLES: Record<string, TableSpec> = {
     ] },
 };
 
-const CUSTOMER_TABLE: Record<IndustryKey, string> = { studios: 'members', sports: 'participants', wellness: 'clients', commerce: 'shoppers', foods: 'guests' };
+const CUSTOMER_TABLE: Record<IndustryKey, string> = { studios: 'members', sports: 'participants', wellness: 'clients', commerce: 'shoppers', foods: 'guests', realty: 'realtyClients' };
 
 export function buildTable(ind: IndustryKey, key: string, locIds: string[]): TableData | null {
   const k = key === 'customers' ? CUSTOMER_TABLE[ind] : key;
@@ -380,5 +410,12 @@ export const AI: Record<IndustryKey, { suggestions: string[]; answer: string; as
     assumptions: 'Counts orders accepted since opening, Pacific time.',
     sources: [['Orders · Ballard', '11:00–12:10'], ['Fremont kitchen screen', 'Offline since 11:42']],
     action: { title: 'Draft “Weekday lunch” promotion for Seattle locations', kind: 'draft', affected: ['Seattle – Ballard', 'Seattle – Fremont'], excluded: ['Vancouver, London, Berlin (outside requested scope)'] },
+  },
+  realty: {
+    suggestions: ['Summarise viewing feedback for 42 Birchmount Cres', 'Draft a description for Suite 1806 from its facts', 'Who should I follow up with this week?'],
+    answer: 'Three viewings at 42 Birchmount Cres logged feedback: two rated it 4–5 and liked the kitchen and garden; one raised the basement ceiling height. One buyer asked about closing dates. I only used the logged feedback — buyer identities were not shared with me.',
+    assumptions: 'Feedback from completed viewings in the last 14 days, Toronto time. No-shows are excluded.',
+    sources: [['Viewings · feedback', 'Updated 6 min ago']],
+    action: { title: 'Draft follow-up emails for 2 interested buyers', kind: 'draft', affected: ['Toronto Midtown · 2 buyers'], excluded: ['Buyers without email consent'] },
   },
 };

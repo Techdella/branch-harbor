@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Immobilier",
-      "who": "Agences et réseaux d’agents"
+      "who": "Agences et réseaux d’agents",
+      "flow": "Annonce → demande → visite → offre",
+      "cta": "Demander une démo immobilier"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "Une plateforme commune, façonnée selon votre façon de travailler. Studios est en pilote ; les autres secteurs sont conçus et inscrits à la feuille de route.",
       "explore": "Explorer {name}",
       "independent": "Un seul établissement ? Découvrez la configuration simplifiée",
-      "realty": "Immobilier · Prévu"
+      "realty": "Immobilier · Prochainement"
     },
     "hqLocal": {
       "title": "Le siège et les établissements, chacun avec les bons contrôles",
@@ -1075,6 +1077,155 @@
           "a": "Les écarts entre paiement et commande apparaissent dans une file de rapprochement que l’équipe traite."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Immobilier",
+      "imageAlt": "Maison moderne aux grandes baies vitrées",
+      "headline": "Chaque agence, chaque annonce, un réseau de confiance.",
+      "intro": "Des annonces validées par le siège, des demandes attribuées au bon agent, des visites réservées selon les vraies disponibilités et des offres tracées — dans plusieurs pays et devises.",
+      "problems": [
+        {
+          "t": "Des standards d’annonce inégaux",
+          "d": "Les agences publient textes et mentions sans relecture du siège."
+        },
+        {
+          "t": "Des demandes sans réponse",
+          "d": "Les demandes des portails et du site arrivent dans des boîtes partagées sans responsable."
+        },
+        {
+          "t": "Des rapports qui mélangent les devises",
+          "d": "Le volume du réseau additionne dollars, livres et euros comme une seule monnaie."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Annonces",
+          "title": "Du brouillon à la vente, validé par le siège",
+          "desc": "Les agences gérées et standard publient après validation du siège ; les modifications d’annonces en ligne aussi. Les mentions viennent de l’entreprise.",
+          "screen": "Annonces",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "1 649 000 $ CA · 2 350 pi²",
+              "tag": "Active"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "En attente du siège",
+              "tag": "En attente"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "925 000 $ CA · 910 pi²",
+              "tag": "Active"
+            }
+          ]
+        },
+        {
+          "label": "Demandes",
+          "title": "Chaque contact a un responsable",
+          "desc": "Les demandes vont à l’agent de l’annonce, puis à tour de rôle, puis au pool de l’agence. Chaque agent voit ses contacts et le pool.",
+          "screen": "Demandes",
+          "scope": "Londres – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portail · 14 Flask Walk",
+              "tag": "Attribuée"
+            },
+            {
+              "a": "Estimation",
+              "b": "Site · pool de l’agence",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Site · location",
+              "tag": "Attribuée"
+            }
+          ]
+        },
+        {
+          "label": "Visites",
+          "title": "Des visites selon les vraies disponibilités",
+          "desc": "Les acheteurs réservent des créneaux libres dans le fuseau horaire de l’agence. Un agent ne peut jamais être réservé deux fois.",
+          "screen": "Visites",
+          "scope": "Madrid – Salamanca",
+          "rows": [
+            {
+              "a": "Sam. 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Confirmée"
+            },
+            {
+              "a": "Sam. 12:00",
+              "b": "Ático Chamberí · demandée",
+              "tag": "Demandée"
+            },
+            {
+              "a": "Ven. 17:00",
+              "b": "Retour saisi · intérêt fort",
+              "tag": "Faite"
+            }
+          ]
+        },
+        {
+          "label": "Offres",
+          "title": "Des offres entièrement tracées",
+          "desc": "Contre-offre, acceptation ou refus : chaque étape est enregistrée. Seuls les agents concernés et les responsables d’agence voient les offres.",
+          "screen": "Offres",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Offre · 1 625 000 $ CA",
+              "b": "Contre-offre · expire dans 2 jours",
+              "tag": "Contre-offre"
+            },
+            {
+              "a": "Offre · 1 175 000 $ CA",
+              "b": "Acceptée · sous offre",
+              "tag": "Acceptée"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Niveaux de gouvernance et contrôles publicitaires",
+        "Rapports réseau par devise, sans données clients",
+        "Formats de flux portails (bac à sable)"
+      ],
+      "local": [
+        "Annonces, photos et mentions fournies par l’entreprise",
+        "Attribution des demandes et disponibilités des agents",
+        "Visites, retours et offres"
+      ],
+      "first": [
+        "Annonces validées par le siège",
+        "Attribution des demandes aux agents",
+        "Réservation de visites et rappels",
+        "Offres avec historique"
+      ],
+      "later": [
+        "Connexions portails en direct",
+        "Imports depuis un service d’annonces",
+        "Signature électronique",
+        "Rapports de commissions"
+      ],
+      "faqs": [
+        {
+          "q": "L’IA peut-elle rédiger les descriptions ?",
+          "a": "L’IA rédige à partir des informations saisies, sans ajouter d’équipements, de vues ni d’affirmations sur le quartier. Elle refuse de cibler ou d’exclure des personnes selon des caractéristiques protégées, et chaque brouillon doit être approuvé."
+        },
+        {
+          "q": "Envoyez-vous les annonces aux portails ?",
+          "a": "Pas encore. Les formats de flux peuvent être prévisualisés en bac à sable, mais aucune connexion n’est active et rien n’est envoyé."
+        },
+        {
+          "q": "Qui voit les offres ?",
+          "a": "Les agents de l’annonce, l’agent de l’acheteur pour son offre et les responsables d’agence. Le siège voit par défaut des totaux sans données clients."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1667,7 +1818,7 @@
       "business": "Nom de l’entreprise",
       "industry": "Secteur",
       "industryPlaceholder": "Choisissez un secteur",
-      "realtyOption": "Immobilier (prévu)",
+      "realtyOption": "Immobilier (prochainement)",
       "locationCount": "Nombre d’établissements",
       "country": "Pays",
       "countryPlaceholder": "Choisissez un pays",

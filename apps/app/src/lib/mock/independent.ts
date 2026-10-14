@@ -35,6 +35,8 @@ export const INDEPENDENT: Record<IndustryKey, IndependentFixture> = {
     {}, 'Leah Park'),
   foods: make('foods', 'bl', { id: 'org_ballard_corner', name: 'Ballard Corner Café', defaultCurrency: 'USD', defaultTimeZone: 'America/Los_Angeles', defaultLocale: 'en', dataRegion: 'us' },
     {}, 'Carlos Ortega'),
+  realty: make('realty', 'tor', { id: 'org_annex_homes', name: 'Annex Homes Realty', defaultCurrency: 'CAD', defaultTimeZone: 'America/Toronto', defaultLocale: 'en', dataRegion: 'us' },
+    {}, 'Priya Shah'),
 };
 
 export function independentSession(ind: IndustryKey): Session {

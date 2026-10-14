@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Badge, Card, DataStatus, ListItem, MoneyText, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, type Tone } from '@/components';
+import { RealtyEntry } from '@/features/realty/RealtyEntry';
 import { ExperienceSwitch } from '@/features/shared/ExperienceSwitch';
 import { regionName } from '@/features/customer/useLocationScope';
 import { useI18n } from '@/i18n';
@@ -64,6 +65,7 @@ export default function Pulse() {
       <SectionHeader title={t('owner.locationsTitle')} />
       {q.loading ? <><SkeletonCard /><SkeletonCard /></> : null}
       {(p?.locations ?? []).map((l) => <LocationPulse key={l.locationId} l={l} />)}
+      <RealtyEntry kind="owner" />
     </Screen>
   );
 }

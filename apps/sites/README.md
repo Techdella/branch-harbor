@@ -54,6 +54,16 @@ Seeded examples: `/stillwater-yoga` (studios, 5 public locations; Leslieville is
 If a connected booking/commerce system is authoritative for a location (`module.mode = external`), native
 booking is hidden and the page points to that system.
 
+
+### Real Estate (`realty` brands, e.g. `/keystone-realty`)
+
+| Route | What it shows |
+|---|---|
+| `/{brand}/properties` | Property search (sale/rent, type, office, city, price range in one currency, beds, baths, minimum area in m² or sq ft), map placeholder, save search with consent-based email alerts |
+| `/{brand}/properties/{id}` | Listing: gallery, facts (area in the office unit + the other unit), features, floor plans, tour link, business-supplied disclosures, agents, open houses, book a viewing (slots in the office time zone), enquiry form, `RealEstateListing` JSON-LD |
+| `/{brand}/{office}/properties` | Office page: homes, agents, enquiry / valuation form |
+| `/{brand}/{office}/manage/viewing/{id}?token=` · `/{brand}/saved-search/{id}?token=` | Manage a viewing request · stop alerts |
+
 ## Behaviour rules
 
 * **No mock data.** If the API is unreachable, customers see a friendly error page (`error.tsx`), never invented content.

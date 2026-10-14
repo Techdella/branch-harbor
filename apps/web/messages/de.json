@@ -109,7 +109,9 @@
     },
     "realty": {
       "name": "Immobilien",
-      "who": "Maklerbüros und Maklernetzwerke"
+      "who": "Maklerbüros und Maklernetzwerke",
+      "flow": "Objekt → Anfrage → Besichtigung → Angebot",
+      "cta": "Immobilien-Demo anfragen"
     }
   },
   "home": {
@@ -148,7 +150,7 @@
       "body": "Eine gemeinsame Plattform, zugeschnitten auf die Arbeitsweise Ihres Unternehmens. Studios ist in der Pilotphase; die anderen Branchen sind entworfen und auf der Roadmap.",
       "explore": "{name} entdecken",
       "independent": "Nur ein Standort? Zur einfacheren Einrichtung",
-      "realty": "Immobilien · Geplant"
+      "realty": "Immobilien · Als Nächstes"
     },
     "hqLocal": {
       "title": "Zentrale und Standorte, jeweils mit den passenden Kontrollen",
@@ -1075,6 +1077,155 @@
           "a": "Abweichungen zwischen Zahlung und Bestellung landen in einer Klärungsliste, die das Team abarbeitet."
         }
       ]
+    },
+    "realty": {
+      "metaTitle": "Immobilien",
+      "imageAlt": "Modernes Einfamilienhaus mit großen Fenstern",
+      "headline": "Jedes Büro, jedes Objekt, ein verlässliches Netzwerk.",
+      "intro": "Objekte mit Prüfung durch die Zentrale, Anfragen beim richtigen Makler, Besichtigungen nach echter Verfügbarkeit und Angebote mit lückenlosem Verlauf – über Länder und Währungen hinweg.",
+      "problems": [
+        {
+          "t": "Uneinheitliche Exposés",
+          "d": "Büros veröffentlichen Texte und Pflichtangaben ohne Prüfung durch die Zentrale."
+        },
+        {
+          "t": "Unbeantwortete Anfragen",
+          "d": "Portal- und Website-Anfragen landen in geteilten Postfächern ohne Zuständigkeit."
+        },
+        {
+          "t": "Berichte, die Währungen mischen",
+          "d": "Das Netzwerkvolumen addiert Dollar, Pfund und Euro, als wären sie eine Währung."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Objekte",
+          "title": "Vom Entwurf bis zum Verkauf, mit Prüfung",
+          "desc": "Gesteuerte und Standard-Büros veröffentlichen nach Freigabe der Zentrale; Änderungen an Live-Objekten ebenso. Pflichtangaben kommen vom Unternehmen.",
+          "screen": "Objekte",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "42 Birchmount Cres",
+              "b": "1.649.000 CA$ · 2.350 sq ft",
+              "tag": "Aktiv"
+            },
+            {
+              "a": "17 Merton St",
+              "b": "Wartet auf Prüfung",
+              "tag": "Ausstehend"
+            },
+            {
+              "a": "88 Harbour St, 1806",
+              "b": "925.000 CA$ · 910 sq ft",
+              "tag": "Aktiv"
+            }
+          ]
+        },
+        {
+          "label": "Anfragen",
+          "title": "Jede Anfrage hat einen Zuständigen",
+          "desc": "Anfragen gehen an den Objektmakler, dann reihum, dann in den Büro-Pool. Makler sehen ihre eigenen Anfragen und den Pool.",
+          "screen": "Anfragen",
+          "scope": "London – Hampstead",
+          "rows": [
+            {
+              "a": "Charlotte E.",
+              "b": "Portal · 14 Flask Walk",
+              "tag": "Zugewiesen"
+            },
+            {
+              "a": "Bewertung",
+              "b": "Website · Büro-Pool",
+              "tag": "Pool"
+            },
+            {
+              "a": "Tomás H.",
+              "b": "Website · Vermietung",
+              "tag": "Zugewiesen"
+            }
+          ]
+        },
+        {
+          "label": "Besichtigungen",
+          "title": "Besichtigungen nach echter Verfügbarkeit",
+          "desc": "Interessenten buchen freie Termine in der Zeitzone des Büros. Ein Makler wird nie doppelt gebucht.",
+          "screen": "Besichtigungen",
+          "scope": "Madrid – Salamanca",
+          "rows": [
+            {
+              "a": "Sa 11:00",
+              "b": "Piso exterior · Lucía R.",
+              "tag": "Bestätigt"
+            },
+            {
+              "a": "Sa 12:00",
+              "b": "Ático Chamberí · angefragt",
+              "tag": "Angefragt"
+            },
+            {
+              "a": "Fr 17:00",
+              "b": "Feedback erfasst · hohes Interesse",
+              "tag": "Erledigt"
+            }
+          ]
+        },
+        {
+          "label": "Angebote",
+          "title": "Angebote mit lückenlosem Verlauf",
+          "desc": "Gegenangebot, Annahme oder Ablehnung – jeder Schritt wird erfasst. Nur beteiligte Makler und Büroleitungen sehen Angebote.",
+          "screen": "Angebote",
+          "scope": "Toronto – Midtown",
+          "rows": [
+            {
+              "a": "Angebot · 1.625.000 CA$",
+              "b": "Gegenangebot · läuft in 2 Tagen ab",
+              "tag": "Gegenangebot"
+            },
+            {
+              "a": "Angebot · 1.175.000 CA$",
+              "b": "Angenommen · reserviert",
+              "tag": "Angenommen"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Governance-Stufen und Werbeprüfungen",
+        "Netzwerkberichte je Währung, ohne Kundendaten",
+        "Portal-Feed-Formate (Sandbox)"
+      ],
+      "local": [
+        "Objekte, Fotos und Pflichtangaben des Unternehmens",
+        "Anfragenverteilung und Verfügbarkeit der Makler",
+        "Besichtigungen, Feedback und Angebote"
+      ],
+      "first": [
+        "Objekte mit Freigabe der Zentrale",
+        "Anfragenverteilung an Makler",
+        "Besichtigungsbuchung und Erinnerungen",
+        "Angebote mit Verlauf"
+      ],
+      "later": [
+        "Live-Portalanbindungen",
+        "Importe aus Objektdatenbanken",
+        "E-Signatur",
+        "Provisionsberichte"
+      ],
+      "faqs": [
+        {
+          "q": "Kann KI Exposé-Texte schreiben?",
+          "a": "Die KI schreibt nur aus den eingegebenen Fakten und ergänzt keine Ausstattung, Aussicht oder Aussagen zur Lage. Sie lehnt es ab, Personen nach geschützten Merkmalen anzusprechen oder auszuschließen, und jeder Entwurf braucht Ihre Freigabe."
+        },
+        {
+          "q": "Senden Sie Objekte an Immobilienportale?",
+          "a": "Noch nicht. Feed-Formate lassen sich in einer Sandbox ansehen, aber keine Portalanbindung ist live und nichts wird gesendet."
+        },
+        {
+          "q": "Wer sieht Angebote?",
+          "a": "Die Objektmakler, der Makler des Käufers für sein eigenes Angebot und Büroleitungen. Die Zentrale sieht standardmäßig Summen ohne Kundendaten."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1667,7 +1818,7 @@
       "business": "Name des Unternehmens",
       "industry": "Branche",
       "industryPlaceholder": "Branche wählen",
-      "realtyOption": "Immobilien (geplant)",
+      "realtyOption": "Immobilien (als Nächstes)",
       "locationCount": "Anzahl der Standorte",
       "country": "Land",
       "countryPlaceholder": "Land wählen",

@@ -422,6 +422,20 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 - `POST /v1/orgs/{orgId}/ai/conversations/{id}/messages`
 - `POST /v1/orgs/{orgId}/ai/proposed-actions/{id}/decision`
 
+
+**realty** (Real Estate — see [docs/verticals/real-estate.md](../../docs/verticals/real-estate.md); Keystone Realty Network demo: `elena.vargas@` HQ admin, `marcus.lee@` Toronto manager, `nadia.hassan@` / `james.whitfield@` agents, same password)
+
+- Public: `GET /v1/public/realty/{brandSlug}/listings?transaction&type&minPrice&maxPrice&currency&minBeds&minBaths&minArea&areaUnit&city&office&sort` (price range needs a currency — never converted; other-currency count reported) · `GET /v1/public/realty/listings/{id}?areaUnit` · `GET /v1/public/realty/{brandSlug}/offices/{officeSlug}` · `GET /v1/public/realty/agencies/{brandSlug}`
+- Public: `GET /v1/public/realty/listings/{id}/viewing-slots?date` · `POST /v1/public/realty/listings/{id}/viewings` (requested; agent confirms) · `GET /v1/public/realty/viewings/{id}?token` · `POST …/viewings/{id}/cancel` · `POST /v1/public/realty/{brandSlug}/enquiries` (routing: listing agent → co-listing agent → round-robin → office pool) · `POST /v1/public/realty/{brandSlug}/saved-searches` (strict criteria, alerts only with consent) · `GET /v1/public/realty/saved-searches/{id}?token` · `POST …/saved-searches/{id}/unsubscribe`
+- Buyer: `GET|POST /v1/me/realty/favourites`, `DELETE /v1/me/realty/favourites/{listingId}`, `GET /v1/me/realty/viewings`, `POST /v1/me/realty/viewings/{id}/cancel`, `GET /v1/me/realty/saved-searches`, `POST /v1/me/realty/saved-searches/{id}/unsubscribe`
+- Staff: `GET /v1/orgs/{orgId}/realty/me` · `GET /realty/offices` · `PUT /realty/offices/{locationId}` (tier needs `policies.write`) · `GET|POST /realty/agents` · `PATCH /realty/agents/{id}` · `GET|POST /realty/listings` · `GET|PATCH /realty/listings/{id}` (governed edits → pending) · `PUT /realty/listings/{id}/agents` · `POST /realty/listings/{id}/status` (202 = waiting for HQ) · `POST /realty/listings/{id}/approval` (`website.approve`, no self-approval) · `POST /realty/listings/{id}/open-houses` · `POST /realty/open-houses/{id}/cancel` · `GET|POST /realty/contacts`
+- Staff: `GET|POST /realty/enquiries` (portal leads idempotent on `externalRef`) · `POST /realty/enquiries/{id}/assign|status` · `GET /realty/viewings` · `GET /realty/viewing-slots` · `POST /realty/viewings` · `POST /realty/viewings/{id}/confirm|cancel|feedback`
+- Offers: `GET /realty/listings/{id}/offers` · `GET /realty/offers` · `GET /realty/offers/{id}` · `POST /realty/listings/{id}/offers` · `POST /realty/offers/{id}/actions` (counter/revise/accept/reject/withdraw/note; one accepted offer per listing)
+- `GET /realty/reports` (no client data; volumes per currency, `combinedVolume: null`) · `GET /realty/my-day`
+- Syndication (sandbox only, `live: false`): `GET /realty/syndication/portals` · `PUT /realty/listings/{id}/syndication/{portal}` · `GET /realty/syndication/{portal}/feed` · `POST /realty/syndication/{portal}/export`
+- AI (proposals only, fair-housing guardrails): `POST /realty/listings/{id}/ai/description` · `POST /realty/listings/{id}/ai/feedback-summary` · `POST /realty/ai/follow-ups` · `GET /realty/ai/proposals` · `POST /realty/ai/proposals/{id}/decision`
+- `POST /realty/jobs/run` `{ job: viewing_reminders | saved_search_alerts }` (also every 5 minutes from `server.ts`)
+
 ## Stubbed / not yet implemented
 
 - Object storage upload signing (S3/R2) — config + status only; no upload endpoint yet.
