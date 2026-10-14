@@ -150,8 +150,9 @@ content (metric names, record text) comes from the data layer and is English.
 | `/approvals` | One inbox: refunds over the threshold, local ad spend, shift swaps, website changes — consequence preview, approve/reject with comment, result after execution |
 | `/team`, `/reports`, `/connections`, `/settings`, `/community` | Members & roles + invite, and **Schedule** (week of shifts per location in local time, clock-in state, pending swaps; staff see it too); freshness-labelled charts; sync health + fix; org defaults, data region, customer sharing + AI training (saved), billing per location (price from the subscription); Later |
 
-Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `registrations`
-`attendance` `programmes` `teams` `schedule` `guardian`·Later · Wellness `calendar` (practitioner/room/list +
+Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `overview` `programmes`
+(+ season setup wizard) `registrations` `teams` (transfers, coaches, squad selection) `schedule` (week/list, fixtures, clash resolutions)
+`attendance` `balances` `announcements` `guardians` (relationships, disputes, messages) `reports` — data via `src/lib/sports/` (live `/v1/orgs/:orgId/sports/*`, sample mode `mock.ts`) · Wellness `calendar` (practitioner/room/list +
 reschedule) `services` `practitioners` `forms` `packages`·Later · Commerce `orders` (partial refund + sync timeline)
 `catalogue` `assortment` `inventory` `returns`·Later · Foods `menu` (master/location, origins, reset) `orders`
 (board) `kitchen` (large cards, overdue, stale-connection banner, full screen) `pickup` `catering`·Later.

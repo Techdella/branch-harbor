@@ -45,7 +45,8 @@ Seeded examples: `/stillwater-yoga` (studios, 5 public locations; Leslieville is
 | `…/classes`, `…/classes/{id}` | Studios: schedule by day; book (seat hold with countdown → pay → confirmed) or join the waitlist when full |
 | `…/order` → `…/orders/{id}?token=` | Foods: pickup slot → menu → modifiers → cart → server quote (tax only if configured) → details → pay → status page that polls and separates "awaiting acceptance" from "accepted" |
 | `…/book` | Wellness: service → practitioner or any → date → slot → terms → details → book (→ deposit) |
-| `…/programmes` | Sports: guardian + participant registration → review-pending confirmation (payment ≠ selection) |
+| `…/programmes` (`?dob=`) | Sports: catalogue with age filter (birth-date ranges per age rule), registration with guardian + participant, form questions (medical/emergency restricted), payment option (full / instalments), refund policy before checkout, first payment → review-pending confirmation (payment ≠ selection) |
+| `…/programmes/portal` (`?token=` / `?invite=`) | Guardian portal: emailed sign-in link, participants, schedule + absence reporting, balances + instalment payment, forms, messages, second-guardian invitation, relationship disputes, withdrawal |
 | `…/shop` | Commerce: products with this location's stock band; no native checkout — links out when an external store (e.g. WooCommerce) is authoritative |
 | `…/manage/booking/{id}?token=` · `…/manage/waitlist/{id}?token=` · `…/manage/appointment/{id}?token=` | Manage pages: cancel booking (refund/void reported from the server), leave waitlist, cancel appointment |
 | `/{brand}/sitemap.xml`, `/{brand}/robots.txt` | Per-brand sitemap (canonical URLs) and robots (manage/order pages disallowed); `/sitemap.xml` and `/robots.txt` on custom domains |

@@ -8,6 +8,7 @@ import {
 import { AppError, conflict, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
 import { convertReservationToSale } from './inventory.ts';
+import { fulfilRegistrationPayment } from './sports-core.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
 export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration';
@@ -121,15 +122,9 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
       await tx.update(appointments).set({ paymentId: p.id, updatedAt: new Date() }).where(eq(appointments.id, a.id));
       return { fulfilled: a.status === 'confirmed', note: a.status === 'confirmed' ? 'Appointment paid' : `Appointment is ${a.status}` };
     }
-    case 'registration': {
-      const [r] = await tx.select({ reg: registrations, prog: programmes }).from(registrations).innerJoin(programmes, eq(programmes.id, registrations.programmeId)).where(eq(registrations.id, p.targetId));
-      if (!r) return { fulfilled: false, note: 'Registration record missing' };
-      // Payment never equals selection: approval-required programmes go to review.
-      if (r.reg.status === 'submitted') {
-        await tx.update(registrations).set({ status: r.prog.requiresApproval ? 'awaiting_review' : 'accepted', paymentId: p.id, updatedAt: new Date() }).where(eq(registrations.id, r.reg.id));
-      }
-      return { fulfilled: true, note: r.prog.requiresApproval ? 'Registration paid — awaiting review' : 'Registration accepted' };
-    }
+    case 'registration':
+      // Payment never equals selection; capacity is re-checked under the programme lock (services/sports-core.ts).
+      return fulfilRegistrationPayment(tx, p);
     default:
       return { fulfilled: false, note: `Unknown target ${p.targetType}` };
   }

@@ -206,6 +206,7 @@ async function main() {
   }
 
   const ops = await seedOperations({ db, today, upsertUser, demo, maya, carlos, priya, swId, meId });
+  await (await import('./seed-sports.ts')).seedSports({ db, today, upsertUser, orgId: ops.orgs.northShore }).then((r) => console.log(`[seed] Sports: coach ${r.users[0]}, guardian app account ${r.guardianLogin} (same password)`));
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');

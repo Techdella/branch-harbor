@@ -64,7 +64,8 @@ immediate revocation, CSV import row errors, group publishing partial failure + 
 and proposed-action approval, privacy export/deletion, connector mapping errors, staff shifts/swaps/time clock,
 the approvals inbox (execute-on-approve, rollback to pending on failed execution, no self-approval, per-kind
 permissions, refund thresholds), leaving a waitlist (guest token and `/me`), sports schedule/attendance with venue
-conflicts and coach scoping, offer eligibility rules, intake form validation/consent versions/AI exclusion, pickup
+conflicts and coach scoping, sports full product (age boundaries, capacity/approval across payment retries, instalments + reminders,
+guardian authorisation/invitations/disputes, transfers, coach-scoped care data, notification scoping, AI context exclusion), offer eligibility rules, intake form validation/consent versions/AI exclusion, pickup
 settings → slot generation (pure planner incl. DST), inventory history with reservations, push sandbox/preferences/
 Expo adapter, org policies and per-location billing.
 
@@ -239,6 +240,19 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 - `POST /v1/orgs/{orgId}/sports/teams/{id}/sessions`
 - `GET /v1/orgs/{orgId}/sports/sessions/{id}/roster`
 - `POST /v1/orgs/{orgId}/sports/sessions/{id}/attendance`
+
+**sports (full product)** — services in `src/services/sports-*.ts`, tables in `src/db/schema/sports-ext.ts`
+
+- Setup wizard: `POST /v1/orgs/{orgId}/sports/setup` (season → programmes with age rule/cut-off per country convention, venues, fee plans, groups + coaches, form, publish) · `GET …/sports/age-preview` · `GET|POST /seasons` (list) · `GET|POST|PATCH …/sports/venues` · `GET …/sports/coaches?locationId` · `GET|POST|PATCH …/sports/forms` (medical/emergency answers go to a restricted store) · `GET|PATCH …/sports/programmes/{id}` · `POST …/programmes/{id}/fee-plans`
+- Registration: `GET /v1/public/sports/{locationId}/programmes?dob=` (age filter, birth-date ranges, payment options with instalment amounts, questions, refund policy) · `POST /v1/public/sports/programmes/{id}/registrations` (place held while paying, sibling discount, instalments, first payment) · `POST /v1/public/sports/registrations/{id}/pay` `{ manageToken }` (retry; capacity re-checked) · `GET /v1/public/sports/registrations/{id}?token=`
+- Review & money: `POST …/registrations/{id}/review` (programme + team capacity under lock; guardian notified) · `POST …/registrations/{id}/withdraw` · `POST …/registrations/{id}/fee-adjustments` (financial aid / waiver) · `GET …/sports/balances` (per currency) · `POST …/sports/instalments/run-reminders` (also hourly) · `GET …/registrations/{id}/restricted` (audited; coaches see coach-visible keys only)
+- Teams: `GET …/sports/teams/{id}` · `PATCH …/teams/{id}` · `PUT …/teams/{id}/coaches` · `POST …/registrations/{id}/transfer` (capacity + history) · `GET|POST …/sports/selections` · `POST …/selections/{id}/decision` (coach proposes, a different director approves)
+- Schedule: `POST …/teams/{id}/recurring-sessions` · `POST …/teams/{id}/fixtures` (local kick-off) · `PATCH …/sessions/{id}` · `POST …/sessions/{id}/cancel` (only that group's guardians) · `GET …/sessions/{id}/resolutions` · `POST …/schedule-proposals/{id}/apply|dismiss`
+- Communication: `GET|POST …/sports/announcements` (team or programme) · `GET …/sports/notifications?refType&refId` · `GET|POST …/sports/messages` · `GET …/sports/guardians` · `POST …/relationships/{id}/verify|dispute` · `GET …/sports/disputes` · `POST …/disputes/{id}/resolve` · `POST …/participants/{id}/invitations`
+- Reports/overview: `GET …/sports/overview` · `GET …/sports/reports` (enrolment, capacity, attendance rate or null, balances per currency)
+- AI (drafts/proposals only; no names, contacts or care data in context): `POST …/sports/ai/programme-description` · `…/ai/enrolment-summary` · `…/ai/conflict-resolutions`
+- Guardian portal (sites; token in body): `POST /v1/public/sports/portal/request-link|session|overview|absences|messages|messages/send|invitations|disputes` · `POST …/portal/instalments/{id}/pay` · `POST …/portal/registrations/{id}/withdraw` · `POST /v1/public/sports/invitations/accept`
+- App guardians: `GET /v1/me/sports` · `POST /v1/me/sports/absences|messages|invitations|invitations/accept|disputes` · `GET /v1/me/sports/messages` · `POST /v1/me/sports/instalments/{id}/pay` · `POST /v1/me/sports/programmes/{id}/registrations`
 
 **me**
 

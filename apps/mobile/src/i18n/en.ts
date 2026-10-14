@@ -1,4 +1,5 @@
 /** English — complete. Other locales fall back to English for any missing key. */
+import sports from '@/features/sports/strings';
 const en = {
   common: {
     appName: 'BranchHarbor',
@@ -331,6 +332,7 @@ const en = {
     actionRequired: 'Action required',
     integration: 'Integration issue',
   },
+  sports,
 };
 
 export default en;
