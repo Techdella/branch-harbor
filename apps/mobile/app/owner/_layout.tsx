@@ -10,7 +10,9 @@ const ICONS: Record<string, IconName> = { pulse: 'activity', approvals: 'check-c
 
 export default function OwnerTabs() {
   const { t } = useI18n();
-  const { status } = useSession();
+  const { status, me } = useSession();
+  // A single independent business has one location: no locations list to switch between.
+  const single = me?.business?.model === 'independent';
   const approvals = useApi(() => api.approvals(), [], { pollMs: 30_000 });
   if (status === 'signedOut') return <Redirect href="/" />;
   const pending = approvals.data?.filter((a) => a.status === 'pending').length ?? 0;
@@ -18,7 +20,7 @@ export default function OwnerTabs() {
     <Tabs screenOptions={{ headerShown: false }} tabBar={(p) => <TabBar {...p} icons={ICONS} />}>
       <Tabs.Screen name="pulse" options={{ title: t('tabs.pulse') }} />
       <Tabs.Screen name="approvals" options={{ title: t('tabs.approvals'), tabBarBadge: pending || undefined }} />
-      <Tabs.Screen name="locations" options={{ title: t('tabs.locations') }} />
+      <Tabs.Screen name="locations" options={{ title: t('tabs.locations'), ...(single ? { href: null } : {}) }} />
       <Tabs.Screen name="alerts" options={{ title: t('tabs.alerts') }} />
     </Tabs>
   );

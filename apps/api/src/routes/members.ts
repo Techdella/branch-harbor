@@ -9,6 +9,7 @@ import { AppError, badRequest, conflict, forbidden, notFound } from '../lib/erro
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { requireMember, resolveScopeChain } from '../services/authz.ts';
+import { assertRoleForModel } from '../services/businessMode.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
 
 export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -56,6 +57,8 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     const b = req.body;
     if (b.role === 'customer') throw badRequest('Customers are not invited as team members');
     const mine = await requireMember(req, s.db, orgId);
+    const [orgModel] = await s.db.select({ model: organizations.model }).from(organizations).where(eq(organizations.id, orgId));
+    if (orgModel) assertRoleForModel(orgModel, b.role, b.scope.kind);
     const chain = await chainFor(orgId, b.scope.kind, b.scope.id);
     if (!canGrantRole(mine, b.role, chain)) throw forbidden('You cannot grant this role in this scope');
     const token = randomToken();

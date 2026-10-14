@@ -13,7 +13,7 @@ import { color } from '@/theme';
 
 export default function Book() {
   const { t, intlLocale } = useI18n();
-  const { brand, location } = useCatalog();
+  const { brand, location, locations } = useCatalog();
   const scope = useLocationScope(location, brand?.name);
   const tz = location?.timeZone ?? 'UTC';
   const todayKey = localDateKey(new Date(), tz);
@@ -42,7 +42,7 @@ export default function Book() {
       <DataStatus q={q} />
       {q.loading ? <><SkeletonCard /><SkeletonCard /></> : null}
       {!q.loading && q.data && q.data.length === 0 ? (
-        <EmptyState icon="calendar" title={location.status === 'operating' ? t('book.noClasses') : t('customer.openingSoon')} body={t('book.noClassesSub')} action={t('customer.chooseLocation')} onAction={() => router.push('/customer/locations')} />
+        <EmptyState icon="calendar" title={location.status === 'operating' ? t('book.noClasses') : t('customer.openingSoon')} body={t('book.noClassesSub')} {...(locations.length > 1 ? { action: t('customer.chooseLocation'), onAction: () => router.push('/customer/locations') } : {})} />
       ) : null}
       {(q.data ?? []).map((c) => <ClassCard key={c.id} c={c} tz={tz} />)}
     </Screen>

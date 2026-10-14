@@ -5,7 +5,7 @@ const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
 
 export function serializeOrg(o: typeof organizations.$inferSelect) {
   return {
-    id: o.id, slug: o.slug, name: o.name, industry: o.industry, model: o.model, country: o.country,
+    id: o.id, slug: o.slug, name: o.name, industry: o.industry, model: o.model, isSingleLocation: o.model === 'independent', country: o.country,
     defaultCurrency: o.defaultCurrency, defaultLocale: o.defaultLocale, defaultTimeZone: o.defaultTimeZone,
     dataRegion: o.dataRegion, status: o.status, paymentAccountMode: o.paymentAccountMode,
     paymentsConnected: !!o.stripeAccountId, applicationFeeBps: o.applicationFeeBps,

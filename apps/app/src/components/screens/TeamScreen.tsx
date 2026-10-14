@@ -7,11 +7,16 @@ import { Avatar, Badge, Button, DataTable, Field, Icon, Input, Select, Tabs } fr
 import type { Member, ShiftView } from '@/lib/types';
 import { addDays, dateInZone, fmtTime, fmtYmd, weekStart, zoneLabel } from '@/lib/format';
 import { useApi, useMutation } from '@/lib/useApi';
+import { INDEPENDENT_ROLES } from '@bh/shared';
 import { useApp } from '../shell/AppContext';
+import { useBusinessMode } from '@/lib/useBusinessMode';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 
 const ROLE_OPTIONS = ['hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance'] as const;
+/** Independent businesses: owner, manager, staff, marketing contributor, finance — no HQ, regional or franchise roles. */
+const INDEPENDENT_ROLE_OPTIONS = INDEPENDENT_ROLES;
+const ORG_WIDE_ROLES: readonly string[] = ['org_owner', 'finance'];
 
 export function TeamScreen() {
   const t = useTranslations('team');
@@ -34,14 +39,23 @@ export function TeamScreen() {
 
 function MembersTab() {
   const t = useTranslations('team');
+  const ts = useTranslations('single.team');
   const app = useApp();
-  const res = useApi((api) => api.team.members(app.ctx), [app.industry, app.role], app.can('members.manage'));
+  const mode = useBusinessMode();
+  const res = useApi((api) => api.team.members(app.ctx), [app.industry, app.role, app.org.id], app.can('members.manage'));
   const [inviting, setInviting] = useState(false);
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<string>('location_manager');
   const [scopeId, setScopeId] = useState(app.scopes.find((s) => s.kind === 'location')?.id ?? 'all');
   const [ok, setOk] = useState('');
-  const invite = useMutation((api) => api.team.invite({ email, role: t(`role.${role}`), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }));
+  // Independent: no scope to pick — org-wide roles cover the business, the others its one location.
+  const independentScope = ORG_WIDE_ROLES.includes(role) || !mode.location ? 'all' : `loc:${mode.location.id}`;
+  const roleLabel = (r: string) => (mode.isIndependent ? ts(`role.${r}`) : t(`role.${r}`));
+  const invite = useMutation((api) =>
+    mode.isIndependent
+      ? api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId: independentScope, scopeLabel: mode.businessName })
+      : api.team.invite({ email, role: t(`role.${role}`), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }),
+  );
   if (!app.can('members.manage')) return <DeniedState permission="members.manage" />;
 
   return (
@@ -53,21 +67,22 @@ function MembersTab() {
       {inviting && (
         <section className="flex flex-col gap-3 rounded-xl bg-surface p-5" aria-label={t('invite')}>
           <h2 className="text-lg font-bold">{t('inviteTitle')}</h2>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className={mode.isIndependent ? 'grid gap-3 md:grid-cols-2' : 'grid gap-3 md:grid-cols-3'}>
             <Field label={t('email')} error={invite.error?.fields?.email}>
               {(p) => <Input id={p.id} type="email" aria-invalid={p.invalid} aria-describedby={p.describedBy} value={email} onChange={(e) => setEmail(e.target.value)} />}
             </Field>
             <Field label={t('roleLabel')}>
               {(p) => (
-                <Select id={p.id} value={role} onChange={(e) => setRole(e.target.value)}>
-                  {ROLE_OPTIONS.map((r) => (
+                <Select id={p.id} value={role} onChange={(e) => setRole(e.target.value)} data-testid="invite-role">
+                  {(mode.isIndependent ? INDEPENDENT_ROLE_OPTIONS : ROLE_OPTIONS).map((r) => (
                     <option key={r} value={r}>
-                      {t(`role.${r}`)}
+                      {roleLabel(r)}
                     </option>
                   ))}
                 </Select>
               )}
             </Field>
+            {!mode.isIndependent && (
             <Field label={t('scope')} hint={t('scopeHint')}>
               {(p) => (
                 <Select id={p.id} aria-describedby={p.describedBy} value={scopeId} onChange={(e) => setScopeId(e.target.value)}>
@@ -79,8 +94,9 @@ function MembersTab() {
                 </Select>
               )}
             </Field>
+            )}
           </div>
-          <p className="text-xs text-stone">{t(`roleHelp.${role}`)}</p>
+          <p className="text-xs text-stone">{mode.isIndependent ? ts(`roleHelp.${role}`) : t(`roleHelp.${role}`)}</p>
           <div className="flex gap-2">
             <Button
               loading={invite.pending}

@@ -7,9 +7,16 @@ import { Icon } from '@bh/ui';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Banner, DeniedState } from '../ui/States';
+import { IndependentLocations } from './independent/IndependentLocations';
 import { EMPTY_LOCATION, LocationWizard, WizardSaveBar, validateLocation, type LocationDraft } from './LocationWizard';
 
+/** Independent businesses: adding a second location runs the upgrade to a network first. */
 export function NewLocationScreen() {
+  const app = useApp();
+  return app.org.model === 'independent' ? <IndependentLocations adding /> : <NetworkNewLocationScreen />;
+}
+
+function NetworkNewLocationScreen() {
   const t = useTranslations('wizard');
   const app = useApp();
   const [draft, setDraft] = useState<LocationDraft>(EMPTY_LOCATION);

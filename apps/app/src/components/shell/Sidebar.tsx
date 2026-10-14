@@ -13,6 +13,9 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
   const path = usePathname();
   const org = app.org;
 
+  // Independent businesses have no Locations directory: their location lives under Settings → Business & location.
+  const independent = org.model === 'independent';
+  const topItems = independent ? NAV_TOP.filter((i) => i.key !== 'locations') : NAV_TOP;
   const opsItems: NavItem[] = OPS[app.industry].map((o) => ({ key: o.key, href: `/ops/${o.key}`, icon: o.icon, later: o.kind === 'later', perm: 'operations.read' }));
   // Sample-mode badges illustrate counts; live counts come from the overview's "Needs attention" and notifications.
   const badges: Record<string, number> = app.live ? {} : { approvals: 4, payments: 1, connections: app.industry === 'studios' ? 2 : 1, registrations: 4, cover: 1 };
@@ -92,7 +95,7 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
         </div>
       )}
 
-      <ul className="flex flex-col gap-0.5">{NAV_TOP.map((i) => item(i, 'top'))}</ul>
+      <ul className="flex flex-col gap-0.5">{topItems.map((i) => item(i, 'top'))}</ul>
       {!collapsed && <div className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute">{t(`industries.${app.industry}.name`)}</div>}
       {collapsed && <hr className="mx-3 my-2 border-line-soft" />}
       <ul className="flex flex-col gap-0.5">{opsItems.map((i) => item(i, 'ops'))}</ul>

@@ -319,7 +319,8 @@
     "pricingCta": "Ver preços",
     "faqTitle": "Perguntas sobre {name}",
     "ctaTitle": "Veja {name} com as suas próprias unidades",
-    "ctaBody": "Conte quantas unidades você administra e quais sistemas usa hoje. Mostraremos o fluxo que faz sentido para você."
+    "ctaBody": "Conte quantas unidades você administra e quais sistemas usa hoje. Mostraremos o fluxo que faz sentido para você.",
+    "startFree": "Começar grátis"
   },
   "industries": {
     "studios": {
@@ -1142,53 +1143,76 @@
       "kicker": "Empresas com uma unidade",
       "imageAlt": "Proprietária abrindo a porta de uma pequena loja",
       "headline": "Tudo em um só lugar, sem a complexidade de uma rede.",
-      "intro": "Com uma única unidade, não há escopos nem aprovações para gerenciar. Adicione mais unidades depois e as ferramentas de rede aparecem quando você precisar.",
-      "cta": "Conhecer a configuração",
+      "intro": "Uma unidade e uma equipe pequena, sem a complexidade de uma rede: sem seletor de escopo, regiões ou cadeias de aprovação. Abra uma segunda unidade depois e mude para as ferramentas de rede em poucos cliques. Tudo o que você tem é mantido.",
+      "cta": "Solicitar uma demonstração",
       "points": [
         {
-          "t": "Pronto em uma tarde",
-          "d": "Um checklist em vez de um assistente do qual você não consegue sair. O progresso é salvo a cada etapa."
+          "t": "Um negócio, um painel",
+          "d": "O nome do seu negócio substitui o seletor de unidade. Visão geral, relatórios e respostas da IA tratam do seu negócio, não de uma rede."
         },
         {
-          "t": "Site hospedado ou WordPress",
-          "d": "Lance um site com um endereço incluído ou mantenha o seu."
+          "t": "Configuração de uma só vez",
+          "d": "Dados do negócio, endereço, horários, fuso horário e moeda em uma única etapa. O progresso é salvo e as etapas opcionais podem esperar."
         },
         {
-          "t": "Mantenha suas ferramentas",
-          "d": "Conecte um sistema de agendamento ou de vendas compatível em vez de substituí-lo."
+          "t": "Publique diretamente",
+          "d": "Sem campos bloqueados nem cadeias de aprovação. Edite seu site e publique; ative aprovações só se quiser revisar mudanças da equipe."
         },
         {
-          "t": "IA que sugere, não decide",
-          "d": "Textos e resumos para você revisar. Nada é publicado sem você."
+          "t": "Papéis simples para uma equipe pequena",
+          "d": "Convide um gerente, funcionários, um colaborador de marketing ou um usuário financeiro. Os papéis de rede não atrapalham."
         }
       ],
-      "stepsTitle": "Configuração em seis etapas",
+      "stepsTitle": "Do cadastro ao site no ar em seis etapas",
       "steps": [
         {
-          "t": "Escolha seu segmento",
-          "d": "Configuramos os fluxos certos para você."
+          "t": "Crie sua conta",
+          "d": "Confirme seu e-mail e escolha seu setor e “negócio independente”."
         },
         {
-          "t": "Adicione os dados da empresa",
-          "d": "Fuso horário, moeda e idioma incluídos."
+          "t": "Seu negócio",
+          "d": "Nome, endereço, fuso horário, moeda e horário de funcionamento em uma etapa."
         },
         {
-          "t": "Escolha hospedado ou WordPress",
-          "d": "Você pode mudar de ideia depois."
+          "t": "Hospedado ou WordPress",
+          "d": "Seu endereço incluído é sites.branchharbor.com/seu-negocio. Conecte seu próprio domínio quando quiser."
         },
         {
           "t": "Adicione aulas, serviços, produtos ou cardápio",
-          "d": "Importe ou cadastre."
+          "d": "Importe ou digite."
         },
         {
           "t": "Conecte os pagamentos",
-          "d": "As compras ficam desativadas até a conta ser habilitada."
+          "d": "A compra fica desativada até a conta ser habilitada."
         },
         {
-          "t": "Visualize, teste e publique",
-          "d": "Faça antes um agendamento ou pedido de teste."
+          "t": "Visualize e publique",
+          "d": "Um único botão Publicar coloca seu site no ar."
         }
-      ]
+      ],
+      "signupCta": "Começar grátis (estúdios)",
+      "signupNote": "O cadastro por autoatendimento está aberto para estúdios. Os outros setores começam com uma demonstração curta durante o piloto.",
+      "upgradeTitle": "Vai abrir uma segunda unidade?",
+      "upgradeBody": "Adicione uma unidade nas Configurações. A BranchHarbor explica o que muda, você confirma e seu negócio vira uma rede. Só o proprietário pode fazer isso, e a mudança fica registrada.",
+      "upgradePoints": [
+        {
+          "t": "Nada se perde",
+          "d": "Sua unidade, clientes, site, equipe e histórico de pagamentos continuam como estão."
+        },
+        {
+          "t": "As ferramentas de rede aparecem",
+          "d": "Diretório de unidades, seletor de escopo, regiões, grupos de proprietários, modelos e publicação em grupo."
+        },
+        {
+          "t": "Seu endereço continua funcionando",
+          "d": "Seu site ganha um localizador de unidades e cada unidade tem sua própria página."
+        },
+        {
+          "t": "A cobrança acompanha suas unidades",
+          "d": "O Solo vira o preço Rede por unidade quando a segunda unidade estiver em operação."
+        }
+      ],
+      "pricingCta": "Ver o preço do Solo"
     },
     "pointsTitle": "Como funciona",
     "ctaTitle": "Quer ver isso com a sua empresa?",
@@ -1540,6 +1564,18 @@
     "taxNote": "Dependendo do país, podem incidir impostos como VAT, GST ou sales tax; eles aparecem antes do pagamento.",
     "proposedNote": "Preços propostos. Planos e valores podem mudar antes da disponibilidade geral.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "Uma unidade independente",
+        "tag": "Negócio único",
+        "features": [
+          "Site hospedado e painel",
+          "Reservas, pedidos e pagamentos para o seu setor",
+          "Papéis simples para uma equipe pequena",
+          "Mude para Rede ao abrir uma segunda unidade"
+        ],
+        "cta": "Começar grátis"
+      },
       "connector": {
         "name": "Conector",
         "for": "Mantenha seu site WordPress",
@@ -1577,7 +1613,7 @@
         "cta": "Solicitar proposta"
       }
     },
-    "ctaNote": "Durante o piloto, todo plano começa com uma conversa para confirmarmos que seu segmento e suas conexões são compatíveis.",
+    "ctaNote": "Durante o piloto, os planos Conector e Rede começam com uma conversa para confirmarmos que seu setor e suas conexões são suportados. A assinatura do Solo é autoatendimento para estúdios.",
     "faqTitle": "Perguntas sobre preços",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "As taxas de processamento de pagamento estão incluídas?",
         "a": "Não. Os pagamentos passam por um provedor conectado, como a Stripe, que cobra as próprias taxas no seu país."
+      },
+      {
+        "q": "O que acontece se eu abrir uma segunda unidade?",
+        "a": "O Solo cobre uma unidade. Ao adicionar outra, você muda para Rede nas Configurações: seu site, clientes, equipe e histórico são mantidos, e a cobrança passa a ser por unidade quando a nova estiver em operação."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ mês · uma unidade",
+    "soloTotal": "Uma unidade. Para adicionar mais, mude para Rede.",
+    "soloAnnual": "Uma unidade, cobrança anual."
   },
   "demo": {
     "metaTitle": "Solicitar uma demonstração",

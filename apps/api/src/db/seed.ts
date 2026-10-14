@@ -14,6 +14,7 @@ import { hashPassword } from '../services/auth.ts';
 import { addDays, zonedToUtc } from '../lib/tz.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { clearOperationsDemo, OPERATIONS_DEMO_SLUGS, seedOperations } from './seed-operations.ts';
+import { seedIndependent } from './seed-independent.ts';
 
 const cfg = config();
 const handle = createDb(cfg.DATABASE_URL, { max: 2 });
@@ -221,6 +222,7 @@ async function main() {
   console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
+  await seedIndependent({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   console.log('─────────────────────────────────────────────────\n');
 }
 

@@ -142,7 +142,16 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     return {
       name: org.name, slug: org.slug, industry: org.industry, country: org.country, defaultLocale: org.defaultLocale, locales,
       tagline: settings.tagline, poweredBy: settings.poweredBy, theme: themeFrom(settings),
+      /** independent: the brand site IS the location site (served at /{brand}, no location finder). */
+      model: org.model === 'independent' ? ('independent' as const) : ('network' as const),
     };
+  }
+
+  /** Independent business: its single customer-visible location (the brand site renders it directly). */
+  async function singleLocation(org: typeof organizations.$inferSelect) {
+    if (org.model !== 'independent') return null;
+    const [l] = await s.db.select().from(locations).where(visible(org.id)).orderBy(asc(locations.createdAt)).limit(1);
+    return l ?? null;
   }
 
   /** Customer-visible location: public, not archived, in a non-deleted organisation. */
@@ -176,12 +185,12 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     return d?.hostname ?? null;
   }
 
-  function locationSummary(l: typeof locations.$inferSelect, brandSlug: string) {
+  function locationSummary(l: typeof locations.$inferSelect, brandSlug: string, single = false) {
     const hours = normaliseHours(l.hours);
     return {
       id: l.id, slug: l.slug, name: l.name, address: l.address, country: l.country, timeZone: l.timeZone, currency: l.currency, locale: l.locale,
       phone: l.phone, email: l.email, status: l.status, geo: l.geo, hours, openNow: openNow(hours.weekly, l.timeZone),
-      path: `/${brandSlug}/${l.slug}`,
+      path: single ? `/${brandSlug}` : `/${brandSlug}/${l.slug}`,
     };
   }
 
@@ -231,6 +240,19 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     return { hostname: host, brandSlug: row.o.slug, locationSlug, isPrimary: row.d.isPrimary, primaryHost: primary };
   });
 
+  // ── Brand mode (proxy.ts in apps/sites): independent brands serve their single location at /{brand} ──
+  app.get('/public/sites/resolve-brand', {
+    schema: {
+      tags: ['sites'], summary: 'Business mode of a brand site: independent businesses render their location at /{brand}',
+      querystring: z.object({ brand: z.string().min(1).max(80) }),
+    },
+  }, async (req, reply) => {
+    const org = await loadBrand(req.query.brand);
+    const single = await singleLocation(org);
+    reply.header('cache-control', 'public, max-age=60');
+    return { brandSlug: org.slug, model: org.model === 'independent' ? 'independent' : 'network', singleLocationSlug: single?.slug ?? null };
+  });
+
   // ── Brand site ──
   app.get('/public/sites/:brandSlug', {
     schema: { tags: ['sites'], summary: 'Brand site: theme, published brand pages, customer-visible locations (with sitemap data)', params: z.object({ brandSlug: z.string().min(1).max(80) }) },
@@ -243,14 +265,15 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
       .where(and(inArray(pages.websiteId, locSites.map((w) => w.id)), isNotNull(pages.publishedVersionId), isNull(pages.archivedAt), ne(pages.status, 'archived'))) : [];
     const hosts = locSites.length ? await s.db.select({ websiteId: domains.websiteId, hostname: domains.hostname }).from(domains)
       .where(and(inArray(domains.websiteId, locSites.map((w) => w.id)), eq(domains.state, 'ready'), eq(domains.isPrimary, true))) : [];
+    const single = org.model === 'independent';
     return {
       brand: brandView(org),
       pages: await publishedPages(site?.id ?? null),
-      site: { includedAddress: `${base}/${org.slug}`, primaryHost: await primaryHost(site?.id ?? null) },
-      locations: locs.map((l) => {
+      site: { includedAddress: `${base}/${org.slug}`, primaryHost: await primaryHost(site?.id ?? null), singleLocationSlug: single ? locs[0]?.slug ?? null : null },
+      locations: (single ? locs.slice(0, 1) : locs).map((l) => {
         const w = locSites.find((x) => x.locationId === l.id);
         return {
-          ...locationSummary(l, org.slug),
+          ...locationSummary(l, org.slug, single),
           primaryHost: w ? hosts.find((h) => h.websiteId === w.id)?.hostname ?? null : null,
           pages: w ? locPages.filter((p) => p.websiteId === w.id).map((p) => ({ slug: p.slug, publishedAt: p.publishedAt?.toISOString() ?? null })) : [],
         };
@@ -276,13 +299,16 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     const site = await hostedSite(org.id, loc.id);
     const brandSite = await hostedSite(org.id, null);
     const others = await s.db.select({ n: locations.id }).from(locations).where(visible(org.id));
+    const single = org.model === 'independent';
     return {
       brand: brandView(org),
-      location: locationSummary(loc, org.slug),
+      location: locationSummary(loc, org.slug, single),
       pages: await publishedPages(site?.id ?? null),
       module: await moduleFor(org, loc),
       site: {
-        includedAddress: `${base}/${org.slug}/${loc.slug}`,
+        // Independent businesses: one address for the whole business.
+        includedAddress: single ? `${base}/${org.slug}` : `${base}/${org.slug}/${loc.slug}`,
+        singleLocation: single,
         primaryHost: await primaryHost(site?.id ?? null),
         brandPrimaryHost: await primaryHost(brandSite?.id ?? null),
         locationCount: others.length,

@@ -37,6 +37,30 @@ async function resolveHost(host: string): Promise<HostMapping | null | 'error'> 
   }
 }
 
+/**
+ * Independent businesses (one location): the brand site IS the location site. /{brand} renders the location home,
+ * /{brand}/{module…} its pages, and the old /{brand}/{location}/… addresses redirect to /{brand}/….
+ */
+const brandCache = new Map<string, { single: string | null; expires: number }>();
+async function singleLocationOf(brand: string): Promise<string | null> {
+  const hit = brandCache.get(brand);
+  if (hit && hit.expires > Date.now()) return hit.single;
+  try {
+    const res = await fetch(`${API_URL}/v1/public/sites/resolve-brand?brand=${encodeURIComponent(brand)}`, { signal: AbortSignal.timeout(4000), cache: 'no-store' });
+    // Unknown brands and older APIs without this endpoint behave as networks (the pages 404 on their own).
+    const single = res.ok ? ((await res.json()) as { model?: string; singleLocationSlug?: string | null }) : null;
+    const value = single?.model === 'independent' ? single.singleLocationSlug ?? null : null;
+    if (brandCache.size > 5000) brandCache.clear();
+    brandCache.set(brand, { single: value, expires: Date.now() + (res.ok || res.status === 404 ? POSITIVE_TTL : NEGATIVE_TTL) });
+    return value;
+  } catch {
+    return null;
+  }
+}
+
+/** First segments under /{brand} that stay brand-level even for an independent business. */
+const BRAND_LEVEL = new Set(['sitemap.xml', 'robots.txt', 'pages']);
+
 const LANG_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
 
 export async function proxy(req: NextRequest) {
@@ -46,7 +70,7 @@ export async function proxy(req: NextRequest) {
 
   const headers = new Headers(req.headers);
   // Never trust client-supplied routing headers.
-  for (const h of ['x-bh-host', 'x-bh-host-location', 'x-bh-brand', 'x-bh-location', 'x-bh-lang', 'x-bh-path']) headers.delete(h);
+  for (const h of ['x-bh-host', 'x-bh-host-location', 'x-bh-brand', 'x-bh-location', 'x-bh-lang', 'x-bh-path', 'x-bh-single']) headers.delete(h);
 
   let pathname = url.pathname;
   let rewrite = false;
@@ -61,6 +85,24 @@ export async function proxy(req: NextRequest) {
     headers.set('x-bh-host', host);
     headers.set('x-bh-host-location', mapping.locationSlug ?? '');
     rewrite = true;
+  }
+
+  // Independent business: serve its one location at the brand address.
+  const first = pathname.split('/').filter(Boolean)[0];
+  const single = first ? await singleLocationOf(decodeURIComponent(first)) : null;
+  if (single) {
+    const parts = pathname.split('/').filter(Boolean);
+    const second = parts[1] ? decodeURIComponent(parts[1]) : undefined;
+    if (!rewrite && second === single) {
+      // /{brand}/{location}/… → /{brand}/… (one address per business).
+      const target = new URL(`/${parts[0]}${parts.length > 2 ? `/${parts.slice(2).join('/')}` : ''}${url.search}`, req.url);
+      return NextResponse.redirect(target, 308);
+    }
+    if (second !== single && !(second && BRAND_LEVEL.has(second))) {
+      pathname = `/${parts[0]}/${encodeURIComponent(single)}${parts.length > 1 ? `/${parts.slice(1).join('/')}` : ''}`;
+      rewrite = true;
+    }
+    headers.set('x-bh-single', single);
   }
 
   const segs = pathname.split('/').filter(Boolean).map((s) => decodeURIComponent(s));

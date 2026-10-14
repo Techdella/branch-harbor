@@ -169,7 +169,8 @@ export function AiPanel({ onClose, fullScreen }: { onClose: () => void; fullScre
         <p className="text-stone">{t('intro')}</p>
         {sugg.status === 'ready' &&
           thread.length === 0 &&
-          sugg.data.map((s) => (
+          // Independent businesses: the AI scope is the business itself — drop multi-location prompts.
+          sugg.data.filter((s) => app.org.model !== 'independent' || !/locations|stores|multi-location/i.test(s)).map((s) => (
             <button key={s} type="button" onClick={() => submit(s)} disabled={!!asking} className="flex items-center gap-2 rounded-md border border-line-soft bg-surface px-3.5 py-3 text-left text-[13px] font-semibold hover:border-ink">
               <Icon name="sparkles" size={13} />
               {s}

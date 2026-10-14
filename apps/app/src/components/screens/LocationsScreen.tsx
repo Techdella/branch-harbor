@@ -11,6 +11,7 @@ import { cityOfZone, countryName, fmtTime, zoneLabel } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, DeniedState, Empty, LoadingBlock } from '../ui/States';
+import { IndependentLocations } from './independent/IndependentLocations';
 
 function useNow(ms = 30000) {
   const [now, setNow] = useState(() => new Date());
@@ -21,7 +22,13 @@ function useNow(ms = 30000) {
   return now;
 }
 
+/** Independent businesses have no Locations directory (their location lives under Settings → Business & location). */
 export function LocationsScreen() {
+  const app = useApp();
+  return app.org.model === 'independent' ? <IndependentLocations /> : <NetworkLocationsScreen />;
+}
+
+function NetworkLocationsScreen() {
   const t = useTranslations('locations');
   const locale = useLocale();
   const app = useApp();

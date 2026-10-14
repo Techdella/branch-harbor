@@ -14,6 +14,8 @@ export interface Routing {
   brand: string;
   location: string;
   requestedLang: string | null;
+  /** Independent business: the slug of its one location, served at the brand address. */
+  single: string | null;
 }
 
 export const getRouting = cache(async (): Promise<Routing> => {
@@ -25,6 +27,7 @@ export const getRouting = cache(async (): Promise<Routing> => {
     brand: h.get('x-bh-brand') ?? '',
     location: h.get('x-bh-location') ?? '',
     requestedLang: h.get('x-bh-lang') || c.get('bh_lang')?.value || null,
+    single: h.get('x-bh-single') || null,
   };
 });
 
@@ -91,6 +94,8 @@ export function makeLinks(r: Routing, brand: string, opts: { brandPrimaryHost?: 
       return `/${brand}${path}`;
     },
     location(slug: string, path = ''): string {
+      // Independent business: its location lives at the brand address.
+      if (r.single === slug) return r.host ? path || '/' : `/${brand}${path}`;
       if (r.host && r.hostLocation === slug) return path || '/';
       if (r.host && !r.hostLocation) return `/${slug}${path}`;
       if (r.host) return `${SITES_BASE_URL}/${brand}/${slug}${path}`;
@@ -100,6 +105,7 @@ export function makeLinks(r: Routing, brand: string, opts: { brandPrimaryHost?: 
       return opts.brandPrimaryHost ? `https://${opts.brandPrimaryHost}${path || '/'}` : `${SITES_BASE_URL}/${brand}${path}`;
     },
     locationCanonical(slug: string, primaryHost: string | null, path = ''): string {
+      if (r.single === slug && !primaryHost) return opts.brandPrimaryHost ? `https://${opts.brandPrimaryHost}${path || '/'}` : `${SITES_BASE_URL}/${brand}${path}`;
       return primaryHost ? `https://${primaryHost}${path || '/'}` : `${SITES_BASE_URL}/${brand}/${slug}${path}`;
     },
   };

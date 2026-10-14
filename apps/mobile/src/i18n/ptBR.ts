@@ -12,6 +12,6 @@ const ptBR: PartialDict = {
   inbox: { title: 'Mensagens', you: 'Você' },
   profile: { title: 'Perfil', language: 'Idioma', notifications: 'Notificações', push: 'Notificações push', email: 'E-mail', sms: 'SMS', privacy: 'Privacidade e meus dados', exportData: 'Solicitar cópia dos meus dados', deleteData: 'Solicitar exclusão da conta', signOut: 'Sair' },
   staff: { present: 'Presente', absent: 'Ausente', accept: 'Aceitar', rejectOrder: 'Recusar', markReady: 'Marcar como pronto', waitingServer: 'Aguardando o servidor…' },
-  owner: { pulseTitle: 'Panorama da rede', approvalsTitle: 'Aprovações', refund: 'Reembolso', shiftSwap: 'Troca de turno', locationsTitle: 'Unidades' },
+  owner: { pulseTitle: 'Panorama da rede', businessPulseTitle: 'Panorama do negócio', noLocationYet: 'Adicione o endereço do seu negócio no app BranchHarbor para ver seu panorama.', approvalsTitle: 'Aprovações', refund: 'Reembolso', shiftSwap: 'Troca de turno', locationsTitle: 'Unidades' },
 };
 export default ptBR;

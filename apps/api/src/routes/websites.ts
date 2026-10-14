@@ -10,6 +10,7 @@ import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, hasPerm, requireMember, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { executePublishJob, publishPage, serializeJob } from '../services/publish.ts';
+import { isIndependent, websiteApprovalMode } from '../services/businessMode.ts';
 import { slugify } from '../lib/slug.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
 
@@ -20,6 +21,9 @@ const templateField = z.object({
   policy: z.enum(['locked', 'editable', 'approval']),
   defaultValue: z.unknown(),
 });
+
+/** Labels for the default fields of pages created without a template (independent businesses). */
+const DEFAULT_FIELD_LABELS: Record<string, string> = { hero_title: 'Headline', offer: 'Offer or announcement', about: 'About your business' };
 
 const originFor = (policy: TemplateField['policy']): FieldOrigin => (policy === 'locked' ? 'locked' : policy === 'approval' ? 'approval' : 'hq');
 
@@ -35,26 +39,42 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     return page;
   }
 
-  async function pageView(pageId: string) {
+  /**
+   * Independent businesses have no HQ: no locked or approval-required fields. With website approvals off
+   * (default) everyone who can edit applies changes directly; with approvals for staff, edits by people
+   * without approval rights go to the owner first.
+   */
+  async function websiteMode(orgId: string) {
+    const [org] = await s.db.select({ model: organizations.model, settings: organizations.settings }).from(organizations).where(eq(organizations.id, orgId));
+    const independent = !!org && isIndependent(org);
+    return { independent, approvals: independent ? websiteApprovalMode(org!) : null };
+  }
+
+  async function pageView(pageId: string, mode?: { independent: boolean; approvals: 'off' | 'staff' | null }) {
     const [page] = await s.db.select().from(pages).where(eq(pages.id, pageId));
     const fields = await s.db.select().from(fieldOverrides).where(eq(fieldOverrides.pageId, pageId));
     const [tpl] = page!.templateId ? await s.db.select().from(templates).where(eq(templates.id, page!.templateId)) : [];
     const labels = new Map((tpl?.fields ?? []).map((f) => [f.key, f]));
+    const m = mode ?? await websiteMode(page!.organizationId);
     return {
       id: page!.id, websiteId: page!.websiteId, locationId: page!.locationId, slug: page!.slug, title: page!.title, status: page!.status, seo: page!.seo,
       publishedVersionId: page!.publishedVersionId, publishedAt: iso(page!.publishedAt),
+      businessModel: m.independent ? 'independent' : 'network',
+      ...(m.independent ? { approvals: m.approvals } : {}),
       fields: fields.map((f) => ({
-        key: f.fieldKey, label: labels.get(f.fieldKey)?.label ?? f.fieldKey, type: labels.get(f.fieldKey)?.type ?? 'text',
-        origin: f.origin, value: f.value, hqValue: f.hqValue, isOverridden: f.origin === 'local',
-        editableLocally: f.origin === 'hq' || f.origin === 'local', requiresApproval: f.origin === 'approval',
+        key: f.fieldKey, label: labels.get(f.fieldKey)?.label ?? DEFAULT_FIELD_LABELS[f.fieldKey] ?? f.fieldKey, type: labels.get(f.fieldKey)?.type ?? 'text',
+        // Independent businesses have one owner and no HQ/local split: every field is simply the business's content.
+        origin: m.independent ? 'local' : f.origin, value: f.value, hqValue: m.independent ? null : f.hqValue, isOverridden: !m.independent && f.origin === 'local',
+        editableLocally: m.independent || f.origin === 'hq' || f.origin === 'local', requiresApproval: m.independent ? m.approvals === 'staff' : f.origin === 'approval',
         pendingValue: f.pendingValue ?? null, pendingApprovalId: f.pendingApprovalId,
       })),
     };
   }
 
   // ── Templates ──
-  app.get('/orgs/:orgId/templates', { schema: { tags: ['websites'], security: secured, params: orgParams } }, async (req) => {
+  app.get('/orgs/:orgId/templates', { schema: { tags: ['websites'], security: secured, params: orgParams, description: 'Independent businesses: `hidden: true` — template policies (locked/approval fields) are a network tool.' } }, async (req) => {
     await requireMember(req, s.db, req.params.orgId);
+    if ((await websiteMode(req.params.orgId)).independent) return { items: [], hidden: true, reason: 'independent_business' };
     return { items: await s.db.select().from(templates).where(eq(templates.organizationId, req.params.orgId)) };
   });
 
@@ -123,12 +143,17 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     const out = await s.db.transaction(async (tx) => {
       const [site] = await tx.insert(websites).values({
         organizationId: orgId, locationId: b.locationId, kind: b.kind, templateId: tpl?.id ?? null, connectionId: b.connectionId ?? null,
-        includedAddress: `${s.cfg.SITES_BASE_URL}/${org!.slug}${loc ? `/${loc.slug}` : ''}`,
+        // Independent businesses: the brand site IS the location site, served at /{brand}.
+        includedAddress: `${s.cfg.SITES_BASE_URL}/${org!.slug}${loc && !isIndependent(org!) ? `/${loc.slug}` : ''}`,
       }).returning();
       for (const p of b.pages) {
         const [page] = await tx.insert(pages).values({ organizationId: orgId, websiteId: site!.id, locationId: b.locationId, templateId: tpl?.id ?? null, slug: slugify(p.slug), title: p.title }).returning();
         if (tpl?.fields.length) {
-          await tx.insert(fieldOverrides).values(tpl.fields.map((f) => ({ organizationId: orgId, pageId: page!.id, fieldKey: f.key, origin: originFor(f.policy), value: f.defaultValue ?? null, hqValue: f.defaultValue ?? null })));
+          await tx.insert(fieldOverrides).values(tpl.fields.map((f) => ({ organizationId: orgId, pageId: page!.id, fieldKey: f.key, origin: isIndependent(org!) ? 'hq' as const : originFor(f.policy), value: f.defaultValue ?? null, hqValue: f.defaultValue ?? null })));
+        } else if (isIndependent(org!) && loc) {
+          // Independent businesses have no templates: start every page with simple editable content.
+          const defaults: Record<string, unknown> = { hero_title: p.slug === 'home' ? org!.name : p.title, offer: '', about: '' };
+          await tx.insert(fieldOverrides).values(Object.entries(defaults).map(([fieldKey, value]) => ({ organizationId: orgId, pageId: page!.id, fieldKey, origin: 'hq' as const, value, hqValue: value })));
         }
       }
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'website.created', scopeKind: b.locationId ? 'location' : 'organization', scopeId: b.locationId ?? orgId, targetType: 'website', targetId: site!.id });
@@ -166,12 +191,25 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     await requirePerm(req, s.db, 'website.edit', scope);
     const canHq = await hasPerm(req, s.db, 'templates.write', { organizationId: orgId, kind: 'organization', id: orgId });
     const canApprove = await hasPerm(req, s.db, 'website.approve', scope);
+    const mode = await websiteMode(orgId);
     const existing = await s.db.select().from(fieldOverrides).where(eq(fieldOverrides.pageId, id));
     const results: Array<{ key: string; result: 'applied' | 'pending_approval' | 'rejected_locked' | 'unknown_field'; approvalId?: string }> = [];
     await s.db.transaction(async (tx) => {
       for (const [key, value] of Object.entries(req.body.fields)) {
         const f = existing.find((e) => e.fieldKey === key);
         if (!f) { results.push({ key, result: 'unknown_field' }); continue; }
+        if (mode.independent) {
+          // No locks for independent businesses; approvals only when the owner enabled them for staff.
+          if (mode.approvals === 'staff' && !canApprove) {
+            const [ap] = await tx.insert(approvals).values({ organizationId: orgId, locationId: page.locationId, targetType: 'field', targetId: f.id, payload: { pageId: id, fieldKey: key, value }, requestedBy: me.id, requestComment: req.body.comment ?? null }).returning();
+            await tx.update(fieldOverrides).set({ pendingValue: value, pendingApprovalId: ap!.id, updatedAt: new Date() }).where(eq(fieldOverrides.id, f.id));
+            results.push({ key, result: 'pending_approval', approvalId: ap!.id });
+          } else {
+            await tx.update(fieldOverrides).set({ value, hqValue: value, updatedBy: me.id, updatedAt: new Date() }).where(eq(fieldOverrides.id, f.id));
+            results.push({ key, result: 'applied' });
+          }
+          continue;
+        }
         if (f.origin === 'locked') {
           if (!canHq) { results.push({ key, result: 'rejected_locked' }); continue; }
           await tx.update(fieldOverrides).set({ value, hqValue: value, updatedBy: me.id, updatedAt: new Date() }).where(eq(fieldOverrides.id, f.id));
@@ -191,7 +229,7 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     if (results.every((r) => r.result === 'rejected_locked' || r.result === 'unknown_field')) {
       throw new AppError(403, 'fields_locked', 'These fields are controlled by headquarters', Object.fromEntries(results.map((r) => [r.key, r.result === 'unknown_field' ? 'Unknown field' : 'Locked brand content'])));
     }
-    return { results, page: await pageView(id) };
+    return { results, page: await pageView(id, mode) };
   });
 
   app.post('/orgs/:orgId/pages/:id/fields/:key/reset', {
@@ -229,15 +267,20 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post('/orgs/:orgId/pages/:id/publish', { schema: { tags: ['websites'], security: secured, params: idParams, summary: 'Publish a single page (creates a version snapshot)' } }, async (req) => {
     const { orgId, id } = req.params;
     const page = await loadPage(orgId, id);
-    await requirePerm(req, s.db, 'website.publish', pageScope(orgId, page.locationId));
+    const scope = pageScope(orgId, page.locationId);
+    await requirePerm(req, s.db, 'website.publish', scope);
     if (page.status === 'pending_approval') throw conflict('pending_approval', 'This page is awaiting approval');
+    const mode = await websiteMode(orgId);
+    if (mode.independent && mode.approvals === 'staff' && !(await hasPerm(req, s.db, 'website.approve', scope))) {
+      throw conflict('approval_required', 'The owner asked to approve website changes before they go live. Submit the page for approval instead.');
+    }
     const pendingFields = await s.db.select({ k: fieldOverrides.fieldKey }).from(fieldOverrides).where(and(eq(fieldOverrides.pageId, id)));
     const ver = await s.db.transaction(async (tx) => {
       const v = await publishPage(tx, id, req.user!.id);
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'page.published', targetType: 'page', targetId: id, metadata: { version: v.version } });
       return v;
     });
-    return { version: ver, fieldCount: pendingFields.length };
+    return { version: ver, fieldCount: pendingFields.length, approvalRequired: false, businessModel: mode.independent ? 'independent' : 'network' };
   });
 
   app.get('/orgs/:orgId/pages/:id/versions', { schema: { tags: ['websites'], security: secured, params: idParams } }, async (req) => {

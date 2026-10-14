@@ -21,6 +21,8 @@ export interface Brand {
   tagline: string | null;
   poweredBy: boolean;
   theme: Theme;
+  /** independent: the brand site is the location site (no finder). Absent on older APIs = network. */
+  model?: 'independent' | 'network';
 }
 
 export interface PublishedPage {
@@ -57,7 +59,7 @@ export interface LocationSummary {
 export interface BrandSite {
   brand: Brand;
   pages: PublishedPage[];
-  site: { includedAddress: string; primaryHost: string | null };
+  site: { includedAddress: string; primaryHost: string | null; singleLocationSlug?: string | null };
   locations: Array<LocationSummary & { primaryHost: string | null; pages: Array<{ slug: string; publishedAt: string | null }> }>;
 }
 
@@ -74,7 +76,7 @@ export interface LocationSite {
     payAtPickup: boolean;
     sandboxPayments: boolean;
   };
-  site: { includedAddress: string; primaryHost: string | null; brandPrimaryHost: string | null; locationCount: number };
+  site: { includedAddress: string; primaryHost: string | null; brandPrimaryHost: string | null; locationCount: number; singleLocation?: boolean };
 }
 
 export interface ScheduleItem {

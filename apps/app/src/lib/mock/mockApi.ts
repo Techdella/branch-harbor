@@ -35,6 +35,7 @@ import type {
 import { addDays, dateInZone, zonedToUtc } from '../format';
 import { AI, buildOverview, buildTable } from './content';
 import { FIXTURES, PASTEL as P, at, loc, minutesAgo, scopeLocationIds, scopeOptions, sessionFor, unsplash, visibleLocations } from './orgs';
+import { withIndependent } from './business';
 
 /* ---------------- helpers ---------------- */
 
@@ -432,7 +433,7 @@ function domainRecords(host: string, found: [boolean, boolean]): DomainStatus['r
 
 /* ---------------- The API ---------------- */
 
-const rawMockApi: BranchHarborApi = {
+const rawMockApi: Omit<BranchHarborApi, 'business'> = {
   mode: 'mock',
   auth: {
     session: (ctx) => read(() => sessionFor(ctx.industry, ctx.role)),
@@ -973,4 +974,4 @@ function withContext<T extends object>(target: T): T {
   });
 }
 
-export const mockApi: BranchHarborApi = withContext(rawMockApi);
+export const mockApi: BranchHarborApi = withContext(withIndependent(rawMockApi));

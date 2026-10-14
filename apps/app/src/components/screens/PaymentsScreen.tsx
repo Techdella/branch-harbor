@@ -104,7 +104,7 @@ function Transactions() {
                 onRowClick={(x) => setOpen(x.id)}
                 columns={[
                   { key: 'ref', header: t('col.ref'), render: (x) => <span><strong className="font-mono text-[13px]">{x.externalRef}</strong><span className="block text-xs text-stone">{fmtDateTime(x.createdAt, loc(x.locationId).timeZone, locale)}</span></span> },
-                  { key: 'what', header: t('col.what'), render: (x) => <span>{x.description}<span className="block text-xs text-stone">{loc(x.locationId).name}</span></span> },
+                  { key: 'what', header: t('col.what'), render: (x) => <span>{x.description}{app.org.model !== 'independent' && <span className="block text-xs text-stone">{loc(x.locationId).name}</span>}</span> },
                   { key: 'amt', header: t('col.amount'), align: 'right', render: (x) => <strong>{moneyWithCode(x.amount, locale)}</strong> },
                   { key: 'pay', header: t('col.payment'), render: (x) => <Badge tone={payTone[x.payment]}>{t(`payState.${x.payment}`)}</Badge> },
                   { key: 'ref2', header: t('col.refund'), render: (x) => <Badge tone={refTone[x.refund]} icon={x.refund === 'none' ? 'minus' : undefined}>{t(`refundState.${x.refund}`)}</Badge> },
@@ -269,7 +269,10 @@ function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationI
 
 function Setup() {
   const t = useTranslations('payments');
+  const ts = useTranslations('single.payments');
   const app = useApp();
+  // Independent businesses have one payment account — no per-location account mapping.
+  const independent = app.org.model === 'independent';
   const res = useApi((api) => api.payments.accounts(app.ctx), [app.industry, app.role]);
   const loc = useLocLookup();
   return (
@@ -284,16 +287,16 @@ function Setup() {
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2 text-[15px] font-bold">
                       <Icon name="card" size={17} />
-                      {l.name}
+                      {independent ? ts('account') : l.name}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     <Badge tone={a.status === 'enabled' ? 'success' : a.status === 'pending_verification' ? 'warning' : 'danger'}>{t(`acctStatus.${a.status}`)}</Badge>
-                    <Badge tone="neutral" icon={null}>{a.arrangement === 'own' ? t('ownAccount') : t('sharedAccount')}</Badge>
+                    {!independent && <Badge tone="neutral" icon={null}>{a.arrangement === 'own' ? t('ownAccount') : t('sharedAccount')}</Badge>}
                     <Badge tone="neutral" icon={null}>{l.currency}</Badge>
                   </div>
                   <p className="text-xs text-stone">
-                    {a.provider} · {a.arrangement === 'own' ? t('ownDetail') : t('sharedDetail')}
+                    {a.provider} · {independent ? ts('accountDetail', { name: app.org.name }) : a.arrangement === 'own' ? t('ownDetail') : t('sharedDetail')}
                   </p>
                   {a.capabilities.length > 0 && <p className="text-xs">{a.capabilities.join(' · ')}</p>}
                   {a.status !== 'enabled' && <p className="text-xs font-semibold text-warning">{t('notPurchasable')}</p>}

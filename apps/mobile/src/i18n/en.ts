@@ -294,6 +294,8 @@ const en = {
   },
   owner: {
     pulseTitle: 'Network pulse',
+    businessPulseTitle: 'Business pulse',
+    noLocationYet: 'Add your business address in the BranchHarbor app to see your pulse.',
     scope: 'Scope',
     allLocations: 'All authorised locations',
     salesByCurrency: 'Sales by currency',

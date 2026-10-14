@@ -11,6 +11,9 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { serializeLocation } from '../services/serializers.ts';
+import { activeLocations, isIndependent, requireNetwork, upgradeRequired, upgradeToNetwork } from '../services/businessMode.ts';
+import { AppError } from '../lib/errors.ts';
+import { requireMember } from '../services/authz.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 async function uniqueSlug(db: Exec, orgId: string, name: string) {
@@ -69,12 +72,37 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   app.post('/orgs/:orgId/locations', {
-    schema: { tags: ['locations'], security: secured, params: orgParams, body: createLocationSchema.extend({ status: z.enum(locationStatuses).default('draft') }), summary: 'Add a location. Never auto-publishes or makes it visible to customers.' },
+    schema: {
+      tags: ['locations'], security: secured, params: orgParams,
+      body: createLocationSchema.extend({
+        status: z.enum(locationStatuses).default('draft'),
+        upgradeToNetwork: z.boolean().default(false).describe('Independent businesses only: adding a second location requires upgrading to a network. Set true (owner only) to upgrade in the same step.'),
+      }),
+      summary: 'Add a location. Never auto-publishes or makes it visible to customers.',
+      description: 'An independent business already has its one location: a second one returns 409 `upgrade_required` unless `upgradeToNetwork: true` is sent by the owner, which upgrades the organisation (audited) and then adds the location.',
+    },
   }, async (req, reply) => {
     const { orgId } = req.params;
-    const b = req.body;
+    const { upgradeToNetwork: wantsUpgrade, ...b } = req.body;
     const target: ScopeTarget = b.regionId ? { organizationId: orgId, kind: 'region', id: b.regionId } : { organizationId: orgId, kind: 'organization', id: orgId };
     await requirePerm(req, s.db, 'locations.write', target);
+    const [orgRow] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
+    let upgrade = false;
+    if (orgRow && isIndependent(orgRow)) {
+      if (b.regionId || b.ownerGroupId) requireNetwork(orgRow, 'Regions and owner groups');
+      const existing = await activeLocations(s.db, orgId);
+      if (existing.length >= 1) {
+        if (!wantsUpgrade) {
+          throw upgradeRequired(
+            `${orgRow.name} is set up as an independent business with one location. To add another location, upgrade to a network: your existing location, customers, website and history are kept. Send upgradeToNetwork: true, or call POST /v1/orgs/${orgId}/upgrade-to-network first.`,
+            { currentLocationCount: existing.length },
+          );
+        }
+        const mine = await requireMember(req, s.db, orgId);
+        if (!mine.some((a) => a.role === 'org_owner' && a.scopeKind === 'organization')) throw new AppError(403, 'forbidden', 'Only the business owner can upgrade to a network');
+        upgrade = true;
+      }
+    }
     if (!isValidTimeZone(b.timeZone)) throw validationError('Unknown timezone', { timeZone: 'Use an IANA timezone such as America/Toronto' });
     await assertParents(s.db, orgId, b.regionId, b.ownerGroupId);
     const [dupe] = await s.db.select({ id: locations.id }).from(locations).where(and(eq(locations.organizationId, orgId), eq(locations.code, b.code)));
@@ -82,6 +110,7 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     const geo = await s.geocoder.geocode(`${b.address.line1}, ${b.address.city}, ${b.address.country}`);
     const row = await s.db.transaction(async (tx) => {
+      if (upgrade && orgRow) await upgradeToNetwork(tx, orgRow, { actorUserId: req.user!.id, ip: req.ip, trigger: 'add_location' }, s.cfg.SITES_BASE_URL);
       const [row] = await tx.insert(locations).values({
         organizationId: orgId, regionId: b.regionId ?? null, ownerGroupId: b.ownerGroupId ?? null, name: b.name, code: b.code,
         slug: await uniqueSlug(tx, orgId, b.name), address: b.address, country: b.address.country, timeZone: b.timeZone,
@@ -91,7 +120,7 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'location.created', scopeKind: 'location', scopeId: row!.id, targetType: 'location', targetId: row!.id });
       return row!;
     });
-    return reply.code(201).send(serializeLocation(row));
+    return reply.code(201).send({ ...serializeLocation(row), ...(upgrade ? { organizationUpgraded: true } : {}) });
   });
 
   app.patch('/orgs/:orgId/locations/:id', {
@@ -109,6 +138,10 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
     await requirePerm(req, s.db, 'locations.write', { organizationId: orgId, kind: 'location', id });
     const b = req.body;
     if (b.timeZone && !isValidTimeZone(b.timeZone)) throw validationError('Unknown timezone', { timeZone: 'Invalid IANA timezone' });
+    if (b.regionId || b.ownerGroupId) {
+      const [o] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
+      if (o) requireNetwork(o, 'Regions and owner groups');
+    }
     if (b.regionId !== undefined || b.ownerGroupId !== undefined) {
       // Moving a location across regions/owner groups changes who can access it: HQ-level only.
       await requirePerm(req, s.db, 'locations.write', { organizationId: orgId, kind: 'organization', id: orgId });
@@ -147,6 +180,8 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'locations.write', { organizationId: orgId, kind: 'organization', id: orgId });
+    const [importOrg] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
+    if (importOrg) requireNetwork(importOrg, 'Importing locations');
     const { headers, rows } = parseCsv(req.body.csv);
     const missing = ['name', 'code', 'address_line1', 'city', 'country', 'time_zone', 'currency'].filter((h) => !headers.includes(h));
     if (missing.length) throw validationError('CSV is missing required columns', Object.fromEntries(missing.map((m) => [m, 'Required column'])));

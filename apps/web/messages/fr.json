@@ -319,7 +319,8 @@
     "pricingCta": "Voir les tarifs",
     "faqTitle": "Questions sur {name}",
     "ctaTitle": "Découvrez {name} avec vos propres établissements",
-    "ctaBody": "Dites-nous combien d’établissements vous gérez et quels outils vous utilisez aujourd’hui. Nous vous présenterons le parcours adapté."
+    "ctaBody": "Dites-nous combien d’établissements vous gérez et quels outils vous utilisez aujourd’hui. Nous vous présenterons le parcours adapté.",
+    "startFree": "Commencer gratuitement"
   },
   "industries": {
     "studios": {
@@ -1142,53 +1143,76 @@
       "kicker": "Entreprises à un seul site",
       "imageAlt": "Commerçante ouvrant la porte d’une petite boutique",
       "headline": "Tout au même endroit, sans la complexité d’un réseau.",
-      "intro": "Un seul établissement, c’est zéro périmètre ni approbation à gérer. Ajoutez d’autres établissements plus tard : les outils réseau apparaîtront au moment où vous en aurez besoin.",
-      "cta": "Découvrir la mise en place",
+      "intro": "Un établissement et une petite équipe, sans la complexité d’un réseau : ni sélecteur de périmètre, ni régions, ni circuits de validation. Ouvrez un deuxième établissement plus tard et passez aux outils réseau en quelques clics. Tout ce que vous avez est conservé.",
+      "cta": "Demander une démo",
       "points": [
         {
-          "t": "Prêt en un après-midi",
-          "d": "Une check-list plutôt qu’un assistant dont on ne peut pas sortir. Votre progression est enregistrée à chaque étape."
+          "t": "Une entreprise, un tableau de bord",
+          "d": "Le nom de votre entreprise remplace le sélecteur d’établissement. Vue d’ensemble, rapports et réponses de l’IA portent sur votre entreprise, pas sur un réseau."
         },
         {
-          "t": "Site hébergé ou WordPress",
-          "d": "Lancez un site avec une adresse incluse, ou gardez le vôtre."
+          "t": "Configuré en une fois",
+          "d": "Coordonnées, adresse, horaires, fuseau horaire et devise en une seule étape. La progression est enregistrée au fur et à mesure et les étapes facultatives peuvent attendre."
         },
         {
-          "t": "Gardez vos outils",
-          "d": "Connectez un logiciel de réservation ou de vente pris en charge au lieu de le remplacer."
+          "t": "Publiez directement",
+          "d": "Ni champs verrouillés ni circuits de validation. Modifiez votre site et publiez ; activez les validations seulement si vous voulez vérifier les changements de l’équipe."
         },
         {
-          "t": "Une IA qui propose, sans décider",
-          "d": "Textes et résumés soumis à votre relecture. Rien n’est publié sans vous."
+          "t": "Des rôles simples pour une petite équipe",
+          "d": "Invitez un responsable, du personnel, un contributeur marketing ou un utilisateur finance. Les rôles réseau restent à l’écart."
         }
       ],
-      "stepsTitle": "Une mise en place en six étapes",
+      "stepsTitle": "De l’inscription à la mise en ligne en six étapes",
       "steps": [
         {
-          "t": "Choisissez votre secteur",
-          "d": "Nous configurons les parcours adaptés."
+          "t": "Créez votre compte",
+          "d": "Vérifiez votre e-mail, puis choisissez votre secteur et « entreprise indépendante »."
         },
         {
-          "t": "Renseignez votre entreprise",
-          "d": "Fuseau horaire, devise et langue compris."
+          "t": "Votre entreprise",
+          "d": "Nom, adresse, fuseau horaire, devise et horaires d’ouverture en une étape."
         },
         {
-          "t": "Choisissez hébergé ou WordPress",
-          "d": "Vous pourrez changer d’avis plus tard."
+          "t": "Hébergé ou WordPress",
+          "d": "Votre adresse incluse est sites.branchharbor.com/votre-entreprise. Connectez votre propre domaine à tout moment."
         },
         {
-          "t": "Ajoutez cours, prestations, produits ou carte",
-          "d": "Par import ou saisie."
+          "t": "Ajoutez vos cours, services, produits ou votre carte",
+          "d": "Importez ou saisissez."
         },
         {
           "t": "Connectez les paiements",
-          "d": "Les achats restent désactivés tant que le compte n’est pas activé."
+          "d": "L’achat reste désactivé tant que le compte n’est pas activé."
         },
         {
-          "t": "Prévisualisez, testez et publiez",
-          "d": "Faites d’abord une réservation ou une commande test."
+          "t": "Prévisualisez et publiez",
+          "d": "Un seul bouton Publier met votre site en ligne."
         }
-      ]
+      ],
+      "signupCta": "Commencer gratuitement (studios)",
+      "signupNote": "L’inscription en libre-service est ouverte aux studios. Les autres secteurs commencent par une courte démo pendant le pilote.",
+      "upgradeTitle": "Vous ouvrez un deuxième établissement ?",
+      "upgradeBody": "Ajoutez un établissement depuis les Paramètres. BranchHarbor explique ce qui change, vous confirmez, et votre entreprise devient un réseau. Seul le propriétaire peut le faire, et le changement est journalisé.",
+      "upgradePoints": [
+        {
+          "t": "Rien n’est perdu",
+          "d": "Votre établissement, vos clients, votre site, votre équipe et votre historique de paiements restent tels quels."
+        },
+        {
+          "t": "Les outils réseau apparaissent",
+          "d": "Annuaire des établissements, sélecteur de périmètre, régions, groupes de propriétaires, modèles et publication groupée."
+        },
+        {
+          "t": "Votre adresse continue de fonctionner",
+          "d": "Votre site gagne un localisateur et chaque établissement a sa propre page."
+        },
+        {
+          "t": "La facturation suit vos établissements",
+          "d": "Solo devient le tarif Réseau par établissement dès que le deuxième est en activité."
+        }
+      ],
+      "pricingCta": "Voir le tarif Solo"
     },
     "pointsTitle": "Comment ça marche",
     "ctaTitle": "Prêt à le voir avec votre entreprise ?",
@@ -1540,6 +1564,18 @@
     "taxNote": "Des taxes comme la TVA, la GST ou la sales tax peuvent s’appliquer selon votre pays ; elles sont affichées avant le paiement.",
     "proposedNote": "Tarifs provisoires. Les formules et les prix peuvent évoluer avant la disponibilité générale.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "Un établissement indépendant",
+        "tag": "Entreprise unique",
+        "features": [
+          "Site hébergé et tableau de bord",
+          "Réservations, commandes et paiements pour votre secteur",
+          "Des rôles simples pour une petite équipe",
+          "Passez à Réseau en ouvrant un deuxième établissement"
+        ],
+        "cta": "Commencer gratuitement"
+      },
       "connector": {
         "name": "Connecteur",
         "for": "Gardez votre site WordPress",
@@ -1577,7 +1613,7 @@
         "cta": "Demander un devis"
       }
     },
-    "ctaNote": "Pendant le pilote, chaque formule commence par un échange afin de confirmer que votre secteur et vos connexions sont pris en charge.",
+    "ctaNote": "Pendant le pilote, les formules Connecteur et Réseau commencent par un échange afin de confirmer que votre secteur et vos connexions sont pris en charge. L’inscription Solo est en libre-service pour les studios.",
     "faqTitle": "Questions sur les tarifs",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "Les frais de traitement des paiements sont-ils inclus ?",
         "a": "Non. Les paiements passent par un prestataire connecté comme Stripe, qui facture ses propres frais dans votre pays."
+      },
+      {
+        "q": "Que se passe-t-il si j’ouvre un deuxième établissement ?",
+        "a": "Solo couvre un établissement. Lorsque vous en ajoutez un autre, vous passez à Réseau depuis les Paramètres : votre site, vos clients, votre équipe et votre historique sont conservés, et la facturation passe au tarif par établissement dès que le nouveau est en activité."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ mois · un établissement",
+    "soloTotal": "Un établissement. Passez à Réseau pour en ajouter d’autres.",
+    "soloAnnual": "Un établissement, facturé à l’année."
   },
   "demo": {
     "metaTitle": "Demander une démo",

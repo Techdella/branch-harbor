@@ -9,7 +9,10 @@ import { PLAN_KEYS, PRICE_CURRENCIES, currencySymbol, defaultCurrencyFor, format
 
 const STORAGE_KEY = 'bh.pricing.currency';
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
+
 const STYLE: Record<PlanKey, { icon: IconName; card: string; iconBg: string; tag: string; line: string; btn: string }> = {
+  solo: { icon: 'store', card: 'bg-butter text-ink', iconBg: 'bg-surface', tag: 'bg-surface', line: 'border-black/10', btn: 'bg-ink text-white hover:bg-ink-2' },
   connector: { icon: 'wordpress', card: 'bg-surface text-ink border border-line-soft', iconBg: 'bg-butter', tag: 'bg-canvas', line: 'border-line-soft', btn: 'border-[1.5px] border-ink bg-surface text-ink hover:bg-canvas-raised' },
   hosted: { icon: 'globe', card: 'bg-ink text-white', iconBg: 'bg-lime text-ink', tag: 'bg-lime text-ink', line: 'border-ink-2', btn: 'bg-lime text-ink hover:brightness-95' },
   network: { icon: 'building', card: 'bg-lilac text-ink', iconBg: 'bg-surface', tag: 'bg-surface', line: 'border-black/10', btn: 'bg-ink text-white hover:bg-ink-2' },
@@ -98,7 +101,7 @@ export function PricingPlans() {
         </div>
       </div>
 
-      <ul className="grid gap-3 lg:grid-cols-3">
+      <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {PLAN_KEYS.map((k) => {
           const s = STYLE[k];
           const price = perLocationPrice(currency, k, annual);
@@ -118,10 +121,10 @@ export function PricingPlans() {
               <div aria-live="polite">
                 <p className="flex flex-wrap items-baseline gap-x-2">
                   <span className="tabular text-[44px] leading-none font-extrabold tracking-[-0.04em]">{fmt(price)}</span>
-                  <span className={cx('text-sm font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>{t('perLocation')}</span>
+                  <span className={cx('text-sm font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>{k === 'solo' ? t('perMonthOneLocation') : t('perLocation')}</span>
                 </p>
                 <p className={cx('tabular mt-2 text-xs font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>
-                  {t(annual ? 'totalAnnual' : 'total', { amount: fmt(price * count), count })}
+                  {k === 'solo' ? t(annual ? 'soloAnnual' : 'soloTotal') : t(annual ? 'totalAnnual' : 'total', { amount: fmt(price * count), count })}
                 </p>
               </div>
               <ul className={cx('flex flex-col gap-2.5 border-t pt-5', s.line)}>
@@ -132,9 +135,16 @@ export function PricingPlans() {
                   </li>
                 ))}
               </ul>
-              <Link href={`/demo?plan=${k}`} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
-                {t(`plans.${k}.cta`)}
-              </Link>
+              {k === 'solo' ? (
+                // Self-service sign-up for single-location businesses (industries that support it); others start with a demo.
+                <a href={`${APP_URL}/sign-up?model=independent&industry=studios`} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
+                  {t('plans.solo.cta')}
+                </a>
+              ) : (
+                <Link href={`/demo?plan=${k}`} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
+                  {t(`plans.${k}.cta`)}
+                </Link>
+              )}
             </li>
           );
         })}

@@ -1,23 +1,24 @@
+import { LIST_PRICES_MINOR, PRICED_CURRENCIES } from '@bh/shared';
 import { numberLocale } from '@/lib/intl';
 
 /**
  * Static list prices per currency. These are set per currency — not live exchange-rate conversions.
  * Proposed pricing, to be validated before general availability.
  */
-export const PRICE_CURRENCIES = ['USD', 'CAD', 'GBP', 'EUR', 'AUD'] as const;
+export const PRICE_CURRENCIES = PRICED_CURRENCIES;
 export type PriceCurrency = (typeof PRICE_CURRENCIES)[number];
 
-export const PLAN_KEYS = ['connector', 'hosted', 'network'] as const;
+/** `solo` is one flat price for a single-location business; the others are per location. */
+export const PLAN_KEYS = ['solo', 'connector', 'hosted', 'network'] as const;
 export type PlanKey = (typeof PLAN_KEYS)[number];
 
-/** Monthly price per location, whole currency units. */
-export const LIST_PRICES: Record<PriceCurrency, Record<PlanKey, number>> = {
-  USD: { connector: 29, hosted: 59, network: 89 },
-  CAD: { connector: 39, hosted: 79, network: 119 },
-  GBP: { connector: 23, hosted: 47, network: 71 },
-  EUR: { connector: 27, hosted: 55, network: 83 },
-  AUD: { connector: 45, hosted: 89, network: 135 },
-};
+/**
+ * Monthly list prices, whole currency units. Read from @bh/shared so the API subscription (Solo plan, network
+ * per-location price) and this page always show the same numbers.
+ */
+export const LIST_PRICES: Record<PriceCurrency, Record<PlanKey, number>> = Object.fromEntries(
+  PRICE_CURRENCIES.map((c) => [c, Object.fromEntries(PLAN_KEYS.map((k) => [k, LIST_PRICES_MINOR[c][k] / 100]))]),
+) as Record<PriceCurrency, Record<PlanKey, number>>;
 
 /** Annual billing: two months included (10 / 12), rounded to whole units per location. */
 export function perLocationPrice(currency: PriceCurrency, plan: PlanKey, annual: boolean): number {

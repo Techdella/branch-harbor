@@ -1,0 +1,176 @@
+{
+  "businessLabel": "Unternehmen: {name}",
+  "personaNetwork": "Netzwerk-Demo",
+  "personaIndependent": "Demo unabhängiges Unternehmen",
+  "personaOwner": "Inhaber · ein Standort",
+  "roles": {
+    "hq": "Inhaber",
+    "local": "Leitung",
+    "staff": "Mitarbeitende"
+  },
+  "location": {
+    "title": "Unternehmen & Standort",
+    "hint": "Adresse, Zeitzone, Währung und Öffnungszeiten erscheinen auf Ihrer Website.",
+    "saved": "Unternehmensdaten gespeichert.",
+    "line1": "Straße und Hausnummer",
+    "city": "Ort",
+    "region": "Bundesland, Provinz oder Region",
+    "postalCode": "Postleitzahl",
+    "country": "Land",
+    "timeZone": "Zeitzone",
+    "timeZoneHint": "Buchungen, Bestellungen und Öffnungszeiten verwenden diese Zeitzone.",
+    "currency": "Währung",
+    "currencyHint": "Preise und Zahlungen verwenden diese Währung. Bestehende Preise behalten ihre Währung.",
+    "phone": "Telefon",
+    "email": "Kontakt-E-Mail",
+    "hours": "Öffnungszeiten",
+    "hoursHint": "Wird auf Ihrer Website angezeigt, z. B. Di–So 8:00–18:00.",
+    "visible": "Für Kunden auf Ihrer Website sichtbar",
+    "notVisible": "Noch nicht für Kunden sichtbar — veröffentlichen Sie Ihre Website, um online zu gehen",
+    "save": "Unternehmensdaten speichern"
+  },
+  "billing": {
+    "title": "Tarif",
+    "separate": "Getrennt von Kundenzahlungen",
+    "status": {
+      "trialing": "Testphase",
+      "active": "Aktiv"
+    },
+    "soloBody": "Ein Standort, gehostete Website und Dashboard, alle Abläufe Ihrer Branche.",
+    "perLocationBody": "Abrechnung pro aktivem Standort.",
+    "perMonth": "{price} / Monat",
+    "quote": "Preis auf Anfrage",
+    "trialEnds": "Testphase endet am {date}",
+    "nextInvoice": "Nächste Rechnung am {date}",
+    "taxNote": "Steuern wie MwSt. oder GST kommen hinzu, wo sie anfallen. Karten- und Zahlungsgebühren berechnet Ihr Zahlungsanbieter."
+  },
+  "approvals": {
+    "title": "Website-Freigaben",
+    "label": "Änderungen des Teams vor dem Veröffentlichen freigeben",
+    "offHint": "Aus: Sie und Ihre Leitung bearbeiten und veröffentlichen direkt.",
+    "onHint": "An: Änderungen von Mitarbeitenden ohne Freigaberecht warten auf Sie, bevor sie veröffentlicht werden können."
+  },
+  "upgrade": {
+    "cardTitle": "Standort hinzufügen",
+    "cardBody": "BranchHarbor ist für einen Standort eingerichtet. Sie eröffnen einen weiteren? Wechseln Sie zu einem Netzwerk, um mehrere Standorte zu verwalten — alles bleibt erhalten.",
+    "addLocation": "Standort hinzufügen",
+    "title": "Zu einem Netzwerk wechseln",
+    "intro": "{name} ist als unabhängiges Unternehmen eingerichtet. Ein zweiter Standort braucht die Netzwerk-Werkzeuge. Das ändert sich.",
+    "whatChanges": "Was sich ändert",
+    "consequences": [
+      "Ihr Standort, Ihre Kunden, Website, Ihr Team und Ihr Zahlungsverlauf bleiben unverändert.",
+      "Bereichsauswahl, Standortverzeichnis, Regionen und Inhabergruppen werden verfügbar.",
+      "Website-Vorlagen können Felder sperren oder eine Freigabe verlangen, und Seiten können an mehrere Standorte gleichzeitig veröffentlicht werden.",
+      "Rollen für Zentrale, Regionalleitung und Franchisenehmer können eingeladen werden.",
+      "Die Abrechnung wechselt vom Solo-Tarif zur Preisgestaltung pro Standort, sobald ein zweiter Standort in Betrieb ist.",
+      "Ihre Kunden-Website erhält unter Ihrer aktuellen Adresse eine Standortsuche, und jeder Standort bekommt eine eigene Seite."
+    ],
+    "pricing": "Preise",
+    "perLocation": "{price} / Standort / Monat",
+    "pricingNote": "Listenpreise ohne Steuern. Ein neuer Standort wird erst berechnet, wenn er in Betrieb ist.",
+    "addNow": "Neuen Standort jetzt hinzufügen",
+    "newLocation": "Neuer Standort",
+    "locationName": "Name des Standorts",
+    "locationNamePh": "z. B. Fitzroy",
+    "code": "Interner Code",
+    "codeHint": "Kurz und eindeutig, wird in Berichten und Importen verwendet.",
+    "notPublished": "Der neue Standort startet als Entwurf: Kunden sehen nichts, bis Sie ihn veröffentlichen.",
+    "confirm": "Ich verstehe, dass mein Unternehmen zu einem Netzwerk wird. Meine Daten bleiben erhalten und die Änderung wird im Aktivitätsprotokoll festgehalten.",
+    "submit": "Zu einem Netzwerk wechseln",
+    "submitWithLocation": "Wechseln und Standort hinzufügen",
+    "cancel": "Abbrechen",
+    "ownerOnly": "Nur der Inhaber kann wechseln. Die Änderung wird protokolliert.",
+    "doneTitle": "Ihr Unternehmen ist jetzt ein Netzwerk",
+    "doneBody": "Standorte, Regionen, Vorlagen und Gruppenveröffentlichung sind jetzt verfügbar. Ihre bestehenden Daten bleiben unverändert.",
+    "goLocations": "Zu den Standorten",
+    "goOverview": "Zurück zum Überblick",
+    "errors": {
+      "name": "Geben Sie einen Namen für den neuen Standort ein.",
+      "line1": "Geben Sie die Adresse ein.",
+      "city": "Geben Sie den Ort ein."
+    }
+  },
+  "website": {
+    "title": "Website",
+    "description": "Bearbeiten Sie Ihre Website und veröffentlichen Sie, wenn Sie so weit sind. Änderungen bleiben bis zur Veröffentlichung Entwurf.",
+    "tab": {
+      "content": "Inhalt"
+    },
+    "yourSite": "Ihre Website",
+    "live": "Online · Version {version}",
+    "notLive": "Noch nicht online",
+    "published": "Veröffentlicht. Ihre Website ist online unter {address}.",
+    "approvalsOnStaff": "Ihre Änderungen gehen vor der Veröffentlichung zur Freigabe an den Inhaber.",
+    "noSiteTitle": "Sie haben noch keine Website",
+    "noSiteBody": "Erstellen Sie Ihre gehostete Website. Sie nutzt Name, Adresse und Öffnungszeiten Ihres Unternehmens, und Sie können vor und nach dem Veröffentlichen alles bearbeiten.",
+    "createAndPublish": "Website erstellen und veröffentlichen",
+    "savedDraft": "{field} als Entwurf gespeichert. Veröffentlichen, um es online zu stellen.",
+    "sentToOwner": "{field} zur Freigabe an den Inhaber gesendet.",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "empty": "Nicht festgelegt",
+    "pending": "Wartet auf Freigabe:",
+    "noFields": "Diese Seite hat noch keine bearbeitbaren Inhalte.",
+    "publish": "Veröffentlichen",
+    "publishNote": "Das Veröffentlichen aktualisiert Ihre Website und behält die vorherige Version zum Zurücksetzen.",
+    "ownerPublishes": "Der Inhaber veröffentlicht Änderungen",
+    "noPublishPermission": "Ihre Rolle kann Entwürfe bearbeiten; Leitung oder Inhaber veröffentlichen.",
+    "preview": "Vorschau (Entwurf)",
+    "detailsTitle": "Adresse, Öffnungszeiten und Kontakt",
+    "detailsBody": "Ihre Website zeigt Adresse, Öffnungszeiten und Kontaktdaten aus den Einstellungen.",
+    "detailsLink": "Unternehmensdaten bearbeiten",
+    "activity": "Aktivität"
+  },
+  "locationsPage": {
+    "title": "Ihr Standort",
+    "description": "Unabhängige Unternehmen haben einen Standort. Seine Daten finden Sie unter Einstellungen → Unternehmen & Standort.",
+    "addTitle": "Standort hinzufügen",
+    "addDescription": "Mit einem zweiten Standort wird Ihr Unternehmen zu einem Netzwerk.",
+    "edit": "In den Einstellungen bearbeiten",
+    "noDirectory": "Für ein Unternehmen mit einem Standort gibt es kein Standortverzeichnis. Wenn Sie einen weiteren Standort eröffnen, wechseln Sie unten zum Netzwerk und die Netzwerk-Werkzeuge erscheinen.",
+    "upgradeTitle": "Sie eröffnen einen weiteren Standort?",
+    "ownerOnly": "Bitten Sie den Inhaber, einen Standort hinzuzufügen."
+  },
+  "team": {
+    "role": {
+      "org_owner": "Inhaber",
+      "location_manager": "Leitung",
+      "staff": "Mitarbeitende / Trainer / Coach",
+      "marketing_contributor": "Marketing-Mitwirkende",
+      "finance": "Finanzen"
+    },
+    "roleHelp": {
+      "org_owner": "Voller Zugriff, inklusive Abrechnung, Team und Unternehmenseinstellungen.",
+      "location_manager": "Führt den Alltag: Pläne, Kunden, Bestellungen und Website-Veröffentlichung.",
+      "staff": "Nur eigener Plan, Anwesenheit oder Bestellungen.",
+      "marketing_contributor": "Entwirft Website- und Marketing-Inhalte; veröffentlicht nur, wenn Sie es erlauben.",
+      "finance": "Zahlungen, Abgleich und erlaubte Erstattungen."
+    }
+  },
+  "payments": {
+    "account": "Ihr Zahlungskonto",
+    "accountDetail": "ein Konto für {name}"
+  },
+  "onboarding": {
+    "stepBusiness": "Ihr Unternehmen",
+    "businessTitle": "Ihr Unternehmen",
+    "businessDesc": "Name, Adresse, Zeitzone, Währung und Öffnungszeiten. Das ist der Standort, den Ihre Kunden besuchen.",
+    "addressLegend": "Adresse und Öffnungszeiten",
+    "line1": "Straße und Hausnummer",
+    "city": "Ort",
+    "region": "Bundesland, Provinz oder Region",
+    "postalCode": "Postleitzahl",
+    "phone": "Telefon",
+    "hours": "Öffnungszeiten",
+    "hoursHint": "Wird auf Ihrer Website angezeigt.",
+    "hoursPh": "z. B. Di–So 8:00–18:00",
+    "addressNote": "Sie können das später unter Einstellungen → Unternehmen & Standort ändern. Sie eröffnen später einen weiteren Standort? Sie können jederzeit zu einem Netzwerk wechseln.",
+    "checkBusiness": "Adresse und Zeitzone des Unternehmens",
+    "blockerBusiness": "Adresse Ihres Unternehmens hinzufügen",
+    "errors": {
+      "line1": "Geben Sie Ihre Adresse ein.",
+      "city": "Geben Sie Ihren Ort ein."
+    }
+  }
+}

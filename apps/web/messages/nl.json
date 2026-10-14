@@ -319,7 +319,8 @@
     "pricingCta": "Prijzen bekijken",
     "faqTitle": "Vragen over {name}",
     "ctaTitle": "Zie {name} met je eigen vestigingen",
-    "ctaBody": "Vertel ons hoeveel vestigingen je hebt en welke systemen je nu gebruikt. We lopen het werkproces door dat bij je past."
+    "ctaBody": "Vertel ons hoeveel vestigingen je hebt en welke systemen je nu gebruikt. We lopen het werkproces door dat bij je past.",
+    "startFree": "Gratis beginnen"
   },
   "industries": {
     "studios": {
@@ -1142,53 +1143,76 @@
       "kicker": "Bedrijven met één vestiging",
       "imageAlt": "Eigenaar opent de deur van een kleine winkel",
       "headline": "Alles op één plek, zonder netwerkcomplexiteit.",
-      "intro": "Eén vestiging betekent geen bevoegdheden of goedkeuringen om te beheren. Voeg later vestigingen toe en de netwerktools verschijnen wanneer je ze nodig hebt.",
-      "cta": "Bekijk de opzet",
+      "intro": "Eén vestiging en een klein team, zonder netwerkcomplexiteit: geen bereikkiezer, regio’s of goedkeuringsketens. Open later een tweede vestiging en stap in een paar klikken over op de netwerktools. Alles wat je hebt blijft behouden.",
+      "cta": "Demo aanvragen",
       "points": [
         {
-          "t": "Ingericht in één middag",
-          "d": "Een checklist in plaats van een wizard waar je niet uit kunt. Je voortgang wordt bij elke stap bewaard."
+          "t": "Eén bedrijf, één dashboard",
+          "d": "Je bedrijfsnaam vervangt de vestigingskiezer. Overzicht, rapporten en AI-antwoorden gaan over je bedrijf, niet over een netwerk."
         },
         {
-          "t": "Gehoste site of WordPress",
-          "d": "Lanceer een site met een meegeleverd adres of houd je eigen site."
+          "t": "In één keer ingericht",
+          "d": "Bedrijfsgegevens, adres, openingstijden, tijdzone en valuta in één stap. Je voortgang wordt bewaard en optionele stappen kunnen wachten."
         },
         {
-          "t": "Houd je tools",
-          "d": "Koppel een ondersteund boekings- of commercesysteem in plaats van het te vervangen."
+          "t": "Direct publiceren",
+          "d": "Geen vergrendelde velden of goedkeuringsketens. Bewerk je website en publiceer; zet goedkeuringen alleen aan als je wijzigingen van medewerkers eerst wilt controleren."
         },
         {
-          "t": "AI die voorstelt, niet beslist",
-          "d": "Teksten en samenvattingen die jij controleert. Zonder jou wordt niets gepubliceerd."
+          "t": "Eenvoudige rollen voor een klein team",
+          "d": "Nodig een manager, medewerkers, een marketingmedewerker of een financiële gebruiker uit. Netwerkrollen zitten niet in de weg."
         }
       ],
-      "stepsTitle": "Opzet in zes stappen",
+      "stepsTitle": "Van aanmelden tot live in zes stappen",
       "steps": [
         {
-          "t": "Kies je branche",
-          "d": "Wij zetten de passende werkprocessen klaar."
+          "t": "Maak je account aan",
+          "d": "Bevestig je e-mailadres en kies je branche en “zelfstandig bedrijf”."
         },
         {
-          "t": "Vul je bedrijfsgegevens in",
-          "d": "Inclusief tijdzone, valuta en taal."
+          "t": "Je bedrijf",
+          "d": "Naam, adres, tijdzone, valuta en openingstijden in één stap."
         },
         {
-          "t": "Kies gehost of WordPress",
-          "d": "Je kunt later nog wisselen."
+          "t": "Gehost of WordPress",
+          "d": "Je inbegrepen adres is sites.branchharbor.com/jouw-bedrijf. Koppel op elk moment je eigen domein."
         },
         {
-          "t": "Voeg lessen, behandelingen, producten of je menu toe",
-          "d": "Importeren of invoeren."
+          "t": "Voeg lessen, diensten, producten of je menu toe",
+          "d": "Importeer of voer in."
         },
         {
           "t": "Koppel betalingen",
-          "d": "Aankopen blijven uit tot het account is geactiveerd."
+          "d": "Kopen blijft uit tot het account is geactiveerd."
         },
         {
-          "t": "Bekijk, test en publiceer",
-          "d": "Doe eerst een testboeking of testbestelling."
+          "t": "Bekijk en publiceer",
+          "d": "Eén knop Publiceren zet je site live."
         }
-      ]
+      ],
+      "signupCta": "Gratis beginnen (studio’s)",
+      "signupNote": "Zelf aanmelden kan voor studio’s. Andere branches beginnen tijdens de pilot met een korte demo.",
+      "upgradeTitle": "Open je een tweede vestiging?",
+      "upgradeBody": "Voeg een vestiging toe via Instellingen. BranchHarbor legt uit wat er verandert, jij bevestigt en je bedrijf wordt een netwerk. Alleen de eigenaar kan dit doen en de wijziging wordt vastgelegd.",
+      "upgradePoints": [
+        {
+          "t": "Er gaat niets verloren",
+          "d": "Je vestiging, klanten, website, team en betaalgeschiedenis blijven zoals ze zijn."
+        },
+        {
+          "t": "Netwerktools verschijnen",
+          "d": "Vestigingsoverzicht, bereikkiezer, regio’s, eigenaarsgroepen, sjablonen en groepspublicatie."
+        },
+        {
+          "t": "Je adres blijft werken",
+          "d": "Je website krijgt een vestigingszoeker en elke vestiging een eigen pagina."
+        },
+        {
+          "t": "Facturatie volgt je vestigingen",
+          "d": "Solo wordt de Netwerkprijs per vestiging zodra de tweede vestiging operationeel is."
+        }
+      ],
+      "pricingCta": "Bekijk de Solo-prijs"
     },
     "pointsTitle": "Zo werkt het",
     "ctaTitle": "Klaar om het met jouw bedrijf te zien?",
@@ -1540,6 +1564,18 @@
     "taxNote": "Afhankelijk van je land kunnen belastingen zoals btw, GST of sales tax van toepassing zijn; die zie je vóór het betalen.",
     "proposedNote": "Voorlopige prijzen. Abonnementen en prijzen kunnen veranderen vóór de algemene beschikbaarheid.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "Eén zelfstandige vestiging",
+        "tag": "Eén bedrijf",
+        "features": [
+          "Gehoste website en dashboard",
+          "Boekingen, bestellingen en betalingen voor je branche",
+          "Eenvoudige rollen voor een klein team",
+          "Stap over op Netwerk als je een tweede vestiging opent"
+        ],
+        "cta": "Gratis beginnen"
+      },
       "connector": {
         "name": "Connector",
         "for": "Houd je WordPress-site",
@@ -1577,7 +1613,7 @@
         "cta": "Offerte aanvragen"
       }
     },
-    "ctaNote": "Tijdens de pilot begint elk abonnement met een gesprek, zodat we kunnen bevestigen dat je branche en koppelingen worden ondersteund.",
+    "ctaNote": "Tijdens de pilot beginnen de Connector- en Netwerkabonnementen met een gesprek, zodat we kunnen bevestigen dat je branche en koppelingen worden ondersteund. Solo is zelf af te sluiten voor studio’s.",
     "faqTitle": "Vragen over prijzen",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "Zijn transactiekosten voor betalingen inbegrepen?",
         "a": "Nee. Betalingen lopen via een gekoppelde provider zoals Stripe, die in jouw land eigen kosten rekent."
+      },
+      {
+        "q": "Wat gebeurt er als ik een tweede vestiging open?",
+        "a": "Solo dekt één vestiging. Voeg je er een toe, dan stap je via Instellingen over op Netwerk: je website, klanten, team en geschiedenis blijven behouden en de facturatie gaat over op een prijs per vestiging zodra de nieuwe vestiging operationeel is."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ maand · één vestiging",
+    "soloTotal": "Eén vestiging. Voor meer stap je over op Netwerk.",
+    "soloAnnual": "Eén vestiging, jaarlijks gefactureerd."
   },
   "demo": {
     "metaTitle": "Demo aanvragen",

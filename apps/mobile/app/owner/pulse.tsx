@@ -19,6 +19,22 @@ export default function Pulse() {
   const p = q.data;
   // Per-currency totals only. Never a combined figure across currencies.
   const totals = p ? totalsByCurrency(p.locations.flatMap((l) => (l.sales ? [l.sales] : []))) : [];
+  // Independent business: the pulse IS its one location — no "all locations" scope, aggregation or list.
+  const single = p?.singleLocation && p.locations.length <= 1 ? p.locations[0] ?? null : null;
+  if (p?.singleLocation) {
+    return (
+      <Screen onRefresh={q.refresh} refreshing={q.refreshing}>
+        <ScreenHeader
+          title={t('owner.businessPulseTitle')}
+          right={<ExperienceSwitch />}
+          scope={{ label: p.singleLocation.businessName, sub: single ? `${single.city}, ${regionName(single.country, intlLocale)} · ${p.range}` : p.range, icon: 'store' }}
+        />
+        <DataStatus q={q} />
+        <Text variant="small" tone="muted">{t('common.lastUpdated', { time: relativeAgo(p.updatedAt, intlLocale) })}</Text>
+        {single ? <LocationPulse l={single} /> : <Text tone="muted">{t('owner.noLocationYet')}</Text>}
+      </Screen>
+    );
+  }
 
   return (
     <Screen onRefresh={q.refresh} refreshing={q.refreshing}>

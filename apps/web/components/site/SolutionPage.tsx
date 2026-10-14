@@ -4,6 +4,9 @@ import type { IconName } from '@bh/icons';
 import { IMG, PASTEL } from '@/content/images';
 import { H2, Lead, Panel, PastelIcon, PageHero } from './Blocks';
 import { LinkButton } from './LinkButton';
+import { SELF_SERVE_INDUSTRIES } from '@bh/shared';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
 
 type Key = 'franchises' | 'independent';
 
@@ -54,9 +57,24 @@ export async function SolutionPage({ which }: { which: Key }) {
           </div>
         }
       >
-        <LinkButton href={m.href} size="lg" signal="arrow-up-right">
-          {t(`${which}.cta`)}
-        </LinkButton>
+        {which === 'independent' ? (
+          <div className="flex flex-col items-start gap-3">
+            <div className="flex flex-wrap gap-2.5">
+              {/* Self-service sign-up only for industries that support it; the rest start with a demo. */}
+              <LinkButton href={`${APP_URL}/sign-up?model=independent&industry=${SELF_SERVE_INDUSTRIES[0]}`} external size="lg" signal="arrow-up-right">
+                {t('independent.signupCta')}
+              </LinkButton>
+              <LinkButton href="/demo?locations=1" size="lg" variant="secondary">
+                {t('independent.cta')}
+              </LinkButton>
+            </div>
+            <p className="text-sm text-stone">{t('independent.signupNote')}</p>
+          </div>
+        ) : (
+          <LinkButton href={m.href} size="lg" signal="arrow-up-right">
+            {t(`${which}.cta`)}
+          </LinkButton>
+        )}
       </PageHero>
 
       <Panel labelledBy="points-title">
@@ -86,6 +104,28 @@ export async function SolutionPage({ which }: { which: Key }) {
           ))}
         </ol>
       </Panel>
+
+      {which === 'independent' && (
+        <Panel labelledBy="upgrade-title" tone="aqua">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+            <div className="flex flex-col gap-3">
+              <H2 id="upgrade-title">{t('independent.upgradeTitle')}</H2>
+              <Lead>{t('independent.upgradeBody')}</Lead>
+              <LinkButton href="/pricing" variant="secondary" iconRight="arrow-right" className="self-start">
+                {t('independent.pricingCta')}
+              </LinkButton>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {(t.raw('independent.upgradePoints') as { t: string; d: string }[]).map((p) => (
+                <li key={p.t} className="flex flex-col gap-1.5 rounded-[24px] bg-surface p-6">
+                  <h3 className="text-lg font-extrabold tracking-[-0.02em]">{p.t}</h3>
+                  <p className="text-[15px] leading-relaxed text-stone">{p.d}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Panel>
+      )}
 
       {intl && (
         <Panel labelledBy="intl-title" tone="aqua">

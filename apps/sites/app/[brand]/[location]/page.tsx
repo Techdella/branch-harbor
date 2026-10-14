@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const home = data.pages.find((p) => p.slug === 'home');
   const canonical = links.locationCanonical(location, data.site.primaryHost);
   const { available } = await resolveSiteLocale();
-  const title = home?.seo.title ?? home?.title ?? `${data.brand.name} ${data.location.name}`;
+  const title = home?.seo.title ?? home?.title ?? (data.site.singleLocation ? data.brand.name : `${data.brand.name} ${data.location.name}`);
   const description = home?.seo.description ?? str(home?.content.about) ?? `${data.brand.name} · ${data.location.address.line1}, ${data.location.address.city}`;
   return {
     title,
@@ -36,7 +36,7 @@ function jsonLd(data: LocationSite, url: string) {
   return {
     '@context': 'https://schema.org',
     '@type': SCHEMA_TYPE[data.module.kind] ?? 'LocalBusiness',
-    name: `${data.brand.name} ${l.name}`,
+    name: data.site.singleLocation || l.name === data.brand.name ? data.brand.name : `${data.brand.name} ${l.name}`,
     url,
     ...(l.phone ? { telephone: l.phone } : {}),
     ...(l.email ? { email: l.email } : {}),
@@ -165,7 +165,7 @@ export default async function LocationHome({ params }: Props) {
         <div className="card p-6">
           <h2 className="text-xl font-extrabold">{t('location.contact')}</h2>
           <address className="mt-3 not-italic">
-            <p>{data.brand.name} {l.name}</p>
+            <p>{data.site.singleLocation || l.name === data.brand.name ? data.brand.name : `${data.brand.name} ${l.name}`}</p>
             <p>{address}</p>
           </address>
           <div className="mt-4 flex flex-wrap gap-2">

@@ -1,0 +1,176 @@
+{
+  "businessLabel": "Negocio: {name}",
+  "personaNetwork": "Demo de red",
+  "personaIndependent": "Demo de negocio independiente",
+  "personaOwner": "Propietario · una sede",
+  "roles": {
+    "hq": "Propietario",
+    "local": "Gerente",
+    "staff": "Personal"
+  },
+  "location": {
+    "title": "Negocio y sede",
+    "hint": "Tu dirección, zona horaria, moneda y horario aparecen en tu web.",
+    "saved": "Datos del negocio guardados.",
+    "line1": "Dirección",
+    "city": "Ciudad",
+    "region": "Estado, provincia o región",
+    "postalCode": "Código postal",
+    "country": "País",
+    "timeZone": "Zona horaria",
+    "timeZoneHint": "Las reservas, pedidos y horarios usan esta zona horaria.",
+    "currency": "Moneda",
+    "currencyHint": "Los precios y pagos usan esta moneda. Los precios existentes conservan su moneda.",
+    "phone": "Teléfono",
+    "email": "Correo de contacto",
+    "hours": "Horario de apertura",
+    "hoursHint": "Se muestra en tu web, p. ej. mar–dom 8:00–18:00.",
+    "visible": "Visible para los clientes en tu web",
+    "notVisible": "Aún no es visible para los clientes: publica tu web para salir en línea",
+    "save": "Guardar datos del negocio"
+  },
+  "billing": {
+    "title": "Plan",
+    "separate": "Independiente de los pagos de clientes",
+    "status": {
+      "trialing": "Prueba",
+      "active": "Activo"
+    },
+    "soloBody": "Una sede, web alojada y panel, todos los flujos de tu sector.",
+    "perLocationBody": "Facturado por sede en funcionamiento.",
+    "perMonth": "{price} / mes",
+    "quote": "Precio a consultar",
+    "trialEnds": "La prueba termina el {date}",
+    "nextInvoice": "Próxima factura el {date}",
+    "taxNote": "Los impuestos como el IVA o el GST se añaden cuando corresponden. Las comisiones de tarjeta y pago las cobra tu proveedor de pagos."
+  },
+  "approvals": {
+    "title": "Aprobaciones de la web",
+    "label": "Aprobar los cambios del personal antes de publicarlos",
+    "offHint": "Desactivado: tú y tus gerentes editáis y publicáis directamente.",
+    "onHint": "Activado: los cambios del personal sin permiso de aprobación te esperan antes de poder publicarse."
+  },
+  "upgrade": {
+    "cardTitle": "Añadir una sede",
+    "cardBody": "BranchHarbor está configurado para una sede. ¿Vas a abrir otra? Pasa a una red para gestionar varias sedes; se conserva todo lo que tienes.",
+    "addLocation": "Añadir una sede",
+    "title": "Pasar a una red",
+    "intro": "{name} está configurado como negocio independiente. Una segunda sede necesita las herramientas de red. Esto es lo que cambia.",
+    "whatChanges": "Qué cambia",
+    "consequences": [
+      "Tu sede, tus clientes, tu web, tu equipo y tu historial de pagos siguen igual.",
+      "El selector de ámbito, el directorio de sedes, las regiones y los grupos de propietarios pasan a estar disponibles.",
+      "Las plantillas web pueden bloquear campos o requerir aprobación, y las páginas pueden publicarse en varias sedes a la vez.",
+      "Se pueden invitar los roles de sede central, gerente regional y franquiciado.",
+      "La facturación pasa del plan Solo al precio por sede cuando una segunda sede esté en funcionamiento.",
+      "Tu web de clientes tiene un buscador de sedes en tu dirección actual y cada sede tiene su propia página."
+    ],
+    "pricing": "Precios",
+    "perLocation": "{price} / sede / mes",
+    "pricingNote": "Precios de lista sin impuestos. Una sede nueva no se factura hasta que esté en funcionamiento.",
+    "addNow": "Añadir la nueva sede ahora",
+    "newLocation": "Nueva sede",
+    "locationName": "Nombre de la sede",
+    "locationNamePh": "p. ej. Fitzroy",
+    "code": "Código interno",
+    "codeHint": "Corto y único, se usa en informes e importaciones.",
+    "notPublished": "La nueva sede empieza como borrador: no se muestra nada a los clientes hasta que la publiques.",
+    "confirm": "Entiendo que mi negocio pasa a ser una red. Mis datos se conservan y el cambio queda en el registro de actividad.",
+    "submit": "Pasar a una red",
+    "submitWithLocation": "Pasar a red y añadir la sede",
+    "cancel": "Cancelar",
+    "ownerOnly": "Solo el propietario puede hacer el cambio. Queda registrado.",
+    "doneTitle": "Tu negocio ahora es una red",
+    "doneBody": "Ya tienes disponibles sedes, regiones, plantillas y publicación en grupo. Tus datos existentes no cambian.",
+    "goLocations": "Ir a Sedes",
+    "goOverview": "Volver al resumen",
+    "errors": {
+      "name": "Escribe un nombre para la nueva sede.",
+      "line1": "Escribe la dirección.",
+      "city": "Escribe la ciudad."
+    }
+  },
+  "website": {
+    "title": "Sitio web",
+    "description": "Edita tu web y publica cuando quieras. Los cambios quedan en borrador hasta que publiques.",
+    "tab": {
+      "content": "Contenido"
+    },
+    "yourSite": "Tu web",
+    "live": "En línea · versión {version}",
+    "notLive": "Aún no está en línea",
+    "published": "Publicado. Tu web está en línea en {address}.",
+    "approvalsOnStaff": "Tus cambios se envían al propietario para su aprobación antes de publicarse.",
+    "noSiteTitle": "Aún no tienes web",
+    "noSiteBody": "Crea tu web alojada. Usa el nombre, la dirección y el horario de tu negocio, y puedes editarlo todo antes y después de publicar.",
+    "createAndPublish": "Crear y publicar mi web",
+    "savedDraft": "{field} guardado como borrador. Publica para ponerlo en línea.",
+    "sentToOwner": "{field} enviado al propietario para su aprobación.",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "empty": "Sin definir",
+    "pending": "Pendiente de aprobación:",
+    "noFields": "Esta página aún no tiene contenido editable.",
+    "publish": "Publicar",
+    "publishNote": "Publicar actualiza tu web en línea y guarda la versión anterior para poder revertir.",
+    "ownerPublishes": "El propietario publica los cambios",
+    "noPublishPermission": "Tu rol puede editar borradores; publica un gerente o el propietario.",
+    "preview": "Vista previa (borrador)",
+    "detailsTitle": "Dirección, horario y contacto",
+    "detailsBody": "Tu web muestra la dirección, el horario y los datos de contacto de Configuración.",
+    "detailsLink": "Editar datos del negocio",
+    "activity": "Actividad"
+  },
+  "locationsPage": {
+    "title": "Tu sede",
+    "description": "Los negocios independientes tienen una sede. Sus datos están en Configuración → Negocio y sede.",
+    "addTitle": "Añadir una sede",
+    "addDescription": "Añadir una segunda sede convierte tu negocio en una red.",
+    "edit": "Editar en Configuración",
+    "noDirectory": "Un negocio con una sola sede no tiene directorio de sedes. Si abres otra sede, pasa a red abajo y aparecerán las herramientas de red.",
+    "upgradeTitle": "¿Vas a abrir otra sede?",
+    "ownerOnly": "Pide al propietario que añada una sede."
+  },
+  "team": {
+    "role": {
+      "org_owner": "Propietario",
+      "location_manager": "Gerente",
+      "staff": "Personal / instructor / entrenador",
+      "marketing_contributor": "Colaborador de marketing",
+      "finance": "Finanzas"
+    },
+    "roleHelp": {
+      "org_owner": "Acceso completo, incluida la facturación, el equipo y la configuración del negocio.",
+      "location_manager": "Lleva el día a día: horarios, clientes, pedidos y publicación de la web.",
+      "staff": "Solo su horario, asistencia o pedidos.",
+      "marketing_contributor": "Redacta contenidos de la web y de marketing; publica solo si lo permites.",
+      "finance": "Pagos, conciliación y reembolsos permitidos."
+    }
+  },
+  "payments": {
+    "account": "Tu cuenta de pagos",
+    "accountDetail": "una sola cuenta para {name}"
+  },
+  "onboarding": {
+    "stepBusiness": "Tu negocio",
+    "businessTitle": "Tu negocio",
+    "businessDesc": "Nombre, dirección, zona horaria, moneda y horario. Es la sede que visitan tus clientes.",
+    "addressLegend": "Dirección y horario",
+    "line1": "Dirección",
+    "city": "Ciudad",
+    "region": "Estado, provincia o región",
+    "postalCode": "Código postal",
+    "phone": "Teléfono",
+    "hours": "Horario de apertura",
+    "hoursHint": "Se muestra en tu web.",
+    "hoursPh": "p. ej. mar–dom 8:00–18:00",
+    "addressNote": "Puedes cambiarlo más adelante en Configuración → Negocio y sede. ¿Abrirás otra sede? Puedes pasar a una red cuando quieras.",
+    "checkBusiness": "Dirección y zona horaria del negocio",
+    "blockerBusiness": "Añade la dirección de tu negocio",
+    "errors": {
+      "line1": "Escribe tu dirección.",
+      "city": "Escribe tu ciudad."
+    }
+  }
+}

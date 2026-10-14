@@ -57,6 +57,7 @@ import type {
   WellnessDay,
 } from '../types';
 import { ONBOARDING_STEPS } from '../types';
+import { httpBusiness } from './business';
 import { http, login, logout, resendVerification, signup, verifyEmail } from './client';
 import {
   activeViewRole,
@@ -1022,11 +1023,20 @@ function saveLocalDraft(p: OnboardingProgress) {
 async function ensureOrgFromDraft(p: OnboardingProgress) {
   if (workspace()?.org) return;
   if (!p.done.includes('business')) return;
-  const d = p.data as { industry?: string; model?: string; biz?: { name: string; country: string; timeZone: string; currency: string; locale: string; dataRegion: string } };
+  const d = p.data as { industry?: string; model?: string; biz?: { name: string; country: string; timeZone: string; currency: string; locale: string; dataRegion: string }; loc?: { line1?: string; city?: string; region?: string; postalCode?: string; phone?: string; hours?: string } };
   if (!d.biz?.name) return;
+  // Independent businesses create their organisation and their one location in a single step.
+  const l = d.loc;
+  const firstLocation = d.model === 'independent' && l?.line1 && l.city
+    ? {
+      address: { line1: l.line1, city: l.city, ...(l.region ? { region: l.region } : {}), ...(l.postalCode ? { postalCode: l.postalCode } : {}), country: d.biz.country },
+      timeZone: d.biz.timeZone, currency: d.biz.currency, ...(l.phone ? { phone: l.phone } : {}), ...(l.hours ? { hours: { summary: l.hours } } : {}),
+    }
+    : undefined;
   await http.post('/orgs', {
     name: d.biz.name, industry: d.industry ?? 'studios', model: d.model ?? 'network', country: d.biz.country, defaultCurrency: d.biz.currency,
     defaultTimeZone: d.biz.timeZone, defaultLocale: d.biz.locale || 'en', dataRegion: d.biz.dataRegion || 'us',
+    ...(firstLocation ? { firstLocation } : {}),
   });
   await loadWorkspace();
 }
@@ -1116,7 +1126,7 @@ export function devVerificationToken(): string | null {
   }
 }
 
-export const httpApi: BranchHarborApi = {
+const httpApiCore: Omit<BranchHarborApi, 'business'> = {
   mode: 'live',
 
   auth: {
@@ -1570,6 +1580,13 @@ export const httpApi: BranchHarborApi = {
     const short = (n: string) => n.split(' – ').pop()!;
     const out: Report[] = [];
     const fresh = (f: ApiMetric<unknown>['freshness']) => `${f.source}${f.lastSyncAt ? ` · synced ${new Date(f.lastSyncAt).toISOString().slice(11, 16)} UTC` : ''}`;
+    // Independent businesses: one location, so totals per currency without a per-location breakdown.
+    const indep = ws().orgView?.model === 'independent';
+    if (indep) {
+      for (const row of r.metrics.revenue.value ?? []) {
+        out.push({ id: `rev_${row.currency}`, title: `Revenue · ${row.currency} · 30 days`, freshness: fresh(r.metrics.revenue.freshness), unit: 'money', currency: row.currency, bars: [{ label: ws().orgView!.name, value: row.netMinor }], note: 'Net of refunds.' });
+      }
+    }
     const currencies = [...new Set(r.revenueByLocation.map((x) => x.currency))];
     for (const cur of currencies) {
       const locs = r.revenueByLocation.filter((x) => x.currency === cur);
@@ -1582,9 +1599,9 @@ export const httpApi: BranchHarborApi = {
         note: locs.some((x) => !x.revenue.length) ? 'Missing bars are Unavailable or Not connected — never zero. Refunds are excluded (net).' : 'Net of refunds.',
       });
     }
-    out.push({ id: 'cmb', title: 'Combined revenue', freshness: 'Not calculated', unit: 'money', bars: [], note: r.metrics.combinedRevenue.unavailableReason ?? (currencies.length > 1 ? `Not shown: no conversion method is defined for ${currencies.join(' + ')}.` : 'Only one currency in this scope.') });
+    if (!indep) out.push({ id: 'cmb', title: 'Combined revenue', freshness: 'Not calculated', unit: 'money', bars: [], note: r.metrics.combinedRevenue.unavailableReason ?? (currencies.length > 1 ? `Not shown: no conversion method is defined for ${currencies.join(' + ')}.` : 'Only one currency in this scope.') });
     const single = (id: string, title: string, mt: ApiMetric<number>, unit: Report['unit'], scale = 1) =>
-      out.push({ id, title, freshness: fresh(mt.freshness), stale: !mt.freshness.complete, unit, bars: [{ label: `${r.scope.locationCount} locations`, value: mt.value == null ? null : Math.round(mt.value * scale) }], note: mt.unavailableReason ?? mt.definition });
+      out.push({ id, title, freshness: fresh(mt.freshness), stale: !mt.freshness.complete, unit, bars: [{ label: indep ? ws().orgView!.name : `${r.scope.locationCount} locations`, value: mt.value == null ? null : Math.round(mt.value * scale) }], note: mt.unavailableReason ?? mt.definition });
     single('leads', 'Enquiries · 30 days', r.metrics.leads, 'count');
     const ind = ws().orgView?.industry;
     if (ind === 'studios') single('occ', 'Occupancy', r.metrics.occupancy, 'percent', 100);
@@ -1638,6 +1655,8 @@ export const httpApi: BranchHarborApi = {
       const rev = Object.fromEntries(Object.entries(STEP_MAP).map(([k, v]) => [v, k as OnboardingStep]));
       const done = r.steps.filter((s) => s.status === 'complete').map((s) => rev[s.key]!).filter(Boolean);
       const skipped = r.steps.filter((s) => s.status === 'skipped').map((s) => rev[s.key]!).filter(Boolean);
+      // Independent checklists merge business details into "Your business" (first_location).
+      if ((r as { model?: string }).model === 'independent' && done.includes('location') && !done.includes('business')) done.push('business');
       const withDraft = [...r.steps].filter((s) => s.data && 'draft' in s.data).sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''))[0];
       const draft = (withDraft?.data?.draft as { current?: OnboardingStep; data?: Record<string, unknown> } | undefined) ?? undefined;
       const current = draft?.current ?? ONBOARDING_STEPS.find((s) => !done.includes(s) && !skipped.includes(s)) ?? 'publish';
@@ -1716,3 +1735,4 @@ export const httpApi: BranchHarborApi = {
   },
 };
 
+export const httpApi: BranchHarborApi = { ...httpApiCore, business: httpBusiness };

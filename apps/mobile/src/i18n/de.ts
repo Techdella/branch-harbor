@@ -12,6 +12,6 @@ const de: PartialDict = {
   inbox: { title: 'Nachrichten', you: 'Du' },
   profile: { title: 'Profil', language: 'Sprache', notifications: 'Benachrichtigungen', push: 'Push-Mitteilungen', email: 'E-Mail', sms: 'SMS', privacy: 'Datenschutz & meine Daten', exportData: 'Kopie meiner Daten anfordern', deleteData: 'Kontolöschung beantragen', signOut: 'Abmelden' },
   staff: { present: 'Anwesend', absent: 'Abwesend', accept: 'Annehmen', rejectOrder: 'Ablehnen', markReady: 'Als fertig markieren', waitingServer: 'Warte auf Server…' },
-  owner: { pulseTitle: 'Netzwerk-Überblick', approvalsTitle: 'Freigaben', refund: 'Erstattung', shiftSwap: 'Schichttausch', locationsTitle: 'Standorte' },
+  owner: { pulseTitle: 'Netzwerk-Überblick', businessPulseTitle: 'Tagesüberblick', noLocationYet: 'Füge in der BranchHarbor-App die Adresse deines Unternehmens hinzu, um deinen Überblick zu sehen.', approvalsTitle: 'Freigaben', refund: 'Erstattung', shiftSwap: 'Schichttausch', locationsTitle: 'Standorte' },
 };
 export default de;

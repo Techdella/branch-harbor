@@ -16,6 +16,14 @@ import { APP_LOCALES, APP_LOCALE_LABELS } from '@/i18n/config';
 import { LanguageSelect } from '../shell/TopBar';
 import { Banner } from '../ui/States';
 import { COUNTRY_ZONES, EMPTY_LOCATION, LocationWizard, validateLocation, type LocationDraft } from '../screens/LocationWizard';
+import { SIGNUP_INTENT_KEY } from '../auth/AuthForms';
+
+/**
+ * Independent businesses (one location) get a shorter checklist: "Your business" covers the business details AND
+ * its address, time zone, currency and hours; there is no location wizard, CSV import or staff-invite step.
+ */
+const INDEPENDENT_STEPS: OnboardingStep[] = ['account', 'industry', 'business', 'website', 'data', 'connect', 'publish'];
+const stepsFor = (model: 'independent' | 'network'): readonly OnboardingStep[] => (model === 'independent' ? INDEPENDENT_STEPS : ONBOARDING_STEPS);
 
 const STEP_ICON: Record<OnboardingStep, IconName> = { account: 'user', industry: 'grid', business: 'building', location: 'pin', website: 'globe', data: 'list', connect: 'plug', team: 'users', publish: 'eye' };
 const OPTIONAL: OnboardingStep[] = ['connect', 'team'];
@@ -68,6 +76,7 @@ const slug = (v: string) => v.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
 
 export function Onboarding() {
   const t = useTranslations('onboarding');
+  const ts = useTranslations('single.onboarding');
   const locale = useLocale();
   const params = useSearchParams();
   const [done, setDone] = useState<OnboardingStep[]>(['account']);
@@ -84,15 +93,29 @@ export function Onboarding() {
   useEffect(() => {
     (async () => {
       const p = await (await getApi()).onboarding.get().catch(() => null);
+      let model: Data['model'] = INITIAL.model;
       if (p) {
+        const d = { ...INITIAL, ...(p.data as Partial<Data>) };
+        // A sign-up from the marketing site may carry the industry and business model (independent or network).
+        if (!p.done.includes('industry')) {
+          try {
+            const intent = JSON.parse(localStorage.getItem(SIGNUP_INTENT_KEY) ?? 'null') as { industry?: string | null; model?: Data['model'] | null } | null;
+            if (intent?.industry && INDUSTRIES.includes(intent.industry as IndustryKey)) d.industry = intent.industry as IndustryKey;
+            if (intent?.model) d.model = intent.model;
+          } catch {
+            /* no stored intent */
+          }
+        }
+        model = d.model;
         setDone(p.done);
         setSkipped(p.skipped);
-        setStep(p.current);
-        setData({ ...INITIAL, ...(p.data as Partial<Data>) });
+        setStep(stepsFor(d.model).includes(p.current) ? p.current : p.current === 'team' ? 'publish' : 'business');
+        setData(d);
         setSavedAt(p.savedAt);
       }
       const q = params.get('step') as OnboardingStep | null;
-      if (q && ONBOARDING_STEPS.includes(q)) setStep(q);
+      if (q && stepsFor(model).includes(q)) setStep(q);
+      else if (q === 'location' && model === 'independent') setStep('business');
       setLoaded(true);
     })();
     const h = setInterval(() => tick((x) => x + 1), 10000);
@@ -115,11 +138,20 @@ export function Onboarding() {
     setTimeout(() => headingRef.current?.focus(), 0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const idx = ONBOARDING_STEPS.indexOf(step);
-  const nextStep = ONBOARDING_STEPS[Math.min(ONBOARDING_STEPS.length - 1, idx + 1)]!;
+  const independent = data.model === 'independent';
+  const steps = stepsFor(data.model);
+  const idx = Math.max(0, steps.indexOf(step));
+  const nextStep = steps[Math.min(steps.length - 1, idx + 1)]!;
+  const doneCount = done.filter((d) => steps.includes(d)).length;
 
   const validate = (): Record<string, string> => {
     if (step === 'business' && !data.biz.name.trim()) return { name: t('errors.businessName') };
+    if (step === 'business' && independent) {
+      const e: Record<string, string> = {};
+      if (!data.loc.line1.trim()) e.line1 = ts('errors.line1');
+      if (!data.loc.city.trim()) e.city = ts('errors.city');
+      return e;
+    }
     if (step === 'location') return validateLocation(data.loc, (k) => t(`wizardErrors.${k.replace('errors.', '')}`));
     if (step === 'data' && data.items.length === 0) return { items: t('errors.items') };
     if (step === 'website' && data.address === 'domain' && data.domain && !/^([a-z0-9-]+\.)+[a-z]{2,}$/i.test(data.domain.trim())) return { domain: t('errors.domain') };
@@ -130,11 +162,16 @@ export function Onboarding() {
     const e = validate();
     setErr(e);
     if (Object.keys(e).length) return;
-    const nd = [...new Set([...done, step])];
+    // Independent: "Your business" also completes the (hidden) location step — the business IS its location.
+    const nd = [...new Set([...done, step, ...(independent && step === 'business' ? (['location'] as OnboardingStep[]) : [])])];
     const ns = skipped.filter((x) => x !== step);
+    const nextData = independent && step === 'business'
+      ? { ...data, loc: { ...data.loc, name: data.loc.city.trim() || data.biz.name, code: data.loc.code || 'MAIN', country: data.biz.country, timeZone: data.biz.timeZone, currency: data.biz.currency } }
+      : data;
     setDone(nd);
     setSkipped(ns);
-    await persist({ done: nd, skipped: ns, current: nextStep, data });
+    if (nextData !== data) setData(nextData);
+    await persist({ done: nd, skipped: ns, current: nextStep, data: nextData });
     if (step !== 'publish') go(nextStep);
   };
   const skip = async () => {
@@ -146,7 +183,7 @@ export function Onboarding() {
 
   const set = <K extends keyof Data>(k: K, v: Data[K]) => setData((d) => ({ ...d, [k]: v }));
   const blockers = [
-    !done.includes('location') && { label: t('blockers.location'), step: 'location' as const },
+    !done.includes('location') && (independent ? { label: ts('blockerBusiness'), step: 'business' as const } : { label: t('blockers.location'), step: 'location' as const }),
     !done.includes('website') && { label: t('blockers.website'), step: 'website' as const },
     data.items.length === 0 && { label: t('blockers.items'), step: 'data' as const },
     !SELF_SERVE[data.industry] && { label: t('blockers.industry', { industry: t(`industry.${data.industry}.name`) }), step: 'industry' as const },
@@ -173,13 +210,13 @@ export function Onboarding() {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
         <nav aria-label={t('checklist')} className="rounded-xl bg-surface p-4 lg:sticky lg:top-3 lg:w-[300px] lg:shrink-0">
           <div className="mb-3 px-1">
-            <div className="text-sm font-bold">{t('progress', { done: done.length, total: ONBOARDING_STEPS.length })}</div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-canvas" role="progressbar" aria-valuenow={done.length} aria-valuemin={0} aria-valuemax={ONBOARDING_STEPS.length} aria-label={t('checklist')}>
-              <div className="h-full bg-ink transition-all" style={{ width: `${(done.length / ONBOARDING_STEPS.length) * 100}%` }} />
+            <div className="text-sm font-bold">{t('progress', { done: doneCount, total: steps.length })}</div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-canvas" role="progressbar" aria-valuenow={doneCount} aria-valuemin={0} aria-valuemax={steps.length} aria-label={t('checklist')}>
+              <div className="h-full bg-ink transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
             </div>
           </div>
           <ol className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
-            {ONBOARDING_STEPS.map((s, i) => {
+            {steps.map((s, i) => {
               const isDone = done.includes(s);
               const isSkipped = skipped.includes(s) && !isDone;
               return (
@@ -188,7 +225,7 @@ export function Onboarding() {
                     <span className={cx('flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold', isDone ? 'bg-ink text-white' : 'bg-canvas')}>
                       {isDone ? <Icon name="check" size={14} stroke={2.4} /> : i + 1}
                     </span>
-                    <span className="whitespace-nowrap lg:flex-1">{t(`steps.${s}`)}</span>
+                    <span className="whitespace-nowrap lg:flex-1">{independent && s === 'business' ? ts('stepBusiness') : t(`steps.${s}`)}</span>
                     {isDone && <span className="sr-only">{t('done')}</span>}
                     {isSkipped && <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-bold text-stone">{t('skipped')}</span>}
                     {!isDone && !isSkipped && OPTIONAL.includes(s) && <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-bold text-stone">{t('optional')}</span>}
@@ -207,11 +244,11 @@ export function Onboarding() {
                 <Icon name={STEP_ICON[step]} size={24} />
               </span>
               <div>
-                <div className="text-[13px] text-stone">{t('stepOf', { n: idx + 1, total: ONBOARDING_STEPS.length })}</div>
+                <div className="text-[13px] text-stone">{t('stepOf', { n: idx + 1, total: steps.length })}</div>
                 <h1 ref={headingRef} tabIndex={-1} className="text-[28px] font-bold leading-tight tracking-[-0.035em] outline-none">
-                  {step === 'data' ? t(`industry.${data.industry}.itemsTitle`) : t(`title.${step}`)}
+                  {step === 'data' ? t(`industry.${data.industry}.itemsTitle`) : independent && step === 'business' ? ts('businessTitle') : t(`title.${step}`)}
                 </h1>
-                <p className="mt-1 max-w-2xl text-sm text-stone">{step === 'data' ? t('desc.data') : t(`desc.${step}`)}</p>
+                <p className="mt-1 max-w-2xl text-sm text-stone">{step === 'data' ? t('desc.data') : independent && step === 'business' ? ts('businessDesc') : t(`desc.${step}`)}</p>
               </div>
             </div>
 
@@ -228,7 +265,7 @@ export function Onboarding() {
             {step !== 'publish' && (
               <div className="mt-8 flex flex-wrap items-center gap-2 border-t border-line-soft pt-5">
                 {idx > 0 && (
-                  <Button variant="ghost" icon="arrow-left" onClick={() => go(ONBOARDING_STEPS[idx - 1]!)}>
+                  <Button variant="ghost" icon="arrow-left" onClick={() => go(steps[idx - 1]!)}>
                     {t('back')}
                   </Button>
                 )}
@@ -320,6 +357,7 @@ function BusinessStep({ data, set, err = {} }: StepProps) {
   const b = data.biz;
   const up = (p: Partial<Data['biz']>) => set('biz', { ...b, ...p });
   return (
+    <div className="flex flex-col gap-6">
     <div className="grid gap-4 md:grid-cols-2">
       <Field label={t('biz.name')} error={err.name}>{(p) => <Input id={p.id} aria-invalid={p.invalid} aria-describedby={p.describedBy} value={b.name} onChange={(e) => up({ name: e.target.value })} />}</Field>
       <Field label={t('biz.country')}>
@@ -383,6 +421,27 @@ function BusinessStep({ data, set, err = {} }: StepProps) {
         )}
       </Field>
     </div>
+    {data.model === 'independent' && <IndependentAddress data={data} set={set} err={err} />}
+    </div>
+  );
+}
+
+/** Independent path: the business's address, contact and hours (its one location) in the same step. */
+function IndependentAddress({ data, set, err = {} }: StepProps) {
+  const t = useTranslations('single.onboarding');
+  const l = data.loc;
+  const up = (p: Partial<LocationDraft>) => set('loc', { ...l, ...p });
+  return (
+    <fieldset className="grid gap-4 rounded-xl border-[1.5px] border-line-soft p-5 md:grid-cols-2">
+      <legend className="px-1 text-sm font-bold">{t('addressLegend')}</legend>
+      <Field label={t('line1')} error={err.line1}>{(p) => <Input id={p.id} aria-invalid={p.invalid} aria-describedby={p.describedBy} value={l.line1} onChange={(e) => up({ line1: e.target.value })} autoComplete="address-line1" />}</Field>
+      <Field label={t('city')} error={err.city}>{(p) => <Input id={p.id} aria-invalid={p.invalid} aria-describedby={p.describedBy} value={l.city} onChange={(e) => up({ city: e.target.value })} autoComplete="address-level2" />}</Field>
+      <Field label={t('region')} optional>{(p) => <Input id={p.id} value={l.region} onChange={(e) => up({ region: e.target.value })} autoComplete="address-level1" />}</Field>
+      <Field label={t('postalCode')} optional>{(p) => <Input id={p.id} value={l.postalCode} onChange={(e) => up({ postalCode: e.target.value })} autoComplete="postal-code" />}</Field>
+      <Field label={t('phone')} optional>{(p) => <Input id={p.id} type="tel" value={l.phone} onChange={(e) => up({ phone: e.target.value })} autoComplete="tel" />}</Field>
+      <Field label={t('hours')} hint={t('hoursHint')} optional>{(p) => <Input id={p.id} aria-describedby={p.describedBy} value={l.hours} onChange={(e) => up({ hours: e.target.value })} placeholder={t('hoursPh')} />}</Field>
+      <p className="text-xs text-stone md:col-span-2">{t('addressNote')}</p>
+    </fieldset>
   );
 }
 
@@ -533,7 +592,10 @@ function CsvImport({ imported, onImported }: { imported: number; onImported: (n:
 
 function WebsiteStep({ data, set, err = {} }: StepProps) {
   const t = useTranslations('onboarding.web');
-  const included = `https://sites.branchharbor.com/${slug(data.biz.name) || 'your-business'}/${slug(data.loc.name) || 'your-location'}`;
+  // Independent businesses: the brand site IS the location site, at /{business}.
+  const included = data.model === 'independent'
+    ? `https://sites.branchharbor.com/${slug(data.biz.name) || 'your-business'}`
+    : `https://sites.branchharbor.com/${slug(data.biz.name) || 'your-business'}/${slug(data.loc.name) || 'your-location'}`;
   return (
     <div className="flex flex-col gap-6">
       <fieldset className="grid gap-2.5 md:grid-cols-2">
@@ -849,9 +911,14 @@ function PublishStep({ data, set, blockers, go, onPublish }: StepProps & { block
   const ti = useTranslations('onboarding');
   const [testing, setTesting] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const live = data.address === 'domain' && data.domainPrimary && data.domain ? `https://${data.domain}` : `https://sites.branchharbor.com/${slug(data.biz.name)}/${slug(data.loc.name)}`;
+  const ts = useTranslations('single.onboarding');
+  const independent = data.model === 'independent';
+  const [publishError, setPublishError] = useState('');
+  const live = data.address === 'domain' && data.domainPrimary && data.domain ? `https://${data.domain}` : independent ? `https://sites.branchharbor.com/${slug(data.biz.name)}` : `https://sites.branchharbor.com/${slug(data.biz.name)}/${slug(data.loc.name)}`;
   const checks = [
-    { ok: blockers.every((b) => b.step !== 'location'), label: t('check.location'), note: `${data.loc.name} · ${data.loc.timeZone}`, step: 'location' as const },
+    independent
+      ? { ok: blockers.every((b) => b.step !== 'business'), label: ts('checkBusiness'), note: [data.loc.line1, data.loc.city, data.biz.timeZone].filter(Boolean).join(' · '), step: 'business' as const }
+      : { ok: blockers.every((b) => b.step !== 'location'), label: t('check.location'), note: `${data.loc.name} · ${data.loc.timeZone}`, step: 'location' as const },
     { ok: blockers.every((b) => b.step !== 'website'), label: t('check.website'), note: data.site === 'wordpress' ? t('viaWordPress') : live, step: 'website' as const },
     { ok: data.items.length > 0, label: t('check.items'), note: t('itemsCount', { count: data.items.length }), step: 'data' as const },
     { ok: data.pay === 'enabled', warn: true, label: t('check.payments'), note: data.pay === 'enabled' ? t('payOn') : t('payOff'), step: 'connect' as const },
@@ -949,14 +1016,28 @@ function PublishStep({ data, set, blockers, go, onPublish }: StepProps & { block
           loading={publishing}
           onClick={async () => {
             setPublishing(true);
-            await new Promise((r) => setTimeout(r, 900));
+            setPublishError('');
+            if (independent) {
+              // Independent businesses publish for real: one site, one "Publish".
+              try {
+                await (await getApi()).business.publish({ industry: data.industry, role: 'hq', scopeId: 'all', business: 'independent' });
+              } catch (e) {
+                setPublishError(e instanceof Error ? e.message : String(e));
+                setPublishing(false);
+                return;
+              }
+            } else {
+              await new Promise((r) => setTimeout(r, 900));
+            }
             set('published', true);
             setPublishing(false);
             onPublish();
           }}
+          data-testid="onboarding-publish"
         >
           {t('publish')}
         </Button>
+        {publishError && <Banner tone="danger" live="assertive">{publishError}</Banner>}
         <p className="text-xs text-stone">{t('publishNote')}</p>
       </div>
     </div>

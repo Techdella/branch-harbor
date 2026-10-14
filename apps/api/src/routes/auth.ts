@@ -1,12 +1,13 @@
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { signUpSchema, apiError } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { consentRecords, emailVerificationTokens, roleAssignments, organizations, users } from '../db/schema/index.ts';
+import { consentRecords, emailVerificationTokens, locations, roleAssignments, organizations, users } from '../db/schema/index.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { AppError, badRequest, conflict, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser, signAccessToken } from '../plugins/auth.ts';
 import { audit } from '../services/audit.ts';
+import { businessModeView } from '../services/businessMode.ts';
 import {
   REFRESH_COOKIE, clearRefreshCookie, createVerificationToken, findUserByEmail, hashPassword, issueTokens, revokeRefreshToken,
   rotateRefreshToken, sendVerificationEmail, serializeUser, setRefreshCookie, verifyPassword, wantsBodyToken,
@@ -138,13 +139,23 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
     const [u] = await s.db.select().from(users).where(eq(users.id, me.id));
     if (!u || u.deletedAt) throw unauthorized();
     const rows = await s.db
-      .select({ assignment: roleAssignments, org: { id: organizations.id, name: organizations.name, slug: organizations.slug, industry: organizations.industry } })
+      .select({ assignment: roleAssignments, org: { id: organizations.id, name: organizations.name, slug: organizations.slug, industry: organizations.industry, model: organizations.model, settings: organizations.settings } })
       .from(roleAssignments)
       .innerJoin(organizations, eq(organizations.id, roleAssignments.organizationId))
       .where(eq(roleAssignments.userId, u.id));
-    const orgs = new Map<string, { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; scope: { kind: string; id: string } }> }>();
+    // Business mode per organisation: independent businesses have one (primary) location and no network concepts.
+    const indepIds = [...new Set(rows.filter((r) => r.org.model === 'independent').map((r) => r.org.id))];
+    const primary = new Map<string, string>();
+    if (indepIds.length) {
+      const locs = await s.db.select({ id: locations.id, organizationId: locations.organizationId }).from(locations)
+        .where(and(inArray(locations.organizationId, indepIds), isNull(locations.archivedAt))).orderBy(asc(locations.createdAt));
+      for (const l of locs) if (!primary.has(l.organizationId)) primary.set(l.organizationId, l.id);
+    }
+    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
+    const orgs = new Map<string, MeOrg>();
     for (const r of rows) {
-      const o = orgs.get(r.org.id) ?? { ...r.org, roles: [] };
+      const { settings, model: _model, ...base } = r.org;
+      const o = orgs.get(r.org.id) ?? { ...base, ...businessModeView({ model: r.org.model, settings }, primary.get(r.org.id) ?? null), roles: [] };
       o.roles.push({ id: r.assignment.id, role: r.assignment.role, scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
       orgs.set(r.org.id, o);
     }

@@ -35,12 +35,23 @@ export async function onboardingState(db: Exec, orgId: string, userId: string) {
     blockers.push({ step: 'preview_publish', code: 'payments_not_enabled', message: 'Paid bookings and orders stay unavailable until a payment account is enabled.', repairAction: `POST /v1/orgs/${orgId}/payments/connect/onboarding` });
   if (!locs.length) blockers.push({ step: 'first_location', code: 'no_locations', message: 'Add a location before publishing.', repairAction: `POST /v1/orgs/${orgId}/locations` });
 
-  const steps = ONBOARDING_STEPS.map((def) => {
+  // Independent businesses get a shorter checklist: business details and the location are one "Your business"
+  // step, and inviting staff is left to the Team screen (still possible at any time).
+  const independent = org.model === 'independent';
+  const defs = independent
+    ? ONBOARDING_STEPS.filter((d) => d.key !== 'business_details' && d.key !== 'invite_staff')
+      .map((d) => (d.key === 'first_location' ? { ...d, title: 'Your business: address, time zone, currency and hours' } : d))
+    : ONBOARDING_STEPS;
+  if (independent && !locs.length) {
+    const b = blockers.find((x) => x.code === 'no_locations');
+    if (b) b.message = 'Add your business address, time zone and hours before publishing.';
+  }
+  const steps = defs.map((def) => {
     const stored = org.onboarding[def.key];
     const status = derived[def.key] ? 'complete' : stored?.status ?? 'not_started';
     return { ...def, status, data: stored?.data ?? null, updatedAt: stored?.updatedAt ?? null, derived: !!derived[def.key] };
   });
   const done = steps.filter((st) => st.status === 'complete' || st.status === 'skipped').length;
-  return { steps, completed: done, total: steps.length, blockers };
+  return { model: independent ? 'independent' as const : 'network' as const, steps, completed: done, total: steps.length, blockers };
 }
 

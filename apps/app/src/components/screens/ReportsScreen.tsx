@@ -21,6 +21,8 @@ export function ReportsScreen() {
   const locale = useLocale();
   const app = useApp();
   const scopeLabel = useScopeLabel();
+  // Independent businesses: one location, so each report is a single figure rather than a per-location chart.
+  const independent = app.org.model === 'independent';
   const res = useApi((api) => api.reports(app.ctx), [app.industry, app.role, app.scopeId], app.can('reports.read'));
   if (!app.can('reports.read')) return <DeniedState permission="reports.read" />;
   return (
@@ -42,7 +44,11 @@ export function ReportsScreen() {
                       {r.freshness}
                     </span>
                   </div>
-                  {r.bars.length > 0 ? (
+                  {independent && r.bars.length === 1 ? (
+                    <div className="flex h-[150px] flex-col justify-center gap-1 rounded-lg bg-canvas px-5" data-testid="report-total">
+                      <span className="tabular text-[34px] font-extrabold tracking-[-0.02em]">{r.bars[0]!.value == null ? t('unavailable') : fmt(r, r.bars[0]!.value, locale)}</span>
+                    </div>
+                  ) : r.bars.length > 0 ? (
                     <figure>
                       <div className="flex h-[150px] items-end gap-2" role="img" aria-label={t('chartLabel', { title: r.title, values: r.bars.map((b) => `${b.label}: ${b.value == null ? t('unavailable') : fmt(r, b.value, locale)}`).join('; ') })}>
                         {r.bars.map((b) => (

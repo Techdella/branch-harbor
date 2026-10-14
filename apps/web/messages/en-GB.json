@@ -319,7 +319,8 @@
     "pricingCta": "See pricing",
     "faqTitle": "{name} questions",
     "ctaTitle": "See {name} with your own locations",
-    "ctaBody": "Tell us how many locations you run and which systems you use today. We’ll walk through the workflow that fits."
+    "ctaBody": "Tell us how many locations you run and which systems you use today. We’ll walk through the workflow that fits.",
+    "startFree": "Start free"
   },
   "industries": {
     "studios": {
@@ -1142,39 +1143,39 @@
       "kicker": "Single-location businesses",
       "imageAlt": "Owner opening the door of a small shop",
       "headline": "Everything in one place, without network complexity.",
-      "intro": "One location means no scopes or approvals to manage. Add more locations later and the network tools appear when you need them.",
-      "cta": "Explore setup",
+      "intro": "One location and a small team, without network complexity: no scope selector, regions or approval chains. Open a second location later and upgrade to the network tools in a few clicks. Everything you have is kept.",
+      "cta": "Request a demo",
       "points": [
         {
-          "t": "Set up in an afternoon",
-          "d": "A checklist rather than a wizard you can’t leave. Save progress at each step."
+          "t": "One business, one dashboard",
+          "d": "Your business name replaces the location picker. Overview, reports and AI answers are about your business, not a network."
         },
         {
-          "t": "Hosted site or WordPress",
-          "d": "Launch a site with an included address or keep yours."
+          "t": "Set up in one sitting",
+          "d": "Business details, address, hours, time zone and currency in a single step. Progress saves as you go, and optional steps can wait."
         },
         {
-          "t": "Keep your tools",
-          "d": "Connect a supported booking or commerce system instead of replacing it."
+          "t": "Publish directly",
+          "d": "No locked fields or approval chains. Edit your website and publish; turn on approvals only if you want to check staff changes first."
         },
         {
-          "t": "AI that drafts, not decides",
-          "d": "Copy and summaries for your review. Nothing publishes without you."
+          "t": "Simple roles for a small team",
+          "d": "Invite a manager, staff, a marketing contributor or a finance user. Network roles stay out of the way."
         }
       ],
-      "stepsTitle": "Setup in six steps",
+      "stepsTitle": "From sign-up to live in six steps",
       "steps": [
         {
-          "t": "Choose your industry",
-          "d": "We set up the relevant workflows."
+          "t": "Create your account",
+          "d": "Verify your email, then choose your industry and “independent business”."
         },
         {
-          "t": "Add your business details",
-          "d": "Time zone, currency and language included."
+          "t": "Your business",
+          "d": "Name, address, time zone, currency and opening hours in one step."
         },
         {
           "t": "Pick hosted or WordPress",
-          "d": "Change your mind later."
+          "d": "Your included address is sites.branchharbor.com/your-business. Connect your own domain any time."
         },
         {
           "t": "Add your classes, services, products or menu",
@@ -1185,10 +1186,33 @@
           "d": "Purchasing stays off until the account is enabled."
         },
         {
-          "t": "Preview, test and publish",
-          "d": "Run a test booking or order first."
+          "t": "Preview and publish",
+          "d": "One Publish button makes your site live."
         }
-      ]
+      ],
+      "signupCta": "Start free with Studios",
+      "signupNote": "Self-service sign-up is open for studios. Other industries start with a short demo while they are in pilot.",
+      "upgradeTitle": "Opening a second location?",
+      "upgradeBody": "Add a location from Settings. BranchHarbor explains what changes, you confirm, and your business becomes a network. Only the owner can do it, and the change is logged.",
+      "upgradePoints": [
+        {
+          "t": "Nothing is lost",
+          "d": "Your location, customers, website, team and payment history stay as they are."
+        },
+        {
+          "t": "Network tools appear",
+          "d": "Locations directory, scope selector, regions, owner groups, templates and group publishing."
+        },
+        {
+          "t": "Your address keeps working",
+          "d": "Your website gains a location finder and each location gets its own page."
+        },
+        {
+          "t": "Billing follows your locations",
+          "d": "Solo becomes per-location Network pricing once the second location is operating."
+        }
+      ],
+      "pricingCta": "See Solo pricing"
     },
     "pointsTitle": "How it works",
     "ctaTitle": "Ready to see it with your business?",
@@ -1540,6 +1564,18 @@
     "taxNote": "Taxes such as VAT, GST or sales tax may apply depending on your country and are shown before you pay.",
     "proposedNote": "Proposed pricing. Plans and prices may change before general availability.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "One independent location",
+        "tag": "Single business",
+        "features": [
+          "Hosted website and dashboard",
+          "Bookings, orders and payments for your industry",
+          "Simple roles for a small team",
+          "Upgrade to Network when you open a second location"
+        ],
+        "cta": "Start free"
+      },
       "connector": {
         "name": "Connector",
         "for": "Keep your WordPress site",
@@ -1577,7 +1613,7 @@
         "cta": "Request a quote"
       }
     },
-    "ctaNote": "During the pilot, plans start with a conversation so we can confirm your industry and connections are supported.",
+    "ctaNote": "During the pilot, connector and network plans start with a conversation so we can confirm your industry and connections are supported. Solo sign-up is self-service for studios.",
     "faqTitle": "Pricing questions",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "Are payment-processing fees included?",
         "a": "No. Payments go through a connected provider such as Stripe, which charges its own fees in your country."
+      },
+      {
+        "q": "What happens if I open a second location?",
+        "a": "Solo covers one location. When you add another, you upgrade to Network from Settings: your website, customers, team and history are kept, and billing moves to per-location pricing once the new location is operating."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ month · one location",
+    "soloTotal": "One location. Add more by moving to Network.",
+    "soloAnnual": "One location, billed annually."
   },
   "demo": {
     "metaTitle": "Request a demo",

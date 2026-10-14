@@ -1,0 +1,176 @@
+{
+  "businessLabel": "Entreprise : {name}",
+  "personaNetwork": "Démo réseau",
+  "personaIndependent": "Démo entreprise indépendante",
+  "personaOwner": "Propriétaire · un établissement",
+  "roles": {
+    "hq": "Propriétaire",
+    "local": "Responsable",
+    "staff": "Personnel"
+  },
+  "location": {
+    "title": "Entreprise et établissement",
+    "hint": "Votre adresse, fuseau horaire, devise et horaires apparaissent sur votre site.",
+    "saved": "Coordonnées enregistrées.",
+    "line1": "Adresse",
+    "city": "Ville",
+    "region": "État, province ou région",
+    "postalCode": "Code postal",
+    "country": "Pays",
+    "timeZone": "Fuseau horaire",
+    "timeZoneHint": "Les réservations, commandes et horaires utilisent ce fuseau horaire.",
+    "currency": "Devise",
+    "currencyHint": "Les prix et paiements utilisent cette devise. Les prix existants gardent leur devise.",
+    "phone": "Téléphone",
+    "email": "E-mail de contact",
+    "hours": "Horaires d’ouverture",
+    "hoursHint": "Affichés sur votre site, p. ex. mar.–dim. 8:00–18:00.",
+    "visible": "Visible par les clients sur votre site",
+    "notVisible": "Pas encore visible par les clients — publiez votre site pour le mettre en ligne",
+    "save": "Enregistrer les coordonnées"
+  },
+  "billing": {
+    "title": "Formule",
+    "separate": "Distinct des paiements clients",
+    "status": {
+      "trialing": "Essai",
+      "active": "Active"
+    },
+    "soloBody": "Un établissement, site hébergé et tableau de bord, tous les parcours de votre secteur.",
+    "perLocationBody": "Facturé par établissement en activité.",
+    "perMonth": "{price} / mois",
+    "quote": "Prix sur demande",
+    "trialEnds": "L’essai se termine le {date}",
+    "nextInvoice": "Prochaine facture le {date}",
+    "taxNote": "Les taxes telles que la TVA ou la GST s’ajoutent lorsqu’elles s’appliquent. Les frais de carte et de paiement sont facturés par votre prestataire de paiement."
+  },
+  "approvals": {
+    "title": "Validation du site",
+    "label": "Valider les modifications de l’équipe avant leur mise en ligne",
+    "offHint": "Désactivé : vous et vos responsables modifiez et publiez directement.",
+    "onHint": "Activé : les modifications du personnel sans droit de validation vous attendent avant de pouvoir être publiées."
+  },
+  "upgrade": {
+    "cardTitle": "Ajouter un établissement",
+    "cardBody": "BranchHarbor est configuré pour un seul établissement. Vous en ouvrez un autre ? Passez à un réseau pour gérer plusieurs établissements — tout ce que vous avez est conservé.",
+    "addLocation": "Ajouter un établissement",
+    "title": "Passer à un réseau",
+    "intro": "{name} est configurée comme entreprise indépendante. Un deuxième établissement nécessite les outils réseau. Voici ce qui change.",
+    "whatChanges": "Ce qui change",
+    "consequences": [
+      "Votre établissement, vos clients, votre site, votre équipe et votre historique de paiements restent tels quels.",
+      "Le sélecteur de périmètre, l’annuaire des établissements, les régions et les groupes de propriétaires deviennent disponibles.",
+      "Les modèles de site peuvent verrouiller des champs ou exiger une validation, et les pages peuvent être publiées sur plusieurs établissements à la fois.",
+      "Les rôles siège, responsable régional et franchisé peuvent être invités.",
+      "La facturation passe de la formule Solo au tarif par établissement dès qu’un deuxième établissement est en activité.",
+      "Votre site client obtient un localisateur à votre adresse actuelle, et chaque établissement a sa propre page."
+    ],
+    "pricing": "Tarifs",
+    "perLocation": "{price} / établissement / mois",
+    "pricingNote": "Prix catalogue hors taxes. Un nouvel établissement n’est pas facturé tant qu’il n’est pas en activité.",
+    "addNow": "Ajouter le nouvel établissement maintenant",
+    "newLocation": "Nouvel établissement",
+    "locationName": "Nom de l’établissement",
+    "locationNamePh": "p. ex. Fitzroy",
+    "code": "Code interne",
+    "codeHint": "Court et unique, utilisé dans les rapports et imports.",
+    "notPublished": "Le nouvel établissement commence en brouillon : rien n’est montré aux clients avant sa publication.",
+    "confirm": "Je comprends que mon entreprise devient un réseau. Mes données sont conservées et le changement est inscrit dans le journal d’activité.",
+    "submit": "Passer à un réseau",
+    "submitWithLocation": "Passer au réseau et ajouter l’établissement",
+    "cancel": "Annuler",
+    "ownerOnly": "Seul le propriétaire peut effectuer ce changement. Il est journalisé.",
+    "doneTitle": "Votre entreprise est maintenant un réseau",
+    "doneBody": "Vos établissements, régions, modèles et la publication groupée sont disponibles. Vos données existantes sont inchangées.",
+    "goLocations": "Aller aux établissements",
+    "goOverview": "Retour à la vue d’ensemble",
+    "errors": {
+      "name": "Saisissez un nom pour le nouvel établissement.",
+      "line1": "Saisissez l’adresse.",
+      "city": "Saisissez la ville."
+    }
+  },
+  "website": {
+    "title": "Site web",
+    "description": "Modifiez votre site et publiez quand vous êtes prêt. Les modifications restent en brouillon jusqu’à la publication.",
+    "tab": {
+      "content": "Contenu"
+    },
+    "yourSite": "Votre site",
+    "live": "En ligne · version {version}",
+    "notLive": "Pas encore en ligne",
+    "published": "Publié. Votre site est en ligne à l’adresse {address}.",
+    "approvalsOnStaff": "Vos modifications sont envoyées au propriétaire pour validation avant publication.",
+    "noSiteTitle": "Vous n’avez pas encore de site",
+    "noSiteBody": "Créez votre site hébergé. Il reprend le nom, l’adresse et les horaires de votre entreprise, et vous pouvez tout modifier avant et après la publication.",
+    "createAndPublish": "Créer et publier mon site",
+    "savedDraft": "{field} enregistré en brouillon. Publiez pour le mettre en ligne.",
+    "sentToOwner": "{field} envoyé au propriétaire pour validation.",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "empty": "Non renseigné",
+    "pending": "En attente de validation :",
+    "noFields": "Cette page n’a pas encore de contenu modifiable.",
+    "publish": "Publier",
+    "publishNote": "La publication met à jour votre site en ligne et conserve la version précédente pour revenir en arrière.",
+    "ownerPublishes": "Le propriétaire publie les modifications",
+    "noPublishPermission": "Votre rôle permet de modifier les brouillons ; un responsable ou le propriétaire publie.",
+    "preview": "Aperçu (brouillon)",
+    "detailsTitle": "Adresse, horaires et contact",
+    "detailsBody": "Votre site affiche l’adresse, les horaires et les coordonnées des Paramètres.",
+    "detailsLink": "Modifier les coordonnées",
+    "activity": "Activité"
+  },
+  "locationsPage": {
+    "title": "Votre établissement",
+    "description": "Les entreprises indépendantes ont un seul établissement. Ses informations se trouvent dans Paramètres → Entreprise et établissement.",
+    "addTitle": "Ajouter un établissement",
+    "addDescription": "Ajouter un deuxième établissement fait passer votre entreprise en réseau.",
+    "edit": "Modifier dans les Paramètres",
+    "noDirectory": "Il n’y a pas d’annuaire d’établissements pour une entreprise à site unique. Si vous ouvrez un autre établissement, passez au réseau ci-dessous et les outils réseau apparaîtront.",
+    "upgradeTitle": "Vous ouvrez un autre établissement ?",
+    "ownerOnly": "Demandez au propriétaire d’ajouter un établissement."
+  },
+  "team": {
+    "role": {
+      "org_owner": "Propriétaire",
+      "location_manager": "Responsable",
+      "staff": "Personnel / instructeur / coach",
+      "marketing_contributor": "Contributeur marketing",
+      "finance": "Finance"
+    },
+    "roleHelp": {
+      "org_owner": "Accès complet, y compris la facturation, l’équipe et les paramètres de l’entreprise.",
+      "location_manager": "Gère le quotidien : plannings, clients, commandes et publication du site.",
+      "staff": "Uniquement son planning, ses présences ou ses commandes.",
+      "marketing_contributor": "Rédige les contenus du site et du marketing ; publie seulement si vous l’autorisez.",
+      "finance": "Paiements, rapprochement et remboursements autorisés."
+    }
+  },
+  "payments": {
+    "account": "Votre compte de paiement",
+    "accountDetail": "un seul compte pour {name}"
+  },
+  "onboarding": {
+    "stepBusiness": "Votre entreprise",
+    "businessTitle": "Votre entreprise",
+    "businessDesc": "Nom, adresse, fuseau horaire, devise et horaires. C’est l’établissement que vos clients visitent.",
+    "addressLegend": "Adresse et horaires",
+    "line1": "Adresse",
+    "city": "Ville",
+    "region": "État, province ou région",
+    "postalCode": "Code postal",
+    "phone": "Téléphone",
+    "hours": "Horaires d’ouverture",
+    "hoursHint": "Affichés sur votre site.",
+    "hoursPh": "p. ex. mar.–dim. 8:00–18:00",
+    "addressNote": "Vous pourrez les modifier plus tard dans Paramètres → Entreprise et établissement. Vous ouvrirez un autre établissement ? Vous pouvez passer à un réseau à tout moment.",
+    "checkBusiness": "Adresse et fuseau horaire de l’entreprise",
+    "blockerBusiness": "Ajoutez l’adresse de votre entreprise",
+    "errors": {
+      "line1": "Saisissez votre adresse.",
+      "city": "Saisissez votre ville."
+    }
+  }
+}

@@ -45,10 +45,14 @@ export function SignInForm() {
   );
 }
 
+/** Remembers a sign-up intent from the marketing site (?industry=studios&model=independent) for onboarding. */
+export const SIGNUP_INTENT_KEY = 'bh_signup_intent';
+
 export function SignUpForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
   const router = useRouter();
+  const intentParams = useSearchParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +65,16 @@ export function SignUpForm() {
         onSubmit={async (e) => {
           e.preventDefault();
           const r = await m.run();
-          if (r) router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+          if (r) {
+            const industry = intentParams.get('industry');
+            const model = intentParams.get('model');
+            try {
+              if (industry || model) localStorage.setItem(SIGNUP_INTENT_KEY, JSON.stringify({ industry, model: model === 'independent' || model === 'network' ? model : null }));
+            } catch {
+              /* storage unavailable: onboarding asks again */
+            }
+            router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+          }
         }}
       >
         {m.error && <ErrorSummary message={m.error.message} fields={m.error.fields} />}

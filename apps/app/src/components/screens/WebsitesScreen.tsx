@@ -13,6 +13,7 @@ import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
+import { IndependentWebsite } from './independent/IndependentWebsite';
 
 type Tab = 'editor' | 'approvals' | 'publish' | 'domains';
 
@@ -24,6 +25,8 @@ export function WebsitesScreen() {
   const tab = (params.get('tab') as Tab) || 'editor';
   const setTab = (k: Tab) => router.replace(`?tab=${k}`, { scroll: false });
   if (!app.can('website.edit')) return <DeniedState permission="website.edit" />;
+  // Independent businesses: one site, no templates/origin tags/group publish — a single "Publish" flow.
+  if (app.org.model === 'independent') return <IndependentWebsite />;
   const tabs: { key: Tab; label: string }[] = [
     { key: 'editor', label: t('tab.editor') },
     { key: 'approvals', label: t('tab.approvals') },
@@ -265,7 +268,7 @@ function FieldOrigin({ f, overridden }: { f: WebsiteField; overridden: boolean }
 
 /* ------------------------------ Approvals ------------------------------ */
 
-function Approvals({ onOpen }: { onOpen: () => void }) {
+export function Approvals({ onOpen }: { onOpen: () => void }) {
   const t = useTranslations('websites');
   const locale = useLocale();
   const app = useApp();
@@ -410,7 +413,7 @@ function Publish() {
 
 /* ------------------------------ Domains ------------------------------ */
 
-function Domains() {
+export function Domains() {
   const t = useTranslations('websites');
   const app = useApp();
   const res = useApi((api) => api.websites.sites(app.ctx), [app.industry, app.role, app.scopeId]);

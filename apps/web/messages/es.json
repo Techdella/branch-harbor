@@ -319,7 +319,8 @@
     "pricingCta": "Ver precios",
     "faqTitle": "Preguntas sobre {name}",
     "ctaTitle": "Descubre {name} con tus propias sedes",
-    "ctaBody": "Cuéntanos cuántas sedes gestionas y qué sistemas usas hoy. Te mostraremos el flujo que mejor encaja."
+    "ctaBody": "Cuéntanos cuántas sedes gestionas y qué sistemas usas hoy. Te mostraremos el flujo que mejor encaja.",
+    "startFree": "Empezar gratis"
   },
   "industries": {
     "studios": {
@@ -1142,53 +1143,76 @@
       "kicker": "Negocios con una sola sede",
       "imageAlt": "Propietaria abriendo la puerta de una pequeña tienda",
       "headline": "Todo en un solo lugar, sin la complejidad de una red.",
-      "intro": "Con una sola sede no hay ámbitos ni aprobaciones que gestionar. Añade más sedes después y las herramientas de red aparecerán cuando las necesites.",
-      "cta": "Ver la puesta en marcha",
+      "intro": "Una sede y un equipo pequeño, sin la complejidad de una red: sin selector de ámbito, regiones ni cadenas de aprobación. Abre una segunda sede más adelante y pasa a las herramientas de red en unos clics. Se conserva todo lo que tienes.",
+      "cta": "Solicitar una demo",
       "points": [
         {
-          "t": "Listo en una tarde",
-          "d": "Una lista de pasos en lugar de un asistente del que no puedes salir. Tu progreso se guarda en cada paso."
+          "t": "Un negocio, un panel",
+          "d": "El nombre de tu negocio sustituye al selector de sede. El resumen, los informes y las respuestas de la IA tratan de tu negocio, no de una red."
         },
         {
-          "t": "Sitio alojado o WordPress",
-          "d": "Lanza un sitio con una dirección incluida o conserva el tuyo."
+          "t": "Configuración de una sola vez",
+          "d": "Datos del negocio, dirección, horario, zona horaria y moneda en un solo paso. El progreso se guarda sobre la marcha y los pasos opcionales pueden esperar."
         },
         {
-          "t": "Conserva tus herramientas",
-          "d": "Conecta un sistema de reservas o de venta compatible en lugar de sustituirlo."
+          "t": "Publica directamente",
+          "d": "Sin campos bloqueados ni cadenas de aprobación. Edita tu web y publica; activa las aprobaciones solo si quieres revisar los cambios del equipo."
         },
         {
-          "t": "IA que redacta, no decide",
-          "d": "Textos y resúmenes para que los revises. Nada se publica sin ti."
+          "t": "Roles sencillos para un equipo pequeño",
+          "d": "Invita a un gerente, personal, un colaborador de marketing o un usuario de finanzas. Los roles de red no estorban."
         }
       ],
-      "stepsTitle": "Puesta en marcha en seis pasos",
+      "stepsTitle": "Del alta a publicar en seis pasos",
       "steps": [
         {
-          "t": "Elige tu sector",
-          "d": "Configuramos los flujos adecuados."
+          "t": "Crea tu cuenta",
+          "d": "Verifica tu correo y elige tu sector y «negocio independiente»."
         },
         {
-          "t": "Añade los datos de tu negocio",
-          "d": "Zona horaria, moneda e idioma incluidos."
+          "t": "Tu negocio",
+          "d": "Nombre, dirección, zona horaria, moneda y horario de apertura en un paso."
         },
         {
-          "t": "Elige alojado o WordPress",
-          "d": "Puedes cambiar de opinión más adelante."
+          "t": "Alojado o WordPress",
+          "d": "Tu dirección incluida es sites.branchharbor.com/tu-negocio. Conecta tu propio dominio cuando quieras."
         },
         {
-          "t": "Añade clases, servicios, productos o carta",
-          "d": "Importa o introdúcelos a mano."
+          "t": "Añade tus clases, servicios, productos o carta",
+          "d": "Importa o introduce."
         },
         {
           "t": "Conecta los pagos",
-          "d": "Las compras siguen desactivadas hasta que la cuenta esté habilitada."
+          "d": "La compra sigue desactivada hasta que la cuenta esté habilitada."
         },
         {
-          "t": "Revisa, prueba y publica",
-          "d": "Haz primero una reserva o un pedido de prueba."
+          "t": "Previsualiza y publica",
+          "d": "Un solo botón Publicar pone tu web en línea."
         }
-      ]
+      ],
+      "signupCta": "Empezar gratis (estudios)",
+      "signupNote": "El alta autoservicio está abierta para estudios. Los demás sectores empiezan con una demo breve mientras están en piloto.",
+      "upgradeTitle": "¿Vas a abrir una segunda sede?",
+      "upgradeBody": "Añade una sede desde Configuración. BranchHarbor explica qué cambia, tú confirmas y tu negocio se convierte en una red. Solo el propietario puede hacerlo y el cambio queda registrado.",
+      "upgradePoints": [
+        {
+          "t": "No se pierde nada",
+          "d": "Tu sede, tus clientes, tu web, tu equipo y tu historial de pagos siguen igual."
+        },
+        {
+          "t": "Aparecen las herramientas de red",
+          "d": "Directorio de sedes, selector de ámbito, regiones, grupos de propietarios, plantillas y publicación en grupo."
+        },
+        {
+          "t": "Tu dirección sigue funcionando",
+          "d": "Tu web incorpora un buscador de sedes y cada sede tiene su propia página."
+        },
+        {
+          "t": "La facturación sigue a tus sedes",
+          "d": "Solo pasa al precio Red por sede cuando la segunda sede está en funcionamiento."
+        }
+      ],
+      "pricingCta": "Ver el precio de Solo"
     },
     "pointsTitle": "Cómo funciona",
     "ctaTitle": "¿Quieres verlo con tu negocio?",
@@ -1540,6 +1564,18 @@
     "taxNote": "Según tu país pueden aplicarse impuestos como el IVA, el GST o el sales tax; se muestran antes de pagar.",
     "proposedNote": "Precios provisionales. Los planes y precios pueden cambiar antes de la disponibilidad general.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "Una sede independiente",
+        "tag": "Negocio único",
+        "features": [
+          "Sitio web alojado y panel",
+          "Reservas, pedidos y pagos para tu sector",
+          "Roles sencillos para un equipo pequeño",
+          "Pasa a Red cuando abras una segunda sede"
+        ],
+        "cta": "Empezar gratis"
+      },
       "connector": {
         "name": "Conector",
         "for": "Conserva tu sitio WordPress",
@@ -1577,7 +1613,7 @@
         "cta": "Pedir presupuesto"
       }
     },
-    "ctaNote": "Durante el piloto, cada plan empieza con una conversación para confirmar que tu sector y tus conexiones son compatibles.",
+    "ctaNote": "Durante el piloto, los planes Conector y Red empiezan con una conversación para confirmar que tu sector y tus conexiones son compatibles. El alta en Solo es autoservicio para estudios.",
     "faqTitle": "Preguntas sobre precios",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "¿Están incluidas las comisiones de procesamiento de pagos?",
         "a": "No. Los pagos pasan por un proveedor conectado como Stripe, que cobra sus propias comisiones en tu país."
+      },
+      {
+        "q": "¿Qué pasa si abro una segunda sede?",
+        "a": "Solo cubre una sede. Cuando añadas otra, pasas a Red desde Configuración: se conservan tu sitio web, tus clientes, tu equipo y tu historial, y la facturación pasa al precio por sede cuando la nueva esté en funcionamiento."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ mes · una sede",
+    "soloTotal": "Una sede. Para añadir más, pasa a Red.",
+    "soloAnnual": "Una sede, facturación anual."
   },
   "demo": {
     "metaTitle": "Solicitar una demo",

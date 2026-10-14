@@ -25,7 +25,7 @@ import type {
 
 // ───────────────────────── raw API shapes (subset) ─────────────────────────
 interface RawUser { id: string; email: string; name: string; locale: string }
-interface RawOrg { id: string; name: string; slug: string; industry: string; roles: { id: string; role: string; scope: { kind: string; id: string } }[] }
+interface RawOrg { id: string; name: string; slug: string; industry: string; roles: { id: string; role: string; scope: { kind: string; id: string } }[]; model?: 'independent' | 'network'; primaryLocationId?: string | null }
 interface RawMe { user: RawUser; organizations: RawOrg[] }
 interface RawAddress { line1?: string; city?: string; region?: string; postalCode?: string; country?: string }
 interface RawLocation { id: string; name: string; address: RawAddress; country: string; timeZone: string; currency: string; status: string; organizationId?: string; publiclyVisible?: boolean }
@@ -115,7 +115,13 @@ function toMe(m: RawMe): Me {
   if (staffOrgs(m).length) experiences.push('staff');
   if (ownerOrgs(m).length) experiences.push('owner');
   const assignments: RoleAssignment[] = m.organizations.flatMap((o) => o.roles.map((r) => ({ role: r.role as Role, scope: { kind: r.scope.kind as RoleAssignment['scope']['kind'], id: r.scope.id } })));
-  return { user: { id: m.user.id, name: m.user.name, email: m.user.email }, assignments, experiences };
+  // An owner whose only business is independent (one location) gets the single-business owner experience.
+  const owned = ownerOrgs(m);
+  const single = owned.length === 1 && owned[0]!.model === 'independent' ? owned[0]! : null;
+  return {
+    user: { id: m.user.id, name: m.user.name, email: m.user.email }, assignments, experiences,
+    ...(single ? { business: { model: 'independent' as const, name: single.name, locationId: single.primaryLocationId ?? null } } : {}),
+  };
 }
 
 const guestMe = (): Me => ({ user: { id: 'guest', name: 'Guest', email: null }, assignments: [], experiences: ['customer'], guest: true });
@@ -765,8 +771,10 @@ export const liveApi = {
       };
     })));
     const count = rows.length;
+    const single = orgs.length === 1 && orgs[0]!.model === 'independent' && count <= 1;
     return {
-      scopeLabel: `${orgs.map((o) => o.name).join(' · ')} · ${count} ${count === 1 ? 'location' : 'locations'}`,
+      ...(single ? { singleLocation: { businessName: orgs[0]!.name } } : {}),
+      scopeLabel: single ? orgs[0]!.name : `${orgs.map((o) => o.name).join(' · ')} · ${count} ${count === 1 ? 'location' : 'locations'}`,
       range: 'Last 7 days', locations: rows, updatedAt: new Date().toISOString(),
     };
   },

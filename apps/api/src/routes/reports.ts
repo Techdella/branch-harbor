@@ -1,7 +1,7 @@
 import { and, count, desc, eq, gte, inArray, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { appointments, classBookings, classOccurrences, connections, foodOrders, leads, locations, menus, paymentReferences, registrations, webhookEvents } from '../db/schema/index.ts';
+import { appointments, classBookings, classOccurrences, connections, foodOrders, leads, locations, menus, organizations, paymentReferences, registrations, webhookEvents } from '../db/schema/index.ts';
 import { metric, revenueByCurrency, type Freshness } from '../domain/reports.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { authorisedLocations, requirePerm } from '../services/authz.ts';
@@ -33,6 +33,8 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
     // Locations in the requested scope that the user may report on.
     const allowed = await authorisedLocations(req, s.db, orgId, 'reports.read');
     const allLocs = await s.db.select().from(locations).where(eq(locations.organizationId, orgId));
+    const [orgRow] = await s.db.select({ model: organizations.model }).from(organizations).where(eq(organizations.id, orgId));
+    const independent = orgRow?.model === 'independent';
     const scoped = allLocs.filter((l) =>
       (q.scopeKind === 'organization') || (q.scopeKind === 'region' && l.regionId === scopeId) || (q.scopeKind === 'owner_group' && l.ownerGroupId === scopeId) || (q.scopeKind === 'location' && l.id === scopeId))
       .filter((l) => allowed === 'all' || allowed.has(l.id) || q.scopeKind !== 'organization');
@@ -101,7 +103,9 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
         registrations: metric(Object.fromEntries(regs.map((r) => [r.status, r.c])), 'Programme registrations created in the period, by status', fresh('BranchHarbor registrations')),
         leads: metric(leadCount, 'Leads captured by BranchHarbor forms in the period. Excludes enquiries received elsewhere.', fresh('BranchHarbor forms')),
       },
-      revenueByLocation,
+      // Independent businesses have one location: no per-location breakdown.
+      revenueByLocation: independent ? [] : revenueByLocation,
+      businessModel: independent ? 'independent' : 'network',
       connections: conns.map((c) => ({ id: c.id, provider: c.provider, state: c.state, lastSuccessAt: c.lastSuccessAt?.toISOString() ?? null })),
     };
   });

@@ -11,6 +11,8 @@ export interface Me {
   /** Experiences the server allows for this account. Demo builds allow all three. */
   experiences: Experience[];
   guest?: boolean;
+  /** Owner of a single independent business (one location): no location switching or aggregation. */
+  business?: { model: 'independent'; name: string; locationId: string | null };
 }
 
 export interface Brand {
@@ -239,6 +241,8 @@ export interface PulseLocation {
   sync: 'healthy' | 'degraded' | 'not_connected';
 }
 export interface Pulse {
+  /** Independent business: the pulse is its one location (no aggregation or location list). */
+  singleLocation?: { businessName: string };
   scopeLabel: string;
   range: string;
   locations: PulseLocation[];

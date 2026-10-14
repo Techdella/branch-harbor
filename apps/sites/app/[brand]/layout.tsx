@@ -13,6 +13,8 @@ export default async function BrandLayout({ children, params }: { children: Reac
   const { locale, available } = await resolveSiteLocale();
   const t = await getTranslations('common');
   const { brand } = data;
+  // Independent business: one location, so no "All locations" finder links.
+  const single = brand.model === 'independent';
 
   return (
     <>
@@ -30,9 +32,11 @@ export default async function BrandLayout({ children, params }: { children: Reac
             )}
           </a>
           <nav aria-label={brand.name} className="ms-auto flex items-center gap-1">
-            <a href={`${links.brand()}${links.brand().endsWith('/') ? '' : ''}#finder`} className="hidden h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold hover:bg-canvas sm:flex">
-              <Icon name="pin" size={16} />{t('allLocations')}
-            </a>
+            {!single && (
+              <a href={`${links.brand()}${links.brand().endsWith('/') ? '' : ''}#finder`} className="hidden h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold hover:bg-canvas sm:flex">
+                <Icon name="pin" size={16} />{t('allLocations')}
+              </a>
+            )}
             <LanguageSwitcher current={locale} available={available} label={t('language')} />
           </nav>
         </div>
@@ -42,7 +46,7 @@ export default async function BrandLayout({ children, params }: { children: Reac
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-graphite sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="font-bold text-ink">{brand.name}</span>
-            <a href={`${links.brand()}#finder`} className="underline underline-offset-2">{t('allLocations')}</a>
+            {!single && <a href={`${links.brand()}#finder`} className="underline underline-offset-2">{t('allLocations')}</a>}
             {data.pages.filter((p) => p.slug !== 'home').map((p) => (
               <a key={p.slug} href={links.brand(`/pages/${p.slug}`)} className="underline underline-offset-2">{p.title}</a>
             ))}

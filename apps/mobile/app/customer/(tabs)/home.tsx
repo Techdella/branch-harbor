@@ -14,7 +14,7 @@ import { color, pastel, radius } from '@/theme';
 export default function Home() {
   const { t, intlLocale } = useI18n();
   const { me, setBrandId } = useSession();
-  const { brand, location, brandsQ, locationsQ } = useCatalog();
+  const { brand, location, locations, brandsQ, locationsQ } = useCatalog();
   const scope = useLocationScope(location);
   const foods = brand?.industry === 'foods';
 
@@ -38,7 +38,8 @@ export default function Home() {
       : { label: t('customer.quickBook'), icon: 'calendar', go: () => router.push('/customer/book'), bg: pastel.lilac },
     { label: t('customer.quickBookings'), icon: 'receipt', go: () => router.push('/customer/bookings'), bg: color.surface },
     { label: t('customer.quickInbox'), icon: 'message', go: () => router.push('/customer/inbox'), bg: color.surface },
-    { label: t('tabs.locations'), icon: 'pin', go: () => router.push('/customer/locations'), bg: color.surface },
+    // Single-location businesses skip the location picker.
+    ...(locations.length > 1 ? [{ label: t('tabs.locations'), icon: 'pin' as IconName, go: () => router.push('/customer/locations'), bg: color.surface }] : []),
   ];
 
   return (

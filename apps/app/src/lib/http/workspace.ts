@@ -27,6 +27,10 @@ export interface ApiMeOrg {
   name: string;
   slug: string;
   industry: string;
+  /** Business mode (API ≥ independent-business support); absent on older APIs = network. */
+  model?: 'independent' | 'network';
+  isSingleLocation?: boolean;
+  primaryLocationId?: string | null;
   roles: { id: string; role: string; scope: ApiScope }[];
 }
 export interface ApiOrg {
@@ -207,6 +211,7 @@ async function loadDirectory(meOrg: ApiMeOrg): Promise<Omit<Workspace, 'user' | 
       dataRegion: org.dataRegion,
       regions,
       ownerGroups,
+      model: org.model === 'independent' ? 'independent' : 'network',
     },
     assignments,
     locations: locs.map((l, i) => toLocation(l, i, dir)),

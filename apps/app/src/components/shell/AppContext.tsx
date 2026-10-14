@@ -6,6 +6,7 @@ import { can, type Permission } from '@bh/shared';
 import type { IndustryKey, Location, Organization, RequestContext, ScopeOptionT, Session, ViewRole } from '@/lib/types';
 import { APP_INDUSTRIES, VIEW_ROLES } from '@/lib/types';
 import { FIXTURES, scopeOptions, sessionFor } from '@/lib/mock/orgs';
+import { INDEPENDENT, independentSession } from '@/lib/mock/independent';
 import { apiMode, enterFallback, onApiMode } from '@/lib/api';
 import { ApiError } from '@/lib/errors';
 import {
@@ -30,9 +31,11 @@ interface AppState {
   navCollapsed: boolean;
   /** Live mode: the selected organisation. */
   orgId: string | null;
+  /** Sample mode only: show the network demo or the independent-business demo ("Viewing as" switcher). */
+  business: 'network' | 'independent';
 }
 
-interface AppCtx extends Omit<AppState, 'orgId'> {
+interface AppCtx extends Omit<AppState, 'orgId' | 'business'> {
   ready: boolean;
   ctx: RequestContext;
   session: Session;
@@ -51,6 +54,9 @@ interface AppCtx extends Omit<AppState, 'orgId'> {
   can: (p: Permission) => boolean;
   setIndustry: (i: IndustryKey) => void;
   setRole: (r: ViewRole) => void;
+  /** Sample mode: switch between the network demo and the independent-business demo. */
+  sampleBusiness: 'network' | 'independent';
+  setSampleBusiness: (b: 'network' | 'independent') => void;
   setScopeId: (id: string) => void;
   setAiOpen: (open: boolean) => void;
   toggleNav: () => void;
@@ -58,7 +64,7 @@ interface AppCtx extends Omit<AppState, 'orgId'> {
 }
 
 const KEY = 'bh_app_state';
-const DEFAULTS: AppState = { industry: 'studios', role: 'hq', scopeId: 'all', aiOpen: false, navCollapsed: false, orgId: null };
+const DEFAULTS: AppState = { industry: 'studios', role: 'hq', scopeId: 'all', aiOpen: false, navCollapsed: false, orgId: null, business: 'network' };
 
 const Ctx = createContext<AppCtx | null>(null);
 
@@ -74,6 +80,7 @@ function load(): AppState {
       aiOpen: !!v.aiOpen,
       navCollapsed: !!v.navCollapsed,
       orgId: typeof v.orgId === 'string' ? v.orgId : null,
+      business: v.business === 'independent' ? 'independent' : 'network',
     };
   } catch {
     return DEFAULTS;
@@ -141,15 +148,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (live && ws) {
       const role = effectiveRole(state.role, ws);
       setActiveRole(role); // synchronously, so child screens' first requests use the right persona
+      const scopes = scopeOptionsOf(role, ws);
       return {
         industry: ws.orgView!.industry,
         role,
         session: sessionOf(role, ws),
-        scopes: scopeOptionsOf(role, ws),
+        // Independent businesses have no scope selector: the business itself is the only scope.
+        scopes: ws.orgView!.model === 'independent' ? [{ ...scopes[0]!, label: ws.orgView!.name }] : scopes,
         org: ws.orgView!,
         locations: ws.locations,
         industries: industriesAvailable(ws),
         roles: availableRoles(ws),
+      };
+    }
+    if (state.business === 'independent') {
+      // Sample independent business: one location, the owner's view, the business as the only scope.
+      const f = INDEPENDENT[state.industry];
+      return {
+        industry: state.industry,
+        role: 'hq' as ViewRole,
+        session: independentSession(state.industry),
+        scopes: [{ id: `loc:${f.location.id}`, kind: 'location' as const, label: f.org.name, locationIds: [f.location.id] }],
+        org: f.org,
+        locations: [f.location] as Location[],
+        industries: [...APP_INDUSTRIES],
+        roles: ['hq'] as ViewRole[],
       };
     }
     return {
@@ -162,7 +185,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       industries: [...APP_INDUSTRIES],
       roles: [...VIEW_ROLES],
     };
-  }, [live, ws, state.industry, state.role]);
+  }, [live, ws, state.industry, state.role, state.business]);
   const scope = derived.scopes.find((s) => s.id === state.scopeId) ?? derived.scopes[0] ?? { id: 'all', kind: 'all' as const, label: 'All authorised locations', locationIds: [] };
 
   const setIndustry = useCallback(
@@ -179,6 +202,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [],
   );
   const setRole = useCallback((role: ViewRole) => setState((s) => ({ ...s, role, scopeId: 'all' })), []);
+  const setSampleBusiness = useCallback((business: 'network' | 'independent') => setState((s) => ({ ...s, business, role: business === 'independent' ? 'hq' : s.role, scopeId: 'all' })), []);
   const setScopeId = useCallback((scopeId: string) => setState((s) => ({ ...s, scopeId })), []);
   const setAiOpen = useCallback((aiOpen: boolean) => setState((s) => ({ ...s, aiOpen })), []);
   const toggleNav = useCallback(() => setState((s) => ({ ...s, navCollapsed: !s.navCollapsed })), []);
@@ -194,7 +218,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       navCollapsed: state.navCollapsed,
       scopeId: scope.id,
       ready: loaded,
-      ctx: { industry: derived.industry, role: derived.role, scopeId: scope.id },
+      ctx: { industry: derived.industry, role: derived.role, scopeId: scope.id, business: derived.org.model === 'independent' ? 'independent' : 'network' },
       session: derived.session,
       scopes: derived.scopes,
       scope,
@@ -207,12 +231,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       can: (p) => can(derived.session.assignments, p),
       setIndustry,
       setRole,
+      sampleBusiness: live ? 'network' : state.business,
+      setSampleBusiness,
       setScopeId,
       setAiOpen,
       toggleNav,
       reloadWorkspace,
     }),
-    [derived, state.aiOpen, state.navCollapsed, scope, loaded, mode, live, setIndustry, setRole, setScopeId, setAiOpen, toggleNav, reloadWorkspace],
+    [derived, state.aiOpen, state.navCollapsed, state.business, scope, loaded, mode, live, setIndustry, setRole, setSampleBusiness, setScopeId, setAiOpen, toggleNav, reloadWorkspace],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

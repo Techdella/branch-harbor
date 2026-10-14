@@ -12,6 +12,7 @@
 import { ApiError } from './errors';
 import { USE_MOCKS, markOfflineSession } from './http/client';
 import { httpApi } from './http/httpApi';
+import type { BusinessApi } from './business';
 import type {
   AiAnswer,
   ApprovalItem,
@@ -163,6 +164,8 @@ export interface BranchHarborApi {
     domain(hostname: string): Promise<DomainStatus>;
     verifyDomain(hostname: string): Promise<DomainStatus>;
   };
+  /** Independent (single-location) businesses: location details, Solo billing, website approvals, single publish and the upgrade to a network. */
+  business: BusinessApi;
   ai: {
     suggestions(ctx: RequestContext): Promise<string[]>;
     ask(ctx: RequestContext, question: string): Promise<AiAnswer>;

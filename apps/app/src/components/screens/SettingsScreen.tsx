@@ -13,6 +13,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { LanguageSelect } from '../shell/TopBar';
 import { Async, Banner, DeniedState, LoadingBlock, SectionCard } from '../ui/States';
 import { COUNTRY_ZONES } from './LocationWizard';
+import { AddLocationCard, BusinessLocationCard, SoloBillingCard, WebsiteApprovalsCard } from './independent/BusinessSettings';
 
 export function SettingsScreen() {
   const t = useTranslations('settings');
@@ -22,6 +23,8 @@ export function SettingsScreen() {
   const [form, setForm] = useState<OrgSettings | null>(null);
   const [ok, setOk] = useState(false);
   const save = useMutation((api, s: Partial<OrgSettings>) => api.settings.save(app.ctx, s));
+  // Independent businesses: location details, Solo billing, website approvals and "Add a location" live here.
+  const independent = app.org.model === 'independent';
   useEffect(() => {
     if (res.status === 'ready') setForm(res.data);
   }, [res.status, res.data]);
@@ -50,6 +53,8 @@ export function SettingsScreen() {
                     <Field label={t('legalName')}>{(p) => <Input id={p.id} value={form.legalName} onChange={(e) => setForm({ ...form, legalName: e.target.value })} />}</Field>
                   </div>
                 </SectionCard>
+                {independent && <BusinessLocationCard />}
+                {!independent && (
                 <SectionCard title={t('defaults')} aside={<span className="text-xs text-stone">{t('defaultsHint')}</span>}>
                   <div className="grid gap-3.5 md:grid-cols-3">
                     <Field label={t('defaultLanguage')}>
@@ -87,6 +92,7 @@ export function SettingsScreen() {
                     </Field>
                   </div>
                 </SectionCard>
+                )}
                 <SectionCard title={t('dataPolicies')}>
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -96,6 +102,7 @@ export function SettingsScreen() {
                       </div>
                       <Badge tone="neutral" icon="lock">{t(`region.${form.dataRegion}`)}</Badge>
                     </div>
+                    {!independent && (
                     <Field label={t('sharing')} hint={t('sharingHint')}>
                       {(p) => (
                         <Select id={p.id} aria-describedby={p.describedBy} value={form.customerSharing} onChange={(e) => setForm({ ...form, customerSharing: e.target.value as OrgSettings['customerSharing'] })}>
@@ -107,6 +114,7 @@ export function SettingsScreen() {
                         </Select>
                       )}
                     </Field>
+                    )}
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <div className="text-sm font-bold">{t('aiTraining')}</div>
@@ -128,6 +136,10 @@ export function SettingsScreen() {
                     {t('save')}
                   </Button>
                 </div>
+                {independent && <WebsiteApprovalsCard />}
+                {independent && <SoloBillingCard />}
+                {independent && <AddLocationCard startOpen={typeof window !== 'undefined' && window.location.hash === '#add-location'} />}
+                {!independent && (
                 <SectionCard title={t('billing')} aside={<Badge tone="neutral" icon="info">{t('separateBilling')}</Badge>}>
                   <p className="mb-3 text-sm text-stone">
                     {form.billing.perLocation && form.billing.nextInvoice
@@ -146,6 +158,7 @@ export function SettingsScreen() {
                     })}
                   </ul>
                 </SectionCard>
+                )}
               </>
             )
           }

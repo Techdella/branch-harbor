@@ -319,7 +319,8 @@
     "pricingCta": "Vedi i prezzi",
     "faqTitle": "Domande su {name}",
     "ctaTitle": "Scopri {name} con le tue sedi",
-    "ctaBody": "Dicci quante sedi gestisci e quali sistemi usi oggi. Ti mostreremo il processo più adatto."
+    "ctaBody": "Dicci quante sedi gestisci e quali sistemi usi oggi. Ti mostreremo il processo più adatto.",
+    "startFree": "Inizia gratis"
   },
   "industries": {
     "studios": {
@@ -1142,53 +1143,76 @@
       "kicker": "Attività con una sola sede",
       "imageAlt": "Titolare che apre la porta di un piccolo negozio",
       "headline": "Tutto in un unico posto, senza la complessità di una rete.",
-      "intro": "Con una sola sede non ci sono ambiti né approvazioni da gestire. Aggiungi altre sedi più avanti e gli strumenti di rete compariranno quando ti servono.",
-      "cta": "Scopri la configurazione",
+      "intro": "Una sede e un piccolo team, senza la complessità di una rete: niente selettore di ambito, regioni o catene di approvazione. Apri una seconda sede più avanti e passa agli strumenti di rete in pochi clic. Tutto ciò che hai viene mantenuto.",
+      "cta": "Richiedi una demo",
       "points": [
         {
-          "t": "Pronto in un pomeriggio",
-          "d": "Una checklist invece di una procedura guidata da cui non si esce. I progressi vengono salvati a ogni passaggio."
+          "t": "Un’attività, una dashboard",
+          "d": "Il nome della tua attività sostituisce il selettore di sede. Panoramica, report e risposte dell’IA riguardano la tua attività, non una rete."
         },
         {
-          "t": "Sito ospitato o WordPress",
-          "d": "Lancia un sito con un indirizzo incluso o mantieni il tuo."
+          "t": "Configurazione in un’unica sessione",
+          "d": "Dati dell’attività, indirizzo, orari, fuso orario e valuta in un solo passaggio. I progressi vengono salvati e i passaggi facoltativi possono aspettare."
         },
         {
-          "t": "Tieni i tuoi strumenti",
-          "d": "Collega un sistema di prenotazione o di vendita supportato invece di sostituirlo."
+          "t": "Pubblica direttamente",
+          "d": "Niente campi bloccati né catene di approvazione. Modifica il sito e pubblica; attiva le approvazioni solo se vuoi controllare le modifiche del personale."
         },
         {
-          "t": "Un’IA che propone, non decide",
-          "d": "Testi e riepiloghi da rivedere. Nulla viene pubblicato senza di te."
+          "t": "Ruoli semplici per un piccolo team",
+          "d": "Invita un responsabile, personale, un collaboratore marketing o un utente finanza. I ruoli di rete non sono d’intralcio."
         }
       ],
-      "stepsTitle": "Configurazione in sei passaggi",
+      "stepsTitle": "Dall’iscrizione alla pubblicazione in sei passaggi",
       "steps": [
         {
-          "t": "Scegli il tuo settore",
-          "d": "Impostiamo i processi adatti."
+          "t": "Crea il tuo account",
+          "d": "Verifica l’email, poi scegli il settore e “attività indipendente”."
         },
         {
-          "t": "Aggiungi i dati dell’attività",
-          "d": "Fuso orario, valuta e lingua inclusi."
+          "t": "La tua attività",
+          "d": "Nome, indirizzo, fuso orario, valuta e orari di apertura in un passaggio."
         },
         {
-          "t": "Scegli ospitato o WordPress",
-          "d": "Potrai cambiare idea in seguito."
+          "t": "Ospitato o WordPress",
+          "d": "Il tuo indirizzo incluso è sites.branchharbor.com/la-tua-attivita. Collega il tuo dominio quando vuoi."
         },
         {
-          "t": "Aggiungi lezioni, trattamenti, prodotti o menu",
-          "d": "Importali o inseriscili."
+          "t": "Aggiungi lezioni, servizi, prodotti o menu",
+          "d": "Importa o inserisci."
         },
         {
           "t": "Collega i pagamenti",
-          "d": "Gli acquisti restano disattivati finché l’account non è abilitato."
+          "d": "L’acquisto resta disattivato finché l’account non è abilitato."
         },
         {
-          "t": "Visualizza, prova e pubblica",
-          "d": "Fai prima una prenotazione o un ordine di prova."
+          "t": "Anteprima e pubblicazione",
+          "d": "Un solo pulsante Pubblica mette online il sito."
         }
-      ]
+      ],
+      "signupCta": "Inizia gratis (studi)",
+      "signupNote": "L’iscrizione self-service è aperta agli studi. Gli altri settori iniziano con una breve demo durante il pilota.",
+      "upgradeTitle": "Apri una seconda sede?",
+      "upgradeBody": "Aggiungi una sede dalle Impostazioni. BranchHarbor spiega cosa cambia, tu confermi e la tua attività diventa una rete. Solo il titolare può farlo e la modifica viene registrata.",
+      "upgradePoints": [
+        {
+          "t": "Non si perde nulla",
+          "d": "Sede, clienti, sito, team e storico dei pagamenti restano come sono."
+        },
+        {
+          "t": "Compaiono gli strumenti di rete",
+          "d": "Elenco delle sedi, selettore di ambito, regioni, gruppi di proprietari, modelli e pubblicazione di gruppo."
+        },
+        {
+          "t": "Il tuo indirizzo continua a funzionare",
+          "d": "Il sito ottiene un trova-sedi e ogni sede ha la sua pagina."
+        },
+        {
+          "t": "La fatturazione segue le tue sedi",
+          "d": "Solo diventa il prezzo Rete per sede quando la seconda sede è operativa."
+        }
+      ],
+      "pricingCta": "Vedi il prezzo di Solo"
     },
     "pointsTitle": "Come funziona",
     "ctaTitle": "Pronto a vederlo con la tua attività?",
@@ -1540,6 +1564,18 @@
     "taxNote": "A seconda del paese possono applicarsi imposte come IVA, GST o sales tax; vengono mostrate prima del pagamento.",
     "proposedNote": "Prezzi proposti. Piani e prezzi possono cambiare prima della disponibilità generale.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "Una sede indipendente",
+        "tag": "Attività singola",
+        "features": [
+          "Sito ospitato e dashboard",
+          "Prenotazioni, ordini e pagamenti per il tuo settore",
+          "Ruoli semplici per un piccolo team",
+          "Passa a Rete quando apri una seconda sede"
+        ],
+        "cta": "Inizia gratis"
+      },
       "connector": {
         "name": "Connettore",
         "for": "Mantieni il tuo sito WordPress",
@@ -1577,7 +1613,7 @@
         "cta": "Richiedi un preventivo"
       }
     },
-    "ctaNote": "Durante il pilota, ogni piano parte da una conversazione per confermare che il tuo settore e le tue connessioni siano supportati.",
+    "ctaNote": "Durante il pilota, i piani Connettore e Rete iniziano con una conversazione per confermare che il tuo settore e le tue connessioni sono supportati. L’iscrizione a Solo è self-service per gli studi.",
     "faqTitle": "Domande sui prezzi",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "Le commissioni sui pagamenti sono incluse?",
         "a": "No. I pagamenti passano da un fornitore collegato come Stripe, che applica le proprie commissioni nel tuo paese."
+      },
+      {
+        "q": "Cosa succede se apro una seconda sede?",
+        "a": "Solo copre una sede. Quando ne aggiungi un’altra passi a Rete dalle Impostazioni: sito, clienti, team e storico restano invariati e la fatturazione passa al prezzo per sede quando la nuova sede è operativa."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ mese · una sede",
+    "soloTotal": "Una sede. Per aggiungerne altre passa a Rete.",
+    "soloAnnual": "Una sede, fatturazione annuale."
   },
   "demo": {
     "metaTitle": "Richiedi una demo",

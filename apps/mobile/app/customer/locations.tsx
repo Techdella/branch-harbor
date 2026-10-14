@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Image, View } from 'react-native';
 import { router } from 'expo-router';
 import { Badge, Card, DataStatus, Icon, Screen, ScreenHeader, SkeletonCard, Text } from '@/components';
@@ -13,6 +14,14 @@ export default function Locations() {
   const { setLocation } = useSession();
   const { brand, locations, location, locationsQ } = useCatalog();
   const now = new Date().toISOString();
+  // A business with a single location has nothing to choose: select it and go back.
+  useEffect(() => {
+    if (!locationsQ.loading && locations.length === 1 && brand) {
+      setLocation(brand.id, locations[0]!.id);
+      if (router.canGoBack()) router.back();
+      else router.replace('/customer/home');
+    }
+  }, [locationsQ.loading, locations, brand, setLocation]);
   return (
     <Screen tabs={false}>
       <ScreenHeader title={t('customer.chooseLocation')} back />

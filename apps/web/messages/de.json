@@ -319,7 +319,8 @@
     "pricingCta": "Preise ansehen",
     "faqTitle": "Fragen zu {name}",
     "ctaTitle": "Erleben Sie {name} mit Ihren eigenen Standorten",
-    "ctaBody": "Sagen Sie uns, wie viele Standorte Sie betreiben und welche Systeme Sie heute nutzen. Wir zeigen Ihnen den passenden Ablauf."
+    "ctaBody": "Sagen Sie uns, wie viele Standorte Sie betreiben und welche Systeme Sie heute nutzen. Wir zeigen Ihnen den passenden Ablauf.",
+    "startFree": "Kostenlos starten"
   },
   "industries": {
     "studios": {
@@ -1142,53 +1143,76 @@
       "kicker": "Unternehmen mit einem Standort",
       "imageAlt": "Inhaberin öffnet die Tür eines kleinen Ladens",
       "headline": "Alles an einem Ort – ohne Netzwerk-Komplexität.",
-      "intro": "Ein Standort heißt: keine Zuständigkeitsbereiche und keine Freigaben. Kommen später weitere Standorte hinzu, erscheinen die Netzwerkfunktionen genau dann, wenn Sie sie brauchen.",
-      "cta": "Einrichtung ansehen",
+      "intro": "Ein Standort und ein kleines Team, ohne Netzwerk-Komplexität: kein Bereichsauswahl, keine Regionen, keine Freigabeketten. Eröffnen Sie später einen zweiten Standort und wechseln Sie mit wenigen Klicks zu den Netzwerk-Werkzeugen. Alles bleibt erhalten.",
+      "cta": "Demo anfragen",
       "points": [
         {
-          "t": "An einem Nachmittag eingerichtet",
-          "d": "Eine Checkliste statt eines Assistenten, aus dem Sie nicht herauskommen. Der Fortschritt wird bei jedem Schritt gespeichert."
+          "t": "Ein Unternehmen, ein Dashboard",
+          "d": "Ihr Unternehmensname ersetzt die Standortauswahl. Überblick, Berichte und KI-Antworten beziehen sich auf Ihr Unternehmen, nicht auf ein Netzwerk."
         },
         {
-          "t": "Gehostete Website oder WordPress",
-          "d": "Starten Sie eine Website mit inklusive Adresse – oder behalten Sie Ihre eigene."
+          "t": "In einem Durchgang eingerichtet",
+          "d": "Unternehmensdaten, Adresse, Öffnungszeiten, Zeitzone und Währung in einem Schritt. Der Fortschritt wird laufend gespeichert, optionale Schritte können warten."
         },
         {
-          "t": "Ihre Tools bleiben",
-          "d": "Binden Sie ein unterstütztes Buchungs- oder Shopsystem an, statt es zu ersetzen."
+          "t": "Direkt veröffentlichen",
+          "d": "Keine gesperrten Felder, keine Freigabeketten. Website bearbeiten und veröffentlichen; Freigaben nur aktivieren, wenn Sie Änderungen des Teams prüfen möchten."
         },
         {
-          "t": "KI, die entwirft statt entscheidet",
-          "d": "Texte und Zusammenfassungen zur Prüfung. Ohne Sie wird nichts veröffentlicht."
+          "t": "Einfache Rollen für ein kleines Team",
+          "d": "Laden Sie eine Leitung, Mitarbeitende, Marketing oder Finanzen ein. Netzwerk-Rollen stören nicht."
         }
       ],
-      "stepsTitle": "Einrichtung in sechs Schritten",
+      "stepsTitle": "Von der Anmeldung zur Veröffentlichung in sechs Schritten",
       "steps": [
         {
-          "t": "Branche wählen",
-          "d": "Wir richten die passenden Abläufe ein."
+          "t": "Konto erstellen",
+          "d": "E-Mail bestätigen, dann Branche und „unabhängiges Unternehmen“ wählen."
         },
         {
-          "t": "Unternehmensdaten ergänzen",
-          "d": "Inklusive Zeitzone, Währung und Sprache."
+          "t": "Ihr Unternehmen",
+          "d": "Name, Adresse, Zeitzone, Währung und Öffnungszeiten in einem Schritt."
         },
         {
-          "t": "Gehostet oder WordPress wählen",
-          "d": "Sie können später wechseln."
+          "t": "Gehostet oder WordPress",
+          "d": "Ihre inklusive Adresse ist sites.branchharbor.com/ihr-unternehmen. Eigene Domain jederzeit verbinden."
         },
         {
-          "t": "Kurse, Leistungen, Produkte oder Speisekarte anlegen",
+          "t": "Kurse, Leistungen, Produkte oder Speisekarte hinzufügen",
           "d": "Importieren oder eingeben."
         },
         {
-          "t": "Zahlungen anbinden",
+          "t": "Zahlungen verbinden",
           "d": "Käufe bleiben deaktiviert, bis das Konto freigeschaltet ist."
         },
         {
-          "t": "Vorschau, Test und Veröffentlichung",
-          "d": "Zuerst eine Testbuchung oder Testbestellung durchführen."
+          "t": "Vorschau und veröffentlichen",
+          "d": "Ein einziger Veröffentlichen-Knopf bringt Ihre Website online."
         }
-      ]
+      ],
+      "signupCta": "Kostenlos starten (Studios)",
+      "signupNote": "Die Selbstanmeldung ist für Studios geöffnet. Andere Branchen starten während der Pilotphase mit einer kurzen Demo.",
+      "upgradeTitle": "Sie eröffnen einen zweiten Standort?",
+      "upgradeBody": "Fügen Sie in den Einstellungen einen Standort hinzu. BranchHarbor erklärt, was sich ändert, Sie bestätigen, und Ihr Unternehmen wird zum Netzwerk. Nur die Inhaberin oder der Inhaber kann das tun, und die Änderung wird protokolliert.",
+      "upgradePoints": [
+        {
+          "t": "Nichts geht verloren",
+          "d": "Standort, Kunden, Website, Team und Zahlungsverlauf bleiben unverändert."
+        },
+        {
+          "t": "Netzwerk-Werkzeuge erscheinen",
+          "d": "Standortverzeichnis, Bereichsauswahl, Regionen, Inhabergruppen, Vorlagen und Gruppenveröffentlichung."
+        },
+        {
+          "t": "Ihre Adresse funktioniert weiter",
+          "d": "Ihre Website erhält eine Standortsuche und jeder Standort eine eigene Seite."
+        },
+        {
+          "t": "Die Abrechnung folgt Ihren Standorten",
+          "d": "Aus Solo wird der Netzwerk-Preis pro Standort, sobald der zweite Standort in Betrieb ist."
+        }
+      ],
+      "pricingCta": "Solo-Preis ansehen"
     },
     "pointsTitle": "So funktioniert es",
     "ctaTitle": "Bereit, es mit Ihrem Unternehmen zu sehen?",
@@ -1540,6 +1564,18 @@
     "taxNote": "Je nach Land können Steuern wie Umsatzsteuer, GST oder Sales Tax anfallen; sie werden vor der Zahlung angezeigt.",
     "proposedNote": "Vorläufige Preise. Tarife und Preise können sich bis zur allgemeinen Verfügbarkeit ändern.",
     "plans": {
+      "solo": {
+        "name": "Solo",
+        "for": "Ein unabhängiger Standort",
+        "tag": "Ein Unternehmen",
+        "features": [
+          "Gehostete Website und Dashboard",
+          "Buchungen, Bestellungen und Zahlungen für Ihre Branche",
+          "Einfache Rollen für ein kleines Team",
+          "Wechsel zu Netzwerk, wenn Sie einen zweiten Standort eröffnen"
+        ],
+        "cta": "Kostenlos starten"
+      },
       "connector": {
         "name": "Connector",
         "for": "Ihre WordPress-Website behalten",
@@ -1577,7 +1613,7 @@
         "cta": "Angebot anfordern"
       }
     },
-    "ctaNote": "Während des Pilotbetriebs beginnt jeder Tarif mit einem Gespräch, damit wir prüfen können, ob Ihre Branche und Ihre Anbindungen unterstützt werden.",
+    "ctaNote": "Während der Pilotphase beginnen die Tarife Connector und Netzwerk mit einem Gespräch, damit wir prüfen können, ob Ihre Branche und Ihre Verbindungen unterstützt werden. Solo können Studios selbst buchen.",
     "faqTitle": "Fragen zu den Preisen",
     "faqs": [
       {
@@ -1595,8 +1631,15 @@
       {
         "q": "Sind Gebühren für die Zahlungsabwicklung enthalten?",
         "a": "Nein. Zahlungen laufen über einen verbundenen Anbieter wie Stripe, der in Ihrem Land eigene Gebühren berechnet."
+      },
+      {
+        "q": "Was passiert, wenn ich einen zweiten Standort eröffne?",
+        "a": "Solo umfasst einen Standort. Wenn Sie einen weiteren hinzufügen, wechseln Sie in den Einstellungen zu Netzwerk: Website, Kunden, Team und Verlauf bleiben erhalten, und die Abrechnung erfolgt pro Standort, sobald der neue Standort in Betrieb ist."
       }
-    ]
+    ],
+    "perMonthOneLocation": "/ Monat · ein Standort",
+    "soloTotal": "Ein Standort. Für weitere wechseln Sie zu Netzwerk.",
+    "soloAnnual": "Ein Standort, jährliche Abrechnung."
   },
   "demo": {
     "metaTitle": "Demo anfragen",

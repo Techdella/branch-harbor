@@ -17,7 +17,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ brand: 
   }
   const links = makeLinks(await getRouting(), brand, { brandPrimaryHost: data.site.primaryHost });
   const urls: Array<{ loc: string; lastmod?: string | null }> = [];
-  urls.push({ loc: links.brandCanonical(), lastmod: data.pages.find((p) => p.slug === 'home')?.publishedAt });
+  // Independent business: the brand address IS the location home (listed once, below).
+  const single = data.site.singleLocationSlug ?? null;
+  if (!single) urls.push({ loc: links.brandCanonical(), lastmod: data.pages.find((p) => p.slug === 'home')?.publishedAt });
   for (const p of data.pages.filter((x) => x.slug !== 'home')) urls.push({ loc: links.brandCanonical(`/pages/${p.slug}`), lastmod: p.publishedAt });
   const mod = MODULE_PATH[data.brand.industry];
   for (const l of data.locations) {

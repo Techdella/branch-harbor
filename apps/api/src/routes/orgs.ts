@@ -1,6 +1,9 @@
 import { and, count, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { createOrganizationSchema, onboardingStepUpdateSchema, ONBOARDING_STEPS, apiError, DATA_REGIONS, currency, locale, timeZone, isValidTimeZone } from '@bh/shared';
+import {
+  createOrganizationSchema, onboardingStepUpdateSchema, ONBOARDING_STEPS, apiError, DATA_REGIONS, currency, locale, timeZone, isValidTimeZone,
+  firstLocationSchema, soloPrice, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel,
+} from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { locations, organizations, ownerGroups, regions, roleAssignments, subscriptions, users } from '../db/schema/index.ts';
 import { AppError, badRequest, forbidden, notFound, validationError } from '../lib/errors.ts';
@@ -9,8 +12,9 @@ import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { requireMember, requirePerm, permissionsAt } from '../services/authz.ts';
 import { onboardingState } from '../services/onboarding.ts';
+import { activeLocations, businessModeView, isIndependent, loadOrg, networkPrice, planView, requireNetwork, upgradeToNetwork } from '../services/businessMode.ts';
 import { CUSTOMER_DATA_SHARING } from '../services/orgSettings.ts';
-import { serializeOrg } from '../services/serializers.ts';
+import { serializeLocation, serializeOrg } from '../services/serializers.ts';
 import { orgParams, secured } from './_common.ts';
 
 export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -18,7 +22,11 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
   app.addHook('preHandler', authenticate);
 
   app.post('/orgs', {
-    schema: { tags: ['orgs'], security: secured, summary: 'Create an organisation (onboarding). Creator becomes org_owner.', body: createOrganizationSchema },
+    schema: {
+      tags: ['orgs'], security: secured, summary: 'Create an organisation (onboarding). Creator becomes org_owner.',
+      description: 'model "independent" is a single-location business: pass `firstLocation` to create its (only) location in the same step. Independent businesses start on the Solo plan.',
+      body: createOrganizationSchema.extend({ firstLocation: firstLocationSchema.optional() }),
+    },
   }, async (req, reply) => {
     const me = requireUser(req);
     const b = req.body;
@@ -27,7 +35,12 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!u?.v) throw new AppError(403, 'email_unverified', 'Verify your email address before creating an organisation');
     }
     if (!isValidTimeZone(b.defaultTimeZone)) throw validationError('Unknown timezone', { defaultTimeZone: 'Use an IANA timezone such as Europe/London' });
-    const org = await s.db.transaction(async (tx) => {
+    const fl = b.firstLocation;
+    if (fl?.timeZone && !isValidTimeZone(fl.timeZone)) throw validationError('Unknown timezone', { 'firstLocation.timeZone': 'Use an IANA timezone such as Europe/Lisbon' });
+    const geo = fl ? await s.geocoder.geocode(`${fl.address.line1}, ${fl.address.city}, ${fl.address.country}`) : null;
+    const independent = b.model === 'independent';
+    const solo = independent ? soloPrice(b.defaultCurrency) : null;
+    const { org, location } = await s.db.transaction(async (tx) => {
       let slug = slugify(b.name);
       const [{ c } = { c: 0 }] = await tx.select({ c: count() }).from(organizations).where(eq(organizations.slug, slug));
       if (c > 0) slug = `${slug}-${crypto.randomUUID().slice(0, 6)}`;
@@ -36,14 +49,37 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         slug, name: b.name, industry: b.industry, model: b.model, country: b.country, defaultCurrency: b.defaultCurrency,
         defaultLocale: b.defaultLocale, defaultTimeZone: b.defaultTimeZone, dataRegion: b.dataRegion,
         applicationFeeBps: s.cfg.STRIPE_APPLICATION_FEE_BPS,
-        onboarding: { industry: { status: 'complete', updatedAt: now }, business_details: { status: 'complete', updatedAt: now } },
+        onboarding: {
+          industry: { status: 'complete', updatedAt: now }, business_details: { status: 'complete', updatedAt: now },
+          ...(fl ? { first_location: { status: 'complete' as const, updatedAt: now } } : {}),
+        },
       }).returning();
       await tx.insert(roleAssignments).values({ organizationId: org!.id, userId: me.id, role: 'org_owner', scopeKind: 'organization', scopeId: org!.id, createdBy: me.id });
-      await tx.insert(subscriptions).values({ organizationId: org!.id, currency: b.defaultCurrency, plan: 'trial', status: 'trialing', currentPeriodEnd: new Date(Date.now() + 14 * 86400_000) });
-      await audit(tx, { organizationId: org!.id, ...actor(req), action: 'org.created', scopeKind: 'organization', scopeId: org!.id, targetType: 'organization', targetId: org!.id });
-      return org!;
+      // Independent businesses are on Solo (one location, flat price) from the start; the trial runs first.
+      await tx.insert(subscriptions).values({
+        organizationId: org!.id, currency: b.defaultCurrency, plan: independent ? 'solo' : 'trial', status: 'trialing',
+        pricePerLocationMinor: solo?.amount ?? null, billedLocationCount: 0, currentPeriodEnd: new Date(Date.now() + 14 * 86400_000),
+      });
+      await audit(tx, { organizationId: org!.id, ...actor(req), action: 'org.created', scopeKind: 'organization', scopeId: org!.id, targetType: 'organization', targetId: org!.id, metadata: { model: b.model, withFirstLocation: !!fl } });
+      let location: typeof locations.$inferSelect | null = null;
+      if (fl) {
+        // The business's one location is named after where it is (e.g. "Alfama"); the business name stays on the organisation.
+        const name = fl.name?.trim() || fl.address.city;
+        const [l] = await tx.insert(locations).values({
+          organizationId: org!.id, name, code: (fl.code ?? 'MAIN').toUpperCase(), slug: slugify(name) || 'main',
+          address: fl.address, country: fl.address.country, timeZone: fl.timeZone ?? b.defaultTimeZone, currency: fl.currency ?? b.defaultCurrency,
+          locale: b.defaultLocale, phone: fl.phone ?? null, email: fl.email ?? null, hours: fl.hours ?? null, status: 'onboarding', geo,
+        }).returning();
+        location = l!;
+        await audit(tx, { organizationId: org!.id, ...actor(req), action: 'location.created', scopeKind: 'location', scopeId: l!.id, targetType: 'location', targetId: l!.id, metadata: { via: 'org_create' } });
+      }
+      return { org: org!, location };
     });
-    return reply.code(201).send(serializeOrg(org));
+    return reply.code(201).send({
+      ...serializeOrg(org),
+      businessMode: businessModeView(org, location?.id ?? null),
+      firstLocation: location ? serializeLocation(location) : null,
+    });
   });
 
   app.get('/orgs', { schema: { tags: ['orgs'], security: secured, summary: 'Organisations the current user belongs to' } }, async (req) => {
@@ -57,7 +93,8 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, req.params.orgId));
     if (!org) throw notFound('Organisation');
     const permissions = await permissionsAt(req, s.db, { organizationId: org.id, kind: 'organization', id: org.id });
-    return { ...serializeOrg(org), myOrgPermissions: permissions };
+    const locs = await activeLocations(s.db, org.id);
+    return { ...serializeOrg(org), myOrgPermissions: permissions, locationCount: locs.length, businessMode: businessModeView(org, locs[0]?.id ?? null) };
   });
 
   app.patch('/orgs/:orgId', {
@@ -70,12 +107,13 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         customerDataSharing: z.enum(CUSTOMER_DATA_SHARING).optional().describe('off (default) | totals_only | shared'),
         aiTrainingOptOut: z.boolean().optional().describe('true (default): business data is never used to train AI models'),
         refundApprovalThresholds: z.partialRecord(currency, z.number().int().min(0)).optional().describe('Refunds above this amount (minor units, per currency) need approval'),
+        websiteApprovals: z.enum(WEBSITE_APPROVAL_MODES).optional().describe('Independent businesses only. off (default): edits apply and publish directly. staff: edits by people without approval rights need the owner\'s approval.'),
       }),
     },
   }, async (req) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'org.manage', { organizationId: orgId, kind: 'organization', id: orgId });
-    const { customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, ...orgFields } = req.body;
+    const { customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, websiteApprovals, ...orgFields } = req.body;
     if (req.body.defaultTimeZone && !isValidTimeZone(req.body.defaultTimeZone)) throw validationError('Unknown timezone', { defaultTimeZone: 'Invalid IANA timezone' });
     const [before] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     if (!before) throw notFound('Organisation');
@@ -83,11 +121,15 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
       throw new AppError(409, 'data_region_locked', 'Data region cannot be changed after creation without a migration. Contact support.');
     }
     // Policies are merged into settings so other keys (e.g. the hosted-site theme) are preserved.
-    const policyChanges = Object.fromEntries(Object.entries({ customerDataSharing, aiTrainingOptOut, refundApprovalThresholds }).filter(([, v]) => v !== undefined));
+    if (websiteApprovals !== undefined && !isIndependent(before)) {
+      throw validationError('Networks control approvals with template field policies', { websiteApprovals: 'Only available to independent businesses' });
+    }
+    const policyChanges = Object.fromEntries(Object.entries({ customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, websiteApprovals }).filter(([, v]) => v !== undefined));
     const settings = Object.keys(policyChanges).length ? { ...before.settings, ...policyChanges } : before.settings;
     const [org] = await s.db.update(organizations).set({ ...orgFields, settings, updatedAt: new Date() }).where(eq(organizations.id, orgId)).returning();
     await audit(s.db, { organizationId: orgId, ...actor(req), action: 'org.updated', scopeKind: 'organization', scopeId: orgId, targetType: 'organization', targetId: orgId, metadata: { changes: req.body } });
-    return serializeOrg(org!);
+    const locs = await activeLocations(s.db, orgId);
+    return { ...serializeOrg(org!), businessMode: businessModeView(org!, locs[0]?.id ?? null) };
   });
 
   // ── Onboarding checklist ──
@@ -114,8 +156,10 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // ── Regions & owner groups ──
   for (const [path, table, label] of [['regions', regions, 'Region'], ['owner-groups', ownerGroups, 'Owner group']] as const) {
-    app.get(`/orgs/:orgId/${path}`, { schema: { tags: ['orgs'], security: secured, params: orgParams } }, async (req) => {
+    app.get(`/orgs/:orgId/${path}`, { schema: { tags: ['orgs'], security: secured, params: orgParams, description: 'Independent businesses have none: the list is empty with `hidden: true` until they upgrade to a network.' } }, async (req) => {
       await requireMember(req, s.db, req.params.orgId);
+      const org = await loadOrg(s.db, req.params.orgId);
+      if (org && isIndependent(org)) return { items: [], hidden: true, reason: 'independent_business' };
       const rows = await s.db.select().from(table).where(eq(table.organizationId, req.params.orgId));
       const counts = await s.db
         .select({ id: path === 'regions' ? locations.regionId : locations.ownerGroupId, c: count() })
@@ -128,6 +172,8 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     }, async (req, reply) => {
       const { orgId } = req.params;
       await requirePerm(req, s.db, 'locations.write', { organizationId: orgId, kind: 'organization', id: orgId });
+      const org = await loadOrg(s.db, orgId);
+      if (org) requireNetwork(org, path === 'regions' ? 'Regions' : 'Owner groups');
       const values = path === 'regions' ? { organizationId: orgId, name: req.body.name } : { organizationId: orgId, name: req.body.name, legalName: req.body.legalName ?? null };
       const [row] = await s.db.insert(table).values(values).returning();
       await audit(s.db, { organizationId: orgId, ...actor(req), action: `${path}.created`, targetType: label, targetId: row!.id });
@@ -144,9 +190,23 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     const locs = await s.db.select({ id: locations.id, name: locations.name, status: locations.status, archivedAt: locations.archivedAt }).from(locations).where(eq(locations.organizationId, orgId));
     // Operating and opening locations are billed; drafts, paused/closed and archived locations are not.
     const billable = locs.filter((l) => !l.archivedAt && ['operating', 'opening_soon', 'onboarding'].includes(l.status));
+    const org = await loadOrg(s.db, orgId);
+    const model = asBusinessModel(org?.model);
+    const plan = planView(sub, model);
+    if (plan.key === 'solo') {
+      // Solo: one flat price for the single location, whatever its status.
+      const price = plan.price;
+      return {
+        ...sub, plan: 'solo', businessModel: model, planDetails: plan, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox',
+        pricePerLocation: null,
+        estimatedTotal: price ? { amount: price.amount, currency: price.currency, interval: price.interval } : null,
+        locations: locs.filter((l) => !l.archivedAt).map((l) => ({ id: l.id, name: l.name, status: l.status, billed: true, price })),
+        upgrade: { available: true, path: `/v1/orgs/${orgId}/upgrade-to-network`, note: 'Adding a second location moves you to per-location network pricing.' },
+      };
+    }
     const price = sub.pricePerLocationMinor;
     return {
-      ...sub, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox',
+      ...sub, businessModel: model, planDetails: plan, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox',
       pricePerLocation: price != null ? { amount: price, currency: sub.currency, interval: sub.billingInterval } : null,
       estimatedTotal: price != null ? { amount: price * sub.billedLocationCount, currency: sub.currency, interval: sub.billingInterval } : null,
       locations: locs.map((l) => {
@@ -154,6 +214,46 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         return { id: l.id, name: l.name, status: l.status, billed, price: billed && price != null ? { amount: price, currency: sub.currency, interval: sub.billingInterval } : null };
       }),
     };
+  });
+
+  // ── Business mode: independent → network ──
+  const requireOwner = async (req: Parameters<typeof requireMember>[0], orgId: string) => {
+    const mine = await requireMember(req, s.db, orgId);
+    if (!mine.some((a) => a.role === 'org_owner' && a.scopeKind === 'organization')) throw forbidden('Only the business owner can change the business model');
+  };
+
+  app.get('/orgs/:orgId/upgrade-to-network', {
+    schema: { tags: ['orgs'], security: secured, params: orgParams, summary: 'Preview what upgrading an independent business to a network changes (owner only)' },
+  }, async (req) => {
+    const { orgId } = req.params;
+    await requireOwner(req, orgId);
+    const org = await loadOrg(s.db, orgId);
+    if (!org) throw notFound('Organisation');
+    const [sub] = await s.db.select().from(subscriptions).where(eq(subscriptions.organizationId, orgId));
+    const locs = await activeLocations(s.db, orgId);
+    const per = networkPrice(org.defaultCurrency);
+    return {
+      model: org.model, canUpgrade: isIndependent(org), consequences: UPGRADE_CONSEQUENCES, locationCount: locs.length,
+      currentPlan: sub ? planView(sub, asBusinessModel(org.model)) : null,
+      nextPlan: { key: 'network', name: 'Network', pricing: 'per_location', price: per != null ? { amount: per, currency: org.defaultCurrency, interval: 'month' } : null },
+      keeps: ['locations', 'customers', 'websites', 'pages', 'team', 'payments', 'bookings', 'orders', 'reports'],
+    };
+  });
+
+  app.post('/orgs/:orgId/upgrade-to-network', {
+    schema: {
+      tags: ['orgs'], security: secured, params: orgParams, body: upgradeToNetworkSchema,
+      summary: 'Upgrade an independent business to a network (owner only, audited). Keeps all data; enables regions, owner groups, template policies, group publishing and network roles.',
+    },
+  }, async (req) => {
+    const { orgId } = req.params;
+    await requireOwner(req, orgId);
+    const org = await loadOrg(s.db, orgId);
+    if (!org) throw notFound('Organisation');
+    if (!isIndependent(org)) throw new AppError(409, 'already_network', 'This organisation is already a network.');
+    const updated = await s.db.transaction((tx) => upgradeToNetwork(tx, org, { actorUserId: requireUser(req).id, ip: req.ip, reason: req.body.reason ?? null, trigger: 'explicit' }, s.cfg.SITES_BASE_URL));
+    const locs = await activeLocations(s.db, orgId);
+    return { ...serializeOrg(updated), businessMode: businessModeView(updated, locs[0]?.id ?? null), upgraded: true };
   });
 
   app.get('/orgs/:orgId/permissions', {

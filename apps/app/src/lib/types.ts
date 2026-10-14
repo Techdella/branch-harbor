@@ -14,6 +14,8 @@ export interface RequestContext {
   industry: IndustryKey;
   scopeId: string;
   role: ViewRole;
+  /** Business mode of the selected organisation (absent = network). */
+  business?: 'independent' | 'network';
 }
 
 export interface Session {
@@ -45,6 +47,8 @@ export interface Organization {
   dataRegion: 'us' | 'eu' | 'apac';
   regions: Region[];
   ownerGroups: OwnerGroup[];
+  /** Business mode (spec §6–§7). Absent = network. Read it through `useBusinessMode()`. */
+  model?: 'independent' | 'network';
 }
 
 export interface Address {

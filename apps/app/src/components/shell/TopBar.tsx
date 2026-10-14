@@ -152,12 +152,47 @@ function Notifications() {
 /** "Viewing as": every persona in sample mode; with the API, only the roles the user actually holds. */
 function RoleSelect({ className }: { className?: string }) {
   const t = useTranslations('shell');
+  const ts = useTranslations('single');
   const app = useApp();
+  const independent = app.org.model === 'independent';
+  // Sample mode also offers the independent-business demo (one location, no network concepts).
+  if (!app.live) {
+    const value = app.sampleBusiness === 'independent' ? 'independent' : app.role;
+    return (
+      <label className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas pl-3.5 pr-2 text-xs font-semibold text-stone', className)}>
+        {t('viewingAs')}
+        <select
+          value={value}
+          data-testid="persona-select"
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === 'independent') app.setSampleBusiness('independent');
+            else {
+              app.setSampleBusiness('network');
+              app.setRole(v as ViewRole);
+            }
+          }}
+          className="h-10 bg-transparent text-[13px] font-bold text-ink focus:outline-none"
+        >
+          <optgroup label={ts('personaNetwork')}>
+            {(['hq', 'local', 'staff'] as const).map((r) => (
+              <option key={r} value={r}>
+                {t(`roles.${r}`)}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label={ts('personaIndependent')}>
+            <option value="independent">{ts('personaOwner')}</option>
+          </optgroup>
+        </select>
+      </label>
+    );
+  }
   if (app.roles.length <= 1)
     return (
       <span className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas px-3.5 text-xs font-semibold text-stone', className)}>
         {t('signedInAs')}
-        <strong className="text-[13px] text-ink">{t(`roles.${app.role}`)}</strong>
+        <strong className="text-[13px] text-ink">{independent ? ts(`roles.${app.role}`) : t(`roles.${app.role}`)}</strong>
       </span>
     );
   return (
@@ -166,7 +201,7 @@ function RoleSelect({ className }: { className?: string }) {
       <select value={app.role} onChange={(e) => app.setRole(e.target.value as ViewRole)} className="h-10 bg-transparent text-[13px] font-bold text-ink focus:outline-none">
         {app.roles.map((r) => (
           <option key={r} value={r}>
-            {t(`roles.${r}`)}
+            {independent ? ts(`roles.${r}`) : t(`roles.${r}`)}
           </option>
         ))}
       </select>
@@ -176,6 +211,7 @@ function RoleSelect({ className }: { className?: string }) {
 
 function ProfileMenu() {
   const t = useTranslations('shell');
+  const ts = useTranslations('single');
   const app = useApp();
   const router = useRouter();
   return (
@@ -194,7 +230,7 @@ function ProfileMenu() {
             <div className="min-w-0">
               <div className="truncate text-sm font-bold">{app.session.user.name}</div>
               <div className="truncate text-xs text-stone">{app.session.user.email}</div>
-              <div className="mt-0.5 text-xs font-semibold">{t(`roles.${app.role}`)}</div>
+              <div className="mt-0.5 text-xs font-semibold">{app.org.model === 'independent' ? ts(`roles.${app.role}`) : t(`roles.${app.role}`)}</div>
             </div>
           </div>
           <RoleSelect className="md:hidden" />

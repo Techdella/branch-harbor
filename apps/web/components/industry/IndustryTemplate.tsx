@@ -6,6 +6,9 @@ import { INDUSTRIES, type IndustryKey } from '@/content/industries';
 import { getIntegration } from '@/content/integrations';
 import { CheckList, FaqList, H2, Kicker, Lead, Panel, PastelIcon, SampleBadge, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
+import { supportsSelfServe } from '@bh/shared';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
 import { WorkflowExplorer, type WorkflowStepView } from './WorkflowExplorer';
 
 interface Copy {
@@ -84,6 +87,11 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
             <LinkButton href={demoHref} size="lg" signal="arrow-up-right">
               {tm(`${industry}.cta`)}
             </LinkButton>
+            {supportsSelfServe(industry) && (
+              <LinkButton href={`${APP_URL}/sign-up?industry=${industry}&model=independent`} external size="lg" variant="secondary">
+                {t('startFree')}
+              </LinkButton>
+            )}
             <a href="#workflow" className="inline-flex h-[54px] items-center rounded-full border-[1.5px] border-ink px-6 text-[15px] font-bold hover:bg-canvas-raised">
               {t('seeWorkflow')}
             </a>
