@@ -21,7 +21,7 @@ export interface Integration {
  */
 export const INTEGRATIONS: Integration[] = [
   { id: 'woocommerce', name: 'WooCommerce', mono: 'Wo', category: 'commerce', status: 'tested', direction: 'bidirectional' },
-  { id: 'gutenberg', name: 'WordPress blocks (Gutenberg)', mono: 'Gb', category: 'wordpress', status: 'tested', direction: 'export' },
+  { id: 'gutenberg', name: 'Gutenberg (WordPress)', mono: 'Gb', category: 'wordpress', status: 'tested', direction: 'export' },
   { id: 'yoast', name: 'Yoast SEO', mono: 'Yo', category: 'wordpress', status: 'tested', direction: 'none' },
   { id: 'wprocket', name: 'WP Rocket', mono: 'Wr', category: 'wordpress', status: 'tested', direction: 'none' },
   { id: 'stripe', name: 'Stripe', mono: 'St', category: 'payments', status: 'setup', direction: 'import' },

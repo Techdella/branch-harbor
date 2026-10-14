@@ -3,6 +3,7 @@ import { Logo } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { INDUSTRY_KEYS } from '@/content/industries';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { CookieSettingsButton } from '@/components/consent/CookieBanner';
 
 export async function SiteFooter() {
   const t = await getTranslations('footer');
@@ -67,7 +68,10 @@ export async function SiteFooter() {
         <p>
           {t('copyright', { year: new Date().getFullYear() })} · {t('note')}
         </p>
-        <p>{t('credits')}</p>
+        <p className="flex flex-wrap gap-x-4 gap-y-1">
+          <CookieSettingsButton className="font-bold text-white underline-offset-4 hover:underline" />
+          <span>{t('credits')}</span>
+        </p>
       </div>
     </footer>
   );

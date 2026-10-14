@@ -2,10 +2,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { LogoMark } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { LinkButton } from '@/components/site/LinkButton';
-import { pageMetadata } from '@/components/site/meta';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
-export const generateMetadata = async ({ params }: Props) => pageMetadata((await params).locale, 'signIn', 'body');
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'sign-in');
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentProps, type FormEvent, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { INDUSTRIES as INDUSTRY_LIST, apiError, demoRequestSchema, type Locale } from '@bh/shared';
@@ -9,6 +9,7 @@ import { Icon, cx } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { isIndustryKey } from '@/content/industries';
 import { countryOptions } from './countries';
+import { TURNSTILE_SITE_KEY, Turnstile } from './Turnstile';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
@@ -16,7 +17,7 @@ const FIELDS = ['name', 'email', 'business', 'industry', 'locationCount', 'count
 type FieldName = (typeof FIELDS)[number];
 type Values = Record<FieldName, string> & { marketingConsent: boolean; size: 'single' | 'network' };
 type Errors = Partial<Record<FieldName, string>>;
-type Status = 'idle' | 'sending' | 'success' | 'network' | 'server';
+type Status = 'idle' | 'sending' | 'success' | 'network' | 'server' | 'rateLimited';
 
 const fieldId = (f: FieldName) => `demo-${f}`;
 
@@ -49,13 +50,27 @@ function FormField({ name, label, hint, error, optional, optionalLabel, children
   );
 }
 
+/** @bh/ui Select has no dropdown indicator; add one at the inline end (mirrors in RTL). */
+function SelectBox(props: ComponentProps<typeof Select>) {
+  return (
+    <div className="relative">
+      <Select {...props} className="rtl:pr-3.5 rtl:pl-9" />
+      <Icon name="chevron-down" size={16} className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-stone" />
+    </div>
+  );
+}
+
 export function DemoForm() {
   const t = useTranslations('demo');
   const tm = useTranslations('industryMeta');
   const tc = useTranslations('common');
   const locale = useLocale() as Locale;
   const search = useSearchParams();
-  const countries = useMemo(() => countryOptions(locale), [locale]);
+  // Country names and sort order come from the runtime's ICU data, which differs between Node and
+  // browsers; build the list after mount so server and client HTML match (no hydration mismatch).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const countries = useMemo(() => (mounted ? countryOptions(locale) : { launch: [], other: [] }), [locale, mounted]);
 
   const [v, setV] = useState<Values>({
     name: '',
@@ -74,6 +89,10 @@ export function DemoForm() {
   const [errors, setErrors] = useState<Errors>({});
   const [attempted, setAttempted] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
+  // Bot protection (Cloudflare Turnstile) — only when a site key is configured.
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const summaryRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLHeadingElement>(null);
   const failureRef = useRef<HTMLDivElement>(null);
@@ -136,13 +155,22 @@ export function DemoForm() {
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setTurnstileError(true);
+      setStatus('idle');
+      requestAnimationFrame(() => document.getElementById('demo-turnstile-error')?.scrollIntoView({ block: 'center' }));
+      return;
+    }
+    setTurnstileError(false);
     setStatus('sending');
     try {
       const res = await fetch(`${API_URL}/v1/public/demo-requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(TURNSTILE_SITE_KEY ? { ...data, turnstileToken } : data),
       });
+      // Turnstile tokens are single-use: get a fresh one for any retry.
+      if (TURNSTILE_SITE_KEY && !res.ok) setTurnstileReset((n) => n + 1);
       if (res.ok) {
         setStatus('success');
         requestAnimationFrame(() => {
@@ -151,15 +179,29 @@ export function DemoForm() {
         });
         return;
       }
+      if (res.status === 429) {
+        setStatus('rateLimited');
+        requestAnimationFrame(() => failureRef.current?.focus());
+        return;
+      }
       if (res.status === 400 || res.status === 422) {
         const body = apiError.safeParse(await res.json().catch(() => null));
         const fields = body.success ? body.data.error.fields : undefined;
+        const code = body.success ? body.data.error.code : '';
+        if ((fields && 'turnstileToken' in fields) || code.startsWith('turnstile')) {
+          setTurnstileError(true);
+          setStatus('idle');
+          return;
+        }
         if (fields && Object.keys(fields).length) {
+          // Server-side validation: show our localized message for each field the API rejected.
           const mapped: Errors = {};
           for (const f of Object.keys(fields)) {
-            if ((FIELDS as readonly string[]).includes(f)) mapped[f as FieldName] = t(`errors.${f}` as 'errors.name');
+            const key = f.split('.')[0]!;
+            if ((FIELDS as readonly string[]).includes(key)) mapped[key as FieldName] = t(`errors.${key}` as 'errors.name');
           }
           if (Object.keys(mapped).length) {
+            setAttempted(true);
             setErrors(mapped);
             setStatus('idle');
             requestAnimationFrame(() => summaryRef.current?.focus());
@@ -169,6 +211,7 @@ export function DemoForm() {
       }
       setStatus('server');
     } catch {
+      if (TURNSTILE_SITE_KEY) setTurnstileReset((n) => n + 1);
       setStatus('network');
     }
     requestAnimationFrame(() => failureRef.current?.focus());
@@ -235,10 +278,10 @@ export function DemoForm() {
         </div>
       )}
 
-      {(status === 'network' || status === 'server') && (
+      {(status === 'network' || status === 'server' || status === 'rateLimited') && (
         <div ref={failureRef} tabIndex={-1} role="alert" className="flex flex-col items-start gap-3 rounded-[20px] bg-warning-bg p-5 text-warning outline-none sm:flex-row sm:items-center">
-          <Icon name="wifi-off" size={20} className="shrink-0" />
-          <p className="flex-1 text-sm font-bold">{status === 'network' ? t('errors.network') : t('errors.server')}</p>
+          <Icon name={status === 'network' ? 'wifi-off' : status === 'rateLimited' ? 'clock' : 'alert'} size={20} className="shrink-0" />
+          <p className="flex-1 text-sm font-bold">{status === 'network' ? t('errors.network') : status === 'rateLimited' ? t('errors.rateLimited') : t('errors.server')}</p>
           <button type="submit" className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-4 text-sm font-bold text-white">
             <Icon name="refresh" size={15} />
             {t('errors.retry')}
@@ -277,26 +320,26 @@ export function DemoForm() {
           <Input {...common('name')} autoComplete="name" value={v.name} onChange={(e) => set('name', e.target.value)} required />
         </FormField>
         <FormField name="email" label={t('form.email')} hint={t('form.emailHint')} error={errors.email} optionalLabel={optional}>
-          <Input {...common('email', true)} type="email" autoComplete="email" value={v.email} onChange={(e) => set('email', e.target.value)} required />
+          <Input {...common('email', true)} dir="ltr" className="rtl:text-right" type="email" autoComplete="email" value={v.email} onChange={(e) => set('email', e.target.value)} required />
         </FormField>
         <FormField name="business" label={t('form.business')} error={errors.business} optionalLabel={optional}>
           <Input {...common('business')} autoComplete="organization" value={v.business} onChange={(e) => set('business', e.target.value)} required />
         </FormField>
         <FormField name="industry" label={t('form.industry')} error={errors.industry} optionalLabel={optional}>
-          <Select {...common('industry')} value={v.industry} onChange={(e) => set('industry', e.target.value)} required>
+          <SelectBox {...common('industry')} value={v.industry} onChange={(e) => set('industry', e.target.value)} required>
             <option value="">{t('form.industryPlaceholder')}</option>
             {INDUSTRY_LIST.map((k) => (
               <option key={k} value={k}>
                 {k === 'realty' ? t('form.realtyOption') : tm(`${k}.name`)}
               </option>
             ))}
-          </Select>
+          </SelectBox>
         </FormField>
         <FormField name="locationCount" label={t('form.locationCount')} error={errors.locationCount} optionalLabel={optional}>
           <Input {...common('locationCount')} type="number" inputMode="numeric" min={1} max={10000} value={v.locationCount} onChange={(e) => set('locationCount', e.target.value)} required />
         </FormField>
         <FormField name="country" label={t('form.country')} error={errors.country} optionalLabel={optional}>
-          <Select {...common('country')} autoComplete="country" value={v.country} onChange={(e) => set('country', e.target.value)} required>
+          <SelectBox {...common('country')} autoComplete="country" value={v.country} onChange={(e) => set('country', e.target.value)} required>
             <option value="">{t('form.countryPlaceholder')}</option>
             <optgroup label={t('form.countryGroupLaunch')}>
               {countries.launch.map((c) => (
@@ -312,12 +355,12 @@ export function DemoForm() {
                 </option>
               ))}
             </optgroup>
-          </Select>
+          </SelectBox>
         </FormField>
       </div>
 
       <FormField name="existingWebsite" label={t('form.website')} hint={t('form.websiteHint')} error={errors.existingWebsite} optional optionalLabel={optional}>
-        <Input {...common('existingWebsite', true)} type="url" inputMode="url" autoComplete="url" placeholder="https://" value={v.existingWebsite} onChange={(e) => set('existingWebsite', e.target.value)} />
+        <Input {...common('existingWebsite', true)} dir="ltr" className="rtl:text-right" type="url" inputMode="url" autoComplete="url" placeholder="https://" value={v.existingWebsite} onChange={(e) => set('existingWebsite', e.target.value)} />
       </FormField>
 
       <FormField name="primaryDifficulty" label={t('form.difficulty')} hint={t('form.difficultyHint')} error={errors.primaryDifficulty} optionalLabel={optional}>
@@ -326,7 +369,7 @@ export function DemoForm() {
 
       <div className="grid gap-5 sm:grid-cols-2">
         <FormField name="phone" label={t('form.phone')} error={errors.phone} optional optionalLabel={optional}>
-          <Input {...common('phone')} type="tel" autoComplete="tel" value={v.phone} onChange={(e) => set('phone', e.target.value)} />
+          <Input {...common('phone')} dir="ltr" className="rtl:text-right" type="tel" autoComplete="tel" value={v.phone} onChange={(e) => set('phone', e.target.value)} />
         </FormField>
         <FormField name="existingSystems" label={t('form.systems')} hint={t('form.systemsHint')} error={errors.existingSystems} optional optionalLabel={optional}>
           <Input {...common('existingSystems', true)} value={v.existingSystems} onChange={(e) => set('existingSystems', e.target.value)} />
@@ -338,6 +381,27 @@ export function DemoForm() {
         {t('form.consent')}
       </label>
 
+      {TURNSTILE_SITE_KEY && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-bold text-ink">{t('form.securityCheck')}</span>
+          <Turnstile
+            locale={locale}
+            resetSignal={turnstileReset}
+            describedBy={turnstileError ? 'demo-turnstile-error' : undefined}
+            onToken={(tok) => {
+              setTurnstileToken(tok);
+              if (tok) setTurnstileError(false);
+            }}
+          />
+          {turnstileError && (
+            <p id="demo-turnstile-error" role="alert" className="flex items-center gap-1 text-xs font-bold text-danger">
+              <Icon name="alert" size={13} stroke={2.2} />
+              {t('errors.turnstile')}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col gap-3 border-t border-line-soft pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-md text-xs leading-relaxed text-stone">
           {t('privacyNote')}{' '}
@@ -345,10 +409,10 @@ export function DemoForm() {
             {tc('learnMore')}
           </Link>
         </p>
-        <button type="submit" disabled={status === 'sending'} aria-busy={status === 'sending' || undefined} className="inline-flex h-[54px] items-center justify-center gap-2.5 rounded-full bg-ink ps-6 pe-1.5 text-[15px] font-bold text-white disabled:opacity-60">
+        <button type="submit" disabled={status === 'sending'} aria-busy={status === 'sending' || undefined} className="inline-flex h-[54px] shrink-0 items-center justify-center gap-2.5 rounded-full bg-ink ps-6 pe-1.5 text-[15px] font-bold whitespace-nowrap text-white disabled:opacity-60">
           {status === 'sending' ? t('form.sending') : t('form.submit')}
           <span className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-lime text-ink">
-            <Icon name={status === 'sending' ? 'clock' : 'arrow-up-right'} size={18} />
+            <Icon name={status === 'sending' ? 'clock' : 'arrow-up-right'} size={18} className="rtl:-scale-x-100" />
           </span>
         </button>
       </div>

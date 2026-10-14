@@ -1,16 +1,12 @@
-import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Icon } from '@/components/ui';
 import { FaqList, H2, PageHero, Panel } from '@/components/site/Blocks';
 import { PricingPlans } from '@/components/pricing/PricingPlans';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'pricing' });
-  return { title: t('metaTitle'), description: t('intro') };
-}
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'pricing');
 
 export default async function PricingPage({ params }: Props) {
   const { locale } = await params;

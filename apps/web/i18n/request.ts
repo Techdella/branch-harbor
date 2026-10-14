@@ -5,12 +5,19 @@ import en from '../messages/en.json';
 
 type Messages = Record<string, unknown>;
 
-/** Locales with their own message files. Everything else (and every missing key) falls back to English. */
+/**
+ * Every supported locale has a complete message file (verified by `pnpm check:messages`). The deep
+ * merge over English below is a safety net so a key added to en.json never renders as a raw key.
+ */
 const loaders: Record<string, () => Promise<{ default: Messages }>> = {
+  'en-GB': () => import('../messages/en-GB.json'),
   fr: () => import('../messages/fr.json'),
   es: () => import('../messages/es.json'),
   de: () => import('../messages/de.json'),
   'pt-BR': () => import('../messages/pt-BR.json'),
+  nl: () => import('../messages/nl.json'),
+  it: () => import('../messages/it.json'),
+  ar: () => import('../messages/ar.json'),
 };
 
 function isObject(v: unknown): v is Messages {

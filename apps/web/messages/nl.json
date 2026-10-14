@@ -1,0 +1,2066 @@
+{
+  "meta": {
+    "title": "BranchHarbor — Eén thuis voor elke vestiging",
+    "description": "BranchHarbor verbindt websites, klantactiviteit en branchespecifieke werkprocessen voor bedrijven met meerdere vestigingen en franchiseketens. Het hoofdkantoor houdt overzicht; lokale teams houden de regie die ze nodig hebben.",
+    "titleTemplate": "%s · BranchHarbor"
+  },
+  "common": {
+    "skipToContent": "Naar de hoofdinhoud",
+    "requestDemo": "Demo aanvragen",
+    "signIn": "Inloggen",
+    "sampleData": "Voorbeeldgegevens",
+    "conceptualPreview": "Conceptvoorbeeld · Voorbeeldgegevens",
+    "learnMore": "Meer informatie",
+    "home": "Home",
+    "breadcrumb": "Kruimelpad",
+    "language": "Taal",
+    "draftLegal": "Concept – juridische controle volgt",
+    "draftLegalBody": "Deze pagina is een werkconcept dat we uit transparantie publiceren. Het is nog niet juridisch bindend en wordt vóór de lancering vervangen door gecontroleerde tekst.",
+    "lastUpdated": "Laatst bijgewerkt: {date}",
+    "availability": {
+      "pilot": "Pilot",
+      "next": "Als volgende gepland",
+      "planned": "Gepland"
+    },
+    "status": {
+      "tested": "Getest",
+      "limited": "Beperkte ondersteuning",
+      "setup": "Configuratie nodig",
+      "planned": "Gepland"
+    },
+    "locationStatus": {
+      "operating": "Actief",
+      "openingSoon": "Binnenkort open",
+      "onboarding": "In onboarding"
+    },
+    "optional": "optioneel",
+    "homeLabel": "BranchHarbor – home",
+    "close": "Sluiten"
+  },
+  "nav": {
+    "main": "Hoofdmenu",
+    "industries": "Branches",
+    "franchises": "Voor franchiseketens",
+    "wordpressIntegrations": "WordPress & integraties",
+    "wordpress": "WordPress-connector",
+    "integrations": "Integraties",
+    "pricing": "Prijzen",
+    "resources": "Kennisbank",
+    "support": "Support",
+    "independent": "Bedrijven met één vestiging",
+    "openMenu": "Menu openen",
+    "closeMenu": "Menu sluiten",
+    "mobileMenu": "Menu",
+    "realtyPlanned": "Vastgoed is gepland en nog niet beschikbaar."
+  },
+  "footer": {
+    "tagline": "Eén thuis voor elke vestiging.",
+    "industries": "Branches",
+    "product": "Product",
+    "company": "Bedrijf",
+    "policies": "Beleid",
+    "franchises": "Voor franchiseketens",
+    "independent": "Zelfstandige bedrijven",
+    "wordpress": "WordPress",
+    "integrations": "Integraties",
+    "pricing": "Prijzen",
+    "demo": "Demo aanvragen",
+    "resources": "Kennisbank",
+    "docs": "Documentatie",
+    "support": "Support",
+    "about": "Over ons",
+    "privacy": "Privacy",
+    "terms": "Voorwaarden",
+    "security": "Beveiliging",
+    "note": "Product in pre-release. Functies zijn gelabeld naar beschikbaarheid; voorbeeldgegevens zijn als voorbeeld gemarkeerd.",
+    "credits": "Foto’s: Unsplash-fotografen",
+    "copyright": "© {year} BranchHarbor"
+  },
+  "industryMeta": {
+    "studios": {
+      "name": "Studio’s",
+      "who": "Yoga, pilates, dans, barre, indoor cycling en boutique fitness",
+      "flow": "Aanvraag → proefles → les → lidmaatschap",
+      "cta": "Studiodemo aanvragen"
+    },
+    "sports": {
+      "name": "Sport",
+      "who": "Academies, clubs, trainingsprogramma’s en kampen",
+      "flow": "Inschrijving → groepsindeling → aanwezigheid",
+      "cta": "Sportdemo aanvragen"
+    },
+    "wellness": {
+      "name": "Gezondheid & wellness",
+      "who": "Spa’s, massagepraktijken, wellnesscentra en diensten op afspraak",
+      "flow": "Behandeling → behandelaar → afspraak",
+      "cta": "Wellnessdemo aanvragen"
+    },
+    "commerce": {
+      "name": "Retail",
+      "who": "Winkelketens en franchisewinkels",
+      "flow": "Product vinden → bestelling → afhandeling",
+      "cta": "Retaildemo aanvragen"
+    },
+    "foods": {
+      "name": "Horeca & food",
+      "who": "Restaurants, cafés, bakkerijen, maaltijdservices en foodfranchises",
+      "flow": "Vestiging → menu → bestelling → afhalen",
+      "cta": "Horecademo aanvragen"
+    },
+    "realty": {
+      "name": "Vastgoed",
+      "who": "Makelaarskantoren en makelaarsnetwerken"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Studio-pilot gaat van start · Horeca volgt",
+      "titleLead": "Eén thuis voor",
+      "titleAccent": "elke vestiging.",
+      "body": "Verbind je websites, klantactiviteit en branchespecifieke werkprocessen. Geef het hoofdkantoor overzicht en lokale teams de regie die ze nodig hebben.",
+      "primary": "Ontdek jouw branche",
+      "secondary": "Zo werkt het"
+    },
+    "preview": {
+      "heading": "Productvoorbeeld: overzicht van het hoofdkantoor",
+      "imageAlt": "Cursisten oefenen in een zonnige yogastudio",
+      "imageCaption": "Toronto – Queen West",
+      "imageSub": "Studio · 9 lessen vandaag",
+      "overview": "Overzicht",
+      "scope": "Alle geautoriseerde vestigingen ({count})",
+      "locations": "Vestigingen",
+      "selectHint": "Kies een vestiging om de samenvatting te openen.",
+      "enquiries": "Aanvragen · 7 dagen",
+      "classesToday": "Lessen vandaag",
+      "occupancy": "Bezetting · deze week",
+      "unavailable": "Niet beschikbaar",
+      "notConnected": "Niet gekoppeld",
+      "connected": "Gekoppeld · {minutes} min geleden",
+      "degraded": "Verstoord · laatste synchronisatie {hours} u geleden",
+      "bookingNotConnected": "Boekingssysteem niet gekoppeld",
+      "localTime": "Lokale tijdzone: {tz}",
+      "sourceNote": "Aanvragen komen uit websiteformulieren. Lessen komen uit het gekoppelde boekingssysteem.",
+      "closeDrawer": "Samenvatting van vestiging sluiten",
+      "drawerLabel": "Samenvatting van vestiging"
+    },
+    "industries": {
+      "title": "Kies jouw branche",
+      "body": "Eén gedeeld platform, afgestemd op hoe jouw bedrijf werkt. Studio’s zitten in de pilot; de andere branches zijn ontworpen en staan op de roadmap.",
+      "explore": "{name} ontdekken",
+      "independent": "Eén vestiging? Bekijk de eenvoudigere opzet",
+      "realty": "Vastgoed · Gepland"
+    },
+    "hqLocal": {
+      "title": "Hoofdkantoor en vestigingen, elk met de juiste bevoegdheden",
+      "hq": {
+        "eyebrow": "Hoofdkantoor",
+        "title": "Gedeelde regie",
+        "body": "Vergrendel merkcontent, publiceer sjablonen naar gekozen vestigingen en bekijk rapportages over het hele netwerk. Klantgegevens blijven bij de vestiging, tenzij jouw beleid delen toestaat.",
+        "chips": [
+          "Vergrendelde merkcontent",
+          "Groepspublicatie",
+          "Netwerkrapportages"
+        ]
+      },
+      "local": {
+        "eyebrow": "Vestigingen",
+        "title": "Lokale vrijheid",
+        "body": "Werk openingstijden, prijzen en lokale aanbiedingen bij waar het hoofdkantoor dat toestaat. Elk veld laat zien of het gedeeld is, lokaal of goedkeuring nodig heeft.",
+        "chips": [
+          "Lokaal aanpasbaar",
+          "Goedkeuring nodig",
+          "Terug naar standaard hoofdkantoor"
+        ]
+      }
+    },
+    "steps": {
+      "title": "In drie stappen aan de slag",
+      "body": "Begin met één vestiging en voeg de rest toe wanneer je er klaar voor bent.",
+      "items": [
+        {
+          "title": "Kies jouw branche",
+          "desc": "Start met werkprocessen voor studio’s, sport, wellness, retail of horeca."
+        },
+        {
+          "title": "Koppelen of lanceren",
+          "desc": "Lanceer een gehoste website, of houd je WordPress-site en koppel ondersteunde tools."
+        },
+        {
+          "title": "Vestigingen afstemmen",
+          "desc": "Deel wat overal hetzelfde moet zijn en laat elk team de rest zelf regelen."
+        }
+      ]
+    },
+    "capabilities": {
+      "title": "Wat je krijgt",
+      "body": "Bij elke functie staat wanneer die beschikbaar komt.",
+      "legendLabel": "Legenda beschikbaarheid",
+      "tags": {
+        "launch": "Bij lancering",
+        "preview": "Preview",
+        "setup": "Configuratie nodig",
+        "selected": "Geselecteerde systemen"
+      },
+      "items": [
+        {
+          "name": "Websites",
+          "desc": "Gehoste sites of WordPress-blokken, gedeelde sjablonen en lokale pagina’s."
+        },
+        {
+          "name": "Klanten",
+          "desc": "Aanvragen, leden en deelnemers, bewaard bij de juiste vestiging."
+        },
+        {
+          "name": "Marketing",
+          "desc": "Campagnepagina’s, formulieren en leadroutering naar elke vestiging."
+        },
+        {
+          "name": "Betalingen",
+          "desc": "Via een gekoppeld betaalaccount per bedrijf of vestiging."
+        },
+        {
+          "name": "BranchHarbor AI",
+          "desc": "Concepten en samenvattingen binnen jouw bevoegdheden. Wijzigingen vragen goedkeuring."
+        },
+        {
+          "name": "Koppelingen",
+          "desc": "Ondersteunde boekings- en commercetools, elk met een duidelijke status."
+        }
+      ]
+    },
+    "delivery": {
+      "title": "Twee manieren om te starten",
+      "hosted": {
+        "title": "Start met een BranchHarbor-site",
+        "body": "Wij hosten je website en dashboard. Gebruik een meegeleverd adres of koppel je eigen domein wanneer je wilt.",
+        "cta": "Bekijk gehoste abonnementen"
+      },
+      "wordpress": {
+        "title": "Houd je WordPress-site",
+        "body": "Voeg BranchHarbor-formulieren, roosters en koppelingen toe aan de site die je al hebt. Je hosting blijft hetzelfde.",
+        "cta": "Zo werkt de connector"
+      }
+    },
+    "integrations": {
+      "title": "Werkt met wat je al gebruikt",
+      "body": "Elke koppeling heeft een status. Gepland betekent: nog niet beschikbaar.",
+      "cta": "Alle integraties"
+    },
+    "evidence": {
+      "eyebrow": "Resultaten",
+      "title": "Pilotresultaten publiceren we hier",
+      "body": "We tonen geen klantlogo’s of prestatieclaims voordat we die hebben. Tot pilotbedrijven hun ervaringen delen, kun je de werkprocessen zelf verkennen.",
+      "workflow": "Werkproces {name}"
+    },
+    "pricing": {
+      "eyebrow": "Prijzen in het kort",
+      "title": "Afgerekend per vestiging",
+      "body": "Betaal voor de vestigingen die je autoriseert, in je eigen valuta. Houd je bestaande boekings- of commercesoftware waar we ermee koppelen. Netwerken krijgen hulp bij de onboarding.",
+      "cta": "Prijzen bekijken"
+    },
+    "faq": {
+      "title": "Vragen",
+      "items": [
+        {
+          "q": "Hoe werkt afrekenen per vestiging?",
+          "a": "Je betaalt voor elke vestiging die je in BranchHarbor autoriseert. Een vestiging toevoegen publiceert niet automatisch de website, en een vestiging verwijderen stopt de facturering vanaf de volgende periode."
+        },
+        {
+          "q": "Moet ik mijn huidige software vervangen?",
+          "a": "Nee. Waar we een koppeling ondersteunen, blijft je boekings- of commercesysteem leidend en werkt BranchHarbor ernaast. Bij elke module staat of die een werkproces vervangt, insluit of er alleen over rapporteert."
+        },
+        {
+          "q": "Hoeveel regie houden vestigingen?",
+          "a": "Het hoofdkantoor bepaalt welke velden vergrendeld, aanpasbaar of goedkeuringsplichtig zijn. Vestigingen zien die herkomst bij elk veld en kunnen wijzigingen aanvragen."
+        },
+        {
+          "q": "Wat houdt de onboarding in?",
+          "a": "Een checklist die je voortgang bewaart, hulp bij het importeren van vestigingen en voor netwerken een begeleide uitrol samen met je team."
+        },
+        {
+          "q": "Werkt het in mijn land en mijn taal?",
+          "a": "BranchHarbor is gebouwd voor bedrijven in Noord-Amerika, het Verenigd Koninkrijk en Europa, Australië en Nieuw-Zeeland, Azië, het Midden-Oosten en Latijns-Amerika. Elke vestiging houdt haar eigen tijdzone en valuta, en de interface is in meerdere talen beschikbaar. Welke betaalmogelijkheden er zijn, hangt af van je provider en land."
+        }
+      ]
+    },
+    "closing": {
+      "title": "Breng elke vestiging thuis.",
+      "body": "Vertel ons over je bedrijf, dan laten we je het werkproces zien dat past – met jouw branche en jouw vestigingen.",
+      "primary": "Demo aanvragen",
+      "secondary": "Prijzen bekijken"
+    }
+  },
+  "industryPage": {
+    "badge": "BranchHarbor {name} · {availability}",
+    "seeWorkflow": "Bekijk het werkproces",
+    "mainWorkflow": "Hoofdproces",
+    "problemsTitle": "Waar het nu op vastloopt",
+    "workflowTitle": "Het werkproces voor {name}",
+    "workflowSteps": "Stappen in het werkproces",
+    "previous": "Vorige stap",
+    "next": "Volgende stap",
+    "stepOf": "Stap {current} van {total}",
+    "permissionsTitle": "Bevoegdheden van hoofdkantoor en vestigingen",
+    "permissionsBody": "Het hoofdkantoor bepaalt wat gedeeld wordt. Elke vestiging beheert wat ze mag beheren.",
+    "hqTitle": "Bepaald door het hoofdkantoor",
+    "localTitle": "Beheerd door elke vestiging",
+    "firstTitle": "In de eerste release",
+    "firstBody": "Wat we voor {name} als eerste willen opleveren.",
+    "connectedTitle": "Gekoppelde systemen",
+    "connectedBody": "De status geeft de huidige compatibiliteit weer, geen belofte.",
+    "laterTitle": "Optionele functies voor later",
+    "laterBody": "Ontworpen, nog niet beschikbaar. We labelen ze zodra ze er zijn.",
+    "sampleTitle": "Voorbeeldnetwerk",
+    "sampleBody": "Een fictief netwerk dat op deze hele pagina wordt gebruikt. Elke vestiging houdt haar eigen tijdzone en valuta.",
+    "currency": "Valuta",
+    "timeZone": "Tijdzone",
+    "pricingTitle": "Wat het kost",
+    "pricingBody": "Abonnementen per vestiging met catalogusprijzen in jouw valuta. Netwerken kunnen een offerte aanvragen.",
+    "pricingCta": "Prijzen bekijken",
+    "faqTitle": "Vragen over {name}",
+    "ctaTitle": "Zie {name} met je eigen vestigingen",
+    "ctaBody": "Vertel ons hoeveel vestigingen je hebt en welke systemen je nu gebruikt. We lopen het werkproces door dat bij je past."
+  },
+  "industries": {
+    "studios": {
+      "metaTitle": "Studio’s",
+      "imageAlt": "Groepsles yoga in een studio",
+      "headline": "Houd elke studio verbonden, van eerste aanvraag tot volgende les.",
+      "intro": "Websites, roosters, aanvragen en vervanging van docenten op één plek, terwijl elke studio haar eigen agenda en leden houdt.",
+      "problems": [
+        {
+          "t": "Eén site per studio, allemaal net anders",
+          "d": "Roosters, prijzen en introductieaanbiedingen lopen uit elkaar tussen vestigingen en niemand weet welke pagina klopt."
+        },
+        {
+          "t": "Aanvragen in verschillende inboxen",
+          "d": "Proeflesaanvragen blijven liggen omdat ze in een gedeelde mailbox terechtkwamen waar niemand eigenaar van is."
+        },
+        {
+          "t": "Vervanging regelen via de groepsapp",
+          "d": "Docenten ruilen lessen via berichtjes en het openbare rooster toont de verkeerde naam."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Aanvraag",
+          "title": "Een aanvraag komt bij de juiste studio",
+          "desc": "Websiteformulieren gaan naar de studio die de bezoeker koos. Managers zien nieuwe aanvragen met hun bron en kunnen antwoorden of een proefles inplannen.",
+          "screen": "Aanvragen",
+          "scope": "Toronto – Queen West",
+          "rows": [
+            {
+              "a": "Priya S. · Introductieaanbod",
+              "b": "Websiteformulier · 12 min geleden",
+              "tag": "Nieuw"
+            },
+            {
+              "a": "Daniel K. · Vraag over zwangerschapsyoga",
+              "b": "Websiteformulier · 1 u geleden",
+              "tag": "Beantwoord"
+            },
+            {
+              "a": "Mei L. · Bedrijfsles",
+              "b": "Telefoon · gisteren",
+              "tag": "Toegewezen"
+            }
+          ]
+        },
+        {
+          "label": "Proefles",
+          "title": "Proefles geboekt met een geldig aanbod",
+          "desc": "Het introductieaanbod geldt alleen voor nieuwe leden van die studio. Waar een boekingssysteem gekoppeld is, blijft dat leidend.",
+          "screen": "Aanbiedingen",
+          "scope": "London – Shoreditch",
+          "rows": [
+            {
+              "a": "Nieuwjaarsaanbod · 3 lessen voor £ 30",
+              "b": "Alleen nieuwe leden · 2–31 jan",
+              "tag": "Actief"
+            },
+            {
+              "a": "Eerste les gratis",
+              "b": "Lokale afwijking",
+              "tag": "Lokaal"
+            },
+            {
+              "a": "Vriendenweek",
+              "b": "Goedkeuring hoofdkantoor nodig",
+              "tag": "In afwachting"
+            }
+          ]
+        },
+        {
+          "label": "Les",
+          "title": "Lessen, capaciteit en wachtlijsten",
+          "desc": "Week- en dagweergave per studio. Pas één les of de hele reeks aan, met een preview van wie het raakt.",
+          "screen": "Lessen · za 17 okt",
+          "scope": "Berlin – Prenzlauer Berg",
+          "rows": [
+            {
+              "a": "07:00 Morning Vinyasa · Maya Rao",
+              "b": "16 van 20 geboekt",
+              "tag": "Vervanging gevraagd"
+            },
+            {
+              "a": "09:00 Slow Flow · Sam Tran",
+              "b": "20 van 20 · 3 op wachtlijst",
+              "tag": "Vol"
+            },
+            {
+              "a": "12:15 Lunchpilates · Ana Silva",
+              "b": "11 van 20 geboekt",
+              "tag": "Open"
+            }
+          ]
+        },
+        {
+          "label": "Lidmaatschap",
+          "title": "Leden, rittenkaarten en aanwezigheid",
+          "desc": "Doorzoekbare ledengegevens met tegoed, lidmaatschapsstatus en toestemmingen. Andere studio’s zien deze gegevens niet, tenzij het beleid dat toestaat.",
+          "screen": "Leden",
+          "scope": "Toronto – Queen West",
+          "rows": [
+            {
+              "a": "Ava Chen · Onbeperkt per maand",
+              "b": "Verlengt op 1 nov · 14 lessen deze maand",
+              "tag": "Actief"
+            },
+            {
+              "a": "Liam Ortiz · 10-rittenkaart",
+              "b": "Nog 3 lessen · geldig t/m 30 nov",
+              "tag": "Weinig tegoed"
+            },
+            {
+              "a": "Noor Haddad · Introductieaanbod",
+              "b": "2 van 3 gebruikt",
+              "tag": "Proef"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Gedeelde lestypes, beschrijvingen en merkpagina’s",
+        "Introductieaanbiedingen waar studio’s aan kunnen meedoen",
+        "Netwerkrapportages over aanvragen en aanwezigheid, waar gekoppeld"
+      ],
+      "local": [
+        "Rooster, zalen en docenten van de studio",
+        "Lokale prijzen waar het hoofdkantoor afwijkingen toestaat",
+        "Goedkeuring van vervanging en communicatie met leden"
+      ],
+      "first": [
+        "Websites en studioroosters",
+        "Aanvraagformulieren en leadroutering",
+        "Koppeling met geselecteerde boekingssystemen",
+        "Netwerkoverzicht met actualiteit van gegevens"
+      ],
+      "later": [
+        "Eigen boeken en afrekenen",
+        "Rittenkaarten en lidmaatschappen",
+        "Vervangingsverzoeken voor docenten",
+        "Online lessen en on-demandbibliotheek"
+      ],
+      "faqs": [
+        {
+          "q": "Moeten we onze boekingssoftware vervangen?",
+          "a": "Nee. In de eerste release blijft een ondersteund boekingssysteem leidend; BranchHarbor toont het rooster en linkt ernaar. Eigen boekingen komen later en vervangen je systeem alleen als je daarvoor kiest."
+        },
+        {
+          "q": "Kan het hoofdkantoor ledengegevens van elke studio zien?",
+          "a": "Niet automatisch. Netwerkrapportages tonen totalen. Ledengegevens blijven bij de studio, tenzij je bedrijfsbeleid delen voor een vastgelegd doel toestaat."
+        },
+        {
+          "q": "Wat gebeurt er bij de overgang naar zomer- of wintertijd?",
+          "a": "Lessen worden in UTC opgeslagen en in de lokale tijdzone van elke studio getoond, zodat terugkerende tijden na de overgang kloppen, waar de studio ook staat."
+        }
+      ]
+    },
+    "sports": {
+      "metaTitle": "Sport",
+      "imageAlt": "Kinderen voetballen op een grasveld",
+      "headline": "Programma’s, teams en locaties samen op één georganiseerde plek.",
+      "intro": "Inschrijvingen, selecties, schema’s en aanwezigheid voor elke locatie, waarbij ouders alleen de deelnemers zien die zij vertegenwoordigen.",
+      "problems": [
+        {
+          "t": "Overal inschrijfformulieren",
+          "d": "Papier, spreadsheets en formuliertools die niet praten met de teamindeling."
+        },
+        {
+          "t": "Veldconflicten pas op de dag zelf ontdekt",
+          "d": "Twee groepen op hetzelfde veld omdat schema’s op verschillende plekken staan."
+        },
+        {
+          "t": "Toegang voor ouders is rommelig",
+          "d": "Ouders krijgen berichten voor de verkeerde groep, of helemaal niets."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Inschrijven",
+          "title": "Ouders schrijven een deelnemer in",
+          "desc": "Kies programma en locatie, controleer de leeftijd op de peildatum, koppel de deelnemer aan de ouder en vul de verplichte formulieren in.",
+          "screen": "Inschrijvingen",
+          "scope": "Manchester – Platt Fields",
+          "rows": [
+            {
+              "a": "Ella M. · O10 Najaar",
+              "b": "Ouder: Sara M. · formulieren compleet",
+              "tag": "Wacht op beoordeling"
+            },
+            {
+              "a": "Jonah P. · O12 Kamp",
+              "b": "Betaling ontvangen",
+              "tag": "Geaccepteerd"
+            },
+            {
+              "a": "Leo R. · O10 Najaar",
+              "b": "Capaciteit bereikt",
+              "tag": "Wachtlijst"
+            }
+          ]
+        },
+        {
+          "label": "Indelen",
+          "title": "Beoordelen en groepen indelen",
+          "desc": "Betaald is niet hetzelfde als geselecteerd. Beheerders beoordelen inschrijvingen en delen groepen en trainers in.",
+          "screen": "Teams & groepen",
+          "scope": "Manchester – Platt Fields",
+          "rows": [
+            {
+              "a": "O10 Blauw · Trainer Ortiz",
+              "b": "14 van 16",
+              "tag": "Open"
+            },
+            {
+              "a": "O10 Groen · Trainer Ahmed",
+              "b": "16 van 16",
+              "tag": "Vol"
+            },
+            {
+              "a": "O12 Kamp · Trainer Lee",
+              "b": "22 van 24",
+              "tag": "Open"
+            }
+          ]
+        },
+        {
+          "label": "Plannen",
+          "title": "Schema’s met gemarkeerde veldconflicten",
+          "desc": "Trainingen en wedstrijden per locatie, met overlappingen gemarkeerd voordat ze bij gezinnen terechtkomen.",
+          "screen": "Schema · di",
+          "scope": "Melbourne – Albert Park",
+          "rows": [
+            {
+              "a": "17:00 O10 Blauw · Veld 2",
+              "b": "Trainer Ortiz",
+              "tag": "Gepland"
+            },
+            {
+              "a": "17:00 O12 Kamp · Veld 2",
+              "b": "Zelfde veld als O10 Blauw",
+              "tag": "Conflict"
+            },
+            {
+              "a": "18:30 O14 · Veld 1",
+              "b": "Trainer Lee",
+              "tag": "Gepland"
+            }
+          ]
+        },
+        {
+          "label": "Aanwezigheid",
+          "title": "Snel inchecken voor trainers",
+          "desc": "Trainers openen hun training, zien de geautoriseerde selectie en registreren aanwezigheid met een paar tikken.",
+          "screen": "Aanwezigheid · O10 Blauw",
+          "scope": "Trainer Ortiz",
+          "rows": [
+            {
+              "a": "Ella M.",
+              "b": "Ingecheckt 16:58",
+              "tag": "Aanwezig"
+            },
+            {
+              "a": "Sam K.",
+              "b": "Ouder geïnformeerd",
+              "tag": "Afwezig"
+            },
+            {
+              "a": "Ivy T.",
+              "b": "—",
+              "tag": "Niet geregistreerd"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Programmasjablonen, tarieven en inschrijfformulieren",
+        "Seizoensopzet en deelnameregels",
+        "Rapportages over alle locaties"
+      ],
+      "local": [
+        "Schema’s per locatie en indeling van trainers",
+        "Beoordeling van inschrijvingen en groepsindeling",
+        "Updates over trainingen alleen naar betrokken groepen"
+      ],
+      "first": [
+        "Inschrijven voor programma’s",
+        "Selecties en indeling van trainers",
+        "Planning met conflictmeldingen",
+        "Mededelingen aan groepen"
+      ],
+      "later": [
+        "Betalen in termijnen",
+        "Wedstrijden en uitslagen",
+        "Selectieprocessen",
+        "Uitgebreid ouderportaal"
+      ],
+      "faqs": [
+        {
+          "q": "Zit een kind in het team zodra er betaald is?",
+          "a": "Nee. Waar goedkeuring nodig is, staat in de bevestiging dat de inschrijving nog wordt beoordeeld. Betalen en selecteren zijn aparte stappen."
+        },
+        {
+          "q": "Ziet een trainer alle deelnemers?",
+          "a": "Trainers zien alleen de selecties van de trainingen waarvoor ze zijn ingedeeld."
+        },
+        {
+          "q": "Kiest AI de spelers?",
+          "a": "Nee. AI kan programmabeschrijvingen opstellen en inschrijvingen samenvatten. Het selecteert nooit kinderen op basis van veronderstelde vaardigheden of gevoelige kenmerken."
+        }
+      ]
+    },
+    "wellness": {
+      "metaTitle": "Gezondheid & wellness",
+      "imageAlt": "Cliënt ontspant tijdens een spabehandeling",
+      "headline": "Behandelingen boeken, eenvoudiger voor klanten en lokale teams.",
+      "intro": "Behandelingen, behandelaars, ruimtes en vervolgafspraken, met gerespecteerde buffertijden en een oorspronkelijk tijdslot dat veilig blijft bij het verzetten.",
+      "problems": [
+        {
+          "t": "Ruimtes dubbel geboekt",
+          "d": "Twee agenda’s beloven dezelfde behandelruimte."
+        },
+        {
+          "t": "Verzetten kost het tijdslot",
+          "d": "Klanten annuleren om opnieuw te boeken en als de nieuwe afspraak mislukt, is het oude tijdstip weg."
+        },
+        {
+          "t": "Notities in de verkeerde handen",
+          "d": "Administratieve notities zijn zichtbaar voor medewerkers die ze niet nodig hebben."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Behandeling",
+          "title": "Klanten kiezen een behandeling",
+          "desc": "Elke behandeling legt duur, prijs, buffertijden, bevoegde behandelaars en benodigde middelen vast.",
+          "screen": "Behandelingen",
+          "scope": "Sydney – Surry Hills",
+          "rows": [
+            {
+              "a": "Diepweefselmassage · 60 min",
+              "b": "A$ 140 · 15 min buffer · Ruimte A/B",
+              "tag": "Actief"
+            },
+            {
+              "a": "Hotstone · 90 min",
+              "b": "A$ 195 · stenenverwarmer nodig",
+              "tag": "Actief"
+            },
+            {
+              "a": "Gezichtsbehandeling · 45 min",
+              "b": "A$ 110 · Ruimte C",
+              "tag": "Gepauzeerd"
+            }
+          ]
+        },
+        {
+          "label": "Behandelaar",
+          "title": "Een vaste behandelaar of de eerste die vrij is",
+          "desc": "Beschikbaarheid houdt tegelijk rekening met vestigingstoewijzing, bevoegdheid voor de behandeling en capaciteit van ruimtes.",
+          "screen": "Behandelaars",
+          "scope": "Sydney – Surry Hills",
+          "rows": [
+            {
+              "a": "Rina K.",
+              "b": "Diepweefsel, hotstone",
+              "tag": "Beschikbaar"
+            },
+            {
+              "a": "Tom B.",
+              "b": "Gezichtsbehandeling",
+              "tag": "Vandaag vrij"
+            },
+            {
+              "a": "Ana L.",
+              "b": "Diepweefsel",
+              "tag": "Volgeboekt"
+            }
+          ]
+        },
+        {
+          "label": "Afspraak",
+          "title": "Behandelaar en ruimte samen vastgelegd",
+          "desc": "Een reservering houdt behandelaar en ruimte tegelijk vast. Aanbetaling en annuleringsvoorwaarden zie je vóór de betaling.",
+          "screen": "Agenda · do",
+          "scope": "Dubai – Jumeirah",
+          "rows": [
+            {
+              "a": "10:00 Diepweefsel · Rina K.",
+              "b": "Ruimte A · Jordan P.",
+              "tag": "Bevestigd"
+            },
+            {
+              "a": "11:30 Hotstone · Rina K.",
+              "b": "Ruimte B · Kai S.",
+              "tag": "Aanbetaald"
+            },
+            {
+              "a": "14:00 Gezichtsbehandeling · Tom B.",
+              "b": "Ruimte C",
+              "tag": "Geannuleerd"
+            }
+          ]
+        },
+        {
+          "label": "Herhaling",
+          "title": "Pakketten en veilig verzetten",
+          "desc": "Het oude tijdslot komt pas vrij als het nieuwe vastligt. Mislukt de wijziging, dan blijft de oorspronkelijke afspraak staan.",
+          "screen": "Pakketten",
+          "scope": "Auckland – Ponsonby",
+          "rows": [
+            {
+              "a": "Jordan P. · Pakket 5 massages",
+              "b": "Nog 2 · geldig t/m 15 jan",
+              "tag": "Actief"
+            },
+            {
+              "a": "Kai S. · Drie gezichtsbehandelingen",
+              "b": "Nog 1 · geldig t/m 2 nov",
+              "tag": "Verloopt binnenkort"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Behandelcatalogus en beleidsteksten",
+        "Pakketregels en annuleringsvoorwaarden",
+        "Bezettingsrapportages"
+      ],
+      "local": [
+        "Beschikbaarheid van behandelaars en ruimtes",
+        "Lokale prijzen waar toegestaan",
+        "Administratieve notities met beperkte toegang"
+      ],
+      "first": [
+        "Behandelpagina’s",
+        "Beschikbaarheid en boeken",
+        "Herinneringen",
+        "Aanbetalingen via een gekoppeld account"
+      ],
+      "later": [
+        "Pakketten en lidmaatschappen",
+        "Planning van middelen over vestigingen heen",
+        "Campagnes voor klantbehoud"
+      ],
+      "faqs": [
+        {
+          "q": "Is dit een systeem voor medische dossiers?",
+          "a": "Nee. De eerste release is administratief. Diagnoses, medische dossiers en behandeladviezen vallen erbuiten."
+        },
+        {
+          "q": "Leest AI intakeformulieren?",
+          "a": "Gevoelige antwoorden op formulieren zijn standaard uitgesloten van de algemene AI-context."
+        },
+        {
+          "q": "Wat als het verzetten mislukt?",
+          "a": "Je bestaande afspraak blijft staan. Er komt niets vrij totdat de vervangende afspraak is bevestigd."
+        }
+      ]
+    },
+    "commerce": {
+      "metaTitle": "Retail",
+      "imageAlt": "Interieur van een kledingboetiek",
+      "headline": "Stuur je assortiment centraal. Laat elke winkel haar klanten bedienen.",
+      "intro": "Een gedeelde catalogus met lokale voorraad en prijzen, een WooCommerce-koppeling en voorraadhistorie in plaats van één los getal.",
+      "problems": [
+        {
+          "t": "Voorraad die niemand vertrouwt",
+          "d": "De site zegt ‘op voorraad’, het schap zegt iets anders."
+        },
+        {
+          "t": "Lokale prijzen overschrijven de stamgegevens",
+          "d": "Een aanpassing in één winkel verandert ongemerkt de productinformatie voor iedereen."
+        },
+        {
+          "t": "Dubbele bestellingen bij een nieuwe poging",
+          "d": "Een mislukte synchronisatie maakt dezelfde bestelling twee keer aan."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Catalogus",
+          "title": "Stamproducten met aanpasbare velden",
+          "desc": "Het hoofdkantoor maakt producten en varianten aan, bepaalt welke velden winkels mogen aanpassen en bekijkt een preview vóór verspreiding.",
+          "screen": "Catalogus",
+          "scope": "Alle winkels",
+          "rows": [
+            {
+              "a": "Linnen overshirt · 4 varianten",
+              "b": "Gepubliceerd in 8 winkels",
+              "tag": "Gesynchroniseerd"
+            },
+            {
+              "a": "Merino trui · 6 varianten",
+              "b": "Mislukt in 2 winkels",
+              "tag": "Gedeeltelijk"
+            },
+            {
+              "a": "Canvas tas",
+              "b": "Concept",
+              "tag": "Concept"
+            }
+          ]
+        },
+        {
+          "label": "Assortiment",
+          "title": "Lokale voorraad en toegestane prijzen",
+          "desc": "Winkels passen beschikbaarheid en voorraad aan met een reden. De herkomst van een afwijking is altijd zichtbaar.",
+          "screen": "Lokaal assortiment",
+          "scope": "Amsterdam – De Pijp",
+          "rows": [
+            {
+              "a": "Linnen overshirt · M",
+              "b": "12 op voorraad · prijs hoofdkantoor",
+              "tag": "Op voorraad"
+            },
+            {
+              "a": "Linnen overshirt · L",
+              "b": "1 op voorraad · bijbestellen",
+              "tag": "Laag"
+            },
+            {
+              "a": "Merino trui · S",
+              "b": "Lokale prijs € 79",
+              "tag": "Afwijking"
+            }
+          ]
+        },
+        {
+          "label": "Bestelling",
+          "title": "Bestellingen met heldere betaal- en leverstatus",
+          "desc": "Elke bestelling toont afzonderlijk het bronsysteem, de betaalstatus en de afhandelingsstatus.",
+          "screen": "Bestellingen",
+          "scope": "Paris – Le Marais",
+          "rows": [
+            {
+              "a": "#5521 · Linnen overshirt ×2",
+              "b": "WooCommerce · Betaald",
+              "tag": "Te verzenden"
+            },
+            {
+              "a": "#5519 · Merino trui",
+              "b": "Gedeeltelijke terugbetaling € 20",
+              "tag": "Afgehandeld"
+            },
+            {
+              "a": "#5517 · Canvas tas",
+              "b": "Betaling mislukt",
+              "tag": "In de wacht"
+            }
+          ]
+        },
+        {
+          "label": "Retouren",
+          "title": "Retouren beoordeeld en afgehandeld",
+          "desc": "Aangevraagd, beoordeeld, goedgekeurd, ontvangen en afgehandeld, met terugbetalingen geboekt op de oorspronkelijke betaling.",
+          "screen": "Retouren",
+          "scope": "Paris – Le Marais",
+          "rows": [
+            {
+              "a": "RMA-204 · Merino trui",
+              "b": "Verkeerde maat",
+              "tag": "Goedgekeurd"
+            },
+            {
+              "a": "RMA-203 · Overshirt",
+              "b": "Ontvangen",
+              "tag": "Afgehandeld"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Productcodes en -inhoud in de stamgegevens",
+        "Regels voor aanpasbare velden per product",
+        "Omzetrapportages, opgeteld per valuta"
+      ],
+      "local": [
+        "Voorraadcorrecties met reden",
+        "Toegestane lokale prijzen",
+        "Afhandeling en goedgekeurde retouren"
+      ],
+      "first": [
+        "Gedeelde catalogus",
+        "Lokale beschikbaarheid",
+        "WooCommerce-koppeling",
+        "Synchronisatieresultaten per winkel"
+      ],
+      "later": [
+        "Bestellen in een eigen webwinkel",
+        "Voorraadoverboekingen",
+        "Retourportaal"
+      ],
+      "faqs": [
+        {
+          "q": "Vervangt BranchHarbor de WooCommerce-checkout?",
+          "a": "Nee. Je huidige betaalproviders en checkout blijven. We voegen nooit automatisch een tweede checkout toe."
+        },
+        {
+          "q": "Wat als een winkel een product aanpast?",
+          "a": "Alleen velden die het hoofdkantoor als aanpasbaar heeft gemarkeerd kunnen veranderen, en de wijziging wordt opgeslagen als lokale afwijking die de stamgegevens nooit raakt."
+        },
+        {
+          "q": "Hoe worden winkels met verschillende valuta gerapporteerd?",
+          "a": "Bedragen behouden altijd hun valuta. Netwerkrapportages tellen elke valuta apart op in plaats van om te rekenen tegen een niet-vermelde koers."
+        }
+      ]
+    },
+    "foods": {
+      "metaTitle": "Horeca & food",
+      "imageAlt": "Chef snijdt groenten in een restaurantkeuken",
+      "headline": "Eén merkmenu. Lokale regie. Duidelijke bestellingen.",
+      "intro": "Centrale menu’s met lokale afwijkingen, afhaalbestellingen met echte capaciteit per tijdslot en een keukenscherm gemaakt voor de spits.",
+      "problems": [
+        {
+          "t": "Menu’s die niet gelijklopen",
+          "d": "Een prijswijziging komt bij de ene vestiging aan en bij de andere niet."
+        },
+        {
+          "t": "Afhaaltijden die niet haalbaar zijn",
+          "d": "Online bestellingen negeren hoe druk de keuken al is."
+        },
+        {
+          "t": "Bestellingen kwijt bij een slechte verbinding",
+          "d": "De tablet toont oude bestellingen alsof ze actueel zijn."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Menu",
+          "title": "Merkmenu, gepubliceerd naar vestigingen",
+          "desc": "Het hoofdkantoor beheert gerechten, opties en de door het bedrijf aangeleverde dieetinformatie en publiceert met resultaat per vestiging.",
+          "screen": "Centraal menu",
+          "scope": "Alle vestigingen",
+          "rows": [
+            {
+              "a": "Ember chicken bowl",
+              "b": "Dieet: glutenvrije optie",
+              "tag": "Gepubliceerd"
+            },
+            {
+              "a": "Smoked brisket sandwich",
+              "b": "1 vestiging mislukt",
+              "tag": "Gedeeltelijk"
+            },
+            {
+              "a": "Ahornlimonade",
+              "b": "Lokale prijs toegestaan",
+              "tag": "Gepubliceerd"
+            }
+          ]
+        },
+        {
+          "label": "Afhalen",
+          "title": "Afhaalslots met echte capaciteit",
+          "desc": "Klanten kiezen eerst een afhaaltijd. Tijdsloten, sluitingstijd voor bestellingen en bereidingsbuffers worden vóór bevestiging op de server gecontroleerd.",
+          "screen": "Afhaalinstellingen",
+          "scope": "Singapore – Tanjong Pagar",
+          "rows": [
+            {
+              "a": "12:00–12:15",
+              "b": "6 van 8 bestellingen",
+              "tag": "Open"
+            },
+            {
+              "a": "12:15–12:30",
+              "b": "8 van 8 bestellingen",
+              "tag": "Vol"
+            },
+            {
+              "a": "Bestellen tot",
+              "b": "20 min voor sluiting",
+              "tag": "Ingesteld"
+            }
+          ]
+        },
+        {
+          "label": "Bestelling",
+          "title": "Nog niet geaccepteerd of geaccepteerd – altijd duidelijk",
+          "desc": "Klanten zien duidelijk of het restaurant hun bestelling heeft geaccepteerd. Bij weigering volgt een annulering of terugbetaling en een melding.",
+          "screen": "Bestellingen",
+          "scope": "São Paulo – Pinheiros",
+          "rows": [
+            {
+              "a": "#1046 · Mei L.",
+              "b": "Afhalen 12:25",
+              "tag": "Nieuw"
+            },
+            {
+              "a": "#1044 · Ana P.",
+              "b": "Afhalen 12:14",
+              "tag": "In bereiding"
+            },
+            {
+              "a": "#1039 · Tom R.",
+              "b": "Afhalen 11:58",
+              "tag": "Klaar"
+            }
+          ]
+        },
+        {
+          "label": "Keuken",
+          "title": "Een keukenscherm voor de spits",
+          "desc": "Grote kaarten gesorteerd op beloofde tijd, markeringen bij vertraging, optionele signalen en een duidelijke waarschuwing als de verbinding wegvalt.",
+          "screen": "Keuken",
+          "scope": "São Paulo – Pinheiros",
+          "rows": [
+            {
+              "a": "#1041 · 6 min te laat",
+              "b": "1× bowl · zonder ui",
+              "tag": "In bereiding"
+            },
+            {
+              "a": "#1045 · Klaar om 12:18",
+              "b": "Glutenvrij broodje",
+              "tag": "Nieuw"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Gerechten, opties en dieetinformatie",
+        "Welke velden vestigingen mogen wijzigen",
+        "Publicatieresultaten per vestiging"
+      ],
+      "local": [
+        "Openingstijden, besteltijden en slotcapaciteit",
+        "Uitverkochte gerechten en lokale prijzen",
+        "Accepteren van bestellingen en keukenstatus"
+      ],
+      "first": [
+        "Centrale menu’s met lokale afwijkingen",
+        "Afhaalbestellingen",
+        "Keukenscherm",
+        "Betalingen via een gekoppeld account"
+      ],
+      "later": [
+        "Bezorging",
+        "Cateringoffertes",
+        "Terugkerende maaltijdplannen",
+        "Voorraad van ingrediënten"
+      ],
+      "faqs": [
+        {
+          "q": "Kan AI allergeneninformatie schrijven?",
+          "a": "Nee. Informatie over allergenen en dieet komt van jouw bedrijf. AI kan menuteksten opstellen, maar kan geen ingrediënten, dieetlabels, prijzen of het accepteren van bestellingen wijzigen."
+        },
+        {
+          "q": "Wat gebeurt er als de keukentablet de verbinding verliest?",
+          "a": "Het scherm toont het tijdstip van de laatste verversing en pauzeert statuswijzigingen, zodat oude bestellingen niet als actueel worden getoond."
+        },
+        {
+          "q": "Wat als er wel een betaling binnenkomt maar geen bestelling?",
+          "a": "Verschillen tussen betaling en bestelling komen in een herstelwachtrij die het team afhandelt."
+        }
+      ]
+    }
+  },
+  "solutions": {
+    "franchises": {
+      "metaTitle": "Voor franchiseketens en netwerken",
+      "kicker": "Voor franchiseketens & netwerken",
+      "imageAlt": "Docent geeft les in een lichte studio",
+      "headline": "Bewaak het merk. Vertrouw elke vestiging.",
+      "intro": "Hoofdkantoor, regio’s, eigenaarsgroepen en vestigingen, elk met afgebakende rollen. Gedeelde sjablonen gaan eruit met een controleoverzicht; vestigingen runnen hun dag.",
+      "cta": "Bespreek je netwerk",
+      "points": [
+        {
+          "t": "Organisatie → regio’s → vestigingen",
+          "d": "Eigenaarsgroepen kunnen meerdere vestigingen runnen. Gebruikers kunnen meerdere toewijzingen hebben, ook in verschillende landen."
+        },
+        {
+          "t": "Vergrendeld, aanpasbaar of goedkeuringsplichtig",
+          "d": "Elk sjabloonveld toont zijn herkomst, en lokale afwijkingen kun je terugzetten naar de standaard van het hoofdkantoor."
+        },
+        {
+          "t": "Klantgegevens blijven lokaal",
+          "d": "Netwerkrapportages geven geen toegang tot klantgegevens. Delen tussen vestigingen vraagt een expliciet beleid."
+        },
+        {
+          "t": "Gedeeltelijke fouten eerlijk getoond",
+          "d": "Groepspublicatie rapporteert per vestiging, met versies en terugdraaien."
+        }
+      ],
+      "stepsTitle": "Uitrollen in een netwerk",
+      "steps": [
+        {
+          "t": "Breng je structuur in kaart",
+          "d": "Importeer vestigingen met controle per regel en wijs eigenaarsgroepen toe."
+        },
+        {
+          "t": "Stel overgenomen instellingen in",
+          "d": "Kies wat gedeeld wordt, wat lokaal is en wat goedkeuring nodig heeft."
+        },
+        {
+          "t": "Nodig uit met afgebakende rollen",
+          "d": "Regiomanagers, franchisenemers en medewerkers zien alleen hun eigen toewijzingen."
+        },
+        {
+          "t": "Publiceer en volg",
+          "d": "Een controleoverzicht vóór elke gedeelde wijziging en resultaten per vestiging erna."
+        }
+      ],
+      "intlTitle": "Gebouwd voor netwerken over grenzen heen",
+      "intl": [
+        {
+          "t": "Lokale tijd en valuta",
+          "d": "Elke vestiging houdt haar eigen tijdzone en valuta. Rapportages tellen elke valuta apart op."
+        },
+        {
+          "t": "Talen per vestiging",
+          "d": "Vestigingen kunnen in hun eigen taal publiceren en toch merksjablonen delen."
+        },
+        {
+          "t": "Dataopslag per regio",
+          "d": "Organisaties kiezen bij het aanmaken een dataregio (VS, EU of Azië-Pacific)."
+        }
+      ]
+    },
+    "independent": {
+      "metaTitle": "Zelfstandige bedrijven",
+      "kicker": "Bedrijven met één vestiging",
+      "imageAlt": "Eigenaar opent de deur van een kleine winkel",
+      "headline": "Alles op één plek, zonder netwerkcomplexiteit.",
+      "intro": "Eén vestiging betekent geen bevoegdheden of goedkeuringen om te beheren. Voeg later vestigingen toe en de netwerktools verschijnen wanneer je ze nodig hebt.",
+      "cta": "Bekijk de opzet",
+      "points": [
+        {
+          "t": "Ingericht in één middag",
+          "d": "Een checklist in plaats van een wizard waar je niet uit kunt. Je voortgang wordt bij elke stap bewaard."
+        },
+        {
+          "t": "Gehoste site of WordPress",
+          "d": "Lanceer een site met een meegeleverd adres of houd je eigen site."
+        },
+        {
+          "t": "Houd je tools",
+          "d": "Koppel een ondersteund boekings- of commercesysteem in plaats van het te vervangen."
+        },
+        {
+          "t": "AI die voorstelt, niet beslist",
+          "d": "Teksten en samenvattingen die jij controleert. Zonder jou wordt niets gepubliceerd."
+        }
+      ],
+      "stepsTitle": "Opzet in zes stappen",
+      "steps": [
+        {
+          "t": "Kies je branche",
+          "d": "Wij zetten de passende werkprocessen klaar."
+        },
+        {
+          "t": "Vul je bedrijfsgegevens in",
+          "d": "Inclusief tijdzone, valuta en taal."
+        },
+        {
+          "t": "Kies gehost of WordPress",
+          "d": "Je kunt later nog wisselen."
+        },
+        {
+          "t": "Voeg lessen, behandelingen, producten of je menu toe",
+          "d": "Importeren of invoeren."
+        },
+        {
+          "t": "Koppel betalingen",
+          "d": "Aankopen blijven uit tot het account is geactiveerd."
+        },
+        {
+          "t": "Bekijk, test en publiceer",
+          "d": "Doe eerst een testboeking of testbestelling."
+        }
+      ]
+    },
+    "pointsTitle": "Zo werkt het",
+    "ctaTitle": "Klaar om het met jouw bedrijf te zien?",
+    "ctaBody": "Vraag een demo aan en vertel wat je nu gebruikt. We laten je de opzet zien die past."
+  },
+  "wordpress": {
+    "metaTitle": "WordPress-connector",
+    "kicker": "WordPress-connector",
+    "headline": "Houd je WordPress-site. Voeg toe wat ontbreekt.",
+    "intro": "Een gratis connector-plug-in voegt BranchHarbor-formulieren, roosters, menu’s en koppelingen toe aan de site die je al hebt. Je hosting, thema en editor blijven van jou.",
+    "primary": "Ondersteunde koppelingen bekijken",
+    "secondary": "Demo aanvragen",
+    "previewTitle": "Status van de connector",
+    "preview": [
+      {
+        "n": "Site geautoriseerd",
+        "s": "Gekoppeld"
+      },
+      {
+        "n": "Vestigingskoppeling",
+        "s": "1 vraagt aandacht"
+      },
+      {
+        "n": "WooCommerce",
+        "s": "Getest"
+      },
+      {
+        "n": "Gravity Forms",
+        "s": "Configuratie nodig"
+      }
+    ],
+    "stepsTitle": "Zo werkt koppelen",
+    "steps": [
+      {
+        "t": "Detecteren",
+        "d": "We tonen de relevante plug-ins die we vonden en vertellen wat we hebben gecontroleerd."
+      },
+      {
+        "t": "Adapters kiezen",
+        "d": "Kies alleen de ondersteunde koppelingen die je wilt."
+      },
+      {
+        "t": "Autoriseren",
+        "d": "Minimale rechten via een applicatiewachtwoord, nooit je eigen login."
+      },
+      {
+        "t": "Vestigingen koppelen",
+        "d": "Koppel deze site aan een of meer BranchHarbor-vestigingen."
+      },
+      {
+        "t": "Richting kiezen",
+        "d": "Importeren, exporteren of beide, met regels voor conflicten."
+      },
+      {
+        "t": "Testen & live gaan",
+        "d": "Voer een testsynchronisatie uit en bekijk de status."
+      }
+    ],
+    "matrixTitle": "Compatibiliteitsoverzicht",
+    "matrixBody": "Benoemde categorieën met geteste versies en bekende beperkingen. Geen claim dat alles met elke plug-in werkt.",
+    "matrixHead": {
+      "category": "Categorie",
+      "status": "Status",
+      "tested": "Getest met",
+      "does": "Wat het doet",
+      "limits": "Bekende beperkingen"
+    },
+    "matrix": [
+      {
+        "cat": "WooCommerce",
+        "status": "tested",
+        "ver": "9.x",
+        "does": "Producten, voorraad en bestellingen via openbare API’s; HPOS-bewust",
+        "limit": "Subscriptions-extensie niet ondersteund"
+      },
+      {
+        "cat": "Paginabouwers",
+        "status": "limited",
+        "ver": "—",
+        "does": "Blokken, shortcodes en embeds",
+        "limit": "Native Elementor-widget gepland"
+      },
+      {
+        "cat": "Boekingssystemen",
+        "status": "planned",
+        "ver": "—",
+        "does": "Geselecteerde adapters met gedocumenteerde API-rechten",
+        "limit": "Nog geen beschikbaar"
+      },
+      {
+        "cat": "SEO",
+        "status": "tested",
+        "ver": "Yoast 23",
+        "does": "Laat metadata en sitemaps over aan je SEO-plug-in",
+        "limit": "Door BranchHarbor gehoste pagina’s beheren die zelf"
+      },
+      {
+        "cat": "Formulieren",
+        "status": "setup",
+        "ver": "Gravity Forms 2.8",
+        "does": "Veldkoppeling en routering per vestiging",
+        "limit": "Dubbelcontrole alleen op e-mail"
+      },
+      {
+        "cat": "Cache & beveiliging",
+        "status": "tested",
+        "ver": "WP Rocket 3",
+        "does": "Gedocumenteerde uitzonderingen voor dynamische paden",
+        "limit": "Uitzonderingen handmatig toevoegen"
+      },
+      {
+        "cat": "Meertalig",
+        "status": "limited",
+        "ver": "WPML 4.6",
+        "does": "Taalkoppeling voor vertaalde pagina’s",
+        "limit": "Roosters handmatig vertalen"
+      },
+      {
+        "cat": "Multisite",
+        "status": "setup",
+        "ver": "WordPress 6.6",
+        "does": "Netwerkautorisatie plus koppeling per site",
+        "limit": "Elke site wordt apart gekoppeld"
+      }
+    ],
+    "prereqTitle": "Voordat je installeert",
+    "prereq": [
+      "WordPress 6.4 of hoger, PHP 8.1 of hoger",
+      "Beheerderstoegang om een applicatiewachtwoord aan te maken",
+      "Een BranchHarbor-account met minstens één vestiging",
+      "Toestemming om de genoemde gegevens naar BranchHarbor te sturen"
+    ],
+    "neverTitle": "De connector zal nooit",
+    "never": [
+      "Andere plug-ins uitschakelen of aanpassen",
+      "Je pagina’s of thema overschrijven",
+      "Alle klantgegevens kopiëren zonder vastgelegd doel",
+      "Een tweede checkout toevoegen of advertenties invoegen"
+    ]
+  },
+  "integrations": {
+    "metaTitle": "Integraties",
+    "kicker": "Integraties",
+    "headline": "Compatibiliteit, eerlijk gelabeld.",
+    "intro": "Elke koppeling toont haar status, de richting van de gegevens en welk systeem leidend blijft. Gepland betekent: nog niet beschikbaar.",
+    "searchLabel": "Integraties zoeken",
+    "searchPlaceholder": "Zoek op naam of categorie",
+    "categoryLabel": "Categorie",
+    "statusLabel": "Status",
+    "all": "Alle",
+    "results": "{count, plural, =0 {Geen integraties} one {# integratie} other {# integraties}}",
+    "empty": "Geen integraties gevonden met deze filters.",
+    "clear": "Filters wissen",
+    "inspect": "{name} bekijken",
+    "direction": "Gegevensrichting",
+    "sourceOfTruth": "Leidend systeem",
+    "limits": "Bekende beperkingen",
+    "close": "Details sluiten",
+    "statusHelpTitle": "Wat de statussen betekenen",
+    "statusHelp": {
+      "tested": "Getest met de genoemde versies, met gedocumenteerde acties en beperkingen.",
+      "limited": "Werkt alleen voor de genoemde acties. Bekijk de beperkingen voordat je erop vertrouwt.",
+      "setup": "Beschikbaar, maar vraagt een account, inloggegevens of configuratie aan jouw kant.",
+      "planned": "Niet beschikbaar. Getoond zodat je kunt plannen; er wordt geen datum beloofd."
+    },
+    "disclaimer": "De statussen beschrijven de huidige pre-releaseversie en worden vóór de lancering herzien. Productnamen zijn van hun eigenaren; vermelding betekent geen partnerschap of aanbeveling.",
+    "directions": {
+      "import": "Naar BranchHarbor",
+      "export": "Vanuit BranchHarbor",
+      "bidirectional": "In beide richtingen",
+      "none": "Werkt naast elkaar, geen gegevensuitwisseling"
+    },
+    "categories": {
+      "commerce": "Commerce",
+      "payments": "Betalingen",
+      "pos": "Kassasystemen",
+      "booking": "Boeken & plannen",
+      "marketing": "Marketing",
+      "messaging": "Berichten",
+      "accounting": "Boekhouding",
+      "wordpress": "WordPress",
+      "analytics": "Analytics",
+      "automation": "Automatisering"
+    },
+    "items": {
+      "woocommerce": {
+        "desc": "Producten, voorraad en bestellingen via ondersteunde API’s, met HPOS-ondersteuning en verklaarde checkoutcompatibiliteit.",
+        "truth": "WooCommerce beheert bestellingen en checkout. BranchHarbor beheert de centrale catalogus als je daarvoor kiest.",
+        "limit": "Eigen checkoutvelden moeten gekoppeld worden. De Subscriptions-extensie wordt nog niet ondersteund."
+      },
+      "gutenberg": {
+        "desc": "BranchHarbor-roosters, -formulieren en -menu’s als native blokken.",
+        "truth": "WordPress beheert de pagina-inhoud.",
+        "limit": "Full Site Editing-sjablonen alleen getest met standaardthema’s."
+      },
+      "yoast": {
+        "desc": "Werkt ernaast zonder metadata te schrijven. BranchHarbor-blokken laten titels en sitemaps over aan Yoast.",
+        "truth": "Yoast beheert metadata, canonieke URL’s en sitemaps.",
+        "limit": "—"
+      },
+      "wprocket": {
+        "desc": "Werkt ernaast met gedocumenteerde uitzonderingen voor dynamische en ingelogde paden.",
+        "truth": "—",
+        "limit": "Voeg de genoemde uitzonderingen toe na installatie."
+      },
+      "stripe": {
+        "desc": "Gekoppelde accounts per bedrijf of vestiging voor betalingen in ondersteunde landen. Voorwaarden en kosten bepaalt Stripe.",
+        "truth": "Stripe beheert de betaalstatus. BranchHarbor legt referenties vast en stemt af.",
+        "limit": "Zelfstandig geëxploiteerde franchises hebben mogelijk eigen accounts nodig. Beschikbaarheid verschilt per land."
+      },
+      "mailchimp": {
+        "desc": "Exporteer contacten met toestemming per vestiging naar doelgroepen.",
+        "truth": "BranchHarbor beheert de toestemming; Mailchimp beheert de verzending.",
+        "limit": "Alleen contacten met vastgelegde toestemming worden geëxporteerd."
+      },
+      "twilio": {
+        "desc": "Sms-herinneringen en meldingen via je eigen Twilio-account.",
+        "truth": "Twilio beheert de afleverstatus.",
+        "limit": "Je levert zelf het account en de afzendernummers; de afzenderregels per land gelden."
+      },
+      "gravityforms": {
+        "desc": "Koppel formuliervelden aan BranchHarbor-leads en routeer per vestiging.",
+        "truth": "Gravity Forms beheert de inzending; BranchHarbor bewaart de lead.",
+        "limit": "Dubbele inzendingen alleen op e-mail tegengehouden."
+      },
+      "multisite": {
+        "desc": "Netwerkautorisatie plus een expliciete koppeling per site en vestiging.",
+        "truth": "Elke site houdt haar eigen inhoud.",
+        "limit": "Elke subsite wordt apart gekoppeld."
+      },
+      "ga4": {
+        "desc": "Voeg je Google Analytics 4-meet-ID toe aan gehoste sites, met toestemmingsbeheer.",
+        "truth": "Google Analytics beheert de rapportage.",
+        "limit": "Er worden geen gegevens teruggezet in BranchHarbor-rapportages."
+      },
+      "googlecalendar": {
+        "desc": "Publiceer personeelsroosters naar agenda’s.",
+        "truth": "BranchHarbor beheert het rooster.",
+        "limit": "Alleen in één richting; wijzigingen in Google worden niet geïmporteerd."
+      },
+      "elementor": {
+        "desc": "Shortcode- en embedwidgets binnen Elementor-lay-outs.",
+        "truth": "Elementor beheert de lay-out.",
+        "limit": "Nog geen native widget; de opmaak volgt het thema."
+      },
+      "wpml": {
+        "desc": "Taalkoppeling voor vertaalde pagina’s en records.",
+        "truth": "WPML beheert de vertalingen.",
+        "limit": "Menu’s en roosters worden handmatig vertaald."
+      },
+      "mindbody": {
+        "desc": "Lesroosters en boekingen uit Mindbody.",
+        "truth": "Mindbody zou leidend blijven.",
+        "limit": "Niet beschikbaar. API-toegang wordt beoordeeld."
+      },
+      "momence": {
+        "desc": "Lesroosters en lidmaatschappen uit Momence.",
+        "truth": "Momence zou leidend blijven.",
+        "limit": "Niet beschikbaar."
+      },
+      "janeapp": {
+        "desc": "Afspraken en beschikbaarheid van behandelaars uit Jane.",
+        "truth": "Jane zou leidend blijven.",
+        "limit": "Niet beschikbaar."
+      },
+      "teamsnap": {
+        "desc": "Selecties en schema’s voor clubs die TeamSnap al gebruiken.",
+        "truth": "TeamSnap zou leidend blijven.",
+        "limit": "Niet beschikbaar."
+      },
+      "adyen": {
+        "desc": "Betalingen voor grotere netwerken die Adyen al gebruiken.",
+        "truth": "Adyen zou de betaalstatus beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "paypal": {
+        "desc": "PayPal als extra betaalmethode in gehoste checkouts.",
+        "truth": "PayPal zou de betaalstatus beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "square": {
+        "desc": "Winkelverkopen en catalogus voor retail en horeca.",
+        "truth": "Square zou de kassatransacties beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "toast": {
+        "desc": "Kassabestellingen en menu’s voor restaurants.",
+        "truth": "Toast zou de kassatransacties beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "lightspeed": {
+        "desc": "Kassaverkopen en voorraad voor retail en horeca.",
+        "truth": "Lightspeed zou de kassatransacties beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "shopify": {
+        "desc": "Producten en bestellingen voor winkels die al via Shopify verkopen.",
+        "truth": "Shopify zou checkout en bestellingen beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "googlebusiness": {
+        "desc": "Houd openingstijden en vestigingsgegevens gelijk met Google Bedrijfsprofiel.",
+        "truth": "BranchHarbor zou de vestigingsgegevens beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "meta": {
+        "desc": "Leadformulieren uit Facebook en Instagram naar de juiste vestiging gerouteerd.",
+        "truth": "Meta zou de advertentieweergave beheren.",
+        "limit": "Niet beschikbaar."
+      },
+      "whatsapp": {
+        "desc": "Updates over bestellingen en afspraken via WhatsApp Business.",
+        "truth": "Meta zou de berichtaflevering beheren.",
+        "limit": "Niet beschikbaar. Berichtsjablonen moeten worden goedgekeurd."
+      },
+      "xero": {
+        "desc": "Exporteer uitbetalingen en facturen per vestiging naar Xero.",
+        "truth": "Xero zou de boekhouding voeren.",
+        "limit": "Niet beschikbaar."
+      },
+      "quickbooks": {
+        "desc": "Exporteer uitbetalingen en facturen per vestiging naar QuickBooks Online.",
+        "truth": "QuickBooks zou de boekhouding voeren.",
+        "limit": "Niet beschikbaar."
+      },
+      "zapier": {
+        "desc": "Start workflows in andere tools op basis van BranchHarbor-gebeurtenissen.",
+        "truth": "Hangt af van de gekoppelde app.",
+        "limit": "Niet beschikbaar."
+      }
+    }
+  },
+  "pricing": {
+    "metaTitle": "Prijzen",
+    "kicker": "Prijzen",
+    "headline": "Eenvoudige prijzen per vestiging.",
+    "intro": "Kies hoe je je website runt en betaal per geautoriseerde vestiging. Prijzen worden getoond in de valuta die je kiest.",
+    "currencyLabel": "Valuta",
+    "billingLabel": "Facturering",
+    "monthly": "Maandelijks",
+    "annual": "Jaarlijks · 2 maanden inbegrepen",
+    "locationsLabel": "Vestigingen",
+    "decrease": "Een vestiging verwijderen",
+    "increase": "Een vestiging toevoegen",
+    "perLocation": "/ vestiging / maand",
+    "total": "{amount} / maand voor {count, plural, one {# vestiging} other {# vestigingen}}",
+    "totalAnnual": "{amount} / maand voor {count, plural, one {# vestiging} other {# vestigingen}}, jaarlijks gefactureerd",
+    "listPriceNote": "Catalogusprijzen worden per valuta apart vastgesteld. Het zijn geen omrekeningen tegen de actuele koers; je betaalt de prijs in de valuta die je kiest.",
+    "taxNote": "Afhankelijk van je land kunnen belastingen zoals btw, GST of sales tax van toepassing zijn; die zie je vóór het betalen.",
+    "proposedNote": "Voorlopige prijzen. Abonnementen en prijzen kunnen veranderen vóór de algemene beschikbaarheid.",
+    "plans": {
+      "connector": {
+        "name": "Connector",
+        "for": "Houd je WordPress-site",
+        "tag": "Gratis plug-in + service",
+        "features": [
+          "WordPress-blokken en -formulieren",
+          "Ondersteunde koppelingen",
+          "Leadroutering per vestiging",
+          "BranchHarbor-dashboard"
+        ],
+        "cta": "Start met de connector"
+      },
+      "hosted": {
+        "name": "Hosted",
+        "for": "Lanceer een BranchHarbor-site",
+        "tag": "Meest compleet",
+        "features": [
+          "Gehoste website en dashboard",
+          "Meegeleverd adres of je eigen domein",
+          "Branchespecifieke werkprocessen",
+          "BranchHarbor AI (preview)"
+        ],
+        "cta": "Kies Hosted"
+      },
+      "network": {
+        "name": "Network",
+        "for": "Franchiseketens en groepen",
+        "tag": "Offerte mogelijk",
+        "features": [
+          "Regio’s en eigenaarsgroepen",
+          "Sjablonen: vergrendeld / aanpasbaar / goedkeuring",
+          "Groepspublicatie met terugdraaien",
+          "Begeleide onboarding"
+        ],
+        "cta": "Offerte aanvragen"
+      }
+    },
+    "ctaNote": "Tijdens de pilot begint elk abonnement met een gesprek, zodat we kunnen bevestigen dat je branche en koppelingen worden ondersteund.",
+    "faqTitle": "Vragen over prijzen",
+    "faqs": [
+      {
+        "q": "Waarom verschillen de prijzen per valuta?",
+        "a": "Elke valuta heeft een eigen catalogusprijs, vastgesteld voor die markt. We rekenen niet om tegen een actuele koers: de prijs die je ziet is de prijs die je betaalt (plus eventuele belasting)."
+      },
+      {
+        "q": "Is belasting inbegrepen?",
+        "a": "Nee. Afhankelijk van je land en bedrijfsgegevens kunnen btw, GST, sales tax of vergelijkbare belastingen gelden. De toepasselijke belasting zie je voordat je bevestigt."
+      },
+      {
+        "q": "Kunnen vestigingen in verschillende valuta betalen?",
+        "a": "Netwerken kunnen per vestiging of centraal gefactureerd worden. Elke factuur gebruikt één valuta; we tellen nooit bedragen in verschillende valuta bij elkaar op."
+      },
+      {
+        "q": "Zijn transactiekosten voor betalingen inbegrepen?",
+        "a": "Nee. Betalingen lopen via een gekoppelde provider zoals Stripe, die in jouw land eigen kosten rekent."
+      }
+    ]
+  },
+  "demo": {
+    "metaTitle": "Demo aanvragen",
+    "kicker": "Demo aanvragen",
+    "headline": "Zie BranchHarbor met jouw bedrijf.",
+    "intro": "Vertel ons iets over je vestigingen en wat je wilt oplossen. We bereiden een rondleiding voor door het werkproces dat bij je past.",
+    "imageAlt": "Docent rekt zich uit in een rustige studio",
+    "asideTitle": "Wat er daarna gebeurt",
+    "aside": [
+      "We bekijken je aanvraag en controleren of je branche en systemen worden ondersteund.",
+      "We mailen je om een moment te plannen dat in jouw tijdzone past.",
+      "Je ziet het werkproces met voorbeeldgegevens die op jouw bedrijf lijken."
+    ],
+    "privacyNote": "We gebruiken deze gegevens om op je aanvraag te reageren. Op onze privacypagina lees je hoe we met persoonsgegevens omgaan.",
+    "form": {
+      "title": "Je gegevens",
+      "sizeLegend": "Wat past het best bij jou?",
+      "single": "Eén bedrijf",
+      "singleDesc": "Eén vestiging",
+      "network": "Netwerk",
+      "networkDesc": "Meerdere vestigingen of franchisenemers",
+      "name": "Je naam",
+      "email": "Zakelijk e-mailadres",
+      "emailHint": "We gebruiken dit alleen om je demo in te plannen.",
+      "business": "Bedrijfsnaam",
+      "industry": "Branche",
+      "industryPlaceholder": "Kies een branche",
+      "realtyOption": "Vastgoed (gepland)",
+      "locationCount": "Aantal vestigingen",
+      "country": "Land",
+      "countryPlaceholder": "Kies een land",
+      "countryGroupLaunch": "Lanceringslanden",
+      "countryGroupOther": "Overige landen",
+      "website": "Huidige website",
+      "websiteHint": "Laat leeg als je er nog geen hebt.",
+      "difficulty": "Wat is het grootste probleem dat je wilt oplossen?",
+      "difficultyHint": "Bijvoorbeeld: aanvragen die bij de verkeerde studio terechtkomen, of menu’s die niet gelijklopen.",
+      "phone": "Telefoon",
+      "systems": "Systemen die je nu gebruikt",
+      "systemsHint": "Bijvoorbeeld: WordPress, WooCommerce, Mindbody, Square.",
+      "consent": "Stuur me af en toe productnieuws per e-mail. Afmelden kan altijd.",
+      "submit": "Demo aanvragen",
+      "sending": "Bezig met verzenden…",
+      "securityCheck": "Beveiligingscontrole"
+    },
+    "errors": {
+      "summaryTitle": "{count, plural, one {Er is # probleem met dit formulier} other {Er zijn # problemen met dit formulier}}",
+      "name": "Vul je naam in.",
+      "email": "Vul een zakelijk e-mailadres in, zoals naam@bedrijf.nl.",
+      "business": "Vul je bedrijfsnaam in.",
+      "industry": "Kies je branche.",
+      "locationCount": "Vul in hoeveel vestigingen je hebt (1 of meer).",
+      "country": "Kies je land.",
+      "existingWebsite": "Vul een volledig webadres in, zoals https://jouwbedrijf.nl, of laat het veld leeg.",
+      "primaryDifficulty": "Vertel ons welk probleem je vooral wilt oplossen.",
+      "phone": "Vul een korter telefoonnummer in.",
+      "existingSystems": "Maak deze lijst korter (maximaal 500 tekens).",
+      "generic": "Controleer dit veld.",
+      "network": "We konden je aanvraag niet verzenden. Controleer je verbinding en probeer het opnieuw – je antwoorden staan er nog.",
+      "server": "Er ging bij ons iets mis. Je antwoorden staan er nog; probeer het zo opnieuw.",
+      "retry": "Opnieuw proberen",
+      "rateLimited": "Je hebt in korte tijd meerdere aanvragen verstuurd. Wacht een paar minuten en probeer het opnieuw – je antwoorden staan er nog.",
+      "turnstile": "Rond de beveiligingscontrole af en verstuur je aanvraag opnieuw."
+    },
+    "success": {
+      "title": "Bedankt, {name}. Je aanvraag is binnen.",
+      "body": "We hebben je aanvraag voor {business} ontvangen. Iemand van ons team mailt naar {email} om een moment voor je demo te plannen.",
+      "next": "In de tussentijd kun je de werkprocessen voor jouw branche verkennen.",
+      "explore": "{industry} ontdekken",
+      "home": "Terug naar home"
+    }
+  },
+  "resources": {
+    "metaTitle": "Kennisbank",
+    "kicker": "Kennisbank",
+    "headline": "Gidsen voor eigenaren en managers.",
+    "intro": "Korte, praktische gidsen die we tijdens de pilot schrijven. Eerst publiceren we de opzet, zodat je ziet wat elke gids behandelt.",
+    "searchLabel": "Gidsen zoeken",
+    "searchPlaceholder": "Gidsen zoeken",
+    "all": "Alle",
+    "minutes": "{count} min lezen",
+    "outline": "Opzet",
+    "empty": "Geen gidsen gevonden voor je zoekopdracht.",
+    "categories": {
+      "start": "Aan de slag",
+      "websites": "Websites",
+      "wordpress": "WordPress",
+      "networks": "Netwerken",
+      "payments": "Betalingen"
+    },
+    "items": [
+      {
+        "cat": "start",
+        "title": "Je eerste vestiging instellen",
+        "sum": "Bedrijfsgegevens, tijdzone, valuta en wat je overneemt van het hoofdkantoor.",
+        "mins": 6
+      },
+      {
+        "cat": "websites",
+        "title": "Je eigen domein koppelen",
+        "sum": "DNS-records, verificatie, certificaten en ervoor zorgen dat je e-mail blijft werken.",
+        "mins": 8
+      },
+      {
+        "cat": "wordpress",
+        "title": "De connector installeren",
+        "sum": "Vereisten, autorisatie met minimale rechten en vestigingen koppelen.",
+        "mins": 7
+      },
+      {
+        "cat": "networks",
+        "title": "Vergrendelde, aanpasbare en goedkeuringsvelden",
+        "sum": "Hoe eigenaarschap van sjablonen werkt en hoe je een lokale afwijking terugzet.",
+        "mins": 5
+      },
+      {
+        "cat": "payments",
+        "title": "Een betaling zonder bestelling afstemmen",
+        "sum": "De herstelwachtrij gebruiken als betaal- en afhandelingsgegevens niet overeenkomen.",
+        "mins": 4
+      },
+      {
+        "cat": "networks",
+        "title": "Een gedeelde wijziging veilig publiceren",
+        "sum": "Controleoverzichten, gedeeltelijke fouten, nieuwe pogingen en terugdraaien.",
+        "mins": 6
+      },
+      {
+        "cat": "start",
+        "title": "Medewerkers uitnodigen met de juiste toegang",
+        "sum": "Rollen, meerdere toewijzingen en toegang intrekken.",
+        "mins": 5
+      },
+      {
+        "cat": "payments",
+        "title": "Netwerken met meerdere valuta",
+        "sum": "Waarom elke vestiging haar valuta houdt en hoe rapportages ze optellen.",
+        "mins": 4
+      }
+    ],
+    "docsCta": "Op zoek naar de productdocumentatie?",
+    "docsLink": "Open de documentatie-index",
+    "results": "{count, plural, =0 {Geen gidsen} one {# gids} other {# gidsen}}"
+  },
+  "docs": {
+    "metaTitle": "Documentatie",
+    "kicker": "Documentatie",
+    "headline": "Productdocumentatie",
+    "intro": "De naslagdocumentatie wordt tijdens de pilot geschreven. Deze index laat zien hoe ze wordt ingedeeld.",
+    "status": "In de maak",
+    "sections": [
+      {
+        "t": "Aan de slag",
+        "d": "Organisaties, vestigingen, tijdzones, valuta en talen."
+      },
+      {
+        "t": "Rollen en rechten",
+        "d": "Hoofdkantoor, regio’s, eigenaarsgroepen, vestigingen en afgebakende rollen."
+      },
+      {
+        "t": "Websites en domeinen",
+        "d": "Gehoste sites, sjablonen, lokale pagina’s, eigen domeinen en publiceren."
+      },
+      {
+        "t": "WordPress-connector",
+        "d": "Installatie, adapters, vestigingen koppelen, synchronisatiestatus en herstel."
+      },
+      {
+        "t": "Koppelingen",
+        "d": "Ondersteunde systemen, gegevensrichting, leidend systeem en conflictregels."
+      },
+      {
+        "t": "Betalingen",
+        "d": "Gekoppelde accounts, terugbetalingen, afstemming en rapportage per valuta."
+      },
+      {
+        "t": "BranchHarbor AI",
+        "d": "Wat AI mag opstellen, wat goedkeuring vraagt en wat het nooit doet."
+      },
+      {
+        "t": "API en webhooks",
+        "d": "Openbare API-referentie voor ontwikkelaars die met BranchHarbor integreren."
+      }
+    ],
+    "helpTitle": "Nu hulp nodig?",
+    "helpBody": "Ga naar support voor hulpopties, of blader door de gidsen in de kennisbank."
+  },
+  "support": {
+    "metaTitle": "Support",
+    "kicker": "Support",
+    "headline": "Waarmee kunnen we helpen?",
+    "intro": "Vind de juiste plek voor hulp, of je BranchHarbor nu verkent of al meedoet aan de pilot.",
+    "topicsTitle": "Veelgestelde onderwerpen",
+    "topics": [
+      {
+        "t": "Boekingen & lessen",
+        "d": "Roosters, wachtlijsten, vervanging"
+      },
+      {
+        "t": "Websites & domeinen",
+        "d": "DNS, publiceren, sjablonen"
+      },
+      {
+        "t": "WordPress-connector",
+        "d": "Installatie, koppelen, synchronisatie"
+      },
+      {
+        "t": "Betalingen",
+        "d": "Terugbetalingen, afstemming"
+      },
+      {
+        "t": "Team & rechten",
+        "d": "Rollen en toegang"
+      },
+      {
+        "t": "BranchHarbor AI",
+        "d": "Reikwijdte en goedkeuringen"
+      }
+    ],
+    "optionsTitle": "Zo krijg je hulp",
+    "options": {
+      "customers": {
+        "t": "Pilotklanten",
+        "d": "Gebruik Help in de BranchHarbor-app. Verzoeken zijn gekoppeld aan je vestiging, zodat we – met jouw toestemming – de juiste context zien."
+      },
+      "prospects": {
+        "t": "BranchHarbor verkennen",
+        "d": "Stel ons je vraag via het demoformulier. Zet je vraag in het veld over het grootste probleem."
+      },
+      "security": {
+        "t": "Beveiligingsmeldingen",
+        "d": "Een kwetsbaarheid gevonden? Op onze beveiligingspagina staat hoe je die verantwoord meldt."
+      }
+    },
+    "openApp": "App openen",
+    "askQuestion": "Stel een vraag",
+    "securityLink": "Beveiligingspagina",
+    "hoursNote": "Supporttijden en regionale contactmogelijkheden publiceren we vóór de algemene beschikbaarheid."
+  },
+  "about": {
+    "metaTitle": "Over ons",
+    "kicker": "Over BranchHarbor",
+    "headline": "Eigen vestigingen, één gedeeld thuis.",
+    "intro": "BranchHarbor helpt zelfstandige bedrijven, ondernemers met meerdere vestigingen en franchiseketens om hun websites, lokale klantactiviteit en branchespecifieke werkprocessen op één afgestemde plek te beheren – waar hun vestigingen ook zitten.",
+    "purposeTitle": "Waarom we dit bouwen",
+    "purpose": "Bedrijven met meerdere vestigingen draaien op losse websites, inconsistente lokale content, campagnes die lastig te meten zijn en integraties die niemand helemaal vertrouwt. Het hoofdkantoor heeft overzicht nodig; lokale teams hebben ruimte nodig om hun dag te runnen. Wij denken dat dat allebei kan.",
+    "principlesTitle": "Hoe we werken",
+    "principles": [
+      {
+        "t": "Rustig en kundig",
+        "d": "Heldere taal voor eigenaren, gevolgen uitgelegd vóór ingrijpende wijzigingen."
+      },
+      {
+        "t": "Vestigingen blijven herkenbaar",
+        "d": "Elke vestiging houdt haar eigen identiteit en bouwt tegelijk op een gedeeld thuis."
+      },
+      {
+        "t": "Eerlijk over beperkingen",
+        "d": "Geplande functies zijn gelabeld. Geen verzonnen klanten of claims."
+      },
+      {
+        "t": "Gebouwd met pilots",
+        "d": "We brengen telkens één complete branche uit, getoetst bij echte bedrijven."
+      }
+    ],
+    "companyTitle": "Bedrijfsgegevens",
+    "company": "BranchHarbor is nog niet gelanceerd. Geregistreerde bedrijfsgegevens, adressen en teamprofielen publiceren we hier vóór de algemene beschikbaarheid.",
+    "contactTitle": "Contact met het team",
+    "contactBody": "Je bereikt ons op dit moment het snelst via het demoformulier.",
+    "contactCta": "Neem contact op"
+  },
+  "legal": {
+    "updated": "oktober 2026",
+    "contents": "Op deze pagina",
+    "privacy": {
+      "metaTitle": "Privacy",
+      "title": "Privacyverklaring",
+      "intro": "Deze verklaring legt uit hoe BranchHarbor met persoonsgegevens omgaat wanneer je onze website bezoekt, een demo aanvraagt of de BranchHarbor-dienst gebruikt, en hoe we klantgegevens verwerken namens de bedrijven die ons gebruiken.",
+      "sections": [
+        {
+          "h": "Wie we zijn en welke rol we hebben",
+          "p": [
+            "Voor onze website, demo-aanvragen en accountbeheer is BranchHarbor de verwerkingsverantwoordelijke (of ‘business’ volgens privacywetten van Amerikaanse staten) voor je persoonsgegevens.",
+            "Voor klantgegevens die bedrijven in BranchHarbor opslaan – zoals leden, klanten, deelnemers of gasten – is het bedrijf de verwerkingsverantwoordelijke en treedt BranchHarbor op als verwerker (of ‘service provider’) volgens hun instructies."
+          ]
+        },
+        {
+          "h": "Wat we verzamelen en waarom",
+          "p": [
+            "Demo-aanvragen: naam, zakelijk e-mailadres, bedrijfsnaam, branche, aantal vestigingen, land en andere gegevens die je zelf deelt, gebruikt om op je aanvraag te reageren. Marketingmails sturen we alleen als je daarvoor kiest.",
+            "Websitegebruik: basale technische gegevens zoals bezochte pagina’s en browsertype, gebruikt om de site te laten werken en te beveiligen. Niet-noodzakelijke analytics draaien alleen met toestemming waar de wet dat vereist."
+          ]
+        },
+        {
+          "h": "Rechtsgronden (EER en VK)",
+          "p": [
+            "Op grond van de AVG en de UK GDPR baseren we ons op gerechtvaardigd belang om vragen te beantwoorden en onze diensten te beveiligen, op de overeenkomst om de dienst te leveren, op toestemming voor marketing en niet-noodzakelijke cookies, en waar van toepassing op een wettelijke verplichting."
+          ]
+        },
+        {
+          "h": "Delen en internationale doorgifte",
+          "p": [
+            "We werken met dienstverleners voor hosting, e-mail en support op basis van schriftelijke overeenkomsten. We verkopen geen persoonsgegevens en delen ze niet voor contextoverschrijdende gedragsgerichte advertenties.",
+            "Organisaties kiezen een dataregio (VS, EU of Azië-Pacific). Bij internationale doorgifte gebruiken we passende waarborgen zoals de modelcontractbepalingen of het UK International Data Transfer Addendum."
+          ]
+        },
+        {
+          "h": "Bewaren en verwijderen",
+          "p": [
+            "We bewaren gegevens uit demo-aanvragen zo lang als nodig is om te reageren en op te volgen, en verwijderen of anonimiseren ze daarna. Klantgegevens worden bewaard volgens de instellingen van het bedrijf en na opzegging van het account binnen een vastgestelde termijn verwijderd."
+          ]
+        },
+        {
+          "h": "Je rechten",
+          "p": [
+            "Afhankelijk van waar je woont, heb je mogelijk het recht op inzage, correctie, verwijdering of overdraagbaarheid van je gegevens, het recht om bezwaar te maken tegen of beperking te vragen van de verwerking, en het recht om toestemming in te trekken – onder meer op grond van de AVG, de UK GDPR, de Canadese PIPEDA, de Californische CCPA/CPRA, de Australische Privacy Act en de Braziliaanse LGPD.",
+            "Liggen je gegevens bij een bedrijf dat BranchHarbor gebruikt, neem dan eerst contact op met dat bedrijf; wij helpen hen daarbij. Je kunt ook een klacht indienen bij je lokale toezichthouder, zoals de Autoriteit Persoonsgegevens."
+          ]
+        },
+        {
+          "h": "Contact",
+          "p": [
+            "Contactgegevens voor privacyverzoeken en, waar vereist, onze vertegenwoordigers in de EU en het VK publiceren we hier vóór de lancering."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "metaTitle": "Voorwaarden",
+      "title": "Gebruiksvoorwaarden",
+      "intro": "Deze conceptvoorwaarden schetsen de overeenkomst tussen BranchHarbor en de bedrijven die het gebruiken. De definitieve voorwaarden, inclusief toepasselijk recht en de contractpartij per regio, publiceren we vóór de lancering.",
+      "sections": [
+        {
+          "h": "Accounts en geautoriseerde gebruikers",
+          "p": [
+            "Het bedrijf dat een organisatie aanmaakt, is verantwoordelijk voor de gebruikers die het uitnodigt en de rollen die het toekent, ook op franchise- en vestigingsniveau."
+          ]
+        },
+        {
+          "h": "Abonnementen, vestigingen en facturering",
+          "p": [
+            "Abonnementen worden gefactureerd per geautoriseerde vestiging in de valuta die bij aankoop wordt getoond. Belastingen zoals btw, GST of sales tax worden toegevoegd waar van toepassing. Na het verwijderen van een vestiging stopt de facturering vanaf de volgende periode."
+          ]
+        },
+        {
+          "h": "Gekoppelde diensten en derden",
+          "p": [
+            "Gekoppelde systemen (bijvoorbeeld betaalproviders of boekingssoftware) vallen onder hun eigen voorwaarden. Bij elke integratie staat welk systeem leidend is en welke gegevens worden uitgewisseld."
+          ]
+        },
+        {
+          "h": "Je content en klantgegevens",
+          "p": [
+            "Je blijft eigenaar van je content en de gegevens van je klanten. We verwerken die alleen om de dienst te leveren en zoals beschreven in onze verwerkersvoorwaarden."
+          ]
+        },
+        {
+          "h": "Aanvaardbaar gebruik",
+          "p": [
+            "Gebruik BranchHarbor niet om ongevraagde berichten te sturen, rechten te schenden, je bedrijf onjuist voor te stellen of lokale wetten te overtreden, waaronder regels voor consumentenbescherming en toestemming voor marketing in je land."
+          ]
+        },
+        {
+          "h": "Aansprakelijkheid",
+          "p": [
+            "Aansprakelijkheidsbeperkingen worden in de definitieve voorwaarden vastgelegd. Niets in deze voorwaarden beperkt rechten die volgens je lokale recht niet beperkt mogen worden, waaronder wettelijke consumentenrechten."
+          ]
+        },
+        {
+          "h": "Wijzigingen in deze voorwaarden",
+          "p": [
+            "We laten je weten wanneer er belangrijke wijzigingen komen, voordat ze ingaan."
+          ]
+        }
+      ]
+    },
+    "security": {
+      "metaTitle": "Beveiliging",
+      "title": "Beveiligingspraktijken",
+      "intro": "Hoe we de bedrijven die BranchHarbor gebruiken en hun klanten willen beschermen. Dit beschrijft ontwerpafspraken voor de pre-releasedienst, geen onafhankelijke certificeringen.",
+      "sections": [
+        {
+          "h": "Scheiding tussen klanten en toegangsbeheer",
+          "p": [
+            "Elk verzoek is beperkt tot één organisatie. Rollen worden toegekend op het niveau van organisatie, regio, eigenaarsgroep of vestiging, en netwerkrapportages geven op zichzelf nooit toegang tot klantgegevens."
+          ]
+        },
+        {
+          "h": "Toegang door support",
+          "p": [
+            "Toegang van onze medewerkers tot een klantaccount moet geautoriseerd en in tijd beperkt zijn en wordt vastgelegd in het auditlog dat het bedrijf kan inzien."
+          ]
+        },
+        {
+          "h": "Betaalgegevens",
+          "p": [
+            "Kaartgegevens worden verwerkt door de gekoppelde betaalproviders. BranchHarbor bewaart tokens en referenties, nooit volledige kaartnummers."
+          ]
+        },
+        {
+          "h": "Inloggegevens voor integraties",
+          "p": [
+            "Koppelingen gebruiken inloggegevens met beperkte rechten, zoals OAuth-tokens of WordPress-applicatiewachtwoorden – nooit je hoofdwachtwoord. Inloggegevens worden versleuteld opgeslagen en kunnen altijd worden ingetrokken."
+          ]
+        },
+        {
+          "h": "Dataregio en versleuteling",
+          "p": [
+            "Organisaties kiezen een dataregio (VS, EU of Azië-Pacific). Gegevens worden versleuteld tijdens transport en bij opslag."
+          ]
+        },
+        {
+          "h": "Reactie op incidenten",
+          "p": [
+            "We informeren getroffen bedrijven zonder onnodige vertraging en ondersteunen ze bij hun eigen meldplichten onder wetten als de AVG, de UK GDPR en PIPEDA."
+          ]
+        },
+        {
+          "h": "Een kwetsbaarheid melden",
+          "p": [
+            "Een contactpunt en beleid voor verantwoorde openbaarmaking publiceren we hier vóór de lancering. Test alsjeblieft niet op accounts die niet van jou zijn."
+          ]
+        }
+      ]
+    }
+  },
+  "signIn": {
+    "metaTitle": "Inloggen",
+    "title": "Inloggen bij BranchHarbor",
+    "body": "Je dashboard staat in de BranchHarbor-app. Daar log je veilig in.",
+    "cta": "Verder naar inloggen",
+    "noAccount": "Nog geen account?",
+    "demo": "Demo aanvragen"
+  },
+  "notFound": {
+    "title": "We konden die pagina niet vinden.",
+    "body": "De link is misschien verouderd, of de pagina is verplaatst.",
+    "home": "Naar home"
+  },
+  "consent": {
+    "title": "Cookies op BranchHarbor",
+    "body": "We gebruiken noodzakelijke cookies om deze site te laten werken. Met jouw toestemming willen we ook analytische en marketingcookies gebruiken om te begrijpen hoe de site wordt gebruikt. Niets optioneels staat aan totdat jij kiest.",
+    "acceptAll": "Alles accepteren",
+    "essentialOnly": "Alleen noodzakelijk",
+    "customize": "Aanpassen",
+    "save": "Keuzes opslaan",
+    "dialogTitle": "Cookievoorkeuren",
+    "dialogBody": "Kies welke optionele cookies we mogen gebruiken. Je kunt dit altijd wijzigen via ‘Cookie-instellingen’ onderaan elke pagina.",
+    "alwaysOn": "Altijd aan",
+    "settings": "Cookie-instellingen",
+    "privacy": "Privacyverklaring",
+    "categories": {
+      "essential": {
+        "name": "Noodzakelijk",
+        "desc": "Nodig om de site te laten werken: je taal, beveiligingscontroles bij formulieren en het onthouden van deze keuze."
+      },
+      "analytics": {
+        "name": "Analytisch",
+        "desc": "Geaggregeerde metingen die ons laten zien welke pagina’s nuttig zijn. Uit, tenzij je toestemming geeft."
+      },
+      "marketing": {
+        "name": "Marketing",
+        "desc": "Helpt ons campagnes te meten en relevante BranchHarbor-content op andere sites te tonen. Uit, tenzij je toestemming geeft."
+      }
+    }
+  }
+}

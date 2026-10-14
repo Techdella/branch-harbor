@@ -1,16 +1,12 @@
-import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { INTEGRATION_STATUSES } from '@/content/integrations';
 import { PageHero, Panel, StatusPill } from '@/components/site/Blocks';
 import { IntegrationCatalogue } from '@/components/integrations/IntegrationCatalogue';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'integrations' });
-  return { title: t('metaTitle'), description: t('intro') };
-}
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'integrations');
 
 export default async function IntegrationsPage({ params }: Props) {
   const { locale } = await params;

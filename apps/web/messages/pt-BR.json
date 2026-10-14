@@ -1,7 +1,8 @@
 {
   "meta": {
     "title": "BranchHarbor — Uma casa para cada unidade",
-    "description": "O BranchHarbor conecta sites, atividade de clientes e fluxos de trabalho de empresas com várias unidades e redes de franquias. A matriz tem visibilidade; as equipes locais têm o controle de que precisam."
+    "description": "O BranchHarbor conecta sites, atividade de clientes e fluxos de trabalho de empresas com várias unidades e redes de franquias. A matriz tem visibilidade; as equipes locais têm o controle de que precisam.",
+    "titleTemplate": "%s · BranchHarbor"
   },
   "common": {
     "skipToContent": "Pular para o conteúdo principal",
@@ -13,10 +14,28 @@
     "home": "Início",
     "breadcrumb": "Trilha de navegação",
     "language": "Idioma",
-    "availability": { "pilot": "Piloto", "next": "Próximo previsto", "planned": "Previsto" },
-    "status": { "tested": "Testado", "limited": "Suporte limitado", "setup": "Requer configuração", "planned": "Previsto" },
-    "locationStatus": { "operating": "Em operação", "openingSoon": "Inauguração em breve", "onboarding": "Em implantação" },
-    "optional": "opcional"
+    "draftLegal": "Rascunho – aguardando revisão jurídica",
+    "draftLegalBody": "Esta página é um rascunho publicado por transparência. Ela ainda não tem validade jurídica e será substituída por um texto revisado antes do lançamento.",
+    "lastUpdated": "Última atualização: {date}",
+    "availability": {
+      "pilot": "Piloto",
+      "next": "Próximo previsto",
+      "planned": "Previsto"
+    },
+    "status": {
+      "tested": "Testado",
+      "limited": "Suporte limitado",
+      "setup": "Requer configuração",
+      "planned": "Previsto"
+    },
+    "locationStatus": {
+      "operating": "Em operação",
+      "openingSoon": "Inauguração em breve",
+      "onboarding": "Em implantação"
+    },
+    "optional": "opcional",
+    "homeLabel": "BranchHarbor – página inicial",
+    "close": "Fechar"
   },
   "nav": {
     "main": "Principal",
@@ -31,7 +50,8 @@
     "independent": "Empresas com uma unidade",
     "openMenu": "Abrir menu",
     "closeMenu": "Fechar menu",
-    "mobileMenu": "Menu"
+    "mobileMenu": "Menu",
+    "realtyPlanned": "Imobiliário está previsto e ainda não está disponível."
   },
   "footer": {
     "tagline": "Uma casa para cada unidade.",
@@ -53,15 +73,44 @@
     "terms": "Termos",
     "security": "Segurança",
     "note": "Produto em pré-lançamento. Os recursos são identificados pela disponibilidade; dados de exemplo são marcados como exemplo.",
-    "credits": "Fotos: colaboradores do Unsplash"
+    "credits": "Fotos: colaboradores do Unsplash",
+    "copyright": "© {year} BranchHarbor"
   },
   "industryMeta": {
-    "studios": { "name": "Estúdios", "who": "Yoga, Pilates, dança, barre, ciclismo e academias boutique", "flow": "Contato → aula experimental → aula → plano", "cta": "Solicitar demonstração para estúdios" },
-    "sports": { "name": "Esportes", "who": "Academias esportivas, clubes, programas de treino e acampamentos", "flow": "Inscrição → definição de turma → presença", "cta": "Solicitar demonstração para esportes" },
-    "wellness": { "name": "Saúde e bem-estar", "who": "Spas, massagem, centros de bem-estar e serviços com agendamento", "flow": "Serviço → profissional → agendamento", "cta": "Solicitar demonstração para bem-estar" },
-    "commerce": { "name": "Varejo", "who": "Grupos varejistas e lojas franqueadas", "flow": "Descoberta → pedido → entrega", "cta": "Solicitar demonstração para varejo" },
-    "foods": { "name": "Alimentação", "who": "Restaurantes, cafés, padarias, refeições prontas e franquias de alimentação", "flow": "Unidade → cardápio → pedido → retirada", "cta": "Solicitar demonstração para alimentação" },
-    "realty": { "name": "Imobiliário", "who": "Imobiliárias e redes de corretores" }
+    "studios": {
+      "name": "Estúdios",
+      "who": "Yoga, Pilates, dança, barre, ciclismo e academias boutique",
+      "flow": "Contato → aula experimental → aula → plano",
+      "cta": "Solicitar demonstração para estúdios"
+    },
+    "sports": {
+      "name": "Esportes",
+      "who": "Academias esportivas, clubes, programas de treino e acampamentos",
+      "flow": "Inscrição → definição de turma → presença",
+      "cta": "Solicitar demonstração para esportes"
+    },
+    "wellness": {
+      "name": "Saúde e bem-estar",
+      "who": "Spas, massagem, centros de bem-estar e serviços com agendamento",
+      "flow": "Serviço → profissional → agendamento",
+      "cta": "Solicitar demonstração para bem-estar"
+    },
+    "commerce": {
+      "name": "Varejo",
+      "who": "Grupos varejistas e lojas franqueadas",
+      "flow": "Descoberta → pedido → entrega",
+      "cta": "Solicitar demonstração para varejo"
+    },
+    "foods": {
+      "name": "Alimentação",
+      "who": "Restaurantes, cafés, padarias, refeições prontas e franquias de alimentação",
+      "flow": "Unidade → cardápio → pedido → retirada",
+      "cta": "Solicitar demonstração para alimentação"
+    },
+    "realty": {
+      "name": "Imobiliário",
+      "who": "Imobiliárias e redes de corretores"
+    }
   },
   "home": {
     "hero": {
@@ -75,6 +124,7 @@
     "preview": {
       "heading": "Prévia do produto: visão geral da matriz",
       "imageAlt": "Alunos praticando em um estúdio de yoga ensolarado",
+      "imageCaption": "Toronto – Queen West",
       "imageSub": "Estúdio · 9 aulas hoje",
       "overview": "Visão geral",
       "scope": "Todas as unidades autorizadas ({count})",
@@ -106,44 +156,96 @@
         "eyebrow": "Matriz",
         "title": "Controles compartilhados",
         "body": "Bloqueie conteúdo da marca, publique modelos nas unidades escolhidas e acompanhe relatórios da rede. Os dados dos clientes ficam na unidade, a menos que sua política permita o compartilhamento.",
-        "chips": ["Conteúdo da marca bloqueado", "Publicação em grupo", "Relatórios da rede"]
+        "chips": [
+          "Conteúdo da marca bloqueado",
+          "Publicação em grupo",
+          "Relatórios da rede"
+        ]
       },
       "local": {
         "eyebrow": "Unidades",
         "title": "Autonomia local",
         "body": "Atualize horários, preços e ofertas locais onde a matriz permitir. Cada campo mostra se é compartilhado, local ou se precisa de aprovação.",
-        "chips": ["Editável localmente", "Requer aprovação", "Restaurar padrão da matriz"]
+        "chips": [
+          "Editável localmente",
+          "Requer aprovação",
+          "Restaurar padrão da matriz"
+        ]
       }
     },
     "steps": {
       "title": "Comece em três passos",
       "body": "Comece com uma unidade e adicione as outras quando estiver pronto.",
       "items": [
-        { "title": "Escolha seu segmento", "desc": "Comece com fluxos criados para estúdios, esportes, bem-estar, varejo ou alimentação." },
-        { "title": "Conecte ou lance", "desc": "Lance um site hospedado, ou mantenha seu site WordPress e conecte as ferramentas compatíveis." },
-        { "title": "Coordene as unidades", "desc": "Compartilhe o que deve ser consistente e deixe cada equipe cuidar do resto." }
+        {
+          "title": "Escolha seu segmento",
+          "desc": "Comece com fluxos criados para estúdios, esportes, bem-estar, varejo ou alimentação."
+        },
+        {
+          "title": "Conecte ou lance",
+          "desc": "Lance um site hospedado, ou mantenha seu site WordPress e conecte as ferramentas compatíveis."
+        },
+        {
+          "title": "Coordene as unidades",
+          "desc": "Compartilhe o que deve ser consistente e deixe cada equipe cuidar do resto."
+        }
       ]
     },
     "capabilities": {
       "title": "O que está incluído",
       "body": "Cada recurso indica sua disponibilidade no lançamento.",
       "legendLabel": "Legenda de disponibilidade",
-      "tags": { "launch": "No lançamento", "preview": "Prévia", "setup": "Requer configuração", "selected": "Sistemas selecionados" },
+      "tags": {
+        "launch": "No lançamento",
+        "preview": "Prévia",
+        "setup": "Requer configuração",
+        "selected": "Sistemas selecionados"
+      },
       "items": [
-        { "name": "Sites", "desc": "Sites hospedados ou blocos WordPress, modelos compartilhados e páginas locais." },
-        { "name": "Clientes", "desc": "Contatos, alunos e participantes, vinculados à unidade certa." },
-        { "name": "Marketing", "desc": "Páginas de campanha, formulários e encaminhamento de leads para cada unidade." },
-        { "name": "Pagamentos", "desc": "Por meio de uma conta de pagamentos conectada para cada empresa ou unidade." },
-        { "name": "BranchHarbor AI", "desc": "Rascunhos e resumos dentro das suas permissões. Alterações precisam de aprovação." },
-        { "name": "Conexões", "desc": "Ferramentas de agendamento e vendas compatíveis, cada uma com status claro." }
+        {
+          "name": "Sites",
+          "desc": "Sites hospedados ou blocos WordPress, modelos compartilhados e páginas locais."
+        },
+        {
+          "name": "Clientes",
+          "desc": "Contatos, alunos e participantes, vinculados à unidade certa."
+        },
+        {
+          "name": "Marketing",
+          "desc": "Páginas de campanha, formulários e encaminhamento de leads para cada unidade."
+        },
+        {
+          "name": "Pagamentos",
+          "desc": "Por meio de uma conta de pagamentos conectada para cada empresa ou unidade."
+        },
+        {
+          "name": "BranchHarbor AI",
+          "desc": "Rascunhos e resumos dentro das suas permissões. Alterações precisam de aprovação."
+        },
+        {
+          "name": "Conexões",
+          "desc": "Ferramentas de agendamento e vendas compatíveis, cada uma com status claro."
+        }
       ]
     },
     "delivery": {
       "title": "Duas formas de começar",
-      "hosted": { "title": "Comece com um site BranchHarbor", "body": "Hospedamos seu site e seu painel. Use um endereço incluído ou conecte seu próprio domínio quando quiser.", "cta": "Ver planos hospedados" },
-      "wordpress": { "title": "Mantenha seu site WordPress", "body": "Adicione formulários, agendas e conexões do BranchHarbor ao site que você já tem. Sua hospedagem continua a mesma.", "cta": "Como o conector funciona" }
+      "hosted": {
+        "title": "Comece com um site BranchHarbor",
+        "body": "Hospedamos seu site e seu painel. Use um endereço incluído ou conecte seu próprio domínio quando quiser.",
+        "cta": "Ver planos hospedados"
+      },
+      "wordpress": {
+        "title": "Mantenha seu site WordPress",
+        "body": "Adicione formulários, agendas e conexões do BranchHarbor ao site que você já tem. Sua hospedagem continua a mesma.",
+        "cta": "Como o conector funciona"
+      }
     },
-    "integrations": { "title": "Funciona com o que você já usa", "body": "Cada conexão mostra um status. “Previsto” significa que ainda não está disponível.", "cta": "Todas as integrações" },
+    "integrations": {
+      "title": "Funciona com o que você já usa",
+      "body": "Cada conexão mostra um status. “Previsto” significa que ainda não está disponível.",
+      "cta": "Todas as integrações"
+    },
     "evidence": {
       "eyebrow": "Evidências",
       "title": "Os resultados do piloto serão publicados aqui",
@@ -159,11 +261,26 @@
     "faq": {
       "title": "Perguntas",
       "items": [
-        { "q": "Como funciona a cobrança por unidade?", "a": "Você paga por cada unidade autorizada no BranchHarbor. Adicionar uma unidade não publica o site dela automaticamente, e remover uma encerra a cobrança a partir do período seguinte." },
-        { "q": "Preciso substituir meus sistemas atuais?", "a": "Não. Quando oferecemos uma conexão, seu sistema de agendamento ou de vendas continua sendo a referência e o BranchHarbor funciona junto com ele. Cada módulo informa se substitui, incorpora ou apenas acompanha um fluxo." },
-        { "q": "Quanto controle as unidades mantêm?", "a": "A matriz decide quais campos ficam bloqueados, editáveis ou exigem aprovação. As unidades veem essa origem em cada campo e podem solicitar alterações." },
-        { "q": "O que inclui a implantação?", "a": "Uma lista de tarefas que salva o progresso, ajuda para importar unidades e, para redes, uma implantação guiada com sua equipe." },
-        { "q": "Funciona no meu país e no meu idioma?", "a": "O BranchHarbor foi feito para empresas da América do Norte, Reino Unido e Europa, Austrália e Nova Zelândia, Ásia, Oriente Médio e América Latina. Cada unidade mantém seu fuso horário e sua moeda, e a interface está disponível em vários idiomas. A disponibilidade de pagamentos depende do seu provedor e do seu país." }
+        {
+          "q": "Como funciona a cobrança por unidade?",
+          "a": "Você paga por cada unidade autorizada no BranchHarbor. Adicionar uma unidade não publica o site dela automaticamente, e remover uma encerra a cobrança a partir do período seguinte."
+        },
+        {
+          "q": "Preciso substituir meus sistemas atuais?",
+          "a": "Não. Quando oferecemos uma conexão, seu sistema de agendamento ou de vendas continua sendo a referência e o BranchHarbor funciona junto com ele. Cada módulo informa se substitui, incorpora ou apenas acompanha um fluxo."
+        },
+        {
+          "q": "Quanto controle as unidades mantêm?",
+          "a": "A matriz decide quais campos ficam bloqueados, editáveis ou exigem aprovação. As unidades veem essa origem em cada campo e podem solicitar alterações."
+        },
+        {
+          "q": "O que inclui a implantação?",
+          "a": "Uma lista de tarefas que salva o progresso, ajuda para importar unidades e, para redes, uma implantação guiada com sua equipe."
+        },
+        {
+          "q": "Funciona no meu país e no meu idioma?",
+          "a": "O BranchHarbor foi feito para empresas da América do Norte, Reino Unido e Europa, Austrália e Nova Zelândia, Ásia, Oriente Médio e América Latina. Cada unidade mantém seu fuso horário e sua moeda, e a interface está disponível em vários idiomas. A disponibilidade de pagamentos depende do seu provedor e do seu país."
+        }
       ]
     },
     "closing": {
@@ -173,6 +290,1314 @@
       "secondary": "Ver preços"
     }
   },
+  "industryPage": {
+    "badge": "BranchHarbor {name} · {availability}",
+    "seeWorkflow": "Ver o fluxo",
+    "mainWorkflow": "Fluxo principal",
+    "problemsTitle": "O que atrapalha hoje",
+    "workflowTitle": "O fluxo de {name}",
+    "workflowSteps": "Etapas do fluxo",
+    "previous": "Etapa anterior",
+    "next": "Próxima etapa",
+    "stepOf": "Etapa {current} de {total}",
+    "permissionsTitle": "Permissões da matriz e das unidades",
+    "permissionsBody": "A matriz decide o que é compartilhado. Cada unidade gerencia o que tem permissão para gerenciar.",
+    "hqTitle": "Definido pela matriz",
+    "localTitle": "Gerenciado por cada unidade",
+    "firstTitle": "Na primeira versão",
+    "firstBody": "O que planejamos entregar primeiro para {name}.",
+    "connectedTitle": "Sistemas conectados",
+    "connectedBody": "O status mostra a compatibilidade atual, não uma promessa.",
+    "laterTitle": "Recursos opcionais futuros",
+    "laterBody": "Projetados, mas ainda não disponíveis. Vamos sinalizá-los quando forem lançados.",
+    "sampleTitle": "Rede de exemplo",
+    "sampleBody": "Uma rede fictícia usada em toda esta página. Cada unidade mantém seu próprio fuso horário e moeda.",
+    "currency": "Moeda",
+    "timeZone": "Fuso horário",
+    "pricingTitle": "Como funciona o preço",
+    "pricingBody": "Planos por unidade com preços de tabela na sua moeda. Redes podem solicitar uma proposta.",
+    "pricingCta": "Ver preços",
+    "faqTitle": "Perguntas sobre {name}",
+    "ctaTitle": "Veja {name} com as suas próprias unidades",
+    "ctaBody": "Conte quantas unidades você administra e quais sistemas usa hoje. Mostraremos o fluxo que faz sentido para você."
+  },
+  "industries": {
+    "studios": {
+      "metaTitle": "Estúdios",
+      "imageAlt": "Aula de yoga em grupo em um estúdio",
+      "headline": "Todos os estúdios conectados, do primeiro contato à próxima aula.",
+      "intro": "Sites, grades de aulas, contatos e substituições de instrutores em um só lugar, com cada estúdio mantendo sua própria agenda e seus alunos.",
+      "problems": [
+        {
+          "t": "Um site por estúdio, todos um pouco diferentes",
+          "d": "Grades, preços e ofertas de boas-vindas ficam diferentes entre as unidades, e ninguém sabe qual página está atualizada."
+        },
+        {
+          "t": "Contatos caindo em caixas de entrada diferentes",
+          "d": "Pedidos de aula experimental ficam sem resposta porque foram para um e-mail compartilhado que ninguém acompanha."
+        },
+        {
+          "t": "Substituições pelo grupo de mensagens",
+          "d": "As trocas entre instrutores acontecem por mensagem e a grade pública mostra o nome errado."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Contato",
+          "title": "O contato chega ao estúdio certo",
+          "desc": "Os formulários do site vão para o estúdio escolhido pelo visitante. Os gerentes veem os novos contatos com a origem e podem responder ou agendar uma aula experimental.",
+          "screen": "Contatos",
+          "scope": "Toronto – Queen West",
+          "rows": [
+            {
+              "a": "Priya S. · Oferta de boas-vindas",
+              "b": "Formulário do site · há 12 min",
+              "tag": "Novo"
+            },
+            {
+              "a": "Daniel K. · Dúvida sobre yoga para gestantes",
+              "b": "Formulário do site · há 1 h",
+              "tag": "Respondido"
+            },
+            {
+              "a": "Mei L. · Aula corporativa",
+              "b": "Telefone · ontem",
+              "tag": "Atribuído"
+            }
+          ]
+        },
+        {
+          "label": "Experimental",
+          "title": "Aula experimental com uma oferta válida",
+          "desc": "A oferta de boas-vindas vale só para novos alunos daquele estúdio. Onde houver um sistema de agendamento conectado, ele continua sendo a referência.",
+          "screen": "Ofertas",
+          "scope": "London – Shoreditch",
+          "rows": [
+            {
+              "a": "Oferta de Ano-Novo · 3 aulas por £ 30",
+              "b": "Só novos alunos · 2–31 jan.",
+              "tag": "Ativa"
+            },
+            {
+              "a": "Primeira aula grátis",
+              "b": "Exceção local",
+              "tag": "Local"
+            },
+            {
+              "a": "Semana dos amigos",
+              "b": "Requer aprovação da matriz",
+              "tag": "Pendente"
+            }
+          ]
+        },
+        {
+          "label": "Aula",
+          "title": "Aulas, capacidade e listas de espera",
+          "desc": "Visões semanal e diária por estúdio. Edite uma aula ou a série inteira, com uma prévia de quem será afetado.",
+          "screen": "Aulas · sáb., 17 out.",
+          "scope": "Berlin – Prenzlauer Berg",
+          "rows": [
+            {
+              "a": "07:00 Morning Vinyasa · Maya Rao",
+              "b": "16 de 20 reservas",
+              "tag": "Substituição solicitada"
+            },
+            {
+              "a": "09:00 Slow Flow · Sam Tran",
+              "b": "20 de 20 · 3 na espera",
+              "tag": "Lotada"
+            },
+            {
+              "a": "12:15 Pilates do almoço · Ana Silva",
+              "b": "11 de 20 reservas",
+              "tag": "Aberta"
+            }
+          ]
+        },
+        {
+          "label": "Plano",
+          "title": "Alunos, pacotes e frequência",
+          "desc": "Cadastros de alunos pesquisáveis com saldo de pacote, status do plano e consentimento. Outros estúdios não veem esses dados, a menos que a política permita.",
+          "screen": "Alunos",
+          "scope": "Toronto – Queen West",
+          "rows": [
+            {
+              "a": "Ava Chen · Ilimitado mensal",
+              "b": "Renova em 1º nov. · 14 aulas este mês",
+              "tag": "Ativo"
+            },
+            {
+              "a": "Liam Ortiz · Pacote de 10 aulas",
+              "b": "Restam 3 aulas · vence em 30 nov.",
+              "tag": "Saldo baixo"
+            },
+            {
+              "a": "Noor Haddad · Oferta de boas-vindas",
+              "b": "2 de 3 usadas",
+              "tag": "Experimental"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Tipos de aula, descrições e páginas da marca compartilhados",
+        "Ofertas de boas-vindas que os estúdios podem adotar",
+        "Relatórios da rede sobre contatos e frequência, quando conectados"
+      ],
+      "local": [
+        "Grade, salas e instrutores do estúdio",
+        "Preços locais quando a matriz permitir exceções",
+        "Aprovação de substituições e comunicação com alunos"
+      ],
+      "first": [
+        "Sites e grades dos estúdios",
+        "Formulários de contato e distribuição de leads",
+        "Conexão com sistemas de agendamento selecionados",
+        "Visão da rede com atualização dos dados"
+      ],
+      "later": [
+        "Agendamento e pagamento próprios",
+        "Pacotes de aulas e planos",
+        "Pedidos de substituição de instrutores",
+        "Aulas online e biblioteca sob demanda"
+      ],
+      "faqs": [
+        {
+          "q": "Precisamos trocar nosso software de agendamento?",
+          "a": "Não. Na primeira versão, um sistema de agendamento compatível continua sendo a referência: o BranchHarbor mostra a grade dele e leva até ele. O agendamento próprio virá depois e só substituirá seu sistema se você quiser."
+        },
+        {
+          "q": "A matriz consegue ver os dados dos alunos de todos os estúdios?",
+          "a": "Não automaticamente. Os relatórios da rede mostram totais. Os cadastros de alunos ficam com o estúdio, a menos que a política da empresa permita o compartilhamento para uma finalidade definida."
+        },
+        {
+          "q": "E na mudança de horário de verão?",
+          "a": "As aulas são salvas em UTC e exibidas no fuso horário de cada estúdio, então os horários recorrentes continuam certos depois da mudança, onde quer que o estúdio esteja."
+        }
+      ]
+    },
+    "sports": {
+      "metaTitle": "Esportes",
+      "imageAlt": "Crianças jogando futebol em um campo gramado",
+      "headline": "Programas, turmas e locais reunidos em um só lugar organizado.",
+      "intro": "Inscrições, elencos, horários e presença para cada local, com responsáveis vendo apenas os participantes que representam.",
+      "problems": [
+        {
+          "t": "Formulários de inscrição por todo lado",
+          "d": "Papel, planilhas e ferramentas de formulário que não conversam com o elenco."
+        },
+        {
+          "t": "Conflitos de campo descobertos no dia",
+          "d": "Duas turmas no mesmo campo porque os horários ficam em lugares diferentes."
+        },
+        {
+          "t": "Acesso dos pais é confuso",
+          "d": "Os pais recebem avisos da turma errada, ou nenhum aviso."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Inscrição",
+          "title": "Responsáveis inscrevem um participante",
+          "desc": "Escolha o programa e o local, confirme a elegibilidade pela data de corte de idade, vincule o participante ao responsável e preencha os formulários obrigatórios.",
+          "screen": "Inscrições",
+          "scope": "Manchester – Platt Fields",
+          "rows": [
+            {
+              "a": "Ella M. · Sub-10 Outono",
+              "b": "Responsável: Sara M. · formulários completos",
+              "tag": "Aguardando análise"
+            },
+            {
+              "a": "Jonah P. · Clínica Sub-12",
+              "b": "Pagamento recebido",
+              "tag": "Aceita"
+            },
+            {
+              "a": "Leo R. · Sub-10 Outono",
+              "b": "Capacidade atingida",
+              "tag": "Na lista de espera"
+            }
+          ]
+        },
+        {
+          "label": "Turmas",
+          "title": "Analisar e definir turmas",
+          "desc": "Pagar não é o mesmo que ser selecionado. Os administradores analisam as inscrições e definem turmas e técnicos.",
+          "screen": "Times e turmas",
+          "scope": "Manchester – Platt Fields",
+          "rows": [
+            {
+              "a": "Sub-10 Azul · Técnico Ortiz",
+              "b": "14 de 16",
+              "tag": "Aberta"
+            },
+            {
+              "a": "Sub-10 Verde · Técnico Ahmed",
+              "b": "16 de 16",
+              "tag": "Lotada"
+            },
+            {
+              "a": "Clínica Sub-12 · Técnico Lee",
+              "b": "22 de 24",
+              "tag": "Aberta"
+            }
+          ]
+        },
+        {
+          "label": "Horários",
+          "title": "Horários com conflitos de local sinalizados",
+          "desc": "Treinos e jogos por local, com sobreposições destacadas antes de chegarem às famílias.",
+          "screen": "Horários · ter.",
+          "scope": "Melbourne – Albert Park",
+          "rows": [
+            {
+              "a": "17:00 Sub-10 Azul · Campo 2",
+              "b": "Técnico Ortiz",
+              "tag": "Agendado"
+            },
+            {
+              "a": "17:00 Clínica Sub-12 · Campo 2",
+              "b": "Mesmo campo do Sub-10 Azul",
+              "tag": "Conflito"
+            },
+            {
+              "a": "18:30 Sub-14 · Campo 1",
+              "b": "Técnico Lee",
+              "tag": "Agendado"
+            }
+          ]
+        },
+        {
+          "label": "Presença",
+          "title": "Check-in rápido para técnicos",
+          "desc": "Os técnicos abrem o treino, veem o elenco autorizado e registram a presença em poucos toques.",
+          "screen": "Presença · Sub-10 Azul",
+          "scope": "Técnico Ortiz",
+          "rows": [
+            {
+              "a": "Ella M.",
+              "b": "Check-in às 16:58",
+              "tag": "Presente"
+            },
+            {
+              "a": "Sam K.",
+              "b": "Responsável avisado",
+              "tag": "Ausente"
+            },
+            {
+              "a": "Ivy T.",
+              "b": "—",
+              "tag": "Sem registro"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Modelos de programas, taxas e formulários de inscrição",
+        "Estrutura da temporada e regras de elegibilidade",
+        "Relatórios entre locais"
+      ],
+      "local": [
+        "Horários do local e definição de técnicos",
+        "Análise de inscrições e divisão de turmas",
+        "Avisos de treino só para as turmas afetadas"
+      ],
+      "first": [
+        "Inscrição em programas",
+        "Elencos e definição de técnicos",
+        "Agendamento com alertas de conflito",
+        "Comunicados às turmas"
+      ],
+      "later": [
+        "Pagamento parcelado",
+        "Jogos e resultados",
+        "Processos seletivos",
+        "Portal dos responsáveis ampliado"
+      ],
+      "faqs": [
+        {
+          "q": "Pagar significa que a criança está no time?",
+          "a": "Não. Quando há aprovação, a confirmação informa que a inscrição está em análise. Pagamento e seleção são etapas separadas."
+        },
+        {
+          "q": "Um técnico vê todos os participantes?",
+          "a": "Os técnicos veem apenas os elencos dos treinos para os quais foram designados."
+        },
+        {
+          "q": "A IA escolhe jogadores?",
+          "a": "Não. A IA pode redigir descrições de programas e resumir inscrições. Ela nunca seleciona crianças com base em habilidade presumida ou características sensíveis."
+        }
+      ]
+    },
+    "wellness": {
+      "metaTitle": "Saúde e bem-estar",
+      "imageAlt": "Cliente relaxando durante um tratamento de spa",
+      "headline": "Agendar serviços ficou mais simples para clientes e equipes locais.",
+      "intro": "Serviços, profissionais, salas e retornos, com intervalos respeitados e o horário original protegido durante a remarcação.",
+      "problems": [
+        {
+          "t": "Salas reservadas duas vezes",
+          "d": "Duas agendas prometem a mesma sala de atendimento."
+        },
+        {
+          "t": "Remarcar faz perder o horário",
+          "d": "O cliente cancela para remarcar e, se o novo horário falhar, o original já se foi."
+        },
+        {
+          "t": "Anotações nas mãos erradas",
+          "d": "Anotações administrativas ficam visíveis para quem não precisa delas."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Serviço",
+          "title": "O cliente escolhe um serviço",
+          "desc": "Cada serviço define duração, preço, intervalos, profissionais habilitados e os recursos necessários.",
+          "screen": "Serviços",
+          "scope": "Sydney – Surry Hills",
+          "rows": [
+            {
+              "a": "Massagem profunda · 60 min",
+              "b": "A$ 140 · intervalo de 15 min · Sala A/B",
+              "tag": "Ativo"
+            },
+            {
+              "a": "Pedras quentes · 90 min",
+              "b": "A$ 195 · requer aquecedor de pedras",
+              "tag": "Ativo"
+            },
+            {
+              "a": "Limpeza de pele · 45 min",
+              "b": "A$ 110 · Sala C",
+              "tag": "Pausado"
+            }
+          ]
+        },
+        {
+          "label": "Profissional",
+          "title": "Um profissional específico ou o primeiro disponível",
+          "desc": "A disponibilidade considera ao mesmo tempo a unidade do profissional, a habilitação para o serviço e a capacidade das salas.",
+          "screen": "Profissionais",
+          "scope": "Sydney – Surry Hills",
+          "rows": [
+            {
+              "a": "Rina K.",
+              "b": "Massagem profunda, pedras quentes",
+              "tag": "Disponível"
+            },
+            {
+              "a": "Tom B.",
+              "b": "Limpeza de pele",
+              "tag": "De folga hoje"
+            },
+            {
+              "a": "Ana L.",
+              "b": "Massagem profunda",
+              "tag": "Agenda cheia"
+            }
+          ]
+        },
+        {
+          "label": "Agendamento",
+          "title": "Profissional e sala reservados juntos",
+          "desc": "Uma reserva bloqueia o profissional e a sala. O sinal e as regras de cancelamento aparecem antes do pagamento.",
+          "screen": "Agenda · qui.",
+          "scope": "Dubai – Jumeirah",
+          "rows": [
+            {
+              "a": "10:00 Massagem profunda · Rina K.",
+              "b": "Sala A · Jordan P.",
+              "tag": "Confirmado"
+            },
+            {
+              "a": "11:30 Pedras quentes · Rina K.",
+              "b": "Sala B · Kai S.",
+              "tag": "Sinal pago"
+            },
+            {
+              "a": "14:00 Limpeza de pele · Tom B.",
+              "b": "Sala C",
+              "tag": "Cancelado"
+            }
+          ]
+        },
+        {
+          "label": "Retorno",
+          "title": "Pacotes e remarcação segura",
+          "desc": "O horário antigo só é liberado depois que o novo estiver garantido. Se a mudança falhar, o agendamento original continua valendo.",
+          "screen": "Pacotes",
+          "scope": "Auckland – Ponsonby",
+          "rows": [
+            {
+              "a": "Jordan P. · Pacote de 5 massagens",
+              "b": "Restam 2 · vence em 15 jan.",
+              "tag": "Ativo"
+            },
+            {
+              "a": "Kai S. · Trio de limpezas de pele",
+              "b": "Resta 1 · vence em 2 nov.",
+              "tag": "Vencendo"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Catálogo de serviços e textos de políticas",
+        "Regras de pacotes e condições de cancelamento",
+        "Relatórios de ocupação"
+      ],
+      "local": [
+        "Disponibilidade de profissionais e salas",
+        "Preços locais quando permitido",
+        "Anotações administrativas com acesso restrito"
+      ],
+      "first": [
+        "Páginas de serviços",
+        "Disponibilidade e agendamento",
+        "Lembretes",
+        "Sinal por meio de uma conta conectada"
+      ],
+      "later": [
+        "Pacotes e planos",
+        "Agenda de recursos entre unidades",
+        "Campanhas de retenção"
+      ],
+      "faqs": [
+        {
+          "q": "É um sistema de prontuário clínico?",
+          "a": "Não. A primeira versão é administrativa. Diagnóstico, prontuários clínicos e recomendações de tratamento estão fora do escopo."
+        },
+        {
+          "q": "A IA lê fichas de anamnese?",
+          "a": "Por padrão, respostas sensíveis de formulários ficam fora do contexto geral da IA."
+        },
+        {
+          "q": "E se uma remarcação falhar?",
+          "a": "Seu agendamento atual continua valendo. Nada é liberado até que o novo horário seja confirmado."
+        }
+      ]
+    },
+    "commerce": {
+      "metaTitle": "Varejo",
+      "imageAlt": "Interior de uma loja de roupas",
+      "headline": "Coordene seu catálogo. Deixe cada loja atender os próprios clientes.",
+      "intro": "Um catálogo compartilhado com estoque e preços locais, conexão com o WooCommerce e um histórico de estoque em vez de um número solto.",
+      "problems": [
+        {
+          "t": "Estoque em que ninguém confia",
+          "d": "O site diz “em estoque”; a prateleira diz outra coisa."
+        },
+        {
+          "t": "Preços locais sobrescrevem o cadastro principal",
+          "d": "Uma edição na loja muda, sem aviso, o conteúdo do produto para todas."
+        },
+        {
+          "t": "Pedidos duplicados ao tentar de novo",
+          "d": "Uma sincronização com falha cria o mesmo pedido duas vezes."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Catálogo",
+          "title": "Produtos principais com campos editáveis",
+          "desc": "A matriz cria produtos e variações, define quais campos as lojas podem editar e confere a prévia antes de distribuir.",
+          "screen": "Catálogo",
+          "scope": "Todas as lojas",
+          "rows": [
+            {
+              "a": "Camisa de linho · 4 variações",
+              "b": "Publicada em 8 lojas",
+              "tag": "Sincronizado"
+            },
+            {
+              "a": "Suéter de merino · 6 variações",
+              "b": "Falha em 2 lojas",
+              "tag": "Parcial"
+            },
+            {
+              "a": "Bolsa de lona",
+              "b": "Rascunho",
+              "tag": "Rascunho"
+            }
+          ]
+        },
+        {
+          "label": "Sortimento",
+          "title": "Estoque local e preços permitidos",
+          "desc": "As lojas ajustam disponibilidade e estoque informando o motivo. A origem de cada exceção fica sempre visível.",
+          "screen": "Sortimento local",
+          "scope": "Amsterdam – De Pijp",
+          "rows": [
+            {
+              "a": "Camisa de linho · M",
+              "b": "12 em estoque · preço da matriz",
+              "tag": "Em estoque"
+            },
+            {
+              "a": "Camisa de linho · G",
+              "b": "1 em estoque · repor",
+              "tag": "Baixo"
+            },
+            {
+              "a": "Suéter de merino · P",
+              "b": "Preço local € 79",
+              "tag": "Exceção"
+            }
+          ]
+        },
+        {
+          "label": "Pedido",
+          "title": "Pedidos com pagamento e envio claros",
+          "desc": "Cada pedido mostra separadamente o sistema de origem, o status do pagamento e o status do atendimento.",
+          "screen": "Pedidos",
+          "scope": "Paris – Le Marais",
+          "rows": [
+            {
+              "a": "#5521 · Camisa de linho ×2",
+              "b": "WooCommerce · Pago",
+              "tag": "A enviar"
+            },
+            {
+              "a": "#5519 · Suéter de merino",
+              "b": "Reembolso parcial de € 20",
+              "tag": "Enviado"
+            },
+            {
+              "a": "#5517 · Bolsa de lona",
+              "b": "Falha no pagamento",
+              "tag": "Em espera"
+            }
+          ]
+        },
+        {
+          "label": "Devoluções",
+          "title": "Devoluções analisadas e resolvidas",
+          "desc": "Solicitada, analisada, autorizada, recebida e resolvida, com reembolsos vinculados ao pagamento original.",
+          "screen": "Devoluções",
+          "scope": "Paris – Le Marais",
+          "rows": [
+            {
+              "a": "RMA-204 · Suéter de merino",
+              "b": "Tamanho errado",
+              "tag": "Autorizada"
+            },
+            {
+              "a": "RMA-203 · Camisa",
+              "b": "Recebida",
+              "tag": "Resolvida"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Identificadores e conteúdo dos produtos principais",
+        "Regras de campos editáveis por produto",
+        "Relatórios de receita, totalizados por moeda"
+      ],
+      "local": [
+        "Ajustes de estoque com motivo",
+        "Preços locais permitidos",
+        "Atendimento de pedidos e devoluções autorizadas"
+      ],
+      "first": [
+        "Catálogo compartilhado",
+        "Disponibilidade local",
+        "Conexão com o WooCommerce",
+        "Resultados de sincronização por loja"
+      ],
+      "later": [
+        "Pedidos na loja virtual própria",
+        "Transferências de estoque",
+        "Portal de devoluções"
+      ],
+      "faqs": [
+        {
+          "q": "O BranchHarbor substitui o checkout do WooCommerce?",
+          "a": "Não. Seus gateways e seu checkout atuais continuam. Nunca inserimos um segundo checkout automaticamente."
+        },
+        {
+          "q": "E se uma loja editar um produto?",
+          "a": "Só mudam os campos que a matriz marcou como editáveis, e a alteração é salva como exceção local, sem nunca tocar no conteúdo principal."
+        },
+        {
+          "q": "Como ficam os relatórios de lojas em moedas diferentes?",
+          "a": "Os valores sempre mantêm a moeda original. Os relatórios da rede totalizam cada moeda separadamente, em vez de convertê-las com uma taxa não informada."
+        }
+      ]
+    },
+    "foods": {
+      "metaTitle": "Alimentação",
+      "imageAlt": "Chef preparando legumes na cozinha de um restaurante",
+      "headline": "Um cardápio da marca. Controle local. Pedidos claros.",
+      "intro": "Cardápios principais com exceções locais, pedidos para retirada com capacidade real por horário e uma tela de cozinha feita para a hora do rush.",
+      "problems": [
+        {
+          "t": "Cardápios desatualizados",
+          "d": "Uma mudança de preço chega a algumas unidades e a outras não."
+        },
+        {
+          "t": "Horários de retirada impossíveis",
+          "d": "Os pedidos online ignoram o quanto a cozinha já está cheia."
+        },
+        {
+          "t": "Pedidos perdidos com conexão ruim",
+          "d": "O tablet mostra pedidos antigos como se fossem atuais."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Cardápio",
+          "title": "Cardápio da marca publicado nas unidades",
+          "desc": "A matriz cuida dos pratos, adicionais e das informações nutricionais fornecidas pela empresa, e publica com resultado por unidade.",
+          "screen": "Cardápio principal",
+          "scope": "Todas as unidades",
+          "rows": [
+            {
+              "a": "Bowl de frango na brasa",
+              "b": "Opção sem glúten",
+              "tag": "Publicado"
+            },
+            {
+              "a": "Sanduíche de peito defumado",
+              "b": "Falha em 1 unidade",
+              "tag": "Parcial"
+            },
+            {
+              "a": "Limonada de bordo",
+              "b": "Preço local permitido",
+              "tag": "Publicado"
+            }
+          ]
+        },
+        {
+          "label": "Retirada",
+          "title": "Horários de retirada com capacidade real",
+          "desc": "O cliente escolhe primeiro o horário de retirada. Horários, limite de pedidos e tempo de preparo são verificados no servidor antes da confirmação.",
+          "screen": "Configurações de retirada",
+          "scope": "Singapore – Tanjong Pagar",
+          "rows": [
+            {
+              "a": "12:00–12:15",
+              "b": "6 de 8 pedidos",
+              "tag": "Aberto"
+            },
+            {
+              "a": "12:15–12:30",
+              "b": "8 de 8 pedidos",
+              "tag": "Lotado"
+            },
+            {
+              "a": "Limite de pedidos",
+              "b": "20 min antes de fechar",
+              "tag": "Definido"
+            }
+          ]
+        },
+        {
+          "label": "Pedido",
+          "title": "Aguardando ou aceito, sem dúvida",
+          "desc": "O cliente vê com clareza se o restaurante aceitou o pedido. Uma recusa dispara o cancelamento ou reembolso e um aviso.",
+          "screen": "Pedidos",
+          "scope": "São Paulo – Pinheiros",
+          "rows": [
+            {
+              "a": "#1046 · Mei L.",
+              "b": "Retirada 12:25",
+              "tag": "Novo"
+            },
+            {
+              "a": "#1044 · Ana P.",
+              "b": "Retirada 12:14",
+              "tag": "Em preparo"
+            },
+            {
+              "a": "#1039 · Tom R.",
+              "b": "Retirada 11:58",
+              "tag": "Pronto"
+            }
+          ]
+        },
+        {
+          "label": "Cozinha",
+          "title": "Uma tela de cozinha para a hora do rush",
+          "desc": "Cards grandes ordenados pelo horário prometido, marcadores de atraso, alertas opcionais e um aviso claro quando a conexão cai.",
+          "screen": "Cozinha",
+          "scope": "São Paulo – Pinheiros",
+          "rows": [
+            {
+              "a": "#1041 · 6 min de atraso",
+              "b": "1× bowl · sem cebola",
+              "tag": "Em preparo"
+            },
+            {
+              "a": "#1045 · Para 12:18",
+              "b": "Pão sem glúten",
+              "tag": "Novo"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Pratos, adicionais e informações nutricionais",
+        "Quais campos as unidades podem mudar",
+        "Resultados de publicação por unidade"
+      ],
+      "local": [
+        "Horários, limites de pedido e capacidade por horário",
+        "Itens esgotados e preços locais",
+        "Aceite de pedidos e status da cozinha"
+      ],
+      "first": [
+        "Cardápios principais com exceções locais",
+        "Pedidos para retirada",
+        "Tela de cozinha",
+        "Pagamentos por meio de uma conta conectada"
+      ],
+      "later": [
+        "Delivery",
+        "Orçamentos de buffet",
+        "Planos de refeição recorrentes",
+        "Estoque de ingredientes"
+      ],
+      "faqs": [
+        {
+          "q": "A IA pode escrever informações sobre alergênicos?",
+          "a": "Não. As informações sobre alergênicos e restrições alimentares vêm da sua empresa. A IA pode redigir textos do cardápio, mas não pode mudar ingredientes, rótulos alimentares, preços nem o aceite de pedidos."
+        },
+        {
+          "q": "O que acontece se o tablet da cozinha perder a conexão?",
+          "a": "A tela mostra o horário da última atualização e pausa as mudanças de status, para que pedidos antigos não apareçam como atuais."
+        },
+        {
+          "q": "E se o pagamento chegar, mas o pedido não?",
+          "a": "Divergências entre pagamento e pedido aparecem em uma fila de recuperação para a equipe resolver."
+        }
+      ]
+    }
+  },
+  "solutions": {
+    "franchises": {
+      "metaTitle": "Para franquias e redes",
+      "kicker": "Para franquias e redes",
+      "imageAlt": "Instrutora conduzindo uma aula em um estúdio iluminado",
+      "headline": "Coordene a marca. Confie em cada unidade.",
+      "intro": "Matriz, regionais, grupos de franqueados e unidades, cada um com papéis bem definidos. Os modelos compartilhados saem com uma tabela de revisão; as unidades cuidam do dia a dia.",
+      "cta": "Converse sobre sua rede",
+      "points": [
+        {
+          "t": "Organização → regionais → unidades",
+          "d": "Um grupo de franqueados pode operar várias unidades. Uma pessoa pode ter mais de uma atribuição, inclusive em países diferentes."
+        },
+        {
+          "t": "Bloqueado, editável ou com aprovação",
+          "d": "Cada campo de modelo mostra a origem, e as exceções locais podem voltar ao padrão da matriz."
+        },
+        {
+          "t": "Os dados dos clientes ficam na unidade",
+          "d": "Os relatórios da rede não dão acesso aos dados dos clientes. O compartilhamento entre unidades exige uma política explícita."
+        },
+        {
+          "t": "Falhas parciais mostradas com transparência",
+          "d": "A publicação em grupo informa o resultado por unidade, com versões salvas e reversão."
+        }
+      ],
+      "stepsTitle": "Implantação em uma rede",
+      "steps": [
+        {
+          "t": "Modele sua estrutura",
+          "d": "Importe unidades com validação linha a linha e defina os grupos de franqueados."
+        },
+        {
+          "t": "Defina as configurações herdadas",
+          "d": "Escolha o que é compartilhado, o que é local e o que precisa de aprovação."
+        },
+        {
+          "t": "Convide com papéis definidos",
+          "d": "Gerentes regionais, franqueados e equipes veem apenas as próprias atribuições."
+        },
+        {
+          "t": "Publique e acompanhe",
+          "d": "Tabelas de revisão antes de cada mudança compartilhada e resultados por unidade depois."
+        }
+      ],
+      "intlTitle": "Feito para redes que atravessam fronteiras",
+      "intl": [
+        {
+          "t": "Horário e moeda locais",
+          "d": "Cada unidade mantém seu fuso horário e sua moeda. Os relatórios totalizam cada moeda separadamente."
+        },
+        {
+          "t": "Idiomas por unidade",
+          "d": "As unidades podem publicar no próprio idioma e ainda compartilhar os modelos da marca."
+        },
+        {
+          "t": "Residência de dados",
+          "d": "Cada organização escolhe uma região de dados (EUA, UE ou Ásia-Pacífico) ao ser criada."
+        }
+      ]
+    },
+    "independent": {
+      "metaTitle": "Empresas independentes",
+      "kicker": "Empresas com uma unidade",
+      "imageAlt": "Proprietária abrindo a porta de uma pequena loja",
+      "headline": "Tudo em um só lugar, sem a complexidade de uma rede.",
+      "intro": "Com uma única unidade, não há escopos nem aprovações para gerenciar. Adicione mais unidades depois e as ferramentas de rede aparecem quando você precisar.",
+      "cta": "Conhecer a configuração",
+      "points": [
+        {
+          "t": "Pronto em uma tarde",
+          "d": "Um checklist em vez de um assistente do qual você não consegue sair. O progresso é salvo a cada etapa."
+        },
+        {
+          "t": "Site hospedado ou WordPress",
+          "d": "Lance um site com um endereço incluído ou mantenha o seu."
+        },
+        {
+          "t": "Mantenha suas ferramentas",
+          "d": "Conecte um sistema de agendamento ou de vendas compatível em vez de substituí-lo."
+        },
+        {
+          "t": "IA que sugere, não decide",
+          "d": "Textos e resumos para você revisar. Nada é publicado sem você."
+        }
+      ],
+      "stepsTitle": "Configuração em seis etapas",
+      "steps": [
+        {
+          "t": "Escolha seu segmento",
+          "d": "Configuramos os fluxos certos para você."
+        },
+        {
+          "t": "Adicione os dados da empresa",
+          "d": "Fuso horário, moeda e idioma incluídos."
+        },
+        {
+          "t": "Escolha hospedado ou WordPress",
+          "d": "Você pode mudar de ideia depois."
+        },
+        {
+          "t": "Adicione aulas, serviços, produtos ou cardápio",
+          "d": "Importe ou cadastre."
+        },
+        {
+          "t": "Conecte os pagamentos",
+          "d": "As compras ficam desativadas até a conta ser habilitada."
+        },
+        {
+          "t": "Visualize, teste e publique",
+          "d": "Faça antes um agendamento ou pedido de teste."
+        }
+      ]
+    },
+    "pointsTitle": "Como funciona",
+    "ctaTitle": "Quer ver isso com a sua empresa?",
+    "ctaBody": "Solicite uma demonstração e conte o que você usa hoje. Mostraremos a configuração ideal."
+  },
+  "wordpress": {
+    "metaTitle": "Conector WordPress",
+    "kicker": "Conector WordPress",
+    "headline": "Mantenha seu site WordPress. Acrescente o que falta.",
+    "intro": "Um plugin conector gratuito adiciona formulários, grades, cardápios e conexões do BranchHarbor ao site que você já tem. Hospedagem, tema e editor continuam sendo seus.",
+    "primary": "Ver conexões compatíveis",
+    "secondary": "Solicitar demonstração",
+    "previewTitle": "Status do conector",
+    "preview": [
+      {
+        "n": "Site autorizado",
+        "s": "Conectado"
+      },
+      {
+        "n": "Mapeamento de unidades",
+        "s": "1 precisa de atenção"
+      },
+      {
+        "n": "WooCommerce",
+        "s": "Testado"
+      },
+      {
+        "n": "Gravity Forms",
+        "s": "Requer configuração"
+      }
+    ],
+    "stepsTitle": "Como funciona a conexão",
+    "steps": [
+      {
+        "t": "Detectar",
+        "d": "Listamos os plugins relevantes que encontramos e mostramos o que verificamos."
+      },
+      {
+        "t": "Escolher adaptadores",
+        "d": "Selecione apenas as conexões compatíveis que você quer."
+      },
+      {
+        "t": "Autorizar",
+        "d": "Acesso mínimo com uma senha de aplicativo, nunca o seu login."
+      },
+      {
+        "t": "Mapear unidades",
+        "d": "Vincule este site a uma ou mais unidades do BranchHarbor."
+      },
+      {
+        "t": "Escolher a direção",
+        "d": "Importar, exportar ou ambos, com regras para conflitos."
+      },
+      {
+        "t": "Testar e publicar",
+        "d": "Rode uma sincronização de teste e confira o status."
+      }
+    ],
+    "matrixTitle": "Matriz de compatibilidade",
+    "matrixBody": "Categorias nomeadas, com versões testadas e limites conhecidos. Sem promessa de compatibilidade universal com plugins.",
+    "matrixHead": {
+      "category": "Categoria",
+      "status": "Status",
+      "tested": "Testado com",
+      "does": "O que faz",
+      "limits": "Limites conhecidos"
+    },
+    "matrix": [
+      {
+        "cat": "WooCommerce",
+        "status": "tested",
+        "ver": "9.x",
+        "does": "Produtos, estoque e pedidos via APIs públicas; compatível com HPOS",
+        "limit": "Extensão Subscriptions não suportada"
+      },
+      {
+        "cat": "Construtores de página",
+        "status": "limited",
+        "ver": "—",
+        "does": "Blocos, shortcodes e incorporações",
+        "limit": "Widget nativo do Elementor previsto"
+      },
+      {
+        "cat": "Sistemas de agendamento",
+        "status": "planned",
+        "ver": "—",
+        "does": "Adaptadores selecionados com direitos de API documentados",
+        "limit": "Nenhum disponível ainda"
+      },
+      {
+        "cat": "SEO",
+        "status": "tested",
+        "ver": "Yoast 23",
+        "does": "Deixa metadados e sitemaps a cargo do seu plugin de SEO",
+        "limit": "Páginas hospedadas no BranchHarbor gerenciam os próprios"
+      },
+      {
+        "cat": "Formulários",
+        "status": "setup",
+        "ver": "Gravity Forms 2.8",
+        "does": "Mapeamento de campos e direcionamento por unidade",
+        "limit": "Detecção de duplicatas só por e-mail"
+      },
+      {
+        "cat": "Cache e segurança",
+        "status": "tested",
+        "ver": "WP Rocket 3",
+        "does": "Exclusões documentadas para caminhos dinâmicos",
+        "limit": "Adicione as exclusões manualmente"
+      },
+      {
+        "cat": "Multilíngue",
+        "status": "limited",
+        "ver": "WPML 4.6",
+        "does": "Mapeamento de idiomas para páginas traduzidas",
+        "limit": "Grades traduzidas manualmente"
+      },
+      {
+        "cat": "Multisite",
+        "status": "setup",
+        "ver": "WordPress 6.6",
+        "does": "Autorização da rede e conexão por site",
+        "limit": "Cada site se conecta separadamente"
+      }
+    ],
+    "prereqTitle": "Antes de instalar",
+    "prereq": [
+      "WordPress 6.4 ou superior, PHP 8.1 ou superior",
+      "Acesso de administrador para criar uma senha de aplicativo",
+      "Uma conta BranchHarbor com pelo menos uma unidade",
+      "Consentimento para enviar os dados listados ao BranchHarbor"
+    ],
+    "neverTitle": "O conector nunca vai",
+    "never": [
+      "Desativar ou alterar outros plugins",
+      "Sobrescrever suas páginas ou seu tema",
+      "Copiar todos os cadastros de clientes sem uma finalidade mapeada",
+      "Inserir um segundo checkout ou anúncios"
+    ]
+  },
+  "integrations": {
+    "metaTitle": "Integrações",
+    "kicker": "Integrações",
+    "headline": "Compatibilidade, com status honesto.",
+    "intro": "Cada conexão mostra seu status, a direção dos dados e qual sistema continua sendo a referência. “Previsto” significa que ainda não está disponível.",
+    "searchLabel": "Buscar integrações",
+    "searchPlaceholder": "Busque por nome ou categoria",
+    "categoryLabel": "Categoria",
+    "statusLabel": "Status",
+    "all": "Todas",
+    "results": "{count, plural, =0 {Nenhuma integração} one {# integração} other {# integrações}}",
+    "empty": "Nenhuma integração corresponde a esses filtros.",
+    "clear": "Limpar filtros",
+    "inspect": "Ver {name}",
+    "direction": "Direção dos dados",
+    "sourceOfTruth": "Sistema de referência",
+    "limits": "Limites conhecidos",
+    "close": "Fechar detalhes",
+    "statusHelpTitle": "O que significa cada status",
+    "statusHelp": {
+      "tested": "Testado com as versões indicadas, com ações e limites documentados.",
+      "limited": "Funciona apenas para as ações listadas. Confira os limites antes de depender disso.",
+      "setup": "Disponível, mas exige uma conta, credenciais ou configuração do seu lado.",
+      "planned": "Não disponível. Exibido para ajudar no planejamento; nenhuma data é prometida."
+    },
+    "disclaimer": "Os status descrevem a versão atual de pré-lançamento e serão revisados antes do lançamento. Os nomes de produtos pertencem aos seus donos; aparecer na lista não implica parceria nem endosso.",
+    "directions": {
+      "import": "Para o BranchHarbor",
+      "export": "Do BranchHarbor",
+      "bidirectional": "Nas duas direções",
+      "none": "Convivem, sem troca de dados"
+    },
+    "categories": {
+      "commerce": "Comércio",
+      "payments": "Pagamentos",
+      "pos": "PDV",
+      "booking": "Agendamento e horários",
+      "marketing": "Marketing",
+      "messaging": "Mensagens",
+      "accounting": "Contabilidade",
+      "wordpress": "WordPress",
+      "analytics": "Análise",
+      "automation": "Automação"
+    },
+    "items": {
+      "woocommerce": {
+        "desc": "Produtos, estoque e pedidos via APIs compatíveis, com suporte a HPOS e compatibilidade de checkout declarada.",
+        "truth": "O WooCommerce gerencia pedidos e checkout. O BranchHarbor gerencia o catálogo principal, se você preferir.",
+        "limit": "Campos personalizados de checkout precisam ser mapeados. Extensão Subscriptions ainda não suportada."
+      },
+      "gutenberg": {
+        "desc": "Grades, formulários e cardápios do BranchHarbor como blocos nativos.",
+        "truth": "O WordPress gerencia o conteúdo das páginas.",
+        "limit": "Modelos de edição completa do site testados apenas com temas padrão."
+      },
+      "yoast": {
+        "desc": "Convive sem gravar metadados. Os blocos do BranchHarbor deixam títulos e sitemaps a cargo do Yoast.",
+        "truth": "O Yoast gerencia metadados, URLs canônicas e sitemaps.",
+        "limit": "—"
+      },
+      "wprocket": {
+        "desc": "Convive com exclusões documentadas para caminhos dinâmicos e autenticados.",
+        "truth": "—",
+        "limit": "Adicione as exclusões indicadas após a instalação."
+      },
+      "stripe": {
+        "desc": "Contas conectadas por empresa ou unidade para pagamentos nos países compatíveis. Requisitos e taxas são definidos pela Stripe.",
+        "truth": "A Stripe gerencia o status dos pagamentos. O BranchHarbor registra referências e concilia.",
+        "limit": "Franquias de donos independentes podem precisar de contas separadas. A disponibilidade varia por país."
+      },
+      "mailchimp": {
+        "desc": "Exporte contatos com consentimento para públicos, por unidade.",
+        "truth": "O BranchHarbor gerencia o consentimento; o Mailchimp, os envios.",
+        "limit": "Só são exportados contatos com consentimento registrado."
+      },
+      "twilio": {
+        "desc": "Lembretes e notificações por SMS enviados pela sua conta Twilio.",
+        "truth": "A Twilio gerencia o status de entrega.",
+        "limit": "Você fornece a conta e os números remetentes; valem as regras de remetente de cada país."
+      },
+      "gravityforms": {
+        "desc": "Mapeie campos de formulário para leads do BranchHarbor e direcione por unidade.",
+        "truth": "O Gravity Forms gerencia o envio; o BranchHarbor armazena o lead.",
+        "limit": "Prevenção de duplicatas só por e-mail."
+      },
+      "multisite": {
+        "desc": "Autorização da rede mais uma conexão explícita por site e unidade.",
+        "truth": "Cada site mantém o próprio conteúdo.",
+        "limit": "Cada subsite se conecta separadamente."
+      },
+      "ga4": {
+        "desc": "Adicione seu ID de métricas do Google Analytics 4 aos sites hospedados, com gestão de consentimento.",
+        "truth": "O Google Analytics gerencia os relatórios.",
+        "limit": "Nenhum dado é importado de volta para os relatórios do BranchHarbor."
+      },
+      "googlecalendar": {
+        "desc": "Publique as escalas da equipe em agendas.",
+        "truth": "O BranchHarbor gerencia a escala.",
+        "limit": "Apenas em uma direção; edições feitas no Google não são importadas."
+      },
+      "elementor": {
+        "desc": "Widgets de shortcode e incorporação dentro de layouts do Elementor.",
+        "truth": "O Elementor gerencia o layout.",
+        "limit": "Ainda sem widget nativo; o estilo é herdado do tema."
+      },
+      "wpml": {
+        "desc": "Mapeamento de idiomas para páginas e registros traduzidos.",
+        "truth": "O WPML gerencia as traduções.",
+        "limit": "Menus e grades traduzidos manualmente."
+      },
+      "mindbody": {
+        "desc": "Grades de aulas e reservas do Mindbody.",
+        "truth": "O Mindbody continuaria sendo a referência.",
+        "limit": "Não disponível. Acesso à API em análise."
+      },
+      "momence": {
+        "desc": "Grades de aulas e planos do Momence.",
+        "truth": "O Momence continuaria sendo a referência.",
+        "limit": "Não disponível."
+      },
+      "janeapp": {
+        "desc": "Agendamentos e disponibilidade de profissionais do Jane.",
+        "truth": "O Jane continuaria sendo a referência.",
+        "limit": "Não disponível."
+      },
+      "teamsnap": {
+        "desc": "Elencos e horários para clubes que já usam o TeamSnap.",
+        "truth": "O TeamSnap continuaria sendo a referência.",
+        "limit": "Não disponível."
+      },
+      "adyen": {
+        "desc": "Pagamentos para redes maiores que já usam a Adyen.",
+        "truth": "A Adyen gerenciaria o status dos pagamentos.",
+        "limit": "Não disponível."
+      },
+      "paypal": {
+        "desc": "PayPal como forma de pagamento adicional nos checkouts hospedados.",
+        "truth": "O PayPal gerenciaria o status dos pagamentos.",
+        "limit": "Não disponível."
+      },
+      "square": {
+        "desc": "Vendas na loja e catálogo para varejo e alimentação.",
+        "truth": "A Square gerenciaria as transações do PDV.",
+        "limit": "Não disponível."
+      },
+      "toast": {
+        "desc": "Pedidos de PDV e cardápios para restaurantes.",
+        "truth": "O Toast gerenciaria as transações do PDV.",
+        "limit": "Não disponível."
+      },
+      "lightspeed": {
+        "desc": "Vendas de PDV e estoque para varejo e hospitalidade.",
+        "truth": "A Lightspeed gerenciaria as transações do PDV.",
+        "limit": "Não disponível."
+      },
+      "shopify": {
+        "desc": "Produtos e pedidos para lojas que já vendem na Shopify.",
+        "truth": "A Shopify gerenciaria checkout e pedidos.",
+        "limit": "Não disponível."
+      },
+      "googlebusiness": {
+        "desc": "Mantenha horários e dados das unidades sincronizados com o Perfil da Empresa no Google.",
+        "truth": "O BranchHarbor gerenciaria os dados das unidades.",
+        "limit": "Não disponível."
+      },
+      "meta": {
+        "desc": "Formulários de leads do Facebook e do Instagram direcionados à unidade certa.",
+        "truth": "A Meta gerenciaria a veiculação dos anúncios.",
+        "limit": "Não disponível."
+      },
+      "whatsapp": {
+        "desc": "Atualizações de pedidos e agendamentos pelo WhatsApp Business.",
+        "truth": "A Meta gerenciaria a entrega das mensagens.",
+        "limit": "Não disponível. Modelos de mensagem precisam de aprovação."
+      },
+      "xero": {
+        "desc": "Exporte repasses e faturas por unidade para o Xero.",
+        "truth": "O Xero manteria a contabilidade.",
+        "limit": "Não disponível."
+      },
+      "quickbooks": {
+        "desc": "Exporte repasses e faturas por unidade para o QuickBooks Online.",
+        "truth": "O QuickBooks manteria a contabilidade.",
+        "limit": "Não disponível."
+      },
+      "zapier": {
+        "desc": "Dispare fluxos em outras ferramentas a partir de eventos do BranchHarbor.",
+        "truth": "Depende do app conectado.",
+        "limit": "Não disponível."
+      }
+    }
+  },
+  "pricing": {
+    "metaTitle": "Preços",
+    "kicker": "Preços",
+    "headline": "Preço simples por unidade.",
+    "intro": "Escolha como você quer manter seu site e pague por unidade autorizada. Os preços aparecem na moeda que você escolher.",
+    "currencyLabel": "Moeda",
+    "billingLabel": "Cobrança",
+    "monthly": "Mensal",
+    "annual": "Anual · 2 meses incluídos",
+    "locationsLabel": "Unidades",
+    "decrease": "Remover uma unidade",
+    "increase": "Adicionar uma unidade",
+    "perLocation": "/ unidade / mês",
+    "total": "{amount} / mês para {count, plural, one {# unidade} other {# unidades}}",
+    "totalAnnual": "{amount} / mês para {count, plural, one {# unidade} other {# unidades}}, com cobrança anual",
+    "listPriceNote": "Os preços de tabela são definidos separadamente para cada moeda. Não são conversões pelo câmbio do dia: o valor cobrado é o preço na moeda escolhida.",
+    "taxNote": "Dependendo do país, podem incidir impostos como VAT, GST ou sales tax; eles aparecem antes do pagamento.",
+    "proposedNote": "Preços propostos. Planos e valores podem mudar antes da disponibilidade geral.",
+    "plans": {
+      "connector": {
+        "name": "Conector",
+        "for": "Mantenha seu site WordPress",
+        "tag": "Plugin gratuito + serviço",
+        "features": [
+          "Blocos e formulários para WordPress",
+          "Conexões compatíveis",
+          "Direcionamento de leads por unidade",
+          "Painel do BranchHarbor"
+        ],
+        "cta": "Começar com o conector"
+      },
+      "hosted": {
+        "name": "Hospedado",
+        "for": "Lance um site BranchHarbor",
+        "tag": "O mais completo",
+        "features": [
+          "Site e painel hospedados",
+          "Endereço incluído ou seu próprio domínio",
+          "Fluxos por segmento",
+          "BranchHarbor AI (prévia)"
+        ],
+        "cta": "Escolher Hospedado"
+      },
+      "network": {
+        "name": "Rede",
+        "for": "Franquias e grupos",
+        "tag": "Sob proposta",
+        "features": [
+          "Regionais e grupos de franqueados",
+          "Modelos bloqueados / editáveis / com aprovação",
+          "Publicação em grupo com reversão",
+          "Implantação assistida"
+        ],
+        "cta": "Solicitar proposta"
+      }
+    },
+    "ctaNote": "Durante o piloto, todo plano começa com uma conversa para confirmarmos que seu segmento e suas conexões são compatíveis.",
+    "faqTitle": "Perguntas sobre preços",
+    "faqs": [
+      {
+        "q": "Por que os preços mudam conforme a moeda?",
+        "a": "Cada moeda tem seu próprio preço de tabela, definido para aquele mercado. Não convertemos pelo câmbio do dia, então o preço que você vê é o preço que você paga (mais os impostos aplicáveis)."
+      },
+      {
+        "q": "Os impostos estão incluídos?",
+        "a": "Não. Dependendo do país e dos dados da empresa, podem incidir VAT, GST, sales tax ou tributos similares. Os impostos aplicáveis aparecem antes da confirmação."
+      },
+      {
+        "q": "Unidades diferentes podem pagar em moedas diferentes?",
+        "a": "Redes podem ser cobradas por unidade ou de forma centralizada. Cada fatura usa uma única moeda; nunca somamos valores em moedas diferentes."
+      },
+      {
+        "q": "As taxas de processamento de pagamento estão incluídas?",
+        "a": "Não. Os pagamentos passam por um provedor conectado, como a Stripe, que cobra as próprias taxas no seu país."
+      }
+    ]
+  },
   "demo": {
     "metaTitle": "Solicitar uma demonstração",
     "kicker": "Solicitar uma demonstração",
@@ -180,7 +1605,11 @@
     "intro": "Conte um pouco sobre suas unidades e o que você quer resolver. Vamos preparar uma apresentação do fluxo de trabalho adequado.",
     "imageAlt": "Instrutora alongando em um estúdio tranquilo",
     "asideTitle": "O que acontece depois",
-    "aside": ["Analisamos sua solicitação e verificamos se seu segmento e seus sistemas são compatíveis.", "Enviamos um e-mail para combinar um horário no seu fuso.", "Você vê o fluxo de trabalho com dados de exemplo parecidos com a sua empresa."],
+    "aside": [
+      "Analisamos sua solicitação e verificamos se seu segmento e seus sistemas são compatíveis.",
+      "Enviamos um e-mail para combinar um horário no seu fuso.",
+      "Você vê o fluxo de trabalho com dados de exemplo parecidos com a sua empresa."
+    ],
     "privacyNote": "Usamos esses dados para responder à sua solicitação. Consulte nossa página de privacidade para saber como tratamos dados pessoais.",
     "form": {
       "title": "Seus dados",
@@ -210,7 +1639,8 @@
       "systemsHint": "Por exemplo: WordPress, WooCommerce, Mindbody, Square.",
       "consent": "Quero receber novidades do produto por e-mail ocasionalmente. Posso cancelar a qualquer momento.",
       "submit": "Solicitar demonstração",
-      "sending": "Enviando…"
+      "sending": "Enviando…",
+      "securityCheck": "Verificação de segurança"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Há # problema neste formulário} other {Há # problemas neste formulário}}",
@@ -227,7 +1657,9 @@
       "generic": "Verifique este campo.",
       "network": "Não foi possível enviar sua solicitação. Verifique sua conexão e tente novamente — suas respostas continuam aqui.",
       "server": "Algo deu errado do nosso lado. Suas respostas continuam aqui; tente novamente em instantes.",
-      "retry": "Tentar novamente"
+      "retry": "Tentar novamente",
+      "rateLimited": "Você enviou várias solicitações em pouco tempo. Aguarde alguns minutos e tente de novo – suas respostas continuam aqui.",
+      "turnstile": "Conclua a verificação de segurança e envie sua solicitação novamente."
     },
     "success": {
       "title": "Obrigado, {name}. Recebemos sua solicitação.",
@@ -235,6 +1667,400 @@
       "next": "Enquanto isso, você pode explorar os fluxos de trabalho do seu segmento.",
       "explore": "Explorar {industry}",
       "home": "Voltar ao início"
+    }
+  },
+  "resources": {
+    "metaTitle": "Recursos",
+    "kicker": "Recursos",
+    "headline": "Guias para donos e gestores.",
+    "intro": "Guias curtos e práticos, escritos junto com o piloto. Primeiro publicamos os roteiros, para você ver o que cada guia vai cobrir.",
+    "searchLabel": "Buscar guias",
+    "searchPlaceholder": "Buscar guias",
+    "all": "Todos",
+    "minutes": "{count} min de leitura",
+    "outline": "Roteiro",
+    "empty": "Nenhum guia corresponde à sua busca.",
+    "categories": {
+      "start": "Primeiros passos",
+      "websites": "Sites",
+      "wordpress": "WordPress",
+      "networks": "Redes",
+      "payments": "Pagamentos"
+    },
+    "items": [
+      {
+        "cat": "start",
+        "title": "Configure sua primeira unidade",
+        "sum": "Dados da empresa, fuso horário, moeda e o que é herdado da matriz.",
+        "mins": 6
+      },
+      {
+        "cat": "websites",
+        "title": "Conecte seu próprio domínio",
+        "sum": "Registros DNS, verificação, certificados e como manter o e-mail funcionando.",
+        "mins": 8
+      },
+      {
+        "cat": "wordpress",
+        "title": "Instale o conector",
+        "sum": "Requisitos, autorização com acesso mínimo e mapeamento de unidades.",
+        "mins": 7
+      },
+      {
+        "cat": "networks",
+        "title": "Campos bloqueados, editáveis e com aprovação",
+        "sum": "Como funciona a responsabilidade pelos modelos e como restaurar uma exceção local.",
+        "mins": 5
+      },
+      {
+        "cat": "payments",
+        "title": "Concilie um pagamento sem pedido",
+        "sum": "Use a fila de recuperação quando os registros de pagamento e de atendimento não batem.",
+        "mins": 4
+      },
+      {
+        "cat": "networks",
+        "title": "Publique uma mudança compartilhada com segurança",
+        "sum": "Tabelas de revisão, falhas parciais, novas tentativas e reversão.",
+        "mins": 6
+      },
+      {
+        "cat": "start",
+        "title": "Convide a equipe com o acesso certo",
+        "sum": "Papéis, atribuições múltiplas e revogação de acesso.",
+        "mins": 5
+      },
+      {
+        "cat": "payments",
+        "title": "Redes com várias moedas",
+        "sum": "Por que cada unidade mantém sua moeda e como os relatórios totalizam.",
+        "mins": 4
+      }
+    ],
+    "docsCta": "Procurando a documentação do produto?",
+    "docsLink": "Abrir o índice da documentação",
+    "results": "{count, plural, =0 {Nenhum guia} one {# guia} other {# guias}}"
+  },
+  "docs": {
+    "metaTitle": "Documentação",
+    "kicker": "Documentação",
+    "headline": "Documentação do produto",
+    "intro": "A documentação de referência está sendo escrita junto com o piloto. Este índice mostra como ela será organizada.",
+    "status": "Em andamento",
+    "sections": [
+      {
+        "t": "Primeiros passos",
+        "d": "Organizações, unidades, fusos horários, moedas e idiomas."
+      },
+      {
+        "t": "Papéis e permissões",
+        "d": "Matriz, regionais, grupos de franqueados, unidades e papéis com escopo."
+      },
+      {
+        "t": "Sites e domínios",
+        "d": "Sites hospedados, modelos, páginas locais, domínios próprios e publicação."
+      },
+      {
+        "t": "Conector WordPress",
+        "d": "Instalação, adaptadores, mapeamento de unidades, status de sincronização e recuperação."
+      },
+      {
+        "t": "Conexões",
+        "d": "Sistemas compatíveis, direção dos dados, sistema de referência e regras de conflito."
+      },
+      {
+        "t": "Pagamentos",
+        "d": "Contas conectadas, reembolsos, conciliação e relatórios por moeda."
+      },
+      {
+        "t": "BranchHarbor AI",
+        "d": "O que a IA pode redigir, o que precisa de aprovação e o que ela nunca faz."
+      },
+      {
+        "t": "API e webhooks",
+        "d": "Referência da API pública para desenvolvedores que integram com o BranchHarbor."
+      }
+    ],
+    "helpTitle": "Precisa de ajuda agora?",
+    "helpBody": "Acesse o suporte para ver as opções de ajuda ou consulte os guias em recursos."
+  },
+  "support": {
+    "metaTitle": "Suporte",
+    "kicker": "Suporte",
+    "headline": "Como podemos ajudar?",
+    "intro": "Encontre o canal certo, esteja você conhecendo o BranchHarbor ou já participando do piloto.",
+    "topicsTitle": "Assuntos frequentes",
+    "topics": [
+      {
+        "t": "Reservas e aulas",
+        "d": "Grades, listas de espera, substituições"
+      },
+      {
+        "t": "Sites e domínios",
+        "d": "DNS, publicação, modelos"
+      },
+      {
+        "t": "Conector WordPress",
+        "d": "Instalação, mapeamento, sincronização"
+      },
+      {
+        "t": "Pagamentos",
+        "d": "Reembolsos, conciliação"
+      },
+      {
+        "t": "Equipe e permissões",
+        "d": "Papéis e acesso"
+      },
+      {
+        "t": "BranchHarbor AI",
+        "d": "Escopo e aprovações"
+      }
+    ],
+    "optionsTitle": "Formas de obter ajuda",
+    "options": {
+      "customers": {
+        "t": "Clientes do piloto",
+        "d": "Use a Ajuda dentro do app BranchHarbor. As solicitações ficam vinculadas à sua unidade para vermos o contexto certo, com a sua permissão."
+      },
+      "prospects": {
+        "t": "Conhecendo o BranchHarbor",
+        "d": "Pergunte o que quiser pelo formulário de demonstração. Escreva sua dúvida no campo “principal dificuldade”."
+      },
+      "security": {
+        "t": "Relatos de segurança",
+        "d": "Encontrou uma vulnerabilidade? Nossa página de segurança explica como relatar de forma responsável."
+      }
+    },
+    "openApp": "Abrir o app",
+    "askQuestion": "Fazer uma pergunta",
+    "securityLink": "Página de segurança",
+    "hoursNote": "Os horários de suporte e os contatos regionais serão publicados antes da disponibilidade geral."
+  },
+  "about": {
+    "metaTitle": "Sobre",
+    "kicker": "Sobre o BranchHarbor",
+    "headline": "Unidades com identidade própria, uma casa em comum.",
+    "intro": "O BranchHarbor ajuda empresas independentes, operadores com várias unidades e redes de franquias a gerenciar seus sites, a atividade local com clientes e os fluxos do seu segmento em um só lugar coordenado – onde quer que estejam suas unidades.",
+    "purposeTitle": "Por que estamos construindo isso",
+    "purpose": "Empresas com várias unidades convivem com sites desconectados, conteúdo local inconsistente, campanhas difíceis de medir e integrações em que ninguém confia de verdade. A matriz precisa de visibilidade; as equipes locais precisam de espaço para tocar o dia a dia. Acreditamos que as duas coisas podem andar juntas.",
+    "principlesTitle": "Como trabalhamos",
+    "principles": [
+      {
+        "t": "Tranquilos e capazes",
+        "d": "Linguagem clara para os donos e consequências explicadas antes de mudanças amplas."
+      },
+      {
+        "t": "Unidades continuam distintas",
+        "d": "Cada unidade mantém sua identidade enquanto conta com uma casa em comum."
+      },
+      {
+        "t": "Honestos sobre os limites",
+        "d": "Recursos previstos são sinalizados. Nada de clientes ou resultados inventados."
+      },
+      {
+        "t": "Construído com pilotos",
+        "d": "Lançamos um segmento completo de cada vez, medido com empresas reais."
+      }
+    ],
+    "companyTitle": "Dados da empresa",
+    "company": "O BranchHarbor está em pré-lançamento. Dados cadastrais, endereços e perfis da equipe serão publicados aqui antes da disponibilidade geral.",
+    "contactTitle": "Fale com a equipe",
+    "contactBody": "Hoje, o jeito mais rápido de falar com a gente é pelo formulário de demonstração.",
+    "contactCta": "Fale conosco"
+  },
+  "legal": {
+    "updated": "Outubro de 2026",
+    "contents": "Nesta página",
+    "privacy": {
+      "metaTitle": "Privacidade",
+      "title": "Aviso de privacidade",
+      "intro": "Este aviso explica como o BranchHarbor trata dados pessoais quando você visita nosso site, solicita uma demonstração ou usa o serviço BranchHarbor, e como tratamos dados de clientes em nome das empresas que nos utilizam.",
+      "sections": [
+        {
+          "h": "Quem somos e qual é o nosso papel",
+          "p": [
+            "Para o nosso site, as solicitações de demonstração e a administração de contas, o BranchHarbor é o controlador (ou “business”, segundo as leis de privacidade dos estados dos EUA) dos seus dados pessoais.",
+            "Para os dados de clientes que as empresas armazenam no BranchHarbor – como alunos, clientes, participantes ou convidados –, a empresa é a controladora e o BranchHarbor atua como operador (ou “service provider”), seguindo as instruções dela."
+          ]
+        },
+        {
+          "h": "O que coletamos e por quê",
+          "p": [
+            "Solicitações de demonstração: nome, e-mail corporativo, nome da empresa, segmento, número de unidades, país e quaisquer informações que você decidir compartilhar, usados para responder à sua solicitação. E-mails de marketing só são enviados se você consentir.",
+            "Uso do site: dados técnicos básicos, como páginas visitadas e tipo de navegador, usados para operar e proteger o site. Análises não essenciais só rodam com consentimento quando a lei exige."
+          ]
+        },
+        {
+          "h": "Bases legais (EEE e Reino Unido)",
+          "p": [
+            "Pelo GDPR e pelo UK GDPR, nos baseamos no legítimo interesse para responder a solicitações e proteger nossos serviços, no contrato para prestar o serviço, no consentimento para marketing e cookies não essenciais e em obrigação legal, quando aplicável."
+          ]
+        },
+        {
+          "h": "Compartilhamento e transferências internacionais",
+          "p": [
+            "Usamos prestadores de serviço de hospedagem, e-mail e suporte com contratos por escrito. Não vendemos dados pessoais nem os compartilhamos para publicidade comportamental entre contextos.",
+            "Cada organização escolhe uma região de dados (EUA, UE ou Ásia-Pacífico). Em transferências internacionais, usamos salvaguardas adequadas, como Cláusulas Contratuais Padrão ou o Adendo de Transferência Internacional de Dados do Reino Unido."
+          ]
+        },
+        {
+          "h": "Retenção e exclusão",
+          "p": [
+            "Mantemos os dados das solicitações de demonstração pelo tempo necessário para responder e fazer o acompanhamento e, depois, os excluímos ou anonimizamos. Os dados de clientes são mantidos conforme as configurações da empresa e excluídos após o encerramento da conta, depois de um prazo definido."
+          ]
+        },
+        {
+          "h": "Seus direitos",
+          "p": [
+            "Dependendo de onde você mora, você pode ter direito de acessar, corrigir, excluir ou portar seus dados, de se opor ao tratamento ou restringi-lo e de revogar o consentimento – inclusive pela LGPD, pelo GDPR, pelo UK GDPR, pela PIPEDA do Canadá, pela CCPA/CPRA da Califórnia e pelo Privacy Act da Austrália.",
+            "Se seus dados estiverem com uma empresa que usa o BranchHarbor, fale primeiro com essa empresa; nós a apoiaremos. Você também pode apresentar uma reclamação à autoridade de proteção de dados do seu país, como a ANPD no Brasil."
+          ]
+        },
+        {
+          "h": "Contato",
+          "p": [
+            "Os contatos para solicitações de privacidade e, quando exigido, nossos representantes na UE e no Reino Unido serão publicados aqui antes do lançamento."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "metaTitle": "Termos",
+      "title": "Termos de serviço",
+      "intro": "Estes termos provisórios descrevem o acordo entre o BranchHarbor e as empresas que o utilizam. Os termos definitivos, incluindo a lei aplicável e a entidade contratante de cada região, serão publicados antes do lançamento.",
+      "sections": [
+        {
+          "h": "Contas e usuários autorizados",
+          "p": [
+            "A empresa que cria uma organização é responsável pelos usuários que convida e pelos papéis que atribui, inclusive no nível de franquia e de unidade."
+          ]
+        },
+        {
+          "h": "Planos, unidades e cobrança",
+          "p": [
+            "Os planos são cobrados por unidade autorizada, na moeda exibida na contratação. Impostos como VAT, GST ou sales tax são acrescentados quando aplicáveis. Remover uma unidade encerra a cobrança a partir do período seguinte."
+          ]
+        },
+        {
+          "h": "Serviços conectados e terceiros",
+          "p": [
+            "Sistemas conectados (por exemplo, provedores de pagamento ou softwares de agendamento) seguem os próprios termos. Cada integração informa qual sistema é a referência e quais dados são trocados."
+          ]
+        },
+        {
+          "h": "Seu conteúdo e os dados dos seus clientes",
+          "p": [
+            "Você continua dono do seu conteúdo e dos dados dos seus clientes. Só os tratamos para prestar o serviço e conforme descrito nos nossos termos de tratamento de dados."
+          ]
+        },
+        {
+          "h": "Uso aceitável",
+          "p": [
+            "Não use o BranchHarbor para enviar mensagens não solicitadas, violar direitos, apresentar sua empresa de forma enganosa ou descumprir leis locais, incluindo as regras de defesa do consumidor e de consentimento para marketing do seu país."
+          ]
+        },
+        {
+          "h": "Responsabilidade",
+          "p": [
+            "Os limites de responsabilidade serão definidos nos termos definitivos. Nada nestes termos limita direitos que não podem ser limitados pela sua legislação local, incluindo os direitos legais do consumidor."
+          ]
+        },
+        {
+          "h": "Mudanças nestes termos",
+          "p": [
+            "Avisaremos sobre mudanças relevantes antes que entrem em vigor."
+          ]
+        }
+      ]
+    },
+    "security": {
+      "metaTitle": "Segurança",
+      "title": "Práticas de segurança",
+      "intro": "Como pretendemos proteger as empresas que usam o BranchHarbor e os clientes delas. Este texto descreve compromissos de projeto para o serviço em pré-lançamento, não certificações independentes.",
+      "sections": [
+        {
+          "h": "Isolamento entre clientes e controle de acesso",
+          "p": [
+            "Cada solicitação é limitada a uma única organização. Os papéis são atribuídos no nível de organização, regional, grupo de franqueados ou unidade, e os relatórios da rede nunca dão, por si só, acesso aos cadastros de clientes."
+          ]
+        },
+        {
+          "h": "Acesso do suporte",
+          "p": [
+            "O acesso da nossa equipe a uma conta de cliente precisa ser autorizado, ter prazo limitado e ficar registrado na trilha de auditoria visível para a empresa."
+          ]
+        },
+        {
+          "h": "Dados de pagamento",
+          "p": [
+            "Os dados de cartão são tratados pelos provedores de pagamento conectados. O BranchHarbor armazena tokens e referências, nunca números de cartão completos."
+          ]
+        },
+        {
+          "h": "Credenciais de integração",
+          "p": [
+            "As conexões usam credenciais com escopo limitado, como tokens OAuth ou senhas de aplicativo do WordPress – nunca sua senha principal. As credenciais são criptografadas em repouso e podem ser revogadas a qualquer momento."
+          ]
+        },
+        {
+          "h": "Residência e criptografia de dados",
+          "p": [
+            "Cada organização escolhe uma região de dados (EUA, UE ou Ásia-Pacífico). Os dados são criptografados em trânsito e em repouso."
+          ]
+        },
+        {
+          "h": "Resposta a incidentes",
+          "p": [
+            "Avisaremos as empresas afetadas sem demora indevida e as apoiaremos no cumprimento das próprias obrigações de notificação previstas em leis como a LGPD, o GDPR, o UK GDPR e a PIPEDA."
+          ]
+        },
+        {
+          "h": "Relatar uma vulnerabilidade",
+          "p": [
+            "Um contato e uma política de divulgação responsável serão publicados aqui antes do lançamento. Não faça testes em contas que não sejam suas."
+          ]
+        }
+      ]
+    }
+  },
+  "signIn": {
+    "metaTitle": "Entrar",
+    "title": "Entrar no BranchHarbor",
+    "body": "Seu painel fica no app BranchHarbor. Você continuará lá para entrar com segurança.",
+    "cta": "Continuar para o login",
+    "noAccount": "Ainda não tem uma conta?",
+    "demo": "Solicitar demonstração"
+  },
+  "notFound": {
+    "title": "Não encontramos essa página.",
+    "body": "O link pode estar desatualizado ou a página pode ter mudado de lugar.",
+    "home": "Ir para a página inicial"
+  },
+  "consent": {
+    "title": "Cookies no BranchHarbor",
+    "body": "Usamos cookies essenciais para o site funcionar. Com a sua permissão, também gostaríamos de usar cookies de análise e de marketing para entender como o site é usado. Nada opcional é ativado até você escolher.",
+    "acceptAll": "Aceitar todos",
+    "essentialOnly": "Só essenciais",
+    "customize": "Personalizar",
+    "save": "Salvar escolhas",
+    "dialogTitle": "Preferências de cookies",
+    "dialogBody": "Escolha quais cookies opcionais podemos usar. Você pode mudar isso a qualquer momento em “Configurações de cookies”, no rodapé de todas as páginas.",
+    "alwaysOn": "Sempre ativos",
+    "settings": "Configurações de cookies",
+    "privacy": "Aviso de privacidade",
+    "categories": {
+      "essential": {
+        "name": "Essenciais",
+        "desc": "Necessários para o site funcionar: seu idioma, as verificações de segurança dos formulários e a memória desta escolha."
+      },
+      "analytics": {
+        "name": "Análise",
+        "desc": "Medições agregadas que mostram quais páginas são úteis. Desativados, a menos que você aceite."
+      },
+      "marketing": {
+        "name": "Marketing",
+        "desc": "Ajudam a medir campanhas e a mostrar conteúdo relevante do BranchHarbor em outros sites. Desativados, a menos que você aceite."
+      }
     }
   }
 }

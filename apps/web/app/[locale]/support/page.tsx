@@ -3,10 +3,10 @@ import type { IconName } from '@bh/icons';
 import { H2, PageHero, Panel, PastelIcon } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
 import { PASTEL } from '@/content/images';
-import { pageMetadata } from '@/components/site/meta';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
-export const generateMetadata = async ({ params }: Props) => pageMetadata((await params).locale, 'support');
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'support');
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
 const TOPICS: { icon: IconName; bg: string }[] = [

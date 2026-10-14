@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { INDUSTRY_KEYS, isIndustryKey } from '@/content/industries';
 import { IndustryTemplate } from '@/components/industry/IndustryTemplate';
+import { buildMetadata } from '@/lib/seo';
 
 export const dynamicParams = false;
 
@@ -15,9 +16,7 @@ type Props = { params: Promise<{ locale: string; industry: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, industry } = await params;
-  if (!isIndustryKey(industry)) return {};
-  const t = await getTranslations({ locale, namespace: 'industries' });
-  return { title: t(`${industry}.metaTitle`), description: t(`${industry}.intro`) };
+  return isIndustryKey(industry) ? buildMetadata(locale, industry) : {};
 }
 
 export default async function IndustryPage({ params }: Props) {

@@ -7,6 +7,7 @@ import { Icon, cx } from '@/components/ui';
 import { PREVIEW_LOCATIONS, type PreviewLocation } from '@/content/industries';
 import { IMG } from '@/content/images';
 import { SampleBadge } from '@/components/site/Blocks';
+import { numberLocale } from '@/lib/intl';
 
 /** Headquarters overview with a selected-location drawer. Clearly labelled sample data. */
 export function ProductPreview() {
@@ -22,8 +23,8 @@ export function ProductPreview() {
       return code;
     }
   };
-  const num = (n: number) => new Intl.NumberFormat(locale).format(n);
-  const pct = (n: number) => new Intl.NumberFormat(locale, { style: 'percent' }).format(n / 100);
+  const num = (n: number) => new Intl.NumberFormat(numberLocale(locale)).format(n);
+  const pct = (n: number) => new Intl.NumberFormat(numberLocale(locale), { style: 'percent' }).format(n / 100);
 
   const syncText = (l: PreviewLocation) =>
     l.sync.state === 'connected' ? t('connected', { minutes: l.sync.minutes }) : l.sync.state === 'degraded' ? t('degraded', { hours: l.sync.hours }) : t('bookingNotConnected');

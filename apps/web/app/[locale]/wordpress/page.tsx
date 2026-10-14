@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { IconName } from '@bh/icons';
 import { Icon } from '@/components/ui';
@@ -6,14 +5,11 @@ import { PASTEL } from '@/content/images';
 import type { IntegrationStatus } from '@/content/integrations';
 import { CheckList, H2, Lead, PageHero, Panel, PastelIcon, SampleBadge, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'wordpress' });
-  return { title: t('metaTitle'), description: t('intro') };
-}
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'wordpress');
 
 const PREVIEW: { icon: IconName; bg: string }[] = [
   { icon: 'wordpress', bg: PASTEL.signal },

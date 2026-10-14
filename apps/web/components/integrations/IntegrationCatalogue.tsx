@@ -2,10 +2,10 @@
 
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Drawer } from '@bh/ui';
 import { Icon, cx } from '@/components/ui';
 import { CATEGORY_PASTEL, INTEGRATIONS, INTEGRATION_CATEGORIES, INTEGRATION_STATUSES, type Integration, type IntegrationCategory, type IntegrationStatus } from '@/content/integrations';
 import { StatusPill } from '@/components/site/Blocks';
+import { SideDrawer } from '@/components/site/SideDrawer';
 
 export function IntegrationCatalogue() {
   const t = useTranslations('integrations');
@@ -143,7 +143,7 @@ export function IntegrationCatalogue() {
         </ul>
       )}
 
-      <Drawer open={!!open} onClose={close} title={open?.name ?? ''} kicker={open ? t(`categories.${open.category}`) : undefined}>
+      <SideDrawer open={!!open} onClose={close} title={open?.name ?? ''} kicker={open ? t(`categories.${open.category}`) : undefined} closeLabel={t('close')}>
         {open && (
           <div className="flex flex-col gap-5">
             <StatusPill status={open.status} label={tc(`status.${open.status}`)} className="w-fit" />
@@ -165,7 +165,7 @@ export function IntegrationCatalogue() {
             <p className="text-xs leading-relaxed text-stone">{t(`statusHelp.${open.status}`)}</p>
           </div>
         )}
-      </Drawer>
+      </SideDrawer>
     </>
   );
 }

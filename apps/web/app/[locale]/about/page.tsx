@@ -4,10 +4,10 @@ import type { IconName } from '@bh/icons';
 import { H2, Lead, PageHero, Panel, PastelIcon } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
 import { IMG, PASTEL } from '@/content/images';
-import { pageMetadata } from '@/components/site/meta';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
-export const generateMetadata = async ({ params }: Props) => pageMetadata((await params).locale, 'about');
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'about');
 
 const P: { icon: IconName; bg: string }[] = [
   { icon: 'heart', bg: PASTEL.blush },

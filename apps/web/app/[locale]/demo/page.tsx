@@ -1,18 +1,14 @@
-import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { IMG } from '@/content/images';
 import { Kicker, Lead } from '@/components/site/Blocks';
 import { DemoForm } from '@/components/demo/DemoForm';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'demo' });
-  return { title: t('metaTitle'), description: t('intro') };
-}
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'demo');
 
 export default async function DemoPage({ params }: Props) {
   const { locale } = await params;
@@ -36,7 +32,7 @@ export default async function DemoPage({ params }: Props) {
       </section>
       <aside aria-labelledby="next-title" className="flex flex-col gap-3">
         <div className="relative min-h-[280px] overflow-hidden rounded-[28px] bg-lilac md:rounded-2xl">
-          <Image src={IMG.yogaStretch} alt={t('imageAlt')} fill sizes="(min-width: 1024px) 35vw, 100vw" className="object-cover" />
+          <Image src={IMG.yogaStretch} alt={t('imageAlt')} fill priority sizes="(min-width: 1024px) 35vw, 100vw" className="object-cover" />
         </div>
         <div className="flex flex-col gap-4 rounded-[28px] bg-lilac p-7 md:rounded-2xl">
           <h2 id="next-title" className="text-xl font-extrabold tracking-[-0.02em]">

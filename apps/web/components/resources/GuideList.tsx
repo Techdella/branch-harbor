@@ -44,7 +44,7 @@ export function GuideList() {
         ))}
       </div>
       <p role="status" className="sr-only">
-        {list.length}
+        {t('results', { count: list.length })}
       </p>
       {list.length === 0 ? (
         <p className="rounded-[20px] border border-dashed border-line p-8 text-center font-bold">{t('empty')}</p>

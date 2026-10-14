@@ -9,6 +9,9 @@ import { PASTEL } from '@/content/images';
 import { ProductPreview } from '@/components/home/ProductPreview';
 import { FaqList, H2, Kicker, Lead, Panel, PastelIcon, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
+import { buildMetadata } from '@/lib/seo';
+
+export const generateMetadata = async ({ params }: { params: Promise<{ locale: string }> }) => buildMetadata((await params).locale, 'home');
 
 const CAPABILITIES: { icon: IconName; pastel: string; tag: 'launch' | 'preview' | 'setup' | 'selected' }[] = [
   { icon: 'globe', pastel: PASTEL.aqua, tag: 'launch' },

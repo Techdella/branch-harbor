@@ -69,7 +69,7 @@ export function WorkflowExplorer({ steps, pastel }: { steps: WorkflowStepView[];
       </div>
 
       <div role="tabpanel" id={`${baseId}-panel`} aria-labelledby={`${baseId}-tab-${i}`} className="mt-6 grid gap-3 lg:grid-cols-[1fr_1.3fr]">
-        <div className="flex flex-col items-start gap-4 rounded-[24px] p-6 md:p-8" style={{ background: pastel }}>
+        <div className="flex min-w-0 flex-col items-start gap-4 rounded-[24px] p-6 md:p-8" style={{ background: pastel }}>
           <span className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-surface">
             <Icon name={step.icon} size={24} />
           </span>
@@ -85,7 +85,7 @@ export function WorkflowExplorer({ steps, pastel }: { steps: WorkflowStepView[];
             </button>
           </div>
         </div>
-        <div className="rounded-[24px] bg-canvas p-2.5 sm:p-4">
+        <div className="min-w-0 rounded-[24px] bg-canvas p-2.5 sm:p-4">
           <div className="overflow-hidden rounded-[18px] bg-surface">
             <div className="flex flex-wrap items-center gap-2 border-b border-line-soft px-4 py-3">
               <Icon name={step.icon} size={16} />
@@ -101,7 +101,8 @@ export function WorkflowExplorer({ steps, pastel }: { steps: WorkflowStepView[];
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-canvas">
                     <Icon name={r.icon} size={16} />
                   </span>
-                  <span className="flex min-w-0 flex-1 flex-col">
+                  {/* Long compounds (e.g. German) must wrap rather than widen the grid at 360px. */}
+                  <span className="flex min-w-0 flex-1 flex-col hyphens-auto [overflow-wrap:anywhere]">
                     <span className="text-sm font-bold">{r.a}</span>
                     <span className="text-xs text-stone">{r.b}</span>
                   </span>

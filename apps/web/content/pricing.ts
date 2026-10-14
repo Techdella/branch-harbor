@@ -1,3 +1,5 @@
+import { numberLocale } from '@/lib/intl';
+
 /**
  * Static list prices per currency. These are set per currency — not live exchange-rate conversions.
  * Proposed pricing, to be validated before general availability.
@@ -30,6 +32,23 @@ export function defaultCurrencyFor(locale: string): PriceCurrency {
   return 'USD';
 }
 
+/** U+2066 LEFT-TO-RIGHT ISOLATE … U+2069 POP DIRECTIONAL ISOLATE. */
+const ltrIsolate = (s: string) => `\u2066${s}\u2069`;
+
+/**
+ * Formats a list price. The currency symbol is wrapped in a left-to-right isolate so symbols that mix
+ * letters and punctuation (US$, A$, CA$) keep their shape inside right-to-left text instead of
+ * rendering as "$US".
+ */
 export function formatPrice(amount: number, currency: PriceCurrency, locale: string): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(amount);
+  return new Intl.NumberFormat(numberLocale(locale), { style: 'currency', currency, maximumFractionDigits: 0, minimumFractionDigits: 0 })
+    .formatToParts(amount)
+    .map((p) => (p.type === 'currency' ? ltrIsolate(p.value) : p.value))
+    .join('');
+}
+
+/** The currency's symbol in this locale (e.g. "US$", "£"), isolated for bidi like formatPrice. */
+export function currencySymbol(currency: PriceCurrency, locale: string): string {
+  const sym = new Intl.NumberFormat(numberLocale(locale), { style: 'currency', currency, currencyDisplay: 'symbol' }).formatToParts(0).find((p) => p.type === 'currency')?.value;
+  return sym ? ltrIsolate(sym) : currency;
 }

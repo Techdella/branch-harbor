@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { IconName } from '@bh/icons';
 import { Icon, cx } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
-import { PLAN_KEYS, PRICE_CURRENCIES, defaultCurrencyFor, formatPrice, perLocationPrice, type PlanKey, type PriceCurrency } from '@/content/pricing';
+import { PLAN_KEYS, PRICE_CURRENCIES, currencySymbol, defaultCurrencyFor, formatPrice, perLocationPrice, type PlanKey, type PriceCurrency } from '@/content/pricing';
 
 const STORAGE_KEY = 'bh.pricing.currency';
 
@@ -54,7 +54,7 @@ export function PricingPlans() {
           <select id={currencyId} value={currency} onChange={(e) => chooseCurrency(e.target.value as PriceCurrency)} className="h-11 rounded-full border border-line bg-surface px-4 text-sm font-bold">
             {PRICE_CURRENCIES.map((c) => (
               <option key={c} value={c}>
-                {c} · {new Intl.NumberFormat(locale, { style: 'currency', currency: c, currencyDisplay: 'symbol' }).formatToParts(0).find((p) => p.type === 'currency')?.value}
+                {c} · {currencySymbol(c, locale)}
               </option>
             ))}
           </select>

@@ -63,7 +63,7 @@ export function SiteHeader() {
   return (
     <header className="relative rounded-[28px] bg-surface md:rounded-2xl">
       <div className="flex items-center gap-4 px-4 py-3 sm:px-6 md:py-4">
-        <Link href="/" className="shrink-0 rounded-full" aria-label="BranchHarbor — home">
+        <Link href="/" className="shrink-0 rounded-full" aria-label={tc('homeLabel')}>
           <Logo size={34} />
         </Link>
 
@@ -130,7 +130,8 @@ export function SiteHeader() {
           <a href={`${APP_URL}/sign-in`} className="rounded-full px-2 py-1 text-sm font-bold hover:underline">
             {tc('signIn')}
           </a>
-          <LinkButton href="/demo" signal="arrow-up-right">
+          {/* No lime here: the page's own primary CTA carries the single lime signal (brand rule). */}
+          <LinkButton href="/demo" iconRight="arrow-up-right">
             {tc('requestDemo')}
           </LinkButton>
         </div>

@@ -2,10 +2,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHero, Panel } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
 import { GuideList } from '@/components/resources/GuideList';
-import { pageMetadata } from '@/components/site/meta';
+import { buildMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string }> };
-export const generateMetadata = async ({ params }: Props) => pageMetadata((await params).locale, 'resources');
+export const generateMetadata = async ({ params }: Props) => buildMetadata((await params).locale, 'resources');
 
 export default async function ResourcesPage({ params }: Props) {
   const { locale } = await params;
