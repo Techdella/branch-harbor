@@ -9,6 +9,7 @@ import { ApiError } from '@/lib/errors';
 import { env } from '@/lib/env';
 import { useSession } from '@/lib/session';
 import { useApi } from '@/lib/useApi';
+import { useCt } from '@/features/commerce/strings';
 import type { Channel, Preferences } from '@/lib/types';
 import { color, pastel } from '@/theme';
 
@@ -91,6 +92,7 @@ export default function Profile() {
       )}
 
       <SectionHeader title={t('profile.privacy')} />
+      <ShopEntry />
       <ListItem icon="download" iconBg={pastel.sage} title={t('profile.exportData')} chevron onPress={() => { setReqErr(null); setReq('export'); }} />
       <ListItem icon="shield" iconBg={pastel.blush} title={t('profile.deleteData')} chevron onPress={() => { setReqErr(null); setReq('delete'); }} />
 
@@ -122,4 +124,10 @@ export default function Profile() {
       />
     </Screen>
   );
+}
+
+/** Entry to the commerce shop (browse, order for pickup, track, return). */
+function ShopEntry() {
+  const { ct } = useCt();
+  return <ListItem icon="bag" iconBg={pastel.butter} title={ct('shopEntry')} subtitle={ct('shopEntrySub')} chevron onPress={() => router.push('/shop')} />;
 }
