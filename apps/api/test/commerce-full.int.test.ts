@@ -97,7 +97,7 @@ describe.skipIf(!hasDb)('commerce full product (DB)', () => {
     expect(list.status).toBe(200);
     expect(list.body.items).toHaveLength(1);
     const detail = (await call(app, 'GET', org(`/catalogue/${productId}`), { token: owner.token })).body;
-    const body = { ...detail, description: 'Lay-flat notebook with numbered pages.', variants: detail.variants.map((v: any) => ({ id: v.id, sku: v.sku, name: v.name, options: v.options, prices: v.prices })), images: [], eligibility: detail.eligibility, priceBounds: detail.priceBounds };
+    const body: Record<string, any> = { ...detail, description: 'Lay-flat notebook with numbered pages.', variants: detail.variants.map((v: any) => ({ id: v.id, sku: v.sku, name: v.name, options: v.options, prices: v.prices })), images: [], eligibility: detail.eligibility, priceBounds: detail.priceBounds };
     for (const k of ['id', 'organizationId', 'createdAt', 'updatedAt', 'listings', 'translations', 'variantTranslations', 'collectionIds', 'lockedFields', 'contentVersion', 'updatedBy']) delete body[k];
     const upd = await call(app, 'PUT', org(`/catalogue/${productId}`), { token: owner.token, body });
     expect(upd.status).toBe(200);

@@ -13,7 +13,7 @@ import { CoverScreen } from './studios/CoverScreen';
 import { RegistrationsScreen } from './sports/RegistrationsScreen';
 import { AttendanceScreen } from './sports/AttendanceScreen';
 import { CalendarScreen } from './wellness/CalendarScreen';
-import { CommerceOrdersScreen } from './commerce/OrdersScreen';
+import { CommerceRoutes } from './commerce/CommerceRoutes';
 import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
 import { KitchenScreen } from './foods/KitchenScreen';
@@ -45,6 +45,7 @@ export function OpsRouter({ screen }: { screen: string }) {
   if (!app.can('operations.read')) return <DeniedState permission="operations.read" />;
   if (def.kind === 'table') return <TableScreen tableKey={def.key} title={title} icon={def.icon} permission="operations.read" />;
   const key = `${app.industry}:${def.key}`;
+  if (app.industry === 'commerce') return <CommerceRoutes screen={def.key} />;
   switch (key) {
     case 'studios:classes':
       return <ClassesScreen />;
@@ -56,8 +57,6 @@ export function OpsRouter({ screen }: { screen: string }) {
       return <AttendanceScreen />;
     case 'wellness:calendar':
       return <CalendarScreen />;
-    case 'commerce:orders':
-      return <CommerceOrdersScreen />;
     case 'foods:menu':
       return <MenuScreen />;
     case 'foods:orders':

@@ -98,7 +98,7 @@ export const commerceOperationsRoutes: FastifyPluginAsyncZod = async (app) => {
         backordered: open.filter((o) => o.fulfilmentStatus === 'backordered').length,
         awaitingTransfer: open.filter((o) => o.fulfilmentStatus === 'awaiting_transfer').length,
         needsAttention: open.filter((o) => o.attention).length,
-        awaitingPayment: recent.filter((o) => o.status === 'pending_payment').length,
+        awaitingPayment: recent.filter((o) => o.status === 'pending_payment' && o.source === 'native').length,
       },
       sales: canReports === 'all' || (canReports instanceof Set && canReports.size) ? sales : null,
       salesUnavailableReason: canReports === 'all' || (canReports instanceof Set && canReports.size) ? null : 'Requires report access',

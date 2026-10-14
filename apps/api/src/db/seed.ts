@@ -206,6 +206,7 @@ async function main() {
   }
 
   const ops = await seedOperations({ db, today, upsertUser, demo, maya, carlos, priya, swId, meId });
+  await (await import('./seed-commerce.ts')).seedCommerce({ db, orgId: ops.orgs.fieldnote, demo, upsertUser });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
