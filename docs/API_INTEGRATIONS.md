@@ -89,6 +89,96 @@ Each connector needs a partner/developer account and a documented source-of-trut
 | 30 | Logs | Structured API logs | Better Stack Logs, Datadog, Axiom | `LOG_DRAIN_URL` |
 | 31 | Hosting | Web + app (Next.js), API (Node), workers | **Vercel** (web/app) + **Fly.io / Render / AWS ECS** (API + workers) in US, EU and APAC regions | — |
 
+## 9. Delivery partners, POS/marketplaces and property portals (implemented; sandbox until credentials)
+
+All of these are configured **per location / office** in the business app: **Connections → Partner integrations** (API: `/v1/orgs/{orgId}/partner-connections`). Credentials are encrypted with `ENCRYPTION_KEY` and only ever returned masked. Every connection starts in **sandbox** (nothing is sent). It becomes **live** only when its credentials are complete, **Test connection** passes and someone with *Manage connections* switches it to live. New credentials always drop it back to sandbox. Pull-based portal feeds show **Waiting for the portal** until the portal has fetched the feed URL at least once.
+
+Assumptions that must be confirmed during each partner's onboarding are marked `ASSUMPTION` in the code (`apps/api/src/integrations/partners/*.ts`, `apps/api/src/integrations/realty-portals.ts`).
+
+### 9.1 Uber Direct (Foods — courier delivery)
+
+Partner approval: an **Uber Direct business account** with API access in the location's country. Availability is checked before quoting. The default country list is in `uber-direct.ts` and can be overridden with `UBER_DIRECT_COUNTRIES`. Outside those countries orders are delivered by your own drivers, and the customer sees a notice saying so.
+
+1. In the Uber Direct dashboard → *Developer*: copy **Client ID**, **Client secret** and **Customer ID**. The API uses OAuth client credentials (`POST https://auth.uber.com/oauth/v2/token`, scope `eats.deliveries`). Tokens are cached until 60 s before they expire.
+2. Dashboard → *Webhooks*: add `https://<api-host>/v1/webhooks/uber-direct` for **Delivery status** and **Courier update**. Copy the **Webhook signing key**. Signatures are HMAC-SHA256 of the raw body, sent in `x-uber-signature` (or the legacy `x-postmates-signature`).
+3. In BranchHarbor: Connections → Partner integrations → location → **Uber Direct → Set up**. Paste the values and choose the delivery fee mode:
+   - **absorb**: customers pay your zone fee and you pay Uber.
+   - **pass_through**: customers pay the Uber quote. This only applies when the quote is in the location currency. Otherwise the zone fee applies.
+4. **Test connection** (gets a token), then **Go live**. In the location's ordering settings, set the delivery provider to *Uber Direct*.
+5. Flow: checkout quote (`POST /v1/customers/{customer_id}/delivery_quotes`; pickup-ready time = now + kitchen prep, aimed at the delivery slot) → staff **Send to Uber Direct**. This creates the delivery with `external_id` = our delivery id and the same `idempotency_key`, reusing the quote while it's valid. Status webhooks then move the delivery and the order (picked up → *out for delivery*, delivered → *delivered*). The courier tracking link appears on the customer's order page. Cancelling the order cancels the courier.
+
+### 9.2 Deliverect (Foods — POS injection and marketplaces)
+
+Partner approval: **Deliverect partner credentials**. Staging comes first. Production requires Deliverect certification. You also need the restaurant's Deliverect account and location.
+
+1. From Deliverect: **client_id / client_secret** (OAuth: `POST {base}/oauth/token`, `audience` = base URL), the customer's **account id** and **location id**, and for POS injection the **channel name** assigned to BranchHarbor plus the location's **channel link id**.
+2. Register the order webhook `https://<api-host>/v1/webhooks/deliverect` with Deliverect. This one URL receives orders, cancellations (status 100) and busy mode. HMAC-SHA256 hex arrives in `x-server-authorization-hmac-sha256`. Staging signs with the channel link id. Production uses the secret generated in Deliverect's integration settings: paste it as **Webhook HMAC secret**, or set `DELIVERECT_WEBHOOK_SECRET`.
+3. In BranchHarbor: Partner integrations → **Deliverect → Set up**. Choose the environment (staging / production) and switch on what you need:
+   - **Send accepted orders to the POS** (`POST {base}/{channelName}/order/{channelLinkId}` once per order).
+   - **Receive marketplace orders** (Uber Eats, Deliveroo, DoorDash, Just Eat). These are created as BranchHarbor orders with channel attribution, idempotent per channel order id. Totals come from Deliverect's integers with `decimalDigits` converted to the location currency's minor units. Tax, delivery, bag and small-order fees, tip and channel discount are recorded. Marketplace emails are not stored.
+   - Optionally, **auto-accept**.
+4. **Test connection**, then **Go live**. **Push menu to Deliverect** sends the location's menu at the location's prices (`POST {base}/productAndCategories`) and snoozes sold-out items. Allergen tags are sent only for allergens the business declared. "Wheat" has no Deliverect tag and is reported as not sent. **Pause marketplaces** sets busy mode.
+5. Our status changes are sent back to Deliverect (`POST {base}/orderStatus/{orderId}`): 20 accepted, 50 preparing, 70 ready, 90 finalized, 110 rejected/cancelled.
+
+### 9.3 Rightmove (UK) — Real Time Datafeed, push
+
+Partner approval: email the **Rightmove Data Feed team** to have a new RTDF **network** set up for BranchHarbor as the feed provider. They issue:
+- a **Network ID**
+- a **client certificate** (ask for PKCS#12)
+- test URLs for the beta phase
+
+Each office needs its **Branch ID**.
+
+1. Partner integrations → office → **Rightmove → Set up**. Enter the Network ID and Branch ID, paste the certificate as base64 (`base64 -w0 cert.p12`) plus its password. For beta testing, enter Rightmove's test **API base URL**. Leave it empty for production (`https://adfapi.rightmove.co.uk`).
+2. **Test connection** calls `GetBranchPropertyList` over mutual TLS. Then **Go live**.
+3. Listings opted into Rightmove are validated:
+   - full UK postcode
+   - bedrooms
+   - photos at public http(s) URLs
+   - description
+   - price (or POA)
+   - valid price qualifier (lettings: default/POA only)
+   - rent frequency for lettings
+   - tenure (sales) and council tax band, from the listing's *portal details* or the business's disclosures
+4. **Send / publish now** sends each valid listing with `SendProperty` (`agent_ref` = listing reference). Withdrawn, sold or let listings, and listings that are opted out, are removed with `RemoveProperty`. Results and Rightmove errors/warnings appear on **Portal feeds**.
+
+### 9.4 idealista (Spain, Portugal, Italy) — hosted JSON feed, pull
+
+Partner approval: ask idealista (your account manager / *idealista tools* support) to enable **automatic import ("carga automática") from a feed** for your professional account.
+
+1. Partner integrations → office → **idealista → Set up**: customer code (`ilc…`) and contact email.
+2. Give idealista the **Feed URL** shown on the card. It's a signed, per-office URL. Treat it as a secret, and use **New feed URL** to rotate it. idealista can also take the same file by FTP, but BranchHarbor doesn't upload by FTP.
+3. **Test connection** builds the feed. **Go live** after idealista confirms. The status reads *Waiting for the portal* until idealista fetches the URL.
+4. Validation: built area (m²), postal code, an energy certificate rating supplied by the business (A–G, *in process* or *exempt*), photos, and description. Rentals are priced per month. Listings leave the feed when withdrawn or sold.
+
+### 9.5 Zillow / RESO (US, Canada) — hosted XML feed, pull
+
+Partner approval: apply to **Zillow Listing Feeds** for your brokerage, or to the syndicator/MLS that accepts this layout. Canadian listings normally go through your board (CREA DDF®), so confirm that the target portal accepts direct feeds.
+
+1. Partner integrations → office → **Zillow / RESO XML → Set up**: the feed id the portal assigns and the licensed brokerage name.
+2. Give the portal the **Feed URL**, run **Test connection**, then **Go live**.
+3. Validation: ZIP/postal code, state/province, bedrooms and bathrooms (residential), photos, a listing agent with an email address, and, in Canada, the brokerage disclosure. Element names follow the Zillow feed layout. The equivalent RESO Data Dictionary names are noted in the file.
+
+### 9.6 REAXML (Australia, New Zealand) — hosted XML feed, pull
+
+Partner approval: ask **realestate.com.au** (REA) and/or **Domain** to enable REAXML import for your agency and give you the agency/agent id.
+
+1. Partner integrations → office → **REAXML → Set up**: the portal agent id.
+2. Give the portal the **Feed URL**, run **Test connection**, then **Go live**.
+3. Validation: state (NSW, VIC, …), postcode, a headline of 80 characters or fewer, at most 26 photos, rentals priced per **week**, photos, and description. Withdrawn, sold and let listings stay in the file for 30 days with `status="withdrawn|sold|leased"`, so the portal archives them.
+
+### 9.7 Testing without partners
+
+`pnpm --filter @bh/api test` covers these integrations with an injected mock `fetch` (`Services.partnerFetch`, `Services.rightmoveFetch`), so no real service is ever called:
+- token caching
+- quote → create → webhook mapping
+- signature failures
+- idempotent create and inbound orders
+- POS push on accept
+- menu snapshot
+- feed validation and output snapshots for every portal
+- removal on withdraw
+
 ---
 
 ## What to set up first (shortest path to a Studios pilot)

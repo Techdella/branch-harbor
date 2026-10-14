@@ -172,6 +172,9 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 **webhooks**
 
 - `POST /v1/webhooks/stripe`
+- `POST /v1/webhooks/uber-direct` — Uber Direct `event.delivery_status` / `event.courier_update`; HMAC-SHA256 of the raw body in `x-uber-signature` (or `x-postmates-signature`) with the location's webhook signing key; idempotent per event id (`partner_webhook_events`); statuses pending→pending, pickup→assigned, pickup_complete/dropoff→picked_up (order → out for delivery), delivered→delivered (order → delivered), canceled→cancelled, returned→failed
+- `POST /v1/webhooks/deliverect` — Deliverect orders / cancellations (status 100) / busy mode; HMAC-SHA256 hex in `x-server-authorization-hmac-sha256` (production partner secret; in staging the channel link id); marketplace orders are idempotent per `channel` + `channelOrderId`
+- `GET /v1/feeds/realty/{connectionId}/{token}.(xml|json)` — signed per-office hosted property feed for pull portals (idealista, Zillow/RESO XML, REAXML); token rotatable; 404 on a wrong token, 410 when switched off
 
 **studios**
 
@@ -470,6 +473,13 @@ Full foods product (routes/foods-ext.ts: foods-public, foods-menu-admin, foods-o
 - `POST /v1/orgs/{orgId}/connections/{id}/mappings/{mappingId}/resolve`
 - `DELETE /v1/orgs/{orgId}/connections/{id}`
 
+**partner integrations** (Uber Direct, Deliverect, Rightmove, idealista, Zillow/RESO XML, REAXML — per location/office; credentials encrypted and only returned masked; `connections.manage` to change, `operations.read` to view)
+
+- `GET /v1/orgs/{orgId}/partner-connections?industry=foods|realty` — catalogue, locations (with `canManage`, `uberDirectAvailable`) and connections with `status` (`not_configured` · `disabled` · `sandbox` · `awaiting_portal` · `live` · `error`), `statusReason`, masked credentials, last result, webhook/feed URL
+- `POST /v1/orgs/{orgId}/partner-connections` `{ provider, locationId, settings }` (starts in sandbox) · `PATCH …/{id}` `{ settings?, enabled?, mode? }` (live needs complete credentials and a passing test; new credentials drop back to sandbox) · `POST …/{id}/test` · `POST …/{id}/rotate-feed-token` · `GET …/{id}/log` · `DELETE …/{id}` (credentials removed, switched off)
+- Deliverect: `GET /v1/orgs/{orgId}/foods/locations/{locationId}/deliverect/menu-snapshot` · `POST …/deliverect/menu-push` (sandbox: snapshot only; live: products + sold-out snoozes) · `POST …/deliverect/busy` `{ paused, minutes? }`
+- Side effects (background job `foods.partner_order_event`): accepted BranchHarbor order → POS via Deliverect (once); status changes on marketplace orders → Deliverect (`20` accepted, `50` preparing, `70` ready, `90` finalized, `110` rejected/cancelled); cancelled order → Uber courier cancelled. Checkout quotes use Uber Direct when the location's delivery provider is `uber_direct` (`feeMode` `pass_through` shows the quote to the customer, `absorb` keeps the zone fee); outside Uber Direct countries orders fall back to own drivers with `deliveryNotice`.
+
 **payments**
 
 - `POST /v1/public/payments/{paymentId}/sandbox-confirm`
@@ -567,11 +577,13 @@ Full foods product (routes/foods-ext.ts: foods-public, foods-menu-admin, foods-o
 - Staff: `GET|POST /realty/enquiries` (portal leads idempotent on `externalRef`) · `POST /realty/enquiries/{id}/assign|status` · `GET /realty/viewings` · `GET /realty/viewing-slots` · `POST /realty/viewings` · `POST /realty/viewings/{id}/confirm|cancel|feedback`
 - Offers: `GET /realty/listings/{id}/offers` · `GET /realty/offers` · `GET /realty/offers/{id}` · `POST /realty/listings/{id}/offers` · `POST /realty/offers/{id}/actions` (counter/revise/accept/reject/withdraw/note; one accepted offer per listing)
 - `GET /realty/reports` (no client data; volumes per currency, `combinedVolume: null`) · `GET /realty/my-day`
-- Syndication (sandbox only, `live: false`): `GET /realty/syndication/portals` · `PUT /realty/listings/{id}/syndication/{portal}` · `GET /realty/syndication/{portal}/feed` · `POST /realty/syndication/{portal}/export`
+- Syndication (portals `rightmove` · `idealista` · `reso_xml` · `reaxml`; legacy `*_style` ids accepted): `GET /realty/syndication/portals` (status per office + last push) · `GET /realty/syndication/listings` (fresh validation errors + last result per opted-in listing) · `PUT /realty/listings/{id}/syndication/{portal}` (opt-out removes it from the portal) · `PUT /realty/listings/{id}/portal-fields` (price qualifier, tenure, council tax band, energy rating, available from — supplied by the business) · `GET /realty/syndication/{portal}/feed?locationId=` · `POST /realty/syndication/{portal}/export` (live push or sandbox record; withdrawn/sold/let are removed). Listing status changes queue `realty.portal_sync` (re-send / remove).
 - AI (proposals only, fair-housing guardrails): `POST /realty/listings/{id}/ai/description` · `POST /realty/listings/{id}/ai/feedback-summary` · `POST /realty/ai/follow-ups` · `GET /realty/ai/proposals` · `POST /realty/ai/proposals/{id}/decision`
 - `POST /realty/jobs/run` `{ job: viewing_reminders | saved_search_alerts }` (also every 5 minutes from `server.ts`)
 
 ## Stubbed / not yet implemented
+
+- Partner integrations follow the partners' published shapes, but some details are assumptions until partner onboarding (marked in code): Deliverect snooze/busy-mode paths and marketplace channel ids; Rightmove single-select codes; idealista `featuresType` values; REAXML category names. idealista/REA FTP upload is not automated (hosted feed URL only).
 
 - Object storage upload signing (S3/R2) — config + status only; no upload endpoint yet.
 - Sentry/OpenTelemetry wiring — DSN accepted, SDK not initialised.

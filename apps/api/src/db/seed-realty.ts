@@ -229,10 +229,24 @@ export async function seedRealty(c: { db: Db; today: string; upsertUser: (email:
 
   // Syndication opt-ins (sandbox) and a consented saved search.
   await db.insert(t.realtySyndication).values([
-    { organizationId: orgId, listingId: L$['TOR-0001']!.id, portal: 'realtor_ca_style', optedIn: true },
-    { organizationId: orgId, listingId: L$['TOR-0002']!.id, portal: 'realtor_ca_style', optedIn: true },
-    { organizationId: orgId, listingId: L$['LON-0001']!.id, portal: 'rightmove_style', optedIn: true },
-    { organizationId: orgId, listingId: L$['MAD-0001']!.id, portal: 'idealista_style', optedIn: true },
+    { organizationId: orgId, listingId: L$['TOR-0001']!.id, portal: 'reso_xml', optedIn: true },
+    { organizationId: orgId, listingId: L$['TOR-0002']!.id, portal: 'reso_xml', optedIn: true },
+    { organizationId: orgId, listingId: L$['LON-0001']!.id, portal: 'rightmove', optedIn: true },
+    // Opted in but missing material information (council tax band) — shows validation errors on the Portal feeds screen.
+    { organizationId: orgId, listingId: L$['LON-0002']!.id, portal: 'rightmove', optedIn: true },
+    { organizationId: orgId, listingId: L$['MAD-0001']!.id, portal: 'idealista', optedIn: true },
+    { organizationId: orgId, listingId: L$['SYD-0001']!.id, portal: 'reaxml', optedIn: true },
+    { organizationId: orgId, listingId: L$['SYD-0002']!.id, portal: 'reaxml', optedIn: true, lastStatus: 'sandbox_removed' },
+  ]);
+  // Portal facts supplied by the business (labelled sample values).
+  await db.insert(t.realtyListingPortalFields).values([
+    { organizationId: orgId, listingId: L$['LON-0001']!.id, priceQualifier: 'guide_price', tenure: 'freehold', councilTaxBand: 'H' },
+    { organizationId: orgId, listingId: L$['MAD-0001']!.id, energyRating: 'D' },
+  ]);
+  // Office portal connections: sandbox only (no portal credentials in demo data — nothing is ever transmitted).
+  await db.insert(t.connections).values([
+    { organizationId: orgId, locationId: by.LON.id, provider: 'rightmove', kind: 'portal', direction: 'export', authoritative: 'branchharbor', state: 'disconnected', config: { enabled: true, mode: 'sandbox', networkId: '0', branchId: '0' } },
+    { organizationId: orgId, locationId: by.SYD.id, provider: 'reaxml', kind: 'portal', direction: 'export', authoritative: 'branchharbor', state: 'disconnected', config: { enabled: true, mode: 'sandbox', feedTokenVersion: 1, agentId: 'SAMPLE-AGENCY' } },
   ]);
   await db.insert(t.realtySavedSearches).values({ organizationId: orgId, email: 'buyer.alerts@example.com', name: '3 bed in Toronto under $1.7M', criteria: { transaction: 'sale', minBedrooms: 3, maxPrice: 1_700_000_00, currency: 'CAD', city: 'Toronto' }, frequency: 'weekly', alertsConsent: true, manageTokenHash: sha256('seed-saved-search'), lastAlertedAt: days(2) });
   await db.insert(t.consentRecords).values({ organizationId: orgId, email: 'buyer.alerts@example.com', purpose: 'realty_search_alerts', version: '2026-10', granted: true, source: 'seed' });

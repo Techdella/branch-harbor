@@ -19,6 +19,7 @@ import { configOf, loadPickupSettings } from './pickup.ts';
 import { allergenView, currentClose, inWindows, loadFoodConfig, localized, regimeFor, windowsSummary, type AllergenView } from './foods-menu.ts';
 import { depleteForOrder, ingredientShortages, restoreForOrder } from './foods-inventory.ts';
 import { deliveryFeeFor, resolveDeliveryZone } from './foods-delivery.ts';
+import { providerDeliveryQuote } from './foods-partners.ts';
 import { cancelKdsTickets, createKdsTickets } from './foods-kitchen.ts';
 import type { FoodLocationConfig } from '../db/schema/index.ts';
 
@@ -260,6 +261,14 @@ export async function prepareCheckout(s: Services, loc: Location, input: Checkou
     if (priced.subtotal < zone.zone.minimumOrderMinor) {
       throw conflict('below_minimum', `The minimum order for delivery to ${zone.zone.name} is ${(zone.zone.minimumOrderMinor / 100).toFixed(2)} ${loc.currency}.`, { minimumMinor: zone.zone.minimumOrderMinor, subtotalMinor: priced.subtotal, currency: loc.currency });
     }
+    // Delivery partner (Uber Direct): quote now; the customer pays the quote (pass-through) or the zone fee (absorbed).
+    const slotEnd = fulfilment.deliverySlotId ? (await s.db.select({ e: foodDeliverySlots.endsAt }).from(foodDeliverySlots).where(eq(foodDeliverySlots.id, fulfilment.deliverySlotId)))[0]?.e ?? null : null;
+    const pq = await providerDeliveryQuote(s, loc, cfg, { address: input.address as Record<string, unknown>, deliverBy: promisedAt, dropoffDeadline: slotEnd, subtotalMinor: priced.subtotal, zoneFeeMinor: deliveryFee, contactPhone: input.contact?.phone ?? null });
+    if (pq) {
+      deliveryFee = pq.customerFeeMinor;
+      if (pq.quote) fulfilment.providerQuote = pq.quote;
+      if (pq.notice) fulfilment.deliveryNotice = pq.notice;
+    }
   }
   const tip = input.tipMinor ?? 0;
   if (tip > 0) {
@@ -281,6 +290,8 @@ export async function quoteCheckout(s: Services, loc: Location, input: CheckoutI
     subtotal: m(p.totals.subtotal), serviceCharge: p.totals.serviceCharge ? { ...m(p.totals.serviceCharge), label: p.totals.serviceChargeLabel } : null,
     deliveryFee: input.channel === 'delivery' ? m(p.totals.deliveryFee) : null, tax: p.priced.taxRateBps > 0 ? m(p.totals.tax) : null, taxRateBps: p.priced.taxRateBps || null,
     tip: p.totals.tip ? m(p.totals.tip) : null, total: m(p.totals.total),
+    deliveryPartner: p.fulfilment.providerQuote ? { provider: p.fulfilment.providerQuote.provider, feeMode: p.fulfilment.providerQuote.feeMode, sandbox: p.fulfilment.providerQuote.sandbox } : null,
+    deliveryNotice: p.fulfilment.deliveryNotice ?? null,
     zone: p.zone ? { id: p.zone.zone.id, name: p.zone.zone.name, minimumOrder: m(p.zone.zone.minimumOrderMinor), freeDeliveryAbove: p.zone.zone.freeDeliveryAboveMinor === null ? null : m(p.zone.zone.freeDeliveryAboveMinor) } : null,
     tips: p.cfg.tips.enabled && p.cfg.tips.channels.includes(input.channel) ? { presetsBps: p.cfg.tips.presetsBps, allowCustom: p.cfg.tips.allowCustom } : null,
     table: p.table ? { label: p.table.label } : null, promisedAt: p.promisedAt?.toISOString() ?? null,
@@ -417,6 +428,8 @@ export async function transitionFoodOrder(s: Services, orderId: string, to: Food
   });
 
   if (to === 'accepted') await createKdsTickets(s.db, updated);
+  // Partner side effects (POS push on accept, marketplace status, courier cancellation) run as a background job.
+  if (to === 'accepted' || updated.fulfilment.marketplace || requiresRefund(to)) await s.jobs.enqueue('foods.partner_order_event', { orderId: updated.id, to });
   let paymentAction: string = 'none';
   const [tabPayment] = requiresRefund(to) && updated.paymentId ? await s.db.select().from(paymentReferences).where(and(eq(paymentReferences.id, updated.paymentId), eq(paymentReferences.targetType, 'food_tab'))) : [];
   if (requiresRefund(to)) {

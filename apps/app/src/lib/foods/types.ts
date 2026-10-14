@@ -78,7 +78,7 @@ export interface Delivery {
 }
 export interface FoodOrderLite {
   id: string; orderNumber: string; locationId: string; status: string; paymentStatus: string; channel: string; total: Money; promisedAt: string | null; contact: { name: string };
-  fulfilment: { zoneName?: string; tableLabel?: string; address?: { city: string; postalCode: string } }; lines: Array<{ name: string; quantity: number }>; createdAt: string; overdue?: boolean;
+  fulfilment: { zoneName?: string; tableLabel?: string; address?: { city: string; postalCode: string }; marketplace?: { channelName: string; courier: 'channel' | 'restaurant'; channelOrderDisplayId: string }; pos?: { status: string } }; lines: Array<{ name: string; quantity: number }>; createdAt: string; overdue?: boolean;
 }
 
 export interface Table { id: string; locationId: string; label: string; code: string; seats: number; area: string | null; active: boolean; openTabId: string | null }

@@ -47,7 +47,8 @@ export function DeliveryScreen() {
         <Section title={t('delivery.toDispatch')}>
           <Async res={toDispatch} loading={<LoadingBlock variant="table" rows={2} />}>
             {(orders: FoodOrderLite[]) => {
-              const list = orders.filter((o) => !dispatched.has(o.id) && ['accepted', 'preparing', 'ready'].includes(o.status));
+              // Marketplace orders (via Deliverect) are collected by the marketplace's own courier.
+              const list = orders.filter((o) => !dispatched.has(o.id) && o.fulfilment.marketplace?.courier !== 'channel' && ['accepted', 'preparing', 'ready'].includes(o.status));
               if (!list.length) return <p className="text-sm text-stone">{t('delivery.nothingToDispatch')}</p>;
               return (
                 <ul className="divide-y divide-line-soft">

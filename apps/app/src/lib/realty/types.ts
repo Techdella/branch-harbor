@@ -193,8 +193,11 @@ export interface RealtyReport {
   };
 }
 
-export interface Portal { id: string; name: string; description: string; format: 'xml' | 'json'; countries: string[]; mode: 'sandbox'; live: false; status: string; optedInListings: number; lastExportedAt: string | null }
-export interface FeedPreview { portal: string; name: string; format: 'xml' | 'json'; notice: string; included: Array<{ listingId: string; reference: string }>; excluded: Array<{ listingId: string; reference: string; issues: string[] }>; content: string }
+export type PortalOfficeStatus = 'not_configured' | 'disabled' | 'sandbox' | 'awaiting_portal' | 'live' | 'error';
+export interface PortalOffice { locationId: string; name: string; country: string; connectionId: string | null; status: PortalOfficeStatus; statusReason: string; lastPush: { at: string; action: string; status: string; message: string | null } | null; lastFetchedAt: string | null }
+export interface Portal { id: string; name: string; description: string; format: 'xml' | 'json'; countries: string[]; delivery: 'push' | 'pull'; mode: 'sandbox' | 'live'; live: boolean; status: string; offices: PortalOffice[]; optedInListings: number; invalidListings: number; lastExportedAt: string | null }
+export interface SyndicationRow { listingId: string; reference: string; title: string; locationId: string; listingStatus: string; portal: string; issues: string[]; lastStatus: string; lastIssues: string[]; lastExportedAt: string | null }
+export interface FeedPreview { portal: string; name: string; format: 'xml' | 'json'; delivery?: 'push' | 'pull'; mode?: 'sandbox' | 'live'; officeStatus?: PortalOfficeStatus; notice: string; included: Array<{ listingId: string; reference: string }>; excluded: Array<{ listingId: string; reference: string; issues: string[] }>; removed?: Array<{ listingId: string; reference: string; status: string }>; content: string }
 
 export interface AiProposal { id: string; kind: string; status: string; output: Record<string, unknown>; createdAt: string }
 export interface AiResult { proposal: AiProposal | null; refusals: string[]; unavailable?: boolean }

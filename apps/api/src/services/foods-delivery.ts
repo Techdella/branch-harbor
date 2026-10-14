@@ -7,8 +7,9 @@ import { and, asc, eq, gte, lt } from 'drizzle-orm';
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import { foodDeliveries, foodDeliverySlots, foodDeliveryZones, foodDrivers, foodOrders, locations } from '../db/schema/index.ts';
-import { AppError, conflict, notFound, validationError } from '../lib/errors.ts';
-import { deliveryProvider } from '../integrations/foods-delivery.ts';
+import { conflict, notFound, validationError } from '../lib/errors.ts';
+import { randomUUID } from 'node:crypto';
+import { createProviderDelivery } from './foods-partners.ts';
 import { audit } from './audit.ts';
 import { loadFoodConfig } from './foods-menu.ts';
 import { planPickupSlots, type PickupConfig } from './pickup.ts';
@@ -113,29 +114,36 @@ export async function dispatchOrder(s: Services, organizationId: string, orderId
     [driver] = await s.db.select().from(foodDrivers).where(and(eq(foodDrivers.id, input.driverId), eq(foodDrivers.locationId, o.locationId), eq(foodDrivers.active, true)));
     if (!driver) throw validationError('Driver not found at this location', { driverId: 'Unknown driver' });
   }
+  if (o.fulfilment.marketplace?.courier === 'channel') throw conflict('marketplace_courier', `${o.fulfilment.marketplace.channelName} sends its own courier for this order`);
   const [loc] = await s.db.select().from(locations).where(eq(locations.id, o.locationId));
+  const [existing] = await s.db.select().from(foodDeliveries).where(eq(foodDeliveries.orderId, o.id));
+  if (existing && !['cancelled', 'failed'].includes(existing.status)) throw conflict('already_dispatched', 'This order already has an active delivery');
+  // Our delivery id is the provider's external_id (idempotent create); a re-dispatch after a cancelled/failed attempt gets a new suffix.
+  const deliveryId = existing?.id ?? randomUUID();
+  const attempt = (existing?.events.filter((e) => /^Requested from /.test(e.note ?? '')).length ?? 0) + 1;
   let external: { externalId: string; trackingUrl: string | null; feeMinor: number | null; sandbox: boolean } | null = null;
   if (input.provider !== 'own') {
-    const adapter = deliveryProvider(input.provider);
-    if (adapter.mode === 'disabled') throw new AppError(503, 'provider_unavailable', `${adapter.name} is not configured`);
-    external = await adapter.createDelivery({
-      reference: o.orderNumber, pickup: { name: loc!.name, address: loc!.address as Record<string, unknown>, phone: loc!.phone ?? null },
-      dropoff: { name: o.contact.name, phone: o.contact.phone ?? null, address: (o.fulfilment.address ?? {}) as Record<string, unknown> },
-      readyAt: o.promisedAt ?? new Date(), valueMinor: o.totalMinor, currency: o.currency,
-    });
+    // Reserve the row first (as "failed" until the provider confirms) so a crash or retry reuses the same external id.
+    if (!existing) await s.db.insert(foodDeliveries).values({ id: deliveryId, organizationId, locationId: o.locationId, orderId: o.id, provider: input.provider, status: 'failed', currency: o.currency, events: [] }).onConflictDoNothing();
+    try {
+      external = await createProviderDelivery(s, o, loc!, input.provider, deliveryId, attempt);
+    } catch (err) {
+      const [cur] = await s.db.select().from(foodDeliveries).where(eq(foodDeliveries.id, deliveryId));
+      await s.db.update(foodDeliveries).set({ status: 'failed', events: [...(cur?.events ?? []), { at: new Date().toISOString(), status: 'failed', by: input.actorUserId, note: `Request to ${input.provider} failed: ${(err as Error).message}`.slice(0, 300) }], updatedAt: new Date() }).where(eq(foodDeliveries.id, deliveryId));
+      throw err;
+    }
   }
+  const [reserved] = existing ? [existing] : await s.db.select().from(foodDeliveries).where(eq(foodDeliveries.id, deliveryId));
   const now = new Date().toISOString();
   const values = {
     organizationId, locationId: o.locationId, orderId: o.id, provider: input.provider, driverId: driver?.id ?? null, externalId: external?.externalId ?? null,
     status: input.provider === 'own' ? 'assigned' : 'pending', trackingUrl: external?.trackingUrl ?? null, feeQuoteMinor: external?.feeMinor ?? null, currency: o.currency,
-    sandbox: external?.sandbox ?? false, events: [{ at: now, status: input.provider === 'own' ? 'assigned' : 'pending', by: input.actorUserId, note: driver ? `Assigned to ${driver.name}` : `Requested from ${input.provider}` }],
+    sandbox: external?.sandbox ?? false, events: [{ at: now, status: input.provider === 'own' ? 'assigned' : 'pending', by: input.actorUserId, note: driver ? `Assigned to ${driver.name}` : `Requested from ${input.provider}${external?.sandbox ? ' (sandbox)' : ''}` }],
     updatedAt: new Date(),
   };
-  const [existing] = await s.db.select().from(foodDeliveries).where(eq(foodDeliveries.orderId, o.id));
-  if (existing && !['cancelled', 'failed'].includes(existing.status)) throw conflict('already_dispatched', 'This order already has an active delivery');
-  const [d] = existing
-    ? await s.db.update(foodDeliveries).set({ ...values, events: [...existing.events, ...values.events] }).where(eq(foodDeliveries.id, existing.id)).returning()
-    : await s.db.insert(foodDeliveries).values(values).returning();
+  const [d] = reserved
+    ? await s.db.update(foodDeliveries).set({ ...values, events: [...reserved.events, ...values.events] }).where(eq(foodDeliveries.id, reserved.id)).returning()
+    : await s.db.insert(foodDeliveries).values({ id: deliveryId, ...values }).returning();
   await audit(s.db, { organizationId, actorUserId: input.actorUserId, action: 'food_delivery.dispatched', scopeKind: 'location', scopeId: o.locationId, targetType: 'food_order', targetId: o.id, metadata: { provider: input.provider, driverId: driver?.id ?? null } });
   return serializeDelivery(d!, driver ? { id: driver.id, name: driver.name, phone: driver.phone } : null);
 }

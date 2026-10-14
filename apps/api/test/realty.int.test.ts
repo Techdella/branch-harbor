@@ -462,22 +462,23 @@ describe.skipIf(!hasDb)('realty: listings, approvals, routing, viewings, offers,
     expect(stored.every((p) => !JSON.stringify(p.output).match(/young professionals|with children/))).toBe(true);
   });
 
-  it('portal syndication is sandbox only, opt-in per listing, and validates required fields', async () => {
+  it('portal syndication is sandbox without office credentials, opt-in per listing, and validates required fields', async () => {
     const portals = await call(app, 'GET', R('/syndication/portals'), { token: owner.token });
     expect(portals.body.items.every((p: any) => p.live === false && p.mode === 'sandbox')).toBe(true);
     const l = await listing(owner.token, toronto.id, { leadAgentId: agentA.id });
     await call(app, 'POST', R(`/listings/${l.id}/status`), { token: owner.token, body: { to: 'active' } });
-    expect((await call(app, 'PUT', R(`/listings/${l.id}/syndication/rightmove_style`), { token: owner.token, body: { optedIn: true } })).status).toBe(400); // UK feed, Canadian listing
-    const opt = await call(app, 'PUT', R(`/listings/${l.id}/syndication/realtor_ca_style`), { token: agentA.user.token, body: { optedIn: true } });
+    expect((await call(app, 'PUT', R(`/listings/${l.id}/syndication/rightmove`), { token: owner.token, body: { optedIn: true } })).status).toBe(400); // UK feed, Canadian listing
+    const opt = await call(app, 'PUT', R(`/listings/${l.id}/syndication/reso_xml`), { token: agentA.user.token, body: { optedIn: true } });
     expect(opt.status).toBe(200);
     expect(opt.body.issues).toContain('Brokerage name/licence disclosure is required');
-    let feed = await call(app, 'GET', R('/syndication/realtor_ca_style/feed'), { token: owner.token });
+    let feed = await call(app, 'GET', R('/syndication/reso_xml/feed'), { token: owner.token });
     expect(feed.body.excluded.map((x: any) => x.listingId)).toContain(l.id);
     await call(app, 'PUT', R(`/offices/${toronto.id}`), { token: owner.token, body: { brokerageLicence: 'Keystone Realty Inc., Brokerage' } });
-    feed = await call(app, 'GET', R('/syndication/realtor_ca_style/feed'), { token: owner.token });
+    feed = await call(app, 'GET', R('/syndication/reso_xml/feed'), { token: owner.token });
     expect(feed.body.included.map((x: any) => x.listingId)).toContain(l.id);
-    expect(JSON.parse(feed.body.content).sandbox).toBe(true);
-    const exp = await call(app, 'POST', R('/syndication/realtor_ca_style/export'), { token: owner.token, body: {} });
+    expect(feed.body.content).toContain('SANDBOX PREVIEW');
+    expect(feed.body.content).toContain('<ProviderListingId>');
+    const exp = await call(app, 'POST', R('/syndication/reso_xml/export'), { token: owner.token, body: {} });
     expect(exp.body).toMatchObject({ mode: 'sandbox', live: false, transmitted: false });
     expect(exp.body.results.find((r: any) => r.listingId === l.id).status).toBe('sandbox_exported');
   });

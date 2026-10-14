@@ -10,6 +10,9 @@ import { fmtDateTime, relativeTime } from '@/lib/format';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty } from '../../ui/States';
+
+/** Real portal feeds and the countries they serve (BranchHarbor API: integrations/realty-portals.ts). */
+const PORTALS_BY_COUNTRY: Array<[string, string[]]> = [['rightmove', ['GB']], ['idealista', ['ES', 'PT', 'IT']], ['reso_xml', ['US', 'CA']], ['reaxml', ['AU', 'NZ']]];
 import { ApprovalBadge, ListingStatusBadge, Price, RAsync, useRealtyCtx } from './common';
 
 const BOARD: LS[] = ['draft', 'coming_soon', 'active', 'under_offer', 'sold', 'let', 'withdrawn'];
@@ -95,6 +98,7 @@ function ListingCard({ l, onOpen }: { l: RealtyListing; onOpen: () => void }) {
 
 function ListingDrawer({ id, onClose }: { id: string; onClose: () => void }) {
   const t = useTranslations('realty');
+  const tp = useTranslations('partners');
   const locale = useLocale();
   const ctx = useRealtyCtx();
   const res = useRealty((api) => api.listing(ctx, id), [ctx, id]);
@@ -204,13 +208,18 @@ function ListingDrawer({ id, onClose }: { id: string; onClose: () => void }) {
                 {l.permissions?.canEdit && (
                   <section className="flex flex-col gap-2">
                     <h3 className="text-xs font-bold uppercase text-stone">{t('portals.title')}</h3>
-                    <p className="text-xs text-stone">{t('portals.sandboxNote')}</p>
-                    {['realtor_ca_style', 'zillow_style', 'rightmove_style', 'idealista_style'].map((p) => {
+                    <p className="text-xs text-stone">{tp('portals.configureHint')} {tp('portals.removedNote')}</p>
+                    {PORTALS_BY_COUNTRY.filter(([, countries]) => countries.includes(l.office.country)).map(([p]) => {
                       const s = l.syndication.find((x) => x.portal === p);
                       return (
-                        <div key={p} className="flex flex-wrap items-center gap-2 rounded-md bg-canvas px-3 py-2">
-                          <Toggle checked={!!s?.optedIn} label={t(`portals.names.${p}` as 'portals.names.zillow_style')} onChange={async (on) => { const r = await synd.run(p, on); if (r) res.reload(); }} />
-                          {s?.lastIssues.length ? <Badge tone="warning" icon="alert">{t('portals.issues', { count: s.lastIssues.length })}</Badge> : null}
+                        <div key={p} className="flex flex-col gap-1 rounded-md bg-canvas px-3 py-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Toggle checked={!!s?.optedIn} label={tp(`portals.names.${p}`)} onChange={async (on) => { const r = await synd.run(p, on); if (r) res.reload(); }} />
+                            <span className="text-sm font-semibold">{tp(`portals.names.${p}`)}</span>
+                            {s?.optedIn && <Badge tone={s.lastStatus === 'published' ? 'success' : s.lastStatus === 'invalid' || s.lastStatus === 'error' ? 'warning' : 'neutral'}>{tp(`portals.lastStatus.${s.lastStatus}`)}</Badge>}
+                            {s?.lastIssues.length ? <Badge tone="warning" icon="alert">{t('portals.issues', { count: s.lastIssues.length })}</Badge> : null}
+                          </div>
+                          {s?.optedIn && s.lastIssues.length > 0 && <ul className="list-disc ps-5 text-xs text-warning">{s.lastIssues.map((i) => <li key={i}>{i}</li>)}</ul>}
                         </div>
                       );
                     })}
