@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { Badge, Card, DataStatus, MoneyText, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, type Tone } from '@/components';
+import { router } from 'expo-router';
+import { Badge, Button, Card, DataStatus, MoneyText, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, type Tone } from '@/components';
 import { ExperienceSwitch } from '@/features/shared/ExperienceSwitch';
 import { regionName } from '@/features/customer/useLocationScope';
 import { useI18n } from '@/i18n';
@@ -28,6 +29,7 @@ export default function Pulse() {
         scope={{ label: t('owner.allLocations'), sub: p ? `${p.scopeLabel} · ${p.range}` : undefined, icon: 'building' }}
       />
       <DataStatus q={q} />
+      <Button label={t('foodsx.pulse')} icon="utensils" variant="secondary" size="sm" onPress={() => router.push('/owner/foods')} />
       {p ? <Text variant="small" tone="muted">{t('common.lastUpdated', { time: relativeAgo(p.updatedAt, intlLocale) })}</Text> : null}
 
       <SectionHeader title={t('owner.salesByCurrency')} sub={p?.range ?? t('owner.thisWeek')} />

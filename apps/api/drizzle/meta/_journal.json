@@ -29,6 +29,13 @@
       "when": 1791996845930,
       "tag": "0003_ops_shifts_approvals_offers_intake_pickup",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792001381372,
+      "tag": "0004_foods_full_product",
+      "breakpoints": true
     }
   ]
 }

@@ -24,6 +24,7 @@ export default function Today() {
   return (
     <Screen onRefresh={() => { void shiftsQ.refresh(); void sessionsQ.refresh(); }} refreshing={shiftsQ.refreshing}>
       <ScreenHeader title={t('staff.hello', { name: me?.user.name ?? '' })} kicker={t('common.today')} right={<ExperienceSwitch />} />
+      <ListItem icon="truck" iconBg={pastel.blush} title={t('foodsx.deliveries')} chevron onPress={() => router.push('/staff/deliveries')} />
       <DataStatus q={shiftsQ} />
 
       <SectionHeader title={t('staff.shift')} />

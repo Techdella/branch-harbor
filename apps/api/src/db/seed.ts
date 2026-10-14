@@ -14,6 +14,7 @@ import { hashPassword } from '../services/auth.ts';
 import { addDays, zonedToUtc } from '../lib/tz.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { clearOperationsDemo, OPERATIONS_DEMO_SLUGS, seedOperations } from './seed-operations.ts';
+import { seedFoods } from './seed-foods.ts';
 
 const cfg = config();
 const handle = createDb(cfg.DATABASE_URL, { max: 2 });
@@ -206,6 +207,7 @@ async function main() {
   }
 
   const ops = await seedOperations({ db, today, upsertUser, demo, maya, carlos, priya, swId, meId });
+  const foods = await seedFoods({ db, today, meId, demo, carlos, upsertUser });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
@@ -215,7 +217,8 @@ async function main() {
   console.log(`                priya.anand@demo.branchharbor.com (regional manager, Europe)`);
   console.log(`                carlos.ortega@demo.branchharbor.com (staff, Ballard) — same password`);
   console.log(` Organisations: Stillwater Yoga Collective (${swId}) — Toronto CAD, Seattle USD, London GBP, Berlin EUR, Sydney AUD`);
-  console.log(`                Maple & Ember Restaurants (${meId}) — Seattle USD, Vancouver CAD`);
+  console.log(`                Maple & Ember Restaurants (${meId}) — Seattle USD, Vancouver CAD, London GBP, Lisbon EUR`);
+  console.log(`                  foods: table QR codes ${Object.values(foods.tableCodes).join(', ')} · ${foods.users.join(', ')}`);
   console.log(`                North Shore Football Academy (${ops.orgs.northShore}) — Toronto CAD, Manchester GBP, Austin USD`);
   console.log(`                Harbourline Wellness (${ops.orgs.harbourline}) — Toronto CAD, Dublin EUR, Melbourne AUD`);
   console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);

@@ -91,6 +91,7 @@ export default function Profile() {
       )}
 
       <SectionHeader title={t('profile.privacy')} />
+      <ListItem icon="repeat" iconBg={pastel.butter} title={t('foodsx.mealPlans')} chevron onPress={() => router.push('/customer/meal-plans')} />
       <ListItem icon="download" iconBg={pastel.sage} title={t('profile.exportData')} chevron onPress={() => { setReqErr(null); setReq('export'); }} />
       <ListItem icon="shield" iconBg={pastel.blush} title={t('profile.deleteData')} chevron onPress={() => { setReqErr(null); setReq('delete'); }} />
 

@@ -1,0 +1,26 @@
+{
+  "foodsite": {
+    "orderTitle": "Online bestellen",
+    "preorderTitle": "Vorbestellung",
+    "cateringTitle": "Catering",
+    "mealTitle": "Wöchentliche Essenspläne",
+    "tableTitle": "Am Tisch bestellen",
+    "nav": {
+      "delivery": "Lieferung",
+      "preorder": "Vorbestellen",
+      "catering": "Catering",
+      "mealPlans": "Essenspläne"
+    },
+    "channel": {
+      "pickup": "Abholung",
+      "delivery": "Lieferung",
+      "dine_in": "Am Tisch",
+      "preorder": "Vorbestellung"
+    },
+    "kitchenClosed": "Die Küche ist gerade geschlossen.",
+    "allergensNotProvided": "Keine Allergenangaben — bitte im Restaurant fragen",
+    "tip": "Trinkgeld",
+    "serviceCharge": "Servicegebühr",
+    "deliveryFee": "Liefergebühr"
+  }
+}

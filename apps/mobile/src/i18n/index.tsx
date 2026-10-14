@@ -9,6 +9,7 @@ import es from './es';
 import de from './de';
 import ptBR from './ptBR';
 import { storage } from '@/lib/storage';
+import { foodsxDe, foodsxEn, foodsxEs, foodsxFr, foodsxPt } from '@/features/foods/i18n';
 
 export const APP_LOCALES = ['en', 'fr', 'es', 'de', 'pt-BR'] as const;
 export type AppLocale = (typeof APP_LOCALES)[number];
@@ -21,6 +22,7 @@ export const APP_LOCALE_LABELS: Record<AppLocale, string> = {
 };
 
 const i18n = new I18n({ en, fr, es, de, 'pt-BR': ptBR });
+i18n.store({ en: { foodsx: foodsxEn }, fr: { foodsx: foodsxFr }, es: { foodsx: foodsxEs }, de: { foodsx: foodsxDe }, 'pt-BR': { foodsx: foodsxPt } });
 i18n.enableFallback = true;
 i18n.defaultLocale = 'en';
 

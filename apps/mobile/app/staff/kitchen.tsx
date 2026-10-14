@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { router } from 'expo-router';
 import { Badge, Banner, Button, Card, ConfirmSheet, EmptyState, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, ToggleRow } from '@/components';
 import { useLocations } from '@/features/shared/useLocations';
 import { useI18n } from '@/i18n';
@@ -73,6 +74,7 @@ export default function Kitchen() {
   return (
     <Screen onRefresh={q.refresh} refreshing={q.refreshing}>
       <ScreenHeader title={t('staff.kitchenTitle', { location: loc ? `Maple & Ember ${loc.name}` : '' })} scope={{ label: t('common.lastUpdated', { time: lastRefresh }), icon: 'refresh', sub: loc?.address }} />
+      <View style={{ flexDirection: 'row', gap: 8 }}><Button label={t('foodsx.kds')} icon="chef" variant="secondary" size="sm" onPress={() => router.push('/staff/kds')} /><Button label={t('foodsx.deliveries')} icon="truck" variant="secondary" size="sm" onPress={() => router.push('/staff/deliveries')} /></View>
 
       {stale ? (
         <Banner

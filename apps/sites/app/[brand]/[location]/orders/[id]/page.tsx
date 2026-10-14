@@ -16,7 +16,7 @@ export default async function OrderStatusPage({ params, searchParams }: { params
   let order: FoodOrder | null = null;
   if (token && token.length >= 10 && /^[0-9a-f-]{36}$/i.test(id)) {
     try {
-      order = await apiGet<FoodOrder & { locationId: string }>(`/v1/public/foods/orders/${id}?token=${encodeURIComponent(token)}`);
+      order = await apiGet<FoodOrder & { locationId: string }>(`/v1/public/foods/orders/${id}/track?token=${encodeURIComponent(token)}`);
       if ((order as FoodOrder & { locationId: string }).locationId !== data.location.id) order = null;
     } catch (err) {
       if (!isNotFound(err)) throw err;

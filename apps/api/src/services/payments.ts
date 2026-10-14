@@ -10,7 +10,23 @@ import { audit } from './audit.ts';
 import { convertReservationToSale } from './inventory.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
-export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration';
+export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration' | 'catering_deposit' | 'food_tab';
+
+/**
+ * Extension points for vertical modules that add payment targets or provider events without editing the
+ * core switch statements (registered at import time by the module's service file).
+ */
+export interface PaymentTargetExtension {
+  /** Confirm the record a succeeded payment pays for (same contract as fulfilTarget). */
+  fulfil(tx: Tx, p: PaymentRow): Promise<{ fulfilled: boolean; note: string }>;
+  /** Reconciliation: is the paid record present and confirmed, and what does it expect to be paid? */
+  isRecorded(db: Exec, p: PaymentRow): Promise<{ ok: boolean; expected: { amount: number; currency: string } | null }>;
+}
+export const paymentTargetExtensions: Record<string, PaymentTargetExtension> = {};
+/** Called inside the webhook transaction after a payment failed or was cancelled. */
+export const paymentFailureHooks: Array<(tx: Tx, p: PaymentRow) => Promise<void>> = [];
+/** Handlers for provider events the core does not process (e.g. subscription invoices). Return a note when handled. */
+export const stripeEventExtensions: Array<(tx: Tx, event: Stripe.Event) => Promise<{ note: string; paymentId?: string | null; organizationId?: string | null } | null>> = [];
 
 export async function connectedAccountFor(db: Exec, organizationId: string, locationId: string) {
   const [row] = await db
@@ -103,6 +119,8 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
       const [o] = await tx.select().from(foodOrders).where(eq(foodOrders.id, p.targetId)).for('update');
       if (!o) return { fulfilled: false, note: 'Food order record missing' };
       if (o.status === 'rejected' || o.status === 'cancelled') return { fulfilled: false, note: `Order already ${o.status}` };
+      // A second payment for an order that is already paid must not replace the original link: it is a duplicate to refund.
+      if (o.paymentStatus === 'paid' && o.paymentId && o.paymentId !== p.id) return { fulfilled: true, note: 'Order already paid by another payment — duplicate flagged for refund' };
       await tx.update(foodOrders).set({ paymentStatus: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(foodOrders.id, o.id));
       return { fulfilled: true, note: 'Order paid — awaiting restaurant acceptance' };
     }
@@ -130,8 +148,11 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
       }
       return { fulfilled: true, note: r.prog.requiresApproval ? 'Registration paid — awaiting review' : 'Registration accepted' };
     }
-    default:
+    default: {
+      const ext = paymentTargetExtensions[p.targetType];
+      if (ext) return ext.fulfil(tx, p);
       return { fulfilled: false, note: `Unknown target ${p.targetType}` };
+    }
   }
 }
 
@@ -210,6 +231,7 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
           if (ref.targetType === 'food_order' && ref.targetId) {
             await tx.update(foodOrders).set({ paymentStatus: 'voided', status: 'cancelled', updatedAt: new Date() }).where(and(eq(foodOrders.id, ref.targetId), eq(foodOrders.status, 'awaiting_acceptance'), eq(foodOrders.paymentStatus, 'pending')));
           }
+          for (const hook of paymentFailureHooks) await hook(tx, ref);
         }
         await audit(tx, { organizationId: ref.organizationId, actorUserId: null, actorType: 'webhook', action: `payment.${event.type}`, scopeKind: 'location', scopeId: ref.locationId, targetType: 'payment', targetId: ref.id, metadata: { eventId: event.id, note } });
       }
@@ -233,6 +255,16 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
       const orgRows = await tx.select({ id: organizations.id }).from(organizations).where(eq(organizations.stripeAccountId, acct.id));
       if (orgRows.length) await tx.update(locations).set({ paymentsEnabled: enabled, updatedAt: new Date() }).where(inArray(locations.organizationId, orgRows.map((o) => o.id)));
       note = `Account charges ${enabled ? 'enabled' : 'disabled'}`;
+    } else {
+      for (const ext of stripeEventExtensions) {
+        const r = await ext(tx, event);
+        if (r) {
+          note = r.note;
+          paymentId = r.paymentId ?? null;
+          orgId = r.organizationId ?? null;
+          break;
+        }
+      }
     }
 
     await tx.update(webhookEvents).set({ status: 'processed', processedAt: new Date(), error: null, paymentId, organizationId: orgId }).where(eq(webhookEvents.id, eventRowId));
@@ -319,7 +351,7 @@ export async function reverseTargetPayment(s: Services, paymentId: string | null
 }
 
 export interface ReconciliationItem {
-  kind: 'paid_without_record' | 'unpaid_confirmed_record' | 'amount_mismatch';
+  kind: 'paid_without_record' | 'unpaid_confirmed_record' | 'amount_mismatch' | 'duplicate_payment';
   paymentId: string | null;
   targetType: string | null;
   targetId: string | null;
@@ -362,7 +394,11 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
         case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'pending_payment'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
         case 'appointment': { const a = p.targetId ? apptMap.get(p.targetId) : undefined; ok = !!a && a.status !== 'cancelled' ? true : !!a && p.refundedMinor >= p.amountMinor; if (a) expected = { amount: a.priceMinor, currency: a.currency }; break; }
         case 'registration': { const r = p.targetId ? regMap.get(p.targetId) : undefined; ok = !!r && r.status !== 'submitted'; break; }
-        default: ok = false;
+        default: {
+          const ext = p.targetType ? paymentTargetExtensions[p.targetType] : undefined;
+          if (ext) ({ ok, expected } = await ext.isRecorded(db, p));
+          else ok = false;
+        }
       }
       if (!ok && p.refundedMinor < p.amountMinor) {
         items.push({ kind: 'paid_without_record', paymentId: p.id, targetType: p.targetType, targetId: p.targetId, locationId: p.locationId, expected, actual, detail: 'Payment succeeded but the linked record is missing or not confirmed', recoverable: !!(p.targetType && (p.recordSnapshot || p.targetId)) });
@@ -371,6 +407,23 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
       if (mismatch) {
         items.push({ kind: 'amount_mismatch', paymentId: p.id, targetType: p.targetType, targetId: p.targetId, locationId: p.locationId, expected: expected ?? { amount: p.amountMinor, currency: p.currency }, actual, detail: 'Amount or currency charged differs from the record total', recoverable: false });
       }
+    }
+  }
+
+  // Duplicate payments: more than one succeeded, unrefunded payment for the same record (e.g. a customer paid twice).
+  const succeededByTarget = new Map<string, PaymentRow[]>();
+  for (const p of pays) {
+    if (p.state !== 'succeeded' || !p.targetType || !p.targetId || p.refundedMinor >= p.amountMinor) continue;
+    const k = `${p.targetType}:${p.targetId}`;
+    succeededByTarget.set(k, [...(succeededByTarget.get(k) ?? []), p]);
+  }
+  for (const group of succeededByTarget.values()) {
+    if (group.length < 2) continue;
+    const linked = group[0]!.targetType === 'food_order' ? foodMap.get(group[0]!.targetId!)?.paymentId ?? null : null;
+    const sorted = [...group].sort((a, b) => (a.id === linked ? -1 : b.id === linked ? 1 : a.createdAt.getTime() - b.createdAt.getTime()));
+    for (const extra of sorted.slice(1)) {
+      if (!inScope(extra.locationId)) continue;
+      items.push({ kind: 'duplicate_payment', paymentId: extra.id, targetType: extra.targetType, targetId: extra.targetId, locationId: extra.locationId, expected: { amount: 0, currency: extra.currency }, actual: { amount: extra.amountMinor - extra.refundedMinor, currency: extra.currency }, detail: `Duplicate payment: the record was already paid by payment ${sorted[0]!.id}. Refund this one.`, recoverable: false });
     }
   }
 

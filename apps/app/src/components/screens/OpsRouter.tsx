@@ -17,6 +17,7 @@ import { CommerceOrdersScreen } from './commerce/OrdersScreen';
 import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
 import { KitchenScreen } from './foods/KitchenScreen';
+import { foodsScreen } from './foods/ext';
 
 export function OpsRouter({ screen }: { screen: string }) {
   const t = useTranslations('ops');
@@ -44,6 +45,8 @@ export function OpsRouter({ screen }: { screen: string }) {
   if (def.kind === 'later') return <LaterScreen icon={def.icon} title={title} note={t(`${app.industry}.${def.key}.later`)} />;
   if (!app.can('operations.read')) return <DeniedState permission="operations.read" />;
   if (def.kind === 'table') return <TableScreen tableKey={def.key} title={title} icon={def.icon} permission="operations.read" />;
+  const foodsExt = app.industry === 'foods' ? foodsScreen(def.key) : null;
+  if (foodsExt) return foodsExt;
   const key = `${app.industry}:${def.key}`;
   switch (key) {
     case 'studios:classes':

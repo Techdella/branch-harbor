@@ -5,3 +5,4 @@ export * from './industries.ts';
 export * from './permissions.ts';
 export * from './schemas.ts';
 export * from './api-contracts.ts';
+export * from './foods.ts';

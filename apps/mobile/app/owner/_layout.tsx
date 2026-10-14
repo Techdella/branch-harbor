@@ -20,6 +20,7 @@ export default function OwnerTabs() {
       <Tabs.Screen name="approvals" options={{ title: t('tabs.approvals'), tabBarBadge: pending || undefined }} />
       <Tabs.Screen name="locations" options={{ title: t('tabs.locations') }} />
       <Tabs.Screen name="alerts" options={{ title: t('tabs.alerts') }} />
+      <Tabs.Screen name="foods" options={{ href: null }} />
     </Tabs>
   );
 }

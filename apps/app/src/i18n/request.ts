@@ -2,6 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
 import { LOCALE_COOKIE, resolveAppLocale } from './config';
 import en from '../../messages/en.json';
+import foodsEn from '../../messages/foods/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -23,10 +24,11 @@ export default getRequestConfig(async () => {
     raw = accept.split(',')[0]?.split(';')[0];
   }
   const locale = resolveAppLocale(raw);
-  let messages: Messages = en as Messages;
+  let messages: Messages = merge(en as Messages, foodsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
-    messages = merge(en as Messages, translated);
+    messages = merge(messages, translated);
+    messages = merge(messages, (await import(`../../messages/foods/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });
