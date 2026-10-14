@@ -13,51 +13,8 @@ import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
 import type { BranchHarborApi, SiteAddress } from '../api';
 import { ApiError } from '../errors';
-import { addDays, dateInZone, fmtDay, fmtTime, moneyWithCode, zoneLabel, zonedToUtc } from '../format';
-import type {
-  AiAnswer,
-  ApprovalItem,
-  ApprovalRequest,
-  AttentionItem,
-  Cell,
-  ClassOccurrence,
-  CommerceOrder,
-  Connection,
-  ConnectionState,
-  CoverRequest,
-  DomainStatus,
-  FoodOrder,
-  FoodOrderStatus,
-  GroupPublish,
-  ImportRow,
-  IndustryKey,
-  Location,
-  Member,
-  MenuItem,
-  Metric,
-  OnboardingProgress,
-  OnboardingStep,
-  OrgSettings,
-  Overview,
-  PaymentAccount,
-  PaymentAutomation,
-  AutoChargeRow,
-  PaymentState,
-  ReconciliationItem,
-  RefundState,
-  Registration,
-  Report,
-  RequestContext,
-  ShiftView,
-  SportsGroup,
-  TableData,
-  TimelineEvent,
-  Transaction,
-  UpcomingItem,
-  WebsiteField,
-  WebsitePage,
-  WellnessDay,
-} from '../types';
+import { addDays, fmtDay, fmtTime, moneyWithCode, zoneLabel, zonedToUtc } from '../format';
+import type { AiAnswer, ApprovalItem, ApprovalRequest, AttentionItem, Cell, ClassOccurrence, Connection, ConnectionState, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, IndustryKey, Location, Member, MenuItem, Metric, OnboardingProgress, OnboardingStep, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, PaymentState, ReconciliationItem, RefundState, Report, RequestContext, ShiftView, TableData, TimelineEvent, Transaction, UpcomingItem, WebsiteField, WebsitePage } from '../types';
 import { ONBOARDING_STEPS } from '../types';
 import { httpBusiness } from './business';
 import { http, login, logout, resendVerification, signup, verifyEmail } from './client';
@@ -365,21 +322,6 @@ async function coverById(id: string): Promise<CoverRequest> {
   if (!c) throw new ApiError('not_found', 'Cover request not found.', 404);
   return coverView(c);
 }
-
-/* ------------------------------------------------------------------ */
-/* sports, wellness, commerce                                          */
-/* ------------------------------------------------------------------ */
-
-interface ApiRegistration {
-  id: string;
-  locationId: string;
-  programmeId: string;
-  status: string;
-  teamId: string | null;
-  paymentId: string | null;
-  forms: Record<string, unknown>;
-  participant: { id: string; name: string; dateOfBirth: string | null };
-}
 interface ApiProgramme {
   id: string;
   locationId: string;
@@ -488,53 +430,6 @@ interface ApiPractitioner {
   serviceIds: string[];
   availability: { weekday: number; start: string; end: string }[];
   active: boolean;
-}
-interface ApiCommerceOrder {
-  id: string;
-  locationId: string;
-  source: string;
-  externalId: string | null;
-  status: string;
-  fulfilmentStatus: string;
-  currency: Currency;
-  totalMinor: number;
-  taxMinor: number;
-  refundedMinor: number;
-  lines: { variantId: string; sku: string; name: string; quantity: number; unitPriceMinor: number }[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-const ageFrom = (dob: string | null) => (dob ? Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 86400_000)) : 0);
-
-function commerceView(x: ApiCommerceOrder): CommerceOrder {
-  const lineTotal = (l: ApiCommerceOrder['lines'][number]) => l.unitPriceMinor * l.quantity;
-  let refundedLeft = x.refundedMinor;
-  const lines = x.lines.map((l, i) => {
-    const refunded = refundedLeft >= lineTotal(l) && refundedLeft > 0;
-    if (refunded) refundedLeft -= lineTotal(l);
-    return { id: `${x.id}:${i}`, name: l.name, qty: l.quantity, unit: m(l.unitPriceMinor, x.currency), refunded };
-  });
-  const payment: CommerceOrder['payment'] = x.status === 'pending_payment' ? 'processing' : x.status === 'cancelled' ? 'failed' : 'succeeded';
-  const refund: CommerceOrder['refund'] = x.refundedMinor <= 0 ? 'none' : x.refundedMinor >= x.totalMinor ? 'complete' : 'partial';
-  return {
-    id: x.id,
-    number: x.externalId ?? x.id.slice(0, 8).toUpperCase(),
-    customer: '—',
-    locationId: x.locationId,
-    source: x.source === 'native' ? 'BranchHarbor' : `${humanise(x.source)}${x.externalId ? ` #${x.externalId}` : ''}`,
-    placedAt: x.createdAt,
-    lines,
-    total: m(x.totalMinor, x.currency),
-    tax: { label: x.taxMinor ? 'Tax as configured' : 'No tax recorded', amount: x.taxMinor ? m(x.taxMinor, x.currency) : null },
-    payment,
-    refund,
-    fulfilment: x.fulfilmentStatus === 'fulfilled' ? 'fulfilled' : x.status === 'pending_payment' ? 'on_hold' : 'to_fulfil',
-    timeline: [
-      { at: x.createdAt, text: `Order created (${x.source})`, tone: 'success', icon: 'check' },
-      ...(x.refundedMinor ? [{ at: x.updatedAt, text: `Refunded ${(x.refundedMinor / 100).toFixed(2)} ${x.currency}`, tone: 'info' as Tone, icon: 'undo' as IconName }] : []),
-    ],
-  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -841,9 +736,6 @@ const fmtDate = (iso: string | null | undefined, tz = 'UTC') => (iso ? new Intl.
 function tableOf(key: string, columns: [string, string, ('left' | 'right')?][], rows: TableData['rows'], source: string, extra: Partial<TableData> = {}): TableData {
   return { key, columns: columns.map(([k, label, align]) => ({ key: k, label, align })), rows, filters: [{ key: 'all', label: 'All' }], source, ...extra };
 }
-
-const NOT_IN_API = (key: string, what: string): TableData =>
-  tableOf(key, [['item', what]], [], 'BranchHarbor API', { description: `${what} aren’t available from the BranchHarbor API yet, so nothing is shown here rather than sample data.` });
 
 async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
   const scope = inScope(ctx);
@@ -1256,125 +1148,6 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     },
     resetCover: async () => {
       throw new ApiError('not_supported', 'Cover requests can’t be reopened once decided. Request cover again from the class.', 409);
-    },
-  },
-
-  sports: {
-    registrations: async (ctx) => {
-      const scope = inScope(ctx);
-      const [regs, progs, teams] = await Promise.all([
-        http.get<{ items: ApiRegistration[] }>(o('/sports/registrations')).then(items),
-        http.get<{ items: ApiProgramme[] }>(o('/sports/programmes')).then(items),
-        http.get<{ items: ApiTeam[] }>(o('/sports/teams')).then(items),
-      ]);
-      const groups: SportsGroup[] = teams.filter((t) => scope.has(t.locationId)).map((t) => ({ id: t.id, name: t.name, roster: regs.filter((r) => r.teamId === t.id && r.status === 'accepted').length, capacity: t.capacity ?? 0 }));
-      const list = regs.filter((r) => scope.has(r.locationId)).map((r): Registration => {
-        const p = progs.find((x) => x.id === r.programmeId);
-        const formsComplete = Object.keys(r.forms ?? {}).length > 0;
-        return {
-          id: r.id, participant: r.participant.name, age: ageFrom(r.participant.dateOfBirth), programme: p?.name ?? 'Programme', guardian: '—', guardianVerified: false,
-          payment: r.paymentId ? { label: 'Paid', amount: p ? m(p.feeMinor, p.currency) : undefined, tone: 'success' } : { label: p?.feeMinor ? 'Not taken' : 'No fee', tone: 'neutral' },
-          formsComplete, formsNote: formsComplete ? 'Forms submitted' : 'No forms on record',
-          status: r.status === 'accepted' ? 'accepted' : r.status === 'waitlisted' ? 'waitlisted' : r.status === 'withdrawn' || r.status === 'rejected' ? 'withdrawn' : 'awaiting_review',
-          groupId: r.teamId ?? undefined,
-        };
-      });
-      return { items: list, groups };
-    },
-    decide: async (id, input) => {
-      await http.post(o(`/sports/registrations/${id}/review`), { decision: input.decision, teamId: input.groupId });
-      const r = await httpApi.sports.registrations({ industry: 'sports', role: role(), scopeId: 'all' });
-      const found = r.items.find((x) => x.id === id);
-      if (!found) throw new ApiError('not_found', 'Registration not found.', 404);
-      return found;
-    },
-    session: async (ctx) => {
-      // The coach's next session: the one in progress, else the next upcoming, else the most recent one still unrecorded.
-      const scope = inScope(ctx);
-      const nowMs = Date.now();
-      const list = (await http.get<{ items: ApiSportsSession[] }>(o('/sports/sessions'), { from: new Date(nowMs - 7 * 86400_000).toISOString(), to: new Date(nowMs + 14 * 86400_000).toISOString() }).then(items))
-        .filter((x) => scope.has(x.location.id) && x.status !== 'cancelled');
-      const live = list.find((x) => Date.parse(x.startsAt) <= nowMs && Date.parse(x.endsAt) >= nowMs);
-      const next = list.find((x) => Date.parse(x.startsAt) > nowMs);
-      const unrecorded = [...list].reverse().find((x) => Date.parse(x.endsAt) < nowMs && x.attendance.recorded < x.rosterCount);
-      const sess = live ?? next ?? unrecorded;
-      if (!sess) throw new ApiError('not_found', 'No training sessions or fixtures are scheduled in this scope for the next two weeks.', 404);
-      const r = await http.get<{ roster: { id: string; name: string; attendance: string | null }[] }>(o(`/sports/sessions/${sess.id}/roster`));
-      return {
-        id: sess.id, group: `${sess.team.name} · ${sess.kind === 'fixture' ? 'Fixture' : 'Training'}`, start: sess.startsAt, timeZone: sess.location.timeZone,
-        venue: `${sess.venue ?? 'Venue not set'}${sess.venueConflict ? ' (venue clash)' : ''}`, coach: sess.team.coach?.name ?? 'No coach assigned',
-        roster: r.roster.map((p) => ({ id: p.id, name: p.name })), submitted: r.roster.length > 0 && r.roster.every((p) => p.attendance !== null),
-      };
-    },
-    submitAttendance: async (sessionId, marks) => {
-      await http.post(o(`/sports/sessions/${sessionId}/attendance`), { marks: Object.entries(marks).map(([participantId, status]) => ({ participantId, status })) });
-      return { ok: true as const, notifiedGuardians: Object.values(marks).filter((v) => v === 'absent').length };
-    },
-  },
-
-  wellness: {
-    day: async (ctx) => {
-      const lid = [...inScope(ctx)][0];
-      if (!lid) throw new ApiError('not_found', 'No location in this scope.', 404);
-      const tz = tzOf(lid);
-      const date = dateInZone(new Date(), tz);
-      const from = zonedToUtc(date, '00:00', tz);
-      const to = zonedToUtc(addDays(date, 1), '00:00', tz);
-      const [appts, pracs, services, rooms] = await Promise.all([
-        http.get<{ items: ApiAppointment[] }>(o('/wellness/appointments'), { locationId: lid, from, to }).then(items),
-        http.get<{ items: ApiPractitioner[] }>(o('/wellness/practitioners')).then(items),
-        http.get<{ items: ApiService[] }>(o('/wellness/services')).then(items),
-        maybe(http.get<{ items: { id: string; locationId: string; name: string }[] }>(o('/wellness/resources')).then(items), []),
-      ]);
-      const hhmm = (iso: string) => new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }).format(new Date(iso));
-      const slots = [...new Set(appts.map((a) => hhmm(a.startsAt)))].sort();
-      return {
-        date, locationId: lid, timeZone: tz, slots,
-        practitioners: pracs.filter((p) => p.locationId === lid).map((p, i) => ({ id: p.id, name: p.name, pastel: PASTEL_CYCLE[i % PASTEL_CYCLE.length]! })),
-        rooms: rooms.filter((r) => r.locationId === lid).map((r) => r.name),
-        appointments: appts.filter((a) => a.status !== 'rescheduled').map((a) => {
-          const s = services.find((x) => x.id === a.serviceId);
-          return { id: a.id, service: s ? `${s.name} · ${s.durationMinutes} min` : 'Appointment', client: a.customerName ?? 'Client', practitionerId: a.practitionerId, room: rooms.find((r) => r.id === a.resourceId)?.name ?? '—', start: a.startsAt, minutes: Math.round((new Date(a.endsAt).getTime() - new Date(a.startsAt).getTime()) / 60000), status: a.status === 'cancelled' ? 'cancelled' : a.paymentId ? 'deposit_paid' : 'confirmed' };
-        }),
-      } satisfies WellnessDay;
-    },
-    slots: async (appointmentId) => {
-      const appts = await http.get<{ items: ApiAppointment[] }>(o('/wellness/appointments'), { from: new Date(Date.now() - 86400_000).toISOString(), to: new Date(Date.now() + 14 * 86400_000).toISOString() }).then(items);
-      const a = appts.find((x) => x.id === appointmentId);
-      if (!a) throw new ApiError('not_found', 'Appointment not found.', 404);
-      const tz = tzOf(a.locationId);
-      const pracs = await http.get<{ items: ApiPractitioner[] }>(o('/wellness/practitioners')).then(items);
-      const out: { id: string; start: string; practitioner: string; room: string }[] = [];
-      for (const d of [0, 1]) {
-        const date = addDays(dateInZone(new Date(), tz), d);
-        const r = await http.get<{ slots: { startsAt: string; practitionerIds: string[] }[] }>(`/public/wellness/${a.locationId}/availability`, { serviceId: a.serviceId, date }, { auth: false });
-        for (const s of r.slots) {
-          if (new Date(s.startsAt).getTime() < Date.now()) continue;
-          const pid = s.practitionerIds.includes(a.practitionerId) ? a.practitionerId : s.practitionerIds[0];
-          if (pid) out.push({ id: `${s.startsAt}|${pid}`, start: s.startsAt, practitioner: pracs.find((p) => p.id === pid)?.name ?? 'Practitioner', room: '—' });
-        }
-      }
-      return out.slice(0, 6);
-    },
-    reschedule: async (appointmentId, slotId) => {
-      const [startsAt, practitionerId] = slotId.split('|');
-      const r = await http.post<{ appointment?: ApiAppointment }>(o(`/wellness/appointments/${appointmentId}/reschedule`), { startsAt, practitionerId });
-      const lid = r.appointment?.locationId ?? [...inScope({ industry: 'wellness', role: role(), scopeId: 'all' })][0]!;
-      return httpApi.wellness.day({ industry: 'wellness', role: role(), scopeId: `loc:${lid}` });
-    },
-  },
-
-  commerce: {
-    orders: async (ctx) => {
-      const scope = inScope(ctx);
-      return (await http.get<{ items: ApiCommerceOrder[] }>(o('/commerce/orders')).then(items)).filter((x) => scope.has(x.locationId)).map(commerceView);
-    },
-    refund: async (orderId, lineIds) => {
-      const order = await http.get<ApiCommerceOrder>(o(`/commerce/orders/${orderId}`)).then((r) => ((r as unknown as { order?: ApiCommerceOrder }).order ?? r));
-      const amountMinor = order.lines.reduce((s, l, i) => (lineIds.includes(`${orderId}:${i}`) ? s + l.unitPriceMinor * l.quantity : s), 0);
-      await http.post(o(`/commerce/orders/${orderId}/refunds`), { amountMinor, reason: 'Partial refund from BranchHarbor' });
-      const fresh = await http.get<ApiCommerceOrder>(o(`/commerce/orders/${orderId}`)).then((r) => ((r as unknown as { order?: ApiCommerceOrder }).order ?? r));
-      return commerceView(fresh);
     },
   },
 

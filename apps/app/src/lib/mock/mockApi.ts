@@ -130,27 +130,6 @@ function freshRegs(): { items: Registration[]; groups: SportsGroup[] } {
     ],
   };
 }
-const ROSTER = ['Ella M.', 'Sam K.', 'Ivy T.', 'Noah B.', 'Ari P.', 'Mila J.', 'Owen C.', 'Zoe W.', 'Kai R.', 'Lena H.', 'Theo S.', 'Ruby A.', 'Max D.', 'Isla F.'];
-
-/* ---------------- Wellness ---------------- */
-
-function freshDay(locId: string): WellnessDay {
-  const l = loc('wellness', locId);
-  const date = dateInZone(new Date(), l.timeZone);
-  const t = (hhmm: string) => zonedToUtc(date, hhmm, l.timeZone);
-  return {
-    date, locationId: locId, timeZone: l.timeZone, slots: ['09:00', '10:00', '11:30', '13:00', '14:00', '15:30', '17:00'], rooms: ['Room A', 'Room B', 'Room C'],
-    practitioners: [{ id: 'rk', name: 'Rina K.', pastel: P.sage }, { id: 'tb', name: 'Tom B.', pastel: P.lilac }, { id: 'al', name: 'Ana L.', pastel: P.butter }],
-    appointments: [
-      { id: 'ap_jordan', service: 'Deep tissue · 60 min', client: 'Jordan P.', practitionerId: 'rk', room: 'Room A', start: t('10:00'), minutes: 60, status: 'confirmed' },
-      { id: 'ap_kai', service: 'Hot stone · 90 min', client: 'Kai S.', practitionerId: 'rk', room: 'Room B', start: t('11:30'), minutes: 90, status: 'deposit_paid' },
-      { id: 'ap_mira', service: 'Facial · 45 min', client: 'Mira D.', practitionerId: 'tb', room: 'Room C', start: t('13:00'), minutes: 45, status: 'confirmed' },
-      { id: 'ap_cx', service: 'Facial · 45 min', client: 'Pat G.', practitionerId: 'tb', room: 'Room C', start: t('14:00'), minutes: 45, status: 'cancelled' },
-      { id: 'ap_lou', service: 'Deep tissue · 60 min', client: 'Lou F.', practitionerId: 'al', room: 'Room B', start: t('10:00'), minutes: 60, status: 'confirmed' },
-      { id: 'ap_pat', service: 'Deep tissue · 60 min', client: 'Sam G.', practitionerId: 'al', room: 'Room A', start: t('14:00'), minutes: 60, status: 'confirmed' },
-    ],
-  };
-}
 
 /* ---------------- Commerce ---------------- */
 
@@ -342,10 +321,6 @@ function page(ind: IndustryKey, locId: string) {
   const s = st(ind);
   return (s.pages[locId] ??= freshPage(ind, locId));
 }
-function day(locId: string) {
-  const s = st('wellness');
-  return (s.days[locId] ??= freshDay(locId));
-}
 
 function menuFor(ind: IndustryKey, view: string): MenuItem[] {
   const s = st(ind);
@@ -532,90 +507,6 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         return c;
       }, 1000),
     resetCover: () => write(() => (st('studios').cover = freshCover()), 200),
-  },
-
-  sports: {
-    registrations: (ctx) => {
-      requirePerm(ctx, 'operations.read');
-      return read(() => st('sports').regs, () => ({ items: [], groups: st('sports').regs.groups }));
-    },
-    decide: (id, input) =>
-      write(() => {
-        if (lastCtx.role === 'staff') throw new ApiError('forbidden', 'Coaches can’t accept registrations.', 403);
-        const s = st('sports').regs;
-        const r = s.items.find((x) => x.id === id)!;
-        if (input.decision === 'accept') {
-          const g = s.groups.find((x) => x.id === input.groupId);
-          if (!g) throw new ApiError('validation_error', 'Choose a group first.', 422, { groupId: 'Choose a group.' });
-          if (g.roster >= g.capacity) throw new ApiError('group_full', `${g.name} is full. Choose another group or waitlist.`, 409);
-          if (!r.formsComplete) throw new ApiError('forms_incomplete', 'Required forms are missing.', 422);
-          g.roster += 1;
-          r.status = 'accepted';
-          r.groupId = g.id;
-        } else r.status = 'waitlisted';
-        return r;
-      }),
-    session: (ctx) =>
-      (requirePerm(ctx, 'operations.read'),
-      read(() => {
-        const l = loc('sports', 'rp');
-        return { id: 'ses_u10b', group: 'U10 Blue · Training', start: at(l.timeZone, '17:00'), timeZone: l.timeZone, venue: 'Riverside Park · Pitch 2', coach: 'Coach Ortiz', roster: ROSTER.map((n, i) => ({ id: `p${i}`, name: n })), submitted: st('sports').attendanceSubmitted };
-      })),
-    submitAttendance: (_sid, marks) =>
-      write(() => {
-        st('sports').attendanceSubmitted = true;
-        return { ok: true as const, notifiedGuardians: Object.values(marks).filter((v) => v === 'absent').length };
-      }, 800),
-  },
-
-  wellness: {
-    day: (ctx) => {
-      requirePerm(ctx, 'operations.read');
-      const id = scopeIds(ctx)[0] ?? 'hf';
-      return read(() => day(id), () => ({ ...day(id), appointments: [] }));
-    },
-    slots: async (apptId) => {
-      await sleep(250);
-      const d = Object.values(st('wellness').days).find((x) => x.appointments.some((a) => a.id === apptId)) ?? day('hf');
-      const t = (ymd: string, hhmm: string) => zonedToUtc(ymd, hhmm, d.timeZone);
-      return [
-        { id: 's1', start: t(d.date, '15:30'), practitioner: 'Rina K.', room: 'Room B' },
-        { id: 's2', start: t(d.date, '17:00'), practitioner: 'Rina K.', room: 'Room A' },
-        { id: 's3', start: t(addDays(d.date, 1), '10:00'), practitioner: 'Rina K.', room: 'Room A' },
-      ];
-    },
-    reschedule: async (apptId, slotId, opts) => {
-      await sleep(1200);
-      const d = Object.values(st('wellness').days).find((x) => x.appointments.some((a) => a.id === apptId));
-      if (!d) throw new ApiError('not_found', 'Appointment not found.', 404);
-      const slots = await rawMockApi.wellness.slots(apptId);
-      const slot = slots.find((s) => s.id === slotId)!;
-      if (opts?.simulateConflict && slot.room === 'Room B') throw new ApiError('slot_conflict', `${slot.room} was booked moments ago. The original time is unchanged and the client hasn’t been notified.`, 409);
-      const a = d.appointments.find((x) => x.id === apptId)!;
-      a.start = slot.start;
-      a.room = slot.room;
-      return clone(d);
-    },
-  },
-
-  commerce: {
-    orders: (ctx) => {
-      requirePerm(ctx, 'operations.read');
-      const ids = scopeIds(ctx);
-      return read(() => st('commerce').orders.filter((o) => ids.includes(o.locationId)), () => []);
-    },
-    refund: async (orderId, lineIds) => {
-      if (lastCtx.role !== 'hq' && lastCtx.role !== 'local') throw new ApiError('forbidden', 'You can’t refund orders.', 403);
-      await sleep(1200);
-      const o = st('commerce').orders.find((x) => x.id === orderId)!;
-      const lines = o.lines.filter((l) => lineIds.includes(l.id));
-      const amount = lines.reduce((s, l) => s + l.unit.amount * l.qty, 0);
-      lines.forEach((l) => (l.refunded = true));
-      o.refund = o.lines.every((l) => l.refunded) ? 'complete' : 'partial';
-      const who = sessionFor('commerce', lastCtx.role).user.name;
-      o.timeline.push({ at: now(), text: `Partial refund of ${(amount / 100).toFixed(2)} ${o.total.currency} requested by ${who}`, tone: 'warning', icon: 'undo' }, { at: now(), text: 'Refund complete · WooCommerce gateway confirmed (signed event)', tone: 'success', icon: 'check' });
-      return clone(o);
-    },
   },
 
   foods: {

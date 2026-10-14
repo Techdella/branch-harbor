@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { SUPPORTED_LOCALES, locale as localeSchema, type Locale } from '@bh/shared';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
 import {
-  appointments, classBookings, classOccurrences, classTypes, connections, domains, locationVariants, locations, organizations,
-  pageVersions, pages, paymentReferences, practitioners, products, services, variants, waitlistEntries, websites,
+  classBookings, classOccurrences, classTypes, connections, domains, locationVariants, locations, organizations,
+  pageVersions, pages, paymentReferences, products, variants, waitlistEntries, websites,
 } from '../db/schema/index.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { notFound } from '../lib/errors.ts';
@@ -386,24 +386,6 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
       location: { name: row.l.name, slug: row.l.slug, timeZone: row.l.timeZone, address: row.l.address },
       brand: { name: row.org.name, slug: row.org.slug },
       canLeave: ['waiting', 'offered'].includes(row.w.status) && row.o.startsAt > new Date(),
-    };
-  });
-
-  app.get('/public/sites/manage/appointments/:id', {
-    schema: { tags: ['sites'], summary: 'Appointment status for the customer (requires manage token)', params: z.object({ id: z.uuid() }), querystring: z.object({ token: z.string().min(10) }) },
-  }, async (req) => {
-    const [row] = await s.db.select({ a: appointments, svc: services, p: practitioners, l: locations }).from(appointments)
-      .innerJoin(services, eq(services.id, appointments.serviceId))
-      .innerJoin(practitioners, eq(practitioners.id, appointments.practitionerId))
-      .innerJoin(locations, eq(locations.id, appointments.locationId))
-      .where(eq(appointments.id, req.params.id));
-    if (!row || row.a.manageTokenHash !== sha256(req.query.token)) throw notFound('Appointment');
-    return {
-      id: row.a.id, status: row.a.status, startsAt: row.a.startsAt.toISOString(), endsAt: row.a.endsAt.toISOString(),
-      service: { name: row.svc.name, cancellationPolicy: row.svc.cancellationPolicy }, practitioner: { name: row.p.name },
-      price: { amount: row.a.priceMinor, currency: row.a.currency },
-      location: { name: row.l.name, slug: row.l.slug, timeZone: row.l.timeZone },
-      cancellable: row.a.status === 'confirmed' && row.a.startsAt > new Date(),
     };
   });
 

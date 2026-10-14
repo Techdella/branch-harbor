@@ -19,7 +19,6 @@ import { InsightsScreen } from './studios/InsightsScreen';
 import { RegistrationsScreen } from './sports/RegistrationsScreen';
 import { AttendanceScreen } from './sports/AttendanceScreen';
 import { SportsScreen } from './sports/SportsScreens';
-import { CalendarScreen } from './wellness/CalendarScreen';
 import { wellnessScreen } from './wellness/WellnessRouter';
 import { CommerceRoutes } from './commerce/CommerceRoutes';
 import { MenuScreen } from './foods/MenuScreen';
@@ -89,8 +88,6 @@ export function OpsRouter({ screen }: { screen: string }) {
     case 'sports:guardians':
     case 'sports:reports':
       return <SportsScreen screen={def.key} />;
-    case 'wellness:calendar':
-      return <CalendarScreen />;
     case 'foods:menu':
       return <MenuScreen />;
     case 'foods:orders':

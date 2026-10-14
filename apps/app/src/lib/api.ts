@@ -13,43 +13,7 @@ import { ApiError } from './errors';
 import { USE_MOCKS, markOfflineSession } from './http/client';
 import { httpApi } from './http/httpApi';
 import type { BusinessApi } from './business';
-import type {
-  AiAnswer,
-  ApprovalItem,
-  ApprovalRequest,
-  AttendanceSession,
-  ClassOccurrence,
-  CommerceOrder,
-  Connection,
-  CoverRequest,
-  DomainStatus,
-  FoodOrder,
-  FoodOrderStatus,
-  GroupPublish,
-  ImportRow,
-  KitchenFeed,
-  Location,
-  Member,
-  MenuItem,
-  OnboardingProgress,
-  Organization,
-  OrgSettings,
-  Overview,
-  PaymentAccount, PaymentAutomation, AutoChargeRow,
-  ReconciliationItem,
-  Registration,
-  Report,
-  RequestContext,
-  RescheduleSlot,
-  ScopeOptionT,
-  Session,
-  ShiftView,
-  SportsGroup,
-  TableData,
-  Transaction,
-  WebsitePage,
-  WellnessDay,
-} from './types';
+import type { AiAnswer, ApprovalItem, ApprovalRequest, ClassOccurrence, Connection, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, KitchenFeed, Location, Member, MenuItem, OnboardingProgress, Organization, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, ReconciliationItem, Report, RequestContext, ScopeOptionT, Session, ShiftView, TableData, Transaction, WebsitePage } from './types';
 
 export { ApiError } from './errors';
 export { API_URL, USE_MOCKS, setAccessToken as setAuthToken } from './http/client';
@@ -91,21 +55,6 @@ export interface BranchHarborApi {
     acceptCover(id: string, candidateId: string): Promise<CoverRequest>;
     approveCover(id: string): Promise<CoverRequest>;
     resetCover(id: string): Promise<CoverRequest>;
-  };
-  sports: {
-    registrations(ctx: RequestContext): Promise<{ items: Registration[]; groups: SportsGroup[] }>;
-    decide(id: string, input: { decision: 'accept' | 'waitlist'; groupId?: string }): Promise<Registration>;
-    session(ctx: RequestContext): Promise<AttendanceSession>;
-    submitAttendance(sessionId: string, marks: Record<string, 'present' | 'absent'>): Promise<{ ok: true; notifiedGuardians: number }>;
-  };
-  wellness: {
-    day(ctx: RequestContext): Promise<WellnessDay>;
-    slots(appointmentId: string): Promise<RescheduleSlot[]>;
-    reschedule(appointmentId: string, slotId: string, opts?: { simulateConflict?: boolean }): Promise<WellnessDay>;
-  };
-  commerce: {
-    orders(ctx: RequestContext): Promise<CommerceOrder[]>;
-    refund(orderId: string, lineIds: string[]): Promise<CommerceOrder>;
   };
   foods: {
     menu(ctx: RequestContext, view: string): Promise<MenuItem[]>;
