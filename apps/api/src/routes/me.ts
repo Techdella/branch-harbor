@@ -3,6 +3,7 @@ import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   aiConversations, aiMessages, auditEvents, classBookings, consentRecords, customers, foodOrders, appointments, pushTokens, refreshTokens, roleAssignments, users, organizations, registrations,
+  intakeResponses, shifts, timeClockEvents, pushNotifications,
 } from '../db/schema/index.ts';
 import { AppError, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
@@ -42,6 +43,12 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
       s.db.select().from(aiConversations).where(eq(aiConversations.userId, u.id)),
       s.db.select().from(auditEvents).where(eq(auditEvents.actorUserId, u.id)).orderBy(desc(auditEvents.createdAt)).limit(1000),
     ]);
+    const [intake, myShifts, clock, pushes] = await Promise.all([
+      custIds.length ? s.db.select().from(intakeResponses).where(inArray(intakeResponses.customerId, custIds)) : [],
+      s.db.select().from(shifts).where(eq(shifts.userId, u.id)),
+      s.db.select().from(timeClockEvents).where(eq(timeClockEvents.userId, u.id)),
+      s.db.select().from(pushNotifications).where(eq(pushNotifications.userId, u.id)).orderBy(desc(pushNotifications.createdAt)).limit(1000),
+    ]);
     const convoIds = convos.map((c) => c.id);
     const messages = convoIds.length ? await s.db.select().from(aiMessages).where(inArray(aiMessages.conversationId, convoIds)) : [];
     const strip = <T extends Record<string, unknown>>(r: T) => Object.fromEntries(Object.entries(r).filter(([k]) => !/hash|secret|token/i.test(k)));
@@ -59,6 +66,10 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
       foodOrders: food.map(strip),
       appointments: appts.map(strip),
       registrations: regs.map(strip),
+      intakeResponses: intake.map(strip),
+      shifts: myShifts,
+      timeClock: clock,
+      pushNotifications: pushes,
       aiConversations: convos.map((c) => ({ ...c, messages: messages.filter((m) => m.conversationId === c.id) })),
       activity: auditRows,
     };
@@ -103,7 +114,7 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   app.post('/me/consents', {
-    schema: { tags: ['me'], security: secured, summary: 'Record a consent decision (append-only history)', body: z.object({ purpose: z.enum(['marketing_email', 'marketing_sms', 'marketing_whatsapp', 'data_processing_ai', 'analytics']), granted: z.boolean(), version: z.string().min(1).default('2026-10') }) },
+    schema: { tags: ['me'], security: secured, summary: 'Record a consent decision (append-only history)', body: z.object({ purpose: z.enum(['marketing_email', 'marketing_sms', 'marketing_whatsapp', 'data_processing_ai', 'analytics', 'push_updates', 'push_work']), granted: z.boolean(), version: z.string().min(1).default('2026-10') }) },
   }, async (req, reply) => {
     const me = requireUser(req);
     const [row] = await s.db.insert(consentRecords).values({ userId: me.id, email: me.email, purpose: req.body.purpose, version: req.body.version, granted: req.body.granted, source: 'account_settings', ip: req.ip }).returning();

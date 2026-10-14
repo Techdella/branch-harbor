@@ -281,11 +281,14 @@ const TABLES: Record<string, TableSpec> = {
       ['as3', ['overrides'], [tx('Merino crew · S', 'Montréal', true), tx('7'), mo(109, 'CAD'), og('local'), b('In stock', 'success')], 'me'],
       ['as4', [], [tx('Linen overshirt · M', 'Amsterdam', true), tx('9'), mo(92, 'EUR'), og('hq'), b('In stock', 'success')], 'am'],
     ] },
-  inventory: { columns: [['when', 'When'], ['item', 'Item'], ['change', 'Change', 'right'], ['reason', 'Reason'], ['by', 'By']], filters: [['all', 'All'], ['adjust', 'Adjustments'], ['sale', 'Sales']], source: 'Inventory history (movements, not just counts)',
+  inventory: { columns: [['when', 'When'], ['item', 'Item'], ['change', 'Change', 'right'], ['reason', 'Reason'], ['balance', 'On hand after', 'right'], ['by', 'By']], filters: [['all', 'All'], ['adjust', 'Adjustments'], ['sale', 'Sales'], ['reserved', 'Reservations']], source: 'Inventory history (movements, not just counts)',
+    description: 'Every change to stock with its reason. Reservations hold units for unpaid orders and do not change on-hand stock.',
     rows: [
-      ['iv1', ['sale'], [tx('Today 09:12', 'Pacific time'), tx('Linen overshirt · L', 'Portland', true), tx('−1'), tx('Sale · #5521'), tx('WooCommerce')], 'pd'],
-      ['iv2', ['adjust'], [tx('Yesterday', 'Pacific time'), tx('Merino crew · S', 'Portland', true), tx('+12'), tx('Delivery received'), tx('Kim L. (Portland)')], 'pd'],
-      ['iv3', ['adjust'], [tx('Yesterday', 'Central European time'), tx('Canvas tote', 'Amsterdam', true), tx('−2'), tx('Damaged · adjustment'), tx('Sanne V. (Amsterdam)')], 'am'],
+      ['iv1', ['sale'], [tx('Today 09:12', 'Pacific time'), tx('Linen overshirt · L', 'Portland', true), tx('−1'), tx('Sale', '#5521'), tx('1'), tx('WooCommerce')], 'pd'],
+      ['iv4', ['reserved'], [tx('Today 08:40', 'Pacific time'), tx('Field notebook set', 'Portland', true), tx('−2'), b('Reserved · unpaid order', 'info', 'clock'), na('Not on-hand'), tx('System')], 'pd'],
+      ['iv2', ['adjust'], [tx('Yesterday', 'Pacific time'), tx('Merino crew · S', 'Portland', true), tx('+12'), tx('Received', 'PO-2411'), tx('19'), tx('Kim L. (Portland)')], 'pd'],
+      ['iv3', ['adjust'], [tx('Yesterday', 'Central European time'), tx('Canvas tote', 'Amsterdam', true), tx('−2'), tx('Damaged / write-off', 'Scuffed in transit'), tx('7'), tx('Sanne V. (Amsterdam)')], 'am'],
+      ['iv5', ['adjust'], [tx('3 days ago', 'Eastern time'), tx('Merino crew · S', 'Montréal', true), tx('−1'), tx('Stock count', 'Cycle count'), tx('7'), tx('Luc T. (Montréal)')], 'me'],
     ] },
   shoppers: { columns: [['customer', 'Customer'], ['orders', 'Orders', 'right'], ['store', 'Store'], ['consent', 'Consent']], filters: [['all', 'All']], source: 'WooCommerce customers',
     rows: [

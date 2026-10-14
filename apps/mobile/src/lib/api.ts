@@ -52,6 +52,7 @@ const mockApi = {
   joinWaitlist: (occurrenceId: string, _contact?: Partial<GuestContact>) => request<Booking>('POST', '/waitlist', { occurrenceId }),
   myBookings: () => request<Booking[]>('GET', '/me/bookings'),
   cancelBooking: (id: string) => request<Booking>('POST', `/bookings/${id}/cancel`),
+  leaveWaitlist: (id: string) => request<Booking>('POST', `/bookings/${id}/cancel`),
   menu: (locationId: string) => request<MenuItem[]>('GET', `/locations/${locationId}/menu`),
   pickupSlots: (locationId: string, date: string) => request<PickupSlot[]>('GET', `/locations/${locationId}/pickup-slots${q({ date })}`),
   quoteOrder: (locationId: string, lines: OrderLineInput[]) => request<Pick<FoodOrder, 'lines' | 'subtotal' | 'tax' | 'taxLabel' | 'taxInclusive' | 'total'>>('POST', `/locations/${locationId}/orders/quote`, { lines }),
@@ -69,6 +70,7 @@ const mockApi = {
   // staff
   myShifts: () => request<Shift[]>('GET', '/staff/shifts?range=today'),
   clockIn: (shiftId: string) => request<Shift>('POST', `/staff/shifts/${shiftId}/clock-in`),
+  clockOut: (shiftId: string) => request<Shift>('POST', `/staff/shifts/${shiftId}/clock-out`),
   mySessions: () => request<StaffSession[]>('GET', '/staff/sessions?range=today'),
   roster: (sessionId: string) => request<RosterEntry[]>('GET', `/staff/sessions/${sessionId}/roster`),
   markAttendance: (sessionId: string, entryId: string, status: AttendanceStatus) =>

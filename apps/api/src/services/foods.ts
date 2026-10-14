@@ -10,6 +10,8 @@ import { AppError, conflict, notFound, validationError } from '../lib/errors.ts'
 import { audit } from './audit.ts';
 import { findOrCreateCustomer } from './customers.ts';
 import { createPaymentForTarget, reverseTargetPayment } from './payments.ts';
+import { notify, userIdsForCustomer } from './notifications.ts';
+import { configOf, loadPickupSettings } from './pickup.ts';
 
 type Location = typeof locations.$inferSelect;
 
@@ -114,6 +116,9 @@ export async function createFoodOrder(s: Services, organizationId: string, locat
     const [slot] = await tx.select().from(pickupSlots).where(and(eq(pickupSlots.id, input.pickupSlotId), eq(pickupSlots.locationId, loc.id))).for('update');
     if (!slot) throw validationError('Unknown pickup time', { pickupSlotId: 'Not a pickup time at this location' });
     if (slot.cutoffAt <= new Date()) throw conflict('slot_closed', 'Ordering for this pickup time has closed. Choose a later time.');
+    const pickup = configOf(await loadPickupSettings(tx, loc.id));
+    if (!pickup.acceptingOrders) throw conflict('location_not_accepting_orders', 'This location is not taking pickup orders right now');
+    if (slot.startsAt.getTime() < Date.now() + pickup.prepBufferMinutes * 60_000) throw conflict('slot_closed', 'The kitchen needs more preparation time for this pickup. Choose a later time.');
     if (slot.booked >= slot.capacity) throw conflict('slot_full', 'This pickup time is full. Choose another time.');
     await tx.update(pickupSlots).set({ booked: slot.booked + 1 }).where(eq(pickupSlots.id, slot.id));
     const customer = await findOrCreateCustomer(tx, organizationId, loc.id, input.contact, 'food_order');
@@ -181,6 +186,15 @@ export async function transitionFoodOrder(s: Services, orderId: string, to: Food
       cancelled: `Your order was cancelled. ${paymentAction === 'refunded' ? 'A full refund has been issued.' : ''}`,
     };
     await s.jobs.enqueue('email.send', { to: updated.contact.email, subject: `Order ${updated.orderNumber}: ${to}`, text: msg[to]!, tag: 'food-order' });
+  }
+  if (to === 'accepted' || to === 'ready') {
+    const [loc] = await s.db.select({ name: locations.name }).from(locations).where(eq(locations.id, updated.locationId));
+    await notify(s, {
+      userIds: await userIdsForCustomer(s.db, updated.customerId), organizationId: updated.organizationId, category: 'order_status',
+      title: to === 'ready' ? `Order ${updated.orderNumber} is ready` : `Order ${updated.orderNumber} accepted`,
+      body: to === 'ready' ? `Your order is ready for pickup at ${loc?.name ?? 'the restaurant'}.` : `${loc?.name ?? 'The restaurant'} accepted your order. We'll let you know when it's ready.`,
+      data: { orderId: updated.id, status: to, url: `branchharbor://customer/orders/${updated.id}` },
+    });
   }
   return { order: updated, paymentAction };
 }

@@ -4,3 +4,4 @@ export * from './websites.ts';
 export * from './integrations.ts';
 export * from './verticals.ts';
 export * from './mobile.ts';
+export * from './operations.ts';

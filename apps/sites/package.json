@@ -1,0 +1,30 @@
+{
+  "name": "@bh/sites",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3002",
+    "build": "next build",
+    "start": "next start --port 3002",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bh/icons": "workspace:*",
+    "@bh/shared": "workspace:*",
+    "@bh/tokens": "workspace:*",
+    "@bh/ui": "workspace:*",
+    "next": "16.4.0",
+    "next-intl": "4.14.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "22.19.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}

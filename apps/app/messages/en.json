@@ -48,7 +48,8 @@
     "shared": "Shared",
     "setup": "Setup checklist",
     "restricted": "(not available for your role)",
-    "badge": "{count} need attention"
+    "badge": "{count} need attention",
+    "approvals": "Approvals"
   },
   "industries": {
     "studios": {
@@ -908,7 +909,25 @@
       "invited": "Invited",
       "support": "Support access"
     },
-    "footer": "Support access is authorised, time-limited and logged."
+    "footer": "Support access is authorised, time-limited and logged.",
+    "tab": {
+      "members": "Members & roles",
+      "schedule": "Schedule"
+    },
+    "schedule": {
+      "title": "Team schedule",
+      "prev": "Previous week",
+      "next": "Next week",
+      "weekOf": "Week of {date}",
+      "swapsLink": "Shift swaps waiting for approval",
+      "emptyTitle": "No shifts this week",
+      "emptyBody": "Shifts scheduled for people in this scope appear here, in each location’s local time.",
+      "clockedIn": "Clocked in {time}",
+      "worked": "Worked {from}–{to}",
+      "notClockedIn": "Not clocked in",
+      "swapPending": "Swap to {name} awaiting approval",
+      "footer": "Times are shown in each location’s own time zone. Staff clock in and out from the BranchHarbor mobile app."
+    }
   },
   "reports": {
     "title": "Reports",
@@ -1348,5 +1367,53 @@
       "items": "Add at least one item",
       "industry": "{industry} publishing needs a pilot agreement"
     }
+  },
+  "approvals": {
+    "title": "Approvals",
+    "description": "Refunds over your threshold, local ad spend, shift swaps and website changes — one place to decide. Approving runs the action; nothing happens before.",
+    "denied": "Approvals are for managers, owners and headquarters.",
+    "filter": "Filter by kind",
+    "tab": {
+      "pending": "Waiting",
+      "done": "Decided"
+    },
+    "kind": {
+      "all": "All",
+      "refund": "Refund",
+      "ad_spend": "Local ad spend",
+      "shift_swap": "Shift swap",
+      "field": "Website change",
+      "page": "Website page"
+    },
+    "requested": "{location} · requested by {name}",
+    "waiting": "Waiting for someone else to decide",
+    "emptyTitle": "Nothing waiting for you",
+    "emptyBody": "New requests from your locations will appear here.",
+    "emptyDoneTitle": "No decisions yet",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancel": "Cancel",
+    "confirmTitle": "Confirm decision",
+    "confirmApprove": "Approve and run",
+    "confirmReject": "Reject request",
+    "comment": "Comment (optional)",
+    "commentRequired": "Reason (required to reject a website change)",
+    "consequence": {
+      "refund": "Approving refunds {amount} to the customer at {location} now. This cannot be undone.",
+      "ad_spend": "Approving schedules {amount} of local ad spend for {location}.",
+      "shift_swap": "Approving moves the shift from {from} to {to}. Both schedules update immediately.",
+      "website": "Approving applies the change to the {location} page.",
+      "reject": "Rejecting closes the request. Nothing is changed; the requester sees your comment."
+    },
+    "approvedDone": "Approved · {result}",
+    "rejectedDone": "Rejected — nothing was changed.",
+    "status": {
+      "approved": "Approved by {name}",
+      "rejected": "Rejected by {name}",
+      "cancelled": "Withdrawn by the requester",
+      "executing": "Running…",
+      "pending": "Pending"
+    },
+    "footer": "Every request and decision is recorded in the audit log with who, when and the comment."
   }
 }

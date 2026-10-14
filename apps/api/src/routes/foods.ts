@@ -10,6 +10,7 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { createFoodOrder, effectiveMenu, serializeFoodOrder, transitionFoodOrder } from '../services/foods.ts';
+import { configOf, ensurePickupSlots, loadPickupSettings } from '../services/pickup.ts';
 import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
 const prices = z.partialRecord(currency, z.number().int().min(0));
@@ -37,11 +38,18 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags: ['foods'], params: z.object({ locationId: z.uuid() }), querystring: z.object({ from: isoDateTime.optional(), to: isoDateTime.optional() }) },
   }, async (req) => {
     const loc = await publicLocation(req.params.locationId);
+    // Locations with pickup settings get their slot horizon generated on demand.
+    await ensurePickupSlots(s.db, loc);
+    const settings = configOf(await loadPickupSettings(s.db, loc.id));
     const from = req.query.from ? new Date(req.query.from) : new Date();
     const to = req.query.to ? new Date(req.query.to) : new Date(from.getTime() + 2 * 86400_000);
     const rows = await s.db.select().from(pickupSlots).where(and(eq(pickupSlots.locationId, loc.id), gte(pickupSlots.startsAt, from), lt(pickupSlots.startsAt, to))).orderBy(asc(pickupSlots.startsAt));
     const now = new Date();
-    return { timeZone: loc.timeZone, items: rows.map((r) => ({ id: r.id, startsAt: r.startsAt.toISOString(), endsAt: r.endsAt.toISOString(), remaining: Math.max(0, r.capacity - r.booked), available: r.booked < r.capacity && r.cutoffAt > now, cutoffAt: r.cutoffAt.toISOString() })) };
+    const earliest = now.getTime() + settings.prepBufferMinutes * 60_000;
+    return {
+      timeZone: loc.timeZone, acceptingOrders: settings.acceptingOrders, prepBufferMinutes: settings.prepBufferMinutes,
+      items: rows.map((r) => ({ id: r.id, startsAt: r.startsAt.toISOString(), endsAt: r.endsAt.toISOString(), remaining: Math.max(0, r.capacity - r.booked), available: settings.acceptingOrders && r.booked < r.capacity && r.cutoffAt > now && r.startsAt.getTime() >= earliest, cutoffAt: r.cutoffAt.toISOString() })),
+    };
   });
 
   app.post('/public/foods/:locationId/orders', {

@@ -4,6 +4,7 @@ import { demoRequests } from '../db/schema/index.ts';
 import type { EmailMessage } from '../integrations/mailer.ts';
 import { runConnectionSync } from '../services/connections.ts';
 import { expireHolds } from '../services/studios.ts';
+import { deliverPush, type NotifyInput } from '../services/notifications.ts';
 
 /** Background job handlers. Run via BullMQ when REDIS_URL is set, inline otherwise. */
 export function registerJobHandlers(s: Services) {
@@ -31,6 +32,10 @@ export function registerJobHandlers(s: Services) {
 
   s.jobs.register('connection.sync', async ({ connectionId, syncRunId }: { connectionId: string; syncRunId: string }) => {
     await runConnectionSync(s, connectionId, syncRunId);
+  });
+
+  s.jobs.register('push.send', async (input: NotifyInput) => {
+    await deliverPush(s, input);
   });
 
   s.jobs.register('studios.expire-holds', async () => {

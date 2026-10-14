@@ -15,7 +15,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   userInterfaceStyle: 'light',
   backgroundColor: color.canvas,
-  // Placeholder: no icon assets yet. Add ./assets/icon.png (1024x1024) before store builds.
+  // Generated from the harbour mark by scripts/generate-assets.mjs (pnpm --filter @bh/mobile assets).
+  icon: './assets/icon.png',
   ios: {
     bundleIdentifier: `com.branchharbor.app${suffix}`,
     supportsTablet: true,
@@ -23,15 +24,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     package: `com.branchharbor.app${suffix}`,
-    adaptiveIcon: { backgroundColor: color.ink },
+    adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', monochromeImage: './assets/adaptive-icon-monochrome.png', backgroundColor: color.ink },
   },
-  web: { bundler: 'metro', output: 'single', backgroundColor: color.canvas, themeColor: color.ink },
+  web: { bundler: 'metro', output: 'single', backgroundColor: color.canvas, themeColor: color.ink, favicon: './assets/favicon.png' },
   plugins: [
     'expo-router',
     'expo-secure-store',
     'expo-localization',
     'expo-font',
-    ['expo-splash-screen', { backgroundColor: color.canvas, dark: { backgroundColor: color.ink } }],
+    ['expo-splash-screen', { image: './assets/splash-icon.png', imageWidth: 120, resizeMode: 'contain', backgroundColor: color.canvas, dark: { image: './assets/splash-icon.png', backgroundColor: color.ink } }],
+    ['expo-notifications', { icon: './assets/notification-icon.png', color: '#D6F26B', defaultChannel: 'default' }],
     [
       '@stripe/stripe-react-native',
       { merchantIdentifier: process.env.STRIPE_MERCHANT_IDENTIFIER ?? 'merchant.com.branchharbor.app', enableGooglePay: true },

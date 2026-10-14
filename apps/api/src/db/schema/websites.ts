@@ -1,5 +1,5 @@
 import { index, integer, jsonb, pgTable, text, uniqueIndex, uuid, boolean } from 'drizzle-orm/pg-core';
-import { createdAt, orgId, pk, ts, updatedAt } from './_shared.ts';
+import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
 import { locations, organizations } from './core.ts';
 
 /** Field origin: hq = HQ default, editable locally; local = local override; locked = brand-locked; approval = change needs approval. */
@@ -80,15 +80,24 @@ export const approvals = pgTable('approvals', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   locationId: uuid('location_id'),
-  targetType: text('target_type').notNull(), // page | field | campaign | ai_action
+  /** page | field (website changes) · refund | ad_spend | shift_swap (operational requests) */
+  targetType: text('target_type').notNull(),
   targetId: uuid('target_id').notNull(),
   payload: jsonb('payload').$type<Record<string, unknown>>().notNull().default({}),
+  /** Short human summary shown in the approvals inbox. */
+  title: text('title'),
+  /** Money at stake (refunds, ad spend), minor units in `currency`. */
+  amountMinor: minor('amount_minor'),
+  currency: currencyCol(),
   status: text('status').notNull().default('pending'), // pending | approved | rejected | cancelled
   requestedBy: uuid('requested_by').notNull(),
   requestComment: text('request_comment'),
   decidedBy: uuid('decided_by'),
   decisionComment: text('decision_comment'),
   decidedAt: ts('decided_at'),
+  /** Set when the underlying action ran after approval (never before). */
+  executedAt: ts('executed_at'),
+  executionResult: jsonb('execution_result').$type<Record<string, unknown>>(),
   createdAt: createdAt(),
 }, (t) => [index('approvals_org_status_idx').on(t.organizationId, t.status)]);
 

@@ -9,6 +9,7 @@ import { autoPassDnsChecker, createDomainProvider, systemDnsChecker, type DnsChe
 import { createConnectors, type ConnectorAdapter, type ConnectorProvider } from './integrations/connectors.ts';
 import { createAnalytics, createFx, createGeocoder, createStorage } from './integrations/misc.ts';
 import { createAi, type AiProvider } from './integrations/ai.ts';
+import { createPushProvider, type PushProvider } from './integrations/push.ts';
 
 /** Dependency container shared by routes, services and jobs. Tests override individual members. */
 export interface Services {
@@ -28,6 +29,7 @@ export interface Services {
   analytics: ReturnType<typeof createAnalytics>;
   storage: ReturnType<typeof createStorage>;
   ai: AiProvider;
+  push: PushProvider;
 }
 
 export async function createServices(cfg: Config, dbHandle: DbHandle, log: FastifyBaseLogger, overrides: Partial<Services> = {}): Promise<Services> {
@@ -49,5 +51,6 @@ export async function createServices(cfg: Config, dbHandle: DbHandle, log: Fasti
     analytics: overrides.analytics ?? createAnalytics(cfg),
     storage: overrides.storage ?? createStorage(cfg, log),
     ai: overrides.ai ?? createAi(cfg, log),
+    push: overrides.push ?? createPushProvider(cfg, log),
   };
 }

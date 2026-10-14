@@ -171,6 +171,11 @@ export interface Shift {
   startsAt: string;
   endsAt: string;
   clockedInAt?: string;
+  clockedOutAt?: string;
+  /** Present when the location is not in the customer catalogue (e.g. another organisation). */
+  locationName?: string;
+  timeZone?: string;
+  organizationName?: string;
 }
 export interface StaffSession {
   id: string;

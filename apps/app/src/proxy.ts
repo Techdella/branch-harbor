@@ -23,5 +23,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // App routes only: auth pages, Next internals and static files are never guarded.
-  matcher: ['/', '/overview/:path*', '/locations/:path*', '/ops/:path*', '/customers/:path*', '/marketing/:path*', '/websites/:path*', '/payments/:path*', '/team/:path*', '/reports/:path*', '/connections/:path*', '/settings/:path*', '/community/:path*', '/onboarding/:path*'],
+  matcher: ['/', '/overview/:path*', '/locations/:path*', '/ops/:path*', '/customers/:path*', '/marketing/:path*', '/websites/:path*', '/payments/:path*', '/team/:path*', '/approvals/:path*', '/reports/:path*', '/connections/:path*', '/settings/:path*', '/community/:path*', '/onboarding/:path*'],
 };

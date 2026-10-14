@@ -15,7 +15,7 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
 
   const opsItems: NavItem[] = OPS[app.industry].map((o) => ({ key: o.key, href: `/ops/${o.key}`, icon: o.icon, later: o.kind === 'later', perm: 'operations.read' }));
   // Sample-mode badges illustrate counts; live counts come from the overview's "Needs attention" and notifications.
-  const badges: Record<string, number> = app.live ? {} : { payments: 1, connections: app.industry === 'studios' ? 2 : 1, registrations: 4, cover: 1 };
+  const badges: Record<string, number> = app.live ? {} : { approvals: 4, payments: 1, connections: app.industry === 'studios' ? 2 : 1, registrations: 4, cover: 1 };
 
   const label = (it: NavItem, section: 'top' | 'ops' | 'shared') => {
     if (section === 'ops') return t(`ops.${app.industry}.${it.key}.title`);

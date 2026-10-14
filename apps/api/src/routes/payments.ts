@@ -6,6 +6,7 @@ import { AppError, conflict, notFound, unavailable, validationError } from '../l
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requirePerm } from '../services/authz.ts';
+import { assertRefundWithinThreshold } from '../services/approvals.ts';
 import { processStripeEvent, reconciliationQueue, recreateRecordFromPayment, refundPayment, sandboxEvent, serializePayment } from '../services/payments.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
@@ -140,6 +141,7 @@ export const paymentRoutes: FastifyPluginAsyncZod = async (app) => {
       const p = await loadPayment(req.params.orgId, req.params.id);
       await requirePerm(req, s.db, 'payments.refund', p.locationId ? { organizationId: p.organizationId, kind: 'location', id: p.locationId } : { organizationId: p.organizationId, kind: 'organization', id: p.organizationId });
       if (req.body.confirmCurrency.toUpperCase() !== p.currency) throw validationError(`This payment is in ${p.currency}`, { confirmCurrency: `Must be ${p.currency}` });
+      await assertRefundWithinThreshold(req, s.db, p.organizationId, req.body.amountMinor, p.currency);
       const r = await refundPayment(s, p.id, req.body.amountMinor, { actorUserId: req.user!.id, reason: req.body.reason, ip: req.ip });
       return reply.code(201).send({ payment: serializePayment(r.payment), refund: r.refund });
     });

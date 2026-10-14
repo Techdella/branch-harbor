@@ -1,0 +1,104 @@
+@import 'tailwindcss';
+@import '@bh/tokens/theme.css';
+
+@source '../';
+@source '../../../packages/ui/src';
+
+/* Client brand colours come from the API (organisation theme) as CSS variables on <body>. */
+@theme inline {
+  --color-brand: var(--site-brand, #141414);
+  --color-on-brand: var(--site-on-brand, #ffffff);
+  --color-brand-ink: var(--site-brand-ink, #141414);
+  --color-brand-tint: color-mix(in srgb, var(--site-brand-color, #141414) 10%, white);
+  --font-site: var(--site-font, system-ui), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  body {
+    background: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-site);
+  }
+  a {
+    color: inherit;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    transition: filter 150ms;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--site-brand);
+    color: var(--site-on-brand);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(0.95);
+  }
+  .btn-secondary {
+    background: #fff;
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-line);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-ink);
+  }
+  .field {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    border: 1.5px solid #8a8a84;
+    border-radius: 12px;
+    padding: 0.5rem 0.875rem;
+    background: #fff;
+    font: inherit;
+  }
+  .field[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--color-line-soft);
+    border-radius: 20px;
+  }
+  .link {
+    color: var(--site-brand-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}

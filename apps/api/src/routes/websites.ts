@@ -224,42 +224,7 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     return reply.code(201).send(ap);
   });
 
-  app.get('/orgs/:orgId/approvals', {
-    schema: { tags: ['websites'], security: secured, params: orgParams, querystring: z.object({ status: z.enum(['pending', 'approved', 'rejected', 'cancelled']).default('pending') }) },
-  }, async (req) => {
-    const { orgId } = req.params;
-    const allowed = await authorisedLocations(req, s.db, orgId, 'website.approve');
-    const rows = await s.db.select().from(approvals).where(and(eq(approvals.organizationId, orgId), eq(approvals.status, req.query.status))).orderBy(desc(approvals.createdAt));
-    return { items: rows.filter((a) => (allowed === 'all' ? true : !!a.locationId && allowed.has(a.locationId))) };
-  });
-
-  app.post('/orgs/:orgId/approvals/:id/decision', {
-    schema: { tags: ['websites'], security: secured, params: idParams, body: z.object({ decision: z.enum(['approve', 'reject']), comment: z.string().max(2000).optional() }) },
-  }, async (req) => {
-    const { orgId, id } = req.params;
-    const me = requireUser(req);
-    const [ap] = await s.db.select().from(approvals).where(and(eq(approvals.id, id), eq(approvals.organizationId, orgId)));
-    if (!ap) throw notFound('Approval');
-    if (ap.status !== 'pending') throw conflict('already_decided', `This request was already ${ap.status}`);
-    await requirePerm(req, s.db, 'website.approve', pageScope(orgId, ap.locationId));
-    if (ap.requestedBy === me.id) throw forbidden('You cannot approve your own request');
-    if (req.body.decision === 'reject' && !req.body.comment) throw validationError('Explain why the change was rejected', { comment: 'Required when rejecting' });
-    const status = req.body.decision === 'approve' ? 'approved' : 'rejected';
-    await s.db.transaction(async (tx) => {
-      await tx.update(approvals).set({ status, decidedBy: me.id, decisionComment: req.body.comment ?? null, decidedAt: new Date() }).where(eq(approvals.id, id));
-      if (ap.targetType === 'field') {
-        const [f] = await tx.select().from(fieldOverrides).where(eq(fieldOverrides.id, ap.targetId));
-        if (f) {
-          await tx.update(fieldOverrides).set(status === 'approved' ? { value: f.pendingValue, pendingValue: null, pendingApprovalId: null, updatedBy: ap.requestedBy, updatedAt: new Date() } : { pendingValue: null, pendingApprovalId: null }).where(eq(fieldOverrides.id, f.id));
-        }
-      } else if (ap.targetType === 'page') {
-        await tx.update(pages).set({ status: status === 'approved' ? 'approved' : 'draft', updatedAt: new Date() }).where(eq(pages.id, ap.targetId));
-      }
-      await audit(tx, { organizationId: orgId, ...actor(req), action: `approval.${status}`, scopeKind: ap.locationId ? 'location' : 'organization', scopeId: ap.locationId ?? orgId, targetType: ap.targetType, targetId: ap.targetId, metadata: { approvalId: id, comment: req.body.comment } });
-    });
-    const [updated] = await s.db.select().from(approvals).where(eq(approvals.id, id));
-    return updated;
-  });
+  // Approval list/decision live in routes/approvals.ts (one inbox for every kind of request).
 
   app.post('/orgs/:orgId/pages/:id/publish', { schema: { tags: ['websites'], security: secured, params: idParams, summary: 'Publish a single page (creates a version snapshot)' } }, async (req) => {
     const { orgId, id } = req.params;

@@ -11,7 +11,7 @@ import { actor, audit } from '../services/audit.ts';
 import { requireLocationPerm } from '../services/authz.ts';
 import { priceFoodOrderLines, serializeFoodOrder } from '../services/foods.ts';
 import { reverseTargetPayment } from '../services/payments.ts';
-import { cancelBooking } from '../services/studios.ts';
+import { cancelBooking, leaveWaitlist } from '../services/studios.ts';
 import { orgParams, secured } from './_common.ts';
 
 /**
@@ -143,6 +143,17 @@ export const mobileRoutes: FastifyPluginAsyncZod = async (app) => {
       const out = await cancelBooking(s, b.id, { actorUserId: u.id });
       const payment = out.booking.status === 'confirmed' ? await reverseTargetPayment(s, out.booking.paymentId, u.id, 'Customer cancelled booking') : { action: 'none' };
       return { id: b.id, status: 'cancelled', payment, waitlistPromoted: !!out.promoted };
+    });
+
+    priv.post('/me/waitlist/:id/leave', {
+      schema: { tags: ['me'], security: secured, summary: 'Leave one of my class waitlists (an offered spot is released to the next person)', params: z.object({ id: z.uuid() }) },
+    }, async (req) => {
+      const u = await currentUser(req);
+      const custIds = await myCustomerIds(u);
+      const [w] = await s.db.select().from(waitlistEntries).where(eq(waitlistEntries.id, req.params.id));
+      if (!w || !custIds.includes(w.customerId)) throw notFound('Waitlist place');
+      const e = await leaveWaitlist(s, w.id, { actorUserId: u.id });
+      return { id: e.id, status: 'left' as const };
     });
 
     // ── Customer: food orders ──

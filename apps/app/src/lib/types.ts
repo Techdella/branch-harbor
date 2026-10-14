@@ -502,3 +502,41 @@ export interface AiAnswer {
   sources: { label: string; freshness: string }[];
   action?: AiProposedAction;
 }
+
+/* ---------- Team schedule (shifts + time clock) ---------- */
+export interface ShiftView {
+  id: string;
+  locationId: string;
+  locationName: string;
+  timeZone: string;
+  person: string;
+  role: string;
+  start: string;
+  end: string;
+  breakMinutes: number;
+  clockedInAt: string | null;
+  clockedOutAt: string | null;
+  /** Pending swap awaiting a manager, if any. */
+  pendingSwap: { to: string; approvalId: string | null } | null;
+}
+
+/* ---------- Approvals inbox (all kinds) ---------- */
+export type ApprovalKind = 'refund' | 'ad_spend' | 'shift_swap' | 'field' | 'page';
+export interface ApprovalRequest {
+  id: string;
+  kind: ApprovalKind;
+  title: string;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'executing';
+  locationName: string;
+  amount: Money | null;
+  requestedBy: string;
+  requestedAt: string;
+  reason: string | null;
+  /** Kind-specific facts shown before deciding (channel, duration, who swaps with whom, field value…). */
+  details: { label: string; value: string }[];
+  canDecide: boolean;
+  decidedBy: string | null;
+  decisionComment: string | null;
+  /** What ran on approval (e.g. "Refund complete"). */
+  result: string | null;
+}

@@ -1,8 +1,8 @@
-import { and, asc, count, eq, gt, inArray, isNull, lt } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, isNull, lt, ne } from 'drizzle-orm';
 import { z } from 'zod';
 import { publicContactSchema, registrationStates } from '@bh/shared';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
-import { attendance, customers, guardianRelationships, locations, programmes, registrations, seasons, teams, trainingSessions } from '../db/schema/index.ts';
+import { attendance, customers, guardianRelationships, locations, programmes, registrations, seasons, teams, trainingSessions, users } from '../db/schema/index.ts';
 import { AppError, conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
@@ -164,6 +164,54 @@ export const sportsRoutes: FastifyPluginAsyncZod = async (app) => {
         .where(and(eq(trainingSessions.locationId, t.locationId), eq(trainingSessions.venue, req.body.venue), lt(trainingSessions.startsAt, endsAt), gt(trainingSessions.endsAt, startsAt))) : [];
       const [row] = await s.db.insert(trainingSessions).values({ organizationId: t.organizationId, locationId: t.locationId, teamId: t.id, startsAt, endsAt, venue: req.body.venue ?? null, kind: req.body.kind }).returning();
       return reply.code(201).send({ session: row, venueConflicts: clashes });
+    });
+
+    priv.get('/orgs/:orgId/sports/sessions', {
+      schema: {
+        tags: ['sports'], security: secured, params: orgParams,
+        summary: 'Training sessions and fixtures (schedule) with attendance summary and venue conflict indicator. Coaches see the teams they coach.',
+        querystring: z.object({ from: isoDateTime.optional(), to: isoDateTime.optional(), teamId: z.uuid().optional(), locationId: z.uuid().optional(), kind: z.enum(['training', 'fixture']).optional() }),
+      },
+    }, async (req) => {
+      const { orgId } = req.params;
+      const allowed = await authorisedLocations(req, s.db, orgId, 'operations.read');
+      const managerAt = await authorisedLocations(req, s.db, orgId, 'locations.read');
+      const from = req.query.from ? new Date(req.query.from) : new Date(Date.now() - 86400_000);
+      const to = req.query.to ? new Date(req.query.to) : new Date(from.getTime() + 15 * 86400_000);
+      const conds = [eq(trainingSessions.organizationId, orgId), lt(trainingSessions.startsAt, to), gt(trainingSessions.endsAt, from)];
+      if (req.query.teamId) conds.push(eq(trainingSessions.teamId, req.query.teamId));
+      if (req.query.locationId) conds.push(eq(trainingSessions.locationId, req.query.locationId));
+      if (req.query.kind) conds.push(eq(trainingSessions.kind, req.query.kind));
+      const rows = (await s.db.select({ s: trainingSessions, t: teams, p: { id: programmes.id, name: programmes.name }, l: { id: locations.id, name: locations.name, timeZone: locations.timeZone } })
+        .from(trainingSessions).innerJoin(teams, eq(teams.id, trainingSessions.teamId)).innerJoin(programmes, eq(programmes.id, teams.programmeId)).innerJoin(locations, eq(locations.id, trainingSessions.locationId))
+        .where(and(...conds)).orderBy(asc(trainingSessions.startsAt)).limit(500))
+        .filter((r) => (allowed === 'all' || allowed.has(r.s.locationId)) && (managerAt === 'all' || managerAt.has(r.s.locationId) || r.t.coachUserId === req.user!.id));
+      if (!rows.length) return { items: [] };
+      const teamIds = [...new Set(rows.map((r) => r.t.id))];
+      const sessionIds = rows.map((r) => r.s.id);
+      const [rosterCounts, marks, coaches] = await Promise.all([
+        s.db.select({ teamId: registrations.teamId, n: count() }).from(registrations).where(and(inArray(registrations.teamId, teamIds), eq(registrations.status, 'accepted'))).groupBy(registrations.teamId),
+        s.db.select({ sessionId: attendance.sessionId, status: attendance.status, n: count() }).from(attendance).where(inArray(attendance.sessionId, sessionIds)).groupBy(attendance.sessionId, attendance.status),
+        s.db.select({ id: users.id, name: users.name }).from(users).where(inArray(users.id, [...new Set(rows.map((r) => r.t.coachUserId).filter((x): x is string => !!x))].concat(['00000000-0000-0000-0000-000000000000']))),
+      ]);
+      // Venue conflicts: any other scheduled session at the same location + venue overlapping in time (all teams, not just visible ones).
+      const venueRows = await s.db.select({ id: trainingSessions.id, locationId: trainingSessions.locationId, venue: trainingSessions.venue, startsAt: trainingSessions.startsAt, endsAt: trainingSessions.endsAt, teamName: teams.name })
+        .from(trainingSessions).innerJoin(teams, eq(teams.id, trainingSessions.teamId))
+        .where(and(eq(trainingSessions.organizationId, orgId), lt(trainingSessions.startsAt, to), gt(trainingSessions.endsAt, from), ne(trainingSessions.status, 'cancelled')));
+      return {
+        items: rows.map(({ s: x, t, p, l }) => {
+          const m = marks.filter((k) => k.sessionId === x.id);
+          const by = (st: string) => m.find((k) => k.status === st)?.n ?? 0;
+          const conflicts = x.venue && x.status !== 'cancelled' ? venueRows.filter((v) => v.id !== x.id && v.locationId === x.locationId && v.venue === x.venue && v.startsAt < x.endsAt && v.endsAt > x.startsAt) : [];
+          return {
+            id: x.id, kind: x.kind, status: x.status, startsAt: x.startsAt.toISOString(), endsAt: x.endsAt.toISOString(), venue: x.venue,
+            location: l, team: { id: t.id, name: t.name, coach: t.coachUserId ? { id: t.coachUserId, name: coaches.find((c) => c.id === t.coachUserId)?.name ?? 'Coach' } : null }, programme: p,
+            rosterCount: rosterCounts.find((r) => r.teamId === t.id)?.n ?? 0,
+            attendance: { recorded: m.reduce((a, k) => a + k.n, 0), present: by('present'), absent: by('absent'), late: by('late'), excused: by('excused') },
+            venueConflict: conflicts.length > 0, conflicts: conflicts.map((c) => ({ sessionId: c.id, teamName: c.teamName, startsAt: c.startsAt.toISOString(), endsAt: c.endsAt.toISOString() })),
+          };
+        }),
+      };
     });
 
     const coachGuard = async (req: Parameters<typeof hasPerm>[0], t: typeof teams.$inferSelect) => {

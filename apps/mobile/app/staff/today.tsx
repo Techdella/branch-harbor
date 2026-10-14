@@ -28,18 +28,37 @@ export default function Today() {
 
       <SectionHeader title={t('staff.shift')} />
       {shiftsQ.loading ? <SkeletonCard /> : null}
+      {!shiftsQ.loading && (shiftsQ.data ?? []).length === 0 ? <EmptyState icon="clock" title={t('staff.noShift')} /> : null}
       {(shiftsQ.data ?? []).map((s) => {
         const l = byId(s.locationId);
-        const tz = l?.timeZone ?? 'UTC';
+        const tz = s.timeZone ?? l?.timeZone ?? 'UTC';
+        const where = l ? `${l.name} · ${l.address}` : [s.locationName, s.organizationName].filter(Boolean).join(' · ');
+        const clock = async (kind: 'in' | 'out') => {
+          setClocking(s.id);
+          try {
+            const upd = kind === 'in' ? await api.clockIn(s.id) : await api.clockOut(s.id);
+            shiftsQ.setData((d) => d?.map((x) => (x.id === upd.id ? upd : x)));
+            toast(kind === 'in' ? t('staff.clockedIn', { time: fmtTime(upd.clockedInAt ?? new Date().toISOString(), tz, intlLocale) }) : t('staff.clockedOut', { time: fmtTime(upd.clockedOutAt ?? new Date().toISOString(), tz, intlLocale) }));
+          } catch (e) {
+            toast((e as ApiError).message);
+          } finally {
+            setClocking(null);
+          }
+        };
         return (
           <Card key={s.id} dark>
             <Text variant="label" color={color.lime}>{s.role}</Text>
             <Text variant="h2" tone="inverse" tabular>
               {fmtTime(s.startsAt, tz, intlLocale)} – {fmtTime(s.endsAt, tz, intlLocale)} {fmtZone(tz, intlLocale)}
             </Text>
-            <Text variant="small" color="#C9C9C3">{l ? `${l.name} · ${l.address}` : ''}</Text>
-            {s.clockedInAt ? (
-              <Badge label={t('staff.clockedIn', { time: fmtTime(s.clockedInAt, tz, intlLocale) })} tone="success" />
+            <Text variant="small" color="#C9C9C3">{where}</Text>
+            {s.clockedInAt && s.clockedOutAt ? (
+              <Badge label={t('staff.worked', { from: fmtTime(s.clockedInAt, tz, intlLocale), to: fmtTime(s.clockedOutAt, tz, intlLocale) })} tone="neutral" icon="check" />
+            ) : s.clockedInAt ? (
+              <View style={{ gap: 8 }}>
+                <Badge label={t('staff.clockedIn', { time: fmtTime(s.clockedInAt, tz, intlLocale) })} tone="success" />
+                <Button label={t('staff.clockOut')} variant="secondary" icon="clock" loading={clocking === s.id} loadingLabel={t('staff.waitingServer')} style={{ alignSelf: 'flex-start' }} onPress={() => clock('out')} />
+              </View>
             ) : (
               <Button
                 label={t('staff.clockIn')}
@@ -48,17 +67,7 @@ export default function Today() {
                 loading={clocking === s.id}
                 loadingLabel={t('staff.waitingServer')}
                 style={{ alignSelf: 'flex-start' }}
-                onPress={async () => {
-                  setClocking(s.id);
-                  try {
-                    const upd = await api.clockIn(s.id);
-                    shiftsQ.setData((d) => d?.map((x) => (x.id === upd.id ? upd : x)));
-                  } catch (e) {
-                    toast((e as ApiError).message);
-                  } finally {
-                    setClocking(null);
-                  }
-                }}
+                onPress={() => clock('in')}
               />
             )}
           </Card>

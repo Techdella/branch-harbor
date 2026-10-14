@@ -20,7 +20,12 @@ pnpm --filter @bh/api dev                       # http://localhost:4000, docs at
 ```
 
 Demo login after seeding: `demo@branchharbor.com` with the password printed by the seed
-(set `SEED_DEMO_PASSWORD` to choose it). Also seeded: `maya.rao@demo.branchharbor.com` (location
+(set `SEED_DEMO_PASSWORD` to choose it). The demo owner holds `org_owner` in all five demo organisations:
+Stillwater Yoga (studios), Maple & Ember (foods), North Shore Football Academy (sports: Toronto CAD, Manchester GBP,
+Austin USD), Harbourline Wellness (wellness, administrative records only: Toronto CAD, Dublin EUR, Melbourne AUD) and
+Fieldnote Goods (commerce: Portland USD, Montréal CAD, Amsterdam EUR), with shifts (one running now for clock-in),
+offers, intake forms, pickup settings, stock history and pending approvals (refunds, ad spend, shift swaps). The seed
+prints the extra staff/manager accounts (same password). Also seeded: `maya.rao@demo.branchharbor.com` (location
 manager, Queen West), `priya.anand@demo.branchharbor.com` (regional manager, Europe),
 `carlos.ortega@demo.branchharbor.com` (staff, Ballard) — same password.
 
@@ -56,7 +61,12 @@ signature rejection, partial refunds, reconciliation + "recreate record", food-o
 with refund on rejection, studio capacity/holds/waitlist/concurrency, wellness reschedule
 preserving the original on failure, auth (refresh rotation + reuse detection), invitations and
 immediate revocation, CSV import row errors, group publishing partial failure + retry, AI scoping
-and proposed-action approval, privacy export/deletion, connector mapping errors.
+and proposed-action approval, privacy export/deletion, connector mapping errors, staff shifts/swaps/time clock,
+the approvals inbox (execute-on-approve, rollback to pending on failed execution, no self-approval, per-kind
+permissions, refund thresholds), leaving a waitlist (guest token and `/me`), sports schedule/attendance with venue
+conflicts and coach scoping, offer eligibility rules, intake form validation/consent versions/AI exclusion, pickup
+settings → slot generation (pure planner incl. DST), inventory history with reservations, push sandbox/preferences/
+Expo adapter, org policies and per-location billing.
 
 ## Environment
 
@@ -71,6 +81,7 @@ Every variable is documented in [`.env.example`](./.env.example) and validated b
 | Stripe Connect | sandbox: fake `pi_sandbox_*` intents, accounts enabled immediately; `POST /v1/public/payments/:id/sandbox-confirm` simulates the provider through the same webhook processor |
 | Stripe webhooks | rejected (503) unless `STRIPE_WEBHOOK_SECRET` is set — never processed unsigned |
 | Anthropic (BranchHarbor AI) | AI routes return `503 ai_unavailable`; nothing else is affected |
+| Expo Push (`EXPO_ACCESS_TOKEN` or `ENABLE_EXPO_PUSH=true`) | sandbox: notifications are logged and recorded in `push_notifications` with status `sandbox`, never sent |
 | Cloudflare for SaaS | sandbox provider; `DOMAINS_SANDBOX_AUTO_VERIFY=true` skips real DNS lookups |
 | Google Maps, Open Exchange Rates, S3/R2, Sentry, PostHog | disabled |
 | Mindbody, Square, Shopify, WooCommerce, WordPress | sandbox sample data for sync/mapping UX |
@@ -91,7 +102,7 @@ src/
   integrations/*.ts      adapters: Stripe, Cloudflare, email, SMS/WhatsApp, BullMQ, connectors, Anthropic, FX, maps, storage
   routes/*.ts            Zod-typed route modules registered under /v1
   jobs/handlers.ts       background job handlers
-drizzle/                 generated SQL migrations (+ 0001 custom constraints)
+drizzle/                 generated SQL migrations (+ 0001 custom constraints; 0003 shifts, approvals columns, offers, intake, pickup settings, push log)
 ```
 
 **Conventions**
@@ -125,6 +136,11 @@ permissions they hold in that scope. HQ report access does not imply customer ac
 - *Domains*: add hostname → exact CNAME + `_bh-verify` TXT records → `verify` advances `awaiting_dns → verifying → certificate_pending → ready` (or `failed`, retry restarts) via a pure state machine fed by DNS + provider checks.
 - *Websites*: template fields are `locked` / `editable` / `approval`; each page field records its origin (`hq`, `local`, `locked`, `approval`). Local edits become overrides (resettable), approval fields create approval requests (no self-approval; rejection needs a comment), HQ default changes flow to inherited fields only. Group publish creates a version snapshot per location with independent results; jobs are `completed`, `partial` or `failed` and `retry` re-runs only failures.
 - *AI*: Anthropic Messages API (`ANTHROPIC_MODEL`, default `claude-sonnet-5-5`; server-side refusal fallback enabled by default) with a manual tool loop. The system prompt states the active scope and the user's permissions; tools only read data the user may see in the conversation scope or store `proposed_actions`. Tool results are wrapped as `untrustedData`. Approving a proposal executes it through the same validated services with the approver's permissions.
+- *Approvals*: one inbox (`approvals` table, `target_type` = `field` | `page` | `refund` | `ad_spend` | `shift_swap`). Deciders per kind: website → `website.approve`; refund → `payments.refund`; ad spend → `marketing.publish`; shift swap → `operations.write` **and** `locations.read` (managers, never general staff). No self-approval. Approve atomically claims the request (`pending → executing`), runs the underlying action (refund at the provider / commerce refund, campaign scheduled, shifts reassigned, website field applied) and only then marks it `approved` with `executionResult`; a failed execution returns it to `pending` and is audited as `approval.execution_failed`. Refunds above `settings.refundApprovalThresholds[currency]` are blocked on the direct refund endpoints (`409 approval_required`) unless the caller refunds organisation-wide.
+- *Shifts*: shifts per location and person (UTC + location time zone, weekly repeat keeps local wall time), overlap protection, swap requests that create a `shift_swap` approval, append-only clock-in/out events (up to 60 minutes early, one open clock-in per person).
+- *Pickup settings*: per-location hours/slot length/capacity/cut-off/prep buffer/horizon/closed dates. Saving regenerates future slots (booked slots are kept, capacity never drops below bookings); public slot listings generate the horizon on demand; ordering enforces the prep buffer.
+- *Inventory*: physical movements change on-hand stock; `reservation`/`release` movements hold units for unpaid native orders (`location_variants.reserved`) and are converted into a `sale` when the payment succeeds. Listings return the running on-hand balance after each physical movement.
+- *Push*: `services/notifications.ts` queues `push.send`; delivery checks the user's latest consent for `push_updates` (order status, waitlist) or `push_work` (approvals, cover), sends to every registered device via the Expo Push API (or logs in sandbox), prunes `DeviceNotRegistered` tokens and records one `push_notifications` row per user. Triggers: food order accepted/ready (customer), new approval request (everyone who can decide it), cover request (staff at the location), waitlist promotion (customer).
 - *Privacy*: `GET /v1/me/export` (JSON download of personal data), `DELETE /v1/me` (password + `confirm: "DELETE"`; revokes sessions and access, erases PII, keeps tombstones for financial integrity), append-only consent records with purpose/version/timestamp, customer erasure for businesses.
 
 ## Endpoints
@@ -231,7 +247,10 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 - `GET /v1/me/export`
 - `GET /v1/me/consents`
 - `POST /v1/me/consents`
-- `POST /v1/me/push-tokens` / `DELETE /v1/me/push-tokens` (Expo push token registry; no sending yet)
+- `POST /v1/me/push-tokens` / `DELETE /v1/me/push-tokens` (Expo push token registry; sending: see *Push* above)
+- `POST /v1/me/consents` purposes also include `push_updates` and `push_work` (withdraw to stop those pushes)
+- `POST /v1/me/waitlist/{id}/leave` (signed-in customer) · `POST /v1/public/studios/waitlist/{id}/leave` `{ manageToken }` (guest; the token is returned when joining)
+- `GET /v1/me/shifts` (my shifts across organisations + open clock-in)
 - `GET /v1/me/bookings`, `POST /v1/me/bookings/{id}/cancel` (signed-in customer, matched by account or email)
 - `GET /v1/me/food-orders`
 - `GET /v1/me/messages?locationId=`, `POST /v1/me/messages` (customer ↔ location conversation)
@@ -352,6 +371,34 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 - `POST /v1/orgs/{orgId}/commerce/returns/{id}/status`
 - `GET /v1/orgs/{orgId}/commerce/orders/{id}`
 
+**approvals**
+
+- `GET /v1/orgs/{orgId}/approvals?status=pending|approved|rejected|cancelled|all&kind=` (requests the caller can decide or requested; `kind`, `title`, `amount`, `location`, `requester`, `canDecide`)
+- `POST /v1/orgs/{orgId}/approvals/{id}/decision` `{ decision: approve|reject, comment }` (approve runs the action)
+- `POST /v1/orgs/{orgId}/approvals/{id}/cancel` (requester withdraws)
+- `POST /v1/orgs/{orgId}/refund-requests` `{ paymentId | orderId, amountMinor, currency, reason }` (runs immediately within threshold for refunders, else `202` pending approval)
+- `POST /v1/orgs/{orgId}/ad-spend-requests` `{ locationId, amountMinor, currency, channel, durationDays, startsOn?, title }`
+
+**shifts & time clock**
+
+- `GET /v1/orgs/{orgId}/shifts?locationId&userId&from&to` · `POST /v1/orgs/{orgId}/shifts` · `PATCH /v1/orgs/{orgId}/shifts/{id}` · `POST /v1/orgs/{orgId}/shifts/{id}/cancel`
+- `POST /v1/orgs/{orgId}/shifts/{id}/swap-requests` `{ toUserId, toShiftId?, reason }` · `GET /v1/orgs/{orgId}/shift-swaps`
+- `POST /v1/orgs/{orgId}/time-clock/clock-in` `{ locationId, shiftId? }` · `POST /v1/orgs/{orgId}/time-clock/clock-out` · `GET /v1/orgs/{orgId}/time-clock` (timesheet pairs)
+
+**studios offers · wellness intake · sports schedule · pickup settings · inventory**
+
+- `GET /v1/public/studios/{locationId}/offers` · `GET|POST /v1/orgs/{orgId}/studios/offers` · `PATCH /v1/orgs/{orgId}/studios/offers/{id}` · `POST …/offers/{id}/eligibility` · `POST …/offers/{id}/redemptions`
+- `GET /v1/public/wellness/{locationId}/intake-forms?serviceId` · `POST /v1/public/wellness/intake-forms/{id}/responses` `{ appointmentId, manageToken, answers, consent: { accepted: true, version } }`
+- `GET|POST /v1/orgs/{orgId}/wellness/intake-forms` · `PATCH …/intake-forms/{id}` (new version when questions/consent change) · `GET|POST …/intake-forms/{id}/responses`
+- `GET /v1/orgs/{orgId}/sports/sessions?from&to&teamId&locationId&kind` (attendance summary, `venueConflict` + `conflicts`; coaches see the teams they coach)
+- `GET /v1/orgs/{orgId}/foods/pickup-settings` · `GET|PUT /v1/orgs/{orgId}/foods/locations/{locationId}/pickup-settings` · `POST …/pickup-slots/generate`
+- `GET /v1/orgs/{orgId}/commerce/stock-movements?locationId&variantId&reason&from&to` (history with `balanceAfter`) · `GET /v1/orgs/{orgId}/commerce/inventory`
+
+**orgs (policies & billing)**
+
+- `PATCH /v1/orgs/{orgId}` also accepts `customerDataSharing` (`off` default | `totals_only` | `shared`), `aiTrainingOptOut` (default `true`) and `refundApprovalThresholds` (`{ "CAD": 5000 }`); `GET /v1/orgs/{orgId}` returns them as `policies`
+- `GET /v1/orgs/{orgId}/subscription` adds `pricePerLocation`, `estimatedTotal` and `locations[]` (billed or not, with the per-location price)
+
 **ai**
 
 - `GET /v1/orgs/{orgId}/ai/status`
@@ -367,6 +414,8 @@ everything under `/v1/orgs/:orgId` requires a bearer token and a role assignment
 - Sentry/OpenTelemetry wiring — DSN accepted, SDK not initialised.
 - Google/Meta OAuth sign-in — env vars reserved; only email+password auth is implemented.
 - Connector `fetch` is real for WooCommerce products; WordPress/Shopify/Square/Mindbody probe credentials (`test`) but use sandbox sample data for sync.
-- Subscription billing (BranchHarbor plans) is modelled (`subscriptions`) and readable; Stripe Billing checkout/invoices are not wired.
+- Subscription billing (BranchHarbor plans) is modelled (`subscriptions`, incl. the per-location price) and readable; Stripe Billing checkout/invoices are not wired.
+- `customerDataSharing` and `aiTrainingOptOut` are persisted and returned; customer listings do not yet change behaviour by sharing policy (records stay scoped by role as before), and BranchHarbor sends no data for model training either way.
+- Push receipts (Expo's second "getReceipts" step) are not polled; ticket errors are recorded and `DeviceNotRegistered` tokens are pruned.
 - Domain purchase/registration (spec "later") is not implemented.
 - Refresh-token rotation has no grace window for parallel refreshes from multiple tabs (a concurrent reuse signs the user out).

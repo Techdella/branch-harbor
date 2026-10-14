@@ -68,6 +68,11 @@ const envSchema = z.object({
   STRIPE_APPLICATION_FEE_BPS: z.coerce.number().int().min(0).max(10000).default(100),
   BOOKING_HOLD_MINUTES: z.coerce.number().int().default(10),
 
+  // Push notifications (Expo Push API). Without either value pushes are logged (sandbox), not sent.
+  EXPO_ACCESS_TOKEN: optional,
+  ENABLE_EXPO_PUSH: bool(false),
+  EXPO_PUSH_URL: z.string().default('https://exp.host/--/api/v2/push/send'),
+
   // AI
   ANTHROPIC_API_KEY: optional,
   ANTHROPIC_MODEL: z.string().default('claude-sonnet-5-5'),
@@ -143,6 +148,7 @@ export function integrationStatus(cfg: Config) {
     stripe: mode(!!cfg.STRIPE_SECRET_KEY, 'sandbox'),
     stripeWebhooks: cfg.STRIPE_WEBHOOK_SECRET ? 'verified' : 'disabled (unsigned events rejected)',
     ai: mode(!!cfg.ANTHROPIC_API_KEY),
+    push: mode(!!cfg.EXPO_ACCESS_TOKEN || cfg.ENABLE_EXPO_PUSH, 'sandbox'),
     domains: mode(!!(cfg.CLOUDFLARE_API_TOKEN && cfg.CLOUDFLARE_ZONE_ID), 'sandbox'),
     maps: mode(!!cfg.GOOGLE_MAPS_API_KEY),
     fx: mode(!!cfg.OPEN_EXCHANGE_RATES_APP_ID),

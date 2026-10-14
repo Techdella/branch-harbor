@@ -18,6 +18,11 @@ import { commerceRoutes } from './commerce.ts';
 import { foodRoutes } from './foods.ts';
 import { aiRoutes } from './ai.ts';
 import { mobileRoutes } from './mobile.ts';
+import { approvalRoutes } from './approvals.ts';
+import { shiftRoutes } from './shifts.ts';
+import { offerRoutes } from './offers.ts';
+import { intakeFormRoutes } from './intakeForms.ts';
+import { pickupSettingsRoutes } from './pickupSettings.ts';
 
 /** All /v1 routes. Public and webhook routes are unauthenticated; everything else requires a bearer token. */
 export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -41,4 +46,10 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register(commerceRoutes);
   await app.register(aiRoutes);
   await app.register(mobileRoutes);
+  await app.register(approvalRoutes);
+  await app.register(shiftRoutes);
+  await app.register(offerRoutes);
+  await app.register(intakeFormRoutes);
+  await app.register(pickupSettingsRoutes);
+  await app.register((await import('./sites.ts')).siteRoutes);
 };

@@ -7,6 +7,8 @@ import { can, isValidTimeZone, LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES, type Curr
 import { ApiError, type BranchHarborApi } from '../api';
 import type {
   ApprovalItem,
+  ApprovalRequest,
+  ShiftView,
   ClassOccurrence,
   CommerceOrder,
   Connection,
@@ -361,6 +363,60 @@ function menuFor(ind: IndustryKey, view: string): MenuItem[] {
     return { id: it.id, name: it.name, image: it.image, status: it.status, statusNote: it.status === 'partial_failure' ? it.statusNote : undefined, fields };
   });
 }
+
+
+/* ---------------- Team schedule + approvals ---------------- */
+
+const SHIFT_PEOPLE: Record<IndustryKey, [string, string][]> = {
+  studios: [['Front desk', 'Sam Tran'], ['Front desk', 'Jordan Lee'], ['Studio manager', 'Kim Lau']],
+  sports: [['Head coach', 'Coach Ortiz'], ['Coach', 'Coach Ahmed'], ['Site manager', 'Marcus Bell']],
+  wellness: [['Reception', 'Tom Becker'], ['Clinic manager', 'Rina Kapoor'], ['Reception', 'Ana Lima']],
+  commerce: [['Sales associate', 'Kim Lau'], ['Store manager', 'Leah Park'], ['Sales associate', 'Sanne Visser']],
+  foods: [['Kitchen lead', 'Mei Lin'], ['Shift manager', 'Carlos Ortega'], ['Line cook', 'Ren Ito']],
+};
+const SHIFT_TIMES: [string, string][] = [['07:00', '15:00'], ['14:00', '22:00'], ['09:00', '17:00']];
+
+function freshShifts(ind: IndustryKey): ShiftView[] {
+  const out: ShiftView[] = [];
+  const nowMs = Date.now();
+  for (const l of FIXTURES[ind].locations) {
+    if (l.site === 'unpublished') continue;
+    for (let d = -1; d < 8; d++) {
+      SHIFT_PEOPLE[ind].forEach(([role, person], i) => {
+        if ((d + i) % 7 === 6) return; // a day off each week
+        const [s, e] = SHIFT_TIMES[i]!;
+        const start = at(l.timeZone, s, d);
+        const end = at(l.timeZone, e, d);
+        const live = new Date(start).getTime() < nowMs && new Date(end).getTime() > nowMs;
+        out.push({
+          id: `sh_${l.id}_${d}_${i}`, locationId: l.id, locationName: l.name, timeZone: l.timeZone, person, role, start, end, breakMinutes: 30,
+          clockedInAt: live || new Date(end).getTime() < nowMs ? new Date(new Date(start).getTime() - 4 * 60000).toISOString() : null,
+          clockedOutAt: new Date(end).getTime() < nowMs ? new Date(new Date(end).getTime() + 6 * 60000).toISOString() : null,
+          pendingSwap: d === 2 && i === 0 ? { to: SHIFT_PEOPLE[ind][1]![1], approvalId: `ap_${ind}_swap` } : null,
+        });
+      });
+    }
+  }
+  return out.sort((a, b) => a.start.localeCompare(b.start));
+}
+
+function freshApprovals(ind: IndustryKey): ApprovalRequest[] {
+  const f = FIXTURES[ind];
+  const L = f.locations.filter((l) => l.site === 'live');
+  const a = L[0]!, b = L[1] ?? L[0]!, c = L[2] ?? L[0]!;
+  const base = { status: 'pending' as const, canDecide: true, decidedBy: null, decisionComment: null, result: null };
+  return [
+    { ...base, id: `ap_${ind}_refund`, kind: 'refund', title: `Refund for ${ind === 'foods' ? 'pickup order #1042' : ind === 'commerce' ? 'order #5521' : 'payment pi_…8f2c'}`, locationName: a.name, amount: m(ind === 'foods' ? 17.66 : 68, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(48), reason: ind === 'foods' ? 'Order arrived cold — customer asked for a refund' : 'Class cancelled after the heating failed', details: [{ label: 'Above threshold', value: `Refunds over ${a.currency} 50.00 need approval` }, { label: 'Refunded so far', value: `${a.currency} 0.00` }] },
+    { ...base, id: `ap_${ind}_ads`, kind: 'ad_spend', title: `${b.name.split(' – ').pop()} spring local ads`, locationName: b.name, amount: m(400, b.currency), requestedBy: f.people.local, requestedAt: minutesAgo(26 * 60), reason: 'Instagram + Facebook, 5 km radius, promoting the intro offer.', details: [{ label: 'Channel', value: 'Meta ads' }, { label: 'Duration', value: '14 days' }, { label: 'Starts', value: 'In 7 days' }] },
+    { ...base, id: `ap_${ind}_swap`, kind: 'shift_swap', title: `${SHIFT_PEOPLE[ind][0]![0]} · in 2 days`, locationName: a.name, amount: null, requestedBy: SHIFT_PEOPLE[ind][0]![1], requestedAt: minutesAgo(180), reason: 'Exam that morning', details: [{ label: 'From', value: SHIFT_PEOPLE[ind][0]![1] }, { label: 'To', value: SHIFT_PEOPLE[ind][1]![1] }] },
+    { ...base, id: `ap_${ind}_web`, kind: 'field', title: 'Website change: Intro offer', locationName: c.name, amount: null, requestedBy: f.people.local, requestedAt: minutesAgo(300), reason: 'Local launch promotion', details: [{ label: 'New value', value: 'First week unlimited for new members' }] },
+    { ...base, id: `ap_${ind}_done`, kind: 'ad_spend', title: 'Autumn open day', status: 'approved', locationName: a.name, amount: m(250, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(5 * 24 * 60), reason: null, details: [{ label: 'Channel', value: 'Google ads' }, { label: 'Duration', value: '7 days' }], canDecide: false, decidedBy: f.people.hq, decisionComment: 'Approved — keep it local', result: 'Campaign scheduled' },
+  ];
+}
+const SCHEDULE: Partial<Record<IndustryKey, ShiftView[]>> = {};
+const APPROVALS: Partial<Record<IndustryKey, ApprovalRequest[]>> = {};
+const shiftsOf = (ind: IndustryKey) => (SCHEDULE[ind] ??= freshShifts(ind));
+const approvalsOf = (ind: IndustryKey) => (APPROVALS[ind] ??= freshApprovals(ind));
 
 /* ---------------- Onboarding ---------------- */
 
@@ -738,12 +794,42 @@ const rawMockApi: BranchHarborApi = {
 
   team: {
     members: (ctx) => (requirePerm(ctx, 'members.manage'), read(() => st(ctx.industry).team, () => [])),
+    schedule: (ctx, weekStart) => {
+      requirePerm(ctx, 'operations.read');
+      const ids = scopeIds(ctx);
+      const from = zonedToUtc(weekStart, '00:00', 'UTC');
+      const to = zonedToUtc(addDays(weekStart, 7), '00:00', 'UTC');
+      return read(() => shiftsOf(ctx.industry).filter((x) => ids.includes(x.locationId) && x.end > from && x.start < to), () => []);
+    },
     invite: (input) =>
       write(() => {
         if (!/^\S+@\S+\.\S+$/.test(input.email)) throw new ApiError('validation_error', 'Check the highlighted fields.', 422, { email: 'Enter a valid email.' });
         const mem: Member = { id: `mem_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', status: 'invited' };
         st(lastCtx.industry).team.push(mem);
         return mem;
+      }),
+  },
+
+  approvals: {
+    list: (ctx, status) => {
+      remember(ctx);
+      requirePerm(ctx, 'locations.read');
+      return read(() => approvalsOf(ctx.industry).filter((a) => (status === 'pending' ? a.status === 'pending' : a.status !== 'pending')), () => []);
+    },
+    decide: (id, decision, comment) =>
+      write(() => {
+        const a = approvalsOf(lastCtx.industry).find((x) => x.id === id);
+        if (!a) throw new ApiError('not_found', 'Approval not found.', 404);
+        if (a.status !== 'pending') throw new ApiError('already_decided', `This request was already ${a.status}.`, 409);
+        if (!a.canDecide) throw new ApiError('forbidden', 'You cannot decide this request.', 403);
+        if (decision === 'reject' && (a.kind === 'field' || a.kind === 'page') && !comment) throw new ApiError('validation_error', 'Explain why the change was rejected.', 400, { comment: 'Required when rejecting' });
+        a.status = decision === 'approve' ? 'approved' : 'rejected';
+        a.decidedBy = sessionFor(lastCtx.industry, lastCtx.role).user.name;
+        a.decisionComment = comment ?? null;
+        a.canDecide = false;
+        a.result = decision === 'reject' ? null : a.kind === 'refund' ? 'Refund complete' : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : 'Change applied';
+        if (a.kind === 'shift_swap' && decision === 'approve') for (const sh of shiftsOf(lastCtx.industry)) if (sh.pendingSwap?.approvalId === a.id) Object.assign(sh, { person: sh.pendingSwap.to, pendingSwap: null });
+        return a;
       }),
   },
 

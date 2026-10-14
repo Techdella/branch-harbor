@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from './api';
 import { setSessionExpiredHandler } from './http';
+import { usePushNotifications } from './push';
 import { storage, tokenStore } from './storage';
 import type { Experience, Me } from './types';
 
@@ -106,6 +107,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       });
     },
   }), [status, me, experience, setExperience, brandId, locs, accept]);
+
+  // Ask for notification permission after sign-in (never for guests) and register the device token.
+  usePushNotifications(status === 'ready' && !!me && !me.guest, me?.user.id ?? null);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -6,6 +6,7 @@ import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, conflict, notFound } from '../lib/errors.ts';
 import { audit } from './audit.ts';
 import { assertPaymentsEnabled, createPaymentForTarget } from './payments.ts';
+import { notify, userIdsForCustomer } from './notifications.ts';
 
 /** Seats in use = confirmed bookings + holds that have not expired. */
 export async function seatsInUse(tx: Tx, occurrenceId: string): Promise<number> {
@@ -25,7 +26,7 @@ export interface BookInput {
 
 export type BookResult =
   | { outcome: 'confirmed' | 'held'; bookingId: string; manageToken: string; holdExpiresAt: string | null; payment: { id: string; clientSecret: string | null; amount: number; currency: string; sandbox: boolean } | null }
-  | { outcome: 'waitlisted'; waitlistEntryId: string; position: number };
+  | { outcome: 'waitlisted'; waitlistEntryId: string; position: number; manageToken: string };
 
 /**
  * Book a class occurrence. Capacity is checked under a row lock on the occurrence, so concurrent
@@ -53,7 +54,7 @@ export async function bookClass(s: Services, input: BookInput): Promise<BookResu
       if (!input.joinWaitlist) throw new AppError(409, 'class_full', 'This class is full. You can join the waitlist.', undefined, { waitlistAvailable: true, capacity: occ.capacity });
       const [existing] = await tx.select().from(waitlistEntries).where(and(eq(waitlistEntries.occurrenceId, occ.id), eq(waitlistEntries.customerId, input.customerId), sql`${waitlistEntries.status} in ('waiting','offered')`));
       if (existing) throw conflict('already_waitlisted', 'You are already on the waitlist for this class');
-      const [w] = await tx.insert(waitlistEntries).values({ organizationId: occ.organizationId, locationId: occ.locationId, occurrenceId: occ.id, customerId: input.customerId }).returning();
+      const [w] = await tx.insert(waitlistEntries).values({ organizationId: occ.organizationId, locationId: occ.locationId, occurrenceId: occ.id, customerId: input.customerId, manageTokenHash: sha256(manageToken) }).returning();
       const [pos] = await tx.select({ n: sql<number>`count(*)::int` }).from(waitlistEntries).where(and(eq(waitlistEntries.occurrenceId, occ.id), eq(waitlistEntries.status, 'waiting'), sql`${waitlistEntries.createdAt} <= (select created_at from waitlist_entries where id = ${w!.id})`));
       return { kind: 'waitlisted' as const, waitlistEntryId: w!.id, position: pos?.n ?? 1, occ };
     }
@@ -68,7 +69,7 @@ export async function bookClass(s: Services, input: BookInput): Promise<BookResu
     return { kind: 'booked' as const, booking: b!, occ };
   });
 
-  if (res.kind === 'waitlisted') return { outcome: 'waitlisted', waitlistEntryId: res.waitlistEntryId, position: res.position };
+  if (res.kind === 'waitlisted') return { outcome: 'waitlisted', waitlistEntryId: res.waitlistEntryId, position: res.position, manageToken };
   const { booking, occ } = res;
   if (booking.status === 'confirmed') return { outcome: 'confirmed', bookingId: booking.id, manageToken, holdExpiresAt: null, payment: null };
   try {
@@ -86,7 +87,7 @@ export async function bookClass(s: Services, input: BookInput): Promise<BookResu
 }
 
 /** Offer the freed seat to the next waiting customer: confirm free classes, hold paid ones. */
-export async function promoteFromWaitlist(s: Services, tx: Tx, occurrenceId: string): Promise<{ entryId: string; bookingId: string; status: 'confirmed' | 'held'; manageToken: string; email: string | null } | null> {
+export async function promoteFromWaitlist(s: Services, tx: Tx, occurrenceId: string): Promise<{ entryId: string; bookingId: string; status: 'confirmed' | 'held'; manageToken: string; email: string | null; customerId: string; organizationId: string } | null> {
   const [occ] = await tx.select().from(classOccurrences).where(eq(classOccurrences.id, occurrenceId)).for('update');
   if (!occ || occ.status !== 'scheduled' || occ.startsAt <= new Date()) return null;
   if ((await seatsInUse(tx, occ.id)) >= occ.capacity) return null;
@@ -102,7 +103,7 @@ export async function promoteFromWaitlist(s: Services, tx: Tx, occurrenceId: str
   await tx.update(waitlistEntries).set({ status: paid ? 'offered' : 'promoted', offeredBookingId: b!.id }).where(eq(waitlistEntries.id, next.id));
   const [c] = await tx.select({ email: customers.email }).from(customers).where(eq(customers.id, next.customerId));
   await audit(tx, { organizationId: occ.organizationId, actorUserId: null, actorType: 'system', action: paid ? 'waitlist.offered' : 'waitlist.promoted', scopeKind: 'location', scopeId: occ.locationId, targetType: 'class_booking', targetId: b!.id });
-  return { entryId: next.id, bookingId: b!.id, status: paid ? 'held' : 'confirmed', manageToken: token, email: c?.email ?? null };
+  return { entryId: next.id, bookingId: b!.id, status: paid ? 'held' : 'confirmed', manageToken: token, email: c?.email ?? null, customerId: next.customerId, organizationId: occ.organizationId };
 }
 
 export async function cancelBooking(s: Services, bookingId: string, opts: { actorUserId: string | null; organizationId?: string }) {
@@ -125,7 +126,18 @@ export async function cancelBooking(s: Services, bookingId: string, opts: { acto
       tag: 'waitlist',
     });
   }
+  if (out.promoted) await notifyWaitlistPromotion(s, out.promoted);
   return out;
+}
+
+/** Push to the promoted customer's devices (if they have an account with push enabled). */
+export async function notifyWaitlistPromotion(s: Services, p: { bookingId: string; status: 'confirmed' | 'held'; customerId: string; organizationId: string }) {
+  await notify(s, {
+    userIds: await userIdsForCustomer(s.db, p.customerId), organizationId: p.organizationId, category: 'waitlist_promotion',
+    title: p.status === 'confirmed' ? 'You’re in! A spot opened up' : 'A spot opened up — confirm your booking',
+    body: p.status === 'confirmed' ? 'You were moved off the waitlist and are now booked.' : 'A spot is held for you for a limited time. Complete payment to confirm it.',
+    data: { bookingId: p.bookingId, status: p.status, url: 'branchharbor://customer/bookings' },
+  });
 }
 
 /** Background sweep: expire stale holds and pass their seats on to the waitlist. */
@@ -135,7 +147,30 @@ export async function expireHolds(s: Services) {
     .returning({ id: classBookings.id, occurrenceId: classBookings.occurrenceId });
   for (const e of expired) {
     await s.db.update(waitlistEntries).set({ status: 'expired' }).where(and(eq(waitlistEntries.offeredBookingId, e.id), eq(waitlistEntries.status, 'offered')));
-    await s.db.transaction((tx) => promoteFromWaitlist(s, tx, e.occurrenceId));
+    const promoted = await s.db.transaction((tx) => promoteFromWaitlist(s, tx, e.occurrenceId));
+    if (promoted) await notifyWaitlistPromotion(s, promoted);
   }
   return expired.length;
+}
+
+/**
+ * Leave a waitlist. Only places still waiting (or offered but unpaid) can be left; an offered hold is
+ * released and passed on to the next waiting customer.
+ */
+export async function leaveWaitlist(s: Services, entryId: string, opts: { actorUserId: string | null }) {
+  const out = await s.db.transaction(async (tx) => {
+    const [w] = await tx.select().from(waitlistEntries).where(eq(waitlistEntries.id, entryId)).for('update');
+    if (!w) throw notFound('Waitlist place');
+    if (!['waiting', 'offered'].includes(w.status)) throw conflict('waitlist_not_active', w.status === 'left' ? 'You already left this waitlist' : `This waitlist place is ${w.status}`);
+    await tx.update(waitlistEntries).set({ status: 'left', leftAt: new Date() }).where(eq(waitlistEntries.id, w.id));
+    let promoted = null;
+    if (w.status === 'offered' && w.offeredBookingId) {
+      await tx.update(classBookings).set({ status: 'cancelled', cancelledAt: new Date() }).where(and(eq(classBookings.id, w.offeredBookingId), eq(classBookings.status, 'held')));
+      promoted = await promoteFromWaitlist(s, tx, w.occurrenceId);
+    }
+    await audit(tx, { organizationId: w.organizationId, actorUserId: opts.actorUserId, actorType: opts.actorUserId ? 'user' : 'system', action: 'waitlist.left', scopeKind: 'location', scopeId: w.locationId, targetType: 'waitlist_entry', targetId: w.id });
+    return { entry: { ...w, status: 'left' }, promoted };
+  });
+  if (out.promoted) await notifyWaitlistPromotion(s, out.promoted);
+  return out.entry;
 }

@@ -13,6 +13,7 @@ import * as t from './schema/index.ts';
 import { hashPassword } from '../services/auth.ts';
 import { addDays, zonedToUtc } from '../lib/tz.ts';
 import { sha256 } from '../lib/crypto.ts';
+import { clearOperationsDemo, OPERATIONS_DEMO_SLUGS, seedOperations } from './seed-operations.ts';
 
 const cfg = config();
 const handle = createDb(cfg.DATABASE_URL, { max: 2 });
@@ -30,10 +31,11 @@ async function upsertUser(email: string, name: string, locale = 'en') {
 }
 
 async function main() {
-  const slugs = ['stillwater-yoga', 'maple-and-ember'];
+  const slugs = ['stillwater-yoga', 'maple-and-ember', ...OPERATIONS_DEMO_SLUGS];
   const old = await db.select({ id: t.organizations.id }).from(t.organizations).where(inArray(t.organizations.slug, slugs));
   if (old.length) {
     const ids = old.map((o) => o.id);
+    await clearOperationsDemo(db, ids);
     // Tables without an FK cascade to organizations are cleared explicitly.
     for (const tbl of [t.paymentReferences, t.webhookEvents, t.auditEvents, t.aiProposedActions, t.aiMessages, t.publishJobResults, t.pageVersions, t.fieldOverrides, t.externalMappings, t.syncRuns, t.refunds, t.consentRecords] as const) {
       await db.delete(tbl).where(inArray((tbl as typeof t.paymentReferences).organizationId, ids));
@@ -203,6 +205,8 @@ async function main() {
     await db.update(t.pickupSlots).set({ booked: 1 }).where(sql`${t.pickupSlots.id} = ${slot.id}`);
   }
 
+  const ops = await seedOperations({ db, today, upsertUser, demo, maya, carlos, priya, swId, meId });
+
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
   console.log(` Demo login:    demo@branchharbor.com`);
@@ -212,6 +216,10 @@ async function main() {
   console.log(`                carlos.ortega@demo.branchharbor.com (staff, Ballard) — same password`);
   console.log(` Organisations: Stillwater Yoga Collective (${swId}) — Toronto CAD, Seattle USD, London GBP, Berlin EUR, Sydney AUD`);
   console.log(`                Maple & Ember Restaurants (${meId}) — Seattle USD, Vancouver CAD`);
+  console.log(`                North Shore Football Academy (${ops.orgs.northShore}) — Toronto CAD, Manchester GBP, Austin USD`);
+  console.log(`                Harbourline Wellness (${ops.orgs.harbourline}) — Toronto CAD, Dublin EUR, Melbourne AUD`);
+  console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);
+  console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
   console.log('─────────────────────────────────────────────────\n');
 }

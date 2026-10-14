@@ -68,8 +68,11 @@ export const waitlistEntries = pgTable('waitlist_entries', {
   locationId: loc(),
   occurrenceId: uuid('occurrence_id').notNull().references(() => classOccurrences.id, { onDelete: 'cascade' }),
   customerId: uuid('customer_id').notNull().references(() => customers.id, { onDelete: 'cascade' }),
-  status: text('status').notNull().default('waiting'), // waiting | offered | promoted | removed | expired
+  status: text('status').notNull().default('waiting'), // waiting | offered | promoted | removed | expired | left
   offeredBookingId: uuid('offered_booking_id'),
+  /** Lets a guest leave the waitlist from the confirmation link without an account. */
+  manageTokenHash: text('manage_token_hash'),
+  leftAt: ts('left_at'),
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('waitlist_active_uq').on(t.occurrenceId, t.customerId).where(sql`status in ('waiting','offered')`)]);
 
@@ -320,6 +323,8 @@ export const locationVariants = pgTable('location_variants', {
   available: boolean('available').notNull().default(true),
   /** Cached; authoritative history lives in stock_movements. */
   stockOnHand: integer('stock_on_hand').notNull().default(0),
+  /** Units held for unpaid orders. Reservations never change on-hand stock. */
+  reserved: integer('reserved').notNull().default(0),
   reorderPoint: integer('reorder_point'),
   updatedAt: updatedAt(),
 }, (t) => [uniqueIndex('location_variants_uq').on(t.locationId, t.variantId)]);

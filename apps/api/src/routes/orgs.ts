@@ -9,6 +9,7 @@ import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { requireMember, requirePerm, permissionsAt } from '../services/authz.ts';
 import { onboardingState } from '../services/onboarding.ts';
+import { CUSTOMER_DATA_SHARING } from '../services/orgSettings.ts';
 import { serializeOrg } from '../services/serializers.ts';
 import { orgParams, secured } from './_common.ts';
 
@@ -66,18 +67,25 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         name: z.string().min(1).optional(), defaultCurrency: currency.optional(), defaultLocale: locale.optional(), defaultTimeZone: timeZone.optional(),
         paymentAccountMode: z.enum(['per_location', 'shared']).optional(), applicationFeeBps: z.number().int().min(0).max(3000).optional(),
         dataRegion: z.enum(DATA_REGIONS).optional(),
+        customerDataSharing: z.enum(CUSTOMER_DATA_SHARING).optional().describe('off (default) | totals_only | shared'),
+        aiTrainingOptOut: z.boolean().optional().describe('true (default): business data is never used to train AI models'),
+        refundApprovalThresholds: z.partialRecord(currency, z.number().int().min(0)).optional().describe('Refunds above this amount (minor units, per currency) need approval'),
       }),
     },
   }, async (req) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'org.manage', { organizationId: orgId, kind: 'organization', id: orgId });
+    const { customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, ...orgFields } = req.body;
     if (req.body.defaultTimeZone && !isValidTimeZone(req.body.defaultTimeZone)) throw validationError('Unknown timezone', { defaultTimeZone: 'Invalid IANA timezone' });
     const [before] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     if (!before) throw notFound('Organisation');
     if (req.body.dataRegion && req.body.dataRegion !== before.dataRegion) {
       throw new AppError(409, 'data_region_locked', 'Data region cannot be changed after creation without a migration. Contact support.');
     }
-    const [org] = await s.db.update(organizations).set({ ...req.body, updatedAt: new Date() }).where(eq(organizations.id, orgId)).returning();
+    // Policies are merged into settings so other keys (e.g. the hosted-site theme) are preserved.
+    const policyChanges = Object.fromEntries(Object.entries({ customerDataSharing, aiTrainingOptOut, refundApprovalThresholds }).filter(([, v]) => v !== undefined));
+    const settings = Object.keys(policyChanges).length ? { ...before.settings, ...policyChanges } : before.settings;
+    const [org] = await s.db.update(organizations).set({ ...orgFields, settings, updatedAt: new Date() }).where(eq(organizations.id, orgId)).returning();
     await audit(s.db, { organizationId: orgId, ...actor(req), action: 'org.updated', scopeKind: 'organization', scopeId: orgId, targetType: 'organization', targetId: orgId, metadata: { changes: req.body } });
     return serializeOrg(org!);
   });
@@ -133,7 +141,19 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     const [sub] = await s.db.select().from(subscriptions).where(eq(subscriptions.organizationId, orgId));
     const [{ c } = { c: 0 }] = await s.db.select({ c: count() }).from(locations).where(and(eq(locations.organizationId, orgId)));
     if (!sub) throw notFound('Subscription');
-    return { ...sub, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox' };
+    const locs = await s.db.select({ id: locations.id, name: locations.name, status: locations.status, archivedAt: locations.archivedAt }).from(locations).where(eq(locations.organizationId, orgId));
+    // Operating and opening locations are billed; drafts, paused/closed and archived locations are not.
+    const billable = locs.filter((l) => !l.archivedAt && ['operating', 'opening_soon', 'onboarding'].includes(l.status));
+    const price = sub.pricePerLocationMinor;
+    return {
+      ...sub, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox',
+      pricePerLocation: price != null ? { amount: price, currency: sub.currency, interval: sub.billingInterval } : null,
+      estimatedTotal: price != null ? { amount: price * sub.billedLocationCount, currency: sub.currency, interval: sub.billingInterval } : null,
+      locations: locs.map((l) => {
+        const billed = billable.some((b) => b.id === l.id);
+        return { id: l.id, name: l.name, status: l.status, billed, price: billed && price != null ? { amount: price, currency: sub.currency, interval: sub.billingInterval } : null };
+      }),
+    };
   });
 
   app.get('/orgs/:orgId/permissions', {

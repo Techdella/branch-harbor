@@ -1,17 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Avatar, Badge, Button, DataTable, Field, Input, Select } from '@bh/ui';
-import type { Member } from '@/lib/types';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
+import { Avatar, Badge, Button, DataTable, Field, Icon, Input, Select, Tabs } from '@bh/ui';
+import type { Member, ShiftView } from '@/lib/types';
+import { addDays, dateInZone, fmtTime, fmtYmd, weekStart, zoneLabel } from '@/lib/format';
 import { useApi, useMutation } from '@/lib/useApi';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
-import { Async, Banner, DeniedState, LoadingBlock } from '../ui/States';
+import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 
 const ROLE_OPTIONS = ['hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance'] as const;
 
 export function TeamScreen() {
+  const t = useTranslations('team');
+  const app = useApp();
+  const canMembers = app.can('members.manage');
+  const [tab, setTab] = useState<'members' | 'schedule'>(canMembers ? 'members' : 'schedule');
+  if (!canMembers && !app.can('operations.read')) return <DeniedState permission="operations.read" />;
+  return (
+    <>
+      <PageHeader icon="user" title={t('title')} description={t('description')} />
+      <Tabs
+        items={[...(canMembers ? [{ key: 'members' as const, label: t('tab.members') }] : []), ...(app.can('operations.read') ? [{ key: 'schedule' as const, label: t('tab.schedule') }] : [])]}
+        value={tab}
+        onChange={setTab}
+      />
+      {tab === 'members' && canMembers ? <MembersTab /> : <ScheduleTab />}
+    </>
+  );
+}
+
+function MembersTab() {
   const t = useTranslations('team');
   const app = useApp();
   const res = useApi((api) => api.team.members(app.ctx), [app.industry, app.role], app.can('members.manage'));
@@ -25,7 +46,9 @@ export function TeamScreen() {
 
   return (
     <>
-      <PageHeader icon="user" title={t('title')} description={t('description')} actions={<Button icon="plus" onClick={() => (setInviting(true), setOk(''))}>{t('invite')}</Button>} />
+      <div className="flex justify-end">
+        <Button icon="plus" onClick={() => (setInviting(true), setOk(''))}>{t('invite')}</Button>
+      </div>
       {ok && <Banner tone="success" live="polite">{ok}</Banner>}
       {inviting && (
         <section className="flex flex-col gap-3 rounded-xl bg-surface p-5" aria-label={t('invite')}>
@@ -97,5 +120,83 @@ export function TeamScreen() {
       </Async>
       <p className="text-xs text-stone">{t('footer')}</p>
     </>
+  );
+}
+
+/** Team → Schedule: shifts per location and person for one week, in each location's own time zone. */
+function ScheduleTab() {
+  const t = useTranslations('team.schedule');
+  const locale = useLocale();
+  const app = useApp();
+  const tz = app.locations[0]?.timeZone ?? 'UTC';
+  const [week, setWeek] = useState(() => weekStart(dateInZone(new Date(), tz)));
+  const res = useApi((api) => api.team.schedule(app.ctx, week), [app.industry, app.role, app.scopeId, week], app.can('operations.read'));
+  const now = Date.now();
+
+  const byDay = (list: ShiftView[]) => {
+    const groups = new Map<string, ShiftView[]>();
+    for (const s of list) {
+      const d = dateInZone(new Date(s.start), s.timeZone);
+      if (d < week || d >= addDays(week, 7)) continue;
+      groups.set(d, [...(groups.get(d) ?? []), s]);
+    }
+    return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
+  };
+
+  return (
+    <section className="flex flex-col gap-3" aria-label={t('title')}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button variant="secondary" icon="chevron-left" onClick={() => setWeek(addDays(week, -7))} aria-label={t('prev')}>{t('prev')}</Button>
+        <span className="text-sm font-bold" aria-live="polite">{t('weekOf', { date: fmtYmd(week, locale, { day: 'numeric', month: 'long', year: 'numeric' }) })}</span>
+        <Button variant="secondary" onClick={() => setWeek(addDays(week, 7))} aria-label={t('next')}>{t('next')} <Icon name="chevron-right" size={14} /></Button>
+        <Link href="/approvals" className="ml-auto text-xs font-bold underline">{t('swapsLink')}</Link>
+      </div>
+      <Async res={res} permission="operations.read" loading={<LoadingBlock variant="table" />}>
+        {(list) => {
+          const days = byDay(list);
+          if (!days.length) return <Empty icon="calendar" title={t('emptyTitle')} body={t('emptyBody')} />;
+          return (
+            <div className="flex flex-col gap-3">
+              {days.map(([d, shifts]) => (
+                <section key={d} className="rounded-xl bg-surface p-3.5">
+                  <h3 className="px-1 pb-2 text-sm font-bold">{fmtYmd(d, locale, { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
+                  <ul className="flex flex-col gap-1.5">
+                    {shifts.map((s) => {
+                      const live = Date.parse(s.start) <= now && Date.parse(s.end) >= now;
+                      return (
+                        <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-canvas-raised px-3.5 py-2.5 text-sm">
+                          <span className="tabular min-w-[150px] font-semibold">
+                            {fmtTime(s.start, s.timeZone, locale)}–{fmtTime(s.end, s.timeZone, locale)}
+                            <span className="block text-xs font-medium text-stone">{zoneLabel(s.timeZone, locale)}</span>
+                          </span>
+                          <span className="flex min-w-[180px] flex-1 items-center gap-2">
+                            <Avatar name={s.person} size={28} />
+                            <span>
+                              <strong>{s.person}</strong>
+                              <span className="block text-xs text-stone">{s.role} · {s.locationName}</span>
+                            </span>
+                          </span>
+                          <span className="flex flex-wrap gap-1.5">
+                            {s.clockedInAt && s.clockedOutAt ? (
+                              <Badge tone="neutral" icon="check">{t('worked', { from: fmtTime(s.clockedInAt, s.timeZone, locale), to: fmtTime(s.clockedOutAt, s.timeZone, locale) })}</Badge>
+                            ) : s.clockedInAt ? (
+                              <Badge tone="success" icon="clock">{t('clockedIn', { time: fmtTime(s.clockedInAt, s.timeZone, locale) })}</Badge>
+                            ) : live ? (
+                              <Badge tone="warning" icon="alert">{t('notClockedIn')}</Badge>
+                            ) : null}
+                            {s.pendingSwap && <Badge tone="info" icon="repeat">{t('swapPending', { name: s.pendingSwap.to })}</Badge>}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          );
+        }}
+      </Async>
+      <p className="text-xs text-stone">{t('footer')}</p>
+    </section>
   );
 }

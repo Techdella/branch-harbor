@@ -13,10 +13,11 @@ import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
 import type { BranchHarborApi, SiteAddress } from '../api';
 import { ApiError } from '../errors';
-import { addDays, dateInZone, zonedToUtc } from '../format';
+import { addDays, dateInZone, fmtDay, fmtTime, moneyWithCode, zoneLabel, zonedToUtc } from '../format';
 import type {
   AiAnswer,
   ApprovalItem,
+  ApprovalRequest,
   AttentionItem,
   Cell,
   ClassOccurrence,
@@ -45,6 +46,7 @@ import type {
   Registration,
   Report,
   RequestContext,
+  ShiftView,
   SportsGroup,
   TableData,
   TimelineEvent,
@@ -229,7 +231,7 @@ async function attentionItems(ctx: RequestContext): Promise<(AttentionItem & { a
   const allowed = (p: Permission) => allowedFor(ctx, p);
   const [recon, approvals, conns, foods, cover] = await Promise.all([
     allowed('payments.read') ? maybe(http.get<ApiRecon>(o('/payments/reconciliation')), null) : null,
-    allowed('website.approve') ? maybe(http.get<{ items: ApiApproval[] }>(o('/approvals')).then(items), [] as ApiApproval[]) : [],
+    allowed('locations.read') ? maybe(http.get<{ items: (ApiApproval & { canDecide?: boolean; kindLabel?: string })[] }>(o('/approvals')).then((r) => r.items.filter((a) => a.canDecide !== false)), [] as ApiApproval[]) : [],
     maybe(http.get<{ items: ApiConnection[] }>(o('/connections')).then(items), [] as ApiConnection[]),
     w.orgView?.industry === 'foods' ? maybe(http.get<{ items: ApiFoodOrder[] }>(o('/foods/orders'), { status: 'awaiting_acceptance' }).then(items), [] as ApiFoodOrder[]) : [],
     w.orgView?.industry === 'studios' ? maybe(http.get<{ items: ApiCover[] }>(o('/studios/cover-requests'), { status: 'open' }).then(items), [] as ApiCover[]) : [],
@@ -240,7 +242,7 @@ async function attentionItems(ctx: RequestContext): Promise<(AttentionItem & { a
   if (recItems.length)
     out.push({ id: 'recon', icon: 'card', kind: 'action', title: `${recItems.length} payment${recItems.length > 1 ? 's need' : ' needs'} reconciliation`, detail: recItems.map((x) => humanise(x.kind)).filter((v, i, a) => a.indexOf(v) === i).join(' · '), href: '/payments?tab=reconciliation', at: recon?.generatedAt ?? now() });
   const aps = approvals.filter((a) => inS(a.locationId));
-  if (aps.length) out.push({ id: 'approvals', icon: 'shield', kind: 'action', title: `${aps.length} website change${aps.length > 1 ? 's' : ''} awaiting approval`, detail: [...new Set(aps.map((a) => nameOfLoc(a.locationId)))].join(', '), href: '/websites?tab=approvals', at: aps[0]!.createdAt });
+  if (aps.length) out.push({ id: 'approvals', icon: 'shield', kind: 'action', title: `${aps.length} request${aps.length > 1 ? 's' : ''} awaiting approval`, detail: [...new Set(aps.map((a) => humanise(a.targetType)))].join(', ') + ' · ' + [...new Set(aps.map((a) => nameOfLoc(a.locationId)))].join(', '), href: '/approvals', at: aps[0]!.createdAt });
   const fo = foods.filter((x) => inS(x.locationId));
   if (fo.length) out.push({ id: 'food-accept', icon: 'receipt', kind: 'action', title: `${fo.length} order${fo.length > 1 ? 's' : ''} awaiting acceptance`, detail: [...new Set(fo.map((x) => nameOfLoc(x.locationId)))].join(', '), href: '/ops/orders', at: fo[0]!.createdAt });
   const cv = cover.filter((x) => inS(x.locationId));
@@ -397,6 +399,61 @@ interface ApiAppointment {
   paymentId: string | null;
   customerName?: string;
 }
+/* ---------------- operations (offers, schedule, forms, inventory, pickup, shifts, approvals) ---------------- */
+
+interface ApiOffer {
+  id: string; locationId: string | null; locationName: string | null; name: string; kind: string; prices: Record<string, number>; credits: number | null; validDays: number;
+  rules: string[]; status: string; startsAt: string | null; endsAt: string | null; redemptions: number;
+}
+interface ApiSportsSession {
+  id: string; kind: 'training' | 'fixture'; status: string; startsAt: string; endsAt: string; venue: string | null;
+  location: { id: string; name: string; timeZone: string }; team: { id: string; name: string; coach: { id: string; name: string } | null }; programme: { id: string; name: string };
+  rosterCount: number; attendance: { recorded: number; present: number; absent: number; late: number; excused: number };
+  venueConflict: boolean; conflicts: { sessionId: string; teamName: string }[];
+}
+interface ApiIntakeForm { id: string; locationId: string | null; locationName: string | null; name: string; serviceIds: string[]; questions: unknown[]; consentVersion: string; version: number; status: string; responses: number }
+interface ApiStockMovement {
+  id: string; locationId: string; quantity: number; reason: string; reasonLabel: string; note: string | null; reference: string | null; createdAt: string; affectsOnHand: boolean; balanceAfter: number | null;
+  variant: { id: string; sku: string; name: string; productName: string }; location: { id: string; name: string; timeZone: string }; createdByName: string;
+}
+interface ApiInventoryRow { locationId: string; locationName: string; variantId: string; sku: string; name: string; productName: string; onHand: number; reserved: number; available: number; reorderPoint: number | null; lowStock: boolean; sellable: boolean; price: { amount: number | null; currency: Currency } }
+interface ApiPickupSettings {
+  locationId: string; location: { id: string; name: string; timeZone: string }; configured: boolean; hours: { weekday: number; open: string; close: string }[]; slotMinutes: number; slotCapacity: number;
+  prepBufferMinutes: number; cutoffMinutes: number; horizonDays: number; closedDates: string[]; acceptingOrders: boolean; next24h: { slots: number; capacity: number; booked: number };
+}
+interface ApiShift {
+  id: string; locationId: string; location: { id: string; name: string; timeZone: string } | null; user: { id: string; name: string }; role: string; startsAt: string; endsAt: string; breakMinutes: number;
+  clockedInAt: string | null; clockedOutAt: string | null; pendingSwap: { id: string; approvalId: string | null; toUser: { id: string; name: string } } | null;
+}
+interface ApiApprovalFull {
+  id: string; kind: ApprovalRequest['kind']; title: string; status: ApprovalRequest['status']; locationId: string | null; amount: Money | null; location: { name: string } | null;
+  requester: { id: string; name: string | null }; decider: { id: string; name: string | null } | null; requestComment: string | null; decisionComment: string | null;
+  createdAt: string; canDecide: boolean; payload: Record<string, unknown> | null; executionResult: Record<string, unknown> | null;
+}
+const CHANNEL_LABEL: Record<string, string> = { google_ads: 'Google ads', meta_ads: 'Meta ads', local_print: 'Local print', other: 'Other' };
+function approvalView(a: ApiApprovalFull): ApprovalRequest {
+  const p = a.payload ?? {};
+  const details: ApprovalRequest['details'] = [];
+  if (a.kind === 'ad_spend') {
+    details.push({ label: 'Channel', value: CHANNEL_LABEL[String(p.channel)] ?? humanise(String(p.channel ?? 'other')) }, { label: 'Duration', value: `${p.durationDays ?? '?'} days` });
+    if (p.startsOn) details.push({ label: 'Starts', value: String(p.startsOn) });
+  } else if (a.kind === 'shift_swap') {
+    const sh = p.shift as { startsAt?: string; endsAt?: string; timeZone?: string } | undefined;
+    details.push({ label: 'From', value: String((p.from as { name?: string })?.name ?? '—') }, { label: 'To', value: String((p.to as { name?: string })?.name ?? '—') });
+    if (sh?.startsAt && sh.timeZone) details.push({ label: 'Shift', value: `${fmtDay(sh.startsAt, sh.timeZone, 'en')} ${fmtTime(sh.startsAt, sh.timeZone, 'en')}–${fmtTime(sh.endsAt ?? sh.startsAt, sh.timeZone, 'en')} ${zoneLabel(sh.timeZone, 'en')}` });
+  } else if (a.kind === 'refund') {
+    details.push({ label: 'Refund of', value: p.orderId ? 'Commerce order' : 'Online payment' });
+  } else if (a.kind === 'field') {
+    details.push({ label: 'Field', value: humanise(String(p.fieldKey ?? 'field')) }, { label: 'New value', value: str(p.value) });
+  }
+  const r = a.executionResult ?? {};
+  const result = a.status !== 'approved' ? null : a.kind === 'refund' ? `Refund ${String(r.refundState ?? 'processed').replace(/_/g, ' ')}` : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : 'Change applied';
+  return {
+    id: a.id, kind: a.kind, title: a.title, status: a.status, locationName: a.location?.name ?? nameOfLoc(a.locationId), amount: a.amount, requestedBy: a.requester.name ?? 'Someone', requestedAt: a.createdAt,
+    reason: a.requestComment, details, canDecide: a.canDecide, decidedBy: a.decider?.name ?? null, decisionComment: a.decisionComment, result,
+  };
+}
+
 interface ApiService {
   id: string;
   locationId: string | null;
@@ -824,23 +881,110 @@ async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
         'Master catalogue', { primaryAction: 'New product' });
     }
     case 'assortment': {
-      const lid = [...scope][0];
-      if (!lid) return tableOf('assortment', [['item', 'Item']], [], 'Local assortment');
-      const r = await http.get<{ items?: { variantId: string; name?: string; sku?: string; onHand?: number; quantity?: number; price?: Money; priceOrigin?: string; available?: boolean }[] }>(o(`/commerce/locations/${lid}/stock`));
-      return tableOf('assortment', [['item', 'Item'], ['onhand', 'On hand', 'right'], ['price', 'Price', 'right'], ['availability', 'Availability']],
-        (r.items ?? []).map((v) => ({ id: v.variantId, tags: [], cells: { item: tx(v.name ?? v.sku ?? v.variantId, nameOfLoc(lid), true), onhand: tx(String(v.onHand ?? v.quantity ?? 0)), price: v.price ? moneyCell(v.price) : na(), availability: badge(v.available === false ? 'Hidden' : 'Available', v.available === false ? 'neutral' : 'success') } })),
-        `Local assortment · ${nameOfLoc(lid)}`);
+      const list = (await http.get<{ items: ApiInventoryRow[] }>(o('/commerce/inventory')).then(items)).filter((x) => inS(x.locationId));
+      return tableOf('assortment', [['item', 'Item'], ['onhand', 'On hand', 'right'], ['reserved', 'Reserved', 'right'], ['available', 'Available', 'right'], ['price', 'Price', 'right'], ['availability', 'Availability']],
+        list.map((v) => ({
+          id: `${v.locationId}:${v.variantId}`, tags: [v.lowStock ? 'low' : 'ok'],
+          cells: {
+            item: tx(`${v.productName} · ${v.name}`, `${v.sku} · ${v.locationName}`, true), onhand: tx(String(v.onHand)), reserved: tx(String(v.reserved)), available: tx(String(v.available)),
+            price: v.price.amount != null ? moneyCell(m(v.price.amount, v.price.currency)) : na('No price in this currency'),
+            availability: !v.sellable ? badge('Hidden', 'neutral') : v.lowStock ? badge(`Low · reorder at ${v.reorderPoint}`, 'warning') : badge('In stock', 'success'),
+          },
+        })),
+        'Local assortment · stock per location', { filters: [{ key: 'all', label: 'All' }, { key: 'low', label: 'Low' }] });
     }
-    case 'offers':
-      return NOT_IN_API(key, 'Offers');
-    case 'schedule':
-      return NOT_IN_API(key, 'Training schedules');
-    case 'forms':
-      return NOT_IN_API(key, 'Intake forms');
-    case 'inventory':
-      return NOT_IN_API(key, 'Inventory movements across stores');
-    case 'pickup':
-      return NOT_IN_API(key, 'Pickup settings');
+    case 'offers': {
+      const list = await http.get<{ items: ApiOffer[] }>(o('/studios/offers')).then(items);
+      const prices = (p: Record<string, number>) => Object.entries(p).map(([c, a]) => moneyWithCode(m(a, c as Currency), 'en')).join(' / ');
+      const tone: Record<string, Tone> = { active: 'success', draft: 'neutral', paused: 'warning', ended: 'neutral' };
+      return tableOf('offers', [['offer', 'Offer'], ['eligibility', 'Eligibility'], ['locations', 'Locations'], ['valid', 'Valid'], ['status', 'Status']],
+        list.filter((x) => inS(x.locationId)).map((x) => ({
+          id: x.id, tags: [x.status],
+          cells: {
+            offer: tx(x.name, `${x.credits ? `${x.credits} class${x.credits === 1 ? '' : 'es'} · ` : ''}${prices(x.prices) || 'No price set'}`, true),
+            eligibility: tx(x.rules.join(' · ') || 'Anyone', x.redemptions ? `${x.redemptions} redeemed` : undefined),
+            locations: tx(x.locationId ? x.locationName ?? nameOfLoc(x.locationId) : 'All locations', x.locationId ? 'Local offer' : 'Network offer'),
+            valid: tx(x.startsAt || x.endsAt ? `${x.startsAt ? fmtDate(x.startsAt) : 'Now'} – ${x.endsAt ? fmtDate(x.endsAt) : 'ongoing'}` : 'Ongoing', `Use within ${x.validDays} days`),
+            status: badge(humanise(x.status), tone[x.status] ?? 'neutral'),
+          },
+        })),
+        'BranchHarbor offers', { primaryAction: 'New offer', filters: [{ key: 'all', label: 'All' }, { key: 'active', label: 'Active' }, { key: 'draft', label: 'Draft' }, { key: 'ended', label: 'Ended' }] });
+    }
+    case 'schedule': {
+      const from = new Date(Date.now() - 12 * 3600_000).toISOString();
+      const to = new Date(Date.now() + 14 * 86400_000).toISOString();
+      const list = await http.get<{ items: ApiSportsSession[] }>(o('/sports/sessions'), { from, to }).then(items);
+      return tableOf('schedule', [['when', 'When'], ['group', 'Group'], ['venue', 'Venue'], ['coach', 'Coach'], ['check', 'Check']],
+        list.filter((x) => inS(x.location.id)).map((x) => ({
+          id: x.id, tags: [x.venueConflict ? 'conflict' : 'clear', x.kind],
+          cells: {
+            when: tx(`${fmtDay(x.startsAt, x.location.timeZone, 'en')} ${fmtTime(x.startsAt, x.location.timeZone, 'en')}`, zoneLabel(x.location.timeZone, 'en')),
+            group: tx(x.team.name, x.kind === 'fixture' ? 'Fixture' : 'Training', true),
+            venue: tx(x.venue ?? 'Venue not set', x.location.name),
+            coach: x.team.coach ? tx(x.team.coach.name) : na('No coach assigned'),
+            check: x.status === 'cancelled' ? badge('Cancelled', 'neutral') : x.venueConflict ? badge(`Venue clash · ${x.conflicts.map((c) => c.teamName).join(', ')}`, 'danger') : badge('Clear', 'success'),
+          },
+        })),
+        'Schedule · venue bookings', { filters: [{ key: 'all', label: 'Next 2 weeks' }, { key: 'conflict', label: 'Conflicts' }, { key: 'fixture', label: 'Fixtures' }] });
+    }
+    case 'forms': {
+      const [list, services] = await Promise.all([http.get<{ items: ApiIntakeForm[] }>(o('/wellness/intake-forms')).then(items), maybe(http.get<{ items: ApiService[] }>(o('/wellness/services')).then(items), [] as ApiService[])]);
+      return tableOf('forms', [['form', 'Form'], ['used', 'Used by'], ['version', 'Consent version'], ['responses', 'Responses', 'right'], ['ai', 'AI access']],
+        list.filter((f) => inS(f.locationId)).map((f) => ({
+          id: f.id, tags: [f.status],
+          cells: {
+            form: tx(f.name, `${f.questions.length} questions · ${humanise(f.status)}`, true),
+            used: tx(f.serviceIds.length ? [...new Set(f.serviceIds.map((id) => services.find((s) => s.id === id)?.name).filter(Boolean))].join(', ') : 'All services', f.locationId ? f.locationName ?? nameOfLoc(f.locationId) : 'All locations'),
+            version: tx(`${f.consentVersion} · form v${f.version}`),
+            responses: tx(String(f.responses)),
+            ai: badge('Excluded', 'neutral'),
+          },
+        })),
+        'BranchHarbor forms', { description: 'Administrative questions only. Responses are excluded from AI context by default.', filters: [{ key: 'all', label: 'All' }, { key: 'active', label: 'Active' }, { key: 'draft', label: 'Draft' }] });
+    }
+    case 'inventory': {
+      const list = await http.get<{ items: ApiStockMovement[] }>(o('/commerce/stock-movements'), { limit: 300 }).then(items);
+      const sign = (n: number) => (n > 0 ? `+${n}` : `−${Math.abs(n)}`);
+      return tableOf('inventory', [['when', 'When'], ['item', 'Item'], ['change', 'Change', 'right'], ['reason', 'Reason'], ['balance', 'On hand after', 'right'], ['by', 'By']],
+        list.filter((x) => inS(x.locationId)).map((x) => ({
+          id: x.id, tags: [x.reason === 'sale' ? 'sale' : x.affectsOnHand ? 'adjust' : 'reserved'],
+          cells: {
+            when: tx(`${fmtDay(x.createdAt, x.location.timeZone, 'en')} ${fmtTime(x.createdAt, x.location.timeZone, 'en')}`, zoneLabel(x.location.timeZone, 'en')),
+            item: tx(`${x.variant.productName} · ${x.variant.name}`, `${x.variant.sku} · ${x.location.name}`, true),
+            change: tx(sign(x.quantity)),
+            reason: x.affectsOnHand ? tx(x.reasonLabel, x.note ?? x.reference ?? undefined) : badge(x.reasonLabel, 'info'),
+            balance: x.balanceAfter == null ? na('Not on-hand') : tx(String(x.balanceAfter)),
+            by: tx(x.createdByName),
+          },
+        })),
+        'Inventory history (movements, not just counts)', { description: 'Every change to stock with its reason. Reservations hold units for unpaid orders and do not change on-hand stock.', filters: [{ key: 'all', label: 'All' }, { key: 'adjust', label: 'Adjustments' }, { key: 'sale', label: 'Sales' }, { key: 'reserved', label: 'Reservations' }] });
+    }
+    case 'pickup': {
+      const list = (await http.get<{ items: ApiPickupSettings[] }>(o('/foods/pickup-settings')).then(items)).filter((x) => inS(x.locationId));
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const hoursOf = (x: ApiPickupSettings) => {
+        const byDay = new Map<string, string[]>();
+        for (const h of [...x.hours].sort((a, b) => ((a.weekday + 6) % 7) - ((b.weekday + 6) % 7) || a.open.localeCompare(b.open))) byDay.set(days[h.weekday]!, [...(byDay.get(days[h.weekday]!) ?? []), `${h.open}–${h.close}`]);
+        const groups = new Map<string, string[]>();
+        for (const [d, w] of byDay) groups.set(w.join(', '), [...(groups.get(w.join(', ')) ?? []), d]);
+        return [...groups.entries()].map(([w, ds]) => `${ds.length > 2 ? `${ds[0]}–${ds[ds.length - 1]}` : ds.join(', ')} ${w}`).join(' · ') || 'No pickup hours';
+      };
+      const settingRows: [string, string, string | undefined, (x: ApiPickupSettings) => Cell][] = [
+        ['hours', 'Opening hours', 'Local time', (x) => tx(hoursOf(x), zoneLabel(x.location.timeZone, 'en'))],
+        ['slot', 'Slot length', undefined, (x) => tx(`${x.slotMinutes} min`)],
+        ['capacity', 'Orders per slot', undefined, (x) => tx(String(x.slotCapacity))],
+        ['cutoff', 'Order cut-off', undefined, (x) => tx(`${x.cutoffMinutes} min before pickup`)],
+        ['buffer', 'Prep buffer', 'Earliest pickup after ordering', (x) => tx(`${x.prepBufferMinutes} min`)],
+        ['horizon', 'Days bookable ahead', undefined, (x) => tx(`${x.horizonDays} day${x.horizonDays === 1 ? '' : 's'}`)],
+        ['closed', 'Closed dates', undefined, (x) => tx(x.closedDates.length ? x.closedDates.map((d) => fmtDate(`${d}T12:00:00Z`)).join(', ') : 'None')],
+        ['accepting', 'Taking pickup orders', undefined, (x) => (x.acceptingOrders ? badge('Yes', 'success') : badge('Paused', 'warning'))],
+        ['next', 'Next 24 h', 'Booked / capacity', (x) => tx(`${x.next24h.booked} / ${x.next24h.capacity}`, `${x.next24h.slots} slots`)],
+        ['origin', 'Settings', undefined, (x) => (x.configured ? { t: 'origin', v: 'local' } : { t: 'origin', v: 'hq' })],
+      ];
+      return tableOf('pickup', [['setting', 'Setting'], ...list.map((x): [string, string] => [x.locationId, x.location.name])],
+        settingRows.map(([id, label, sub, cell]) => ({ id, tags: [], cells: { setting: tx(label, sub, true), ...Object.fromEntries(list.map((x) => [x.locationId, cell(x)])) } })),
+        'Pickup settings · slots are generated from these', { description: 'Pickup slots are generated from each location’s hours, slot length and capacity. Orders close at the cut-off and never earlier than the preparation buffer allows.' });
+    }
     default:
       throw new ApiError('not_found', 'This table does not exist for this industry.', 404);
   }
@@ -1121,8 +1265,23 @@ export const httpApi: BranchHarborApi = {
       if (!found) throw new ApiError('not_found', 'Registration not found.', 404);
       return found;
     },
-    session: async () => {
-      throw new ApiError('not_available', 'The API doesn’t list upcoming training sessions yet, so attendance can’t be taken here. Open the session from the coach’s schedule instead.', 501);
+    session: async (ctx) => {
+      // The coach's next session: the one in progress, else the next upcoming, else the most recent one still unrecorded.
+      const scope = inScope(ctx);
+      const nowMs = Date.now();
+      const list = (await http.get<{ items: ApiSportsSession[] }>(o('/sports/sessions'), { from: new Date(nowMs - 7 * 86400_000).toISOString(), to: new Date(nowMs + 14 * 86400_000).toISOString() }).then(items))
+        .filter((x) => scope.has(x.location.id) && x.status !== 'cancelled');
+      const live = list.find((x) => Date.parse(x.startsAt) <= nowMs && Date.parse(x.endsAt) >= nowMs);
+      const next = list.find((x) => Date.parse(x.startsAt) > nowMs);
+      const unrecorded = [...list].reverse().find((x) => Date.parse(x.endsAt) < nowMs && x.attendance.recorded < x.rosterCount);
+      const sess = live ?? next ?? unrecorded;
+      if (!sess) throw new ApiError('not_found', 'No training sessions or fixtures are scheduled in this scope for the next two weeks.', 404);
+      const r = await http.get<{ roster: { id: string; name: string; attendance: string | null }[] }>(o(`/sports/sessions/${sess.id}/roster`));
+      return {
+        id: sess.id, group: `${sess.team.name} · ${sess.kind === 'fixture' ? 'Fixture' : 'Training'}`, start: sess.startsAt, timeZone: sess.location.timeZone,
+        venue: `${sess.venue ?? 'Venue not set'}${sess.venueConflict ? ' (venue clash)' : ''}`, coach: sess.team.coach?.name ?? 'No coach assigned',
+        roster: r.roster.map((p) => ({ id: p.id, name: p.name })), submitted: r.roster.length > 0 && r.roster.every((p) => p.attendance !== null),
+      };
     },
     submitAttendance: async (sessionId, marks) => {
       await http.post(o(`/sports/sessions/${sessionId}/attendance`), { marks: Object.entries(marks).map(([participantId, status]) => ({ participantId, status })) });
@@ -1249,7 +1408,7 @@ export const httpApi: BranchHarborApi = {
     },
     approvals: async (ctx) => {
       const scope = inScope(ctx);
-      const list = (await http.get<{ items: ApiApproval[] }>(o('/approvals')).then(items)).filter((a) => !a.locationId || scope.has(a.locationId));
+      const list = (await http.get<{ items: ApiApproval[] }>(o('/approvals')).then(items)).filter((a) => (a.targetType === 'field' || a.targetType === 'page') && (!a.locationId || scope.has(a.locationId)));
       const labels = new Map<string, string>();
       return Promise.all(
         list.map(async (a): Promise<ApprovalItem> => {
@@ -1380,11 +1539,30 @@ export const httpApi: BranchHarborApi = {
       }
       return out;
     },
+    schedule: async (ctx, weekStart) => {
+      const scope = inScope(ctx);
+      const from = new Date(`${weekStart}T00:00:00Z`).getTime() - 14 * 3600_000;
+      const list = await http.get<{ items: ApiShift[] }>(o('/shifts'), { from: new Date(from).toISOString(), to: new Date(from + 8 * 86400_000).toISOString() }).then(items);
+      return list.filter((x) => scope.has(x.locationId)).map((x): ShiftView => ({
+        id: x.id, locationId: x.locationId, locationName: x.location?.name ?? nameOfLoc(x.locationId), timeZone: x.location?.timeZone ?? tzOf(x.locationId), person: x.user.name, role: x.role,
+        start: x.startsAt, end: x.endsAt, breakMinutes: x.breakMinutes, clockedInAt: x.clockedInAt, clockedOutAt: x.clockedOutAt,
+        pendingSwap: x.pendingSwap ? { to: x.pendingSwap.toUser.name, approvalId: x.pendingSwap.approvalId } : null,
+      }));
+    },
     invite: async (input) => {
       const s = input.scopeId === 'all' ? { kind: 'organization', id: orgId() } : apiScope(input.scopeId);
       await http.post(o('/invitations'), { email: input.email, role: (input.roleKey ?? 'staff') as Role, scope: s });
       return { id: `inv_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', status: 'invited' };
     },
+  },
+
+  approvals: {
+    list: async (ctx, status) => {
+      const scope = inScope(ctx);
+      const list = await http.get<{ items: ApiApprovalFull[] }>(o('/approvals'), { status: status === 'pending' ? 'pending' : 'all', limit: 200 }).then(items);
+      return list.filter((a) => (!a.locationId || scope.has(a.locationId)) && (status === 'pending' ? a.status === 'pending' : a.status !== 'pending')).map(approvalView);
+    },
+    decide: async (id, decision, comment) => approvalView(await http.post<ApiApprovalFull>(o(`/approvals/${id}/decision`), { decision, comment: comment || undefined })),
   },
 
   reports: async (ctx) => {
@@ -1418,20 +1596,24 @@ export const httpApi: BranchHarborApi = {
     get: async () => {
       const w = ws();
       const org = await http.get<NonNullable<typeof w.org>>(o());
-      const sub = await maybe(http.get<{ plan: string; status: string; currency: Currency; currentPeriodEnd: string | null; billedLocationCount: number }>(o('/subscription')), null);
+      const sub = await maybe(http.get<{ plan: string; status: string; currency: Currency; currentPeriodEnd: string | null; billedLocationCount: number; pricePerLocation: (Money & { interval: string }) | null; locations?: { id: string; billed: boolean }[] }>(o('/subscription')), null);
+      const policies = (org as { policies?: { customerDataSharing?: OrgSettings['customerSharing']; aiTrainingOptOut?: boolean } }).policies;
       return {
         businessName: org.name, legalName: org.name, defaultLocale: org.defaultLocale, defaultCurrency: org.defaultCurrency, defaultTimeZone: org.defaultTimeZone, dataRegion: org.dataRegion,
-        customerSharing: 'totals_only', aiTraining: false,
+        customerSharing: policies?.customerDataSharing ?? 'off', aiTraining: policies ? policies.aiTrainingOptOut === false : false,
         billing: {
           plan: sub ? `${humanise(sub.plan)} · ${sub.status}` : 'Not available',
-          perLocation: null,
-          locations: w.locations.map((l) => ({ locationId: l.id, status: l.site === 'live' ? 'billed' : 'not_billed_until_published' })),
+          perLocation: sub?.pricePerLocation ? m(sub.pricePerLocation.amount, sub.pricePerLocation.currency) : null,
+          locations: w.locations.map((l) => {
+            const billed = sub?.locations?.find((x) => x.id === l.id)?.billed;
+            return { locationId: l.id, status: (billed ?? l.site === 'live') ? 'billed' : 'not_billed_until_published' };
+          }),
           nextInvoice: sub?.currentPeriodEnd?.slice(0, 10) ?? null,
         },
       } satisfies OrgSettings;
     },
     save: async (ctx, input) => {
-      await http.patch(o(), { name: input.businessName, defaultCurrency: input.defaultCurrency, defaultLocale: input.defaultLocale, defaultTimeZone: input.defaultTimeZone, dataRegion: input.dataRegion });
+      await http.patch(o(), { name: input.businessName, defaultCurrency: input.defaultCurrency, defaultLocale: input.defaultLocale, defaultTimeZone: input.defaultTimeZone, dataRegion: input.dataRegion, customerDataSharing: input.customerSharing, aiTrainingOptOut: input.aiTraining === undefined ? undefined : !input.aiTraining });
       await refreshWorkspace();
       return httpApi.settings.get(ctx);
     },

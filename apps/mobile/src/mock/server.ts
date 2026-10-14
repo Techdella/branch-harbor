@@ -101,6 +101,7 @@ function seed() {
   const k = localDateKey(new Date(), tzStaff);
   state.shifts = [
     { id: 'sh1', locationId: 'sw-qw', role: 'Instructor', startsAt: zonedToUtcIso(k, '06:30', tzStaff), endsAt: zonedToUtcIso(k, '13:00', tzStaff) },
+    { id: 'sh0', locationId: 'sw-qw', role: 'Front desk', startsAt: zonedToUtcIso(k, '05:30', tzStaff), endsAt: zonedToUtcIso(k, '06:15', tzStaff), clockedInAt: zonedToUtcIso(k, '05:26', tzStaff), clockedOutAt: zonedToUtcIso(k, '06:17', tzStaff) },
     { id: 'sh2', locationId: 'me-bl', role: 'Kitchen lead', startsAt: zonedToUtcIso(localDateKey(new Date(), 'America/Los_Angeles'), '16:00', 'America/Los_Angeles'), endsAt: zonedToUtcIso(localDateKey(new Date(), 'America/Los_Angeles'), '22:00', 'America/Los_Angeles') },
   ];
 
@@ -329,7 +330,14 @@ on('POST', /^\/me\/data-requests$/, (_m, b) => ({ id: nid('dr'), kind: b.kind, s
 on('GET', /^\/staff\/shifts$/, () => state.shifts);
 on('POST', /^\/staff\/shifts\/([^/]+)\/clock-in$/, (m) => {
   const s = state.shifts.find((x) => x.id === m[1]) ?? fail(404, 'not_found', 'Shift not found');
+  if (state.shifts.some((x) => x.clockedInAt && !x.clockedOutAt && x.id !== s.id)) fail(409, 'already_clocked_in', 'You are already clocked in. Clock out first.');
   s.clockedInAt = s.clockedInAt ?? iso(now());
+  return s;
+});
+on('POST', /^\/staff\/shifts\/([^/]+)\/clock-out$/, (m) => {
+  const s = state.shifts.find((x) => x.id === m[1]) ?? fail(404, 'not_found', 'Shift not found');
+  if (!s.clockedInAt || s.clockedOutAt) fail(409, 'not_clocked_in', 'You are not clocked in to this shift.');
+  s.clockedOutAt = iso(now());
   return s;
 });
 on('GET', /^\/staff\/sessions$/, () => staffSessions());

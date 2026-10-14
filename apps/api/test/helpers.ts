@@ -75,3 +75,16 @@ export async function enablePublicAndPayments(app: FastifyInstance, token: strin
   const r = await call(app, 'POST', `/v1/orgs/${orgId}/payments/connect/onboarding`, { token, body: { locationId } });
   if (r.status !== 200) throw new Error(`onboarding failed ${JSON.stringify(r.body)}`);
 }
+
+/** Create a verified user and give them `role` in `scope` via a real invitation. */
+export async function memberWithRole(app: FastifyInstance, ownerToken: string, orgId: string, role: string, scope: { kind: string; id: string }, name = `Member ${uid()}`) {
+  const u = await verifiedUser(app, name);
+  const inv = await call(app, 'POST', `/v1/orgs/${orgId}/invitations`, { token: ownerToken, body: { email: u.email, role, scope } });
+  if (inv.status !== 201) throw new Error(`invite failed ${inv.status} ${JSON.stringify(inv.body)}`);
+  const acc = await call(app, 'POST', '/v1/invitations/accept', { token: u.token, body: { token: inv.body.devInvitationToken } });
+  if (acc.status !== 200) throw new Error(`accept failed ${acc.status} ${JSON.stringify(acc.body)}`);
+  return u;
+}
+
+/** ISO timestamp `minutes` from now. */
+export const inMinutes = (minutes: number) => new Date(Date.now() + minutes * 60_000).toISOString();

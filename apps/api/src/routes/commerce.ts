@@ -1,14 +1,17 @@
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { currency } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { locationVariants, orders, paymentReferences, products, returns, stockMovements, variants } from '../db/schema/index.ts';
+import { locationVariants, locations, orders, paymentReferences, products, returns, stockMovements, users, variants } from '../db/schema/index.ts';
+import { affectsOnHand, convertReservationToSale, REASON_LABEL, reserveForOrder } from '../services/inventory.ts';
 import { AppError, conflict, notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requireLocationPerm, requirePerm } from '../services/authz.ts';
-import { refundPayment, serializePayment } from '../services/payments.ts';
-import { idParams, orgParams, secured } from './_common.ts';
+import { serializePayment } from '../services/payments.ts';
+import { refundCommerceOrder } from '../services/commerce.ts';
+import { assertRefundWithinThreshold } from '../services/approvals.ts';
+import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
 const RETURN_FLOW: Record<string, string[]> = { requested: ['reviewed', 'rejected'], reviewed: ['authorised', 'rejected'], authorised: ['received'], received: ['resolved'], resolved: [], rejected: [] };
 
@@ -85,11 +88,68 @@ export const commerceRoutes: FastifyPluginAsyncZod = async (app) => {
     return reply.code(201).send(out);
   });
 
-  app.get('/orgs/:orgId/commerce/stock-movements', { schema: { tags: ['commerce'], security: secured, params: orgParams, querystring: z.object({ locationId: z.uuid(), variantId: z.uuid().optional() }) } }, async (req) => {
-    await requireLocationPerm(req, s.db, req.params.orgId, req.query.locationId, 'operations.read');
-    const conds = [eq(stockMovements.locationId, req.query.locationId)];
+  app.get('/orgs/:orgId/commerce/stock-movements', {
+    schema: {
+      tags: ['commerce'], security: secured, params: orgParams,
+      summary: 'Inventory history: adjustments with reason, sales, returns, reservations and releases, with the on-hand balance after each physical movement',
+      querystring: z.object({ locationId: z.uuid().optional(), variantId: z.uuid().optional(), reason: z.string().optional(), from: isoDateTime.optional(), to: isoDateTime.optional(), limit: z.coerce.number().int().min(1).max(500).default(200) }),
+    },
+  }, async (req) => {
+    const { orgId } = req.params;
+    if (req.query.locationId) await requireLocationPerm(req, s.db, orgId, req.query.locationId, 'operations.read');
+    const allowed = await authorisedLocations(req, s.db, orgId, 'operations.read');
+    const conds = [eq(stockMovements.organizationId, orgId)];
+    if (req.query.locationId) conds.push(eq(stockMovements.locationId, req.query.locationId));
+    else if (allowed !== 'all') {
+      if (!allowed.size) return { items: [] };
+      conds.push(inArray(stockMovements.locationId, [...allowed]));
+    }
     if (req.query.variantId) conds.push(eq(stockMovements.variantId, req.query.variantId));
-    return { items: await s.db.select().from(stockMovements).where(and(...conds)).orderBy(desc(stockMovements.createdAt)).limit(500) };
+    if (req.query.reason) conds.push(inArray(stockMovements.reason, req.query.reason.split(',')));
+    if (req.query.from) conds.push(gte(stockMovements.createdAt, new Date(req.query.from)));
+    if (req.query.to) conds.push(lt(stockMovements.createdAt, new Date(req.query.to)));
+    // Running on-hand balance per (location, variant) over physical movements only.
+    const balance = sql<number>`(sum(case when ${stockMovements.reason} in ('reservation','release') then 0 else ${stockMovements.quantity} end) over (partition by ${stockMovements.locationId}, ${stockMovements.variantId} order by ${stockMovements.createdAt}, ${stockMovements.id}))::int`;
+    const all = s.db.$with('all_moves').as(s.db.select({ id: stockMovements.id, balanceAfter: balance.as('balance_after') }).from(stockMovements).where(eq(stockMovements.organizationId, orgId)));
+    const rows = await s.db.with(all).select({ m: stockMovements, balanceAfter: all.balanceAfter, v: { sku: variants.sku, name: variants.name }, p: { name: products.name }, l: { name: locations.name, timeZone: locations.timeZone }, by: { name: users.name } })
+      .from(stockMovements).innerJoin(all, eq(all.id, stockMovements.id)).innerJoin(variants, eq(variants.id, stockMovements.variantId)).innerJoin(products, eq(products.id, variants.productId))
+      .innerJoin(locations, eq(locations.id, stockMovements.locationId)).leftJoin(users, eq(users.id, stockMovements.createdBy))
+      .where(and(...conds)).orderBy(desc(stockMovements.createdAt), desc(stockMovements.id)).limit(req.query.limit);
+    return {
+      items: rows.map(({ m, balanceAfter, v, p, l, by }) => ({
+        ...m, createdAt: m.createdAt.toISOString(), reasonLabel: REASON_LABEL[m.reason] ?? m.reason, affectsOnHand: affectsOnHand(m.reason),
+        balanceAfter: affectsOnHand(m.reason) ? balanceAfter : null, variant: { id: m.variantId, sku: v.sku, name: v.name, productName: p.name }, location: { id: m.locationId, name: l.name, timeZone: l.timeZone },
+        createdByName: by?.name ?? (m.createdBy ? 'Team member' : 'System'),
+      })),
+    };
+  });
+
+  app.get('/orgs/:orgId/commerce/inventory', {
+    schema: { tags: ['commerce'], security: secured, params: orgParams, querystring: z.object({ locationId: z.uuid().optional() }), summary: 'Stock per location and variant: on hand, reserved, available, low-stock and last movement' },
+  }, async (req) => {
+    const { orgId } = req.params;
+    if (req.query.locationId) await requireLocationPerm(req, s.db, orgId, req.query.locationId, 'operations.read');
+    const allowed = await authorisedLocations(req, s.db, orgId, 'operations.read');
+    const conds = [eq(locationVariants.organizationId, orgId)];
+    if (req.query.locationId) conds.push(eq(locationVariants.locationId, req.query.locationId));
+    else if (allowed !== 'all') {
+      if (!allowed.size) return { items: [] };
+      conds.push(inArray(locationVariants.locationId, [...allowed]));
+    }
+    const rows = await s.db.select({ lv: locationVariants, v: variants, p: { name: products.name }, l: { name: locations.name, currency: locations.currency } })
+      .from(locationVariants).innerJoin(variants, eq(variants.id, locationVariants.variantId)).innerJoin(products, eq(products.id, variants.productId)).innerJoin(locations, eq(locations.id, locationVariants.locationId))
+      .where(and(...conds)).orderBy(locations.name, products.name, variants.name);
+    const last = rows.length ? await s.db.select({ locationId: stockMovements.locationId, variantId: stockMovements.variantId, at: sql<string>`max(${stockMovements.createdAt})` }).from(stockMovements)
+      .where(eq(stockMovements.organizationId, orgId)).groupBy(stockMovements.locationId, stockMovements.variantId) : [];
+    return {
+      items: rows.map(({ lv, v, p, l }) => ({
+        locationId: lv.locationId, locationName: l.name, variantId: v.id, sku: v.sku, name: v.name, productName: p.name,
+        onHand: lv.stockOnHand, reserved: lv.reserved, available: Math.max(0, lv.stockOnHand - lv.reserved), reorderPoint: lv.reorderPoint,
+        lowStock: lv.reorderPoint !== null && lv.stockOnHand - lv.reserved <= lv.reorderPoint, sellable: lv.available,
+        price: { amount: lv.priceMinor ?? v.prices[l.currency] ?? null, currency: l.currency },
+        lastMovementAt: (() => { const x = last.find((m) => m.locationId === lv.locationId && m.variantId === v.id)?.at; return x ? new Date(x).toISOString() : null; })(),
+      })),
+    };
   });
 
   app.get('/orgs/:orgId/commerce/orders', { schema: { tags: ['commerce'], security: secured, params: orgParams, querystring: z.object({ locationId: z.uuid().optional(), status: z.string().optional() }) } }, async (req) => {
@@ -132,12 +192,9 @@ export const commerceRoutes: FastifyPluginAsyncZod = async (app) => {
     const order = await s.db.transaction(async (tx) => {
       const [o] = await tx.insert(orders).values({ organizationId: orgId, locationId: loc.id, source: b.source, externalId: b.externalId ?? null, status: b.status, currency: loc.currency, subtotalMinor: subtotal, taxMinor: b.taxMinor, discountMinor: b.discountMinor, totalMinor: subtotal + b.taxMinor - b.discountMinor, lines }).onConflictDoNothing().returning();
       if (!o) return null;
-      if (b.status !== 'pending_payment') {
-        for (const l of lines) {
-          await tx.insert(stockMovements).values({ organizationId: orgId, locationId: loc.id, variantId: l.variantId, quantity: -l.quantity, reason: 'sale', reference: o.id });
-          await tx.insert(locationVariants).values({ organizationId: orgId, locationId: loc.id, variantId: l.variantId, stockOnHand: -l.quantity }).onConflictDoUpdate({ target: [locationVariants.locationId, locationVariants.variantId], set: { stockOnHand: sql`${locationVariants.stockOnHand} - ${l.quantity}`, updatedAt: new Date() } });
-        }
-      }
+      // Paid/fulfilled orders are sales; unpaid native orders reserve stock until payment confirms.
+      if (b.status !== 'pending_payment') await convertReservationToSale(tx, o);
+      else if (b.source === 'native') await reserveForOrder(tx, o, req.user!.id);
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'order.recorded', scopeKind: 'location', scopeId: loc.id, targetType: 'order', targetId: o.id, metadata: { source: b.source } });
       return o;
     });
@@ -157,26 +214,9 @@ export const commerceRoutes: FastifyPluginAsyncZod = async (app) => {
     const [o] = await s.db.select().from(orders).where(and(eq(orders.id, req.params.id), eq(orders.organizationId, req.params.orgId)));
     if (!o) throw notFound('Order');
     await requireLocationPerm(req, s.db, o.organizationId, o.locationId, 'payments.refund');
-    const remaining = o.totalMinor - o.refundedMinor;
-    if (req.body.amountMinor > remaining) throw new AppError(409, 'refund_exceeds_remaining', `Only ${remaining} ${o.currency} minor units remain refundable`, undefined, { remainingMinor: remaining, currency: o.currency });
-    let payment = null;
-    let refundState: string = 'recorded_only';
-    if (o.paymentId) {
-      const r = await refundPayment(s, o.paymentId, req.body.amountMinor, { actorUserId: req.user!.id, reason: req.body.reason, ip: req.ip });
-      payment = serializePayment(r.payment);
-      refundState = r.refund.state;
-      if (refundState === 'failed') throw new AppError(502, 'refund_failed', 'The payment provider could not process the refund');
-    }
-    const refunded = o.refundedMinor + req.body.amountMinor;
-    const [u] = await s.db.transaction(async (tx) => {
-      for (const l of req.body.restock) {
-        await tx.insert(stockMovements).values({ organizationId: o.organizationId, locationId: o.locationId, variantId: l.variantId, quantity: l.quantity, reason: 'return', reference: o.id, createdBy: req.user!.id });
-        await tx.update(locationVariants).set({ stockOnHand: sql`${locationVariants.stockOnHand} + ${l.quantity}` }).where(and(eq(locationVariants.locationId, o.locationId), eq(locationVariants.variantId, l.variantId)));
-      }
-      await audit(tx, { organizationId: o.organizationId, ...actor(req), action: 'order.refunded', scopeKind: 'location', scopeId: o.locationId, targetType: 'order', targetId: o.id, metadata: { amountMinor: req.body.amountMinor, currency: o.currency, refundState } });
-      return tx.update(orders).set({ refundedMinor: refunded, status: refunded >= o.totalMinor ? 'refunded' : 'partially_refunded', updatedAt: new Date() }).where(eq(orders.id, o.id)).returning();
-    });
-    return reply.code(201).send({ order: u, payment, refundState, note: o.paymentId ? null : `Recorded in BranchHarbor only. Issue the refund in ${o.source}, the authoritative order system.` });
+    await assertRefundWithinThreshold(req, s.db, o.organizationId, req.body.amountMinor, o.currency);
+    const r = await refundCommerceOrder(s, o.id, { amountMinor: req.body.amountMinor, reason: req.body.reason, restock: req.body.restock, actorUserId: req.user!.id, ip: req.ip });
+    return reply.code(201).send({ order: r.order, payment: r.payment, refundState: r.refundState, note: r.note });
   });
 
   app.post('/orgs/:orgId/commerce/orders/:id/returns', {

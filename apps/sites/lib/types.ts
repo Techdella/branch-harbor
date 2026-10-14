@@ -1,0 +1,116 @@
+export interface Money { amount: number; currency: string }
+
+export interface Theme {
+  primary: string;
+  brandColor: string;
+  onPrimary: string;
+  primaryInk: string;
+  primaryContrast: number;
+  font: string;
+  logoUrl: string | null;
+  heroImageUrl: string | null;
+}
+
+export interface Brand {
+  name: string;
+  slug: string;
+  industry: 'studios' | 'sports' | 'wellness' | 'commerce' | 'foods' | 'realty' | string;
+  country: string;
+  defaultLocale: string;
+  locales: string[];
+  tagline: string | null;
+  poweredBy: boolean;
+  theme: Theme;
+}
+
+export interface PublishedPage {
+  slug: string;
+  title: string;
+  seo: { title: string | null; description: string | null; canonicalOwner: 'branchharbor' | 'external' };
+  content: Record<string, unknown>;
+  version: number;
+  publishedAt: string;
+}
+
+export interface WeeklyHours { day: number; opens: string; closes: string }
+
+export interface Address { line1: string; line2?: string; city: string; region?: string; postalCode?: string; country: string }
+
+export interface LocationSummary {
+  id: string;
+  slug: string;
+  name: string;
+  address: Address;
+  country: string;
+  timeZone: string;
+  currency: string;
+  locale: string;
+  phone: string | null;
+  email: string | null;
+  status: string;
+  geo: { lat: number; lng: number } | null;
+  hours: { summary: string | null; weekly: WeeklyHours[] | null };
+  openNow: { open: boolean; closesAt: string | null } | null;
+  path: string;
+}
+
+export interface BrandSite {
+  brand: Brand;
+  pages: PublishedPage[];
+  site: { includedAddress: string; primaryHost: string | null };
+  locations: Array<LocationSummary & { primaryHost: string | null; pages: Array<{ slug: string; publishedAt: string | null }> }>;
+}
+
+export interface LocationSite {
+  brand: Brand;
+  location: LocationSummary;
+  pages: PublishedPage[];
+  module: {
+    kind: string;
+    mode: 'native' | 'external';
+    externalProvider: string | null;
+    externalUrl: string | null;
+    paymentsEnabled: boolean;
+    payAtPickup: boolean;
+    sandboxPayments: boolean;
+  };
+  site: { includedAddress: string; primaryHost: string | null; brandPrimaryHost: string | null; locationCount: number };
+}
+
+export interface ScheduleItem {
+  id: string;
+  classType: { id: string; name: string; description: string | null };
+  startsAt: string;
+  endsAt: string;
+  instructorName: string | null;
+  room: string | null;
+  online: boolean;
+  capacity: number;
+  spotsLeft: number;
+  price: Money;
+  status: 'available' | 'full' | 'cancelled' | 'unavailable';
+  action: 'book' | 'join_waitlist' | null;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  image: string | null;
+  variants: Array<{ id: string; name: string; options: Record<string, string>; price: Money | null; availability: 'in_stock' | 'low_stock' | 'out_of_stock' | 'not_stocked' }>;
+}
+
+export interface Programme {
+  id: string;
+  name: string;
+  description: string | null;
+  ageMin: number | null;
+  ageMax: number | null;
+  ageCutoffDate: string | null;
+  fee: Money;
+  spotsLeft: number | null;
+  requiresApproval: boolean;
+  refundPolicy: string | null;
+  registrationOpensAt: string | null;
+  registrationClosesAt: string | null;
+}

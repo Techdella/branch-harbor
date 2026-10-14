@@ -7,6 +7,7 @@ import {
 } from '../db/schema/index.ts';
 import { AppError, conflict, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
+import { convertReservationToSale } from './inventory.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
 export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration';
@@ -108,7 +109,10 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
     case 'order': {
       const [o] = await tx.select().from(orders).where(eq(orders.id, p.targetId)).for('update');
       if (!o) return { fulfilled: false, note: 'Order record missing' };
-      if (o.status === 'pending_payment') await tx.update(orders).set({ status: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(orders.id, o.id));
+      if (o.status === 'pending_payment') {
+        await tx.update(orders).set({ status: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(orders.id, o.id));
+        await convertReservationToSale(tx, o);
+      }
       return { fulfilled: true, note: 'Order paid' };
     }
     case 'appointment': {

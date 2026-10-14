@@ -11,7 +11,8 @@ import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { findOrCreateCustomer } from '../services/customers.ts';
 import { reverseTargetPayment } from '../services/payments.ts';
-import { bookClass, cancelBooking, seatsInUse } from '../services/studios.ts';
+import { bookClass, cancelBooking, leaveWaitlist, seatsInUse } from '../services/studios.ts';
+import { notify, usersWithPermissionAt } from '../services/notifications.ts';
 import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
 export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -69,6 +70,15 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
     const out = await cancelBooking(s, b.id, { actorUserId: null });
     const refund = out.booking.status === 'confirmed' ? await reverseTargetPayment(s, out.booking.paymentId, null, 'Customer cancelled booking') : { action: 'none' };
     return { id: b.id, status: 'cancelled', payment: refund, waitlistPromoted: !!out.promoted };
+  });
+
+  app.post('/public/studios/waitlist/:id/leave', {
+    schema: { tags: ['studios'], summary: 'Guest leaves a class waitlist with the manage token from their confirmation', params: z.object({ id: z.uuid() }), body: z.object({ manageToken: z.string().min(10) }) },
+  }, async (req) => {
+    const [w] = await s.db.select().from(waitlistEntries).where(eq(waitlistEntries.id, req.params.id));
+    if (!w || !w.manageTokenHash || w.manageTokenHash !== sha256(req.body.manageToken)) throw notFound('Waitlist place');
+    const e = await leaveWaitlist(s, w.id, { actorUserId: null });
+    return { id: e.id, status: 'left' as const };
   });
 
   // ───────── Staff / manager ─────────
@@ -243,6 +253,12 @@ export const studioRoutes: FastifyPluginAsyncZod = async (app) => {
         history: [{ at: new Date().toISOString(), by: me.id, action: 'requested', note: req.body.reason }],
       }).returning();
       await audit(s.db, { organizationId: o.organizationId, ...actor(req), action: 'cover.requested', scopeKind: 'location', scopeId: o.locationId, targetType: 'cover_request', targetId: cr!.id });
+      // Eligible staff: everyone who works this location (operations.read there), except the requester.
+      const eligible = (await usersWithPermissionAt(s.db, o.organizationId, o.locationId, 'operations.read')).filter((id) => id !== me.id);
+      const [ct] = await s.db.select({ name: classTypes.name }).from(classTypes).where(eq(classTypes.id, o.classTypeId));
+      const [l] = await s.db.select({ name: locations.name, timeZone: locations.timeZone }).from(locations).where(eq(locations.id, o.locationId));
+      const when = new Intl.DateTimeFormat('en', { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: l?.timeZone ?? 'UTC' }).format(o.startsAt);
+      await notify(s, { userIds: eligible, organizationId: o.organizationId, category: 'cover_request', title: 'Cover needed', body: `${ct?.name ?? 'A class'} · ${when} at ${l?.name ?? 'your studio'}. Can you take it?`, data: { coverRequestId: cr!.id, url: 'branchharbor://staff/cover' } });
       return reply.code(201).send(cr);
     });
 

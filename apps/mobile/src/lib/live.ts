@@ -36,7 +36,7 @@ interface RawScheduleItem {
 interface RawPayment { id: string; clientSecret: string | null; amount?: number; currency?: string; sandbox: boolean }
 type RawBookResult =
   | { outcome: 'confirmed' | 'held'; bookingId: string; manageToken: string; holdExpiresAt: string | null; payment: RawPayment | null }
-  | { outcome: 'waitlisted'; waitlistEntryId: string; position: number };
+  | { outcome: 'waitlisted'; waitlistEntryId: string; position: number; manageToken?: string };
 interface RawFoodOrder {
   id: string; orderNumber: string; locationId: string; status: FoodOrderStatus; paymentStatus: string;
   lines: { menuItemId: string; name: string; quantity: number; unitPriceMinor: number; modifiers: { id: string; name: string }[]; lineTotalMinor: number; notes?: string }[];
@@ -49,6 +49,20 @@ interface RawMyBooking {
 interface RawOccurrence { id: string; locationId: string; startsAt: string; endsAt: string; classTypeName: string; room: string | null; booked: number; instructorUserId: string | null }
 interface RawCover { id: string; locationId: string; occurrenceId: string; requestedBy: string; status: string; substituteName: string | null; reason: string | null; createdAt: string }
 interface RawApproval { id: string; locationId: string | null; targetType: string; payload: Record<string, unknown>; status: string; requestedBy: string; requestComment: string | null; createdAt: string }
+interface RawApprovalFull {
+  id: string; kind: 'refund' | 'ad_spend' | 'shift_swap' | 'field' | 'page'; title: string; locationId: string | null; location: { name: string } | null; amount: Money | null;
+  payload: Record<string, unknown> | null; requester: { id: string; name: string | null }; requestComment: string | null; createdAt: string; canDecide: boolean;
+}
+interface RawShift {
+  id: string; organizationId: string; locationId: string; location: { id: string; name: string; timeZone: string } | null; role: string; startsAt: string; endsAt: string;
+  clockedInAt: string | null; clockedOutAt: string | null; organizationName?: string | null;
+}
+const CHANNEL: Record<string, string> = { google_ads: 'Google Ads', meta_ads: 'Meta (Instagram/Facebook)', local_print: 'Local print', other: 'Other' };
+/** Shift ids carry the organisation and location so clock-in/out can address the right org: orgId~shiftId~locationId. */
+const toShift = (x: RawShift): Shift => ({
+  id: `${x.organizationId}~${x.id}~${x.locationId}`, locationId: x.locationId, role: x.role, startsAt: x.startsAt, endsAt: x.endsAt,
+  clockedInAt: x.clockedInAt ?? undefined, clockedOutAt: x.clockedOutAt ?? undefined, locationName: x.location?.name, timeZone: x.location?.timeZone, organizationName: x.organizationName ?? undefined,
+});
 interface RawMetric<T> { value: T | null; unavailableReason: string | null; freshness: { source: string; complete: boolean } }
 interface RawOverview {
   metrics: {
@@ -408,7 +422,8 @@ export const liveApi = {
     const c = await contactFor(contact);
     const r = await http<RawBookResult>('POST', `/public/studios/occurrences/${occId}/bookings`, { contact: { name: c.name, email: c.email, phone: c.phone }, joinWaitlist: true }, { auth: false });
     const booking = bookingFromResult(o, r);
-    if (await isGuest()) await rememberBooking(booking);
+    // The manage token lets a guest leave the waitlist later from this device.
+    if (await isGuest()) await rememberBooking({ ...booking, manageToken: r.outcome === 'waitlisted' ? r.manageToken : undefined });
     return booking;
   },
   /**
@@ -441,7 +456,7 @@ export const liveApi = {
     return r.items.map(toMyBooking).filter((b) => b.status !== 'held');
   },
   async cancelBooking(id: string): Promise<Booking> {
-    if (id.startsWith('wl:')) notSupported('Leaving a waitlist');
+    if (id.startsWith('wl:')) return liveApi.leaveWaitlist(id);
     if (await isGuest()) {
       const list = await readJson<StoredBooking[]>(K.bookings, []);
       const b = list.find((x) => x.id === id);
@@ -455,6 +470,25 @@ export const liveApi = {
     await http('POST', `/me/bookings/${id}/cancel`);
     const mine = await liveApi.myBookings();
     return mine.find((b) => b.id === id) ?? notSupported('Booking');
+  },
+
+  /** Leave a class waitlist: signed in via /me, guests with the manage token kept on this device. */
+  async leaveWaitlist(id: string): Promise<Booking> {
+    const entryId = id.replace(/^wl:/, '');
+    if (await isGuest()) {
+      const list = await readJson<StoredBooking[]>(K.bookings, []);
+      const b = list.find((x) => x.id === id);
+      if (!b?.manageToken) throw new ApiError(404, 'not_found', 'This waitlist place was not joined on this device.');
+      await http('POST', `/public/studios/waitlist/${entryId}/leave`, { manageToken: b.manageToken }, { auth: false });
+      const upd = { ...b, status: 'cancelled' as const };
+      await rememberBooking(upd);
+      const { manageToken: _t, ...rest } = upd;
+      return rest;
+    }
+    const before = (await liveApi.myBookings()).find((b) => b.id === id);
+    await http('POST', `/me/waitlist/${entryId}/leave`);
+    if (!before) throw new ApiError(404, 'not_found', 'Waitlist place not found.');
+    return { ...before, status: 'cancelled', waitlistPosition: undefined };
   },
 
   // foods
@@ -564,16 +598,18 @@ export const liveApi = {
     const granted = (p: string) => c.current.find((x) => x.purpose === p)?.granted ?? false;
     return {
       locale: m?.user.locale ?? local.locale,
-      channels: { ...local.channels, email: { ...local.channels.email, marketing: granted('marketing_email') }, sms: { ...local.channels.sms, marketing: granted('marketing_sms') } },
+      // Push updates are transactional and on unless withdrawn (consent purpose push_updates).
+      channels: { ...local.channels, push: { ...local.channels.push, reminders: c.current.find((x) => x.purpose === 'push_updates')?.granted ?? true }, email: { ...local.channels.email, marketing: granted('marketing_email') }, sms: { ...local.channels.sms, marketing: granted('marketing_sms') } },
     };
   },
-  /** Marketing consent is recorded server-side (append-only); reminder and push toggles stay on the device for now. */
+  /** Marketing and push-update consent are recorded server-side (append-only); other reminder toggles stay on the device. */
   async savePreferences(p: Preferences): Promise<Preferences> {
     if (!(await isGuest())) {
       const before = await liveApi.preferences();
       const writes: Promise<unknown>[] = [];
       if (before.channels.email.marketing !== p.channels.email.marketing) writes.push(http('POST', '/me/consents', { purpose: 'marketing_email', granted: p.channels.email.marketing }));
       if (before.channels.sms.marketing !== p.channels.sms.marketing) writes.push(http('POST', '/me/consents', { purpose: 'marketing_sms', granted: p.channels.sms.marketing }));
+      if (before.channels.push.reminders !== p.channels.push.reminders) writes.push(http('POST', '/me/consents', { purpose: 'push_updates', granted: p.channels.push.reminders }));
       if (before.locale !== p.locale) writes.push(http('PATCH', '/me', { locale: p.locale }));
       await Promise.all(writes);
       meCache = null;
@@ -592,11 +628,21 @@ export const liveApi = {
 
   // staff
   async myShifts(): Promise<Shift[]> {
-    // Shift scheduling / time clock is not modelled by the API yet.
-    return [];
+    // Today's shifts in the device's local day (plus anything still running), across every organisation.
+    const { from, to } = localDayRange();
+    const r = await http<{ items: RawShift[]; openClock: { organizationId: string; shiftId: string | null } | null }>('GET', `/me/shifts?from=${encodeURIComponent(new Date(Date.parse(from) - 12 * 3600_000).toISOString())}&to=${encodeURIComponent(to)}`);
+    return r.items.filter((x) => Date.parse(x.endsAt) > Date.parse(from)).map(toShift);
   },
-  async clockIn(_shiftId: string): Promise<Shift> {
-    return notSupported('Clock-in');
+  async clockIn(shiftId: string): Promise<Shift> {
+    const [orgId, id, locationId] = split(shiftId, 3);
+    const r = await http<{ shift: RawShift }>('POST', `/orgs/${orgId}/time-clock/clock-in`, { locationId, shiftId: id, source: 'mobile' });
+    return toShift(r.shift);
+  },
+  async clockOut(shiftId: string): Promise<Shift> {
+    const [orgId] = split(shiftId, 3);
+    const r = await http<{ shift: RawShift | null }>('POST', `/orgs/${orgId}/time-clock/clock-out`, { source: 'mobile' });
+    if (!r.shift) throw new ApiError(409, 'not_clocked_in', 'You are not clocked in to this shift.');
+    return toShift(r.shift);
   },
   async mySessions(): Promise<StaffSession[]> {
     const m = await rawMe();
@@ -726,21 +772,30 @@ export const liveApi = {
   },
   async approvals(): Promise<Approval[]> {
     const m = await rawMe();
-    const { index } = await loadCatalog();
-    const locName = (id: string | null) => (id ? index.get(id)?.loc.name ?? '' : 'All locations');
     const perOrg = await Promise.all(ownerOrgs(m).map(async (o) => {
       const names = await memberNames(o.id);
       const who = (id: string) => (id === m!.user.id ? 'You' : names.get(id) ?? 'Location team');
-      const [website, covers] = await Promise.all([
-        has(o, 'website.approve') ? http<{ items: RawApproval[] }>('GET', `/orgs/${o.id}/approvals?status=pending`).then((r) => r.items) : Promise.resolve([] as RawApproval[]),
+      const { index } = await loadCatalog();
+      const locName = (id: string | null) => (id ? index.get(id)?.loc.name ?? '' : 'All locations');
+      // One inbox: refunds over the threshold, local ad spend, shift swaps and website changes (GET /approvals),
+      // plus studio cover substitutions waiting for a manager.
+      const [requests, covers] = await Promise.all([
+        http<{ items: RawApprovalFull[] }>('GET', `/orgs/${o.id}/approvals?status=pending`).then((r) => r.items.filter((a) => a.canDecide)),
         industryOf(o.industry) === 'studios' && has(o, 'operations.write') ? http<{ items: RawCover[] }>('GET', `/orgs/${o.id}/studios/cover-requests?status=accepted`).then((r) => r.items) : Promise.resolve([] as RawCover[]),
       ]);
+      const out: Approval[] = requests.map((a) => {
+        const p = a.payload ?? {};
+        const base = { id: `${o.id}~approval~${a.id}`, locationId: a.locationId ?? '', locationName: a.location?.name ?? locName(a.locationId), requestedBy: a.requester.name ?? who(a.requester.id), requestedAt: a.createdAt, reason: a.requestComment ?? undefined, status: 'pending' as const };
+        if (a.kind === 'refund') return { ...base, kind: 'refund' as const, title: a.title, amount: a.amount ?? undefined };
+        if (a.kind === 'ad_spend') return { ...base, kind: 'ad_spend' as const, title: a.title, amount: a.amount ?? undefined, channel: CHANNEL[String(p.channel)] ?? String(p.channel ?? ''), days: Number(p.durationDays ?? 0) };
+        if (a.kind === 'shift_swap') {
+          const sh = p.shift as { startsAt?: string; timeZone?: string; role?: string } | undefined;
+          const when = sh?.startsAt ? new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: sh.timeZone ?? 'UTC' }).format(new Date(sh.startsAt)) : '';
+          return { ...base, kind: 'shift_swap' as const, title: a.title, swap: { a: String((p.from as { name?: string })?.name ?? '—'), b: String((p.to as { name?: string })?.name ?? '—'), session: `${sh?.role ?? 'Shift'} · ${when}` } };
+        }
+        return { ...base, kind: 'website' as const, title: a.kind === 'field' ? `Website · ${String(p.fieldKey ?? 'field').replace(/_/g, ' ')}: “${String(p.value ?? '')}”` : 'Website page ready to publish' };
+      });
       const occs = covers.length ? await occurrencesFor(o.id, new Date(Date.now() - 86400_000).toISOString(), new Date(Date.now() + 60 * 86400_000).toISOString()) : [];
-      const out: Approval[] = website.map((a) => ({
-        id: `${o.id}~website~${a.id}`, kind: 'website', locationId: a.locationId ?? '', locationName: locName(a.locationId),
-        title: a.targetType === 'field' ? `Website · ${String(a.payload.fieldKey ?? 'field').replace(/_/g, ' ')}: “${String(a.payload.value ?? '')}”` : 'Website page ready to publish',
-        requestedBy: who(a.requestedBy), requestedAt: a.createdAt, reason: a.requestComment ?? undefined, status: 'pending',
-      }));
       for (const c of covers) {
         const occ = occs.find((x) => x.id === c.occurrenceId);
         out.push({
@@ -756,12 +811,14 @@ export const liveApi = {
   async decide(id: string, decision: 'approved' | 'rejected', reason?: string): Promise<Approval> {
     const [orgId, type, targetId] = split(id, 3);
     const current = (await liveApi.approvals()).find((a) => a.id === id);
-    if (type === 'website') {
-      await http('POST', `/orgs/${orgId}/approvals/${targetId}/decision`, { decision: decision === 'approved' ? 'approve' : 'reject', comment: reason || undefined });
-    } else {
-      await http('POST', `/orgs/${orgId}/studios/cover-requests/${targetId}/decision`, { decision: decision === 'approved' ? 'approve' : 'decline', note: reason || undefined });
-    }
     if (!current) throw new ApiError(409, 'already_decided', 'Someone already decided this request.');
+    if (type === 'cover') {
+      await http('POST', `/orgs/${orgId}/studios/cover-requests/${targetId}/decision`, { decision: decision === 'approved' ? 'approve' : 'decline', note: reason || undefined });
+    } else {
+      // Website rejections need a reason on the server; give a neutral default when none was typed.
+      const comment = reason || (decision === 'rejected' && current.kind === 'website' ? 'Rejected from the mobile app' : undefined);
+      await http('POST', `/orgs/${orgId}/approvals/${targetId}/decision`, { decision: decision === 'approved' ? 'approve' : 'reject', comment });
+    }
     return { ...current, status: decision };
   },
   async notifications(): Promise<AppNotification[]> {

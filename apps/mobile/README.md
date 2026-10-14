@@ -15,7 +15,7 @@ The mock lets any signed-in user switch between all three.
 ## Stack
 
 Expo SDK 57 (`expo@57.0.28`, React Native 0.86.3, React 19.2.3), Expo Router 57 (file-based routes in `app/`), TypeScript 5.9.3 (strict),
-`react-native-svg` (icons from `@bh/icons` via `SvgXml`), `@expo-google-fonts/plus-jakarta-sans`, `expo-localization` + `i18n-js`,
+`react-native-svg` (icons from `@bh/icons` via `SvgXml`), `expo-notifications` (push), `@expo-google-fonts/plus-jakarta-sans`, `expo-localization` + `i18n-js`,
 `expo-secure-store` (bearer token), `@react-native-community/netinfo` (offline detection), `@stripe/stripe-react-native` (PaymentSheet integration point).
 
 Design tokens come from `@bh/tokens` and money/locale/time/permission helpers + zod contracts from `@bh/shared` (both TypeScript source, consumed directly by Metro).
@@ -109,7 +109,7 @@ screens consume. Errors are always `{ error: { code, message, fields } }` → `A
 | `me` | `GET /v1/auth/me` → `organizations[].roles` → assignments + experiences |
 | `signOut` | `DELETE /v1/me/push-tokens` (if registered) + `POST /v1/auth/logout` `{ refreshToken }` |
 | `guest` | no call — guests use public endpoints only; a `guest` marker replaces the token |
-| `registerPushToken(token)` | `POST /v1/me/push-tokens` `{ token, platform, appVersion }` (call it once `expo-notifications` is added; sending is not implemented server-side) |
+| `registerPushToken(token)` | `POST /v1/me/push-tokens` `{ token, platform, appVersion }` — called automatically after sign-in (not for guests) by `src/lib/push.ts`: asks for notification permission once, gets the Expo push token (`expo-notifications`) and registers it; tapping a notification opens the screen in its `data.url`. Web preview: no-op (`push.web.ts`) |
 
 **Customer**
 
@@ -123,6 +123,7 @@ screens consume. Errors are always `{ error: { code, message, fields } }` → `A
 | `confirmBooking` | real Stripe: confirmed by the signed webhook. Sandbox: `POST /v1/public/payments/:paymentId/sandbox-confirm`. Expired hold → `hold_expired` |
 | `myBookings` | signed in: `GET /v1/me/bookings` (bookings + waitlist places, matched by account or email). Guest: bookings made on this device (with manage tokens) |
 | `cancelBooking` | signed in: `POST /v1/me/bookings/:id/cancel`. Guest: `POST /v1/public/studios/bookings/:id/cancel` `{ manageToken }` |
+| `leaveWaitlist` (also used by `cancelBooking` for waitlist places) | signed in: `POST /v1/me/waitlist/:id/leave`. Guest: `POST /v1/public/studios/waitlist/:id/leave` `{ manageToken }` (token kept on the device when joining) |
 | `menu` | `GET /v1/public/foods/:locationId/menu` (categories flattened; unavailable → sold out) |
 | `pickupSlots` | `GET /v1/public/foods/:locationId/pickup-slots?from&to` (remaining slots of the day, past cut-off hidden) |
 | `quoteOrder` | `POST /v1/public/foods/:locationId/quote` — same server checks as ordering; tax only when the business configured a rate |
@@ -130,13 +131,15 @@ screens consume. Errors are always `{ error: { code, message, fields } }` → `A
 | `confirmOrderPayment` | sandbox: `POST /v1/public/payments/:paymentId/sandbox-confirm` (Stripe: webhook) |
 | `order(id)`, `myOrders` | `GET /v1/public/foods/orders/:id?token=` (manage token kept on the device) / signed in: `GET /v1/me/food-orders` |
 | `messages`, `sendMessage` | `GET /v1/me/messages?locationId=`, `POST /v1/me/messages` (signed-in customers; staff reply via `POST /v1/orgs/:orgId/messages`) |
-| `preferences`, `savePreferences` | `GET`/`POST /v1/me/consents` (`marketing_email`, `marketing_sms`) + `PATCH /v1/me` (locale). Reminder/push toggles are kept on the device |
+| `preferences`, `savePreferences` | `GET`/`POST /v1/me/consents` (`marketing_email`, `marketing_sms`, `push_updates` — the push "updates" toggle; the server skips order/waitlist pushes when withdrawn) + `PATCH /v1/me` (locale). Other reminder toggles are kept on the device |
 | `dataRequest('export')` | `GET /v1/me/export` |
 
 **Staff**
 
 | App call | Real endpoint(s) |
 |---|---|
+| `myShifts` | `GET /v1/me/shifts?from&to` (today in device time, all organisations; location name + time zone included). Id = `orgId~shiftId~locationId` |
+| `clockIn`, `clockOut` | `POST /v1/orgs/:orgId/time-clock/clock-in` `{ locationId, shiftId, source: mobile }` (up to 60 min early) / `POST …/time-clock/clock-out` |
 | `mySessions` | `GET /v1/orgs/:orgId/studios/occurrences?from&to` (today, device time zone) for studio orgs where the user has `operations.read`; own classes if they instruct, else their assigned locations. Id = `orgId~occurrenceId` |
 | `roster`, `markAttendance` | `GET /v1/orgs/:orgId/studios/occurrences/:id` (attendees, display names only) / `POST /v1/orgs/:orgId/studios/bookings/:bookingId/attendance` `{ status: attended \| no_show }` |
 | `kitchenLocationId` | first Foods location the user is assigned to (role scope), else the org's first operating location |
@@ -149,14 +152,14 @@ screens consume. Errors are always `{ error: { code, message, fields } }` → `A
 | App call | Real endpoint(s) |
 |---|---|
 | `pulse` | `GET /v1/orgs/:orgId/reports/overview?scopeKind=location&scopeId=…&from=` per location (last 7 days): net revenue in the location currency, bookings/occupancy or order counts, `null` → "Unavailable" |
-| `approvals` | `GET /v1/orgs/:orgId/approvals?status=pending` (website changes) + `GET …/studios/cover-requests?status=accepted` (cover swaps awaiting a manager); names from `GET /v1/orgs/:orgId/members` |
-| `decide` | `POST /v1/orgs/:orgId/approvals/:id/decision` (reject needs a reason) / `POST …/studios/cover-requests/:id/decision` |
+| `approvals` | `GET /v1/orgs/:orgId/approvals?status=pending` (refunds over the threshold, local ad spend, shift swaps and website changes the user can decide) + `GET …/studios/cover-requests?status=accepted` (cover substitutions awaiting a manager) |
+| `decide` | `POST /v1/orgs/:orgId/approvals/:id/decision` (approving runs the refund / schedules the campaign / reassigns the shift on the server) / `POST …/studios/cover-requests/:id/decision` |
 | `notifications` | derived: connections that are not `connected` from `GET /v1/orgs/:orgId/reports/overview` + pending approvals |
 
-**Not available from the API yet (live mode shows an empty state or a clear message, never sample data):** staff shifts and
-clock-in, staff team messages, leaving a waitlist, refund/ad-spend approval requests (refunds are direct `payments.refund` actions in the web
-app), account deletion from the app (needs the password — use the web app), location tax labels/cancellation windows in the catalogue
-(the server quote applies the business-configured tax; the class cancellation window shown is a 12-hour default).
+**Not available from the API yet (live mode shows an empty state or a clear message, never sample data):** staff team
+messages, account deletion from the app (needs the password — use the web app), location tax labels/cancellation windows
+in the catalogue (the server quote applies the business-configured tax; the class cancellation window shown is a 12-hour
+default).
 
 Money is always `{ amount: <integer minor units>, currency }`; times are UTC ISO strings rendered in the location's IANA timezone.
 
@@ -177,7 +180,18 @@ Money is always `{ amount: <integer minor units>, currency }`; times are UTC ISO
 
 ## Builds
 
-`eas.json` has `development` (dev client, mocks on), `preview` (internal, live API) and `production` profiles. Bundle ids: `com.branchharbor.app` (+ `.development` / `.preview`). No icon/splash images are committed yet — splash uses token colours; add `assets/icon.png` before store builds.
+`eas.json` has `development` (dev client, mocks on), `preview` (internal, live API) and `production` profiles. Bundle ids: `com.branchharbor.app` (+ `.development` / `.preview`).
+
+**Icon & splash.** `assets/` holds PNGs generated from the harbour mark (ink rounded square, white H posts, 35% stem, lime
+hub — `logoSvg` in `@bh/icons`): `icon.png` (1024, full-bleed ink), `adaptive-icon.png` + `adaptive-icon-monochrome.png`
+(Android adaptive foreground inside the safe zone; background `#141414`), `splash-icon.png` (rounded tile on canvas
+`#F3F2EE`, ink in dark mode), `notification-icon.png` (96, white silhouette) and `favicon.png` (48, small-size variant).
+Regenerate with `pnpm --filter @bh/mobile assets` (`scripts/generate-assets.mjs`, uses `sharp`). Referenced from `app.config.ts`.
+
+**Push.** `expo-notifications` is configured as a config plugin (notification icon + lime accent, default Android channel).
+Remote push needs a development/production build with an EAS project id (`extra.eas.projectId`); Expo Go and simulators
+simply skip registration. The API sends through the Expo Push API when `EXPO_ACCESS_TOKEN` or `ENABLE_EXPO_PUSH` is set
+and otherwise logs each notification (sandbox).
 
 ## Monorepo notes
 

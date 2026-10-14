@@ -15,6 +15,7 @@ import { httpApi } from './http/httpApi';
 import type {
   AiAnswer,
   ApprovalItem,
+  ApprovalRequest,
   AttendanceSession,
   ClassOccurrence,
   CommerceOrder,
@@ -41,6 +42,7 @@ import type {
   RescheduleSlot,
   ScopeOptionT,
   Session,
+  ShiftView,
   SportsGroup,
   TableData,
   Transaction,
@@ -139,8 +141,15 @@ export interface BranchHarborApi {
   };
   team: {
     members(ctx: RequestContext): Promise<Member[]>;
+    /** Shifts in scope for the 7 days from `weekStart` (YYYY-MM-DD), with clock-in state and pending swaps. */
+    schedule(ctx: RequestContext, weekStart: string): Promise<ShiftView[]>;
     /** `role` is the display label; `roleKey` the API role (e.g. location_manager). */
     invite(input: { email: string; role: string; roleKey?: string; scopeId: string; scopeLabel: string }): Promise<Member>;
+  };
+  /** One inbox for refunds, local ad spend, shift swaps and website changes. Approving runs the action. */
+  approvals: {
+    list(ctx: RequestContext, status: 'pending' | 'done'): Promise<ApprovalRequest[]>;
+    decide(id: string, decision: 'approve' | 'reject', comment?: string): Promise<ApprovalRequest>;
   };
   reports(ctx: RequestContext): Promise<Report[]>;
   settings: {

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { boolean, char, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { bigint, boolean, char, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { createdAt, currencyCol, orgId, pk, ts, updatedAt } from './_shared.ts';
 
 export type OnboardingStepState = { status: 'not_started' | 'in_progress' | 'complete' | 'skipped'; data?: Record<string, unknown>; updatedAt?: string };
@@ -171,6 +171,9 @@ export const subscriptions = pgTable('subscriptions', {
   status: text('status').notNull().default('trialing'),
   billedLocationCount: integer('billed_location_count').notNull().default(0),
   currency: currencyCol().notNull(),
+  /** BranchHarbor plan price per billed location per interval, minor units in `currency`. null = not priced (trial). */
+  pricePerLocationMinor: bigint('price_per_location_minor', { mode: 'number' }),
+  billingInterval: text('billing_interval').notNull().default('month'),
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
   currentPeriodEnd: ts('current_period_end'),

@@ -10,13 +10,15 @@
     "web": "expo start --web",
     "export:web": "expo export --platform web",
     "typecheck": "tsc --noEmit",
-    "doctor": "expo-doctor"
+    "doctor": "expo-doctor",
+    "assets": "node scripts/generate-assets.mjs"
   },
   "dependencies": {
     "@bh/icons": "workspace:*",
     "@bh/shared": "workspace:*",
     "@bh/tokens": "workspace:*",
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
+    "@expo/log-box": "~57.0.4",
     "@expo/metro-runtime": "~57.0.16",
     "@react-native-community/netinfo": "12.0.1",
     "@stripe/stripe-react-native": "0.64.0",
@@ -25,12 +27,12 @@
     "expo-font": "~57.0.4",
     "expo-linking": "~57.0.12",
     "expo-localization": "~57.0.2",
+    "expo-notifications": "~57.0.23",
     "expo-router": "~57.0.26",
     "expo-secure-store": "~57.0.4",
     "expo-splash-screen": "~57.0.10",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.4",
-    "@expo/log-box": "~57.0.4",
     "i18n-js": "^4.5.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.18",
+    "sharp": "0.35.5",
     "typescript": "5.9.3"
   },
   "expo": {

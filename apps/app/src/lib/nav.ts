@@ -70,11 +70,12 @@ export const NAV_TOP: NavItem[] = [
 ];
 
 export const NAV_SHARED: NavItem[] = [
+  { key: 'approvals', href: '/approvals', icon: 'shield', perm: 'locations.read' },
   { key: 'customers', href: '/customers', icon: 'users', perm: 'customers.read' },
   { key: 'websites', href: '/websites', icon: 'globe', perm: 'website.edit' },
   { key: 'marketing', href: '/marketing', icon: 'megaphone', perm: 'marketing.draft' },
   { key: 'payments', href: '/payments', icon: 'card', perm: 'payments.read' },
-  { key: 'team', href: '/team', icon: 'user', perm: 'members.manage' },
+  { key: 'team', href: '/team', icon: 'user', perm: 'operations.read' },
   { key: 'community', href: '/community', icon: 'message', later: true },
   { key: 'reports', href: '/reports', icon: 'chart', perm: 'reports.read' },
   { key: 'connections', href: '/connections', icon: 'plug', perm: 'locations.read' },

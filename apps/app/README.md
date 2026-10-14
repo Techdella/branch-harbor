@@ -33,8 +33,9 @@ NEXT_PUBLIC_USE_MOCKS=false pnpm dev:app                    # or set it in apps/
 # production: NEXT_PUBLIC_USE_MOCKS=false pnpm --filter @bh/app build && pnpm --filter @bh/app start
 ```
 
-Sign in as `demo@branchharbor.com` (organisation owner of *Stillwater Yoga Collective* — studios — and *Maple & Ember
-Restaurants* — foods; the industry switcher moves between them). Other seeded users with the same password:
+Sign in as `demo@branchharbor.com` (organisation owner of *Stillwater Yoga Collective* — studios —, *Maple & Ember
+Restaurants* — foods —, *North Shore Football Academy* — sports —, *Harbourline Wellness* and *Fieldnote Goods* — commerce;
+the industry switcher moves between them). Other seeded users with the same password:
 `maya.rao@demo.branchharbor.com` (location manager, Queen West), `priya.anand@demo.branchharbor.com` (regional manager,
 Europe), `carlos.ortega@demo.branchharbor.com` (staff, Ballard).
 
@@ -85,13 +86,17 @@ All org routes are `/v1/orgs/:orgId/…` for the selected organisation; lists ar
 | `auth.session`, `org`, `scopes` | `GET /auth/me` + workspace directory (above) |
 | `locations` | `GET /locations` |
 | `overview` | `GET /reports/overview?scopeKind&scopeId` (metrics, per-currency revenue) + upcoming from `/studios/occurrences`, `/foods/orders?active` or `/wellness/appointments` + "needs attention" (below) |
-| `notifications` | derived: `/connections` (not connected), `/payments/reconciliation`, `/approvals`, `/foods/orders?status=awaiting_acceptance`, `/studios/cover-requests?status=open` |
+| `notifications` | derived: `/connections` (not connected), `/payments/reconciliation`, `/approvals` (requests you can decide, all kinds → `/approvals`), `/foods/orders?status=awaiting_acceptance`, `/studios/cover-requests?status=open` |
 | `search` | client-side over the directory + `GET /members` |
 | `table('customers' \| 'marketing')` | `GET /customers`, `GET /campaigns` |
-| `table(programmes \| teams \| services \| practitioners \| catalogue \| assortment)` | `/sports/programmes`, `/sports/teams`, `/wellness/services`, `/wellness/practitioners`, `/commerce/products`, `/commerce/locations/:id/stock` |
+| `table(programmes \| teams \| services \| practitioners \| catalogue \| assortment)` | `/sports/programmes`, `/sports/teams`, `/wellness/services`, `/wellness/practitioners`, `/commerce/products`, `/commerce/inventory` (on hand / reserved / available / low stock) |
+| `table(offers \| schedule \| forms \| inventory \| pickup)` | `/studios/offers` (prices per currency, eligibility rules, redemptions); `/sports/sessions` (training + fixtures, venue clash badge); `/wellness/intake-forms` (consent version, responses, AI excluded); `/commerce/stock-movements` (reason, on-hand balance after, reservations); `/foods/pickup-settings` (one column per location) |
 | `studios.classes` | `GET /studios/occurrences?locationId&from&to` (+ `/studios/cover-requests` for the cover flag) |
 | `studios.cover` / `acceptCover` / `approveCover` | `GET /studios/cover-requests`, `/studios/occurrences/:id`; `POST …/cover-requests/:id/accept` (the signed-in user accepts), `POST …/:id/decision` |
 | `sports.registrations` / `decide` / `submitAttendance` | `GET /sports/registrations`, `/sports/programmes`, `/sports/teams`; `POST /sports/registrations/:id/review`; `POST /sports/sessions/:id/attendance` |
+| `sports.session` | `GET /sports/sessions` (the session in progress, else the next one, else the latest unrecorded) + `GET /sports/sessions/:id/roster` |
+| `team.schedule` | `GET /shifts?from&to` (clock-in state, pending swaps) |
+| `approvals.list` / `decide` | `GET /approvals?status=pending\|all`; `POST /approvals/:id/decision { decision, comment }` (approving runs the refund / campaign / shift reassignment / website change on the server) |
 | `wellness.day` / `slots` / `reschedule` | `GET /wellness/appointments`, `/wellness/practitioners`, `/wellness/services`, `/wellness/resources`; `GET /public/wellness/:locationId/availability`; `POST /wellness/appointments/:id/reschedule` |
 | `commerce.orders` / `refund` | `GET /commerce/orders`, `GET /commerce/orders/:id`, `POST /commerce/orders/:id/refunds` (amount from the selected lines) |
 | `foods.menu` / `resetMenuField` | `GET /foods/menus` (master, prices per currency) or `GET /foods/locations/:id/menu`; `PUT /foods/locations/:id/overrides/:itemId { priceMinor: null }` |
@@ -106,17 +111,15 @@ All org routes are `/v1/orgs/:orgId/…` for the selected organisation; lists ar
 | `connections.list` / `fix` | `GET /connections`; `POST /connections/:id/sync` (degraded) or `/test` (disconnected / expired) |
 | `team.members` / `invite` | `GET /members` + `GET /invitations`; `POST /invitations { email, role, scope }` |
 | `reports` | `GET /reports/overview` (revenue per currency per location; combined revenue is never computed) |
-| `settings.get` / `save` | `GET /orgs/:id` + `/subscription`; `PATCH /orgs/:id` |
+| `settings.get` / `save` | `GET /orgs/:id` (`policies`) + `/subscription` (`pricePerLocation`, billed locations); `PATCH /orgs/:id` incl. `customerDataSharing` and `aiTrainingOptOut` |
 | `onboarding.get` / `save` | `GET /onboarding`; `PUT /onboarding/:step` (the draft is kept in the current step's `data.draft`). A new account creates its organisation (`POST /orgs`) when the business step is completed and its first location (`POST /locations`) after the location step. |
 | `onboarding.validateImport` | `POST /locations/import { dryRun: true }` (the app's `timezone` column is sent as `time_zone`; missing `address_line1`/`city` are reported per row) |
 | `onboarding.domain` / `verifyDomain` | `GET`/`POST /domains`, `POST /domains/:id/verify` |
 | `ai.ask` | `GET /ai/status`, then `POST /ai/conversations { scope }` and `POST /ai/conversations/:id/messages` (503 `ai_unavailable` when no key) |
 
-**Not available from the API (shown honestly, never as sample data):** offers, training schedules, intake forms,
-cross-store inventory movements and pickup settings tables show an explanatory empty state; sports attendance has
-no "upcoming sessions" list endpoint, so that screen reports it as unavailable; password reset by email is not
-implemented in the API (the form says so); org settings `customerSharing` / `aiTraining` and per-location billing
-prices are not modelled by the API (shown as defaults / omitted, not saved); AI suggestions are fixed prompts.
+**Not available from the API (shown honestly, never as sample data):** password reset by email is not implemented in
+the API (the form says so); AI suggestions are fixed prompts; creating offers, intake forms, shifts and pickup settings
+from the web UI is not built yet (they are created through the API/seed — the screens list and decide them).
 Location `site` is "live" when the location's hosted website is live (or, with no website, when the location is
 operating and publicly listed); `sync` needs attention when one of its connections isn't healthy.
 
@@ -144,7 +147,8 @@ content (metric names, record text) comes from the data layer and is English.
 | `/customers`, `/marketing` | Scoped tables (members / participants / clients / customers / guests; campaigns) |
 | `/websites` (`?tab=editor|approvals|publish|domains`) | Field governance, approval queue, group publish with per-location results + retry |
 | `/payments` (`?tab=transactions|reconciliation|setup`) | Per-currency totals, detail timeline, reconciliation (recreate / finance-gated refund), accounts |
-| `/team`, `/reports`, `/connections`, `/settings`, `/community` | Scoped roles + invite; freshness-labelled charts; sync health + fix; org defaults, data region, billing per location; Later |
+| `/approvals` | One inbox: refunds over the threshold, local ad spend, shift swaps, website changes — consequence preview, approve/reject with comment, result after execution |
+| `/team`, `/reports`, `/connections`, `/settings`, `/community` | Members & roles + invite, and **Schedule** (week of shifts per location in local time, clock-in state, pending swaps; staff see it too); freshness-labelled charts; sync health + fix; org defaults, data region, customer sharing + AI training (saved), billing per location (price from the subscription); Later |
 
 Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `registrations`
 `attendance` `programmes` `teams` `schedule` `guardian`·Later · Wellness `calendar` (practitioner/room/list +
