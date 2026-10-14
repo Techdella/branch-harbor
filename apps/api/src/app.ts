@@ -38,6 +38,9 @@ export interface BuildOptions {
   logger?: FastifyServerOptions['logger'];
 }
 
+/** Trust the nearest `n` proxies (Fastify's types don't accept a bare hop count). */
+const trustHops = (n: number) => (_address: string, hop: number) => hop < n;
+
 export async function buildApp(opts: BuildOptions = {}): Promise<FastifyInstance> {
   const cfg = opts.config && 'DATABASE_URL' in opts.config && typeof (opts.config as Config).PORT === 'number'
     ? (opts.config as Config)
@@ -49,7 +52,7 @@ export async function buildApp(opts: BuildOptions = {}): Promise<FastifyInstance
       transport: cfg.NODE_ENV === 'development' ? { target: 'pino-pretty', options: { translateTime: 'SYS:HH:MM:ss', ignore: 'pid,hostname' } } : undefined,
       redact: ['req.headers.authorization', 'req.headers.cookie', 'req.headers["stripe-signature"]'],
     },
-    trustProxy: true,
+    trustProxy: typeof cfg.TRUST_PROXY === 'number' ? trustHops(cfg.TRUST_PROXY) : cfg.TRUST_PROXY,
     bodyLimit: 2 * 1024 * 1024,
   });
   app.setValidatorCompiler(validatorCompiler);

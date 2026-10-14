@@ -59,3 +59,28 @@ export function createStorage(cfg: Config, log: FastifyBaseLogger) {
   if (!configured) log.info('[storage] S3/R2 not configured — media uploads disabled');
   return { configured, publicUrl: cfg.S3_PUBLIC_URL ?? null };
 }
+
+/**
+ * Cloudflare Turnstile verification for public forms. Disabled (always passes) without
+ * TURNSTILE_SECRET_KEY so local development needs no account.
+ */
+export function createBotCheck(cfg: Config, log: FastifyBaseLogger) {
+  if (!cfg.TURNSTILE_SECRET_KEY) log.info('[turnstile] TURNSTILE_SECRET_KEY not set — bot checks disabled');
+  return {
+    enabled: !!cfg.TURNSTILE_SECRET_KEY,
+    async verify(token: string | undefined, ip?: string): Promise<boolean> {
+      if (!cfg.TURNSTILE_SECRET_KEY) return true;
+      if (!token) return false;
+      try {
+        const body = new URLSearchParams({ secret: cfg.TURNSTILE_SECRET_KEY, response: token });
+        if (ip) body.set('remoteip', ip);
+        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body, signal: AbortSignal.timeout(5000) });
+        if (!res.ok) return false;
+        return ((await res.json()) as { success?: boolean }).success === true;
+      } catch (err) {
+        log.warn({ err }, '[turnstile] verification request failed');
+        return false;
+      }
+    },
+  };
+}

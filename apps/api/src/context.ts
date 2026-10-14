@@ -7,7 +7,7 @@ import { createJobQueue, type JobQueue } from './integrations/jobs.ts';
 import { createPaymentsProvider, type PaymentsProvider } from './integrations/payments.ts';
 import { autoPassDnsChecker, createDomainProvider, systemDnsChecker, type DnsChecker, type DomainProvider } from './integrations/domains.ts';
 import { createConnectors, type ConnectorAdapter, type ConnectorProvider } from './integrations/connectors.ts';
-import { createAnalytics, createFx, createGeocoder, createStorage } from './integrations/misc.ts';
+import { createAnalytics, createBotCheck, createFx, createGeocoder, createStorage } from './integrations/misc.ts';
 import { createAi, type AiProvider } from './integrations/ai.ts';
 import { createPushProvider, type PushProvider } from './integrations/push.ts';
 
@@ -30,6 +30,7 @@ export interface Services {
   storage: ReturnType<typeof createStorage>;
   ai: AiProvider;
   push: PushProvider;
+  botCheck: ReturnType<typeof createBotCheck>;
 }
 
 export async function createServices(cfg: Config, dbHandle: DbHandle, log: FastifyBaseLogger, overrides: Partial<Services> = {}): Promise<Services> {
@@ -52,5 +53,6 @@ export async function createServices(cfg: Config, dbHandle: DbHandle, log: Fasti
     storage: overrides.storage ?? createStorage(cfg, log),
     ai: overrides.ai ?? createAi(cfg, log),
     push: overrides.push ?? createPushProvider(cfg, log),
+    botCheck: overrides.botCheck ?? createBotCheck(cfg, log),
   };
 }

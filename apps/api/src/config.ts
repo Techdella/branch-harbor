@@ -25,6 +25,21 @@ const envSchema = z.object({
   PUBLIC_API_URL: z.string().default('http://localhost:4000'),
   WEB_URL: z.string().default('http://localhost:3000'),
   APP_URL: z.string().default('http://localhost:3001'),
+  /**
+   * Which proxies may set X-Forwarded-For (client IP used for rate limits and audit).
+   * 'loopback' (default) trusts only a proxy on the same host, e.g. the sites app; set to the
+   * load balancer's address range, a hop count or 'true' only when every path goes through it.
+   */
+  TRUST_PROXY: z
+    .string()
+    .default('loopback')
+    .transform((v): boolean | number | string => {
+      const t = v.trim();
+      if (t === '' || t === 'false') return false;
+      if (t === 'true') return true;
+      if (/^\d+$/.test(t)) return Number(t);
+      return t;
+    }),
   CORS_ORIGINS: z
     .string()
     .default('http://localhost:3000,http://localhost:3001,http://localhost:8081,http://localhost:19006')
@@ -52,6 +67,8 @@ const envSchema = z.object({
   EMAIL_PROVIDER: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['postmark', 'resend', 'log']).optional()),
   POSTMARK_SERVER_TOKEN: optional,
   RESEND_API_KEY: optional,
+  /** Cloudflare Turnstile secret. When set, public demo requests must carry a valid token. */
+  TURNSTILE_SECRET_KEY: optional,
   SALES_NOTIFICATION_EMAIL: z.string().default('sales@branchharbor.com'),
 
   // Messaging

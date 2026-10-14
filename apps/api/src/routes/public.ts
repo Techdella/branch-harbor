@@ -4,7 +4,8 @@ import { demoRequestSchema, INDUSTRY_META, INDUSTRIES, LAUNCH_COUNTRIES, SUPPORT
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { consentRecords, demoRequests, locations, organizations } from '../db/schema/index.ts';
 import { CONNECTOR_CATALOG } from '../integrations/connectors.ts';
-import { notFound } from '../lib/errors.ts';
+import { notFound, validationError } from '../lib/errors.ts';
+import { demoRequestCopy } from '../lib/demoRequestCopy.ts';
 
 export const publicRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
@@ -17,6 +18,9 @@ export const publicRoutes: FastifyPluginAsyncZod = async (app) => {
     },
   }, async (req, reply) => {
     const b = req.body;
+    if (!(await s.botCheck.verify(b.turnstileToken, req.ip))) {
+      throw validationError('Security check failed. Please try again.', { turnstileToken: 'Security check failed. Please try again.' });
+    }
     const row = await s.db.transaction(async (tx) => {
       const [row] = await tx.insert(demoRequests).values({
         name: b.name, email: b.email, business: b.business, industry: b.industry, locationCount: b.locationCount, country: b.country,
@@ -28,7 +32,7 @@ export const publicRoutes: FastifyPluginAsyncZod = async (app) => {
     });
     await s.jobs.enqueue('demo-request.notify', { id: row.id });
     // Confirmation explains the next step without inventing a response deadline.
-    return reply.code(201).send({ id: row.id, status: 'received' as const, nextStep: 'Our team will review your request and contact you by email to arrange a demo.' });
+    return reply.code(201).send({ id: row.id, status: 'received' as const, nextStep: demoRequestCopy(b.locale).nextStep });
   });
 
   app.get('/public/industries', {

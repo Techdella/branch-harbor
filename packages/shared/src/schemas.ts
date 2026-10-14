@@ -36,6 +36,8 @@ export const demoRequestSchema = z.object({
   existingSystems: z.string().max(500).optional(),
   locale: locale.default('en'),
   marketingConsent: z.boolean().default(false),
+  /** Cloudflare Turnstile token; required by the API only when bot checks are enabled. */
+  turnstileToken: z.string().max(2048).optional(),
 });
 export type DemoRequest = z.infer<typeof demoRequestSchema>;
 

@@ -14,9 +14,9 @@ async function forward(req: NextRequest, { params }: { params: Promise<{ path: s
   const headers: Record<string, string> = { accept: 'application/json' };
   const ct = req.headers.get('content-type');
   if (ct) headers['content-type'] = ct;
-  const fwd = req.headers.get('x-forwarded-for');
-  // The API trusts the proxy hop, so per-visitor rate limits keep working.
-  headers['x-forwarded-for'] = fwd ?? '127.0.0.1';
+  // Forward one visitor IP so per-visitor rate limits keep working. Take it from the right of the
+  // chain (entries appended by our own load balancers), never the client-controlled left side.
+  headers['x-forwarded-for'] = clientIp(req.headers.get('x-forwarded-for'));
   try {
     const res = await fetch(target, {
       method: req.method,
@@ -29,6 +29,14 @@ async function forward(req: NextRequest, { params }: { params: Promise<{ path: s
   } catch {
     return Response.json({ error: { code: 'api_unreachable', message: 'The service is unreachable. Please try again.' } }, { status: 503 });
   }
+}
+
+/** Number of trusted proxies in front of this app (default 1: one load balancer). */
+const TRUSTED_HOPS = Math.max(1, Number(process.env.SITES_TRUSTED_PROXY_HOPS ?? '1') || 1);
+
+function clientIp(chain: string | null): string {
+  const hops = (chain ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  return hops[hops.length - TRUSTED_HOPS] ?? hops[0] ?? '127.0.0.1';
 }
 
 export const GET = forward;

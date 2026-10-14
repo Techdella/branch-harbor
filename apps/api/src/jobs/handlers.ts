@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import type { Services } from '../context.ts';
 import { demoRequests } from '../db/schema/index.ts';
 import type { EmailMessage } from '../integrations/mailer.ts';
+import { demoRequestCopy } from '../lib/demoRequestCopy.ts';
 import { runConnectionSync } from '../services/connections.ts';
 import { expireHolds } from '../services/studios.ts';
 import { deliverPush, type NotifyInput } from '../services/notifications.ts';
@@ -21,10 +22,11 @@ export function registerJobHandlers(s: Services) {
       text: [`Name: ${d.name}`, `Email: ${d.email}`, `Business: ${d.business}`, `Industry: ${d.industry}`, `Locations: ${d.locationCount}`, `Country: ${d.country}`, `Website: ${d.existingWebsite ?? '—'}`, `Phone: ${d.phone ?? '—'}`, `Systems: ${d.existingSystems ?? '—'}`, `Difficulty: ${d.primaryDifficulty ?? '—'}`, `Locale: ${d.locale}`, `Marketing consent: ${d.marketingConsent ? 'yes' : 'no'}`].join('\n'),
       tag: 'demo-request',
     });
+    const copy = demoRequestCopy(d.locale);
     await s.mailer.send({
       to: d.email,
-      subject: 'Thanks for your interest in BranchHarbor',
-      text: `Hi ${d.name},\n\nThanks for telling us about ${d.business}. A member of our team will review your request and contact you by email to arrange a demo.\n\n— BranchHarbor`,
+      subject: copy.subject,
+      text: copy.body(d.name, d.business),
       tag: 'demo-request-confirmation',
     });
     await s.db.update(demoRequests).set({ notifiedAt: new Date() }).where(eq(demoRequests.id, id));
