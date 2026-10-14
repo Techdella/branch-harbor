@@ -82,16 +82,37 @@ booking is hidden and the page points to that system.
 * **Cookies**: only essential cookies (language choice, cookie choice). The banner says so; no analytics/ads.
 * **Theme**: `primaryColor` is checked for WCAG contrast by the API, which returns the button colour/text colour pair
   and a darkened "ink" variant for links. Fonts are limited to a safe list loaded via `next/font`.
-* **Payments**: in sandbox mode (API without Stripe keys) the pay button calls the sandbox-confirm endpoint, which
-  runs the same webhook processor as a real payment; the UI then polls the booking/order for the server's state.
+* **Payments**: every customer payment (studio bookings, purchases and fees; foods pickup/delivery/preorder, catering
+  deposit, tab and meal plans; wellness deposits, packages and vouchers; sports registration and instalments; commerce
+  checkout and order page) uses one component, `components/payments/CardPayment.tsx`:
+  * **Live** (API with Stripe keys): Stripe.js **Payment Element** (`@stripe/stripe-js` + `@stripe/react-stripe-js`),
+    loaded with `loadStripe(pk, { stripeAccount })` because charges are direct charges on the location's connected
+    account. The publishable key and account id come from `GET /v1/public/payments/:id` (no secrets). Confirmation uses
+    `redirect: 'if_required'` with a `return_url` back to the order/booking status or manage page, so 3-D Secure / SCA
+    happens in place; Apple Pay / Google Pay appear automatically where the account and domain allow. Errors are
+    localized (en/fr/de/es). The component then **polls the API**: a payment counts only once the signed webhook has
+    marked it succeeded — the browser never decides.
+  * **Consent**: memberships, meal plans and instalment plans show a required "save this card for renewals /
+    instalments" consent; other payments offer "save this card" and, for bookings with a cancellation policy,
+    "allow fee charging" with the policy shown. Bookings paid with credits or a membership show the same fee consent on
+    the confirmation (`FeeConsent`).
+  * **Sandbox** (API without Stripe keys): a clearly labelled "(simulated)" button calls the sandbox-confirm endpoint,
+    which runs the same webhook processor as a real payment.
+  * **Unavailable**: when Stripe.js can't load (offline, blocked) or the location has no card setup, a friendly
+    "card payments are unavailable" message is shown instead of a broken form.
+* **Saved cards** (`components/payments/SavedCard.tsx`): studio account, guardian portal (balances tab) and the meal-plan
+  page show the card on file and let customers add/update it with a SetupIntent (`stripe.confirmSetup`); a failed
+  renewal is retried with the new card by the server.
+* **Complete payment** (`/{brand}/{location}/pay/{paymentId}?token=`): signed link emailed when an automatic fee or
+  instalment charge needs the customer's bank confirmation (3-D Secure).
 * Accessibility: skip link, landmarks, labelled fields with inline errors + error summary, focus moved to step
   headings, native `<dialog>` for modifiers, `aria-live` order status, text + colour for states, 44px targets,
   reduced motion respected, works at 360px.
 
 ## Known gaps
 
-* Live card payments (Stripe Elements / Payment Element with the returned `clientSecret`) are not wired; outside
-  sandbox mode the site says card payment isn't available rather than pretending.
+* Apple Pay on custom domains requires registering each domain on each connected account (see
+  docs/API_INTEGRATIONS.md → Stripe); until then the Payment Element simply doesn't offer Apple Pay there.
 * The map is a schematic SVG (no tiles); directions open OpenStreetMap.
 * Waitlist offers (spot opened while waitlisted) are completed through the email link handled by the business app,
   not a dedicated page here.

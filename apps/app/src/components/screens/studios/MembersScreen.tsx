@@ -79,6 +79,7 @@ export function MembersScreen() {
 
 function MemberDetailPanel({ id, onChanged }: { id: string; onChanged: () => void }) {
   const t = useTranslations('studiosFull.members');
+  const ta = useTranslations('autoPay');
   const locale = useLocale();
   const app = useApp();
   const res = useStudio((api) => api.member(id), [id]);
@@ -186,6 +187,8 @@ function MemberDetailPanel({ id, onChanged }: { id: string; onChanged: () => voi
                   <span className="w-32">{t(`feeKind.${f.kind}`)}</span><span className="tabular">{fmtMoney(f.amount.amount, f.amount.currency, locale)}</span>
                   <Badge tone={f.status === 'due' ? 'warning' : f.status === 'paid' ? 'success' : 'neutral'} icon={f.status === 'due' ? 'alert' : 'check'}>{t(`feeStatus.${f.status}`)}</Badge>
                   {f.waiveReason && <span className="text-stone">{f.waiveReason}</span>}
+                  {f.autoCharge && <Badge tone={f.autoCharge.state === 'failed' ? 'danger' : f.autoCharge.state === 'succeeded' ? 'success' : 'warning'} icon={null}>{ta('autoBadge', { state: ta(`state_${f.autoCharge.state}` as 'state_failed') })}</Badge>}
+                  {f.autoCharge?.failureMessage && <span className="text-danger">{f.autoCharge.failureMessage}</span>}
                   {canWrite && f.status === 'due' && <Button size="sm" variant="ghost" onClick={() => run((a) => a.waiveFee(f.id, 'Waived by staff'), t('waived'))}>{t('waive')}</Button>}
                 </div>
               ))}

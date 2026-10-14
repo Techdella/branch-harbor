@@ -40,6 +40,8 @@ import type {
   OrgSettings,
   Overview,
   PaymentAccount,
+  PaymentAutomation,
+  AutoChargeRow,
   PaymentState,
   ReconciliationItem,
   RefundState,
@@ -1525,6 +1527,15 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
         capabilities: l.paymentsEnabled ? ['Card payments', 'Refunds'] : [],
       }));
     },
+    automation: async (ctx) => {
+      const scope = inScope(ctx);
+      const [settings, list] = await Promise.all([
+        http.get<PaymentAutomation>(o('/payments/automation')),
+        http.get<{ items: AutoChargeRow[] }>(o('/payments/off-session-charges')),
+      ]);
+      return { settings, charges: list.items.filter((c) => scope.has(c.locationId)) };
+    },
+    setAutomation: async (patch) => ({ ...(await http.put<Omit<PaymentAutomation, 'providerMode'>>(o('/payments/automation'), patch)), providerMode: 'live' as const }),
   },
 
   connections: {

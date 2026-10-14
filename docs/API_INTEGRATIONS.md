@@ -12,7 +12,7 @@ Env var names match `apps/api/.env.example`, `apps/app/.env.example` and `apps/m
 
 | # | Service | What it's for | Recommended provider | Alternatives | Env vars |
 |---|---|---|---|---|---|
-| 1 | **Payments: customer payments** | Bookings, orders, registrations, deposits; one connected account per location or owner group; refunds; payouts. Webhooks confirm outcomes. | **Stripe Connect** (direct charges, Express/Standard accounts). Covers 45+ countries including every launch market. | Adyen for Platforms (enterprise, strong in EU), Mollie Connect (EU), Square (US/CA/UK/AU/IE/FR/ES/JP; also a POS integration) | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_CLIENT_ID`, `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` |
+| 1 | **Payments: customer payments** | Bookings, orders, registrations, deposits; one connected account per location or owner group; refunds; payouts. Webhooks confirm outcomes. | **Stripe Connect** (direct charges, Express/Standard accounts). Covers 45+ countries including every launch market. | Adyen for Platforms (enterprise, strong in EU), Mollie Connect (EU), Square (US/CA/UK/AU/IE/FR/ES/JP; also a POS integration) | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`, `STRIPE_CONNECT_CLIENT_ID` (see [Stripe: what is live](#stripe-what-is-live-and-what-to-configure)) |
 | 2 | **Payments: BranchHarbor subscription billing** | Per-location plan billing, invoices, dunning, customer portal | **Stripe Billing** (same account as #1, kept logically separate) | Paddle or Lemon Squeezy as merchant of record, if you'd rather not handle global SaaS VAT/GST yourself | `STRIPE_BILLING_PRICE_*` |
 | 3 | **Tax calculation** | Sales tax / VAT / GST on customer payments and on SaaS billing. US nexus, EU OSS, UK VAT, Canadian GST/HST/PST, Australian GST. | **Stripe Tax** | Avalara, TaxJar, Anrok (SaaS tax) | Stripe key + tax registrations configured in the dashboard |
 | 4 | **Transactional email** | Verification, invites, booking/order confirmations, receipts, approvals | **Postmark** | Resend, Amazon SES, SendGrid. Mailpit for local dev (already in docker-compose). | `EMAIL_PROVIDER`, `POSTMARK_SERVER_TOKEN` / `RESEND_API_KEY`, `EMAIL_FROM` |
@@ -180,6 +180,67 @@ Partner approval: ask **realestate.com.au** (REA) and/or **Domain** to enable RE
 - removal on withdraw
 
 ---
+
+## Stripe: what is live and what to configure
+
+**Live in the code (API + hosted sites + mobile app):**
+
+- **Direct charges on connected accounts.** Every customer payment is a PaymentIntent created on the location's
+  connected account (or the organisation's shared account), with the platform's application fee. Cards, Apple Pay,
+  Google Pay and the local methods the account has enabled show up automatically (`automatic_payment_methods`).
+- **Card entry.** Hosted sites use one shared `<CardPayment>` component (Stripe.js Payment Element, loaded with
+  `loadStripe(pk, { stripeAccount })`, `redirect: 'if_required'`, 3-D Secure in place, return URL = the order/booking
+  status page). The mobile app uses `@stripe/stripe-react-native` PaymentSheet with `stripeAccountId`, Apple Pay /
+  Google Pay and `returnURL: branchharbor://stripe-redirect`. The API returns only the publishable key and the
+  connected account id (`GET /v1/public/payments/:id`, `GET /v1/public/payments/config?locationId=`), never a secret.
+- **Nothing is marked paid by a browser or a phone.** Records are fulfilled only by the signed webhook (or, without
+  keys, by the sandbox endpoint that runs the same event processor). Clients poll the API.
+- **Saved cards.** One Stripe Customer per (customer, connected account). The card is kept with `setup_future_usage:
+  'off_session'` only after explicit consent at checkout (required for studio memberships, meal plans and sports
+  instalment plans; optional otherwise), stored in `payment_consents` with the exact text shown. Customers update the
+  card with a SetupIntent from their account page (studio account, guardian portal, meal-plan page, app pass screen).
+- **Subscriptions.** Studio memberships: first month paid at checkout, then a Stripe Subscription on the connected
+  account with the saved card as default, `trial_end` = end of the paid period, and one recurring price per
+  plan/currency created once (`stripe_recurring_prices` + lookup key). Meal plans: weekly subscription with the first
+  invoice confirmed in the Payment Element / PaymentSheet. Dunning: `invoice.payment_failed` / `customer.subscription.updated`
+  (`past_due`) → grace; `unpaid` → suspended; `invoice.paid` → active again; a card update retries open invoices.
+- **Merchant-initiated charges** (`off_session_charges`, one idempotency key per fee/instalment attempt):
+  late-cancel / no-show fees (studios, wellness) when the customer agreed to fee charging at booking and has a saved
+  card, after a waive window (default 24 h, organisation setting, can be turned off: `PUT /v1/orgs/:orgId/payments/automation`);
+  sports instalments on their due date. Failures leave the fee/instalment unpaid, email the customer and show in
+  Payments → Automatic charges. When the bank asks for 3-D Secure, the customer is emailed a signed link
+  (`/{brand}/{location}/pay/{paymentId}?token=`) to confirm the payment.
+
+**What to configure in Stripe:**
+
+1. **Connect settings** (Dashboard → Connect → Settings): enable the platform for the connected-account countries you
+   launch in; accounts are created as Standard-like accounts with the Stripe Dashboard and `fees.payer = account`
+   (`controller` settings in `integrations/payments.ts`). Branding (icon, colour) is used by Stripe-hosted onboarding.
+2. **API keys:** `STRIPE_SECRET_KEY` (restricted keys work if they cover PaymentIntents, SetupIntents, Customers,
+   Products, Prices, Subscriptions, Invoices, Refunds, Accounts, Account Links) and `STRIPE_PUBLISHABLE_KEY`
+   (returned to browsers/apps; it is public by design).
+3. **Two webhook endpoints:**
+   - **Platform endpoint** → `https://api.<domain>/v1/webhooks/stripe`, secret `STRIPE_WEBHOOK_SECRET`. Events:
+     `account.updated`, `charge.refunded`, `payment_intent.*` for platform-account charges.
+   - **Connect endpoint** ("Listen to events on Connected accounts") → `https://api.<domain>/v1/webhooks/stripe/connect`,
+     secret `STRIPE_CONNECT_WEBHOOK_SECRET`. Events: `payment_intent.succeeded`, `payment_intent.payment_failed`,
+     `payment_intent.canceled`, `payment_intent.requires_action`, `charge.refunded`, `setup_intent.succeeded`,
+     `invoice.paid`, `invoice.payment_failed`, `customer.subscription.updated`, `customer.subscription.deleted`,
+     `account.updated`. Every Connect event carries `account`; the API rejects a Connect-signed event without it and
+     a platform-signed event with it. Processing is idempotent (`webhook_events` unique event id, in the same
+     transaction as the side effects).
+4. **Apple Pay domain verification, per domain.** Apple Pay in the Payment Element only appears on registered domains.
+   For direct charges the domain must be registered **on each connected account**: `POST /v1/payment_method_domains`
+   with `domain_name` and the `Stripe-Account` header, for `sites.branchharbor.com` and for every customer custom
+   domain once it is `ready` (and again if the domain changes). Google Pay needs no registration. In the app, set
+   `STRIPE_MERCHANT_IDENTIFIER` (Apple merchant id, also `EXPO_PUBLIC_STRIPE_MERCHANT_IDENTIFIER`) and upload the
+   Apple Pay certificate to Stripe.
+5. **Billing settings** (per connected account, Dashboard → Billing → Subscriptions and emails): Smart Retries and the
+   retry schedule drive dunning; BranchHarbor's grace period (plan `graceDays`) suspends access after it.
+
+Without `STRIPE_SECRET_KEY` everything runs in **sandbox mode**: no network calls, fake ids, "Simulate payment" buttons
+clearly labelled as test mode, and `POST /v1/public/payments/:id/sandbox-confirm` / `…/setup/:id/sandbox-complete`
+feed synthetic events through the same processor.
 
 ## What to set up first (shortest path to a Studios pilot)
 

@@ -188,6 +188,26 @@ export async function processStudioBillingEvent(tx: Tx, event: Stripe.Event): Pr
     await recordRenewal(tx, m, { outcome: 'failed', externalId: String(obj.id), failureReason: obj.last_finalization_error?.message ?? 'Payment failed' });
     return { handled: true, note: 'Membership in grace period', organizationId: m.organizationId };
   }
+  if (event.type === 'customer.subscription.updated') {
+    // Dunning state from Stripe Billing: past_due → grace (still usable), unpaid → suspended. Recovery comes with invoice.paid.
+    const now = new Date();
+    if (obj.status === 'past_due' && m.status === 'active') {
+      const [plan] = m.planId ? await tx.select().from(studioMembershipPlans).where(eq(studioMembershipPlans.id, m.planId)) : [];
+      await tx.update(memberships).set({ status: 'grace', graceUntil: m.graceUntil ?? new Date(now.getTime() + (plan?.graceDays ?? 7) * DAY), failedPaymentAt: m.failedPaymentAt ?? now, updatedAt: now }).where(eq(memberships.id, m.id));
+      return { handled: true, note: 'Membership in grace period (subscription past due)', organizationId: m.organizationId };
+    }
+    if (obj.status === 'unpaid' && ['active', 'grace'].includes(m.status)) {
+      await tx.update(memberships).set({ status: 'suspended', updatedAt: now }).where(eq(memberships.id, m.id));
+      await enqueueCustomerNotifications(tx, { organizationId: m.organizationId, locationId: m.locationId!, customerIds: [m.customerId], kind: 'membership_changed', subject: `Membership on hold: ${m.plan}`, body: `Your ${m.plan} membership is on hold because the renewal payment could not be taken. Update your card to book again.` });
+      await audit(tx, { organizationId: m.organizationId, actorUserId: null, actorType: 'webhook', action: 'membership.suspended', scopeKind: 'location', scopeId: m.locationId, targetType: 'membership', targetId: m.id });
+      return { handled: true, note: 'Membership suspended (subscription unpaid)', organizationId: m.organizationId };
+    }
+    if (obj.status === 'canceled' && m.status !== 'cancelled') {
+      await tx.update(memberships).set({ status: 'cancelled', endsAt: now, updatedAt: now }).where(eq(memberships.id, m.id));
+      return { handled: true, note: 'Membership cancelled at the provider', organizationId: m.organizationId };
+    }
+    return { handled: true, note: `Subscription ${obj.status ?? 'updated'} (no change)`, organizationId: m.organizationId };
+  }
   if (event.type === 'customer.subscription.deleted') {
     await tx.update(memberships).set({ status: 'cancelled', endsAt: new Date(), updatedAt: new Date() }).where(eq(memberships.id, m.id));
     return { handled: true, note: 'Membership cancelled at the provider', organizationId: m.organizationId };

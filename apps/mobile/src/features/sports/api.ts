@@ -5,6 +5,7 @@
  */
 import { env } from '@/lib/env';
 import { http } from '@/lib/http';
+import { payPayment, type Translate } from '@/lib/cardPayment';
 
 export interface Money { amount: number; currency: string }
 export interface GInstalment { id: string; seq: number; dueOn: string; amount: Money; status: string; state: string }
@@ -23,11 +24,11 @@ const sportsOrgs = async () => (await http<{ organizations: MeOrg[] }>('GET', '/
 const live = {
   guardian: () => http<GuardianOverview>('GET', '/me/sports'),
   reportAbsence: (participantId: string, sessionId: string, reason: string, note?: string) => http<unknown>('POST', '/me/sports/absences', { participantId, sessionId, reason, ...(note ? { note } : {}) }),
-  async payInstalment(id: string): Promise<{ ok: boolean; sandbox: boolean }> {
-    const r = await http<{ payment: { id: string; sandbox: boolean } }>('POST', `/me/sports/instalments/${id}/pay`, {});
-    if (!r.payment.sandbox) return { ok: false, sandbox: false };
-    const c = await http<{ payment: { state: string } }>('POST', `/public/payments/${r.payment.id}/sandbox-confirm`, { outcome: 'succeeded' }, { auth: false });
-    return { ok: c.payment.state === 'succeeded', sandbox: true };
+  /** PaymentSheet on iOS/Android (sandbox: simulated); resolves once the API has the signed webhook. */
+  async payInstalment(id: string, t?: Translate): Promise<{ ok: boolean; sandbox: boolean; message?: string }> {
+    const r = await http<{ payment: { id: string; sandbox: boolean; clientSecret?: string | null } }>('POST', `/me/sports/instalments/${id}/pay`, {});
+    const res = await payPayment(r.payment, t);
+    return { ok: res.ok, sandbox: r.payment.sandbox, ...(res.ok ? {} : { message: res.message }) };
   },
   messages: async () => (await http<{ items: GMessage[] }>('GET', '/me/sports/messages')).items,
   sendMessage: (locationId: string, body: string) => http<GMessage>('POST', '/me/sports/messages', { locationId, body }),

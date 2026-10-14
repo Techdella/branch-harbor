@@ -6,7 +6,7 @@ import { Icon } from '@bh/ui';
 import { call } from '@/lib/client';
 import { calendarLabel, money } from '@/lib/format';
 import type { Programme } from '@/lib/types';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
 
 type Result = { registration: { id: string; status: string; totalFee: { amount: number; currency: string } }; payment: PaymentInfo | null; nextStep: string; manageToken: string; ageGroup: string; instalments: { seq: number; dueOn: string; amount: { amount: number; currency: string } }[] };
 
@@ -52,7 +52,7 @@ export function RegisterProgramme({ programme, feeLabel, brandName, timeZone, po
       <div className="mt-4 space-y-3">
         <p className="text-sm">{t('reviewNote')}</p>
         <ErrorSummary message={error?.message ?? null} />
-        <PayButton payment={payment} label={tb('payCta', { amount: fmt(payment.amount ?? 0, payment.currency ?? programme.fee.currency) })} onDone={async (r) => {
+        <CardPayment payment={payment} label={tb('payCta', { amount: fmt(payment.amount ?? 0, payment.currency ?? programme.fee.currency) })} onDone={async (r) => {
           if (r.ok) { setPaid(true); setRes({ ...res, registration: { ...res.registration, status: programme.requiresApproval ? 'awaiting_review' : 'accepted' } }); return; }
           setError({ message: r.message ?? tb('paymentFailed') });
           // Retry: a new payment attempt; capacity is re-checked by the server (may move to the waitlist).

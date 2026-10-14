@@ -8,6 +8,7 @@ import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import { http } from '@/lib/http';
 import { network } from '@/lib/network';
+import { payPayment } from '@/lib/cardPayment';
 
 export interface KdsTicket {
   id: string; orderNumber: string; firstName: string; channel: string; tableLabel: string | null; status: 'queued' | 'in_progress' | 'done'; orderStatus: string;
@@ -61,12 +62,14 @@ const live = {
   deliveryQuote: async (locationId: string, body: { slotId: string; address: { line1: string; city: string; postalCode: string }; lines: Array<{ itemId: string; quantity: number; optionIds: string[] }> }): Promise<DeliveryQuote> =>
     http('POST', `/public/foods/${locationId}/checkout/quote`, { channel: 'delivery', deliverySlotId: body.slotId, address: body.address, lines: body.lines.map((l) => ({ menuItemId: l.itemId, quantity: l.quantity, modifierIds: l.optionIds })) }, { auth: false }),
   placeDelivery: async (locationId: string, body: { slotId: string; address: { line1: string; city: string; postalCode: string }; lines: Array<{ itemId: string; quantity: number; optionIds: string[] }>; name: string; email: string; phone?: string; expectedTotalMinor: number }) => {
-    const r = await http<{ order: { id: string; orderNumber: string }; manageToken: string; payment: { id: string; sandbox: boolean } | null }>('POST', `/public/foods/${locationId}/checkout`, {
+    const r = await http<{ order: { id: string; orderNumber: string }; manageToken: string; payment: { id: string; sandbox: boolean; clientSecret?: string | null } | null }>('POST', `/public/foods/${locationId}/checkout`, {
       channel: 'delivery', deliverySlotId: body.slotId, address: body.address, lines: body.lines.map((l) => ({ menuItemId: l.itemId, quantity: l.quantity, modifierIds: l.optionIds })),
       contact: { name: body.name, email: body.email, ...(body.phone ? { phone: body.phone } : {}) }, expectedTotalMinor: body.expectedTotalMinor,
     }, { auth: false });
-    if (r.payment?.sandbox) await http('POST', `/public/payments/${r.payment.id}/sandbox-confirm`, { outcome: 'succeeded' }, { auth: false });
-    return { orderNumber: r.order.orderNumber, paid: !!r.payment?.sandbox };
+    // PaymentSheet on iOS/Android (sandbox: simulated); the order is paid once the API has the signed webhook.
+    const paid = r.payment ? await payPayment(r.payment) : { ok: true as const };
+    if (!paid.ok && !paid.cancelled) throw new Error(paid.message);
+    return { orderNumber: r.order.orderNumber, paid: paid.ok };
   },
 };
 

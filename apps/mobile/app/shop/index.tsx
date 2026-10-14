@@ -37,7 +37,7 @@ export default function Shop() {
       const q = await commerce.quote(cur, lines);
       if (!q.ok) { setErr(q.issues[0]?.message ?? 'Unavailable'); return; }
       const r = await commerce.checkout(cur, lines, contact, q.total.amount);
-      if (r.payment?.sandbox) await commerce.pay(r.payment.id, r.order.id);
+      if (r.payment) await commerce.pay(r.payment, r.order.id).catch((e: Error) => setErr(e.message));
       setCart([]); setCheckingOut(false); mine.refresh();
       router.push({ pathname: '/shop/order', params: { id: r.order.id } });
     } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }

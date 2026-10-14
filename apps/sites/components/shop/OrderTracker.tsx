@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
-import { ErrorSummary, PayButton } from '@/components/forms';
+import { ErrorSummary, CardPayment } from '@/components/forms';
 import { dateTime, money } from '@/lib/format';
 import { shop, type PublicOrder } from '@/lib/shop';
 
@@ -58,7 +58,7 @@ export function OrderTracker({ initial, token }: { initial: PublicOrder; token: 
         <section className="card space-y-3 p-5">
           <h2 className="text-lg font-bold">{t('completePayment')}</h2>
           {o.reservationExpiresAt && <p className="text-sm">{t('heldUntilTime', { time: dateTime(o.reservationExpiresAt, tz, locale) })}</p>}
-          <PayButton payment={{ id: o.payment.id, sandbox: o.payment.sandbox }} label={t('payCta', { amount: money(o.amountDue, locale) })} onDone={async (r) => { if (!r.ok) setError(r.message ?? t('paymentFailed')); await refresh(); }} />
+          <CardPayment payment={{ id: o.payment.id, sandbox: o.payment.sandbox, clientSecret: o.payment.clientSecret ?? null }} label={t('payCta', { amount: money(o.amountDue, locale) })} onDone={async (r) => { if (!r.ok) setError(r.message ?? t('paymentFailed')); await refresh(); }} />
           {o.cancellable && <button type="button" className="text-sm underline" onClick={async () => { const r = await shop<PublicOrder>('POST', `/public/commerce/orders/${o.id}/cancel?token=${encodeURIComponent(token)}`, {}); if (r.ok) setO(r.data); else setError(r.error.message); }}>{t('cancelOrder')}</button>}
         </section>
       )}

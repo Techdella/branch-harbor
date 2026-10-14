@@ -24,7 +24,7 @@ import { AppError, conflict, forbidden, notFound, validationError } from '../lib
 import { audit } from './audit.ts';
 import { hasPerm, requireLocationPerm } from './authz.ts';
 import { findOrCreateCustomer, type ContactInput } from './customers.ts';
-import { assertPaymentsEnabled, type PaymentRow } from './payments.ts';
+import { assertPaymentsEnabled, customizeIntent, type PaymentRow } from './payments.ts';
 import { guardiansOf, notifyGuardians } from './sports-notify.ts';
 
 type Programme = typeof programmes.$inferSelect;
@@ -220,7 +220,10 @@ export async function payInstalment(s: Services, instalmentId: string, opts: { f
   if (acct.location.currency !== inst.currency) throw validationError('Instalment currency does not match the location currency');
   const attempt = inst.paymentAttempts + 1;
   const applicationFeeMinor = Math.floor((inst.amountMinor * acct.feeBps) / 10_000);
+  // Instalment plans keep the card (with the guardian's consent) for the later instalments.
+  const saving = await customizeIntent(s, { organizationId: inst.organizationId, locationId: inst.locationId, targetType: 'registration', targetId: inst.registrationId, connectedAccountId: acct.accountId });
   const intent = await s.payments.createPaymentIntent({
+    ...(saving ?? {}),
     amountMinor: inst.amountMinor, currency: inst.currency, connectedAccountId: acct.accountId, applicationFeeMinor,
     idempotencyKey: `sports_instalment:${inst.id}:${attempt}`, description: `Registration instalment ${inst.seq}`,
     metadata: { bh_org: inst.organizationId, bh_location: inst.locationId, bh_target_type: 'registration', bh_target_id: inst.registrationId, bh_instalment: inst.id },

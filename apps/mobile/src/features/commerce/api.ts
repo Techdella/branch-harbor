@@ -8,6 +8,7 @@ import { ApiError } from '@/lib/errors';
 import { http } from '@/lib/http';
 import { storage } from '@/lib/storage';
 import type { Money } from '@bh/shared';
+import { payPayment, type PayablePayment, type Translate } from '@/lib/cardPayment';
 
 export const SHOP_BRAND = process.env.EXPO_PUBLIC_SHOP_BRAND || 'fieldnote-goods';
 type M = Money;
@@ -19,7 +20,7 @@ export interface Quote { total: M; subtotal: M; taxLines: Array<{ name: string; 
 export interface ShopOrder {
   id: string; number: string; status: string; paymentStatus: string; fulfilmentStatus: string; fulfilmentMethod: string; locationName: string | null; fulfilmentLocationName: string | null;
   lines: Array<{ variantId: string; name: string; quantity: number; lineTotal: M }>; total: M; amountDue: M; createdAt: string; reservationExpiresAt: string | null;
-  payment?: { id: string; state: string; sandbox: boolean } | null; returnable?: Array<{ variantId: string; name: string; max: number }>; returns?: Array<{ id: string; rmaNumber: string | null; status: string }>;
+  payment?: { id: string; state: string; sandbox: boolean; clientSecret?: string | null } | null; returnable?: Array<{ variantId: string; name: string; max: number }>; returns?: Array<{ id: string; rmaNumber: string | null; status: string }>;
   returnPolicy?: { open: boolean; endsAt: string };
 }
 export interface QueueOrder { id: string; number: string; customer: { name: string | null }; fulfilmentStatus: string; fulfilmentMethod: string; lines: Array<{ variantId: string; name: string; quantity: number }>; fulfilments: Array<{ id: string; status: string; next: string[]; lines: Array<{ variantId: string; quantity: number; picked: number }> }> }
@@ -78,21 +79,23 @@ export const commerce = {
     if (env.useMocks) { const sub = lines.reduce((a, l) => a + (MOCK_PRODUCTS.flatMap((p) => p.variants).find((v) => v.id === l.variantId)?.price?.amount ?? 0) * l.quantity, 0); return delay({ subtotal: usd(sub), total: usd(sub), amountDue: usd(sub), taxLines: [], ok: true, issues: [] }); }
     return http('POST', `/public/commerce/locations/${store.id}/quote`, { lines, fulfilment: { method: 'pickup' } }, { auth: false });
   },
-  async checkout(store: ShopStore, lines: Array<{ variantId: string; quantity: number }>, contact: { name: string; email: string }, expectedTotalMinor: number): Promise<{ order: ShopOrder; manageToken: string; payment: { id: string; sandbox: boolean } | null }> {
+  async checkout(store: ShopStore, lines: Array<{ variantId: string; quantity: number }>, contact: { name: string; email: string }, expectedTotalMinor: number): Promise<{ order: ShopOrder; manageToken: string; payment: { id: string; sandbox: boolean; clientSecret?: string | null } | null }> {
     if (env.useMocks) {
       const o: ShopOrder = { id: `mo${Date.now()}`, number: `PD-${1000 + mockOrders.length + 10}`, status: 'pending_payment', paymentStatus: 'pending', fulfilmentStatus: 'unfulfilled', fulfilmentMethod: 'pickup', locationName: store.name, fulfilmentLocationName: store.name, lines: lines.map((l) => ({ variantId: l.variantId, name: MOCK_PRODUCTS.flatMap((p) => p.variants.map((v) => ({ v, p }))).find((x) => x.v.id === l.variantId)?.p.name ?? 'Item', quantity: l.quantity, lineTotal: usd(1800 * l.quantity) })), total: usd(expectedTotalMinor), amountDue: usd(expectedTotalMinor), createdAt: now(), reservationExpiresAt: new Date(Date.now() + 15 * 60_000).toISOString(), payment: { id: 'pay_mock', state: 'created', sandbox: true }, returnable: [], returns: [] };
       mockOrders = [o, ...mockOrders];
       await rememberOrder(o.id, 'mock-token-0000');
       return delay({ order: o, manageToken: 'mock-token-0000', payment: { id: 'pay_mock', sandbox: true } });
     }
-    const r = await http<{ order: ShopOrder; manageToken: string; payment: { id: string; sandbox: boolean } | null }>('POST', `/public/commerce/locations/${store.id}/checkout`, { lines, fulfilment: { method: 'pickup' }, contact, expectedTotalMinor });
+    const r = await http<{ order: ShopOrder; manageToken: string; payment: { id: string; sandbox: boolean; clientSecret?: string | null } | null }>('POST', `/public/commerce/locations/${store.id}/checkout`, { lines, fulfilment: { method: 'pickup' }, contact, expectedTotalMinor });
     await rememberOrder(r.order.id, r.manageToken);
     return r;
   },
-  async pay(paymentId: string, orderId: string) {
+  /** PaymentSheet on iOS/Android (sandbox: simulated); resolves once the API has the signed webhook. */
+  async pay(payment: PayablePayment, orderId: string, t?: Translate) {
     if (env.useMocks) { mockOrders = mockOrders.map((o) => (o.id === orderId ? { ...o, status: 'paid', paymentStatus: 'paid', reservationExpiresAt: null } : o)); return delay(true); }
-    const r = await http<{ payment: { state: string } }>('POST', `/public/payments/${paymentId}/sandbox-confirm`, { outcome: 'succeeded' }, { auth: false });
-    return r.payment.state === 'succeeded';
+    const r = await payPayment(payment, t);
+    if (!r.ok && !r.cancelled) throw new Error(r.message);
+    return r.ok;
   },
   async order(id: string): Promise<ShopOrder> {
     if (env.useMocks) { const o = mockOrders.find((x) => x.id === id); if (!o) throw new ApiError(404, 'not_found', 'Order not found'); return delay(o); }

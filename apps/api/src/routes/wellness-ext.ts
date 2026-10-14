@@ -670,6 +670,7 @@ export const wellnessExtRoutes: FastifyPluginAsyncZod = async (app) => {
       const vouchers = await s.db.select().from(wellnessGiftVouchers).where(and(eq(wellnessGiftVouchers.organizationId, orgId), eq(wellnessGiftVouchers.purchaserCustomerId, c.id)));
       const notes = (await s.db.select().from(wellnessClientNotes).where(eq(wellnessClientNotes.customerId, c.id)).orderBy(desc(wellnessClientNotes.createdAt))).filter((n) => noteVisible(n, v));
       const charges = await s.db.select().from(wellnessAppointmentCharges).where(inArray(wellnessAppointmentCharges.appointmentId, appts.length ? appts.map((a) => a.a.id) : ['00000000-0000-0000-0000-000000000000']));
+      const autoCharges = await (await import('../services/payments-saved.ts')).autoChargeStates(s.db, 'wellness_fee', charges.map((x) => x.id));
       const intakeCount = (await s.db.select({ n: sql<number>`count(*)::int` }).from(intakeResponses).where(eq(intakeResponses.customerId, c.id)))[0]?.n ?? 0;
       const canIntake = (await authorisedLocations(req, s.db, orgId, 'customers.read'));
       return {
@@ -678,7 +679,7 @@ export const wellnessExtRoutes: FastifyPluginAsyncZod = async (app) => {
         appointments: appts.map((r) => ({ ...serializeAppointment(r.a), serviceName: r.svc, practitionerName: r.p, locationName: r.l, timeZone: r.tz })),
         packages: pk.map((r) => serializeClientPackage(r.cp, r.plan)), vouchersPurchased: vouchers.map((x) => serializeVoucher(x)),
         notes: notes.map((n) => ({ id: n.id, body: n.body, confidential: n.confidential, locationId: n.locationId, appointmentId: n.appointmentId, authorUserId: n.authorUserId, mine: n.authorUserId === req.user!.id, createdAt: n.createdAt.toISOString() })),
-        charges: charges.map((x) => ({ appointmentId: x.appointmentId, kind: x.kind, fee: { amount: x.feeMinor, currency: x.currency }, outstanding: { amount: x.outstandingMinor, currency: x.currency }, status: x.status })),
+        charges: charges.map((x) => ({ appointmentId: x.appointmentId, kind: x.kind, fee: { amount: x.feeMinor, currency: x.currency }, outstanding: { amount: x.outstandingMinor, currency: x.currency }, status: x.status, autoCharge: autoCharges.get(x.id) ?? null })),
         intake: { responses: intakeCount, restricted: true, canView: canIntake === 'all' || [...locs].some((l) => (canIntake as Set<string>).has(l)), aiContext: 'excluded' as const },
         stats: { visits: appts.filter((a) => a.a.status === 'completed').length, noShows: appts.filter((a) => a.a.status === 'no_show').length, lateCancellations: appts.filter((a) => a.a.cancellationKind === 'late').length },
       };

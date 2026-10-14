@@ -6,7 +6,7 @@ import { Icon } from '@bh/ui';
 import { call } from '@/lib/client';
 import { calendarLabel, localDate, money, time, zone } from '@/lib/format';
 import type { FoodOrder, Menu, MenuItem, Quote, Slot } from '@/lib/foods';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
 
 type Line = { key: string; item: MenuItem; modifierIds: string[]; quantity: number };
 type Step = 'time' | 'menu' | 'review' | 'details' | 'pay';
@@ -262,8 +262,9 @@ export function OrderFlow(props: { locationId: string; locationName: string; bra
         <section aria-labelledby="h-pay" className="card max-w-xl space-y-4 p-6">
           <h2 id="h-pay" ref={headingRef} tabIndex={-1} className="text-xl font-extrabold outline-none">{t('statusTitle', { number: placed.order.orderNumber })}</h2>
           <p>{t('awaitingBody')}</p>
-          <PayButton
+          <CardPayment
             payment={placed.payment}
+            returnUrl={`${props.statusBase}/${placed.order.id}?token=${encodeURIComponent(placed.manageToken)}`}
             label={tb('payCta', { amount: money(placed.order.total, locale) })}
             onDone={(r) => { if (r.ok) goStatus(placed.order, placed.manageToken); else setError({ message: r.message ?? tb('paymentFailed') }); }}
           />

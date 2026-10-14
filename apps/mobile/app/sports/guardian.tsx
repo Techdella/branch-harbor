@@ -71,8 +71,9 @@ export default function GuardianScreen() {
 }
 
 function PayButton({ id, label, onDone }: { id: string; label: string; onDone: (ok: boolean) => void }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
-  return <Button size="sm" label={label} loading={busy} onPress={async () => { setBusy(true); try { const r = await sportsApi.payInstalment(id); onDone(r.ok); } catch { onDone(false); } finally { setBusy(false); } }} />;
+  return <Button size="sm" label={label} loading={busy} onPress={async () => { setBusy(true); try { const r = await sportsApi.payInstalment(id, t); onDone(r.ok); } catch { onDone(false); } finally { setBusy(false); } }} />;
 }
 
 function Schedule({ sessions, onDone }: { sessions: GSession[]; onDone: () => void }) {

@@ -35,7 +35,7 @@ import type {
   Organization,
   OrgSettings,
   Overview,
-  PaymentAccount,
+  PaymentAccount, PaymentAutomation, AutoChargeRow,
   ReconciliationItem,
   Registration,
   Report,
@@ -134,6 +134,8 @@ export interface BranchHarborApi {
     recreateOrder(itemId: string): Promise<ReconciliationItem>;
     refund(itemId: string, confirm: { amount: number; currency: string }): Promise<ReconciliationItem>;
     accounts(ctx: RequestContext): Promise<PaymentAccount[]>;
+    automation(ctx: RequestContext): Promise<{ settings: PaymentAutomation; charges: AutoChargeRow[] }>;
+    setAutomation(patch: Partial<Omit<PaymentAutomation, 'providerMode'>>): Promise<PaymentAutomation>;
   };
 
   connections: {

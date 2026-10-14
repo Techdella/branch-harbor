@@ -394,6 +394,13 @@ export interface ReconciliationItem {
   resolution?: string;
   timeline: TimelineEvent[];
 }
+/** Automatic (off-session) charging of fees and instalments to cards customers agreed to keep on file. */
+export interface PaymentAutomation { autoChargeFees: boolean; feeChargeDelayHours: number; autoChargeInstalments: boolean; providerMode: 'live' | 'sandbox' }
+export interface AutoChargeRow {
+  id: string; kind: 'studio_fee' | 'wellness_fee' | 'sports_instalment'; locationId: string; customer: { id: string; name: string | null }; amount: { amount: number; currency: string };
+  state: 'pending' | 'processing' | 'succeeded' | 'failed' | 'requires_action' | 'cancelled'; failureMessage: string | null; createdAt: string;
+}
+
 export interface PaymentAccount {
   locationId: string;
   provider: string;

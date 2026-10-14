@@ -108,6 +108,7 @@ All org routes are `/v1/orgs/:orgId/…` for the selected organisation; lists ar
 | `payments.transactions` / `reconciliation` | `GET /payments?limit=200`, `GET /payments/reconciliation` |
 | `payments.recreateOrder` / `refund` | `POST /payments/:id/recreate-record`; `POST /payments/:id/refunds { amountMinor, confirmCurrency }` |
 | `payments.accounts` | `GET /payments/connect/status` |
+| `payments.automation` / `setAutomation` | `GET /payments/automation` + `GET /payments/off-session-charges`; `PUT /payments/automation { autoChargeFees, feeChargeDelayHours, autoChargeInstalments }` |
 | `connections.list` / `fix` | `GET /connections`; `POST /connections/:id/sync` (degraded) or `/test` (disconnected / expired) |
 | `team.members` / `invite` | `GET /members` + `GET /invitations`; `POST /invitations { email, role, scope }` |
 | `reports` | `GET /reports/overview` (revenue per currency per location; combined revenue is never computed) |
@@ -146,7 +147,7 @@ content (metric names, record text) comes from the data layer and is English.
 | `/ops/[screen]` | Industry operations — see below; "Later" items show an honest placeholder |
 | `/customers`, `/marketing` | Scoped tables (members / participants / clients / customers / guests; campaigns) |
 | `/websites` (`?tab=editor|approvals|publish|domains`) | Field governance, approval queue, group publish with per-location results + retry |
-| `/payments` (`?tab=transactions|reconciliation|setup`) | Per-currency totals, detail timeline, reconciliation (recreate / finance-gated refund), accounts |
+| `/payments` (`?tab=transactions|reconciliation|automatic|setup`) | Per-currency totals, detail timeline, reconciliation (recreate / finance-gated refund), automatic charges (fee/instalment auto-charging switches, waive window, every off-session charge with failures), accounts |
 | `/approvals` | One inbox: refunds over the threshold, local ad spend, shift swaps, website changes — consequence preview, approve/reject with comment, result after execution |
 | `/team`, `/reports`, `/connections`, `/settings`, `/community` | Members & roles + invite, and **Schedule** (week of shifts per location in local time, clock-in state, pending swaps; staff see it too); freshness-labelled charts; sync health + fix; org defaults, data region, customer sharing + AI training (saved), billing per location (price from the subscription); Later |
 

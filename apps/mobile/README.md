@@ -64,7 +64,8 @@ Sign in as `demo@branchharbor.com` (org owner of both demo brands → Customer, 
 | `EXPO_PUBLIC_API_URL` | `http://localhost:4000` | BranchHarbor API base; routes are under `/v1` |
 | `EXPO_PUBLIC_USE_MOCKS` | `true` | In-app mock API so the app runs without `apps/api`. `false` = live API |
 | `EXPO_PUBLIC_BRAND_SLUGS` | `stillwater-yoga,maple-and-ember` | Live mode: organisation slugs whose public locations form the customer catalogue (white-label brands) |
-| `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` | *(empty)* | Enables Stripe PaymentSheet on iOS/Android. Empty → "Payments not configured" banner; dev/mock builds can simulate payment |
+| `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` | *(empty)* | Optional fallback: the API returns the publishable key + connected account per payment. Also mounts `StripeProvider` at startup |
+| `EXPO_PUBLIC_STRIPE_MERCHANT_IDENTIFIER` | `merchant.com.branchharbor.app` | Apple Pay merchant id passed to `initStripe` (same value as `STRIPE_MERCHANT_IDENTIFIER`) |
 | `STRIPE_MERCHANT_IDENTIFIER` | `merchant.com.branchharbor.app` | Apple Pay merchant id for the Stripe config plugin |
 | `APP_VARIANT` | `development` | Set by `eas.json` profiles; non-production builds get `.development` / `.preview` bundle-id suffixes |
 
@@ -122,7 +123,7 @@ screens consume. Errors are always `{ error: { code, message, fields } }` → `A
 | `occurrence(id)` | same schedule, id = `locationId~occurrenceId` |
 | `holdBooking` / `joinWaitlist` | `POST /v1/public/studios/occurrences/:id/bookings` `{ contact, joinWaitlist }` — paid classes return a timed hold + sandbox/Stripe payment; full → `409 class_full` → waitlist. Contact = account name/email, or a guest name + email asked once |
 | `createPaymentIntent` | client secret returned by the booking/order call (no separate intent endpoint) |
-| `confirmBooking` | real Stripe: confirmed by the signed webhook. Sandbox: `POST /v1/public/payments/:paymentId/sandbox-confirm`. Expired hold → `hold_expired` |
+| `confirmBooking` | real Stripe: after PaymentSheet, polls `GET /v1/public/payments/:id` until the signed webhook marked it succeeded. Sandbox: `POST /v1/public/payments/:paymentId/sandbox-confirm`. Expired hold → `hold_expired` |
 | `myBookings` | signed in: `GET /v1/me/bookings` (bookings + waitlist places, matched by account or email). Guest: bookings made on this device (with manage tokens) |
 | `cancelBooking` | signed in: `POST /v1/me/bookings/:id/cancel`. Guest: `POST /v1/public/studios/bookings/:id/cancel` `{ manageToken }` |
 | `leaveWaitlist` (also used by `cancelBooking` for waitlist places) | signed in: `POST /v1/me/waitlist/:id/leave`. Guest: `POST /v1/public/studios/waitlist/:id/leave` `{ manageToken }` (token kept on the device when joining) |
@@ -190,7 +191,25 @@ staff Today and owner Pulse. Live endpoints: `/v1/public/realty/*`, `/v1/me/real
 (`EXPO_PUBLIC_REALTY_BRAND`, default `keystone-realty`).
 ## Payments
 
-`PaymentStep.native.tsx` wraps Stripe PaymentSheet (`initPaymentSheet` / `presentPaymentSheet`) using the client secret the API returns when the booking hold or order is created; outcomes are confirmed server-side by signed Stripe webhooks. Without `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` the screen says **Payments not configured**; mock, dev and sandbox-API builds offer "Simulate successful payment" so flows can be completed. Web (`PaymentStep.tsx`) never loads the native SDK. Stripe needs a development build (`eas build --profile development`) — not Expo Go — when the key is set.
+Every customer payment in the app uses Stripe **PaymentSheet** on iOS/Android: class bookings and pickup orders
+(`PaymentStep.native.tsx`), studio packs/memberships/offers, wellness deposits, delivery orders, shop orders and sports
+instalments (`src/lib/cardPayment.native.ts` → `payPayment`).
+
+* The **publishable key and connected account** come from the API per payment (`GET /v1/public/payments/:id`);
+  `initStripe({ publishableKey, stripeAccountId })` is called before the sheet because charges are direct charges on the
+  location's account. `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` is only a fallback.
+* `merchantDisplayName` = the business, Apple Pay (`merchantCountryCode` = location country, merchant id
+  `EXPO_PUBLIC_STRIPE_MERCHANT_IDENTIFIER` / `STRIPE_MERCHANT_IDENTIFIER`) and Google Pay (`testEnv` with test keys),
+  `returnURL: branchharbor://stripe-redirect` for bank redirects.
+* Memberships and instalment plans ask for explicit consent to keep the card (recorded by
+  `POST /v1/public/payments/:id/save-card`) before the sheet opens.
+* After the sheet succeeds the app **polls the API** until the signed webhook has marked the payment succeeded.
+* **Saved card** (`src/components/SavedCard.tsx`, Pass screen): add/update the card with a SetupIntent in PaymentSheet
+  (`/v1/me/payment-methods/setup`); failed renewals are retried server-side with it.
+* **Sandbox API** (no Stripe keys): flows show "Simulate successful payment" (same webhook processor). **Web build**:
+  no native SDK — sandbox payments are simulated; real card payments say to use the iOS/Android app or the business's
+  website. PaymentSheet needs a development build (`eas build --profile development`), not Expo Go.
+* Not verified on devices in this environment (no simulator): typecheck and `expo export --platform web` pass.
 
 ## Builds
 

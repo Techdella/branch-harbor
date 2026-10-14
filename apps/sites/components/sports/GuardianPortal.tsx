@@ -5,7 +5,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
 import { call } from '@/lib/client';
 import { calendarLabel, dateTime, money, zone } from '@/lib/format';
-import { EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
+import { SavedCard, type CardOnFile, type SetupStart } from '@/components/payments/SavedCard';
 
 type Money = { amount: number; currency: string };
 interface Instalment { id: string; seq: number; dueOn: string; amount: Money; status: string; state: string; paymentState: string | null }
@@ -56,7 +57,7 @@ export function GuardianPortal({ locationId, brandName, programmesHref }: { loca
 
   if (phase === 'init') return <p role="status">{t('loading')}</p>;
   if (phase === 'login' || !token) return <Login locationId={locationId} brandName={brandName} invite={invite} initialError={error} onSession={save} />;
-  return <Dashboard token={token} programmesHref={programmesHref} onExpired={signOut} />;
+  return <Dashboard locationId={locationId} token={token} programmesHref={programmesHref} onExpired={signOut} />;
 }
 
 function Login({ locationId, brandName, invite, initialError, onSession }: { locationId: string; brandName: string; invite: string | null; initialError: string | null; onSession: (t: string) => void }) {
@@ -113,7 +114,7 @@ function Login({ locationId, brandName, invite, initialError, onSession }: { loc
   );
 }
 
-function Dashboard({ token, programmesHref, onExpired }: { token: string; programmesHref: string; onExpired: () => void }) {
+function Dashboard({ token, programmesHref, onExpired, locationId }: { token: string; programmesHref: string; onExpired: () => void; locationId: string }) {
   const t = useTranslations('portal');
   const locale = useLocale();
   const [data, setData] = useState<Overview | null>(null);
@@ -163,7 +164,11 @@ function Dashboard({ token, programmesHref, onExpired }: { token: string; progra
       {tab === 'schedule' && <Schedule data={data} token={token} onDone={(x) => { setMsg(x); void load(); }} />}
       {tab === 'balances' && (
         <section className="space-y-3">
-          {paying && <div className="card space-y-2 p-4"><p className="font-bold">{t('payNow')}</p><PayButton payment={paying} label={t('payAmount', { amount: m({ amount: paying.amount ?? 0, currency: paying.currency ?? 'CAD' }) })} onDone={(r) => { setPaying(null); setMsg(r.ok ? t('paid') : r.message ?? t('payFailed')); void load(); }} /></div>}
+          <SavedCard
+            load={() => call<CardOnFile>('POST', '/public/sports/portal/payment-method', { portalToken: token, locationId })}
+            start={(text, loc) => call<SetupStart>('POST', '/public/sports/portal/payment-method/setup', { portalToken: token, locationId, purposes: ['instalments'], text, locale: loc })}
+          />
+          {paying && <div className="card space-y-2 p-4"><p className="font-bold">{t('payNow')}</p><CardPayment payment={paying} label={t('payAmount', { amount: m({ amount: paying.amount ?? 0, currency: paying.currency ?? 'CAD' }) })} onDone={(r) => { setPaying(null); setMsg(r.ok ? t('paid') : r.message ?? t('payFailed')); void load(); }} /></div>}
           {data.participants.flatMap((p) => p.registrations.filter((r) => r.instalments.length).map((r) => (
             <article key={r.id} className="card p-4">
               <div className="flex flex-wrap justify-between gap-2"><h3 className="font-bold">{p.name} · {r.programme.name}</h3><span className="text-sm font-semibold">{t(`state.${r.balance.state}`)}</span></div>

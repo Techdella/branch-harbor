@@ -10,6 +10,7 @@
  *   approval          `${orgId}~website~${approvalId}` | `${orgId}~cover~${coverRequestId}`
  */
 import { Platform } from 'react-native';
+import { paymentView, waitForPayment } from './cardPayment.shared';
 import { ROLE_PERMISSIONS, type Permission, type Role, type RoleAssignment } from '@bh/shared';
 import { BRANDS, IMG } from '@/mock/data';
 import { env } from './env';
@@ -286,6 +287,12 @@ function toMyBooking(b: RawMyBooking): Booking {
   };
 }
 
+/** Wait for the API to mark a payment succeeded (signed webhook); never trust the device's own result. */
+async function serverConfirmed(paymentId: string) {
+  const r = await waitForPayment(paymentId, (k) => (k === 'pay.pending' ? 'Your payment is being processed. We’ll confirm it shortly — you won’t be charged twice.' : 'The payment didn’t go through. You weren’t charged.'));
+  if (!r.ok) throw new ApiError(r.pending ? 202 : 402, r.pending ? 'payment_processing' : 'payment_failed', r.message);
+}
+
 async function sandboxConfirm(payment: RawPayment) {
   return http<{ outcome: Record<string, unknown>; payment: { state: string } }>('POST', `/public/payments/${payment.id}/sandbox-confirm`, { outcome: 'succeeded' }, { auth: false });
 }
@@ -447,6 +454,9 @@ export const liveApi = {
       if (!st.payment?.sandbox) throw new ApiError(402, 'payment_required', 'Payment is required to confirm this booking.');
       const r = await sandboxConfirm(st.payment);
       if (r.payment.state !== 'succeeded') throw new ApiError(402, 'payment_failed', 'The payment didn’t go through. You weren’t charged.');
+    } else if (st.payment) {
+      // PaymentSheet finished: the booking is confirmed only once the API has the signed webhook.
+      await serverConfirmed(st.payment.id);
     }
     const booking: Booking = { ...st.booking, status: 'confirmed', holdExpiresAt: undefined };
     bookingState.set(bookingId, { ...st, booking });
@@ -546,7 +556,8 @@ export const liveApi = {
   /** After a successful (or, in sandbox, simulated) payment. Without Stripe keys the API simulates the provider. */
   async confirmOrderPayment(orderId: string, paymentIntentId?: string) {
     const st = orderPayments.get(orderId);
-    if (paymentIntentId || !st?.payment) return;
+    if (!st?.payment) return;
+    if (paymentIntentId) { await serverConfirmed(st.payment.id); return; }
     if (!st.payment.sandbox) throw new ApiError(402, 'payment_required', 'Payment is required to send this order.');
     await sandboxConfirm(st.payment);
   },
@@ -569,14 +580,15 @@ export const liveApi = {
     return out.filter((o): o is FoodOrder => !!o);
   },
   async createPaymentIntent(body: { kind: 'booking' | 'order'; id: string }): Promise<PaymentIntentParams> {
-    if (body.kind === 'booking') {
-      const st = bookingState.get(body.id);
-      if (!st?.payment?.clientSecret) throw new ApiError(409, 'payment_unavailable', 'Online payment isn’t available for this booking.');
-      return { clientSecret: st.payment.clientSecret, amount: st.booking.price, merchantDisplayName: st.merchant };
-    }
-    const st = orderPayments.get(body.id);
-    if (!st?.payment?.clientSecret) throw new ApiError(409, 'payment_unavailable', 'Online payment isn’t available for this order.');
-    return { clientSecret: st.payment.clientSecret, amount: st.total, merchantDisplayName: st.merchant };
+    const st = body.kind === 'booking' ? bookingState.get(body.id) : orderPayments.get(body.id);
+    if (!st?.payment?.clientSecret) throw new ApiError(409, 'payment_unavailable', body.kind === 'booking' ? 'Online payment isn’t available for this booking.' : 'Online payment isn’t available for this order.');
+    // Publishable key + connected account (direct charge) come from the API for this payment; never a secret.
+    const view = await paymentView(st.payment.id);
+    const amount = 'booking' in st ? st.booking.price : st.total;
+    return {
+      clientSecret: st.payment.clientSecret, amount, merchantDisplayName: view.merchantDisplayName || st.merchant, paymentId: st.payment.id,
+      publishableKey: view.publishableKey, stripeAccountId: view.stripeAccount, merchantCountry: view.merchantCountry, sandbox: view.mode === 'sandbox',
+    };
   },
 
   // messages + preferences + privacy

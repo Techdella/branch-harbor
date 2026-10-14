@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { call } from '@/lib/client';
-import { ErrorSummary, PayButton, type PaymentInfo } from '@/components/forms';
+import { ErrorSummary, CardPayment, type PaymentInfo } from '@/components/forms';
 
 /** Claim an offered slot (it may have been taken meanwhile) or leave the waitlist. */
 export function WaitlistActions({ id, token, status }: { id: string; token: string; status: string }) {
@@ -14,7 +14,7 @@ export function WaitlistActions({ id, token, status }: { id: string; token: stri
   const [done, setDone] = useState<string | null>(null);
   const [payment, setPayment] = useState<PaymentInfo | null>(null);
   if (done) return <p role="status" className="rounded-2xl bg-success-bg p-4 font-semibold text-success">{done}</p>;
-  if (payment) return <PayButton payment={payment} label={tb('payCta', { amount: '' }).trim()} onDone={(r) => (r.ok ? setDone(t('claimed')) : setErr(r.message ?? tb('paymentFailed')))} />;
+  if (payment) return <CardPayment payment={payment} label={tb('payCta', { amount: '' }).trim()} onDone={(r) => (r.ok ? setDone(t('claimed')) : setErr(r.message ?? tb('paymentFailed')))} />;
   if (!['waiting', 'offered'].includes(status)) return null;
   return (
     <div className="space-y-3 pt-2">

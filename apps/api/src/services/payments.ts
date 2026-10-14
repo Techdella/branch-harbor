@@ -29,7 +29,22 @@ export const paymentTargetExtensions: Record<string, PaymentTargetExtension> = {
 /** Called inside the webhook transaction after a payment failed or was cancelled. */
 export const paymentFailureHooks: Array<(tx: Tx, p: PaymentRow) => Promise<void>> = [];
 /** Handlers for provider events the core does not process (e.g. subscription invoices). Return a note when handled. */
-export const stripeEventExtensions: Array<(tx: Tx, event: Stripe.Event) => Promise<{ note: string; paymentId?: string | null; organizationId?: string | null } | null>> = [];
+export const stripeEventExtensions: Array<(tx: Tx, event: Stripe.Event, s: Services) => Promise<{ note: string; paymentId?: string | null; organizationId?: string | null } | null>> = [];
+/** Called inside the webhook transaction after a payment first succeeds (e.g. remember the card the customer agreed to save). */
+export const paymentSucceededHooks: Array<(tx: Tx, p: PaymentRow, pi: Stripe.PaymentIntent) => Promise<void>> = [];
+/**
+ * Adjust a new intent before it is created (e.g. attach the Stripe Customer and `setup_future_usage` when checkout must
+ * keep the card for renewals or instalments). Registered by services/payments-saved.ts.
+ */
+export const paymentIntentCustomizers: Array<(s: Services, input: { organizationId: string; locationId: string; targetType: string; targetId: string; connectedAccountId: string | null }) => Promise<{ customerId: string; setupFutureUsage: 'off_session' } | null>> = [];
+
+export async function customizeIntent(s: Services, input: { organizationId: string; locationId: string; targetType: string; targetId: string; connectedAccountId: string | null }) {
+  for (const c of paymentIntentCustomizers) {
+    const r = await c(s, input);
+    if (r) return r;
+  }
+  return null;
+}
 
 export async function connectedAccountFor(db: Exec, organizationId: string, locationId: string) {
   const [row] = await db
@@ -65,7 +80,9 @@ export async function createPaymentForTarget(s: Services, input: CreatePaymentIn
   const acct = await assertPaymentsEnabled(s.db, input.organizationId, input.locationId);
   if (acct.location.currency !== input.currency) throw validationError(`Currency ${input.currency} does not match the location currency ${acct.location.currency}`);
   const applicationFeeMinor = Math.floor((input.amountMinor * acct.feeBps) / 10_000);
+  const saving = await customizeIntent(s, { organizationId: input.organizationId, locationId: input.locationId, targetType: input.targetType, targetId: input.targetId, connectedAccountId: acct.accountId });
   const intent = await s.payments.createPaymentIntent({
+    ...(saving ?? {}),
     amountMinor: input.amountMinor,
     currency: input.currency,
     connectedAccountId: acct.accountId,
@@ -220,6 +237,7 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
           } catch (err) {
             note = `Fulfilment failed: ${(err as Error).message}`;
           }
+          for (const hook of paymentSucceededHooks) await hook(tx, fresh, pi);
         }
         if (finalState === 'failed' || finalState === 'cancelled') {
           // Release capacity held for unpaid class bookings.
@@ -260,7 +278,7 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
       note = `Account charges ${enabled ? 'enabled' : 'disabled'}`;
     } else {
       for (const ext of stripeEventExtensions) {
-        const r = await ext(tx, event);
+        const r = await ext(tx, event, s);
         if (r) {
           note = r.note;
           paymentId = r.paymentId ?? null;

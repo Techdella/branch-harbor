@@ -5,6 +5,7 @@ import en from '../../messages/en.json';
 import singleEn from '../../messages/single/en.json';
 import foodsEn from '../../messages/foods/en.json';
 import partnersEn from '../../messages/partners/en.json';
+import paymentsEn from '../../messages/payments/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -30,11 +31,13 @@ export default getRequestConfig(async () => {
   // messages/foods/*.json so they merge cleanly.
   // Partner integrations (delivery partners, POS, property portals): namespace "partners", English only for now (falls back per key).
   let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages, partners: partnersEn as Messages }, foodsEn as Messages);
+  messages = merge(messages, paymentsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
     messages = merge(messages, { ...translated, single });
     messages = merge(messages, (await import(`../../messages/foods/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/payments/${locale}.json`).catch(() => ({ default: {} }))).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

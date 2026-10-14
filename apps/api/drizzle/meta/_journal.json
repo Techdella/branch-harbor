@@ -85,6 +85,13 @@
       "when": 1792015826381,
       "tag": "0011_partner_integrations",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792017847568,
+      "tag": "0012_payments_saved_cards",
+      "breakpoints": true
     }
   ]
 }

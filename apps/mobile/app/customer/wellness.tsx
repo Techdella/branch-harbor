@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Badge, Banner, Button, Card, EmptyState, ErrorState, ScreenHeader, Screen, SkeletonCard, Tag, Text, TextField } from '@/components';
 import { wellnessApi, type MyAppointment, type WService, type WSlot } from '@/features/wellness/api';
 import { useWT } from '@/features/wellness/strings';
+import { useI18n } from '@/i18n';
 import { ApiError } from '@/lib/errors';
 import { addDaysKey, fmtDateTime, fmtDay, fmtMoney as fmtMoneyRaw, fmtTime, fmtZone, localDateKey } from '@/lib/format';
 
@@ -29,6 +30,7 @@ export default function WellnessCustomer() {
 
 function BookFlow({ onBooked }: { onBooked: () => void }) {
   const { t, locale } = useWT();
+  const { t: gt } = useI18n();
   const { me } = useSession();
   const locs = useApi(() => wellnessApi.locations(), []);
   const [locId, setLocId] = useState<string | null>(null);
@@ -56,7 +58,8 @@ function BookFlow({ onBooked }: { onBooked: () => void }) {
         <Badge label={t('booked')} tone="success" />
         {result.summary.depositDue.amount > 0 && <Text>{t('depositDue')}: {fmtMoney(result.summary.depositDue, locale)}</Text>}
         <Text>{t('dueAtVisit')}: {fmtMoney(result.summary.dueAtVisit, locale)}</Text>
-        {result.payment && !paid ? <Button label={t('paySandbox')} onPress={async () => { await wellnessApi.confirmSandbox(result.payment!.id); setPaid(true); }} /> : null}
+        {result.payment && !paid ? <Button label={result.payment.sandbox ? t('paySandbox') : `${t('depositDue')}: ${fmtMoney(result.summary.depositDue, locale)}`} icon="card" onPress={async () => { setErr(null); try { const r = await wellnessApi.pay(result.payment!, gt); if (r.ok) setPaid(true); else setErr(r.message); } catch (e) { setErr((e as Error).message); } }} /> : null}
+        {err ? <Banner tone="danger" title={err} /> : null}
         {paid && <Badge label={t('paid')} tone="success" />}
         <Button label={t('mine')} variant="secondary" onPress={onBooked} />
       </Card>

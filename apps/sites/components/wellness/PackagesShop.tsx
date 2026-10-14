@@ -6,7 +6,7 @@ import { Icon } from '@bh/ui';
 import { call } from '@/lib/client';
 import { dateLong, money } from '@/lib/format';
 import type { Money } from '@/lib/types';
-import { Checkbox, EMAIL_RE, ErrorSummary, Field, PayButton, type PaymentInfo } from '@/components/forms';
+import { Checkbox, EMAIL_RE, ErrorSummary, Field, CardPayment, type PaymentInfo } from '@/components/forms';
 
 export interface PlanT { id: string; name: string; description: string | null; serviceName: string; sessions: number; price: Money; perSession: Money; validityDays: number; sharing: string; maxSharedWith: number }
 type Bought = { kind: 'package' | 'voucher'; id: string; token: string; payment: PaymentInfo; amount: Money };
@@ -72,7 +72,7 @@ export function PackagesShop(props: { locationId: string; plans: PlanT[]; vouche
         <h2 className="text-xl font-extrabold">{t('payNow')}</h2>
         <p>{money(bought.amount, locale)}</p>
         <ErrorSummary message={error?.message ?? null} />
-        <PayButton payment={bought.payment} label={tb('payCta', { amount: money(bought.amount, locale) })} onDone={(r) => (r.ok ? setPaid(true) : setError({ message: r.message ?? tb('paymentFailed') }))} />
+        <CardPayment payment={bought.payment} returnUrl={`${props.manageBase}/${bought.kind}/${bought.id}?token=${encodeURIComponent(bought.token)}`} label={tb('payCta', { amount: money(bought.amount, locale) })} onDone={(r) => (r.ok ? setPaid(true) : setError({ message: r.message ?? tb('paymentFailed') }))} />
       </section>
     );
   }

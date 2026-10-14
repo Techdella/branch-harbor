@@ -81,6 +81,10 @@ const envSchema = z.object({
   // Payments
   STRIPE_SECRET_KEY: optional,
   STRIPE_WEBHOOK_SECRET: optional,
+  /** Signing secret of the Connect webhook endpoint (events from connected accounts carry `account`). */
+  STRIPE_CONNECT_WEBHOOK_SECRET: optional,
+  /** Publishable key returned to browsers/apps (only when STRIPE_SECRET_KEY is set; never a secret). */
+  STRIPE_PUBLISHABLE_KEY: optional,
   STRIPE_CONNECT_CLIENT_ID: optional,
   STRIPE_APPLICATION_FEE_BPS: z.coerce.number().int().min(0).max(10000).default(100),
   BOOKING_HOLD_MINUTES: z.coerce.number().int().default(10),
@@ -177,6 +181,8 @@ export function integrationStatus(cfg: Config) {
     whatsapp: mode(!!cfg.WHATSAPP_CLOUD_TOKEN),
     stripe: mode(!!cfg.STRIPE_SECRET_KEY, 'sandbox'),
     stripeWebhooks: cfg.STRIPE_WEBHOOK_SECRET ? 'verified' : 'disabled (unsigned events rejected)',
+    stripeConnectWebhooks: cfg.STRIPE_CONNECT_WEBHOOK_SECRET ? 'verified' : 'disabled (connected-account events rejected)',
+    stripeCardEntry: cfg.STRIPE_SECRET_KEY && cfg.STRIPE_PUBLISHABLE_KEY ? 'live' : 'sandbox (simulated payments)',
     ai: mode(!!cfg.ANTHROPIC_API_KEY),
     push: mode(!!cfg.EXPO_ACCESS_TOKEN || cfg.ENABLE_EXPO_PUSH, 'sandbox'),
     domains: mode(!!(cfg.CLOUDFLARE_API_TOKEN && cfg.CLOUDFLARE_ZONE_ID), 'sandbox'),

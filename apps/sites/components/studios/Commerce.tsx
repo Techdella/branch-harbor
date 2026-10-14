@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@bh/ui';
-import { PayButton } from '@/components/forms';
+import { CardPayment } from '@/components/forms';
 import { sleep } from '@/lib/client';
 import { dateTime, money } from '@/lib/format';
 import { getSession, pcall } from '@/lib/portal';
@@ -21,7 +21,7 @@ export function BuyButton({ brand, locationId, kind, productId, offerId, label, 
   if (state.phase === 'signin') return <SignIn brand={brand} locationId={locationId} returnPath={typeof window !== 'undefined' ? window.location.pathname : accountPath} compact />;
   if (state.phase === 'pay' && state.payment) return (
     <div className="space-y-2">
-      <PayButton payment={state.payment} label={t('payAmount', { amount: money(state.payment, locale) })} onDone={async (r) => {
+      <CardPayment payment={state.payment} label={t('payAmount', { amount: money(state.payment, locale) })} onDone={async (r) => {
         if (!r.ok) { setState({ ...state, error: r.message ?? t('payFailed') }); return; }
         for (let i = 0; i < 12; i++) {
           const s = await pcall<{ status: string }>(brand, 'GET', `/public/studios/account/purchases/${state.purchaseId}`);

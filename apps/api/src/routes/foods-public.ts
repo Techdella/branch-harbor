@@ -187,10 +187,10 @@ export const foodPublicRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.post('/public/foods/:locationId/meal-plans/subscriptions', {
     config: { rateLimit: { max: 10, timeWindow: '1 minute' } },
-    schema: { tags: ['foods'], summary: 'Subscribe to a weekly meal plan (Stripe subscription; sandbox without keys)', params: locParams, body: z.object({ planId: z.uuid(), contact: publicContactSchema, address: deliveryAddressSchema.optional(), startWeek: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }) },
+    schema: { tags: ['foods'], summary: 'Subscribe to a weekly meal plan (Stripe subscription; sandbox without keys)', params: locParams, body: z.object({ planId: z.uuid(), contact: publicContactSchema, address: deliveryAddressSchema.optional(), startWeek: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), renewalConsent: z.object({ text: z.string().max(2000).optional(), locale: z.string().max(10).optional() }).optional() }) },
   }, async (req, reply) => {
     const loc = await publicLocation(req.params.locationId);
-    const r = await subscribe(s, loc, req.body);
+    const r = await subscribe(s, loc, { ...req.body, ip: req.ip });
     return reply.code(201).send({ subscription: serializeSubscription(r.subscription, r.plan, loc, { includeContact: true }), manageToken: r.manageToken, payment: r.payment });
   });
 

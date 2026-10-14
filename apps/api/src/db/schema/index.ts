@@ -12,3 +12,4 @@ export * from './studios-ext.ts';
 export * from './commerce-ext.ts';
 export * from './foods-ext.ts';
 export * from './partners.ts';
+export * from './payments-ext.ts';

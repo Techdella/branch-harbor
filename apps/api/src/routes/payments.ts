@@ -2,6 +2,8 @@ import { and, desc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
 import { locations, organizations, paymentReferences, refunds, webhookEvents } from '../db/schema/index.ts';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { verifyStripeWebhook } from '../integrations/payments.ts';
 import { AppError, conflict, notFound, unavailable, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
@@ -16,23 +18,32 @@ export const webhookRoutes: FastifyPluginAsyncZod = async (app) => {
   app.removeContentTypeParser('application/json');
   app.addContentTypeParser('application/json', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
 
-  app.post('/webhooks/stripe', {
-    config: { rateLimit: false },
-    schema: { tags: ['webhooks'], summary: 'Stripe webhook (signature-verified, idempotent)', headers: z.object({ 'stripe-signature': z.string().optional() }).loose() },
-  }, async (req, reply) => {
-    if (!s.payments.webhooksEnabled) throw unavailable('webhooks_disabled', 'Stripe webhooks are not configured (STRIPE_WEBHOOK_SECRET)');
+  const handle = (endpoint: 'auto' | 'connect') => async (req: FastifyRequest, reply: FastifyReply) => {
+    if (endpoint === 'connect' ? !s.payments.connectWebhooksEnabled : !s.payments.webhooksEnabled) {
+      throw unavailable('webhooks_disabled', endpoint === 'connect' ? 'Stripe Connect webhooks are not configured (STRIPE_CONNECT_WEBHOOK_SECRET)' : 'Stripe webhooks are not configured (STRIPE_WEBHOOK_SECRET)');
+    }
     const sig = req.headers['stripe-signature'];
     if (!sig || typeof sig !== 'string') throw new AppError(400, 'missing_signature', 'Missing Stripe-Signature header');
-    let event;
+    let verified;
     try {
-      event = s.payments.constructWebhookEvent(req.body as Buffer, sig);
+      verified = verifyStripeWebhook(s.cfg, req.body as Buffer, sig, endpoint === 'connect' ? 'connect' : 'auto');
     } catch (err) {
-      req.log.warn({ err: (err as Error).message }, 'stripe webhook signature verification failed');
+      req.log.warn({ err: (err as Error).message, endpoint }, 'stripe webhook signature verification failed');
       throw new AppError(400, 'invalid_signature', 'Webhook signature verification failed');
     }
-    const outcome = await processStripeEvent(s, event);
-    return reply.code(200).send({ received: true, ...outcome });
-  });
+    const outcome = await processStripeEvent(s, verified.event);
+    return reply.code(200).send({ received: true, source: verified.source, ...outcome });
+  };
+
+  app.post('/webhooks/stripe', {
+    config: { rateLimit: false },
+    schema: { tags: ['webhooks'], summary: 'Stripe platform webhook (signature-verified with STRIPE_WEBHOOK_SECRET, falls back to the Connect secret; idempotent)', headers: z.object({ 'stripe-signature': z.string().optional() }).loose() },
+  }, handle('auto'));
+
+  app.post('/webhooks/stripe/connect', {
+    config: { rateLimit: false },
+    schema: { tags: ['webhooks'], summary: 'Stripe Connect webhook: events of connected accounts (direct charges, subscriptions, setup intents). Verified with STRIPE_CONNECT_WEBHOOK_SECRET; events must carry `account`.', headers: z.object({ 'stripe-signature': z.string().optional() }).loose() },
+  }, handle('connect'));
 };
 
 export const paymentRoutes: FastifyPluginAsyncZod = async (app) => {
