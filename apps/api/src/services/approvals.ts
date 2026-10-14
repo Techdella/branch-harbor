@@ -175,9 +175,9 @@ async function execute(s: Services, ap: ApprovalRow, approverId: string, ip: str
       await s.db.update(pages).set({ status: 'approved', updatedAt: new Date() }).where(eq(pages.id, ap.targetId));
       return { pageStatus: 'approved' };
     case 'refund': {
-      const p = ap.payload as { paymentId?: string; orderId?: string; amountMinor: number; currency: string; reason?: string; restock?: Array<{ variantId: string; quantity: number }> };
+      const p = ap.payload as { paymentId?: string; orderId?: string; returnId?: string; amountMinor: number; currency: string; reason?: string; restock?: Array<{ variantId: string; quantity: number }> };
       if (p.orderId) {
-        const r = await refundCommerceOrder(s, p.orderId, { amountMinor: p.amountMinor, reason: p.reason, restock: p.restock, actorUserId: approverId, ip });
+        const r = await refundCommerceOrder(s, p.orderId, { amountMinor: p.amountMinor, reason: p.reason, restock: p.restock, actorUserId: approverId, ip, returnId: p.returnId ?? null });
         return { orderId: p.orderId, refundState: r.refundState, refundedMinor: r.order.refundedMinor, currency: r.order.currency };
       }
       const r = await refundPayment(s, p.paymentId!, p.amountMinor, { actorUserId: approverId, reason: p.reason, ip });

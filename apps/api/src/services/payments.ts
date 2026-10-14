@@ -7,7 +7,7 @@ import {
 } from '../db/schema/index.ts';
 import { AppError, conflict, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
-import { convertReservationToSale } from './inventory.ts';
+import { commerceOrderPaymentEnded, fulfilCommerceOrderPayment } from './commerce-orders.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
 export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration';
@@ -106,15 +106,9 @@ export async function fulfilTarget(tx: Tx, p: PaymentRow): Promise<{ fulfilled: 
       await tx.update(foodOrders).set({ paymentStatus: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(foodOrders.id, o.id));
       return { fulfilled: true, note: 'Order paid — awaiting restaurant acceptance' };
     }
-    case 'order': {
-      const [o] = await tx.select().from(orders).where(eq(orders.id, p.targetId)).for('update');
-      if (!o) return { fulfilled: false, note: 'Order record missing' };
-      if (o.status === 'pending_payment') {
-        await tx.update(orders).set({ status: 'paid', paymentId: p.id, updatedAt: new Date() }).where(eq(orders.id, o.id));
-        await convertReservationToSale(tx, o);
-      }
-      return { fulfilled: true, note: 'Order paid' };
-    }
+    case 'order':
+      // Commerce: reservation → sale, cross-store transfer, or the late-payment recovery path.
+      return fulfilCommerceOrderPayment(tx, p);
     case 'appointment': {
       const [a] = await tx.select().from(appointments).where(eq(appointments.id, p.targetId));
       if (!a) return { fulfilled: false, note: 'Appointment record missing' };
@@ -207,6 +201,7 @@ export async function processStripeEvent(s: Services, event: Stripe.Event): Prom
           if (ref.targetType === 'class_booking' && ref.targetId) {
             await tx.update(classBookings).set({ status: 'expired' }).where(and(eq(classBookings.id, ref.targetId), eq(classBookings.status, 'held')));
           }
+          if (ref.targetType === 'order' && ref.targetId) await commerceOrderPaymentEnded(tx, ref, finalState);
           if (ref.targetType === 'food_order' && ref.targetId) {
             await tx.update(foodOrders).set({ paymentStatus: 'voided', status: 'cancelled', updatedAt: new Date() }).where(and(eq(foodOrders.id, ref.targetId), eq(foodOrders.status, 'awaiting_acceptance'), eq(foodOrders.paymentStatus, 'pending')));
           }
@@ -359,7 +354,7 @@ export async function reconciliationQueue(db: Exec, organizationId: string, allo
       switch (p.targetType) {
         case 'class_booking': { const b = p.targetId ? bookingsMap.get(p.targetId) : undefined; ok = !!b && ['confirmed', 'attended', 'no_show'].includes(b.status); break; }
         case 'food_order': { const o = p.targetId ? foodMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'rejected' && o.status !== 'cancelled' ? true : !!o && p.refundedMinor >= p.amountMinor; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
-        case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && o.status !== 'pending_payment'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
+        case 'order': { const o = p.targetId ? orderMap.get(p.targetId) : undefined; ok = !!o && !['pending_payment', 'expired', 'cancelled'].includes(o.status) && o.fulfilmentStatus !== 'stock_conflict'; if (o) expected = { amount: o.totalMinor, currency: o.currency }; break; }
         case 'appointment': { const a = p.targetId ? apptMap.get(p.targetId) : undefined; ok = !!a && a.status !== 'cancelled' ? true : !!a && p.refundedMinor >= p.amountMinor; if (a) expected = { amount: a.priceMinor, currency: a.currency }; break; }
         case 'registration': { const r = p.targetId ? regMap.get(p.targetId) : undefined; ok = !!r && r.status !== 'submitted'; break; }
         default: ok = false;
