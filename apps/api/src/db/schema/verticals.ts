@@ -627,6 +627,11 @@ export const menus = pgTable('menus', {
   name: text('name').notNull(),
   status: text('status').notNull().default('draft'), // draft | published | archived
   publishedAt: ts('published_at'),
+  /** standard (everyday ordering) | preorder (cooking dates) | catering */
+  kind: text('kind').notNull().default('standard'),
+  description: text('description'),
+  /** Day-part ids (foods-ext) limiting when the whole menu sells; empty = whenever the location is open. */
+  dayPartIds: jsonb('day_part_ids').$type<string[]>().notNull().default([]),
   createdAt: createdAt(),
 });
 
@@ -647,6 +652,18 @@ export const menuItems = pgTable('menu_items', {
   localOverridable: jsonb('local_overridable').$type<string[]>().notNull().default(['price', 'available']),
   sortOrder: integer('sort_order').notNull().default(0),
   active: boolean('active').notNull().default(true),
+  /** Category row (foods-ext food_menu_categories); `category` keeps the display name. */
+  categoryId: uuid('category_id'),
+  /** Per-locale name/description supplied by the business: { "fr": { "name": "…", "description": "…" } }. */
+  translations: jsonb('translations').$type<Record<string, { name?: string; description?: string }>>().notNull().default({}),
+  /** True once the business has declared allergens for this item (an empty list then means "none declared"). */
+  allergensDeclared: boolean('allergens_declared').notNull().default(false),
+  /** Day-part ids; empty = inherit from category, then menu. */
+  dayPartIds: jsonb('day_part_ids').$type<string[]>().notNull().default([]),
+  /** Kitchen station key (e.g. grill, cold, bar) used to route the item on the KDS. */
+  stationKey: text('station_key'),
+  prepMinutes: integer('prep_minutes'),
+  images: jsonb('images').$type<string[]>().notNull().default([]),
   createdAt: createdAt(),
 });
 
@@ -657,6 +674,8 @@ export const modifierGroups = pgTable('modifier_groups', {
   name: text('name').notNull(),
   minSelect: integer('min_select').notNull().default(0),
   maxSelect: integer('max_select').notNull().default(1),
+  translations: jsonb('translations').$type<Record<string, { name?: string }>>().notNull().default({}),
+  sortOrder: integer('sort_order').notNull().default(0),
   createdAt: createdAt(),
 });
 
@@ -667,6 +686,10 @@ export const modifiers = pgTable('modifiers', {
   name: text('name').notNull(),
   prices: jsonb('prices').$type<Record<string, number>>().notNull().default({}),
   available: boolean('available').notNull().default(true),
+  translations: jsonb('translations').$type<Record<string, { name?: string }>>().notNull().default({}),
+  /** Business-supplied allergens this option adds to the item. */
+  allergens: jsonb('allergens').$type<string[]>().notNull().default([]),
+  sortOrder: integer('sort_order').notNull().default(0),
   createdAt: createdAt(),
 });
 
@@ -697,7 +720,17 @@ export const pickupSlots = pgTable('pickup_slots', {
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('pickup_slots_uq').on(t.locationId, t.startsAt)]);
 
-export type FoodOrderLine = { menuItemId: string; name: string; quantity: number; unitPriceMinor: number; modifiers: Array<{ id: string; name: string; priceMinor: number }>; lineTotalMinor: number; notes?: string };
+export type FoodOrderLine = { menuItemId: string; name: string; quantity: number; unitPriceMinor: number; modifiers: Array<{ id: string; name: string; priceMinor: number }>; lineTotalMinor: number; notes?: string; stationKey?: string | null };
+export type FoodOrderFulfilment = {
+  address?: { line1: string; line2?: string; city: string; postalCode: string; country?: string; instructions?: string; lat?: number; lng?: number };
+  zoneId?: string; zoneName?: string; deliverySlotId?: string;
+  tableId?: string; tableLabel?: string; tabId?: string;
+  productionDateId?: string; productionDate?: string; collectionWindow?: string;
+  mealPlanBoxId?: string; mealPlanSubscriptionId?: string; cateringEnquiryId?: string;
+  serviceChargeLabel?: string;
+  /** Set once slot capacity and stock held by a cancelled order were released. */
+  resourcesReleased?: boolean;
+};
 
 export const foodOrders = pgTable('food_orders', {
   id: pk(),
@@ -706,9 +739,15 @@ export const foodOrders = pgTable('food_orders', {
   customerId: uuid('customer_id'),
   pickupSlotId: uuid('pickup_slot_id').references(() => pickupSlots.id),
   orderNumber: text('order_number').notNull(),
-  /** awaiting_acceptance | accepted | preparing | ready | collected | cancelled | rejected */
+  /** awaiting_acceptance | accepted | preparing | ready | collected | out_for_delivery | delivered | served | cancelled | rejected */
   status: text('status').notNull().default('awaiting_acceptance'),
-  /** not_required | pending | paid | refund_pending | refunded | voided */
+  /** pickup | delivery | dine_in | preorder | catering | meal_plan */
+  channel: text('channel').notNull().default('pickup'),
+  /** Channel details: delivery address/zone/slot, table/tab, production date, meal-plan box, catering enquiry. */
+  fulfilment: jsonb('fulfilment').$type<FoodOrderFulfilment>().notNull().default({}),
+  tipMinor: minor('tip_minor').notNull().default(0),
+  deliveryFeeMinor: minor('delivery_fee_minor').notNull().default(0),
+  /** not_required | pending | paid | on_tab | refund_pending | refunded | voided */
   paymentStatus: text('payment_status').notNull().default('pending'),
   lines: jsonb('lines').$type<FoodOrderLine[]>().notNull(),
   subtotalMinor: minor('subtotal_minor').notNull(),

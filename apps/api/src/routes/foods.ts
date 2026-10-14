@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
 import { z } from 'zod';
-import { foodOrderCreateSchema, foodOrderStates, currency } from '@bh/shared';
+import { foodOrderCreateSchema, foodOrderStatesAll, FOOD_CHANNELS, currency } from '@bh/shared';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
 import { foodOrders, locationMenuOverrides, locations, menuItems, menus, modifierGroups, modifiers, pickupSlots } from '../db/schema/index.ts';
 import { sha256 } from '../lib/crypto.ts';
@@ -10,6 +10,10 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { createFoodOrder, effectiveMenu, serializeFoodOrder, transitionFoodOrder } from '../services/foods.ts';
+import { cleanAllergens, cleanDietary, loadFoodConfig, recordSoldOut, regimeFor, soldOutUntilClose } from '../services/foods-menu.ts';
+import { KITCHEN_PAYMENT_STATES } from '../services/foods-kitchen.ts';
+import { publishMenu } from '../services/foods-publish.ts';
+import { ACTIVE_FOOD_STATES } from '../domain/foodOrderState.ts';
 import { configOf, ensurePickupSlots, loadPickupSettings } from '../services/pickup.ts';
 import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
@@ -26,12 +30,24 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // ───────── Public ─────────
   app.get('/public/foods/:locationId/menu', {
-    schema: { tags: ['foods'], summary: 'Location menu: HQ items with local prices/availability. Dietary info is business-supplied.', params: z.object({ locationId: z.uuid() }) },
+    schema: {
+      tags: ['foods'], summary: 'Location menu: HQ items with local prices/availability at a time (day-parts in the location time zone). Allergen and dietary info is business-supplied.',
+      params: z.object({ locationId: z.uuid() }),
+      querystring: z.object({ at: isoDateTime.optional().describe('Pickup/delivery/collection time; default now'), lang: z.string().max(10).optional(), kind: z.enum(['standard', 'preorder']).default('standard'), menuId: z.uuid().optional() }),
+    },
   }, async (req) => {
     const loc = await publicLocation(req.params.locationId);
-    const items = await effectiveMenu(s.db, loc.organizationId, loc);
+    const at = req.query.at ? new Date(req.query.at) : undefined;
+    const items = await effectiveMenu(s.db, loc.organizationId, loc, { at, lang: req.query.lang, kinds: [req.query.kind], menuIds: req.query.menuId ? [req.query.menuId] : undefined });
     const categories = [...new Set(items.map((i) => i.category))].map((c) => ({ name: c, items: items.filter((i) => i.category === c) }));
-    return { location: { id: loc.id, name: loc.name, timeZone: loc.timeZone, currency: loc.currency, acceptingOrders: loc.status === 'operating' && (loc.paymentsEnabled || loc.settings.payAtPickup === true) }, categories };
+    const cfg = await loadFoodConfig(s.db, loc.id);
+    return {
+      location: { id: loc.id, name: loc.name, timeZone: loc.timeZone, currency: loc.currency, country: loc.country, acceptingOrders: loc.status === 'operating' && (loc.paymentsEnabled || loc.settings.payAtPickup === true) },
+      at: (at ?? new Date()).toISOString(), allergenRegime: regimeFor(loc, cfg),
+      channels: cfg.channels, tips: cfg.tips.enabled ? { presetsBps: cfg.tips.presetsBps, allowCustom: cfg.tips.allowCustom, channels: cfg.tips.channels } : null,
+      serviceCharge: cfg.serviceCharge.bps > 0 ? { bps: cfg.serviceCharge.bps, label: cfg.serviceCharge.label, channels: cfg.serviceCharge.channels } : null,
+      categories,
+    };
   });
 
   app.get('/public/foods/:locationId/pickup-slots', {
@@ -91,20 +107,17 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
       return reply.code(201).send(m);
     });
 
-    priv.post('/orgs/:orgId/foods/menus/:id/publish', { schema: { tags: ['foods'], security: secured, params: idParams, summary: 'Publish the master menu to all locations (local overrides preserved)' } }, async (req) => {
+    priv.post('/orgs/:orgId/foods/menus/:id/publish', {
+      schema: {
+        tags: ['foods'], security: secured, params: idParams, summary: 'Publish the master menu (all locations or a selection). Returns a result per location: succeeded, partial (some items unsellable there), failed or skipped. Local overrides are preserved.',
+        body: z.object({ locationIds: z.array(z.uuid()).optional() }).optional(),
+      },
+    }, async (req) => {
       const { orgId, id } = req.params;
       await requirePerm(req, s.db, 'templates.write', { organizationId: orgId, kind: 'organization', id: orgId });
-      const [m] = await s.db.update(menus).set({ status: 'published', publishedAt: new Date() }).where(and(eq(menus.id, id), eq(menus.organizationId, orgId))).returning();
-      if (!m) throw notFound('Menu');
-      // Report per-location effect: items without a price in the location currency are unavailable there.
-      const locs = await s.db.select().from(locations).where(and(eq(locations.organizationId, orgId), isNull(locations.archivedAt)));
-      const perLocation = [];
-      for (const l of locs) {
-        const eff = await effectiveMenu(s.db, orgId, l);
-        perLocation.push({ locationId: l.id, name: l.name, currency: l.currency, available: eff.filter((i) => i.available).length, unavailable: eff.filter((i) => !i.available).map((i) => ({ id: i.id, name: i.name, reason: i.unavailableReason })) });
-      }
-      await audit(s.db, { organizationId: orgId, ...actor(req), action: 'menu.published', targetType: 'menu', targetId: id });
-      return { menu: m, locations: perLocation };
+      const r = await publishMenu(s, orgId, id, { locationIds: req.body?.locationIds, actorUserId: req.user!.id });
+      await audit(s.db, { organizationId: orgId, ...actor(req), action: 'menu.published', targetType: 'menu', targetId: id, metadata: { results: r.locations.map((l) => ({ locationId: l.locationId, status: l.status })) } });
+      return r;
     });
 
     priv.post('/orgs/:orgId/foods/menus/:id/items', {
@@ -112,8 +125,10 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
         tags: ['foods'], security: secured, params: idParams,
         body: z.object({
           category: z.string().min(1), name: z.string().min(1), description: z.string().max(2000).optional(), prices, dietary: z.array(z.string()).default([]), allergens: z.array(z.string()).default([]),
+          allergensDeclared: z.boolean().optional(), categoryId: z.uuid().optional(), translations: z.record(z.string(), z.object({ name: z.string().max(200).optional(), description: z.string().max(2000).optional() })).default({}),
+          dayPartIds: z.array(z.uuid()).default([]), stationKey: z.string().max(40).optional(), prepMinutes: z.number().int().min(0).max(240).optional(),
           imageUrl: z.url().optional(), localOverridable: z.array(z.enum(['price', 'available', 'description'])).default(['price', 'available']), sortOrder: z.number().int().default(0),
-          modifierGroups: z.array(z.object({ name: z.string().min(1), minSelect: z.number().int().min(0).default(0), maxSelect: z.number().int().min(1).default(1), modifiers: z.array(z.object({ name: z.string().min(1), prices: prices.default({}) })).min(1) })).default([]),
+          modifierGroups: z.array(z.object({ name: z.string().min(1), minSelect: z.number().int().min(0).default(0), maxSelect: z.number().int().min(1).default(1), modifiers: z.array(z.object({ name: z.string().min(1), prices: prices.default({}), allergens: z.array(z.string()).default([]) })).min(1) })).default([]),
         }),
       },
     }, async (req, reply) => {
@@ -123,11 +138,18 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!m) throw notFound('Menu');
       const b = req.body;
       for (const g of b.modifierGroups) if (g.minSelect > g.maxSelect) throw validationError('minSelect cannot exceed maxSelect', { modifierGroups: g.name });
+      // Allergen and dietary labels come from the business and must use the controlled vocabulary.
+      const allergens = cleanAllergens(b.allergens);
+      const dietary = cleanDietary(b.dietary);
       const item = await s.db.transaction(async (tx) => {
-        const [it] = await tx.insert(menuItems).values({ organizationId: orgId, menuId: id, category: b.category, name: b.name, description: b.description ?? null, prices: b.prices, dietary: b.dietary, allergens: b.allergens, imageUrl: b.imageUrl ?? null, localOverridable: b.localOverridable, sortOrder: b.sortOrder }).returning();
-        for (const g of b.modifierGroups) {
-          const [grp] = await tx.insert(modifierGroups).values({ organizationId: orgId, menuItemId: it!.id, name: g.name, minSelect: g.minSelect, maxSelect: g.maxSelect }).returning();
-          await tx.insert(modifiers).values(g.modifiers.map((x) => ({ organizationId: orgId, groupId: grp!.id, name: x.name, prices: x.prices })));
+        const [it] = await tx.insert(menuItems).values({
+          organizationId: orgId, menuId: id, category: b.category, name: b.name, description: b.description ?? null, prices: b.prices, dietary, allergens, allergensDeclared: b.allergensDeclared ?? allergens.length > 0,
+          categoryId: b.categoryId ?? null, translations: b.translations, dayPartIds: b.dayPartIds, stationKey: b.stationKey ?? null, prepMinutes: b.prepMinutes ?? null,
+          imageUrl: b.imageUrl ?? null, localOverridable: b.localOverridable, sortOrder: b.sortOrder,
+        }).returning();
+        for (const [gi, g] of b.modifierGroups.entries()) {
+          const [grp] = await tx.insert(modifierGroups).values({ organizationId: orgId, menuItemId: it!.id, name: g.name, minSelect: g.minSelect, maxSelect: g.maxSelect, sortOrder: gi }).returning();
+          await tx.insert(modifiers).values(g.modifiers.map((x, mi) => ({ organizationId: orgId, groupId: grp!.id, name: x.name, prices: x.prices, allergens: cleanAllergens(x.allergens), sortOrder: mi })));
         }
         return it!;
       });
@@ -145,11 +167,11 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
       schema: {
         tags: ['foods'], security: secured, params: orgParams.extend({ locationId: z.uuid(), menuItemId: z.uuid() }),
         summary: 'Set local price/availability/sold-out. Only fields HQ marked overridable can change (sold-out is always allowed).',
-        body: z.object({ priceMinor: z.number().int().min(0).nullable().optional(), available: z.boolean().nullable().optional(), soldOut: z.boolean().optional(), soldOutUntil: isoDateTime.nullable().optional() }),
+        body: z.object({ priceMinor: z.number().int().min(0).nullable().optional(), available: z.boolean().nullable().optional(), soldOut: z.boolean().optional(), soldOutUntil: isoDateTime.nullable().optional(), untilClose: z.boolean().optional().describe('Sold out until the location closes today (resets automatically)') }),
       },
     }, async (req) => {
       const { orgId, locationId, menuItemId } = req.params;
-      await requireLocationPerm(req, s.db, orgId, locationId, 'operations.write');
+      const loc = await requireLocationPerm(req, s.db, orgId, locationId, 'operations.write');
       const [it] = await s.db.select().from(menuItems).where(and(eq(menuItems.id, menuItemId), eq(menuItems.organizationId, orgId)));
       if (!it) throw notFound('Menu item');
       const b = req.body;
@@ -157,13 +179,15 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
       if (b.priceMinor !== undefined && !it.localOverridable.includes('price')) locked.priceMinor = 'Price is set by headquarters';
       if (b.available !== undefined && !it.localOverridable.includes('available')) locked.available = 'Availability is set by headquarters';
       if (Object.keys(locked).length) throw new AppError(403, 'field_locked', 'Some fields are controlled by headquarters', locked);
+      const until = b.soldOut && b.untilClose ? await soldOutUntilClose(s.db, loc) : b.soldOutUntil !== undefined ? (b.soldOutUntil ? new Date(b.soldOutUntil) : null) : undefined;
       const values = {
         organizationId: orgId, locationId, menuItemId, modifierId: null,
         ...(b.priceMinor !== undefined ? { priceMinor: b.priceMinor } : {}), ...(b.available !== undefined ? { available: b.available } : {}),
-        ...(b.soldOut !== undefined ? { soldOut: b.soldOut } : {}), ...(b.soldOutUntil !== undefined ? { soldOutUntil: b.soldOutUntil ? new Date(b.soldOutUntil) : null } : {}),
+        ...(b.soldOut !== undefined ? { soldOut: b.soldOut } : {}), ...(until !== undefined ? { soldOutUntil: until } : b.soldOut === false ? { soldOutUntil: null } : {}),
         updatedBy: req.user!.id, updatedAt: new Date(),
       };
       const [row] = await s.db.insert(locationMenuOverrides).values(values).onConflictDoUpdate({ target: [locationMenuOverrides.locationId, locationMenuOverrides.menuItemId, locationMenuOverrides.modifierId], set: values }).returning();
+      if (b.soldOut !== undefined) await recordSoldOut(s.db, { organizationId: orgId, locationId, menuItemId, soldOut: b.soldOut, until: until ?? null, source: 'manual', by: req.user!.id });
       await audit(s.db, { organizationId: orgId, ...actor(req), action: 'menu.local_override', scopeKind: 'location', scopeId: locationId, targetType: 'menu_item', targetId: menuItemId, metadata: b });
       return row;
     });
@@ -192,15 +216,18 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
     priv.get('/orgs/:orgId/foods/orders', {
       schema: {
         tags: ['foods'], security: secured, params: orgParams, summary: 'Kitchen/order view. Shows paid (or pay-at-pickup) orders; unpaid orders are hidden until payment confirms.',
-        querystring: z.object({ locationId: z.uuid().optional(), status: z.enum(foodOrderStates).optional(), active: z.coerce.boolean().default(true) }),
+        querystring: z.object({ locationId: z.uuid().optional(), status: z.enum(foodOrderStatesAll).optional(), channel: z.enum(FOOD_CHANNELS).optional(), active: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'), from: isoDateTime.optional(), to: isoDateTime.optional() }),
       },
     }, async (req) => {
       const { orgId } = req.params;
       const allowed = await authorisedLocations(req, s.db, orgId, 'operations.read');
-      const conds = [eq(foodOrders.organizationId, orgId), inArray(foodOrders.paymentStatus, ['paid', 'not_required', 'refund_pending', 'refunded', 'voided'])];
+      const conds = [eq(foodOrders.organizationId, orgId), inArray(foodOrders.paymentStatus, KITCHEN_PAYMENT_STATES)];
       if (req.query.locationId) conds.push(eq(foodOrders.locationId, req.query.locationId));
+      if (req.query.channel) conds.push(eq(foodOrders.channel, req.query.channel));
+      if (req.query.from) conds.push(gte(foodOrders.createdAt, new Date(req.query.from)));
+      if (req.query.to) conds.push(lt(foodOrders.createdAt, new Date(req.query.to)));
       if (req.query.status) conds.push(eq(foodOrders.status, req.query.status));
-      else if (req.query.active) conds.push(inArray(foodOrders.status, ['awaiting_acceptance', 'accepted', 'preparing', 'ready']));
+      else if (req.query.active) conds.push(inArray(foodOrders.status, ACTIVE_FOOD_STATES));
       if (allowed !== 'all') {
         if (!allowed.size) return { items: [], refreshedAt: new Date().toISOString() };
         conds.push(inArray(foodOrders.locationId, [...allowed]));
@@ -215,7 +242,7 @@ export const foodRoutes: FastifyPluginAsyncZod = async (app) => {
       schema: {
         tags: ['foods'], security: secured, params: idParams,
         summary: 'Move an order through awaiting_acceptance → accepted → preparing → ready → collected (or rejected/cancelled → refund/void)',
-        body: z.object({ to: z.enum(foodOrderStates), expectedFrom: z.enum(foodOrderStates).optional(), note: z.string().max(500).optional() }),
+        body: z.object({ to: z.enum(foodOrderStatesAll), expectedFrom: z.enum(foodOrderStatesAll).optional(), note: z.string().max(500).optional() }),
       },
     }, async (req) => {
       const { orgId, id } = req.params;

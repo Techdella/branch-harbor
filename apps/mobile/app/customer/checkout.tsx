@@ -87,6 +87,7 @@ export default function Checkout() {
         chevron
         onPress={() => router.back()}
       />
+      <ListItem icon="truck" iconBg={pastel.butter} title={t('foodsx.delivery')} chevron onPress={() => router.push('/customer/delivery')} />
 
       <Card>
         {cart.lines.map((l) => (

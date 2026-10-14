@@ -71,6 +71,13 @@
       "when": 1792012691803,
       "tag": "0009_commerce_full",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792012880576,
+      "tag": "0010_foods_full",
+      "breakpoints": true
     }
   ]
 }

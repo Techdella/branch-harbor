@@ -26,6 +26,7 @@ export default function OwnerTabs() {
       <Tabs.Screen name="alerts" options={{ title: t('tabs.alerts') }} />
       <Tabs.Screen name="utilisation" options={{ title: 'Utilisation' }} />
       <Tabs.Screen name="sales" options={{ title: ct('shopTitle') }} />
+      <Tabs.Screen name="foods" options={{ href: null }} />
     </Tabs>
   );
 }

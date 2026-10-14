@@ -94,6 +94,7 @@ export default function Profile() {
       <ListItem icon="trophy" iconBg={pastel.lime} title={t('sports.guardianEntry')} chevron onPress={() => router.push('/sports/guardian')} />
       <SectionHeader title={t('profile.privacy')} />
       <ShopEntry />
+      <ListItem icon="repeat" iconBg={pastel.butter} title={t('foodsx.mealPlans')} chevron onPress={() => router.push('/customer/meal-plans')} />
       <ListItem icon="download" iconBg={pastel.sage} title={t('profile.exportData')} chevron onPress={() => { setReqErr(null); setReq('export'); }} />
       <ListItem icon="shield" iconBg={pastel.blush} title={t('profile.deleteData')} chevron onPress={() => { setReqErr(null); setReq('delete'); }} />
 

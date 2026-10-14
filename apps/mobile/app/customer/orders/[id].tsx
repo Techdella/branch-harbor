@@ -2,6 +2,8 @@ import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Button, Card, DataStatus, Icon, MoneyText, Screen, ScreenHeader, SkeletonCard, Text } from '@/components';
 import { useCatalog } from '@/features/customer/catalog';
+import { useCart } from '@/features/customer/cart';
+import { useState } from 'react';
 import { orderStatusCopy } from '@/features/customer/orderStatus';
 import { useI18n } from '@/i18n';
 import { api } from '@/lib/api';
@@ -15,6 +17,8 @@ export default function OrderStatus() {
   const { t, intlLocale } = useI18n();
   const { locationById, brand } = useCatalog();
   const q = useApi(() => api.order(String(id)), [id], { pollMs: 4000 });
+  const cart = useCart();
+  const [reorderMsg, setReorderMsg] = useState<string | null>(null);
   const o = q.data;
   const loc = o ? locationById(o.locationId) : undefined;
 
@@ -86,6 +90,21 @@ export default function OrderStatus() {
         <Text variant="small" tone="muted">{t('order.taxNote')}</Text>
       </Card>
       {env.useMocks ? <Text variant="small" tone="muted">{t('order.statusSimNote')}</Text> : null}
+      {reorderMsg ? <Text variant="small" tone="muted">{reorderMsg}</Text> : null}
+      <Button label={t('foodsx.reorder')} icon="repeat" onPress={async () => {
+        // Re-price against today's menu: unavailable items or options are skipped and reported, never silently added.
+        const menu = await api.menu(o.locationId);
+        let added = 0; let missing = 0;
+        for (const l of o.lines) {
+          const it = menu.find((x) => x.id === l.itemId && !x.soldOut);
+          const opts = it ? it.modifierGroups.flatMap((g) => g.options).filter((op) => l.options.includes(op.name) && !op.soldOut) : [];
+          if (!it || opts.length !== l.options.length) { missing++; continue; }
+          cart.add(o.locationId, { itemId: it.id, name: it.name, quantity: l.quantity, optionIds: opts.map((x) => x.id), optionNames: opts.map((x) => x.name), unitPrice: { amount: it.price.amount + opts.reduce((a, x) => a + x.price.amount, 0), currency: it.price.currency } });
+          added += l.quantity;
+        }
+        setReorderMsg([t('foodsx.reorderAdded', { count: added }), missing ? t('foodsx.reorderMissing', { count: missing }) : ''].filter(Boolean).join(' '));
+        if (added) router.push('/customer/order');
+      }} />
       <Button label={t('common.done')} variant="secondary" onPress={() => router.replace('/customer/home')} />
     </Screen>
   );

@@ -26,6 +26,7 @@ import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
 import { KitchenScreen } from './foods/KitchenScreen';
 import { RealtyScreen } from './realty/RealtyRouter';
+import { foodsScreen } from './foods/ext';
 
 export function OpsRouter({ screen }: { screen: string }) {
   const t = useTranslations('ops');
@@ -54,6 +55,8 @@ export function OpsRouter({ screen }: { screen: string }) {
   if (!app.can('operations.read')) return <DeniedState permission="operations.read" />;
   if (app.industry === 'wellness') { const w = wellnessScreen(def.key); if (w) return w; }
   if (def.kind === 'table') return <TableScreen tableKey={def.key} title={title} icon={def.icon} permission="operations.read" />;
+  const foodsExt = app.industry === 'foods' ? foodsScreen(def.key) : null;
+  if (foodsExt) return foodsExt;
   const key = `${app.industry}:${def.key}`;
   if (app.industry === 'commerce') return <CommerceRoutes screen={def.key} />;
   switch (key) {

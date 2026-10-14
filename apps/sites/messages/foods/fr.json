@@ -1,0 +1,26 @@
+{
+  "foodsite": {
+    "orderTitle": "Commander en ligne",
+    "preorderTitle": "Précommande",
+    "cateringTitle": "Traiteur",
+    "mealTitle": "Formules repas hebdomadaires",
+    "tableTitle": "Commander à table",
+    "nav": {
+      "delivery": "Livraison",
+      "preorder": "Précommande",
+      "catering": "Traiteur",
+      "mealPlans": "Formules repas"
+    },
+    "channel": {
+      "pickup": "À emporter",
+      "delivery": "Livraison",
+      "dine_in": "À table",
+      "preorder": "Précommande"
+    },
+    "kitchenClosed": "La cuisine est fermée pour le moment.",
+    "allergensNotProvided": "Informations allergènes non fournies — demandez au restaurant",
+    "tip": "Pourboire",
+    "serviceCharge": "Service",
+    "deliveryFee": "Frais de livraison"
+  }
+}

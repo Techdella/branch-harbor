@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Badge, Card, DataStatus, ListItem, MoneyText, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, type Tone } from '@/components';
+import { Badge, Button, Card, DataStatus, ListItem, MoneyText, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, type Tone } from '@/components';
 import { RealtyEntry } from '@/features/realty/RealtyEntry';
 import { ExperienceSwitch } from '@/features/shared/ExperienceSwitch';
 import { StudioOccupancy } from '@/features/studios/components';
@@ -48,6 +48,7 @@ export default function Pulse() {
       />
       <DataStatus q={q} />
       <ListItem icon="trophy" iconBg={pastel.lime} title={t('sports.pulseEntry')} chevron onPress={() => router.push('/sports/pulse')} />
+      <Button label={t('foodsx.pulse')} icon="utensils" variant="secondary" size="sm" onPress={() => router.push('/owner/foods')} />
       {p ? <Text variant="small" tone="muted">{t('common.lastUpdated', { time: relativeAgo(p.updatedAt, intlLocale) })}</Text> : null}
 
       <SectionHeader title={t('owner.salesByCurrency')} sub={p?.range ?? t('owner.thisWeek')} />

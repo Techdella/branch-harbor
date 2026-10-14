@@ -1,0 +1,141 @@
+{
+  "ops": {
+    "foods": {
+      "kitchen": { "title": "Kitchen display", "description": "Tickets by station, bump and recall acknowledged by the server." },
+      "builder": { "title": "Menu builder" },
+      "availability": { "title": "Sold out & availability" },
+      "delivery": { "title": "Delivery" },
+      "tables": { "title": "Tables & QR" },
+      "catering": { "title": "Preorders & catering", "later": "" },
+      "mealplans": { "title": "Meal plans" },
+      "ingredients": { "title": "Ingredients" },
+      "ordering": { "title": "Ordering settings" },
+      "foodreports": { "title": "Food reports" }
+    }
+  },
+  "foodsx": {
+    "common": {
+      "location": "Location", "noLocations": "No locations in this scope", "noLocationsBody": "Choose a scope with at least one location to use this screen.",
+      "none": "None", "notSaved": "Not saved", "readOnly": "Your role can view this but not change it.", "refresh": "Refresh", "remove": "Remove", "save": "Save", "saved": "Saved",
+      "unavailable": "Unavailable", "add": "Add", "edit": "Edit", "view": "View"
+    },
+    "status": {
+      "awaiting_acceptance": "Awaiting acceptance", "accepted": "Accepted", "preparing": "Preparing", "ready": "Ready", "collected": "Collected", "out_for_delivery": "Out for delivery",
+      "delivered": "Delivered", "served": "Served", "cancelled": "Cancelled", "rejected": "Rejected", "queued": "Queued", "in_progress": "In progress", "done": "Done",
+      "new": "New", "quoted": "Quoted", "deposit_paid": "Deposit paid", "confirmed": "Confirmed", "completed": "Completed", "declined": "Declined", "expired": "Expired",
+      "active": "Active", "paused": "Paused", "past_due": "Payment overdue", "pending_payment": "Awaiting first payment", "pending": "Pending", "assigned": "Driver assigned",
+      "picked_up": "Picked up", "failed": "Failed", "succeeded": "Published", "partial": "Partly published", "skipped": "Skipped", "open": "Open", "paid": "Paid", "void": "Void", "closed": "Closed"
+    },
+    "channel": { "pickup": "Pickup", "delivery": "Delivery", "dine_in": "Dine-in", "preorder": "Preorder", "catering": "Catering", "meal_plan": "Meal plan" },
+    "kds": {
+      "title": "Kitchen display", "description": "Tickets routed to stations by item. Bump, recall and status changes wait for the server to confirm.",
+      "stations": "Stations", "expo": "Expo (all orders)", "sound": "Audible alerts", "fullScreen": "Full screen", "exitFull": "Exit full screen",
+      "staleTitle": "Connection lost — this screen is not current", "staleBody": "Last successful refresh at {time} ({ago}). Actions are paused until the connection returns.",
+      "live": "Live · refreshed {time}", "noStations": "No stations set up", "noStationsBody": "Add stations (grill, cold, bar…) in Ordering settings to route items; until then every order shows on the expo view.",
+      "emptyStation": "Nothing for this station right now.", "empty": "No open orders right now.", "target": "Target", "promised": "Promised", "overdue": "Overdue {min} min",
+      "recalled": "Recalled {n}×", "start": "Start", "bump": "Bump", "recall": "Recall", "waitingAck": "Waiting for confirmation…", "allDone": "All stations done — ready to hand over.",
+      "awaitDriver": "Waiting for the driver (see Delivery).",
+      "to": { "accepted": "Accept", "preparing": "Start preparing", "ready": "Mark ready", "collected": "Collected", "served": "Served", "out_for_delivery": "Out for delivery" }
+    },
+    "builder": {
+      "title": "Menu builder", "description": "Categories, items, modifiers, business-supplied allergens and dietary labels, translations and day-parts. Publish with a preview and see the result at every location.",
+      "readOnly": "View only", "readOnlyBody": "Changing the master menu needs headquarters menu permissions.", "tabItems": "Items", "tabDayParts": "Day-parts", "tabPublish": "Preview & publish",
+      "menus": "Menus", "newMenu": "New menu name", "menuKind": "Menu type", "kind": { "standard": "Everyday", "preorder": "Preorder (cooking dates)" },
+      "uncategorised": "Uncategorised", "addItem": "Add item", "archived": "Archived", "station": "Station", "allergensDeclared": "{n, plural, =0 {No allergens declared} one {# allergen declared} other {# allergens declared}}",
+      "allergensNotProvided": "Allergen information not provided", "groups": "{n, plural, one {# modifier group} other {# modifier groups}}", "languages": "Translations: {list}",
+      "emptyCategory": "No items yet.", "newCategory": "New category", "prices": "Prices by currency (leave empty if not sold in that currency)", "newItemHint": "Add allergens, dietary labels, modifiers and translations after creating the item.",
+      "name": "Name", "descriptionField": "Description", "aiDraft": "Draft description with AI", "useDraft": "Use this draft (not saved yet)", "allergens": "Allergens (business-supplied)",
+      "allergensHint": "Choose only what your business declares. Customers see them using each location's convention ({regimes}). BranchHarbor never infers allergens.",
+      "declare": "We declare allergens for this item", "allergensNotProvidedLong": "Customers will see “Allergen information not provided — ask the restaurant”, never “none”.",
+      "dietary": "Dietary labels (business-supplied)", "dayParts": "Day-parts", "dayPartsHint": "Empty = follows its category, then the menu. Evaluated in each location's local time.",
+      "prepMinutes": "Prep target (min)", "translations": "Names in other languages", "nameIn": "Name in {lang}", "fallsBack": "Falls back to the main name",
+      "archive": "Archive item", "modifierGroups": "Modifier groups", "required": "Required · choose {min}–{max}", "optional": "Optional · up to {max}", "removeGroup": "Remove group {name}",
+      "groupName": "Group name", "min": "Min", "max": "Max", "options": "Options", "optionsHint": "Comma separated; add a price with +, e.g. “Regular, Large +3”", "addGroup": "Add modifier group",
+      "dayPartsBody": "Windows use each location's local time, so breakfast in Seattle and London both end at 11:00 local.", "everyDay": "Every day", "from": "From", "to": "To", "days": "Days",
+      "previewTitle": "Preview: {menu}", "previewBody": "What publishing does at each location before anything changes. Locations keep their permitted local prices and availability.",
+      "retryFailed": "Retry {n} failed", "publishSelected": "Publish to {n} selected", "publishAll": "Publish to all locations", "include": "Include", "includeLoc": "Include {name}",
+      "wouldBe": "Result", "sellable": "Sellable items", "notSellable": "Not sellable there", "lastPublish": "Last publish", "never": "Never",
+      "publishedTitle": "Publish finished", "publishedBody": "{ok} published, {partial} partly published, {failed} failed, {skipped} skipped."
+    },
+    "avail": {
+      "title": "Sold out & availability", "description": "Mark items or single options sold out at a location. “Until close” resets automatically at closing time.",
+      "untilClose": "Until close", "markedOut": "{name} is sold out.", "markedBack": "{name} is available again.", "soldOut": "Sold out", "available": "Available",
+      "soldOutIngredient": "Sold out — ingredient ran out", "soldOutUntil": "Sold out until {time}", "allergens": "Allergens: {list}", "noneDeclared": "none declared",
+      "allergensNotProvided": "Allergen information not provided", "toggle": "Available: {name}"
+    },
+    "settings": {
+      "title": "Ordering settings", "description": "Channels, tips, service charges, allergen convention, configured tax, delivery and kitchen stations per location.",
+      "channels": "Ordering channels", "channel": { "pickup": "Pickup", "delivery": "Delivery", "dineIn": "Dine-in QR ordering", "preorder": "Preorders", "catering": "Catering enquiries", "mealPlans": "Meal plans" },
+      "tipsAndCharges": "Tips, service charge and tax", "tipsEnabled": "Accept optional tips", "tipPresets": "Tip presets (%)", "tipPresetsHint": "Comma separated, e.g. 15, 18, 20",
+      "serviceCharge": "Service charge (%)", "serviceChargeLabel": "Label shown to guests", "tax": "Tax rate (%) set by your business", "taxHint": "Leave empty to show no tax line. BranchHarbor never assumes a rate.",
+      "taxNone": "No tax line", "serviceSummary": "{pct} added for the selected channels, shown before payment.", "noServiceCharge": "No service charge.",
+      "allergenConvention": "Allergens & kitchen", "convention": "Allergen convention", "conventionHint": "Which list customers see your declared allergens against.", "conventionDefault": "Default for the country ({regime})",
+      "regime": { "eu14": "EU/UK 14 allergens", "us9": "US major food allergens", "ca": "Canada priority allergens" },
+      "autoSoldOut": "Sell out automatically when an ingredient runs out", "kdsSound": "Kitchen audible alerts on by default",
+      "delivery": "Delivery", "provider": "Provider", "slotCapacity": "Deliveries per slot", "leadMinutes": "Lead time (min)", "slotMinutes": "Slot length (min)",
+      "deliveryHours": "Delivery hours {hours} ({tz}).", "noDeliveryHours": "No delivery hours set — no delivery times are offered.",
+      "stations": "Kitchen stations", "stationsBody": "Items route to the station matching their station key; anything else goes to the first station.", "defaultStations": "Add grill / cold / bar / expo",
+      "prepTarget": "Prep target (min)", "prepTargetOf": "Prep target for {name}", "stationName": "Station name"
+    },
+    "delivery": {
+      "title": "Delivery", "description": "Zones with fees and minimums, drivers, and handoff to your own drivers or a delivery provider.",
+      "mode": { "sandbox": "Sandbox", "live": "Live", "disabled": "Not configured" }, "provider": { "own": "Own driver", "uber_direct": "Uber Direct", "deliverect": "Deliverect" },
+      "toDispatch": "Waiting for a driver", "nothingToDispatch": "No delivery orders waiting.", "driver": "Driver", "chooseDriver": "Choose driver", "assign": "Assign", "sendTo": "Send to {name}",
+      "active": "Active deliveries", "noActive": "No active deliveries.", "order": "Order", "pickedUp": "Picked up", "delivered": "Delivered", "simulate": "Simulate provider update",
+      "failed": "Failed", "failReason": "Why did the delivery fail?", "drivers": "Drivers", "linkedApp": "uses the app", "driverName": "Driver name", "phone": "Phone",
+      "zones": "Delivery zones", "geocodingOff": "Address lookup is not configured", "geocodingOffBody": "Radius zones are checked when the customer shares their location; postcode zones always work.",
+      "noCoordinates": "This location has no map coordinates, so use postcode zones (or add coordinates).", "zone": "Zone", "area": "Area", "fee": "Fee", "minimum": "Minimum order",
+      "freeAbove": "Free above", "paused": "Paused", "pause": "Pause", "resume": "Resume", "radius": "Within {km} km", "noZones": "No zones yet — delivery is not offered.",
+      "zoneName": "Zone name", "kind": "Type", "byPostcode": "Postcodes", "byRadius": "Radius", "postcodes": "Postcodes", "postcodesHint": "Comma separated prefixes, e.g. 98107, SW1A",
+      "radiusMeters": "Radius (metres)", "addZone": "Add zone"
+    },
+    "tables": {
+      "title": "Tables & QR ordering", "description": "Table codes for dine-in ordering. Guests pay at the table or add to the table's tab.",
+      "openTabs": "Open tabs", "noTabs": "No open tabs.", "openedAt": "Opened {time}", "orders": "{n, plural, one {# order} other {# orders}}", "settle": "Paid at counter", "void": "Void",
+      "tables": "Tables", "qrHint": "Print each link as a QR code on the table. Regenerating a code stops the old one working.", "tabOpen": "Tab open", "inactive": "Inactive",
+      "seats": "{n} seats", "regenerate": "New code", "regenConfirm": "Generate a new code? The printed QR code will stop working.", "deactivate": "Deactivate", "activate": "Activate",
+      "label": "Table label", "seatsLabel": "Seats", "add": "Add table"
+    },
+    "catering": {
+      "title": "Preorders & catering", "description": "Catering enquiries are reviewed and quoted before acceptance and deposit. Cooking dates take preorders until their cut-off.",
+      "tabPipeline": "Catering pipeline", "tabDates": "Cooking dates", "tabProduction": "Production summary", "tabPackages": "Packages",
+      "guests": "{n} guests", "closed": "Closed enquiries", "enquiry": "Catering enquiry", "event": "Event", "guestsLabel": "Guests", "fulfilment": "Fulfilment",
+      "fulfil": { "pickup": "Pickup", "delivery": "Delivery", "onsite": "On-site service" }, "contact": "Contact", "dietaryNotes": "Guest-reported dietary needs",
+      "dietaryNotesHint": "check against your declared allergens before quoting", "quoteV": "Quote v{v}", "subtotal": "Subtotal", "serviceCharge": "Service charge", "deliveryFee": "Delivery fee",
+      "tax": "Tax", "noTax": "No tax configured", "total": "Total", "deposit": "Deposit", "validUntil": "Valid until {when}", "revise": "Revise the quote", "buildQuote": "Build a quote",
+      "extraLine": "Extra line", "extraPlaceholder": "e.g. Staffing, 3 hours", "qty": "Quantity", "unitPrice": "Unit price", "depositPct": "Deposit (%)", "validDays": "Valid for (days)",
+      "sendQuote": "Send quote", "quoteHint": "The package price per guest is added automatically. Tax and service charge follow the location settings.",
+      "confirm": "Confirm event", "complete": "Mark completed", "decline": "Decline", "cancel": "Cancel", "reason": "Reason (shared with the customer)",
+      "datesBody": "Customers pick the cooking date first; orders close at the cut-off (location time).", "cutoffPassed": "Cut-off passed", "cutoff": "Cut-off {when}",
+      "booked": "{n} of {cap} booked", "closeDate": "Close", "reopen": "Reopen", "noDates": "No cooking dates open.", "date": "Date", "capacity": "Capacity (orders)",
+      "cutoffDays": "Cut-off days before", "cutoffTime": "Cut-off time", "windows": "Collection windows", "openDate": "Open date", "aiBrief": "Prep brief with AI", "print": "Print",
+      "aiUnavailable": "AI brief unavailable", "aiBriefTitle": "Prep brief (AI draft — numbers below are authoritative)",
+      "prodCounts": "{orders} orders · {events} catering events ({guests} guests) · {boxes} meal-plan boxes", "nothingToProduce": "Nothing to produce for this date.",
+      "perGuest": "per guest", "minGuests": "From {n} guests", "leadDays": "{n} days' notice", "allergens": "Allergens: {list}"
+    },
+    "meal": {
+      "title": "Meal plans", "description": "Weekly meal-prep boxes billed as subscriptions. Customers skip a week before its cut-off; boxes go to the kitchen on the day.",
+      "releaseToday": "Send today's boxes to the kitchen", "released": "{n} boxes sent to the kitchen.", "plans": "Plans", "perWeek": "/ week",
+      "planRule": "{meals} meals · {how} on {day} · changes close {days} days before at {time}", "subscribers": "Subscribers", "noSubscribers": "No subscribers at this location.",
+      "scheduled": "Scheduled", "skip": "Skip", "unskip": "Undo skip", "locked": "Cut-off passed"
+    },
+    "ing": {
+      "title": "Ingredients", "description": "Stock per location in grams, millilitres or units. Orders deplete stock; items can sell out automatically when an ingredient runs out.",
+      "lowStockTitle": "Low stock", "stock": "Stock", "ingredient": "Ingredient", "onHand": "On hand", "threshold": "Low-stock alert at", "autoSoldOut": "Auto sold-out", "usedBy": "Used by",
+      "adjust": "Record stock", "exhausted": "Ran out", "low": "Low", "notTracked": "Not tracked here", "thresholdOf": "Low-stock threshold for {name}", "autoSoldOutOf": "Auto sold-out for {name}",
+      "option": "option", "reason": "Reason", "receive": "Received", "waste": "Waste", "count": "Count", "quantity": "Quantity", "record": "Record",
+      "nowSoldOut": "{name} is now too low for one portion — items using it show as sold out.", "recorded": "{name}: {n} {unit} on hand.", "catalogue": "Catalogue & recipes",
+      "name": "Name", "unit": "Unit", "each": "each", "recipes": "Recipes", "recipesHint": "Quantity of each ingredient per portion. Set by headquarters.", "menuItem": "Menu item",
+      "noRecipe": "No recipe yet.", "perPortion": "Per portion", "setLine": "Set"
+    },
+    "reports": {
+      "title": "Food reports", "description": "Orders by channel, prep times, sold-out frequency, revenue per currency, catering pipeline and meal plans.",
+      "days": "Last {n} days", "noCombined": "Currencies are never added together.", "revenue": "Revenue by currency", "noOrders": "No orders in this period.",
+      "currency": "Currency", "orders": "Orders", "gross": "Gross", "avg": "Average order", "tips": "Tips", "byChannel": "Orders by channel", "cancelled": "{n} cancelled or rejected",
+      "prep": "Prep times", "median": "Median", "p90": "90th percentile", "onTime": "On time", "minutes": "{n} min", "target": "target {n} min", "overTarget": "{n} of {of} over target",
+      "soldOut": "Sold-out frequency", "noSoldOut": "Nothing sold out in this period.", "times": "{n}×", "source": { "manual": "marked by staff", "ingredient": "ingredient ran out" },
+      "catering": "Catering pipeline", "conversion": "Converted to paid: {pct}", "mealPlans": "Meal plans", "noMealPlans": "No meal-plan subscribers.",
+      "mealLine": "{active} active, {paused} paused", "generated": "Generated {at}"
+    }
+  }
+}

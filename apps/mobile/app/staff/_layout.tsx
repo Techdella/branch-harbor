@@ -21,6 +21,8 @@ export default function StaffTabs() {
       <Tabs.Screen name="cover" options={{ title: t('tabs.cover') }} />
       <Tabs.Screen name="appointments" options={{ title: 'Appointments' }} />
       <Tabs.Screen name="shopfloor" options={{ title: ct('floorTitle') }} />
+      <Tabs.Screen name="kds" options={{ href: null }} />
+      <Tabs.Screen name="deliveries" options={{ href: null }} />
     </Tabs>
   );
 }

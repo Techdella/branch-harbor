@@ -1,0 +1,26 @@
+{
+  "foodsite": {
+    "orderTitle": "Pedir en línea",
+    "preorderTitle": "Encargo",
+    "cateringTitle": "Catering",
+    "mealTitle": "Planes de comidas semanales",
+    "tableTitle": "Pedir en la mesa",
+    "nav": {
+      "delivery": "A domicilio",
+      "preorder": "Encargos",
+      "catering": "Catering",
+      "mealPlans": "Planes de comidas"
+    },
+    "channel": {
+      "pickup": "Para recoger",
+      "delivery": "A domicilio",
+      "dine_in": "En la mesa",
+      "preorder": "Encargo"
+    },
+    "kitchenClosed": "La cocina está cerrada ahora mismo.",
+    "allergensNotProvided": "Sin información de alérgenos — pregunte en el restaurante",
+    "tip": "Propina",
+    "serviceCharge": "Servicio",
+    "deliveryFee": "Gastos de envío"
+  }
+}

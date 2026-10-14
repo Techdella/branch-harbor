@@ -1,0 +1,50 @@
+{
+  "ops": {
+    "foods": {
+      "kitchen": {
+        "title": "Küchendisplay"
+      },
+      "builder": {
+        "title": "Menü-Editor"
+      },
+      "availability": {
+        "title": "Ausverkauft & Verfügbarkeit"
+      },
+      "delivery": {
+        "title": "Lieferung"
+      },
+      "tables": {
+        "title": "Tische & QR"
+      },
+      "catering": {
+        "title": "Vorbestellungen & Catering"
+      },
+      "mealplans": {
+        "title": "Essenspläne"
+      },
+      "ingredients": {
+        "title": "Zutaten"
+      },
+      "ordering": {
+        "title": "Bestelleinstellungen"
+      },
+      "foodreports": {
+        "title": "Gastro-Berichte"
+      }
+    }
+  },
+  "foodsx": {
+    "status": {
+      "awaiting_acceptance": "Wartet auf Annahme",
+      "accepted": "Angenommen",
+      "preparing": "In Zubereitung",
+      "ready": "Fertig",
+      "collected": "Abgeholt",
+      "out_for_delivery": "Unterwegs",
+      "delivered": "Geliefert",
+      "served": "Serviert",
+      "cancelled": "Storniert",
+      "rejected": "Abgelehnt"
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Icon } from '@bh/ui';
 import { MODULE_ICON, MODULE_PATH } from '@/lib/modules';
 import { getRouting, loadLocation, makeLinks } from '@/lib/site';
+import { FoodsLinks } from '@/components/foods/FoodsLinks';
 
 export default async function LocationLayout({ children, params }: { children: ReactNode; params: Promise<{ brand: string; location: string }> }) {
   const { brand, location } = await params;
@@ -35,6 +36,7 @@ export default async function LocationLayout({ children, params }: { children: R
               <Icon name={k === 'pricing' ? 'tag' : k === 'online' ? 'play' : 'user'} size={15} />{t(`studio.nav.${k}` as 'studio.nav.pricing')}
             </a>
           ))}
+          {kind === 'foods' && data.module.mode !== 'external' && <FoodsLinks locationId={data.location.id} href={(path) => links.location(location, path)} />}
           {extraPages.map((p) => (
             <a key={p.slug} href={links.location(location, `/${p.slug}`)} className="flex h-10 shrink-0 items-center rounded-full px-3 hover:bg-white">{p.title}</a>
           ))}

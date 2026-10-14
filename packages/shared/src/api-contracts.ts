@@ -39,7 +39,7 @@ export const registrationStates = ['submitted', 'awaiting_review', 'accepted', '
 export const appointmentStates = ['confirmed', 'cancelled', 'rescheduled', 'completed', 'no_show'] as const;
 export const publishResultStates = ['pending', 'succeeded', 'failed', 'skipped'] as const;
 export const fieldOrigins = ['hq', 'local', 'locked', 'approval'] as const;
-export const reconciliationKinds = ['paid_without_record', 'unpaid_confirmed_record', 'amount_mismatch'] as const;
+export const reconciliationKinds = ['paid_without_record', 'unpaid_confirmed_record', 'amount_mismatch', 'duplicate_payment'] as const;
 
 /** Customer contact details collected by public booking/order flows. */
 export const publicContactSchema = z.object({
