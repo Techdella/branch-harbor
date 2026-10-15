@@ -1851,8 +1851,6 @@
     },
     "industryLegend": "Sector",
     "selfServe": "Configuración autónoma",
-    "pilotOnly": "Piloto bajo solicitud",
-    "pilotOnlyBody": "{industry} está disponible a través de nuestro programa piloto. Puedes explorar la configuración, pero para publicar hace falta un acuerdo de piloto. Nos pondremos en contacto contigo.",
     "industry": {
       "studios": {
         "name": "Estudios",
@@ -1895,6 +1893,13 @@
         "itemsTitle": "Añade tus tipos de habitación",
         "itemSingular": "Tipo de habitación",
         "itemPh": "p. ej. Doble con vistas · 2 huéspedes"
+      },
+      "realty": {
+        "name": "Inmobiliaria",
+        "workflow": "Anuncio → consulta → visita → oferta",
+        "itemsTitle": "Añade tus primeros anuncios",
+        "itemSingular": "Anuncio",
+        "itemPh": "p. ej. Calle Serrano 42 · 3 dormitorios"
       }
     },
     "modelLegend": "Tipo de negocio",
@@ -2144,7 +2149,9 @@
         "sports": "Inscribirse",
         "wellness": "Reservar",
         "commerce": "Comprar",
-        "foods": "Pedir"
+        "foods": "Pedir",
+        "realty": "Reservar visita",
+        "hospitality": "Reservar estancia"
       },
       "publishedTitle": "Publicado",
       "publishedBody": "Tu sitio está publicado en {address}.",
@@ -2167,8 +2174,7 @@
     "blockers": {
       "location": "Guarda tu primera sede",
       "website": "Elige un sitio web y una dirección",
-      "items": "Añade al menos un elemento",
-      "industry": "Para publicar en {industry} hace falta un acuerdo de piloto"
+      "items": "Añade al menos un elemento"
     }
   },
   "approvals": {

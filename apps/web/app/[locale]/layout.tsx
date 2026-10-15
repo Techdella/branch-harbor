@@ -70,9 +70,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           >
             {t('skipToContent')}
           </a>
-          <div className="mx-auto flex max-w-[1360px] flex-col gap-3 p-2 sm:p-3">
+          <div className="edge flex flex-col gap-[var(--edge)]">
             <SiteHeader />
-            <main id="main" tabIndex={-1} className="flex flex-col gap-3 outline-none">
+            <main id="main" tabIndex={-1} className="flex flex-col gap-[var(--edge)] outline-none">
               {children}
             </main>
             <SiteFooter />

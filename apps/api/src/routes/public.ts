@@ -36,7 +36,7 @@ export const publicRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   app.get('/public/industries', {
-    schema: { tags: ['public'], summary: 'Industries with release status (planned modules are never presented as working)' },
+    schema: { tags: ['public'], summary: 'Industries with release status (every industry is available for sign-up)' },
   }, async () => ({
     items: INDUSTRIES.map((k) => INDUSTRY_META[k]),
     countries: LAUNCH_COUNTRIES,

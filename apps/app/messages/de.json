@@ -1851,8 +1851,6 @@
     },
     "industryLegend": "Branche",
     "selfServe": "Selbstständige Einrichtung",
-    "pilotOnly": "Pilot auf Anfrage",
-    "pilotOnlyBody": "{industry} ist über unser Pilotprogramm verfügbar. Sie können die Einrichtung ausprobieren, für die Veröffentlichung ist jedoch eine Pilotvereinbarung nötig – wir melden uns bei Ihnen.",
     "industry": {
       "studios": {
         "name": "Studios",
@@ -1895,6 +1893,13 @@
         "itemsTitle": "Zimmertypen hinzufügen",
         "itemSingular": "Zimmertyp",
         "itemPh": "z. B. Doppelzimmer Flussblick · 2 Gäste"
+      },
+      "realty": {
+        "name": "Immobilien",
+        "workflow": "Inserat → Anfrage → Besichtigung → Angebot",
+        "itemsTitle": "Erste Inserate hinzufügen",
+        "itemSingular": "Inserat",
+        "itemPh": "z. B. Lindenstraße 42 · 3 Zimmer"
       }
     },
     "modelLegend": "Unternehmensart",
@@ -2144,7 +2149,9 @@
         "sports": "Anmelden",
         "wellness": "Buchen",
         "commerce": "Kaufen",
-        "foods": "Bestellen"
+        "foods": "Bestellen",
+        "realty": "Besichtigung buchen",
+        "hospitality": "Aufenthalt buchen"
       },
       "publishedTitle": "Veröffentlicht",
       "publishedBody": "Ihre Website ist unter {address} online.",
@@ -2167,8 +2174,7 @@
     "blockers": {
       "location": "Speichern Sie Ihren ersten Standort",
       "website": "Wählen Sie eine Website und eine Adresse",
-      "items": "Fügen Sie mindestens einen Eintrag hinzu",
-      "industry": "Die Veröffentlichung für {industry} erfordert eine Pilotvereinbarung"
+      "items": "Fügen Sie mindestens einen Eintrag hinzu"
     }
   },
   "approvals": {

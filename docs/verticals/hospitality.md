@@ -1,6 +1,6 @@
 # Hospitality — full product and UX
 
-Status: specification for the seventh vertical (`hospitality` in `@bh/shared` `INDUSTRY_META`, release **next**). In MVP
+Status: specification for the seventh vertical (`hospitality` in `@bh/shared` `INDUSTRY_META`, release **available**). In MVP
 per PRODUCT_PLAN decision 2. Written in the spirit of product-spec §9–13; the shared rules of §5 (roles), §14 (payments),
 §15 (AI), §17 (data) and §18 (states) apply.
 

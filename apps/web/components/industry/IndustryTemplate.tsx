@@ -6,9 +6,7 @@ import { INDUSTRIES, type IndustryKey } from '@/content/industries';
 import { getIntegration } from '@/content/integrations';
 import { CheckList, FaqList, H2, Kicker, Lead, Panel, PastelIcon, SampleBadge, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
-import { supportsSelfServe } from '@bh/shared';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
+import { DEMO_URL, signUpUrl } from '@/lib/links';
 import { WorkflowExplorer, type WorkflowStepView } from './WorkflowExplorer';
 
 interface Copy {
@@ -78,24 +76,29 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
               </li>
             </ol>
           </nav>
-          <Kicker icon={def.icon}>{t('badge', { name, availability: tc(`availability.${def.availability}`) })}</Kicker>
+          <Kicker icon={def.icon}>{t('badge', { name })}</Kicker>
           <h1 id="ind-title" className="text-[38px] leading-[1.03] font-extrabold tracking-[-0.045em] md:text-[56px]">
             {copy.headline}
           </h1>
           <Lead>{copy.intro}</Lead>
           <div className="flex flex-wrap gap-2.5">
-            <LinkButton href={demoHref} size="lg" signal="arrow-up-right">
-              {tm(`${industry}.cta`)}
+            <LinkButton href={DEMO_URL} external size="lg" signal="arrow-up-right">
+              {tc('tryDemo')}
             </LinkButton>
-            {supportsSelfServe(industry) && (
-              <LinkButton href={`${APP_URL}/sign-up?industry=${industry}&model=independent`} external size="lg" variant="secondary">
-                {t('startFree')}
-              </LinkButton>
-            )}
-            <a href="#workflow" className="inline-flex h-[54px] items-center rounded-full border-[1.5px] border-ink px-6 text-[15px] font-bold hover:bg-canvas-raised">
-              {t('seeWorkflow')}
-            </a>
+            <LinkButton href={signUpUrl({ industry })} external size="lg" variant="secondary">
+              {tc('startPlan')}
+            </LinkButton>
           </div>
+          <p className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold">
+            <Link href={demoHref} className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline">
+              <Icon name="phone" size={16} />
+              {tm(`${industry}.cta`)}
+            </Link>
+            <a href="#workflow" className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline">
+              {t('seeWorkflow')}
+              <Icon name="arrow-down" size={16} />
+            </a>
+          </p>
         </div>
         <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-3">
           <div className="relative min-h-[300px] overflow-hidden rounded-[24px] md:min-h-[420px]" style={{ background: def.pastel }}>
@@ -138,7 +141,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
       </Panel>
 
       {/* HQ / local permissions */}
-      <section aria-labelledby="perm-title" className="grid gap-3 md:grid-cols-2">
+      <section aria-labelledby="perm-title" className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         <div className="rounded-[28px] bg-surface p-7 md:col-span-2 md:rounded-2xl md:p-10">
           <H2 id="perm-title">{t('permissionsTitle')}</H2>
           <Lead className="mt-3">{t('permissionsBody')}</Lead>
@@ -160,7 +163,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
       </section>
 
       {/* First release + connected systems */}
-      <section aria-label={`${t('firstTitle')} · ${t('connectedTitle')}`} className="grid gap-3 lg:grid-cols-2">
+      <section aria-label={`${t('firstTitle')} · ${t('connectedTitle')}`} className="rail-wide grid gap-[var(--edge)] lg:grid-cols-2">
         <div className="flex flex-col gap-4 rounded-[28px] bg-surface p-7 md:rounded-2xl md:p-10">
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">{t('firstTitle')}</h2>
           <p className="text-[15px] text-stone">{t('firstBody', { name })}</p>
@@ -189,7 +192,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
       </section>
 
       {/* Later capabilities + sample network */}
-      <section aria-label={`${t('laterTitle')} · ${t('sampleTitle')}`} className="grid gap-3 lg:grid-cols-2">
+      <section aria-label={`${t('laterTitle')} · ${t('sampleTitle')}`} className="rail-wide grid gap-[var(--edge)] lg:grid-cols-2">
         <div className="flex flex-col gap-4 rounded-[28px] border-[1.5px] border-dashed border-line bg-canvas-raised p-7 md:rounded-2xl md:p-10">
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">{t('laterTitle')}</h2>
           <p className="text-[15px] text-stone">{t('laterBody')}</p>
@@ -254,9 +257,17 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
           {t('ctaTitle', { name })}
         </H2>
         <p className="max-w-xl text-base leading-relaxed text-[#C9C9C3]">{t('ctaBody')}</p>
-        <LinkButton href={demoHref} size="lg" variant="light" iconRight="arrow-up-right">
+        <div className="flex flex-wrap justify-center gap-2.5">
+          <LinkButton href={DEMO_URL} external size="lg" variant="light" iconRight="arrow-up-right">
+            {tc('tryDemo')}
+          </LinkButton>
+          <LinkButton href={signUpUrl({ industry })} external size="lg" variant="onDark">
+            {tc('startPlan')}
+          </LinkButton>
+        </div>
+        <Link href={demoHref} className="text-sm font-bold text-white underline-offset-4 hover:underline">
           {tm(`${industry}.cta`)}
-        </LinkButton>
+        </Link>
       </Panel>
     </>
   );

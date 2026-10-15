@@ -24,6 +24,9 @@ export const IMG = {
   foodPizza: U('1651981075280-9a9e01acbff0', 900),
   realtyHouse: U('1600585154340-be6161a56a0c'),
   realtyLiving: U('1600566753190-17f0baa2a6c3', 900),
+  hotelRoom: U('1631049307264-da0ec9d70304'),
+  hotelSuite: U('1590490360182-c33d57733427', 900),
+  hotelPool: U('1566073771259-6a8506099945'),
   team: U('1522202176988-66273c2fd55f'),
   meeting: U('1556157382-97eda2d62296'),
 } as const;

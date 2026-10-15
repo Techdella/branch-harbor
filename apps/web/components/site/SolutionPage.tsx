@@ -4,9 +4,8 @@ import type { IconName } from '@bh/icons';
 import { IMG, PASTEL } from '@/content/images';
 import { H2, Lead, Panel, PastelIcon, PageHero } from './Blocks';
 import { LinkButton } from './LinkButton';
-import { SELF_SERVE_INDUSTRIES } from '@bh/shared';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
+import { Link } from '@/i18n/navigation';
+import { DEMO_URL, signUpUrl } from '@/lib/links';
 
 type Key = 'franchises' | 'independent';
 
@@ -39,6 +38,7 @@ const INTL_ICONS: IconName[] = ['clock', 'globe', 'shield'];
 
 export async function SolutionPage({ which }: { which: Key }) {
   const t = await getTranslations(`solutions`);
+  const tc = await getTranslations('common');
   const m = META[which];
   const points = t.raw(`${which}.points`) as { t: string; d: string }[];
   const steps = t.raw(`${which}.steps`) as { t: string; d: string }[];
@@ -60,20 +60,35 @@ export async function SolutionPage({ which }: { which: Key }) {
         {which === 'independent' ? (
           <div className="flex flex-col items-start gap-3">
             <div className="flex flex-wrap gap-2.5">
-              {/* Self-service sign-up only for industries that support it; the rest start with a demo. */}
-              <LinkButton href={`${APP_URL}/sign-up?model=independent&industry=${SELF_SERVE_INDUSTRIES[0]}`} external size="lg" signal="arrow-up-right">
+              {/* Self-service sign-up is open for every industry; the industry is chosen during sign-up. */}
+              <LinkButton href={signUpUrl({ model: 'independent' })} external size="lg" signal="arrow-up-right">
                 {t('independent.signupCta')}
               </LinkButton>
-              <LinkButton href="/demo?locations=1" size="lg" variant="secondary">
-                {t('independent.cta')}
+              <LinkButton href={DEMO_URL} external size="lg" variant="secondary">
+                {tc('tryDemo')}
               </LinkButton>
             </div>
-            <p className="text-sm text-stone">{t('independent.signupNote')}</p>
+            <p className="text-sm text-stone">
+              {t('independent.signupNote')}{' '}
+              <Link href="/demo?locations=1" className="font-bold text-ink underline underline-offset-4">
+                {t('independent.cta')}
+              </Link>
+            </p>
           </div>
         ) : (
-          <LinkButton href={m.href} size="lg" signal="arrow-up-right">
-            {t(`${which}.cta`)}
-          </LinkButton>
+          <div className="flex flex-col items-start gap-3">
+            <div className="flex flex-wrap gap-2.5">
+              <LinkButton href={DEMO_URL} external size="lg" signal="arrow-up-right">
+                {tc('tryDemo')}
+              </LinkButton>
+              <LinkButton href={signUpUrl({ model: 'network' })} external size="lg" variant="secondary">
+                {tc('startPlan')}
+              </LinkButton>
+            </div>
+            <Link href={m.href} className="text-sm font-bold underline-offset-4 hover:underline">
+              {t(`${which}.cta`)}
+            </Link>
+          </div>
         )}
       </PageHero>
 
@@ -147,9 +162,17 @@ export async function SolutionPage({ which }: { which: Key }) {
           {t('ctaTitle')}
         </H2>
         <p className="max-w-xl text-base leading-relaxed text-white md:text-lg">{t('ctaBody')}</p>
-        <LinkButton href="/demo" size="lg" variant="light" iconRight="arrow-up-right">
+        <div className="flex flex-wrap justify-center gap-2.5">
+          <LinkButton href={DEMO_URL} external size="lg" variant="light" iconRight="arrow-up-right">
+            {tc('tryDemo')}
+          </LinkButton>
+          <LinkButton href={signUpUrl({ model: which === 'independent' ? 'independent' : 'network' })} external size="lg" variant="onDark">
+            {tc('startPlan')}
+          </LinkButton>
+        </div>
+        <Link href="/demo" className="text-sm font-bold text-white underline-offset-4 hover:underline">
           {t(`${which}.cta`)}
-        </LinkButton>
+        </Link>
       </Panel>
     </>
   );

@@ -17,11 +17,6 @@
     "draftLegal": "Brouillon – en attente de relecture juridique",
     "draftLegalBody": "Cette page est un brouillon publié par souci de transparence. Elle n’a pas encore de valeur juridique et sera remplacée par un texte validé avant le lancement.",
     "lastUpdated": "Dernière mise à jour : {date}",
-    "availability": {
-      "pilot": "Pilote",
-      "next": "Prévu ensuite",
-      "planned": "Prévu"
-    },
     "status": {
       "tested": "Testé",
       "limited": "Prise en charge limitée",
@@ -35,7 +30,12 @@
     },
     "optional": "facultatif",
     "homeLabel": "BranchHarbor – accueil",
-    "close": "Fermer"
+    "close": "Fermer",
+    "tryDemo": "Essayer la démo",
+    "startPlan": "Souscrire une offre",
+    "otherIndustry": "Un autre secteur ?",
+    "otherIndustryBody": "Nous concevons nos modules sectoriels avec les entreprises qui en ont besoin. Expliquez-nous comment fonctionne la vôtre.",
+    "otherIndustryCta": "Écrivez-nous"
   },
   "nav": {
     "main": "Principal",
@@ -51,7 +51,16 @@
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
     "mobileMenu": "Menu",
-    "realtyPlanned": "L’immobilier est prévu et n’est pas encore disponible."
+    "blog": "Blog",
+    "guides": "Guides",
+    "docs": "Documentation",
+    "blogDesc": "Des idées pour gérer une entreprise multi-sites",
+    "guidesDesc": "Des pas-à-pas pour gérants et responsables",
+    "docsDesc": "Référence produit",
+    "supportDesc": "Obtenir de l’aide sur BranchHarbor",
+    "allResources": "Toutes les ressources",
+    "otherIndustryShort": "Un autre secteur ? Écrivez-nous",
+    "otherIndustrySubject": "Demande pour un nouveau secteur"
   },
   "footer": {
     "tagline": "Un seul foyer pour chaque établissement.",
@@ -72,9 +81,13 @@
     "privacy": "Confidentialité",
     "terms": "Conditions",
     "security": "Sécurité",
-    "note": "Produit en préversion. Les fonctionnalités sont étiquetées selon leur disponibilité ; les données d’exemple sont signalées comme telles.",
+    "note": "Les données d’exemple sont signalées comme telles. Le statut des intégrations indique ce qui fonctionne aujourd’hui.",
     "credits": "Photos : contributeurs Unsplash",
-    "copyright": "© {year} BranchHarbor"
+    "copyright": "© {year} BranchHarbor",
+    "blog": "Blog",
+    "guides": "Guides",
+    "otherIndustry": "Un autre secteur ? Écrivez-nous",
+    "contact": "Contact : {email}"
   },
   "industryMeta": {
     "studios": {
@@ -112,16 +125,21 @@
       "who": "Agences et réseaux d’agents",
       "flow": "Annonce → demande → visite → offre",
       "cta": "Demander une démo immobilier"
+    },
+    "hospitality": {
+      "name": "Hôtellerie",
+      "who": "Hôtels, chambres d’hôtes, appart-hôtels et auberges",
+      "flow": "Dates → chambre et tarif → acompte → séjour",
+      "cta": "Demander une démo hôtellerie"
     }
   },
   "home": {
     "hero": {
-      "badge": "Pilote Studios en cours de constitution · Restauration ensuite",
+      "badge": "Sept secteurs, une seule plateforme",
       "titleLead": "Un seul foyer pour",
       "titleAccent": "chaque établissement.",
       "body": "Reliez vos sites web, l’activité de vos clients et vos processus métier. Donnez au siège une vue d’ensemble et aux équipes locales le contrôle dont elles ont besoin.",
-      "primary": "Explorer votre secteur",
-      "secondary": "Voir comment ça marche"
+      "primary": "Explorer votre secteur"
     },
     "preview": {
       "heading": "Aperçu du produit : vue d’ensemble du siège",
@@ -147,10 +165,9 @@
     },
     "industries": {
       "title": "Choisissez votre secteur",
-      "body": "Une plateforme commune, façonnée selon votre façon de travailler. Studios est en pilote ; les autres secteurs sont conçus et inscrits à la feuille de route.",
+      "body": "Une plateforme commune, adaptée à la façon dont votre entreprise fonctionne. Tous les secteurs sont disponibles dès aujourd’hui, avec inscription en libre-service.",
       "explore": "Explorer {name}",
-      "independent": "Un seul établissement ? Découvrez la configuration simplifiée",
-      "realty": "Immobilier · Prochainement"
+      "independent": "Un seul établissement ? Découvrez la configuration simplifiée"
     },
     "hqLocal": {
       "title": "Le siège et les établissements, chacun avec les bons contrôles",
@@ -250,14 +267,14 @@
     },
     "evidence": {
       "eyebrow": "Preuves",
-      "title": "Les résultats du pilote seront publiés ici",
-      "body": "Nous n’affichons ni logos clients ni chiffres de performance avant de les avoir. En attendant les retours des entreprises pilotes, explorez directement les processus.",
+      "title": "Les résultats de nos clients seront publiés ici",
+      "body": "Nous n’affichons ni logos de clients ni chiffres de performance avant de les avoir. En attendant les retours de nos clients, explorez les processus eux-mêmes.",
       "workflow": "Processus {name}"
     },
     "pricing": {
       "eyebrow": "Aperçu des tarifs",
       "title": "Facturé par établissement",
-      "body": "Payez pour les établissements que vous autorisez, dans votre devise. Gardez votre logiciel de réservation ou de commerce lorsque nous nous y connectons. Les réseaux bénéficient d’un accompagnement.",
+      "body": "Payez pour les établissements que vous autorisez, dans votre devise locale. Gardez votre logiciel de réservation ou de vente existant lorsque nous nous y connectons. Les réseaux bénéficient d’un accompagnement à la mise en route.",
       "cta": "Voir les tarifs"
     },
     "faq": {
@@ -293,7 +310,7 @@
     }
   },
   "industryPage": {
-    "badge": "BranchHarbor {name} · {availability}",
+    "badge": "BranchHarbor {name}",
     "seeWorkflow": "Voir le parcours",
     "mainWorkflow": "Parcours principal",
     "problemsTitle": "Ce qui bloque aujourd’hui",
@@ -306,23 +323,22 @@
     "permissionsBody": "Le siège décide de ce qui est partagé. Chaque établissement gère ce qui lui est permis.",
     "hqTitle": "Défini par le siège",
     "localTitle": "Géré par chaque établissement",
-    "firstTitle": "Dans la première version",
-    "firstBody": "Ce que nous prévoyons de livrer en premier pour {name}.",
+    "firstTitle": "Inclus dès le premier jour",
+    "firstBody": "Ce que les entreprises du secteur {name} obtiennent à l’inscription.",
     "connectedTitle": "Systèmes connectés",
     "connectedBody": "Le statut reflète la compatibilité actuelle, pas une promesse.",
-    "laterTitle": "Fonctionnalités optionnelles à venir",
-    "laterBody": "Conçues, mais pas encore disponibles. Nous les signalerons à leur sortie.",
+    "laterTitle": "Ce que nous construisons avec nos clients",
+    "laterBody": "Pas encore dans le produit actuel. Demandez-nous le calendrier ; aucune date n’est promise.",
     "sampleTitle": "Réseau d’exemple",
     "sampleBody": "Un réseau fictif utilisé tout au long de cette page. Chaque établissement conserve son propre fuseau horaire et sa propre devise.",
     "currency": "Devise",
     "timeZone": "Fuseau horaire",
     "pricingTitle": "Côté tarifs",
-    "pricingBody": "Des formules par établissement, avec des prix catalogue dans votre devise. Les réseaux peuvent demander un devis.",
+    "pricingBody": "Des offres par établissement avec des prix catalogue dans votre devise locale. Les réseaux peuvent demander un devis.",
     "pricingCta": "Voir les tarifs",
     "faqTitle": "Questions sur {name}",
     "ctaTitle": "Découvrez {name} avec vos propres établissements",
-    "ctaBody": "Dites-nous combien d’établissements vous gérez et quels outils vous utilisez aujourd’hui. Nous vous présenterons le parcours adapté.",
-    "startFree": "Commencer gratuitement"
+    "ctaBody": "Dites-nous combien d’établissements vous gérez et quels outils vous utilisez aujourd’hui. Nous vous présenterons le parcours adapté."
   },
   "industries": {
     "studios": {
@@ -1226,6 +1242,156 @@
           "a": "Les agents de l’annonce, l’agent de l’acheteur pour son offre et les responsables d’agence. Le siège voit par défaut des totaux sans données clients."
         }
       ]
+    },
+    "hospitality": {
+      "metaTitle": "Hôtellerie",
+      "imageAlt": "Chambre d’hôtel lumineuse avec un lit fait près d’une grande fenêtre",
+      "headline": "Chaque établissement, chaque séjour, réservé en direct.",
+      "intro": "Chambres et tarifs, réservations directes avec acompte, réception, ménage et messages aux clients pour hôtels, chambres d’hôtes, appart-hôtels et auberges — un établissement ou tout un groupe, chacun dans sa devise.",
+      "problems": [
+        {
+          "t": "Une commission sur chaque séjour",
+          "d": "La plupart des réservations passent par les agences de voyage en ligne, car le site de l’établissement ne prend pas de réservation avec acompte."
+        },
+        {
+          "t": "La dernière chambre vendue deux fois",
+          "d": "Tableurs et plannings papier laissent deux clients réserver la même chambre la même nuit."
+        },
+        {
+          "t": "Le ménage désynchronisé",
+          "d": "La réception ne voit pas quelles chambres sont prêtes, et les clients attendent dans le hall."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Disponibilités",
+          "title": "Chambres et tarifs en temps réel",
+          "desc": "Les clients choisissent leurs dates et voient les types de chambre encore disponibles, avec le tarif, les taxes, l’acompte et les conditions d’annulation avant de réserver.",
+          "screen": "Tarifs et disponibilités",
+          "scope": "Lisbon – Alfama",
+          "rows": [
+            {
+              "a": "River View Double",
+              "b": "148 € / nuit · 3 restantes",
+              "tag": "Disponible"
+            },
+            {
+              "a": "Garden Twin",
+              "b": "126 € / nuit · 1 restante",
+              "tag": "Dernière chambre"
+            },
+            {
+              "a": "Family Suite",
+              "b": "Arrivée fermée le samedi",
+              "tag": "Restreint"
+            }
+          ]
+        },
+        {
+          "label": "Réservation",
+          "title": "Blocage, acompte, confirmation",
+          "desc": "La chambre est bloquée pendant que le client paie l’acompte : la dernière chambre ne peut jamais être vendue deux fois. Les tarifs sans acompte sont confirmés immédiatement.",
+          "screen": "Réservations",
+          "scope": "Edinburgh – Old Town",
+          "rows": [
+            {
+              "a": "Fiona M.",
+              "b": "2 nuits · acompte payé",
+              "tag": "Confirmée"
+            },
+            {
+              "a": "Groupe mariage Harlow",
+              "b": "6 chambres · toutes bloquées",
+              "tag": "Groupe"
+            },
+            {
+              "a": "Kenji T.",
+              "b": "Bloquée · 12 min pour payer",
+              "tag": "En attente"
+            }
+          ]
+        },
+        {
+          "label": "Réception",
+          "title": "Arrivées, chambres et check-in",
+          "desc": "Attribuez des chambres propres, ne recueillez que les informations d’enregistrement demandées par l’établissement et accueillez vos clients. Nuitées et taxes sont portées sur la note.",
+          "screen": "Arrivées",
+          "scope": "Cape Town – Bo-Kaap",
+          "rows": [
+            {
+              "a": "Chambre 204",
+              "b": "Contrôlée · famille Okafor",
+              "tag": "Prête"
+            },
+            {
+              "a": "Chambre 107",
+              "b": "Ménage en cours",
+              "tag": "Ménage"
+            },
+            {
+              "a": "Chambre 311",
+              "b": "Hors service · fuite",
+              "tag": "Bloquée"
+            }
+          ]
+        },
+        {
+          "label": "Départ",
+          "title": "Solder la note, préparer la chambre",
+          "desc": "Le départ se fait à solde nul. La chambre passe en « à nettoyer » et un ménage de départ apparaît sur le tableau du ménage.",
+          "screen": "Note",
+          "scope": "Lisbon – Alfama",
+          "rows": [
+            {
+              "a": "Nuitées × 2",
+              "b": "296,00 € · taxe de séjour 4,00 €",
+              "tag": "Portée"
+            },
+            {
+              "a": "Solde",
+              "b": "0,00 € · payé par carte",
+              "tag": "Soldée"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Site de marque avec recherche d’établissement",
+        "Taux d’occupation, prix moyen et RevPAR par établissement et par devise",
+        "Modèles de plans tarifaires et de conditions pour le groupe"
+      ],
+      "local": [
+        "Chambres, tarifs, restrictions et taxes",
+        "Arrivées, attribution des chambres et notes",
+        "Tableau du ménage et maintenance"
+      ],
+      "first": [
+        "Moteur de réservation directe avec acompte",
+        "Planning des chambres et réception",
+        "Tâches de ménage et de maintenance",
+        "Messages aux clients avant l’arrivée",
+        "Restaurant ou bar avec imputation sur la chambre"
+      ],
+      "later": [
+        "Connexions actives aux channel managers",
+        "Distribution sur les agences de voyage en ligne",
+        "Facturation automatique des absences",
+        "Options supplémentaires pendant la réservation"
+      ],
+      "faqs": [
+        {
+          "q": "BranchHarbor est-il un channel manager ?",
+          "a": "Non. BranchHarbor est le moteur de réservation et la réception de votre établissement. Les formats de channel manager pour SiteMinder, Cloudbeds et Channex peuvent être prévisualisés dans un environnement de test, mais aucune connexion n’est active et rien n’est envoyé."
+        },
+        {
+          "q": "La dernière chambre peut-elle être réservée deux fois ?",
+          "a": "Non. Chaque réservation, blocage, modification et annulation met à jour le stock de chambres dans la même transaction : deux clients ne peuvent pas obtenir la dernière chambre. Une réservation aboutit, l’autre est informée que c’est complet."
+        },
+        {
+          "q": "Comment sont gérées les taxes de séjour ?",
+          "a": "Vous les configurez : pourcentage, par nuit, par personne et par nuit ou par séjour, avec exonérations selon l’âge. Elles apparaissent sur des lignes séparées dans le devis et sur la note. Si vous n’en configurez aucune, aucune n’est facturée."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1341,8 +1507,8 @@
           "d": "Un seul bouton Publier met votre site en ligne."
         }
       ],
-      "signupCta": "Commencer gratuitement (studios)",
-      "signupNote": "L’inscription en libre-service est ouverte aux studios. Les autres secteurs commencent par une courte démo pendant le pilote.",
+      "signupCta": "Souscrire une offre",
+      "signupNote": "L’inscription en libre-service est ouverte à tous les secteurs. Vous préférez en parler d’abord ?",
       "upgradeTitle": "Vous ouvrez un deuxième établissement ?",
       "upgradeBody": "Ajoutez un établissement depuis les Paramètres. BranchHarbor explique ce qui change, vous confirmez, et votre entreprise devient un réseau. Seul le propriétaire peut le faire, et le changement est journalisé.",
       "upgradePoints": [
@@ -1373,7 +1539,7 @@
     "metaTitle": "Connecteur WordPress",
     "kicker": "Connecteur WordPress",
     "headline": "Gardez votre site WordPress. Ajoutez ce qui lui manque.",
-    "intro": "Un plugin connecteur gratuit ajoute formulaires, plannings, cartes et connexions BranchHarbor au site que vous gérez déjà. Votre hébergement, votre thème et votre éditeur restent les vôtres.",
+    "intro": "Une extension de connexion, incluse dans votre offre, ajoute les formulaires, plannings, menus et connexions BranchHarbor au site que vous gérez déjà. Votre hébergement, votre thème et votre éditeur restent les vôtres.",
     "primary": "Voir les connexions prises en charge",
     "secondary": "Demander une démo",
     "previewTitle": "État du connecteur",
@@ -1529,7 +1695,7 @@
       "setup": "Disponible, mais nécessite un compte, des identifiants ou une configuration de votre côté.",
       "planned": "Non disponible. Affiché pour vous aider à planifier ; aucune date n’est promise."
     },
-    "disclaimer": "Les statuts décrivent la version de préproduction actuelle et seront revus avant le lancement. Les noms de produits appartiennent à leurs propriétaires ; leur mention n’implique ni partenariat ni recommandation.",
+    "disclaimer": "Les statuts décrivent le produit actuel et sont revus régulièrement. Les noms de produits appartiennent à leurs propriétaires ; leur mention n’implique ni partenariat ni recommandation.",
     "directions": {
       "import": "Vers BranchHarbor",
       "export": "Depuis BranchHarbor",
@@ -1700,8 +1866,7 @@
     "metaTitle": "Tarifs",
     "kicker": "Tarifs",
     "headline": "Un tarif simple par établissement.",
-    "intro": "Choisissez comment vous gérez votre site, puis payez pour chaque établissement autorisé. Les prix s’affichent dans la devise de votre choix.",
-    "currencyLabel": "Devise",
+    "intro": "Choisissez comment vous gérez votre site, puis payez pour chaque établissement que vous autorisez. Les prix sont affichés dans votre devise locale.",
     "billingLabel": "Facturation",
     "monthly": "Mensuelle",
     "annual": "Annuelle · 2 mois offerts",
@@ -1711,9 +1876,9 @@
     "perLocation": "/ établissement / mois",
     "total": "{amount} / mois pour {count, plural, one {# établissement} other {# établissements}}",
     "totalAnnual": "{amount} / mois pour {count, plural, one {# établissement} other {# établissements}}, facturé annuellement",
-    "listPriceNote": "Les prix catalogue sont fixés séparément pour chaque devise. Ce ne sont pas des conversions au taux du jour : le montant facturé est le prix dans la devise choisie.",
+    "listPriceNote": "Les prix catalogue sont fixés pour chaque marché et ajustés au pouvoir d’achat local. Ce ne sont pas des conversions au taux de change du jour.",
     "taxNote": "Des taxes comme la TVA, la GST ou la sales tax peuvent s’appliquer selon votre pays ; elles sont affichées avant le paiement.",
-    "proposedNote": "Tarifs provisoires. Les formules et les prix peuvent évoluer avant la disponibilité générale.",
+    "proposedNote": "Nous revoyons nos prix régulièrement. Les abonnements existants sont prévenus à l’avance de tout changement.",
     "plans": {
       "solo": {
         "name": "Solo",
@@ -1725,19 +1890,19 @@
           "Des rôles simples pour une petite équipe",
           "Passez à Réseau en ouvrant un deuxième établissement"
         ],
-        "cta": "Commencer gratuitement"
+        "cta": "Souscrire une offre"
       },
       "connector": {
         "name": "Connecteur",
         "for": "Gardez votre site WordPress",
-        "tag": "Plugin gratuit + service",
+        "tag": "Extension incluse",
         "features": [
           "Blocs et formulaires WordPress",
           "Connexions prises en charge",
           "Routage des prospects par établissement",
           "Tableau de bord BranchHarbor"
         ],
-        "cta": "Commencer avec le connecteur"
+        "cta": "Souscrire une offre"
       },
       "hosted": {
         "name": "Hébergé",
@@ -1749,7 +1914,7 @@
           "Parcours métier",
           "BranchHarbor AI (aperçu)"
         ],
-        "cta": "Choisir Hébergé"
+        "cta": "Souscrire une offre"
       },
       "network": {
         "name": "Réseau",
@@ -1764,12 +1929,12 @@
         "cta": "Demander un devis"
       }
     },
-    "ctaNote": "Pendant le pilote, les formules Connecteur et Réseau commencent par un échange afin de confirmer que votre secteur et vos connexions sont pris en charge. L’inscription Solo est en libre-service pour les studios.",
+    "ctaNote": "L’inscription est en libre-service pour tous les secteurs. Les offres Réseau commencent par un devis pour planifier la mise en route avec vous.",
     "faqTitle": "Questions sur les tarifs",
     "faqs": [
       {
-        "q": "Pourquoi les prix diffèrent-ils selon la devise ?",
-        "a": "Chaque devise a son propre prix catalogue, fixé pour son marché. Nous ne convertissons pas au taux du jour : le prix affiché est celui que vous payez (hors taxes applicables)."
+        "q": "Pourquoi les prix varient-ils selon les pays ?",
+        "a": "Chaque marché a son propre prix catalogue, ajusté au pouvoir d’achat local. Nous ne convertissons pas avec un taux de change du jour. Vous payez le prix de votre pays de facturation, dans sa devise, taxes applicables en sus."
       },
       {
         "q": "Les taxes sont-elles incluses ?",
@@ -1786,11 +1951,19 @@
       {
         "q": "Que se passe-t-il si j’ouvre un deuxième établissement ?",
         "a": "Solo couvre un établissement. Lorsque vous en ajoutez un autre, vous passez à Réseau depuis les Paramètres : votre site, vos clients, votre équipe et votre historique sont conservés, et la facturation passe au tarif par établissement dès que le nouveau est en activité."
+      },
+      {
+        "q": "Puis-je payer dans une autre devise ?",
+        "a": "Non. La devise suit votre pays de facturation, et le paiement la vérifie avec votre adresse de facturation et votre carte. Si votre entreprise est facturée depuis un autre pays, c’est le prix de ce pays qui s’applique."
       }
     ],
     "perMonthOneLocation": "/ mois · un établissement",
     "soloTotal": "Un établissement. Passez à Réseau pour en ajouter d’autres.",
-    "soloAnnual": "Un établissement, facturé à l’année."
+    "soloAnnual": "Un établissement, facturé à l’année.",
+    "geoNote": "Prix affichés en {currency} pour votre pays ({country}). Vous êtes facturé dans la devise de votre pays de facturation.",
+    "geoNoteUnknown": "Prix affichés en {currency}. Vous êtes facturé dans la devise de votre pays de facturation.",
+    "demoTitle": "Pas encore prêt à vous inscrire ?",
+    "demoBody": "Explorez une entreprise d’exemple dans la démo, ou réservez un appel pour passer en revue vos établissements avec nous."
   },
   "demo": {
     "metaTitle": "Demander une démo",
@@ -1818,7 +1991,6 @@
       "business": "Nom de l’entreprise",
       "industry": "Secteur",
       "industryPlaceholder": "Choisissez un secteur",
-      "realtyOption": "Immobilier (prochainement)",
       "locationCount": "Nombre d’établissements",
       "country": "Pays",
       "countryPlaceholder": "Choisissez un pays",
@@ -1834,8 +2006,7 @@
       "consent": "Envoyez-moi occasionnellement des nouveautés produit par e-mail. Vous pouvez vous désabonner à tout moment.",
       "submit": "Demander la démo",
       "sending": "Envoi…",
-      "securityCheck": "Vérification de sécurité",
-      "hospitalityOption": "Hôtellerie (hôtels, chambres d’hôtes, auberges)"
+      "securityCheck": "Vérification de sécurité"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Ce formulaire contient # problème} other {Ce formulaire contient # problèmes}}",
@@ -1868,7 +2039,7 @@
     "metaTitle": "Ressources",
     "kicker": "Ressources",
     "headline": "Des guides pour les dirigeants et les responsables.",
-    "intro": "Des guides courts et pratiques, rédigés au fil du pilote. Nous publions d’abord les plans pour que vous voyiez ce que chacun couvrira.",
+    "intro": "Des guides courts et pratiques pour gérants et responsables. Les plans des guides produit sont publiés en premier pour que vous sachiez ce que chacun couvrira.",
     "searchLabel": "Rechercher un guide",
     "searchPlaceholder": "Rechercher un guide",
     "all": "Tous",
@@ -1934,13 +2105,14 @@
     ],
     "docsCta": "Vous cherchez la documentation produit ?",
     "docsLink": "Ouvrir le sommaire de la documentation",
-    "results": "{count, plural, =0 {Aucun guide} one {# guide} other {# guides}}"
+    "results": "{count, plural, =0 {Aucun guide} one {# guide} other {# guides}}",
+    "outlinesTitle": "Guides produit en préparation"
   },
   "docs": {
     "metaTitle": "Documentation",
     "kicker": "Documentation",
     "headline": "Documentation produit",
-    "intro": "La documentation de référence est rédigée au fil du pilote. Ce sommaire montre comment elle sera organisée.",
+    "intro": "La documentation de référence de BranchHarbor. Cet index montre comment elle est organisée.",
     "status": "En cours",
     "sections": [
       {
@@ -1983,7 +2155,7 @@
     "metaTitle": "Assistance",
     "kicker": "Assistance",
     "headline": "Comment pouvons-nous vous aider ?",
-    "intro": "Trouvez le bon interlocuteur, que vous découvriez BranchHarbor ou que vous participiez déjà au pilote.",
+    "intro": "Trouvez la bonne aide, que vous découvriez BranchHarbor ou que vous soyez déjà client.",
     "topicsTitle": "Sujets fréquents",
     "topics": [
       {
@@ -2014,7 +2186,7 @@
     "optionsTitle": "Comment obtenir de l’aide",
     "options": {
       "customers": {
-        "t": "Clients du pilote",
+        "t": "Clients",
         "d": "Utilisez l’Aide dans l’application BranchHarbor. Les demandes sont liées à votre établissement afin que nous voyions le bon contexte, avec votre accord."
       },
       "prospects": {
@@ -2029,7 +2201,7 @@
     "openApp": "Ouvrir l’application",
     "askQuestion": "Poser une question",
     "securityLink": "Page Sécurité",
-    "hoursNote": "Les horaires d’assistance et les contacts régionaux seront publiés avant la disponibilité générale."
+    "hoursNote": "Les horaires du support et les contacts régionaux seront publiés ici."
   },
   "about": {
     "metaTitle": "À propos",
@@ -2050,15 +2222,15 @@
       },
       {
         "t": "Honnêtes sur nos limites",
-        "d": "Les fonctionnalités prévues sont signalées. Aucun client ni résultat inventé."
+        "d": "Les fonctionnalités et intégrations sont présentées honnêtement. Pas de clients ni d’affirmations inventés."
       },
       {
-        "t": "Construit avec des pilotes",
-        "d": "Nous lançons un secteur complet à la fois, mesuré avec de vraies entreprises."
+        "t": "Conçu avec nos clients",
+        "d": "Chaque module sectoriel est façonné et mesuré avec de vraies entreprises."
       }
     ],
     "companyTitle": "Informations sur l’entreprise",
-    "company": "BranchHarbor est en phase de prélancement. Les informations légales de la société, ses adresses et les profils de l’équipe seront publiés ici avant la disponibilité générale.",
+    "company": "Les informations légales de la société, ses adresses et les profils de l’équipe seront publiés ici.",
     "contactTitle": "Contacter l’équipe",
     "contactBody": "Pour nous joindre rapidement aujourd’hui, utilisez le formulaire de demande de démo.",
     "contactCta": "Nous contacter"
@@ -2171,7 +2343,7 @@
     "security": {
       "metaTitle": "Sécurité",
       "title": "Pratiques de sécurité",
-      "intro": "Comment nous entendons protéger les entreprises qui utilisent BranchHarbor et leurs clients. Il s’agit d’engagements de conception pour le service en préproduction, et non de certifications indépendantes.",
+      "intro": "Comment nous entendons protéger les entreprises qui utilisent BranchHarbor et leurs clients. Il s’agit d’engagements de conception pour le service, et non de certifications indépendantes.",
       "sections": [
         {
           "h": "Isolation des clients et contrôle d’accès",
@@ -2256,6 +2428,64 @@
         "name": "Marketing",
         "desc": "Nous aident à mesurer nos campagnes et à présenter des contenus BranchHarbor pertinents sur d’autres sites. Désactivés sauf si vous les acceptez."
       }
+    }
+  },
+  "articles": {
+    "blog": {
+      "metaTitle": "Blog",
+      "kicker": "Blog",
+      "headline": "Des idées pour bien gérer chaque établissement.",
+      "intro": "Des réflexions pratiques sur la franchise, le marketing local, les sites web et les opérations dans plusieurs pays, par l’équipe BranchHarbor.",
+      "browse": "Parcourir le blog"
+    },
+    "guides": {
+      "metaTitle": "Guides",
+      "kicker": "Guides",
+      "headline": "Des guides pas à pas pour gérants et responsables.",
+      "intro": "Des listes de contrôle et des tutoriels à utiliser dès aujourd’hui, que vous gériez un établissement ou cent.",
+      "browse": "Parcourir les guides"
+    },
+    "industryLabel": "Secteur",
+    "tagLabel": "Sujet",
+    "all": "Tous les sujets",
+    "allIndustries": "Tous les secteurs",
+    "results": "{count, plural, =0 {Aucun article} one {# article} other {# articles}}",
+    "empty": "Aucun article ne correspond encore à ces filtres.",
+    "clear": "Effacer les filtres",
+    "minutes": "{count} min de lecture",
+    "by": "Par {author}",
+    "published": "Publié le {date}",
+    "updated": "Mis à jour le {date}",
+    "toc": "Sur cette page",
+    "related": "À lire aussi",
+    "share": "Partager",
+    "shareX": "X",
+    "shareLinkedIn": "LinkedIn",
+    "shareFacebook": "Facebook",
+    "shareEmail": "E-mail",
+    "englishOnly": "Cet article est disponible en anglais.",
+    "englishOnlyIndex": "Les articles sont publiés en anglais.",
+    "rss": "Flux RSS",
+    "backToBlog": "Tous les articles du blog",
+    "backToGuides": "Tous les guides",
+    "ctaTitle": "Découvrez comment BranchHarbor gère vos établissements.",
+    "tags": {
+      "marketing": "Marketing",
+      "franchising": "Franchise",
+      "websites": "Sites web",
+      "brand": "Marque",
+      "finance": "Finance",
+      "international": "International",
+      "operations": "Opérations",
+      "legal": "Juridique",
+      "bookings": "Réservations",
+      "distribution": "Distribution",
+      "launch": "Ouvertures",
+      "localSeo": "Référencement local",
+      "kitchen": "Cuisine",
+      "registration": "Inscriptions",
+      "pricing": "Prix",
+      "leads": "Demandes"
     }
   }
 }

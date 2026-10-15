@@ -7,7 +7,7 @@ import { STATUS_STYLE, type IntegrationStatus } from '@/content/integrations';
 export function Panel({ children, className, id, labelledBy, tone = 'white' }: { children: ReactNode; className?: string; id?: string; labelledBy?: string; tone?: 'white' | 'ink' | 'sage' | 'aqua' | 'lilac' }) {
   const tones = { white: 'bg-surface text-ink', ink: 'bg-ink text-white', sage: 'bg-sage text-white', aqua: 'bg-aqua text-ink', lilac: 'bg-lilac text-ink' };
   return (
-    <section id={id} aria-labelledby={labelledBy} className={cx('scroll-mt-4 rounded-[28px] px-5 py-10 sm:px-8 md:rounded-2xl md:px-12 md:py-14', tones[tone], className)}>
+    <section id={id} aria-labelledby={labelledBy} className={cx('band rounded-[28px] py-10 md:rounded-2xl md:py-14 min-[120rem]:py-20', tones[tone], className)}>
       {children}
     </section>
   );

@@ -1851,8 +1851,6 @@
     },
     "industryLegend": "Secteur",
     "selfServe": "Configuration en autonomie",
-    "pilotOnly": "Pilote sur demande",
-    "pilotOnlyBody": "{industry} est disponible via notre programme pilote. Vous pouvez explorer la configuration, mais la publication nécessite un accord de pilote — nous vous contacterons.",
     "industry": {
       "studios": {
         "name": "Studios",
@@ -1895,6 +1893,13 @@
         "itemsTitle": "Ajoutez vos types de chambre",
         "itemSingular": "Type de chambre",
         "itemPh": "ex. Double vue rivière · 2 personnes"
+      },
+      "realty": {
+        "name": "Immobilier",
+        "workflow": "Annonce → demande → visite → offre",
+        "itemsTitle": "Ajoutez vos premières annonces",
+        "itemSingular": "Annonce",
+        "itemPh": "ex. 42 rue des Lilas · 3 chambres"
       }
     },
     "modelLegend": "Type d’entreprise",
@@ -2144,7 +2149,9 @@
         "sports": "S’inscrire",
         "wellness": "Réserver",
         "commerce": "Acheter",
-        "foods": "Commander"
+        "foods": "Commander",
+        "realty": "Réserver une visite",
+        "hospitality": "Réserver un séjour"
       },
       "publishedTitle": "Publié",
       "publishedBody": "Votre site est en ligne à l’adresse {address}.",
@@ -2167,8 +2174,7 @@
     "blockers": {
       "location": "Enregistrez votre premier établissement",
       "website": "Choisissez un site et une adresse",
-      "items": "Ajoutez au moins un élément",
-      "industry": "La publication pour {industry} nécessite un accord de pilote"
+      "items": "Ajoutez au moins un élément"
     }
   },
   "approvals": {

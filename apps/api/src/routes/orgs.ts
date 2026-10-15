@@ -2,7 +2,7 @@ import { and, count, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import {
   createOrganizationSchema, onboardingStepUpdateSchema, ONBOARDING_STEPS, apiError, DATA_REGIONS, currency, locale, timeZone, isValidTimeZone,
-  firstLocationSchema, soloPrice, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel,
+  firstLocationSchema, soloPrice, currencyForCountry, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel,
 } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { locations, organizations, ownerGroups, regions, roleAssignments, subscriptions, users } from '../db/schema/index.ts';
@@ -39,7 +39,10 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     if (fl?.timeZone && !isValidTimeZone(fl.timeZone)) throw validationError('Unknown timezone', { 'firstLocation.timeZone': 'Use an IANA timezone such as Europe/Lisbon' });
     const geo = fl ? await s.geocoder.geocode(`${fl.address.line1}, ${fl.address.city}, ${fl.address.country}`) : null;
     const independent = b.model === 'independent';
-    const solo = independent ? soloPrice(b.defaultCurrency) : null;
+    // The plan is billed in the currency of the billing country (the organisation's country) from the shared price
+    // book — never in a currency the client picks — so a cheaper market can't be chosen (docs/PRICING.md).
+    const billingCurrency = currencyForCountry(b.country);
+    const solo = independent ? soloPrice(billingCurrency) : null;
     const { org, location } = await s.db.transaction(async (tx) => {
       let slug = slugify(b.name);
       const [{ c } = { c: 0 }] = await tx.select({ c: count() }).from(organizations).where(eq(organizations.slug, slug));
@@ -57,7 +60,7 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
       await tx.insert(roleAssignments).values({ organizationId: org!.id, userId: me.id, role: 'org_owner', scopeKind: 'organization', scopeId: org!.id, createdBy: me.id });
       // Independent businesses are on Solo (one location, flat price) from the start; the trial runs first.
       await tx.insert(subscriptions).values({
-        organizationId: org!.id, currency: b.defaultCurrency, plan: independent ? 'solo' : 'trial', status: 'trialing',
+        organizationId: org!.id, currency: billingCurrency, plan: independent ? 'solo' : 'trial', status: 'trialing',
         pricePerLocationMinor: solo?.amount ?? null, billedLocationCount: 0, currentPeriodEnd: new Date(Date.now() + 14 * 86400_000),
       });
       await audit(tx, { organizationId: org!.id, ...actor(req), action: 'org.created', scopeKind: 'organization', scopeId: org!.id, targetType: 'organization', targetId: org!.id, metadata: { model: b.model, withFirstLocation: !!fl } });

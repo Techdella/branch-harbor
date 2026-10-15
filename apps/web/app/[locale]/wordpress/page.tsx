@@ -144,7 +144,7 @@ export default async function WordPressPage({ params }: Props) {
         </ul>
       </Panel>
 
-      <section aria-label={`${t('prereqTitle')} · ${t('neverTitle')}`} className="grid gap-3 md:grid-cols-2">
+      <section aria-label={`${t('prereqTitle')} · ${t('neverTitle')}`} className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         <div className="flex flex-col gap-5 rounded-[28px] bg-surface p-7 md:rounded-2xl md:p-10">
           <h2 className="text-[28px] font-extrabold tracking-[-0.03em]">{t('prereqTitle')}</h2>
           <CheckList items={t.raw('prereq') as string[]} />

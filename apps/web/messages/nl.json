@@ -17,11 +17,6 @@
     "draftLegal": "Concept – juridische controle volgt",
     "draftLegalBody": "Deze pagina is een werkconcept dat we uit transparantie publiceren. Het is nog niet juridisch bindend en wordt vóór de lancering vervangen door gecontroleerde tekst.",
     "lastUpdated": "Laatst bijgewerkt: {date}",
-    "availability": {
-      "pilot": "Pilot",
-      "next": "Als volgende gepland",
-      "planned": "Gepland"
-    },
     "status": {
       "tested": "Getest",
       "limited": "Beperkte ondersteuning",
@@ -35,7 +30,12 @@
     },
     "optional": "optioneel",
     "homeLabel": "BranchHarbor – home",
-    "close": "Sluiten"
+    "close": "Sluiten",
+    "tryDemo": "Probeer de demo",
+    "startPlan": "Start je abonnement",
+    "otherIndustry": "Een andere branche nodig?",
+    "otherIndustryBody": "We bouwen branchemodules samen met de bedrijven die ze nodig hebben. Vertel ons hoe het jouwe werkt.",
+    "otherIndustryCta": "Laat het ons weten"
   },
   "nav": {
     "main": "Hoofdmenu",
@@ -51,7 +51,16 @@
     "openMenu": "Menu openen",
     "closeMenu": "Menu sluiten",
     "mobileMenu": "Menu",
-    "realtyPlanned": "Vastgoed is gepland en nog niet beschikbaar."
+    "blog": "Blog",
+    "guides": "Gidsen",
+    "docs": "Documentatie",
+    "blogDesc": "Ideeën voor bedrijven met meerdere vestigingen",
+    "guidesDesc": "Stap-voor-stapgidsen voor eigenaren en managers",
+    "docsDesc": "Productnaslag",
+    "supportDesc": "Hulp bij BranchHarbor",
+    "allResources": "Alle bronnen",
+    "otherIndustryShort": "Andere branche? Laat het ons weten",
+    "otherIndustrySubject": "Aanvraag nieuwe branche"
   },
   "footer": {
     "tagline": "Eén thuis voor elke vestiging.",
@@ -72,9 +81,13 @@
     "privacy": "Privacy",
     "terms": "Voorwaarden",
     "security": "Beveiliging",
-    "note": "Product in pre-release. Functies zijn gelabeld naar beschikbaarheid; voorbeeldgegevens zijn als voorbeeld gemarkeerd.",
+    "note": "Voorbeeldgegevens zijn als voorbeeld gemarkeerd. De status van integraties laat zien wat vandaag werkt.",
     "credits": "Foto’s: Unsplash-fotografen",
-    "copyright": "© {year} BranchHarbor"
+    "copyright": "© {year} BranchHarbor",
+    "blog": "Blog",
+    "guides": "Gidsen",
+    "otherIndustry": "Andere branche? Laat het ons weten",
+    "contact": "Contact: {email}"
   },
   "industryMeta": {
     "studios": {
@@ -112,16 +125,21 @@
       "who": "Makelaarskantoren en makelaarsnetwerken",
       "flow": "Woning → aanvraag → bezichtiging → bod",
       "cta": "Vraag een vastgoeddemo aan"
+    },
+    "hospitality": {
+      "name": "Hospitality",
+      "who": "Hotels, B&B’s, serviced apartments en hostels",
+      "flow": "Data → kamer & tarief → aanbetaling → verblijf",
+      "cta": "Vraag een hospitality-demo aan"
     }
   },
   "home": {
     "hero": {
-      "badge": "Studio-pilot gaat van start · Horeca volgt",
+      "badge": "Zeven branches, één platform",
       "titleLead": "Eén thuis voor",
       "titleAccent": "elke vestiging.",
       "body": "Verbind je websites, klantactiviteit en branchespecifieke werkprocessen. Geef het hoofdkantoor overzicht en lokale teams de regie die ze nodig hebben.",
-      "primary": "Ontdek jouw branche",
-      "secondary": "Zo werkt het"
+      "primary": "Ontdek jouw branche"
     },
     "preview": {
       "heading": "Productvoorbeeld: overzicht van het hoofdkantoor",
@@ -147,10 +165,9 @@
     },
     "industries": {
       "title": "Kies jouw branche",
-      "body": "Eén gedeeld platform, afgestemd op hoe jouw bedrijf werkt. Studio’s zitten in de pilot; de andere branches zijn ontworpen en staan op de roadmap.",
+      "body": "Eén gedeeld platform, afgestemd op hoe jouw bedrijf werkt. Elke branche is vandaag beschikbaar, met selfservice-aanmelding.",
       "explore": "{name} ontdekken",
-      "independent": "Eén vestiging? Bekijk de eenvoudigere opzet",
-      "realty": "Vastgoed · Binnenkort"
+      "independent": "Eén vestiging? Bekijk de eenvoudigere opzet"
     },
     "hqLocal": {
       "title": "Hoofdkantoor en vestigingen, elk met de juiste bevoegdheden",
@@ -250,14 +267,14 @@
     },
     "evidence": {
       "eyebrow": "Resultaten",
-      "title": "Pilotresultaten publiceren we hier",
-      "body": "We tonen geen klantlogo’s of prestatieclaims voordat we die hebben. Tot pilotbedrijven hun ervaringen delen, kun je de werkprocessen zelf verkennen.",
+      "title": "Hier publiceren we resultaten van klanten",
+      "body": "We tonen geen klantlogo’s of prestatieclaims voordat we die hebben. Tot klanten hun resultaten delen, kun je de werkstromen zelf verkennen.",
       "workflow": "Werkproces {name}"
     },
     "pricing": {
       "eyebrow": "Prijzen in het kort",
       "title": "Afgerekend per vestiging",
-      "body": "Betaal voor de vestigingen die je autoriseert, in je eigen valuta. Houd je bestaande boekings- of commercesoftware waar we ermee koppelen. Netwerken krijgen hulp bij de onboarding.",
+      "body": "Betaal voor de vestigingen die je autoriseert, in je lokale valuta. Houd je bestaande boekings- of verkoopsoftware waar we ermee koppelen. Netwerken krijgen hulp bij de onboarding.",
       "cta": "Prijzen bekijken"
     },
     "faq": {
@@ -293,7 +310,7 @@
     }
   },
   "industryPage": {
-    "badge": "BranchHarbor {name} · {availability}",
+    "badge": "BranchHarbor {name}",
     "seeWorkflow": "Bekijk het werkproces",
     "mainWorkflow": "Hoofdproces",
     "problemsTitle": "Waar het nu op vastloopt",
@@ -306,23 +323,22 @@
     "permissionsBody": "Het hoofdkantoor bepaalt wat gedeeld wordt. Elke vestiging beheert wat ze mag beheren.",
     "hqTitle": "Bepaald door het hoofdkantoor",
     "localTitle": "Beheerd door elke vestiging",
-    "firstTitle": "In de eerste release",
-    "firstBody": "Wat we voor {name} als eerste willen opleveren.",
+    "firstTitle": "Vanaf dag één inbegrepen",
+    "firstBody": "Wat {name}-bedrijven krijgen bij aanmelding.",
     "connectedTitle": "Gekoppelde systemen",
     "connectedBody": "De status geeft de huidige compatibiliteit weer, geen belofte.",
-    "laterTitle": "Optionele functies voor later",
-    "laterBody": "Ontworpen, nog niet beschikbaar. We labelen ze zodra ze er zijn.",
+    "laterTitle": "Waar we met klanten aan bouwen",
+    "laterBody": "Geen onderdeel van het huidige product. Vraag ons naar de planning; we beloven geen data.",
     "sampleTitle": "Voorbeeldnetwerk",
     "sampleBody": "Een fictief netwerk dat op deze hele pagina wordt gebruikt. Elke vestiging houdt haar eigen tijdzone en valuta.",
     "currency": "Valuta",
     "timeZone": "Tijdzone",
     "pricingTitle": "Wat het kost",
-    "pricingBody": "Abonnementen per vestiging met catalogusprijzen in jouw valuta. Netwerken kunnen een offerte aanvragen.",
+    "pricingBody": "Abonnementen per vestiging met lijstprijzen in je lokale valuta. Netwerken kunnen een offerte aanvragen.",
     "pricingCta": "Prijzen bekijken",
     "faqTitle": "Vragen over {name}",
     "ctaTitle": "Zie {name} met je eigen vestigingen",
-    "ctaBody": "Vertel ons hoeveel vestigingen je hebt en welke systemen je nu gebruikt. We lopen het werkproces door dat bij je past.",
-    "startFree": "Gratis beginnen"
+    "ctaBody": "Vertel ons hoeveel vestigingen je hebt en welke systemen je nu gebruikt. We lopen het werkproces door dat bij je past."
   },
   "industries": {
     "studios": {
@@ -1226,6 +1242,156 @@
           "a": "De makelaars van de woning, de makelaar van de koper voor het eigen bod en kantoormanagers. Het hoofdkantoor ziet standaard totalen zonder klantgegevens."
         }
       ]
+    },
+    "hospitality": {
+      "metaTitle": "Hospitality",
+      "imageAlt": "Lichte hotelkamer met een opgemaakt bed naast een groot raam",
+      "headline": "Elk pand, elk verblijf, rechtstreeks geboekt.",
+      "intro": "Kamers en tarieven, directe boekingen met aanbetaling, de receptie, housekeeping en gastberichten voor hotels, B&B’s, serviced apartments en hostels — één pand of een hele groep, elk in zijn eigen valuta.",
+      "problems": [
+        {
+          "t": "Commissie op elk verblijf",
+          "d": "De meeste boekingen komen via online reisbureaus omdat de eigen website geen boeking met aanbetaling aanneemt."
+        },
+        {
+          "t": "De laatste kamer twee keer verkocht",
+          "d": "Spreadsheets en papieren planningen laten twee gasten dezelfde kamer voor dezelfde nacht boeken."
+        },
+        {
+          "t": "Housekeeping loopt niet synchroon",
+          "d": "De receptie ziet niet welke kamers klaar zijn, dus aankomende gasten wachten in de lobby."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Beschikbaarheid",
+          "title": "Kamers en tarieven live",
+          "desc": "Gasten kiezen hun data en zien de kamertypes die nog vrij zijn, met tarief, belastingen, aanbetaling en annuleringsvoorwaarden voordat ze boeken.",
+          "screen": "Tarieven & beschikbaarheid",
+          "scope": "Lisbon – Alfama",
+          "rows": [
+            {
+              "a": "River View Double",
+              "b": "€ 148 / nacht · nog 3",
+              "tag": "Beschikbaar"
+            },
+            {
+              "a": "Garden Twin",
+              "b": "€ 126 / nacht · nog 1",
+              "tag": "Laatste kamer"
+            },
+            {
+              "a": "Family Suite",
+              "b": "Geen aankomst op zaterdag",
+              "tag": "Beperkt"
+            }
+          ]
+        },
+        {
+          "label": "Reservering",
+          "title": "Vasthouden, aanbetalen, bevestigen",
+          "desc": "De kamer wordt vastgehouden terwijl de gast de aanbetaling doet, dus de laatste kamer wordt nooit twee keer verkocht. Tarieven zonder aanbetaling worden direct bevestigd.",
+          "screen": "Reserveringen",
+          "scope": "Edinburgh – Old Town",
+          "rows": [
+            {
+              "a": "Fiona M.",
+              "b": "2 nachten · aanbetaling voldaan",
+              "tag": "Bevestigd"
+            },
+            {
+              "a": "Bruiloftsgroep Harlow",
+              "b": "6 kamers · allemaal vastgelegd",
+              "tag": "Groep"
+            },
+            {
+              "a": "Kenji T.",
+              "b": "Vastgehouden · nog 12 min om te betalen",
+              "tag": "Vastgehouden"
+            }
+          ]
+        },
+        {
+          "label": "Receptie",
+          "title": "Aankomsten, kamers en inchecken",
+          "desc": "Wijs schone kamers toe, verzamel alleen de registratiegegevens die het pand vraagt en check gasten in. Overnachtingen en belastingen komen op de gastrekening.",
+          "screen": "Aankomsten",
+          "scope": "Cape Town – Bo-Kaap",
+          "rows": [
+            {
+              "a": "Kamer 204",
+              "b": "Gecontroleerd · familie Okafor",
+              "tag": "Klaar"
+            },
+            {
+              "a": "Kamer 107",
+              "b": "Schoonmaak bezig",
+              "tag": "Schoonmaak"
+            },
+            {
+              "a": "Kamer 311",
+              "b": "Buiten gebruik · lekkage",
+              "tag": "Geblokkeerd"
+            }
+          ]
+        },
+        {
+          "label": "Uitchecken",
+          "title": "Rekening afsluiten, kamer klaarmaken",
+          "desc": "Gasten checken uit bij een saldo van nul. De kamer wordt vuil en er verschijnt een vertrekschoonmaak op het housekeepingbord.",
+          "screen": "Gastrekening",
+          "scope": "Lisbon – Alfama",
+          "rows": [
+            {
+              "a": "Overnachtingen × 2",
+              "b": "€ 296,00 · toeristenbelasting € 4,00",
+              "tag": "Geboekt"
+            },
+            {
+              "a": "Saldo",
+              "b": "€ 0,00 · betaald met kaart",
+              "tag": "Voldaan"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Merkwebsite met panden-zoeker",
+        "Bezetting, ADR en RevPAR per pand en per valuta",
+        "Sjablonen voor tarieven en voorwaarden voor de groep"
+      ],
+      "local": [
+        "Kamers, tarieven, beperkingen en belastingen",
+        "Aankomsten, kamertoewijzing en gastrekeningen",
+        "Housekeepingbord en onderhoud"
+      ],
+      "first": [
+        "Directe boekingsmodule met aanbetaling",
+        "Kamerplanning en receptie",
+        "Housekeeping- en onderhoudstaken",
+        "Berichten aan gasten vóór aankomst",
+        "Restaurant of bar met boeken op de kamer"
+      ],
+      "later": [
+        "Live koppelingen met channel managers",
+        "Distributie via online reisbureaus",
+        "Automatische no-showkosten",
+        "Extra’s tijdens het boeken"
+      ],
+      "faqs": [
+        {
+          "q": "Is BranchHarbor een channel manager?",
+          "a": "Nee. BranchHarbor is de eigen boekingsmodule en receptie van je pand. Channel-managerformaten voor SiteMinder, Cloudbeds en Channex zijn te bekijken in een testomgeving, maar er is geen actieve koppeling en er wordt niets verstuurd."
+        },
+        {
+          "q": "Kan de laatste kamer twee keer geboekt worden?",
+          "a": "Nee. Elke boeking, reservering, wijziging en annulering past de kamervoorraad aan in dezelfde transactie, dus twee gasten kunnen niet allebei de laatste kamer krijgen. De ene boeking lukt, de andere krijgt te horen dat het vol is."
+        },
+        {
+          "q": "Hoe werkt toeristenbelasting?",
+          "a": "Je stelt die zelf in: een percentage, per nacht, per persoon per nacht of per verblijf, met vrijstellingen op leeftijd. Ze staan als aparte regels in de offerte en op de rekening. Stel je niets in, dan wordt er niets berekend."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1341,8 +1507,8 @@
           "d": "Eén knop Publiceren zet je site live."
         }
       ],
-      "signupCta": "Gratis beginnen (studio’s)",
-      "signupNote": "Zelf aanmelden kan voor studio’s. Andere branches beginnen tijdens de pilot met een korte demo.",
+      "signupCta": "Start je abonnement",
+      "signupNote": "Selfservice-aanmelding is open voor elke branche. Liever eerst even praten?",
       "upgradeTitle": "Open je een tweede vestiging?",
       "upgradeBody": "Voeg een vestiging toe via Instellingen. BranchHarbor legt uit wat er verandert, jij bevestigt en je bedrijf wordt een netwerk. Alleen de eigenaar kan dit doen en de wijziging wordt vastgelegd.",
       "upgradePoints": [
@@ -1373,7 +1539,7 @@
     "metaTitle": "WordPress-connector",
     "kicker": "WordPress-connector",
     "headline": "Houd je WordPress-site. Voeg toe wat ontbreekt.",
-    "intro": "Een gratis connector-plug-in voegt BranchHarbor-formulieren, roosters, menu’s en koppelingen toe aan de site die je al hebt. Je hosting, thema en editor blijven van jou.",
+    "intro": "Een connector-plug-in, inbegrepen in je abonnement, voegt BranchHarbor-formulieren, roosters, menu’s en koppelingen toe aan de site die je al hebt. Je hosting, thema en editor blijven van jou.",
     "primary": "Ondersteunde koppelingen bekijken",
     "secondary": "Demo aanvragen",
     "previewTitle": "Status van de connector",
@@ -1529,7 +1695,7 @@
       "setup": "Beschikbaar, maar vraagt een account, inloggegevens of configuratie aan jouw kant.",
       "planned": "Niet beschikbaar. Getoond zodat je kunt plannen; er wordt geen datum beloofd."
     },
-    "disclaimer": "De statussen beschrijven de huidige pre-releaseversie en worden vóór de lancering herzien. Productnamen zijn van hun eigenaren; vermelding betekent geen partnerschap of aanbeveling.",
+    "disclaimer": "De statussen beschrijven het huidige product en worden regelmatig herzien. Productnamen zijn van hun eigenaren; vermelding betekent geen partnerschap of aanbeveling.",
     "directions": {
       "import": "Naar BranchHarbor",
       "export": "Vanuit BranchHarbor",
@@ -1700,8 +1866,7 @@
     "metaTitle": "Prijzen",
     "kicker": "Prijzen",
     "headline": "Eenvoudige prijzen per vestiging.",
-    "intro": "Kies hoe je je website runt en betaal per geautoriseerde vestiging. Prijzen worden getoond in de valuta die je kiest.",
-    "currencyLabel": "Valuta",
+    "intro": "Kies hoe je je website beheert en betaal per vestiging die je autoriseert. Prijzen worden getoond in je lokale valuta.",
     "billingLabel": "Facturering",
     "monthly": "Maandelijks",
     "annual": "Jaarlijks · 2 maanden inbegrepen",
@@ -1711,9 +1876,9 @@
     "perLocation": "/ vestiging / maand",
     "total": "{amount} / maand voor {count, plural, one {# vestiging} other {# vestigingen}}",
     "totalAnnual": "{amount} / maand voor {count, plural, one {# vestiging} other {# vestigingen}}, jaarlijks gefactureerd",
-    "listPriceNote": "Catalogusprijzen worden per valuta apart vastgesteld. Het zijn geen omrekeningen tegen de actuele koers; je betaalt de prijs in de valuta die je kiest.",
+    "listPriceNote": "Lijstprijzen worden per markt vastgesteld en aangepast aan de lokale koopkracht. Het zijn geen omrekeningen tegen de dagkoers.",
     "taxNote": "Afhankelijk van je land kunnen belastingen zoals btw, GST of sales tax van toepassing zijn; die zie je vóór het betalen.",
-    "proposedNote": "Voorlopige prijzen. Abonnementen en prijzen kunnen veranderen vóór de algemene beschikbaarheid.",
+    "proposedNote": "We herzien onze prijzen regelmatig. Bestaande abonnementen horen vooraf over elke wijziging.",
     "plans": {
       "solo": {
         "name": "Solo",
@@ -1725,19 +1890,19 @@
           "Eenvoudige rollen voor een klein team",
           "Stap over op Netwerk als je een tweede vestiging opent"
         ],
-        "cta": "Gratis beginnen"
+        "cta": "Start je abonnement"
       },
       "connector": {
         "name": "Connector",
         "for": "Houd je WordPress-site",
-        "tag": "Gratis plug-in + service",
+        "tag": "Plug-in inbegrepen",
         "features": [
           "WordPress-blokken en -formulieren",
           "Ondersteunde koppelingen",
           "Leadroutering per vestiging",
           "BranchHarbor-dashboard"
         ],
-        "cta": "Start met de connector"
+        "cta": "Start je abonnement"
       },
       "hosted": {
         "name": "Hosted",
@@ -1749,7 +1914,7 @@
           "Branchespecifieke werkprocessen",
           "BranchHarbor AI (preview)"
         ],
-        "cta": "Kies Hosted"
+        "cta": "Start je abonnement"
       },
       "network": {
         "name": "Network",
@@ -1764,12 +1929,12 @@
         "cta": "Offerte aanvragen"
       }
     },
-    "ctaNote": "Tijdens de pilot beginnen de Connector- en Netwerkabonnementen met een gesprek, zodat we kunnen bevestigen dat je branche en koppelingen worden ondersteund. Solo is zelf af te sluiten voor studio’s.",
+    "ctaNote": "Aanmelden kan voor elke branche zelf. Netwerkabonnementen beginnen met een offerte zodat we de onboarding samen kunnen plannen.",
     "faqTitle": "Vragen over prijzen",
     "faqs": [
       {
-        "q": "Waarom verschillen de prijzen per valuta?",
-        "a": "Elke valuta heeft een eigen catalogusprijs, vastgesteld voor die markt. We rekenen niet om tegen een actuele koers: de prijs die je ziet is de prijs die je betaalt (plus eventuele belasting)."
+        "q": "Waarom verschillen de prijzen per land?",
+        "a": "Elke markt heeft een eigen lijstprijs, aangepast aan de lokale koopkracht. We rekenen niet om tegen een dagkoers. Je betaalt de prijs van je factuurland, in de valuta van dat land, plus eventuele belastingen."
       },
       {
         "q": "Is belasting inbegrepen?",
@@ -1786,11 +1951,19 @@
       {
         "q": "Wat gebeurt er als ik een tweede vestiging open?",
         "a": "Solo dekt één vestiging. Voeg je er een toe, dan stap je via Instellingen over op Netwerk: je website, klanten, team en geschiedenis blijven behouden en de facturatie gaat over op een prijs per vestiging zodra de nieuwe vestiging operationeel is."
+      },
+      {
+        "q": "Kan ik in een andere valuta betalen?",
+        "a": "Nee. De valuta volgt je factuurland, en bij het afrekenen wordt die gecontroleerd aan de hand van je factuuradres en kaart. Wordt je bedrijf vanuit een ander land gefactureerd, dan geldt de prijs van dat land."
       }
     ],
     "perMonthOneLocation": "/ maand · één vestiging",
     "soloTotal": "Eén vestiging. Voor meer stap je over op Netwerk.",
-    "soloAnnual": "Eén vestiging, jaarlijks gefactureerd."
+    "soloAnnual": "Eén vestiging, jaarlijks gefactureerd.",
+    "geoNote": "Prijzen in {currency} voor {country}. Je wordt gefactureerd in de valuta van je factuurland.",
+    "geoNoteUnknown": "Prijzen in {currency}. Je wordt gefactureerd in de valuta van je factuurland.",
+    "demoTitle": "Nog niet klaar om je aan te melden?",
+    "demoBody": "Verken een voorbeeldbedrijf in de demo, of plan een gesprek waarin we je vestigingen samen doorlopen."
   },
   "demo": {
     "metaTitle": "Demo aanvragen",
@@ -1818,7 +1991,6 @@
       "business": "Bedrijfsnaam",
       "industry": "Branche",
       "industryPlaceholder": "Kies een branche",
-      "realtyOption": "Vastgoed (binnenkort)",
       "locationCount": "Aantal vestigingen",
       "country": "Land",
       "countryPlaceholder": "Kies een land",
@@ -1834,8 +2006,7 @@
       "consent": "Stuur me af en toe productnieuws per e-mail. Afmelden kan altijd.",
       "submit": "Demo aanvragen",
       "sending": "Bezig met verzenden…",
-      "securityCheck": "Beveiligingscontrole",
-      "hospitalityOption": "Horeca-verblijf (hotels, B&B’s, hostels)"
+      "securityCheck": "Beveiligingscontrole"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Er is # probleem met dit formulier} other {Er zijn # problemen met dit formulier}}",
@@ -1868,7 +2039,7 @@
     "metaTitle": "Kennisbank",
     "kicker": "Kennisbank",
     "headline": "Gidsen voor eigenaren en managers.",
-    "intro": "Korte, praktische gidsen die we tijdens de pilot schrijven. Eerst publiceren we de opzet, zodat je ziet wat elke gids behandelt.",
+    "intro": "Korte, praktische gidsen voor eigenaren en managers. De opzet van de productgidsen verschijnt eerst, zodat je ziet wat elke gids behandelt.",
     "searchLabel": "Gidsen zoeken",
     "searchPlaceholder": "Gidsen zoeken",
     "all": "Alle",
@@ -1934,13 +2105,14 @@
     ],
     "docsCta": "Op zoek naar de productdocumentatie?",
     "docsLink": "Open de documentatie-index",
-    "results": "{count, plural, =0 {Geen gidsen} one {# gids} other {# gidsen}}"
+    "results": "{count, plural, =0 {Geen gidsen} one {# gids} other {# gidsen}}",
+    "outlinesTitle": "Productgidsen in voorbereiding"
   },
   "docs": {
     "metaTitle": "Documentatie",
     "kicker": "Documentatie",
     "headline": "Productdocumentatie",
-    "intro": "De naslagdocumentatie wordt tijdens de pilot geschreven. Deze index laat zien hoe ze wordt ingedeeld.",
+    "intro": "Naslagdocumentatie voor BranchHarbor. Deze index laat zien hoe ze is opgebouwd.",
     "status": "In de maak",
     "sections": [
       {
@@ -1983,7 +2155,7 @@
     "metaTitle": "Support",
     "kicker": "Support",
     "headline": "Waarmee kunnen we helpen?",
-    "intro": "Vind de juiste plek voor hulp, of je BranchHarbor nu verkent of al meedoet aan de pilot.",
+    "intro": "Vind de juiste hulp, of je BranchHarbor nu verkent of al klant bent.",
     "topicsTitle": "Veelgestelde onderwerpen",
     "topics": [
       {
@@ -2014,7 +2186,7 @@
     "optionsTitle": "Zo krijg je hulp",
     "options": {
       "customers": {
-        "t": "Pilotklanten",
+        "t": "Klanten",
         "d": "Gebruik Help in de BranchHarbor-app. Verzoeken zijn gekoppeld aan je vestiging, zodat we – met jouw toestemming – de juiste context zien."
       },
       "prospects": {
@@ -2029,7 +2201,7 @@
     "openApp": "App openen",
     "askQuestion": "Stel een vraag",
     "securityLink": "Beveiligingspagina",
-    "hoursNote": "Supporttijden en regionale contactmogelijkheden publiceren we vóór de algemene beschikbaarheid."
+    "hoursNote": "Supporttijden en regionale contactmogelijkheden worden hier gepubliceerd."
   },
   "about": {
     "metaTitle": "Over ons",
@@ -2050,15 +2222,15 @@
       },
       {
         "t": "Eerlijk over beperkingen",
-        "d": "Geplande functies zijn gelabeld. Geen verzonnen klanten of claims."
+        "d": "Functies en integraties worden eerlijk gelabeld. Geen verzonnen klanten of claims."
       },
       {
-        "t": "Gebouwd met pilots",
-        "d": "We brengen telkens één complete branche uit, getoetst bij echte bedrijven."
+        "t": "Gebouwd met klanten",
+        "d": "Elke branchemodule wordt met echte bedrijven vormgegeven en gemeten."
       }
     ],
     "companyTitle": "Bedrijfsgegevens",
-    "company": "BranchHarbor is nog niet gelanceerd. Geregistreerde bedrijfsgegevens, adressen en teamprofielen publiceren we hier vóór de algemene beschikbaarheid.",
+    "company": "Geregistreerde bedrijfsgegevens, adressen en teamprofielen worden hier gepubliceerd.",
     "contactTitle": "Contact met het team",
     "contactBody": "Je bereikt ons op dit moment het snelst via het demoformulier.",
     "contactCta": "Neem contact op"
@@ -2171,7 +2343,7 @@
     "security": {
       "metaTitle": "Beveiliging",
       "title": "Beveiligingspraktijken",
-      "intro": "Hoe we de bedrijven die BranchHarbor gebruiken en hun klanten willen beschermen. Dit beschrijft ontwerpafspraken voor de pre-releasedienst, geen onafhankelijke certificeringen.",
+      "intro": "Hoe we de bedrijven die BranchHarbor gebruiken en hun klanten willen beschermen. Dit beschrijft ontwerpafspraken voor de dienst, geen onafhankelijke certificeringen.",
       "sections": [
         {
           "h": "Scheiding tussen klanten en toegangsbeheer",
@@ -2256,6 +2428,64 @@
         "name": "Marketing",
         "desc": "Helpt ons campagnes te meten en relevante BranchHarbor-content op andere sites te tonen. Uit, tenzij je toestemming geeft."
       }
+    }
+  },
+  "articles": {
+    "blog": {
+      "metaTitle": "Blog",
+      "kicker": "Blog",
+      "headline": "Ideeën om elke vestiging goed te runnen.",
+      "intro": "Praktische inzichten over franchising, lokale marketing, websites en operations in verschillende landen, van het BranchHarbor-team.",
+      "browse": "Naar de blog"
+    },
+    "guides": {
+      "metaTitle": "Gidsen",
+      "kicker": "Gidsen",
+      "headline": "Stap-voor-stapgidsen voor eigenaren en managers.",
+      "intro": "Checklists en handleidingen die je vandaag kunt gebruiken, of je nu één vestiging hebt of honderd.",
+      "browse": "Naar de gidsen"
+    },
+    "industryLabel": "Branche",
+    "tagLabel": "Onderwerp",
+    "all": "Alle onderwerpen",
+    "allIndustries": "Alle branches",
+    "results": "{count, plural, =0 {Geen artikelen} one {# artikel} other {# artikelen}}",
+    "empty": "Er is nog niets dat bij deze filters past.",
+    "clear": "Filters wissen",
+    "minutes": "{count} min lezen",
+    "by": "Door {author}",
+    "published": "Gepubliceerd op {date}",
+    "updated": "Bijgewerkt op {date}",
+    "toc": "Op deze pagina",
+    "related": "Verder lezen",
+    "share": "Delen",
+    "shareX": "X",
+    "shareLinkedIn": "LinkedIn",
+    "shareFacebook": "Facebook",
+    "shareEmail": "E-mail",
+    "englishOnly": "Dit artikel is beschikbaar in het Engels.",
+    "englishOnlyIndex": "Artikelen verschijnen in het Engels.",
+    "rss": "RSS-feed",
+    "backToBlog": "Alle blogartikelen",
+    "backToGuides": "Alle gidsen",
+    "ctaTitle": "Zie hoe BranchHarbor je vestigingen runt.",
+    "tags": {
+      "marketing": "Marketing",
+      "franchising": "Franchising",
+      "websites": "Websites",
+      "brand": "Merk",
+      "finance": "Financiën",
+      "international": "Internationaal",
+      "operations": "Operations",
+      "legal": "Juridisch",
+      "bookings": "Boekingen",
+      "distribution": "Distributie",
+      "launch": "Openingen",
+      "localSeo": "Lokaal zoeken",
+      "kitchen": "Keuken",
+      "registration": "Inschrijvingen",
+      "pricing": "Prijzen",
+      "leads": "Aanvragen"
     }
   }
 }

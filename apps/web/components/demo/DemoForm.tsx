@@ -103,7 +103,7 @@ export function DemoForm() {
     const plan = search.get('plan');
     setV((s) => ({
       ...s,
-      industry: ind && (isIndustryKey(ind) || ind === 'realty') ? ind : s.industry,
+      industry: ind && isIndustryKey(ind) ? ind : s.industry,
       size: plan === 'network' ? 'network' : s.size,
     }));
   }, [search]);
@@ -330,7 +330,7 @@ export function DemoForm() {
             <option value="">{t('form.industryPlaceholder')}</option>
             {INDUSTRY_LIST.map((k) => (
               <option key={k} value={k}>
-                {k === 'realty' ? t('form.realtyOption') : k === 'hospitality' ? t('form.hospitalityOption') : tm(`${k}.name`)}
+                {tm(`${k}.name`)}
               </option>
             ))}
           </SelectBox>

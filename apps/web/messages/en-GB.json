@@ -17,11 +17,6 @@
     "draftLegal": "Draft — pending legal review",
     "draftLegalBody": "This page is a working draft published for transparency. It is not yet legally binding and will be replaced by reviewed wording before launch.",
     "lastUpdated": "Last updated {date}",
-    "availability": {
-      "pilot": "Pilot",
-      "next": "Planned next",
-      "planned": "Planned"
-    },
     "status": {
       "tested": "Tested",
       "limited": "Limited support",
@@ -35,7 +30,12 @@
     },
     "optional": "optional",
     "homeLabel": "BranchHarbor — home",
-    "close": "Close"
+    "close": "Close",
+    "tryDemo": "Try the demo",
+    "startPlan": "Start your plan",
+    "otherIndustry": "Need another industry?",
+    "otherIndustryBody": "We build industry modules with the businesses that need them. Tell us how yours works.",
+    "otherIndustryCta": "Tell us"
   },
   "nav": {
     "main": "Main",
@@ -51,7 +51,16 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "mobileMenu": "Menu",
-    "realtyPlanned": "Real Estate is planned and not yet available."
+    "blog": "Blog",
+    "guides": "Guides",
+    "docs": "Documentation",
+    "blogDesc": "Ideas for running a multi-location business",
+    "guidesDesc": "Step-by-step how-tos for owners and managers",
+    "docsDesc": "Product reference",
+    "supportDesc": "Get help with BranchHarbor",
+    "allResources": "All resources",
+    "otherIndustryShort": "Another industry? Tell us",
+    "otherIndustrySubject": "New industry request"
   },
   "footer": {
     "tagline": "One home for every location.",
@@ -72,9 +81,13 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "security": "Security",
-    "note": "Pre-release product. Features are labelled by availability; sample data is marked as sample.",
+    "note": "Sample data is marked as sample. Integration statuses show what works today.",
     "credits": "Photos: Unsplash contributors",
-    "copyright": "© {year} BranchHarbor"
+    "copyright": "© {year} BranchHarbor",
+    "blog": "Blog",
+    "guides": "Guides",
+    "otherIndustry": "Need another industry? Tell us",
+    "contact": "Contact: {email}"
   },
   "industryMeta": {
     "studios": {
@@ -112,16 +125,21 @@
       "who": "Brokerages and agent networks",
       "flow": "Listing → enquiry → viewing → offer",
       "cta": "Request a real-estate demo"
+    },
+    "hospitality": {
+      "name": "Hospitality",
+      "who": "Hotels, B&Bs, serviced apartments and hostels",
+      "flow": "Dates → room & rate → deposit → stay",
+      "cta": "Request a hospitality demo"
     }
   },
   "home": {
     "hero": {
-      "badge": "Studios pilot now forming · Foods next",
+      "badge": "Seven industries, one platform",
       "titleLead": "One home for",
       "titleAccent": "every location.",
       "body": "Connect your websites, customer activity and industry workflows. Give headquarters visibility and local teams the control they need.",
-      "primary": "Explore your industry",
-      "secondary": "See how it works"
+      "primary": "Explore your industry"
     },
     "preview": {
       "heading": "Product preview: headquarters overview",
@@ -147,10 +165,9 @@
     },
     "industries": {
       "title": "Choose your industry",
-      "body": "One shared platform, shaped around how your business works. Studios is in pilot; the others are designed and on the roadmap.",
+      "body": "One shared platform, shaped around how your business works. Every industry is available today, with self-service sign-up.",
       "explore": "Explore {name}",
-      "independent": "Single-location business? See the simpler setup",
-      "realty": "Real Estate · Coming next"
+      "independent": "Single-location business? See the simpler setup"
     },
     "hqLocal": {
       "title": "Headquarters and locations, each with the right controls",
@@ -250,14 +267,14 @@
     },
     "evidence": {
       "eyebrow": "Evidence",
-      "title": "Pilot results will be published here",
-      "body": "We don’t show customer logos or performance claims before we have them. Until pilot businesses report back, explore the workflows themselves.",
+      "title": "Customer results will be published here",
+      "body": "We don’t show customer logos or performance claims before we have them. Until customers report back, explore the workflows themselves.",
       "workflow": "{name} workflow"
     },
     "pricing": {
       "eyebrow": "Pricing preview",
       "title": "Billed per location",
-      "body": "Pay for the locations you authorise, in your currency. Keep your existing booking or commerce software where we connect to it. Networks get onboarding help.",
+      "body": "Pay for the locations you authorise, in your local currency. Keep your existing booking or commerce software where we connect to it. Networks get onboarding help.",
       "cta": "View pricing"
     },
     "faq": {
@@ -293,7 +310,7 @@
     }
   },
   "industryPage": {
-    "badge": "BranchHarbor {name} · {availability}",
+    "badge": "BranchHarbor {name}",
     "seeWorkflow": "See the workflow",
     "mainWorkflow": "Main workflow",
     "problemsTitle": "What gets in the way today",
@@ -306,23 +323,22 @@
     "permissionsBody": "Headquarters decides what is shared. Each location manages what it’s allowed to.",
     "hqTitle": "Set by headquarters",
     "localTitle": "Managed by each location",
-    "firstTitle": "In the first release",
-    "firstBody": "What we plan to ship for {name} first.",
+    "firstTitle": "Included from day one",
+    "firstBody": "What {name} businesses get when they sign up.",
     "connectedTitle": "Connected systems",
     "connectedBody": "Status reflects today’s compatibility, not a promise.",
-    "laterTitle": "Optional later capabilities",
-    "laterBody": "Designed, not yet available. We’ll label them when they ship.",
+    "laterTitle": "What we’re building with customers",
+    "laterBody": "Not part of today’s product. Ask us about timing; no dates are promised.",
     "sampleTitle": "Sample network",
     "sampleBody": "A fictional network used throughout this page. Each location keeps its own time zone and currency.",
     "currency": "Currency",
     "timeZone": "Time zone",
     "pricingTitle": "Pricing path",
-    "pricingBody": "Per-location plans with list prices in your currency. Networks can request a quote.",
+    "pricingBody": "Per-location plans with list prices in your local currency. Networks can request a quote.",
     "pricingCta": "See pricing",
     "faqTitle": "{name} questions",
     "ctaTitle": "See {name} with your own locations",
-    "ctaBody": "Tell us how many locations you run and which systems you use today. We’ll walk through the workflow that fits.",
-    "startFree": "Start free"
+    "ctaBody": "Tell us how many locations you run and which systems you use today. We’ll walk through the workflow that fits."
   },
   "industries": {
     "studios": {
@@ -1226,6 +1242,156 @@
           "a": "The listing agents, the buyer's agent for their own offer, and office managers. Headquarters sees network totals without client details by default."
         }
       ]
+    },
+    "hospitality": {
+      "metaTitle": "Hospitality",
+      "imageAlt": "Bright hotel room with a made bed beside a large window",
+      "headline": "Every property, every stay, booked direct.",
+      "intro": "Rooms and rates, direct bookings with deposits, the front desk, housekeeping and guest messages for hotels, B&Bs, serviced apartments and hostels — one property or a whole group, each in its own currency.",
+      "problems": [
+        {
+          "t": "Commission on every stay",
+          "d": "Most bookings arrive through online travel agencies because the property’s own site can’t take a booking with a deposit."
+        },
+        {
+          "t": "The last room sold twice",
+          "d": "Spreadsheets and paper charts let two guests book the same room on the same night."
+        },
+        {
+          "t": "Housekeeping out of sync",
+          "d": "The front desk can’t see which rooms are clean, so arriving guests wait in the lobby."
+        }
+      ],
+      "workflow": [
+        {
+          "label": "Availability",
+          "title": "Live rooms and rates",
+          "desc": "Guests choose dates and see the room types still available, with the rate, taxes, deposit and cancellation terms before they book.",
+          "screen": "Rates & availability",
+          "scope": "Lisbon – Alfama",
+          "rows": [
+            {
+              "a": "River View Double",
+              "b": "€148 / night · 3 left",
+              "tag": "Available"
+            },
+            {
+              "a": "Garden Twin",
+              "b": "€126 / night · 1 left",
+              "tag": "Last room"
+            },
+            {
+              "a": "Family Suite",
+              "b": "Closed to arrival on Saturday",
+              "tag": "Restricted"
+            }
+          ]
+        },
+        {
+          "label": "Reservation",
+          "title": "Hold, deposit, confirm",
+          "desc": "The room is held while the guest pays the deposit, so the last room can never sell twice. Rates without a deposit confirm straight away.",
+          "screen": "Reservations",
+          "scope": "Edinburgh – Old Town",
+          "rows": [
+            {
+              "a": "Fiona M.",
+              "b": "2 nights · deposit paid",
+              "tag": "Confirmed"
+            },
+            {
+              "a": "Harlow wedding group",
+              "b": "6 rooms · all secured",
+              "tag": "Group"
+            },
+            {
+              "a": "Kenji T.",
+              "b": "Held · 12 min left to pay",
+              "tag": "On hold"
+            }
+          ]
+        },
+        {
+          "label": "Front desk",
+          "title": "Arrivals, rooms and check-in",
+          "desc": "Assign clean rooms, collect only the registration details the property asks for and check guests in. Room nights and taxes post to the folio.",
+          "screen": "Arrivals",
+          "scope": "Cape Town – Bo-Kaap",
+          "rows": [
+            {
+              "a": "Room 204",
+              "b": "Inspected · Okafor family",
+              "tag": "Ready"
+            },
+            {
+              "a": "Room 107",
+              "b": "Cleaning in progress",
+              "tag": "Cleaning"
+            },
+            {
+              "a": "Room 311",
+              "b": "Out of order · leak",
+              "tag": "Blocked"
+            }
+          ]
+        },
+        {
+          "label": "Check-out",
+          "title": "Settle the folio, turn the room",
+          "desc": "Guests check out at a zero balance. The room turns dirty and a departure clean appears on the housekeeping board.",
+          "screen": "Folio",
+          "scope": "Lisbon – Alfama",
+          "rows": [
+            {
+              "a": "Room nights × 2",
+              "b": "€296.00 · tourist tax €4.00",
+              "tag": "Posted"
+            },
+            {
+              "a": "Balance",
+              "b": "€0.00 · paid by card",
+              "tag": "Settled"
+            }
+          ]
+        }
+      ],
+      "hq": [
+        "Brand website with a property finder",
+        "Occupancy, ADR and RevPAR per property and per currency",
+        "Rate-plan and policy templates for the group"
+      ],
+      "local": [
+        "Rooms, rates, restrictions and taxes",
+        "Arrivals, room assignment and folios",
+        "Housekeeping board and maintenance"
+      ],
+      "first": [
+        "Direct booking engine with deposits",
+        "Room grid and front desk",
+        "Housekeeping and maintenance tasks",
+        "Pre-arrival guest messages",
+        "Restaurant or bar outlet with charge to room"
+      ],
+      "later": [
+        "Live channel manager connections",
+        "Online travel agency distribution",
+        "Automatic no-show charges",
+        "Upsells during booking"
+      ],
+      "faqs": [
+        {
+          "q": "Is BranchHarbor a channel manager?",
+          "a": "No. BranchHarbor is your property’s own booking engine and front desk. Channel manager formats for SiteMinder, Cloudbeds and Channex can be previewed in a sandbox, but no channel connection is live and nothing is sent."
+        },
+        {
+          "q": "Can the last room be booked twice?",
+          "a": "No. Every booking, hold, change and cancellation updates the room count in the same transaction, so two guests can’t both get the last room. One booking succeeds and the other is told the room is sold out."
+        },
+        {
+          "q": "How are city and tourist taxes handled?",
+          "a": "You set them up: a percentage, per night, per person per night or per stay, with exemptions by age. They appear as separate lines in the quote and on the folio. If you set up none, none are charged."
+        }
+      ]
     }
   },
   "solutions": {
@@ -1341,8 +1507,8 @@
           "d": "One Publish button makes your site live."
         }
       ],
-      "signupCta": "Start free with Studios",
-      "signupNote": "Self-service sign-up is open for studios. Other industries start with a short demo while they are in pilot.",
+      "signupCta": "Start your plan",
+      "signupNote": "Self-service sign-up is open for every industry. Prefer to talk first?",
       "upgradeTitle": "Opening a second location?",
       "upgradeBody": "Add a location from Settings. BranchHarbor explains what changes, you confirm, and your business becomes a network. Only the owner can do it, and the change is logged.",
       "upgradePoints": [
@@ -1373,7 +1539,7 @@
     "metaTitle": "WordPress connector",
     "kicker": "WordPress connector",
     "headline": "Keep your WordPress site. Add what it’s missing.",
-    "intro": "A free connector plugin adds BranchHarbor forms, schedules, menus and connections to the site you already run. Your hosting, theme and editor stay yours.",
+    "intro": "A connector plugin, included with your plan, adds BranchHarbor forms, schedules, menus and connections to the site you already run. Your hosting, theme and editor stay yours.",
     "primary": "View supported connections",
     "secondary": "Request a demo",
     "previewTitle": "Connector status",
@@ -1529,7 +1695,7 @@
       "setup": "Available, but needs an account, credentials or configuration on your side.",
       "planned": "Not available. Shown so you can plan; no date is promised."
     },
-    "disclaimer": "Statuses describe the current pre-release build and are reviewed before launch. Product names belong to their owners; listing does not imply partnership or endorsement.",
+    "disclaimer": "Statuses describe the current product and are reviewed regularly. Product names belong to their owners; listing does not imply partnership or endorsement.",
     "directions": {
       "import": "Into BranchHarbor",
       "export": "From BranchHarbor",
@@ -1700,8 +1866,7 @@
     "metaTitle": "Pricing",
     "kicker": "Pricing",
     "headline": "Simple per-location pricing.",
-    "intro": "Choose how you run your website, then pay for each location you authorise. Prices are shown in your chosen currency.",
-    "currencyLabel": "Currency",
+    "intro": "Choose how you run your website, then pay for each location you authorise. Prices are shown in your local currency.",
     "billingLabel": "Billing",
     "monthly": "Monthly",
     "annual": "Annual · 2 months included",
@@ -1711,9 +1876,9 @@
     "perLocation": "/ location / month",
     "total": "{amount} / month for {count, plural, one {# location} other {# locations}}",
     "totalAnnual": "{amount} / month for {count, plural, one {# location} other {# locations}}, billed annually",
-    "listPriceNote": "List prices are set separately for each currency. They are not live exchange-rate conversions, and the amount charged is the price in the currency you choose.",
+    "listPriceNote": "List prices are set for each market and adjusted for local purchasing power. They are not live exchange-rate conversions.",
     "taxNote": "Taxes such as VAT, GST or sales tax may apply depending on your country and are shown before you pay.",
-    "proposedNote": "Proposed pricing. Plans and prices may change before general availability.",
+    "proposedNote": "We review prices periodically. Existing subscriptions are told about any change in advance.",
     "plans": {
       "solo": {
         "name": "Solo",
@@ -1725,19 +1890,19 @@
           "Simple roles for a small team",
           "Upgrade to Network when you open a second location"
         ],
-        "cta": "Start free"
+        "cta": "Start your plan"
       },
       "connector": {
         "name": "Connector",
         "for": "Keep your WordPress site",
-        "tag": "Free plugin + service",
+        "tag": "Plugin included",
         "features": [
           "WordPress blocks and forms",
           "Supported connections",
           "Lead routing by location",
           "BranchHarbor dashboard"
         ],
-        "cta": "Start with the connector"
+        "cta": "Start your plan"
       },
       "hosted": {
         "name": "Hosted",
@@ -1749,7 +1914,7 @@
           "Industry workflows",
           "BranchHarbor AI (preview)"
         ],
-        "cta": "Choose Hosted"
+        "cta": "Start your plan"
       },
       "network": {
         "name": "Network",
@@ -1764,12 +1929,12 @@
         "cta": "Request a quote"
       }
     },
-    "ctaNote": "During the pilot, connector and network plans start with a conversation so we can confirm your industry and connections are supported. Solo sign-up is self-service for studios.",
+    "ctaNote": "Sign-up is self-service for every industry. Network plans start with a quote so we can plan onboarding with you.",
     "faqTitle": "Pricing questions",
     "faqs": [
       {
-        "q": "Why do prices differ between currencies?",
-        "a": "Each currency has its own list price, set for that market. We don’t convert with a live exchange rate, so the price you see is the price you pay (plus any applicable tax)."
+        "q": "Why do prices differ between countries?",
+        "a": "Each market has its own list price, adjusted for local purchasing power. We don’t convert with a live exchange rate. You pay the price for your billing country, in its currency, plus any applicable tax."
       },
       {
         "q": "Is tax included?",
@@ -1786,11 +1951,19 @@
       {
         "q": "What happens if I open a second location?",
         "a": "Solo covers one location. When you add another, you upgrade to Network from Settings: your website, customers, team and history are kept, and billing moves to per-location pricing once the new location is operating."
+      },
+      {
+        "q": "Can I pay in a different currency?",
+        "a": "No. The currency follows your billing country, and checkout confirms it against your billing address and card. If your business is billed from another country, that country’s price applies."
       }
     ],
     "perMonthOneLocation": "/ month · one location",
     "soloTotal": "One location. Add more by moving to Network.",
-    "soloAnnual": "One location, billed annually."
+    "soloAnnual": "One location, billed annually.",
+    "geoNote": "Prices shown in {currency} for {country}. You’re billed in the currency of your billing country.",
+    "geoNoteUnknown": "Prices shown in {currency}. You’re billed in the currency of your billing country.",
+    "demoTitle": "Not ready to sign up?",
+    "demoBody": "Explore a sample business in the demo, or book a call and we’ll walk through your locations with you."
   },
   "demo": {
     "metaTitle": "Request a demo",
@@ -1818,7 +1991,6 @@
       "business": "Business name",
       "industry": "Industry",
       "industryPlaceholder": "Choose an industry",
-      "realtyOption": "Real Estate (coming next)",
       "locationCount": "Number of locations",
       "country": "Country",
       "countryPlaceholder": "Choose a country",
@@ -1834,8 +2006,7 @@
       "consent": "Send me occasional product updates by email. You can unsubscribe at any time.",
       "submit": "Request demo",
       "sending": "Sending…",
-      "securityCheck": "Security check",
-      "hospitalityOption": "Hospitality (hotels, B&Bs, hostels)"
+      "securityCheck": "Security check"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {There is # problem with this form} other {There are # problems with this form}}",
@@ -1868,7 +2039,7 @@
     "metaTitle": "Resources",
     "kicker": "Resources",
     "headline": "Guides for owners and managers.",
-    "intro": "Short, practical guides written alongside the pilot. Outlines are published first so you can see what each will cover.",
+    "intro": "Short, practical guides for owners and managers. Product outlines are published first so you can see what each will cover.",
     "searchLabel": "Search guides",
     "searchPlaceholder": "Search guides",
     "all": "All",
@@ -1934,13 +2105,14 @@
     ],
     "docsCta": "Looking for product documentation?",
     "docsLink": "Open the docs index",
-    "results": "{count, plural, =0 {No guides} one {# guide} other {# guides}}"
+    "results": "{count, plural, =0 {No guides} one {# guide} other {# guides}}",
+    "outlinesTitle": "Product guides in progress"
   },
   "docs": {
     "metaTitle": "Documentation",
     "kicker": "Documentation",
     "headline": "Product documentation",
-    "intro": "Reference documentation is being written alongside the pilot. This index shows how it will be organised.",
+    "intro": "Reference documentation for BranchHarbor. This index shows how it is organised.",
     "status": "In progress",
     "sections": [
       {
@@ -1983,7 +2155,7 @@
     "metaTitle": "Support",
     "kicker": "Support",
     "headline": "How can we help?",
-    "intro": "Find the right place to get help, whether you’re exploring BranchHarbor or already in the pilot.",
+    "intro": "Find the right place to get help, whether you’re exploring BranchHarbor or already a customer.",
     "topicsTitle": "Common topics",
     "topics": [
       {
@@ -2014,7 +2186,7 @@
     "optionsTitle": "Ways to get help",
     "options": {
       "customers": {
-        "t": "Pilot customers",
+        "t": "Customers",
         "d": "Use Help inside the BranchHarbor app. Requests are tied to your location so we can see the right context, with your permission."
       },
       "prospects": {
@@ -2029,7 +2201,7 @@
     "openApp": "Open the app",
     "askQuestion": "Ask a question",
     "securityLink": "Security page",
-    "hoursNote": "Support hours and regional contact options will be published before general availability."
+    "hoursNote": "Support hours and regional contact options will be published here."
   },
   "about": {
     "metaTitle": "About",
@@ -2050,15 +2222,15 @@
       },
       {
         "t": "Honest about limits",
-        "d": "Planned features are labelled. No invented customers or claims."
+        "d": "Features and integrations are labelled honestly. No invented customers or claims."
       },
       {
-        "t": "Built with pilots",
-        "d": "We release one complete vertical at a time, measured with real businesses."
+        "t": "Built with customers",
+        "d": "Every industry module is shaped and measured with real businesses."
       }
     ],
     "companyTitle": "Company details",
-    "company": "BranchHarbor is pre-launch. Registered company details, addresses and team profiles will be published here before general availability.",
+    "company": "Registered company details, addresses and team profiles will be published here.",
     "contactTitle": "Contact the team",
     "contactBody": "The quickest way to reach us today is the demo request form.",
     "contactCta": "Contact us"
@@ -2171,7 +2343,7 @@
     "security": {
       "metaTitle": "Security",
       "title": "Security practices",
-      "intro": "How we intend to protect the businesses that use BranchHarbor and their customers. This describes design commitments for the pre-release service, not independent certifications.",
+      "intro": "How we intend to protect the businesses that use BranchHarbor and their customers. This describes design commitments for the service, not independent certifications.",
       "sections": [
         {
           "h": "Tenant isolation and access control",
@@ -2256,6 +2428,64 @@
         "name": "Marketing",
         "desc": "Helps us measure campaigns and show relevant BranchHarbor content on other sites. Off unless you opt in."
       }
+    }
+  },
+  "articles": {
+    "blog": {
+      "metaTitle": "Blog",
+      "kicker": "Blog",
+      "headline": "Ideas for running every location well.",
+      "intro": "Practical thinking on franchising, local marketing, websites and operations across countries, from the BranchHarbor team.",
+      "browse": "Browse the blog"
+    },
+    "guides": {
+      "metaTitle": "Guides",
+      "kicker": "Guides",
+      "headline": "Step-by-step guides for owners and managers.",
+      "intro": "Checklists and how-tos you can use today, whether you run one location or a hundred.",
+      "browse": "Browse the guides"
+    },
+    "industryLabel": "Industry",
+    "tagLabel": "Topic",
+    "all": "All topics",
+    "allIndustries": "All industries",
+    "results": "{count, plural, =0 {No articles} one {# article} other {# articles}}",
+    "empty": "Nothing matches these filters yet.",
+    "clear": "Clear filters",
+    "minutes": "{count} min read",
+    "by": "By {author}",
+    "published": "Published {date}",
+    "updated": "Updated {date}",
+    "toc": "On this page",
+    "related": "Related reading",
+    "share": "Share",
+    "shareX": "X",
+    "shareLinkedIn": "LinkedIn",
+    "shareFacebook": "Facebook",
+    "shareEmail": "Email",
+    "englishOnly": "This article is available in English.",
+    "englishOnlyIndex": "Articles are published in English.",
+    "rss": "RSS feed",
+    "backToBlog": "All blog posts",
+    "backToGuides": "All guides",
+    "ctaTitle": "See how BranchHarbor runs your locations.",
+    "tags": {
+      "marketing": "Marketing",
+      "franchising": "Franchising",
+      "websites": "Websites",
+      "brand": "Brand",
+      "finance": "Finance",
+      "international": "International",
+      "operations": "Operations",
+      "legal": "Legal",
+      "bookings": "Bookings",
+      "distribution": "Distribution",
+      "launch": "Openings",
+      "localSeo": "Local search",
+      "kitchen": "Kitchen",
+      "registration": "Registration",
+      "pricing": "Pricing",
+      "leads": "Leads"
     }
   }
 }

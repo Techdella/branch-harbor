@@ -32,8 +32,8 @@ export function LanguageSwitcher({ dark = false, className }: { dark?: boolean; 
           });
         }}
         className={cx(
-          'h-10 min-w-0 max-w-full rounded-full border px-3 text-[13px] font-bold',
-          dark ? 'border-[#3a3a3a] bg-ink-2 text-white' : 'border-line bg-surface text-ink',
+          'bh-select h-10 min-w-0 max-w-full rounded-full border ps-4 text-[13px] font-bold transition hover:border-ink focus-visible:border-ink',
+          dark ? 'bh-select-dark border-[#3a3a3a] bg-ink-2 text-white hover:border-[#6b6b66]' : 'border-line bg-surface text-ink',
         )}
       >
         {SUPPORTED_LOCALES.map((l) => (

@@ -5,10 +5,14 @@
 
 export const SUPPORTED_CURRENCIES = [
   'USD', 'CAD', 'GBP', 'EUR', 'AUD', 'NZD', 'SGD', 'AED', 'BRL', 'MXN', 'CHF', 'SEK', 'NOK', 'DKK', 'JPY',
+  'INR', 'ZAR', 'NGN', 'KES', 'GHS', 'EGP', 'SAR', 'HKD', 'PHP', 'MYR', 'IDR', 'PLN', 'CZK', 'TRY',
 ] as const;
 export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
 
-/** Minor-unit exponent per ISO 4217 (JPY has none). */
+/**
+ * Minor-unit exponent per ISO 4217. Every supported currency uses 2 decimals except JPY (0). Note that some
+ * payment providers treat currencies such as IDR or HUF specially; amounts here always follow ISO 4217.
+ */
 const EXPONENT: Partial<Record<Currency, number>> = { JPY: 0 };
 export const minorUnitExponent = (c: Currency): number => EXPONENT[c] ?? 2;
 
