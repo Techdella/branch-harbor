@@ -10,9 +10,18 @@ export interface UiLabels {
   close: string;
   /** Screen-reader label of the scope selector. */
   scope: string;
+  /** Metric value placeholder when its source is not connected (StatCard). */
+  notConnected: string;
+  /** Metric value placeholder when it can't be computed (StatCard) — never a fabricated zero. */
+  unavailable: string;
+  /** OriginTag: where a value comes from. */
+  originHq: string;
+  originLocal: string;
+  originLocked: string;
+  originApproval: string;
 }
 
-export const DEFAULT_UI_LABELS: UiLabels = { optional: 'optional', close: 'Close', scope: 'Scope' };
+export const DEFAULT_UI_LABELS: UiLabels = { optional: 'optional', close: 'Close', scope: 'Scope', notConnected: 'Not connected', unavailable: 'Unavailable', originHq: 'From headquarters', originLocal: 'Set locally', originLocked: 'Locked by HQ', originApproval: 'Approval required' };
 
 const Ctx = createContext<UiLabels>(DEFAULT_UI_LABELS);
 

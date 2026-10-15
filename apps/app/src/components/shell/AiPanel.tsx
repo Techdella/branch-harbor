@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Icon, cx } from '@bh/ui';
-import type { AiAnswer } from '@/lib/types';
+import type { AiAnswer, AiSuggestion } from '@/lib/types';
 import { useApi, useMutation } from '@/lib/useApi';
 import { Banner } from '../ui/States';
+import { useTxt } from '../ui/useDataText';
 import { useApp } from './AppContext';
 import { useScopeLabel } from './ScopePicker';
 
@@ -13,6 +14,7 @@ type ActionState = 'idle' | 'preview' | 'running' | 'done' | 'discarded';
 
 function ProposedAction({ answer }: { answer: AiAnswer }) {
   const t = useTranslations('ai');
+  const tt = useTxt();
   const app = useApp();
   const scopeLabel = useScopeLabel();
   const [state, setState] = useState<ActionState>('idle');
@@ -24,16 +26,16 @@ function ProposedAction({ answer }: { answer: AiAnswer }) {
         <Icon name="workflow" size={13} />
         {t('proposedAction')}
       </div>
-      <div className="text-sm font-bold">{a.title}</div>
+      <div className="text-sm font-bold">{tt(a.title, a.titleMsg)}</div>
       <div className="text-xs text-stone">{t('activeScope', { scope: scopeLabel })}</div>
       {(state === 'preview' || state === 'running' || state === 'done') && (
         <div className="flex flex-col gap-2 rounded-sm bg-canvas p-3 text-xs">
           <div>
             <div className="font-bold">{t('affected', { count: a.affected.length })}</div>
             <ul className="mt-1 list-disc pl-4">
-              {a.affected.map((x) => (
+              {a.affected.map((x, i) => (
                 <li key={x}>
-                  {x}
+                  {tt(x, a.affectedMsg?.[i] ?? undefined)}
                   {state === 'done' && <span className="ml-1 font-bold text-success">· {t('resultDraftSaved')}</span>}
                 </li>
               ))}
@@ -43,8 +45,8 @@ function ProposedAction({ answer }: { answer: AiAnswer }) {
             <div>
               <div className="font-bold">{t('excluded')}</div>
               <ul className="mt-1 list-disc pl-4">
-                {a.excluded.map((x) => (
-                  <li key={x}>{x}</li>
+                {a.excluded.map((x, i) => (
+                  <li key={x}>{tt(x, a.excludedMsg?.[i] ?? undefined)}</li>
                 ))}
               </ul>
             </div>
@@ -97,13 +99,14 @@ function ProposedAction({ answer }: { answer: AiAnswer }) {
 
 export function AiPanel({ onClose, fullScreen }: { onClose: () => void; fullScreen?: boolean }) {
   const t = useTranslations('ai');
+  const tt = useTxt();
   const app = useApp();
   const scopeLabel = useScopeLabel();
   const [q, setQ] = useState('');
   const [thread, setThread] = useState<AiAnswer[]>([]);
   const [asking, setAsking] = useState<string | null>(null);
   const sugg = useApi((api) => api.ai.suggestions(app.ctx), [app.industry, app.role, app.scopeId]);
-  const ask = useMutation((api, question: string) => api.ai.ask(app.ctx, question));
+  const ask = useMutation((api, question: string, suggestionId?: string) => api.ai.ask(app.ctx, question, suggestionId));
   const endRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -121,11 +124,11 @@ export function AiPanel({ onClose, fullScreen }: { onClose: () => void; fullScre
     return () => document.removeEventListener('keydown', onKey);
   }, [fullScreen, onClose]);
 
-  const submit = async (question: string) => {
+  const submit = async (question: string, suggestionId?: string) => {
     if (!question.trim()) return;
     setAsking(question);
     setQ('');
-    const r = await ask.run(question);
+    const r = await ask.run(question, suggestionId);
     setAsking(null);
     if (r) setThread((th) => [...th, r]);
   };
@@ -170,20 +173,25 @@ export function AiPanel({ onClose, fullScreen }: { onClose: () => void; fullScre
         {sugg.status === 'ready' &&
           thread.length === 0 &&
           // Independent businesses: the AI scope is the business itself — drop multi-location prompts.
-          sugg.data.filter((s) => app.org.model !== 'independent' || !/locations|stores|multi-location/i.test(s)).map((s) => (
-            <button key={s} type="button" onClick={() => submit(s)} disabled={!!asking} className="flex items-center gap-2 rounded-md border border-line-soft bg-surface px-3.5 py-3 text-left text-[13px] font-semibold hover:border-ink">
-              <Icon name="sparkles" size={13} />
-              {s}
-            </button>
-          ))}
+          sugg.data
+            .filter((s: AiSuggestion) => app.org.model !== 'independent' || !s.multiLocation)
+            .map((s) => {
+              const text = tt(s.text, s.textMsg);
+              return (
+                <button key={s.id} type="button" onClick={() => submit(text, s.id)} disabled={!!asking} className="flex items-center gap-2 rounded-md border border-line-soft bg-surface px-3.5 py-3 text-left text-[13px] font-semibold hover:border-ink">
+                  <Icon name="sparkles" size={13} />
+                  {text}
+                </button>
+              );
+            })}
         {thread.map((a) => (
           <div key={a.id} className="flex flex-col gap-2">
             <div className="max-w-[88%] self-end rounded-[20px_20px_6px_20px] bg-ink px-3.5 py-2.5 text-[13px] text-white">{a.question}</div>
             <div className="rounded-[18px] bg-canvas-raised p-3.5 text-[13px]">
-              <p>{a.answer}</p>
+              <p>{tt(a.answer, a.answerMsg)}</p>
               {a.assumptions && (
                 <p className="mt-2 text-xs text-stone">
-                  <strong>{t('assumptions')}</strong> {a.assumptions}
+                  <strong>{t('assumptions')}</strong> {tt(a.assumptions, a.assumptionsMsg)}
                 </p>
               )}
               <div className="mt-2.5 flex flex-col gap-1">
@@ -191,8 +199,8 @@ export function AiPanel({ onClose, fullScreen }: { onClose: () => void; fullScre
                 {a.sources.map((s) => (
                   <div key={s.label} className="flex items-center gap-1.5 text-xs">
                     <Icon name="file" size={12} />
-                    <span className="font-semibold">{s.label}</span>
-                    <span className="text-stone">· {s.freshness}</span>
+                    <span className="font-semibold">{tt(s.label, s.labelMsg)}</span>
+                    <span className="text-stone">· {tt(s.freshness, s.freshnessMsg)}</span>
                   </div>
                 ))}
               </div>

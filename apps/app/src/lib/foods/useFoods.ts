@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError } from '../errors';
 import type { Resource } from '../useApi';
 import { getFoodsApi, type FoodsApi } from './api';
+import { useLocalizeErrorRef } from '../useErrorText';
 
 function toApiError(e: unknown): ApiError {
   if (e instanceof ApiError) return e;
@@ -13,6 +14,7 @@ function toApiError(e: unknown): ApiError {
 /** Same contract as `useApi`, against the Foods client (live or sample). */
 export function useFoods<T>(fn: (api: FoodsApi) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<Resource<T>>({ status: 'loading' });
+  const localize = useLocalizeErrorRef();
   const seq = useRef(0);
   const fnRef = useRef(fn);
   fnRef.current = fn;
@@ -24,7 +26,7 @@ export function useFoods<T>(fn: (api: FoodsApi) => Promise<T>, deps: unknown[], 
         const data = await fnRef.current(await getFoodsApi());
         if (id === seq.current) setRes({ status: 'ready', data });
       } catch (e) {
-        if (id === seq.current) setRes({ status: 'error', error: toApiError(e) });
+        if (id === seq.current) setRes({ status: 'error', error: localize.current(toApiError(e)) });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,6 +43,7 @@ export function useFoods<T>(fn: (api: FoodsApi) => Promise<T>, deps: unknown[], 
 export function useFoodsMutation<A extends unknown[], R>(fn: (api: FoodsApi, ...args: A) => Promise<R>) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeErrorRef();
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const run = useCallback(async (...args: A): Promise<R | undefined> => {
@@ -49,7 +52,7 @@ export function useFoodsMutation<A extends unknown[], R>(fn: (api: FoodsApi, ...
     try {
       return await fnRef.current(await getFoodsApi(), ...args);
     } catch (e) {
-      setError(toApiError(e));
+      setError(localize.current(toApiError(e)));
       return undefined;
     } finally {
       setPending(false);

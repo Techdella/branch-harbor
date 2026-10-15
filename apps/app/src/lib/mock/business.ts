@@ -107,7 +107,7 @@ export function withIndependent(api: Omit<BranchHarborApi, 'business'>): BranchH
       const { revenue7d: _r, ...l } = INDEPENDENT[ctx.industry].location;
       return [clone(l)];
     }),
-    search: only(api.search, async (ctx, q) => (await api.search(ctx, q)).filter((g) => g.type !== 'Locations')),
+    search: only(api.search, async (ctx, q) => (await api.search(ctx, q)).filter((g) => g.type !== 'locations')),
     team: {
       ...api.team,
       members: only(api.team.members, async (ctx) => (await sleep(250), clone(st(ctx.industry).team))),
@@ -124,7 +124,7 @@ export function withIndependent(api: Omit<BranchHarborApi, 'business'>): BranchH
       const name = INDEPENDENT[ctx.industry].org.name;
       return (await api.reports(ctx))
         .filter((r: Report) => r.id !== 'cmb')
-        .map((r: Report) => ({ ...r, title: r.title.replace(/ by location/i, ''), bars: r.bars.slice(0, 1).map((b) => ({ ...b, label: name })) }));
+        .map((r: Report) => ({ ...r, title: r.title.replace(/ by location/i, ''), ...(r.titleMsg?.key === 'report.title.inquiriesByLocation' ? { titleMsg: { ...r.titleMsg, key: 'report.title.inquiries' } } : {}), bars: r.bars.slice(0, 1).map((b) => ({ ...b, label: name })) }));
     }),
     settings: {
       get: only(api.settings.get, async (ctx) => {
@@ -147,10 +147,15 @@ export function withIndependent(api: Omit<BranchHarborApi, 'business'>): BranchH
     },
     ai: {
       ...api.ai,
-      ask: only(api.ai.ask, async (ctx, q) => {
-        const a = await api.ai.ask(ctx, q);
+      ask: only(api.ai.ask, async (ctx, q, suggestionId) => {
+        const a = await api.ai.ask(ctx, q, suggestionId);
         const name = INDEPENDENT[ctx.industry].org.name;
-        return { ...a, assumptions: a.assumptions?.replace(/Scope: .*\.$/, `Scope: ${name}.`), action: a.action ? { ...a.action, affected: [name], excluded: [] } : undefined };
+        return {
+          ...a,
+          assumptions: a.assumptions?.replace(/Scope: .*\.$/, `Scope: ${name}.`),
+          ...(a.assumptionsMsg ? { assumptionsMsg: { ...a.assumptionsMsg, params: { ...a.assumptionsMsg.params, scope: name } } } : {}),
+          action: a.action ? { ...a.action, affected: [name], affectedMsg: [null], excluded: [], excludedMsg: [] } : undefined,
+        };
       }),
     },
     business: mockBusiness,

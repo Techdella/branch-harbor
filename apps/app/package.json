@@ -9,7 +9,7 @@
     "start": "next start --port 3001",
     "typecheck": "next typegen && tsc --noEmit",
     "check:messages": "node scripts/check-messages.mjs",
-    "lint:strings": "node ../../scripts/i18n/lint-strings.mjs --root src --allow i18n-allowlist.json",
+    "lint:strings": "node ../../scripts/i18n/lint-strings.mjs --root src --root ../../packages/ui/src --allow i18n-allowlist.json",
     "lint": "pnpm run check:messages && pnpm run lint:strings"
   },
   "dependencies": {

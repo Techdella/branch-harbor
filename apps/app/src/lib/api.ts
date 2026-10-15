@@ -13,7 +13,7 @@ import { ApiError } from './errors';
 import { USE_MOCKS, markOfflineSession } from './http/client';
 import { httpApi } from './http/httpApi';
 import type { BusinessApi } from './business';
-import type { AiAnswer, ApprovalItem, ApprovalRequest, ClassOccurrence, Connection, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, KitchenFeed, Location, Member, MenuItem, OnboardingProgress, Organization, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, ReconciliationItem, Report, RequestContext, ScopeOptionT, Session, ShiftView, TableData, Transaction, WebsitePage } from './types';
+import type { AiAnswer, AiSuggestion, SearchGroup, ApprovalItem, ApprovalRequest, ClassOccurrence, Connection, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, KitchenFeed, Location, Member, MenuItem, OnboardingProgress, Organization, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, ReconciliationItem, Report, RequestContext, ScopeOptionT, Session, ShiftView, TableData, Transaction, WebsitePage } from './types';
 import type { MsgParams } from './msg';
 
 export { ApiError } from './errors';
@@ -46,7 +46,7 @@ export interface BranchHarborApi {
   locations(ctx: RequestContext): Promise<Location[]>;
   overview(ctx: RequestContext): Promise<Overview>;
   table(ctx: RequestContext, key: string): Promise<TableData>;
-  search(ctx: RequestContext, q: string): Promise<{ type: string; items: { id: string; label: string; sub: string; href: string }[] }[]>;
+  search(ctx: RequestContext, q: string): Promise<SearchGroup[]>;
   notifications(ctx: RequestContext): Promise<{ id: string; kind: 'info' | 'action' | 'integration'; title: string; titleKey?: string; titleParams?: MsgParams; at: string; href: string }[]>;
 
   studios: {
@@ -119,8 +119,9 @@ export interface BranchHarborApi {
   /** Independent (single-location) businesses: location details, Solo billing, website approvals, single publish and the upgrade to a network. */
   business: BusinessApi;
   ai: {
-    suggestions(ctx: RequestContext): Promise<string[]>;
-    ask(ctx: RequestContext, question: string): Promise<AiAnswer>;
+    suggestions(ctx: RequestContext): Promise<AiSuggestion[]>;
+    /** `suggestionId` when the question is a suggested prompt (shown in the viewer's language). */
+    ask(ctx: RequestContext, question: string, suggestionId?: string): Promise<AiAnswer>;
   };
 }
 

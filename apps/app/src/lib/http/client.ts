@@ -95,7 +95,7 @@ export function setAuthLostHandler(fn: AuthLostHandler) {
 
 export type Query = Record<string, string | number | boolean | undefined | null>;
 interface ErrorBody {
-  error?: { code?: string; message?: string; fields?: Record<string, string>; details?: unknown };
+  error?: { code?: string; message?: string; fields?: Record<string, string>; details?: Record<string, unknown> };
 }
 
 async function rawFetch(method: string, path: string, opts: { query?: Query; body?: unknown; token?: string | null; headers?: Record<string, string> }): Promise<Response> {
@@ -127,7 +127,7 @@ async function toError(res: Response): Promise<ApiError> {
   const json = (await res.json().catch(() => null)) as ErrorBody | null;
   const e = json?.error;
   const code = e?.code ?? (res.status === 403 ? 'forbidden' : res.status === 401 ? 'unauthorized' : res.status === 404 ? 'not_found' : 'http_error');
-  return new ApiError(code, e?.message ?? (res.statusText || 'Request failed'), res.status, normaliseFields(e?.fields));
+  return new ApiError(code, e?.message ?? (res.statusText || 'Request failed'), res.status, normaliseFields(e?.fields), e?.details && typeof e.details === 'object' ? e.details : undefined);
 }
 
 async function parse<T>(res: Response): Promise<T> {

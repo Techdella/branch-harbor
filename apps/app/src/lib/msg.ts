@@ -19,7 +19,7 @@ export interface DateParam {
   t: 'date';
   at: string;
   tz?: string;
-  style?: 'date' | 'dateTime' | 'dayTime';
+  style?: 'date' | 'dateTime' | 'dayTime' | 'dayMonth' | 'monthYear' | 'weekday' | 'time' | 'zone';
 }
 /** An amount in minor units, formatted in the viewer's locale. */
 export interface MoneyParam {
@@ -27,7 +27,7 @@ export interface MoneyParam {
   amount: number;
   currency: string;
 }
-export type MsgParam = string | number | MsgRef | DateParam | MoneyParam | MsgRef[] | string[];
+export type MsgParam = string | number | MsgRef | DateParam | MoneyParam | MsgRef[] | string[] | MoneyParam[];
 export type MsgParams = Record<string, MsgParam>;
 
 /** Builders used by the data layer. */
@@ -37,3 +37,33 @@ export const moneyArg = (amount: number, currency: string): MoneyParam => ({ t: 
 
 /** Role assignment keys shared by mock and live members. */
 export const ROLE_KEYS = ['org_owner', 'hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance', 'customer', 'support'] as const;
+
+/**
+ * Text that is either plain (business data, shown as is) or a catalogue reference. Table cells, AI answers and search
+ * results carry the plain English string for searching and as the fallback, plus the reference (`…Msg`) to translate.
+ */
+export type Txt = string | MsgRef;
+export const isRef = (x: unknown): x is MsgRef => !!x && typeof x === 'object' && (x as MsgRef).t === 'msg';
+/** English fallback of a Txt. */
+export const plain = (x: Txt): string => (typeof x === 'string' ? x : (x.text ?? x.key));
+/** Catalogue key segment from an English label: "Home studio" → "homeStudio", "Attendance (30d)" → "attendance30d". */
+export const slug = (s: string) =>
+  s
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .split(' ')
+    .map((w, i) => (i ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase()))
+    .join('');
+/** Generic-table text (namespace "data", `table.*`). */
+export const tbl = (key: string, params?: MsgParams, text?: string): MsgRef => ref(`table.${key}`, params, text);
+/** A fixed English label keyed by its slug, e.g. `lbl('col', 'Home studio')` → `table.col.homeStudio`. */
+export const lbl = (group: string, english: string): MsgRef => tbl(`${group}.${slug(english)}`, undefined, english);
+export const timeArg = (at: string, tz?: string): DateParam => ({ t: 'date', at, tz, style: 'time' });
+export const zoneArg = (tz: string, at = new Date().toISOString()): DateParam => ({ t: 'date', at, tz, style: 'zone' });
+export const dayArg = (at: string, tz?: string): DateParam => ({ t: 'date', at, tz, style: 'dayMonth' });
+
+/** Report source sentences the API sends without a code → data `reportSource.*`; anything else is shown as sent. */
+export const reportSourceKey = (s: string): string =>
+  /^sample data$/i.test(s) ? 'reportSource.sample' : /^BranchHarbor native bookings/i.test(s) ? 'reportSource.studiosNative' : /^BranchHarbor listings, enquiries/i.test(s) ? 'reportSource.realtyNative' : 'reportSource.unknown';

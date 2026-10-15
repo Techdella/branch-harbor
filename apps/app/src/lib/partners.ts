@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, apiMode, enterFallback } from './api';
 import { http } from './http/client';
 import { orgId } from './http/workspace';
+import { useLocalizeErrorRef } from './useErrorText';
 
 export type PartnerStatus = 'not_configured' | 'disabled' | 'sandbox' | 'awaiting_portal' | 'live' | 'error';
 export interface PartnerField { key: string; label: string; required: boolean; secret?: boolean; help?: string; type?: 'text' | 'select' | 'boolean'; options?: string[] }
@@ -127,13 +128,14 @@ const asErr = (e: unknown) => (e instanceof ApiError ? e : new ApiError('unknown
 
 export function usePartners<T>(fn: (a: PartnersApi) => Promise<T>, deps: unknown[]) {
   const [res, setRes] = useState<Res<T>>({ status: 'loading' });
+  const localize = useLocalizeErrorRef();
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const seq = useRef(0);
   const load = useCallback((keep = false) => {
     const id = ++seq.current;
     setRes((r) => ({ status: 'loading', data: keep ? r.data : undefined }));
-    run(fnRef.current).then((data) => { if (id === seq.current) setRes({ status: 'ready', data }); }, (e) => { if (id === seq.current) setRes({ status: 'error', error: asErr(e) }); });
+    run(fnRef.current).then((data) => { if (id === seq.current) setRes({ status: 'ready', data }); }, (e) => { if (id === seq.current) setRes({ status: 'error', error: localize.current(asErr(e)) }); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   useEffect(() => { load(); }, [load]);
@@ -143,11 +145,12 @@ export function usePartners<T>(fn: (a: PartnersApi) => Promise<T>, deps: unknown
 export function usePartnersMutation<A extends unknown[], R>(fn: (a: PartnersApi, ...args: A) => Promise<R>) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeErrorRef();
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const go = useCallback(async (...args: A): Promise<R | undefined> => {
     setPending(true); setError(null);
-    try { return await run((a) => fnRef.current(a, ...args)); } catch (e) { setError(asErr(e)); return undefined; } finally { setPending(false); }
+    try { return await run((a) => fnRef.current(a, ...args)); } catch (e) { setError(localize.current(asErr(e))); return undefined; } finally { setPending(false); }
   }, []);
   return { run: go, pending, error };
 }

@@ -9,6 +9,9 @@ import { PageHeader } from '../../../shell/PageHeader';
 import { Async, Banner, LoadingBlock } from '../../../ui/States';
 import { ErrorLine, Labeled, LocationSelect, NoLocations, Section, inputCls, useFx, useLocationPick } from './common';
 
+/** Units are codes; `each` is a word and is translated (g and ml are the same everywhere). */
+const unitText = (unit: string, t: (k: 'ing.each') => string) => (unit === 'each' ? t('ing.each') : unit);
+
 /** Basic ingredient inventory: stock per location, receive/waste/count, low-stock alerts, auto sold-out and recipes. */
 export function IngredientsScreen() {
   const t = useFx();
@@ -33,12 +36,12 @@ export function IngredientsScreen() {
       <Async res={res} loading={<LoadingBlock variant="table" />}>
         {(list) => (
           <>
-            {list.some((i) => i.stock?.lowStock) && <Banner tone="warning" title={t('ing.lowStockTitle')}>{list.filter((i) => i.stock?.lowStock).map((i) => `${i.name} (${i.stock!.onHand} ${i.unit})`).join(', ')}</Banner>}
+            {list.some((i) => i.stock?.lowStock) && <Banner tone="warning" title={t('ing.lowStockTitle')}>{list.filter((i) => i.stock?.lowStock).map((i) => `${i.name} (${i.stock!.onHand} ${unitText(i.unit, t)})`).join(', ')}</Banner>}
             <Section title={t('ing.stock')}>
               <div className="overflow-x-auto" tabIndex={0}>
                 <table className="w-full min-w-[720px] text-sm">
                   <thead><tr className="text-left text-xs uppercase text-stone"><th className="p-2">{t('ing.ingredient')}</th><th className="p-2">{t('ing.onHand')}</th><th className="p-2">{t('ing.threshold')}</th><th className="p-2">{t('ing.autoSoldOut')}</th><th className="p-2">{t('ing.usedBy')}</th><th className="p-2">{t('ing.adjust')}</th></tr></thead>
-                  <tbody>{list.map((i) => <Row key={i.id} i={i} canWrite={canWrite} onMove={async (r, q) => { const x = await move.run(i.id, r, q); if (x) { setMsg(x.soldOutItems.length ? t('ing.nowSoldOut', { name: i.name }) : t('ing.recorded', { name: i.name, n: x.onHand, unit: i.unit })); res.reload(); } }} onStock={async (b) => { if (await setStock.run(i.id, b)) res.reload(); }} />)}</tbody>
+                  <tbody>{list.map((i) => <Row key={i.id} i={i} canWrite={canWrite} onMove={async (r, q) => { const x = await move.run(i.id, r, q); if (x) { setMsg(x.soldOutItems.length ? t('ing.nowSoldOut', { name: i.name }) : t('ing.recorded', { name: i.name, n: x.onHand, unit: unitText(i.unit, t) })); res.reload(); } }} onStock={async (b) => { if (await setStock.run(i.id, b)) res.reload(); }} />)}</tbody>
                 </table>
               </div>
             </Section>
@@ -66,10 +69,10 @@ function Row({ i, canWrite, onMove, onStock }: { i: Ingredient; canWrite: boolea
   return (
     <tr className="border-t border-line-soft align-top">
       <td className="p-2 font-bold">{i.name}<div className="text-xs font-normal text-stone">{i.sku}</div></td>
-      <td className="p-2">{i.stock ? <span className="flex flex-col gap-1"><span className="tabular">{i.stock.onHand} {i.unit}</span>{i.stock.exhausted ? <Badge tone="danger">{t('ing.exhausted')}</Badge> : i.stock.lowStock ? <Badge tone="warning">{t('ing.low')}</Badge> : null}</span> : <span className="text-stone">{t('ing.notTracked')}</span>}</td>
+      <td className="p-2">{i.stock ? <span className="flex flex-col gap-1"><span className="tabular">{i.stock.onHand} {unitText(i.unit, t)}</span>{i.stock.exhausted ? <Badge tone="danger">{t('ing.exhausted')}</Badge> : i.stock.lowStock ? <Badge tone="warning">{t('ing.low')}</Badge> : null}</span> : <span className="text-stone">{t('ing.notTracked')}</span>}</td>
       <td className="p-2"><input aria-label={t('ing.thresholdOf', { name: i.name })} disabled={!canWrite} defaultValue={i.stock?.lowStockThreshold ?? ''} inputMode="numeric" className={cx(inputCls, 'w-24')} onBlur={(e) => { const v = Number(e.target.value); if (Number.isFinite(v) && v !== (i.stock?.lowStockThreshold ?? -1)) onStock({ lowStockThreshold: v }); }} /></td>
       <td className="p-2"><Toggle checked={!!i.stock?.autoSoldOut} label={t('ing.autoSoldOutOf', { name: i.name })} onChange={(v) => canWrite && onStock({ autoSoldOut: v })} /></td>
-      <td className="p-2 text-xs">{i.usedBy.map((u) => `${u.name} (${u.quantity} ${i.unit}${u.viaModifier ? `, ${t('ing.option')}` : ''})`).join('; ') || '—'}</td>
+      <td className="p-2 text-xs">{i.usedBy.map((u) => `${u.name} (${u.quantity} ${unitText(i.unit, t)}${u.viaModifier ? `, ${t('ing.option')}` : ''})`).join('; ') || '—'}</td>
       <td className="p-2">
         {canWrite && (
           <form className="flex flex-wrap gap-1" onSubmit={(e) => { e.preventDefault(); const q = Number(qty); if (Number.isFinite(q) && q >= 0) { onMove(reason, q); setQty(''); } }}>
@@ -98,9 +101,9 @@ function RecipeEditor({ items, ingredients, onSaved }: { items: Array<{ id: stri
       <Async res={recipe} loading={<LoadingBlock variant="table" rows={1} />}>
         {(lines) => (
           <>
-            <ul className="mt-2 flex flex-wrap gap-2 text-sm">{lines.map((l) => <li key={l.ingredientId + (l.modifierId ?? '')} className="rounded-full bg-canvas px-3 py-1">{l.quantity} {l.unit} {l.name}{l.modifierId ? ` (${t('ing.option')})` : ''}</li>)}{!lines.length && <li className="text-stone">{t('ing.noRecipe')}</li>}</ul>
+            <ul className="mt-2 flex flex-wrap gap-2 text-sm">{lines.map((l) => <li key={l.ingredientId + (l.modifierId ?? '')} className="rounded-full bg-canvas px-3 py-1">{l.quantity} {unitText(l.unit, t)} {l.name}{l.modifierId ? ` (${t('ing.option')})` : ''}</li>)}{!lines.length && <li className="text-stone">{t('ing.noRecipe')}</li>}</ul>
             <form className="mt-2 flex flex-wrap items-end gap-2" onSubmit={async (e) => { e.preventDefault(); const q = Number(qty); if (!q) return; const next = [...lines.filter((l) => l.ingredientId !== ing || l.modifierId).map((l) => ({ ingredientId: l.ingredientId, quantity: l.quantity, modifierId: l.modifierId })), { ingredientId: ing, quantity: q }]; if (await save.run(next)) { setQty(''); recipe.reload(); onSaved(); } }}>
-              <select aria-label={t('ing.ingredient')} value={ing} onChange={(e) => setIng(e.target.value)} className={cx(inputCls, 'w-48')}>{ingredients.map((i) => <option key={i.id} value={i.id}>{i.name} ({i.unit})</option>)}</select>
+              <select aria-label={t('ing.ingredient')} value={ing} onChange={(e) => setIng(e.target.value)} className={cx(inputCls, 'w-48')}>{ingredients.map((i) => <option key={i.id} value={i.id}>{i.name} ({unitText(i.unit, t)})</option>)}</select>
               <input aria-label={t('ing.perPortion')} placeholder={t('ing.perPortion')} inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)} className={cx(inputCls, 'w-32')} />
               <Button type="submit" size="sm" icon="plus" loading={save.pending}>{t('ing.setLine')}</Button>
             </form>

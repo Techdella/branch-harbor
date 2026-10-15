@@ -14,6 +14,7 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, Empty, LoadingBlock } from '../../ui/States';
 import { Approvals, Domains } from '../WebsitesScreen';
+import { useTxt } from '../../ui/useDataText';
 
 type Tab = 'editor' | 'approvals' | 'domains';
 
@@ -48,6 +49,7 @@ export function IndependentWebsite() {
 
 function Editor({ withApprovals }: { withApprovals: boolean }) {
   const t = useTranslations('single.website');
+  const tt = useTxt();
   const locale = useLocale();
   const app = useApp();
   const mode = useBusinessMode();
@@ -100,7 +102,8 @@ function Editor({ withApprovals }: { withApprovals: boolean }) {
         <Async res={page} loading={<LoadingBlock variant="detail" rows={3} />}>
           {(p: WebsitePage) => (
             <div className="flex flex-col gap-2.5">
-              {p.fields.map((f) => {
+              {p.fields.map((f0) => {
+                const f = { ...f0, label: tt(f0.label, f0.labelMsg) };
                 const isEditing = editing === f.key;
                 return (
                   <div key={f.key} className={cx('flex flex-col gap-2 rounded-[20px] border-[1.5px] p-3.5', isEditing ? 'border-ink' : f.pending ? 'border-[#E7C66B]' : 'border-line-soft')}>

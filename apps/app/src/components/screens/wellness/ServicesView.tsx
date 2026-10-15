@@ -9,6 +9,7 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty, LoadingBlock } from '../../ui/States';
 import { Loadable, Money, Pill, useScopeLocations } from './shared';
+import { useDataText } from '../../ui/useDataText';
 
 const DEFAULT_POLICY: Policy = { freeCancelHours: 24, lateCancelFeePercent: 50, noShowFeePercent: 100, depositRefundable: true };
 
@@ -52,6 +53,7 @@ export function ServicesView() {
 
 function ServiceCard({ s, pracs, onEdit }: { s: WService; pracs: WPractitioner[]; onEdit?: () => void }) {
   const t = useTranslations('wellnessFull.services');
+  const dt = useDataText();
   const app = useApp();
   const locName = (id: string) => app.locations.find((l) => l.id === id)?.name ?? id;
   const eligible = pracs.filter((p) => p.serviceIds.includes(s.id));
@@ -67,8 +69,8 @@ function ServiceCard({ s, pracs, onEdit }: { s: WService; pracs: WPractitioner[]
         <p className="text-[13px] text-stone">{s.description ?? t('noDescription')}</p>
         <div className="flex flex-wrap gap-1.5">
           <Pill>{t('buffers', { before: s.bufferBeforeMinutes, after: s.bufferAfterMinutes })}</Pill>
-          {s.requiredResourceType && <Pill>{t('needs', { what: s.requiredResourceType.replace(/_/g, ' ') })}</Pill>}
-          {s.equipmentTypes.map((e) => <Pill key={e}>{t('needs', { what: e.replace(/_/g, ' ') })}</Pill>)}
+          {s.requiredResourceType && <Pill>{t('needs', { what: dt(`table.resource.${s.requiredResourceType}`, undefined, s.requiredResourceType.replace(/_/g, ' ')) })}</Pill>}
+          {s.equipmentTypes.map((e) => <Pill key={e}>{t('needs', { what: dt(`table.resource.${e}`, undefined, e.replace(/_/g, ' ')) })}</Pill>)}
           <Pill>{s.depositRule ? (s.depositRule.kind === 'percent' ? t('depositPercent', { v: s.depositRule.value }) : s.depositRule.kind === 'fixed' ? t('depositFixed') : t('noDeposit')) : s.depositMinor ? t('depositFixed') : t('noDeposit')}</Pill>
           <Pill>{t('policySummary', { hours: s.policy.freeCancelHours, late: s.policy.lateCancelFeePercent, noShow: s.policy.noShowFeePercent })}</Pill>
           {s.rebookAfterWeeks && <Pill>{t('rebook', { weeks: s.rebookAfterWeeks })}</Pill>}

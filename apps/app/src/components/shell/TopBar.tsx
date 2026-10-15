@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Avatar, Icon, LogoMark, cx } from '@bh/ui';
-import type { ViewRole } from '@/lib/types';
+import type { SearchGroup, ViewRole } from '@/lib/types';
 import { INDUSTRY_UI } from '@/lib/nav';
 import { getApi } from '@/lib/api';
 import { relativeTime } from '@/lib/format';
@@ -14,7 +14,7 @@ import { APP_LOCALES, APP_LOCALE_LABELS, LOCALE_COOKIE } from '@/i18n/config';
 import { Popover } from '../ui/Popover';
 import { useApp } from './AppContext';
 import { ScopePicker } from './ScopePicker';
-import { useDataText } from '../ui/useDataText';
+import { useDataText, useTxt } from '../ui/useDataText';
 
 export function setLocaleCookie(locale: string) {
   document.cookie = `${LOCALE_COOKIE}=${encodeURIComponent(locale)}; path=/; max-age=31536000; samesite=lax`;
@@ -51,7 +51,8 @@ function Search({ onDone }: { onDone?: () => void }) {
   const app = useApp();
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
-  const [results, setResults] = useState<{ type: string; items: { id: string; label: string; sub: string; href: string }[] }[]>([]);
+  const tt = useTxt();
+  const [results, setResults] = useState<SearchGroup[]>([]);
   useEffect(() => {
     if (!q.trim()) {
       setResults([]);
@@ -89,11 +90,11 @@ function Search({ onDone }: { onDone?: () => void }) {
           ) : (
             results.map((g) => (
               <div key={g.type} className="py-1">
-                <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-mute">{g.type}</div>
+                <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-mute">{t(`searchGroup.${g.type}`)}</div>
                 {g.items.map((it) => (
                   <Link key={it.id} href={it.href} role="option" aria-selected={false} onClick={() => (setOpen(false), setQ(''), onDone?.())} className="block rounded-sm px-3 py-2 hover:bg-canvas">
                     <div className="text-sm font-bold">{it.label}</div>
-                    <div className="text-xs text-stone">{it.sub}</div>
+                    <div className="text-xs text-stone">{tt(it.sub, it.subMsg)}</div>
                   </Link>
                 ))}
               </div>

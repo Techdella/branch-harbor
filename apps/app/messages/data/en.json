@@ -350,6 +350,115 @@
       "commerce": "Explain this week’s order trend",
       "foods": "Summarize today’s orders by location",
       "realty": "Which offices need attention?"
+    },
+    "withScope": "{text} Scope: {scope}.",
+    "scopeOnly": "Scope: {scope}.",
+    "fresh": {
+      "updatedMinAgo": "Updated {count} min ago",
+      "lastSuccessHoursAgo": "Last success {count} h ago",
+      "publishedOn": "Published {date}",
+      "live": "Live",
+      "offlineSince": "Offline since {time}"
+    },
+    "liveSuggest": {
+      "studios": {
+        "s0": "Summarize class occupancy this month",
+        "s1": "Draft a multi-location campaign",
+        "s2": "Which locations need attention?"
+      },
+      "sports": {
+        "s0": "Summarize registrations awaiting review",
+        "s1": "Draft a program announcement",
+        "s2": "Which teams are nearly full?"
+      },
+      "wellness": {
+        "s0": "Summarize appointments this week",
+        "s1": "Draft a reply using our cancellation policy",
+        "s2": "Which practitioners are fully booked?"
+      },
+      "commerce": {
+        "s0": "Explain this week’s order trend",
+        "s1": "Draft product copy",
+        "s2": "Which stores failed the last sync?"
+      },
+      "foods": {
+        "s0": "Summarize today’s orders by location",
+        "s1": "Draft menu copy",
+        "s2": "Plan a lunch promotion"
+      },
+      "realty": {
+        "s0": "Which offices need attention?",
+        "s1": "Draft a campaign for new listings",
+        "s2": "Summarize inquiries this week"
+      }
+    },
+    "mock": {
+      "studios": {
+        "s0": "Summarize attendance changes this month",
+        "s1": "Draft a multi-location New Year campaign",
+        "s2": "Draft a class description for Slow Flow",
+        "answer": "Occupancy rose at Queen West (+6 pts) and Leslieville (+3) versus September. Shoreditch is flat and Surry Hills is down 2 pts. Kitsilano can’t be compared: its booking sync has been degraded since 09:40 local time. I can’t tell why attendance changed from occupancy alone.",
+        "assumptions": "Compared Oct 1–13 with the same days in September, in each studio’s own time zone.",
+        "src0": "Booking connection · class occurrences",
+        "src1": "Kitsilano booking sync",
+        "actionTitle": "Draft “New year, new practice” campaign for 3 Canadian studios",
+        "excluded0": "Seattle – Capitol Hill (different offer pricing)",
+        "excluded1": "London, Berlin, Sydney (not in campaign scope)"
+      },
+      "sports": {
+        "s0": "Suggest a fix for the Pitch 2 clash",
+        "s1": "Summarize U10 enrollment",
+        "s2": "Draft the camp announcement",
+        "answer": "Move U12 Camp to Pitch 1 at 17:00 (free until 18:30), or shift U10 Blue to 16:00 at Hillcrest Dome. Both only affect those two groups. I won’t select or move participants — that stays with your coaches.",
+        "assumptions": "Uses venue bookings for today at Riverside Park, Pacific time.",
+        "src0": "Schedule · venue bookings",
+        "actionTitle": "Draft notice to U12 Camp guardians about the pitch change",
+        "affected0": "U12 Camp · 22 guardians at Riverside Park",
+        "excluded0": "All other groups and venues"
+      },
+      "wellness": {
+        "s0": "Draft a reply using our cancellation policy",
+        "s1": "Summarize utilization by practitioner",
+        "s2": "Write copy for Hot stone",
+        "answer": "Draft: “Hi Jordan, you can move your appointment free of charge up to 24 hours before. I’ve found Thu 17:00 with Rina if that suits.” I didn’t use any intake form details.",
+        "assumptions": "Cancellation policy v2 applies to Harbourfront. Intake form responses are excluded from AI context.",
+        "src0": "Policies › Cancellation v2",
+        "src1": "Calendar · Harbourfront",
+        "actionTitle": "Send reply to Jordan P. by email"
+      },
+      "commerce": {
+        "s0": "Explain this week’s stock trend",
+        "s1": "Draft copy for Canvas tote from its spec sheet",
+        "s2": "Which stores failed the last sync?",
+        "answer": "Linen overshirt L sold 9 units at Portland in 7 days against 3 the week before; stock is 1. Merino crew is flat. This is based on WooCommerce orders only; in-store sales aren’t connected, and Austin is excluded while disconnected.",
+        "assumptions": "Revenue is reported per currency (USD, CAD, EUR) and never combined.",
+        "src0": "WooCommerce orders",
+        "src1": "Inventory history",
+        "actionTitle": "Draft reorder note for Linen overshirt L at Portland",
+        "excluded0": "Austin store (disconnected)"
+      },
+      "foods": {
+        "s0": "Summarize today’s production by item",
+        "s1": "Draft menu copy for the flatbread",
+        "s2": "Plan a lunch promotion across Seattle",
+        "answer": "Ballard so far: 14 Ember bowls, 8 brisket sandwiches, 6 flatbreads, 11 lemonades. Fremont is missing because its kitchen screen is offline, though orders still arrived there. I can’t change prices, dietary labels or order acceptance.",
+        "assumptions": "Counts orders accepted since opening, Pacific time.",
+        "src0": "Orders · Ballard",
+        "src1": "Fremont kitchen screen",
+        "actionTitle": "Draft “Weekday lunch” promotion for Seattle locations",
+        "excluded0": "Vancouver, London, Berlin (outside requested scope)"
+      },
+      "realty": {
+        "s0": "Summarize viewing feedback for 42 Birchmount Cres",
+        "s1": "Draft a description for Suite 1806 from its facts",
+        "s2": "Who should I follow up with this week?",
+        "answer": "Three viewings at 42 Birchmount Cres logged feedback: two rated it 4–5 and liked the kitchen and garden; one raised the basement ceiling height. One buyer asked about closing dates. I only used the logged feedback — buyer identities were not shared with me.",
+        "assumptions": "Feedback from completed viewings in the last 14 days, Toronto time. No-shows are excluded.",
+        "src0": "Viewings · feedback",
+        "actionTitle": "Draft follow-up emails for 2 interested buyers",
+        "affected0": "Toronto Midtown · 2 buyers",
+        "excluded0": "Buyers without email consent"
+      }
     }
   },
   "cover": {
@@ -447,7 +556,19 @@
     "approvedComment": "{name} approved {field} · “{comment}”",
     "rejected": "{name} rejected {field}",
     "rejectedComment": "{name} rejected {field} · “{comment}”",
-    "resetToHq": "{field} reset to the headquarters default"
+    "resetToHq": "{field} reset to the headquarters default",
+    "field": {
+      "brand": "Brand name",
+      "nav": "Header navigation",
+      "headline": "Hero headline",
+      "offer": "Intro offer line",
+      "hours": "Opening hours",
+      "phone": "Phone number",
+      "about": "About this studio",
+      "brand_tagline": "Brand tagline",
+      "hero_title": "Hero title",
+      "intro_offer": "Intro offer"
+    }
   },
   "order": {
     "event": {
@@ -616,6 +737,453 @@
       "finishVerification": "Finish verification",
       "viewAndRetry": "View affected and retry",
       "sendTestOrder": "Send test order"
+    }
+  },
+  "table": {
+    "col": {
+      "age": "Age",
+      "agent": "Agent",
+      "ages": "Ages",
+      "aiAccess": "AI access",
+      "attendance30d": "Attendance (30d)",
+      "availability": "Availability",
+      "available": "Available",
+      "buffer": "Buffer",
+      "by": "By",
+      "campaign": "Campaign",
+      "capacity": "Capacity",
+      "change": "Change",
+      "channel": "Channel",
+      "check": "Check",
+      "client": "Client",
+      "coach": "Coach",
+      "consent": "Consent",
+      "consentVersion": "Consent version",
+      "contact": "Contact",
+      "customer": "Customer",
+      "duration": "Duration",
+      "editableLocally": "Editable locally",
+      "eligibility": "Eligibility",
+      "fee": "Fee",
+      "form": "Form",
+      "group": "Group",
+      "guardian": "Guardian",
+      "guest": "Guest",
+      "homeLocation": "Home location",
+      "homeStudio": "Home studio",
+      "item": "Item",
+      "lastVisit": "Last visit",
+      "location": "Location",
+      "locations": "Locations",
+      "lockedFields": "Locked fields",
+      "member": "Member",
+      "name": "Name",
+      "needs": "Needs",
+      "next": "Next",
+      "nextSession": "Next session",
+      "notes": "Notes",
+      "offer": "Offer",
+      "office": "Office",
+      "onHand": "On hand",
+      "onHandAfter": "On hand after",
+      "orders": "Orders",
+      "origin": "Origin",
+      "participant": "Participant",
+      "plan": "Plan",
+      "practitioner": "Practitioner",
+      "preferences": "Preferences",
+      "price": "Price",
+      "product": "Product",
+      "program": "Program",
+      "reason": "Reason",
+      "registration": "Registration",
+      "reserved": "Reserved",
+      "responses": "Responses",
+      "roster": "Roster",
+      "scope": "Scope",
+      "service": "Service",
+      "services": "Services",
+      "setting": "Setting",
+      "since": "Since",
+      "state": "State",
+      "status": "Status",
+      "store": "Store",
+      "stores": "Stores",
+      "sync": "Sync",
+      "thisWeek": "This week",
+      "type": "Type",
+      "updated": "Updated",
+      "usedBy": "Used by",
+      "valid": "Valid",
+      "variants": "Variants",
+      "venue": "Venue",
+      "weeklyAvailability": "Weekly availability",
+      "when": "When"
+    },
+    "filter": {
+      "active": "Active",
+      "adjustments": "Adjustments",
+      "all": "All",
+      "availableToday": "Available today",
+      "closed": "Closed",
+      "conflicts": "Conflicts",
+      "draft": "Draft",
+      "ended": "Ended",
+      "failed": "Failed",
+      "fixtures": "Games",
+      "full": "Full",
+      "low": "Low",
+      "lowBalance": "Low balance",
+      "needsApproval": "Needs approval",
+      "next2Weeks": "Next 2 weeks",
+      "open": "Open",
+      "overrides": "Overrides",
+      "paused": "Paused",
+      "published": "Published",
+      "reservations": "Reservations",
+      "sales": "Sales",
+      "scheduled": "Scheduled",
+      "thisWeek": "This week",
+      "trial": "Trial",
+      "upcoming": "Upcoming",
+      "waitlisted": "Waitlisted"
+    },
+    "source": {
+      "bookingConnectionConsentFromBranchharbor": "Booking connection · consent from BranchHarbor",
+      "branchharborCampaigns": "BranchHarbor campaigns",
+      "branchharborCustomers": "BranchHarbor customers",
+      "branchharborForms": "BranchHarbor forms",
+      "branchharborGroups": "BranchHarbor groups",
+      "branchharborOffers": "BranchHarbor offers",
+      "branchharborPrograms": "BranchHarbor programs",
+      "branchharborServices": "BranchHarbor services",
+      "calendarScopedNotes": "Calendar · scoped notes",
+      "inquiriesAndContacts": "Inquiries and contacts",
+      "inventoryHistoryMovementsNotJustCounts": "Inventory history (movements, not just counts)",
+      "localAssortment": "Local assortment",
+      "localAssortmentStockPerLocation": "Local assortment · stock per location",
+      "masterCatalog": "Master catalog",
+      "masterCatalogWoocommerce": "Master catalog · WooCommerce",
+      "pickupOrdering": "Pickup ordering",
+      "pickupSettings": "Pickup settings",
+      "pickupSettingsSlotsAreGeneratedFromThese": "Pickup settings · slots are generated from these",
+      "practitionerCalendars": "Practitioner calendars",
+      "registrations": "Registrations",
+      "scheduleVenueBookings": "Schedule · venue bookings",
+      "woocommerceCustomers": "WooCommerce customers"
+    },
+    "desc": {
+      "forms": "Administrative questions only. Responses are excluded from AI context by default.",
+      "inventory": "Every change to stock with its reason. Reservations hold units for unpaid orders and do not change on-hand stock.",
+      "marketing": "Campaign reporting uses observed form and booking data only. Attribution beyond the form source is not measured.",
+      "realtyClients": "Buyers, tenants, vendors and landlords. Agents see their own clients; office managers see their office. HQ reports never include client details.",
+      "pickup": "Pickup slots are generated from each location’s hours, slot length and capacity. Orders close at the cutoff and never earlier than the preparation buffer allows."
+    },
+    "action": {
+      "newCampaign": "New campaign",
+      "newOffer": "New offer",
+      "newProduct": "New product",
+      "newProgram": "New program",
+      "newService": "New service"
+    },
+    "badge": {
+      "absentOn": "Absent {date}",
+      "active": "Active",
+      "canceled": "Canceled",
+      "clear": "Clear",
+      "closed": "Closed",
+      "completed": "Completed",
+      "draft": "Draft",
+      "email": "Email",
+      "emailSms": "Email + SMS",
+      "erased": "Erased",
+      "excluded": "Excluded",
+      "failedSizeMismatch": "{count} failed · {size} mismatch",
+      "hidden": "Hidden",
+      "inStock": "In stock",
+      "local": "Local",
+      "low": "Low",
+      "lowBalance": "Low balance",
+      "lowReorderAt": "Low · reorder at {count}",
+      "needsApproval": "Needs approval",
+      "none": "None",
+      "open": "Open",
+      "openUntil": "Open until {date}",
+      "paused": "Paused",
+      "paymentFailed": "Payment failed",
+      "paymentsNotEnabled": "Payments not enabled",
+      "reservedUnpaidOrder": "Reserved · unpaid order",
+      "rosterFull": "{count} / {capacity} · Full",
+      "scheduled": "Scheduled",
+      "scoped": "Scoped",
+      "sms": "SMS",
+      "synced": "Synced",
+      "trial": "Trial",
+      "venueClash": "Venue clash",
+      "venueClashWith": "Venue clash · {teams}",
+      "waitlisted": "Waitlisted",
+      "yes": "Yes"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_approval": "Pending approval",
+      "scheduled": "Scheduled",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived",
+      "published": "Published",
+      "closed": "Closed",
+      "paused": "Paused",
+      "ended": "Ended",
+      "sent": "Sent",
+      "cancelled": "Canceled"
+    },
+    "channelCode": {
+      "email": "Email",
+      "sms": "SMS",
+      "web": "Web",
+      "social": "Social",
+      "push": "Push",
+      "print": "Print"
+    },
+    "channel": {
+      "web": "Web",
+      "webEmail": "Web + email"
+    },
+    "resource": {
+      "room": "Room",
+      "equipment": "Equipment",
+      "chair": "Chair",
+      "bed": "Treatment bed",
+      "suite": "Suite",
+      "stone_kit": "Stone kit"
+    },
+    "field": {
+      "sku": "SKU",
+      "name": "Name",
+      "description": "Description",
+      "images": "Images",
+      "options": "Options",
+      "translations": "Translations",
+      "variants_sku": "Variant SKU",
+      "price": "Price"
+    },
+    "rule": {
+      "newCustomersOnly": "New customers only",
+      "maxPerCustomer": "{count, plural, one {Once per customer} other {Up to # times per customer}}",
+      "minAge": "Ages {age}+",
+      "locations": "{count, plural, one {At # selected location} other {At # selected locations}}",
+      "anyone": "Anyone"
+    },
+    "reason": {
+      "adjustment": "Adjustment",
+      "count": "Stock count",
+      "received": "Received",
+      "sale": "Sale",
+      "return": "Return",
+      "damage": "Damaged / write-off",
+      "transfer_in": "Transfer in",
+      "transfer_out": "Transfer out",
+      "reservation": "Reserved for unpaid order",
+      "release": "Reservation released",
+      "shrinkage": "Shrinkage (loss/theft)",
+      "found": "Found stock",
+      "correction": "Correction",
+      "supplier_return": "Returned to supplier"
+    },
+    "na": {
+      "notOnHand": "Not on-hand",
+      "syncDegraded": "Sync degraded",
+      "notProvided": "Not provided",
+      "noLimitSet": "No limit set",
+      "noCoachAssigned": "No coach assigned",
+      "noPriceInThisCurrency": "No price in this currency"
+    },
+    "setting": {
+      "openingHours": "Opening hours",
+      "orderCutoff": "Order cutoff",
+      "ordersPerSlot": "Orders per slot",
+      "prepBuffer": "Prep buffer",
+      "slotLength": "Slot length",
+      "daysBookableAhead": "Days bookable ahead",
+      "closedDates": "Closed dates",
+      "takingPickupOrders": "Taking pickup orders",
+      "next24H": "Next 24 h",
+      "settings": "Settings"
+    },
+    "cell": {
+      "value": "{value}",
+      "list": "{items}",
+      "dot": "{a} · {b}",
+      "aiDraftNotSent": "AI draft · not sent",
+      "allAges": "All ages",
+      "allLocations": "All locations",
+      "allServices": "All services",
+      "availability": "Availability",
+      "bookedCapacity": "Booked / capacity",
+      "born": "Born {year}",
+      "bornRange": "Born {from}–{to}",
+      "bufferMinutes": "{before}/{after} min",
+      "buyer": "Buyer",
+      "canadianLocations": "Canadian locations ({count})",
+      "classesPrices": "{count, plural, one {# class} other {# classes}} · {prices}",
+      "creditsLeft": "{count} left",
+      "creditsLeftExpires": "{count} left · expires {date}",
+      "dateRange": "{from} – {to}",
+      "dayRange": "{from}–{to}",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
+      "daysHours": "{days} {hours}",
+      "deposit": "Deposit {amount}",
+      "earliestPickupAfterOrdering": "Earliest pickup after ordering",
+      "erasedCustomer": "Erased customer",
+      "fixture": "Game",
+      "formVersion": "{consent} · form v{version}",
+      "fromDate": "From {date}",
+      "germanCopy": "German copy",
+      "halfTermDays": "Half-term · {count, plural, one {# day} other {# days}}",
+      "hoursBooked": "{count} h booked",
+      "invitationPending": "Invitation pending",
+      "localOffer": "Local offer",
+      "localOverride": "Local override",
+      "localTime": "Local time",
+      "members": "Members",
+      "minBeforeClose": "{count} min before close",
+      "minBeforePickup": "{count} min before pickup",
+      "minutes": "{count} min",
+      "networkOffer": "Network offer",
+      "newMembers": "New members",
+      "newMembersOnly": "New members only",
+      "noPickupHours": "No pickup hours",
+      "noPriceSet": "No price set",
+      "none": "None",
+      "notSet": "Not set",
+      "now": "Now",
+      "ofTotal": "{count} of {total}",
+      "ongoing": "Ongoing",
+      "ongoingLower": "ongoing",
+      "price10": "Price ±10%",
+      "price10Availability": "Price ±10%, availability",
+      "prices": "{prices}",
+      "questionsStatus": "{count, plural, one {# question} other {# questions}} · {status}",
+      "redeemed": "{count} redeemed",
+      "season": "Season",
+      "seasonWeeks": "Season · {count, plural, one {# week} other {# weeks}}",
+      "sku": "SKU {sku}",
+      "slots": "{count, plural, one {# slot} other {# slots}}",
+      "system": "System",
+      "timeRange": "{from}–{to}",
+      "today": "Today",
+      "todayAt": "Today {time}",
+      "todayAtPlace": "Today {time} · {place}",
+      "training": "Training",
+      "usedOf": "{used} of {total} used",
+      "useWithinDays": "Use within {count, plural, one {# day} other {# days}}",
+      "validRange": "{from} – {to}",
+      "vendor": "Vendor",
+      "venueNotSet": "Venue not set",
+      "verified": "Verified",
+      "versionSince": "{version} · {date}",
+      "whenAtPlace": "{when} · {place}",
+      "windows": "{count, plural, one {# window} other {# windows}}",
+      "yesterday": "Yesterday"
+    }
+  },
+  "search": {
+    "roles": "{roles}"
+  },
+  "import": {
+    "nameRequired": "Name is required",
+    "codeRequired": "Internal code is required",
+    "duplicateCode": "Duplicate code {code}",
+    "unsupportedCountry": "{country} isn’t a supported country yet",
+    "countryRequired": "Country is required",
+    "timeZoneMissing": "Time zone missing",
+    "invalidTimeZone": "“{zone}” isn’t a valid time zone",
+    "currencyUnsupported": "Currency not supported",
+    "currencyMismatch": "Expected {currency} for this country — confirm before import"
+  },
+  "report": {
+    "title": {
+      "inquiriesByLocation": "Inquiries by location · {days} days",
+      "inquiries": "Inquiries · {days} days",
+      "revenue": "Revenue · {currency} · {days} days",
+      "combined": "Combined revenue",
+      "pickupCapacity": "Pickup capacity used where connected",
+      "occupancyConnected": "Occupancy where connected",
+      "occupancy": "Occupancy",
+      "appointments": "Appointments"
+    },
+    "fresh": {
+      "updatedMinAgo": "Updated {count} min ago",
+      "providerMinAgo": "{provider} · {count} min ago",
+      "notCalculated": "Not calculated",
+      "bookingSomeStale": "Booking system · some locations stale"
+    },
+    "note": {
+      "formsAttribution": "Source: website forms. Attribution beyond the form source is not measured.",
+      "missingRefundsSeparate": "Missing bars are Unavailable or Not connected — never zero. Refunds shown separately.",
+      "refundsSeparate": "Refunds shown separately.",
+      "noConversion": "Not shown: no conversion method is defined for {list}.",
+      "oneCurrency": "Only one currency in this scope.",
+      "missingBars": "Missing bars mean Unavailable or Not connected, never zero.",
+      "missingNet": "Missing bars are Unavailable or Not connected — never zero. Refunds are excluded (net).",
+      "net": "Net of refunds."
+    }
+  },
+  "onlineRule": {
+    "free_with_registration": "Free with registration",
+    "members": "Included with a membership",
+    "pack_holders": "Included for class pack holders",
+    "buy": "Available to buy",
+    "not_available": "Not available yet"
+  },
+  "studioReport": {
+    "definition": {
+      "occupancy": "Booked places (confirmed, attended, no-show) ÷ capacity for scheduled classes starting in the range.",
+      "attendance": "Attended ÷ booked places with attendance recorded, per week (Monday, UTC). Unrecorded bookings are shown separately.",
+      "churn": "Recurring memberships ending in the month ÷ memberships active at the start of the month.",
+      "revenue": "Succeeded payments in the range, net of refunds, per currency. Currencies are never combined."
+    }
+  },
+  "realtyReport": {
+    "definition": {
+      "daysOnMarket": "Days since the listing first became active (closed listings: until sold or rented).",
+      "funnel": "Records created in the period. Viewings exclude canceled ones.",
+      "volume": "Final price of listings sold or rented in the period, in the listing currency. Currencies are never combined."
+    }
+  },
+  "reportSource": {
+    "sample": "Sample data",
+    "studiosNative": "BranchHarbor native bookings and payments (connected booking systems are not included).",
+    "realtyNative": "BranchHarbor listings, inquiries, viewings and offers"
+  },
+  "menu": {
+    "statusNote": {
+      "failedAt": "Failed at {place}"
+    },
+    "field": {
+      "marketPrices": "Market prices",
+      "price": "Price",
+      "dietary": "Dietary details",
+      "modifiers": "Modifiers",
+      "availability": "Availability"
+    },
+    "availability": {
+      "available": "Available",
+      "soldOut": "Sold out"
+    }
+  },
+  "realtyPortal": {
+    "description": {
+      "rightmove": "Rightmove Real Time Datafeed (RTDF) — UK sales and lettings, pushed per listing",
+      "idealista": "idealista JSON import file (Spain, Portugal, Italy) served at a signed URL",
+      "reso_xml": "Zillow-compatible listing feed (XML) for US and Canadian listings, served at a signed URL",
+      "reaxml": "REAXML feed for Australian and New Zealand listings, served at a signed URL"
+    },
+    "reason": {
+      "sandbox": "Sandbox — sample data, never connected",
+      "not_configured": "Not configured"
     }
   }
 }

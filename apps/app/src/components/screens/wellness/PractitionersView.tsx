@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, Drawer, Field, Input, Select, Tabs } from '@bh/ui';
 import { dateInZone, fmtDateTime, fmtTime, fmtDay, zonedToUtc } from '@/lib/format';
 import { useWellness, useWellnessAction } from '@/lib/wellness/api';
+import { useErrorText } from '@/lib/useErrorText';
 import type { ImpactItem, RebookAction, RebookResult, WException, WPractitioner, WService, Window } from '@/lib/wellness/types';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
@@ -166,6 +167,7 @@ function NewException({ pracs, onClose, onCreated }: { pracs: WPractitioner[]; o
 
 function ImpactDrawer({ exceptionId, onClose }: { exceptionId: string; onClose: () => void }) {
   const t = useTranslations('wellnessFull.practitioners');
+  const errorText = useErrorText();
   const locale = useLocale();
   const app = useApp();
   const res = useWellness(app.locations, (api) => api.impact(exceptionId), [exceptionId]);
@@ -189,7 +191,7 @@ function ImpactDrawer({ exceptionId, onClose }: { exceptionId: string; onClose: 
       <Loadable res={res}>
         {(items) => (
           <div className="flex flex-col gap-3">
-            {result && <Banner tone={result.failed ? 'warning' : 'success'} live="polite" title={t('rebookResult', { done: result.done, failed: result.failed })}>{result.results.filter((r) => r.status === 'failed').map((r) => r.error?.message).join(' · ')}</Banner>}
+            {result && <Banner tone={result.failed ? 'warning' : 'success'} live="polite" title={t('rebookResult', { done: result.done, failed: result.failed })}>{result.results.filter((r) => r.status === 'failed').map((r) => errorText(r.error)).join(' · ')}</Banner>}
             {!items.length ? <Empty icon="check-circle" title={t('nothingAffected')} body={t('nothingAffectedBody')} /> : (
               <>
                 <p className="text-[13px] text-stone">{t('impactIntro', { n: items.length })}</p>

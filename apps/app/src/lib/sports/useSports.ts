@@ -4,12 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError } from '../errors';
 import type { Resource } from '../useApi';
 import { getSports, type SportsClient } from './client';
+import { useLocalizeErrorRef } from '../useErrorText';
 
 const toApiError = (e: unknown) => (e instanceof ApiError ? e : new ApiError('unknown_error', e instanceof Error ? e.message : 'Something went wrong.'));
 
 /** Loads sports data through the live or sample client. Same states as `useApi` (works with <Async>). */
 export function useSports<T>(fn: (c: SportsClient) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<Resource<T>>({ status: 'loading' });
+  const localize = useLocalizeErrorRef();
   const seq = useRef(0);
   const fnRef = useRef(fn);
   fnRef.current = fn;
@@ -21,7 +23,7 @@ export function useSports<T>(fn: (c: SportsClient) => Promise<T>, deps: unknown[
         const data = await fnRef.current(await getSports());
         if (id === seq.current) setRes({ status: 'ready', data });
       } catch (e) {
-        if (id === seq.current) setRes({ status: 'error', error: toApiError(e) });
+        if (id === seq.current) setRes({ status: 'error', error: localize.current(toApiError(e)) });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -37,6 +39,7 @@ export function useSports<T>(fn: (c: SportsClient) => Promise<T>, deps: unknown[
 export function useSportsAction<A extends unknown[], R>(fn: (c: SportsClient, ...args: A) => Promise<R>) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeErrorRef();
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const run = useCallback(async (...args: A): Promise<R | undefined> => {
@@ -45,7 +48,7 @@ export function useSportsAction<A extends unknown[], R>(fn: (c: SportsClient, ..
     try {
       return await fnRef.current(await getSports(), ...args);
     } catch (e) {
-      setError(toApiError(e));
+      setError(localize.current(toApiError(e)));
       return undefined;
     } finally {
       setPending(false);

@@ -8,7 +8,9 @@ import { Badge, Button, Field, Icon, Input, Logo, Select, Textarea, cx } from '@
 import { LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES } from '@bh/shared';
 import type { IconName } from '@bh/icons';
 import { ONBOARDING_STEPS, type DomainStatus, type ImportRow, type IndustryKey, type OnboardingProgress, type OnboardingStep } from '@/lib/types';
-import { getApi } from '@/lib/api';
+import { ApiError, getApi } from '@/lib/api';
+import { useErrorText, useFieldText } from '@/lib/useErrorText';
+import { useDataText } from '../ui/useDataText';
 import { useMutation } from '@/lib/useApi';
 import { countryName, currencyName, relativeTime } from '@/lib/format';
 import { INDUSTRY_UI } from '@/lib/nav';
@@ -458,6 +460,8 @@ function LocationStep({ data, set, err = {} }: StepProps) {
 
 function CsvImport({ imported, onImported }: { imported: number; onImported: (n: number) => void }) {
   const t = useTranslations('onboarding.csv');
+  const dt = useDataText();
+  const fieldText = useFieldText();
   const [open, setOpen] = useState(false);
   const [csv, setCsv] = useState('');
   const [rows, setRows] = useState<ImportRow[] | null>(null);
@@ -550,7 +554,7 @@ function CsvImport({ imported, onImported }: { imported: number; onImported: (n:
                       {r.errors.map((e) => (
                         <span key={e.field + e.message} className="flex flex-wrap items-center gap-2 font-semibold text-danger">
                           <Icon name="alert" size={14} />
-                          {e.message}
+                          {dt(e.textKey, e.textParams, fieldText(e.message))}
                           {e.field === 'timeZone' && (
                             <select aria-label={t('fixTimeZone', { row: r.row })} onChange={(ev) => ev.target.value && fixRow(r.row, 'timeZone', ev.target.value)} className="h-8 rounded-full border-[1.5px] border-ink bg-surface px-2.5 text-xs text-ink" defaultValue="">
                               <option value="">{t('choose')}</option>
@@ -915,6 +919,7 @@ function PublishStep({ data, set, blockers, go, onPublish }: StepProps & { block
   const ts = useTranslations('single.onboarding');
   const independent = data.model === 'independent';
   const [publishError, setPublishError] = useState('');
+  const errorText = useErrorText();
   const live = data.address === 'domain' && data.domainPrimary && data.domain ? `https://${data.domain}` : independent ? `https://sites.branchharbor.com/${slug(data.biz.name)}` : `https://sites.branchharbor.com/${slug(data.biz.name)}/${slug(data.loc.name)}`;
   const checks = [
     independent
@@ -1023,7 +1028,7 @@ function PublishStep({ data, set, blockers, go, onPublish }: StepProps & { block
               try {
                 await (await getApi()).business.publish({ industry: data.industry, role: 'hq', scopeId: 'all', business: 'independent' });
               } catch (e) {
-                setPublishError(e instanceof Error ? e.message : String(e));
+                setPublishError(e instanceof ApiError ? errorText(e) : e instanceof Error ? e.message : String(e));
                 setPublishing(false);
                 return;
               }

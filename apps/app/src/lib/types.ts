@@ -1,7 +1,7 @@
 import type { Currency, Money, Permission, RoleAssignment } from '@bh/shared';
 import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
-import type { MsgParams } from './msg';
+import type { MsgParams, MsgRef } from './msg';
 
 /**
  * Translatable text in view models: `xKey` (+ `xParams`) is a catalogue key in the "data" namespace that components
@@ -164,21 +164,27 @@ export interface HistoryEntry {
 }
 
 /* ---------- Generic tables ---------- */
+/** Table cells. `…Msg` fields carry the catalogue reference (namespace "data") for UI text; the plain strings next to
+ * them are the English fallback and what business data (names, titles people typed) is shown as. */
 export type Cell =
-  | { t: 'text'; v: string; sub?: string; strong?: boolean }
-  | { t: 'badge'; v: string; tone: Tone; icon?: IconName }
-  | { t: 'money'; v: Money; sub?: string }
+  | { t: 'text'; v: string; sub?: string; strong?: boolean; vMsg?: MsgRef; subMsg?: MsgRef }
+  | { t: 'badge'; v: string; tone: Tone; icon?: IconName; vMsg?: MsgRef }
+  | { t: 'money'; v: Money; sub?: string; subMsg?: MsgRef }
   | { t: 'origin'; v: 'hq' | 'local' | 'locked' | 'approval' }
-  | { t: 'unavailable'; reason?: string };
+  | { t: 'unavailable'; reason?: string; reasonMsg?: MsgRef };
 
 export interface TableData {
   key: string;
   description?: string;
-  columns: { key: string; label: string; align?: 'left' | 'right' }[];
+  descriptionMsg?: MsgRef;
+  /** Column headers and filter labels: `labelMsg` is the catalogue reference; location columns carry the name only. */
+  columns: { key: string; label: string; labelMsg?: MsgRef; align?: 'left' | 'right' }[];
   rows: { id: string; tags: string[]; cells: Record<string, Cell> }[];
-  filters: { key: string; label: string }[];
+  filters: { key: string; label: string; labelMsg?: MsgRef }[];
   source: string;
+  sourceMsg?: MsgRef;
   primaryAction?: string;
+  primaryActionMsg?: MsgRef;
 }
 
 /* ---------- Studios ---------- */
@@ -325,6 +331,8 @@ export interface MenuItem {
   image: string;
   status: 'published' | 'draft' | 'partial_failure';
   statusNote?: string;
+  /** Data `menu.statusNote.*` (e.g. which location failed); `statusNote` is the English fallback. */
+  statusNoteMsg?: MsgRef;
   fields: MenuField[];
 }
 export type FoodOrderStatus = 'awaiting_acceptance' | 'accepted' | 'preparing' | 'ready' | 'collected' | 'cancelled' | 'rejected';
@@ -355,6 +363,8 @@ export type FieldPolicy = 'locked' | 'editable' | 'approval';
 export interface WebsiteField {
   key: string;
   label: string;
+  /** Data `website.field.<key>` for template fields the app knows; `label` is the English fallback. */
+  labelMsg?: MsgRef;
   policy: FieldPolicy;
   value: string;
   hqValue?: string;
@@ -512,12 +522,16 @@ export interface ReportBar {
 export interface Report {
   id: string;
   title: string;
+  titleMsg?: MsgRef;
   freshness: string;
+  freshnessMsg?: MsgRef;
   stale?: boolean;
   unit: 'count' | 'percent' | 'money';
   currency?: Currency;
   bars: ReportBar[];
   note: string;
+  /** Data `report.*` / `metricReason.*` references; `title`, `freshness` and `note` are the English fallback. */
+  noteMsg?: MsgRef;
 }
 
 /* ---------- Settings ---------- */
@@ -551,7 +565,8 @@ export interface ImportRow {
   country: string;
   timeZone: string;
   currency: string;
-  errors: { field: string; message: string }[];
+  /** `textKey`/`textParams`: data `import.*` (checks the app runs itself); API messages are shown as sent. */
+  errors: { field: string; message: string; textKey?: string; textParams?: MsgParams }[];
 }
 export type DomainState = 'awaiting_dns' | 'verifying' | 'certificate_pending' | 'ready' | 'failed';
 export interface DomainStatus {
@@ -562,21 +577,42 @@ export interface DomainStatus {
 }
 
 /* ---------- AI ---------- */
+/** AI panel text: the plain strings are what the API sent (or the English fallback); `…Msg` references are phrased from the
+ * "data" catalogue (sample answers in mock mode, fixed prompts, freshness). Model replies from the live API stay as sent. */
 export interface AiProposedAction {
   id: string;
   title: string;
+  titleMsg?: MsgRef;
   kind: 'draft' | 'publish' | 'send' | 'refund';
   affected: string[];
+  /** Same order as `affected`; null where the item is business data (a location name). */
+  affectedMsg?: (MsgRef | null)[];
   excluded: string[];
+  excludedMsg?: (MsgRef | null)[];
   requires: Permission;
 }
 export interface AiAnswer {
   id: string;
   question: string;
   answer: string;
+  answerMsg?: MsgRef;
   assumptions?: string;
-  sources: { label: string; freshness: string }[];
+  assumptionsMsg?: MsgRef;
+  sources: { label: string; freshness: string; labelMsg?: MsgRef; freshnessMsg?: MsgRef }[];
   action?: AiProposedAction;
+}
+/** Global search results, grouped. `type` is a group code translated in the top bar (`shell.searchGroup.*`). */
+export interface SearchGroup {
+  type: 'locations' | 'team';
+  items: { id: string; label: string; sub: string; subMsg?: MsgRef; href: string }[];
+}
+/** A suggested prompt. `multiLocation` prompts are hidden for independent businesses; `action` prompts propose a draft. */
+export interface AiSuggestion {
+  id: string;
+  text: string;
+  textMsg?: MsgRef;
+  multiLocation?: boolean;
+  action?: boolean;
 }
 
 /* ---------- Team schedule (shifts + time clock) ---------- */

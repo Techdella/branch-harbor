@@ -5,6 +5,7 @@ export * from './components/Logo';
 export * from './components/Button';
 export * from './components/Badge';
 export * from './components/Card';
+export * from './components/StatCard';
 export * from './components/Field';
 export * from './components/Tabs';
 export * from './components/Drawer';

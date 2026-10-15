@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, Drawer, Field, Input, Select, Tabs, Toggle, cx } from '@bh/ui';
 import { addDays, cityOfZone, dateInZone, fmtDay, fmtTime, fmtYmd, hhmmIn, zoneLabel, zonedToUtc } from '@/lib/format';
 import { useWellness, useWellnessAction } from '@/lib/wellness/api';
+import { useConflictText, useErrorText } from '@/lib/useErrorText';
 import type { CalAppointment, CalendarDay, CancellationPreview, MoveResult, WService } from '@/lib/wellness/types';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
@@ -169,6 +170,8 @@ function ListView({ d, onOpen }: { d: CalendarDay; onOpen: (a: CalAppointment) =
 
 function MoveConfirm({ move, tz, onClose, onMoved }: { move: { appt: CalAppointment; startsAt: string; practitionerId?: string; resourceId?: string }; tz: string; onClose: () => void; onMoved: () => void }) {
   const t = useTranslations('wellnessFull.calendar');
+  const errorText = useErrorText();
+  const conflictText = useConflictText();
   const locale = useLocale();
   const app = useApp();
   const action = useWellnessAction(app.locations);
@@ -185,10 +188,10 @@ function MoveConfirm({ move, tz, onClose, onMoved }: { move: { appt: CalAppointm
         {check.status === 'loading' && <Banner tone="info" icon="refresh" live="polite">{t('checking')}</Banner>}
         {check.status === 'ready' && (check.data.ok ? <Banner tone="success" title={t('noConflicts')}>{t('noConflictsBody')}</Banner> : (
           <Banner tone="danger" title={t('conflicts')} live="assertive">
-            <ul className="list-disc pl-4">{check.data.conflicts.map((c, i) => <li key={i}>{c.message}</li>)}{!check.data.conflicts.length && check.data.error && <li>{check.data.error.message}</li>}</ul>
+            <ul className="list-disc pl-4">{check.data.conflicts.map((c, i) => <li key={i}>{conflictText(c)}</li>)}{!check.data.conflicts.length && check.data.error && <li>{errorText(check.data.error)}</li>}</ul>
           </Banner>
         ))}
-        {result && !result.ok && <Banner tone="danger" title={t('moveFailed')} live="assertive">{result.error?.message}</Banner>}
+        {result && !result.ok && <Banner tone="danger" title={t('moveFailed')} live="assertive">{errorText(result.error)}</Banner>}
         {action.error && <Banner tone="danger" title={t('moveFailed')} live="assertive">{action.error.message}</Banner>}
         <p className="text-xs text-stone">{t('moveAtomic')}</p>
         <div className="flex gap-2">
@@ -202,6 +205,8 @@ function MoveConfirm({ move, tz, onClose, onMoved }: { move: { appt: CalAppointm
 
 function AppointmentDrawer({ appt, day, onClose, onChanged }: { appt: CalAppointment; day: CalendarDay; onClose: () => void; onChanged: () => void }) {
   const t = useTranslations('wellnessFull.calendar');
+  const errorText = useErrorText();
+  const conflictText = useConflictText();
   const locale = useLocale();
   const app = useApp();
   const tz = day.location.timeZone;
@@ -284,7 +289,7 @@ function AppointmentDrawer({ appt, day, onClose, onChanged }: { appt: CalAppoint
             </div>
             <Field label={t('practitioner')}>{({ id }) => <Select id={id} value={mv.practitionerId} onChange={(e) => (setMv({ ...mv, practitionerId: e.target.value }), setMvCheck(null))}>{day.practitioners.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select>}</Field>
             <Field label={t('room')}>{({ id }) => <Select id={id} value={mv.resourceId} onChange={(e) => (setMv({ ...mv, resourceId: e.target.value }), setMvCheck(null))}><option value="">{t('anyRoom')}</option>{day.rooms.filter((r) => r.kind === 'room').map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</Select>}</Field>
-            {mvCheck && (mvCheck.ok ? <Banner tone="success">{t('noConflictsBody')}</Banner> : <Banner tone="danger" title={t('conflicts')}><ul className="list-disc pl-4">{mvCheck.conflicts.map((c, i) => <li key={i}>{c.message}</li>)}{!mvCheck.conflicts.length && mvCheck.error && <li>{mvCheck.error.message}</li>}</ul></Banner>)}
+            {mvCheck && (mvCheck.ok ? <Banner tone="success">{t('noConflictsBody')}</Banner> : <Banner tone="danger" title={t('conflicts')}><ul className="list-disc pl-4">{mvCheck.conflicts.map((c, i) => <li key={i}>{conflictText(c)}</li>)}{!mvCheck.conflicts.length && mvCheck.error && <li>{errorText(mvCheck.error)}</li>}</ul></Banner>)}
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" disabled={action.pending} onClick={async () => setMvCheck((await action.run((api) => api.move(appt.id, { startsAt: zonedToUtc(mv.date, mv.time, tz), practitionerId: mv.practitionerId, resourceId: mv.resourceId || undefined, dryRun: true }))) ?? null)}>{t('checkConflicts')}</Button>
               <Button disabled={!mvCheck?.ok || action.pending} onClick={async () => { const r = await action.run((api) => api.move(appt.id, { startsAt: zonedToUtc(mv.date, mv.time, tz), practitionerId: mv.practitionerId, resourceId: mv.resourceId || undefined, dryRun: false })); if (r?.ok) onChanged(); else if (r) setMvCheck(r); }}>{t('confirmMove')}</Button>

@@ -11,6 +11,8 @@ import { PageHeader } from '../../shell/PageHeader';
 import { useScopeLabel } from '../../shell/ScopePicker';
 import { Banner, DeniedState, LoadingBlock } from '../../ui/States';
 import { ErrorLine, Labeled, StudioAsync, fmtMoney, inputCls } from './shared';
+import { reportSourceKey } from '@/lib/msg';
+import { useDataText } from '../../ui/useDataText';
 
 const BAR = '#141414';
 
@@ -37,6 +39,7 @@ function Bars({ rows, unit, label }: { rows: Array<{ key: string; label: string;
 
 export function InsightsScreen() {
   const t = useTranslations('studiosFull.insights');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const scopeLabel = useScopeLabel();
@@ -53,7 +56,7 @@ export function InsightsScreen() {
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5">
               <h2 className="text-base font-bold">{t('occupancyByLocation')}</h2>
               <Bars label={t('occupancyByLocation')} unit="%" rows={r.occupancy.byLocation.map((l) => ({ key: l.locationId, label: l.locationName, value: l.occupancyPct, sub: l.classes ? t('bookedOf', { booked: l.booked, capacity: l.capacity }) : t('noClasses') }))} />
-              <p className="text-[11px] text-stone">{r.definitions.occupancy}</p>
+              <p className="text-[11px] text-stone">{dt('studioReport.definition.occupancy', undefined, r.definitions.occupancy ?? '')}</p>
             </section>
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5">
               <h2 className="text-base font-bold">{t('occupancyByType')}</h2>
@@ -66,7 +69,7 @@ export function InsightsScreen() {
                 <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="mt-2 w-full text-left"><thead><tr className="text-stone"><th scope="col">{t('week')}</th><th scope="col">{t('booked')}</th><th scope="col">{t('attended')}</th><th scope="col">{t('noShows')}</th><th scope="col">{t('lateCancels')}</th><th scope="col">{t('unrecorded')}</th></tr></thead>
                   <tbody>{r.attendance.map((w) => <tr key={w.weekStart} className="border-t border-line-soft tabular"><td>{w.weekStart}</td><td>{w.booked}</td><td>{w.attended}</td><td>{w.noShow}</td><td>{w.lateCancel}</td><td>{w.unrecorded}</td></tr>)}</tbody></table></div>
               </details>
-              <p className="text-[11px] text-stone">{r.definitions.attendance}</p>
+              <p className="text-[11px] text-stone">{dt('studioReport.definition.attendance', undefined, r.definitions.attendance ?? '')}</p>
             </section>
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5">
               <h2 className="text-base font-bold">{t('churn')}</h2>
@@ -74,7 +77,7 @@ export function InsightsScreen() {
                 <thead><tr className="text-xs text-stone"><th scope="col">{t('month')}</th><th scope="col">{t('activeStart')}</th><th scope="col">{t('started')}</th><th scope="col">{t('ended')}</th><th scope="col">{t('churnRate')}</th></tr></thead>
                 <tbody>{r.churn.map((c) => <tr key={c.month} className="border-t border-line-soft tabular"><td className="py-1.5">{c.month}</td><td>{c.activeAtStart}</td><td>{c.started}</td><td>{c.cancelled}</td><td className="font-bold">{c.churnRatePct === null ? t('unavailable') : `${c.churnRatePct}%`}</td></tr>)}</tbody>
               </table></div>
-              <p className="text-[11px] text-stone">{r.definitions.churn}</p>
+              <p className="text-[11px] text-stone">{dt('studioReport.definition.churn', undefined, r.definitions.churn ?? '')}</p>
             </section>
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5 [grid-column:1/-1]">
               <h2 className="text-base font-bold">{t('revenue')}</h2>
@@ -83,7 +86,7 @@ export function InsightsScreen() {
                   <article key={c.currency} className="rounded-lg bg-canvas p-4">
                     <div className="text-xs font-bold text-stone">{c.currency}</div>
                     <div className="text-xl font-extrabold tabular">{c.net === null ? t('unavailable') : fmtMoney(c.net, c.currency, locale)}</div>
-                    {c.net === null ? <p className="text-xs text-stone">{c.unavailableReason ?? t('noPayments')}</p> : (
+                    {c.net === null ? <p className="text-xs text-stone">{!c.unavailableReason || c.unavailableReason === 'No payments in this period' ? t('noPayments') : c.unavailableReason}</p> : (
                       <ul className="mt-1 text-xs">
                         {Object.entries(c.byCategory).sort((a, b) => b[1] - a[1]).map(([k, v]) => <li key={k} className="flex justify-between"><span>{t(`cat.${k}`)}</span><span className="tabular">{fmtMoney(v, c.currency, locale)}</span></li>)}
                         <li className="mt-1 flex justify-between text-stone"><span>{t('refunds')}</span><span className="tabular">{fmtMoney(c.refunds ?? 0, c.currency, locale)}</span></li>
@@ -92,7 +95,7 @@ export function InsightsScreen() {
                   </article>
                 ))}
               </div>
-              <p className="text-[11px] text-stone">{t('noCombined')} {r.definitions.revenue} {r.source}</p>
+              <p className="text-[11px] text-stone">{t('noCombined')} {dt('studioReport.definition.revenue', undefined, r.definitions.revenue ?? '')} {dt(reportSourceKey(r.source), undefined, r.source)}</p>
             </section>
           </div>
         )}

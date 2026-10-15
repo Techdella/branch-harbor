@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import type { Currency } from '@bh/shared';
-import type { MsgParam, MsgParams } from '@/lib/msg';
+import type { MsgParam, MsgParams, MsgRef } from '@/lib/msg';
 import { fmtDateTime, fmtDay, fmtTime, moneyWithCode, zoneLabel } from '@/lib/format';
 
 export type DataText = (key: string | undefined | null, params: MsgParams | undefined, fallback: string) => string;
@@ -21,6 +21,11 @@ export function useDataText(): DataText {
     if (p.t === 'msg') return text(p.key, p.params, p.text ?? p.key);
     if (p.t === 'money') return moneyWithCode({ amount: p.amount, currency: p.currency as Currency }, locale);
     const tz = p.tz ?? 'UTC';
+    if (p.style === 'time') return fmtTime(p.at, tz, locale);
+    if (p.style === 'zone') return zoneLabel(tz, locale, new Date(p.at));
+    if (p.style === 'weekday') return fmtDay(p.at, tz, locale, { weekday: 'short' });
+    if (p.style === 'monthYear') return fmtDay(p.at, tz, locale, { month: 'short', year: 'numeric' });
+    if (p.style === 'dayMonth') return fmtDay(p.at, tz, locale, { day: 'numeric', month: 'short' });
     const zone = p.tz ? ` ${zoneLabel(tz, locale, new Date(p.at))}` : '';
     if (p.style === 'dateTime') return `${fmtDateTime(p.at, tz, locale)}${zone}`;
     if (p.style === 'dayTime') return `${fmtDay(p.at, tz, locale)} ${fmtTime(p.at, tz, locale)}${zone}`;
@@ -32,4 +37,10 @@ export function useDataText(): DataText {
     return t(key, values);
   };
   return text;
+}
+
+/** Plain text shown as is, or its catalogue reference translated (see `Txt` in lib/msg.ts). */
+export function useTxt() {
+  const dt = useDataText();
+  return (text: string | undefined, msg?: MsgRef): string => (msg ? dt(msg.key, msg.params, msg.text ?? text ?? msg.key) : (text ?? ''));
 }

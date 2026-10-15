@@ -6,6 +6,8 @@
 import { can, isValidTimeZone, LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES, type Currency, type Money, type Permission } from '@bh/shared';
 import { ApiError, type BranchHarborApi } from '../api';
 import type {
+  AiSuggestion,
+  SearchGroup,
   ApprovalItem,
   ApprovalRequest,
   ShiftView,
@@ -36,7 +38,7 @@ import { addDays, dateInZone, zonedToUtc } from '../format';
 import { AI, buildOverview, buildTable } from './content';
 import { FIXTURES, PASTEL as P, at, loc, minutesAgo, scopeLocationIds, scopeOptions, sessionFor, unsplash, visibleLocations } from './orgs';
 import { withIndependent } from './business';
-import { moneyArg, ref, type MsgParams } from '../msg';
+import { isRef, moneyArg, plain, ref, type MsgParams, type Txt } from '../msg';
 
 /* ---------------- helpers ---------------- */
 
@@ -205,16 +207,16 @@ function freshPage(ind: IndustryKey, locId: string): WebsitePage {
   return {
     locationId: locId, locationName: l.name, page: 'Home', version: 15,
     fields: [
-      { key: 'brand', label: 'Brand name', policy: 'locked', value: f.org.brand },
-      { key: 'nav', label: 'Header navigation', policy: 'locked', value: ind === 'foods' ? 'Menu · Order pickup · Locations · About' : ind === 'commerce' ? 'Shop · Stores · Journal · About' : 'Classes · Offers · Locations · About' },
-      { key: 'headline', label: 'Hero headline', policy: 'approval', value: `Find your place in ${short}`, pending },
-      { key: 'offer', label: 'Intro offer line', policy: 'approval', value: `New here? Your first visit is on us at ${short}.` },
-      { key: 'hours', label: 'Opening hours', policy: 'editable', value: hq.hours, hqValue: hq.hours },
-      { key: 'phone', label: 'Phone number', policy: 'editable', value: locId === 'ls' ? '+1 416 555 0199' : hq.phone, hqValue: hq.phone },
+      { key: 'brand', label: 'Brand name', labelMsg: ref('website.field.brand', undefined, 'Brand name'), policy: 'locked', value: f.org.brand },
+      { key: 'nav', label: 'Header navigation', labelMsg: ref('website.field.nav', undefined, 'Header navigation'), policy: 'locked', value: ind === 'foods' ? 'Menu · Order pickup · Locations · About' : ind === 'commerce' ? 'Shop · Stores · Journal · About' : 'Classes · Offers · Locations · About' },
+      { key: 'headline', label: 'Hero headline', labelMsg: ref('website.field.headline', undefined, 'Hero headline'), policy: 'approval', value: `Find your place in ${short}`, pending },
+      { key: 'offer', label: 'Intro offer line', labelMsg: ref('website.field.offer', undefined, 'Intro offer line'), policy: 'approval', value: `New here? Your first visit is on us at ${short}.` },
+      { key: 'hours', label: 'Opening hours', labelMsg: ref('website.field.hours', undefined, 'Opening hours'), policy: 'editable', value: hq.hours, hqValue: hq.hours },
+      { key: 'phone', label: 'Phone number', labelMsg: ref('website.field.phone', undefined, 'Phone number'), policy: 'editable', value: locId === 'ls' ? '+1 416 555 0199' : hq.phone, hqValue: hq.phone },
     ],
     activity: [
       { at: minutesAgo(310), text: 'Version 15 published by headquarters', textKey: 'website.versionPublishedByHq', textParams: { version: 15 } },
-      ...(pending ? [{ at: pending.at, text: 'Kim Lau requested a change to Hero headline', textKey: 'website.changeRequested', textParams: { name: 'Kim Lau', field: 'Hero headline' } }] : []),
+      ...(pending ? [{ at: pending.at, text: 'Kim Lau requested a change to Hero headline', textKey: 'website.changeRequested', textParams: { name: 'Kim Lau', field: ref('website.field.headline', undefined, 'Hero headline') } }] : []),
     ],
   };
 }
@@ -399,7 +401,7 @@ function menuFor(ind: IndustryKey, view: string): MenuItem[] {
       { key: 'modifiers', label: 'Modifiers', value: it.mods, origin: isHq ? 'hq' : 'inherited', resettable: false },
     ];
     if (!isHq) fields.push({ key: 'availability', label: 'Availability', value: (SOLD_OUT[view] ?? []).includes(it.id) ? 'Sold out' : 'Available', origin: 'local', resettable: false });
-    return { id: it.id, name: it.name, image: it.image, status: it.status, statusNote: it.status === 'partial_failure' ? it.statusNote : undefined, fields };
+    return { id: it.id, name: it.name, image: it.image, status: it.status, statusNote: it.status === 'partial_failure' ? it.statusNote : undefined, ...(it.status === 'partial_failure' ? { statusNoteMsg: ref('menu.statusNote.failedAt', { place: 'Vancouver – Gastown' }, it.statusNote) } : {}), fields };
   });
 }
 
@@ -457,7 +459,7 @@ function freshApprovals(ind: IndustryKey): ApprovalRequest[] {
       details: [{ key: 'channel', label: 'Channel', value: 'Meta ads', valueKey: 'approval.channel.meta_ads' }, { key: 'duration', label: 'Duration', value: '14 days', valueKey: 'approval.value.days', valueParams: { count: 14 } }, { key: 'starts', label: 'Starts', value: 'In 7 days', valueKey: 'approval.value.inDays', valueParams: { count: 7 } }] },
     { ...base, id: `ap_${ind}_swap`, kind: 'shift_swap', title: `${SHIFT_PEOPLE[ind][0]![0]} · in 2 days`, titleKey: 'approval.title.shift_swap_in', titleParams: { role: SHIFT_PEOPLE[ind][0]![0], count: 2 }, locationName: a.name, amount: null, requestedBy: SHIFT_PEOPLE[ind][0]![1], requestedAt: minutesAgo(180), reason: 'Exam that morning',
       details: [{ key: 'from', label: 'From', value: SHIFT_PEOPLE[ind][0]![1] }, { key: 'to', label: 'To', value: SHIFT_PEOPLE[ind][1]![1] }] },
-    { ...base, id: `ap_${ind}_web`, kind: 'field', title: 'Website change: Intro offer', titleKey: 'approval.title.website_change', titleParams: { field: 'Intro offer' }, locationName: c.name, amount: null, requestedBy: f.people.local, requestedAt: minutesAgo(300), reason: 'Local launch promotion', details: [{ key: 'newValue', label: 'New value', value: 'First week unlimited for new members' }] },
+    { ...base, id: `ap_${ind}_web`, kind: 'field', title: 'Website change: Intro offer', titleKey: 'approval.title.website_change', titleParams: { field: ref('website.field.intro_offer', undefined, 'Intro offer') }, locationName: c.name, amount: null, requestedBy: f.people.local, requestedAt: minutesAgo(300), reason: 'Local launch promotion', details: [{ key: 'newValue', label: 'New value', value: 'First week unlimited for new members' }] },
     { ...base, id: `ap_${ind}_done`, kind: 'ad_spend', title: 'Autumn open day', status: 'approved', locationName: a.name, amount: m(250, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(5 * 24 * 60), reason: null,
       details: [{ key: 'channel', label: 'Channel', value: 'Google ads', valueKey: 'approval.channel.google_ads' }, { key: 'duration', label: 'Duration', value: '7 days', valueKey: 'approval.value.days', valueParams: { count: 7 } }], canDecide: false, decidedBy: f.people.hq, decisionComment: 'Approved — keep it local', result: 'Campaign scheduled', resultKey: 'approval.result.campaignScheduled' },
   ];
@@ -541,9 +543,9 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       if (!needle) return [];
       const locs = visibleLocations(ctx.industry, ctx.role).filter((l) => l.name.toLowerCase().includes(needle) || l.address.city.toLowerCase().includes(needle));
       const people = st(ctx.industry).team.filter((p) => p.name.toLowerCase().includes(needle));
-      const groups = [];
-      if (locs.length && ctx.role !== 'staff') groups.push({ type: 'Locations', items: locs.map((l) => ({ id: l.id, label: l.name, sub: `${l.address.city} · ${l.currency} · ${l.timeZone}`, href: `/locations?open=${l.id}` })) });
-      if (people.length && ctx.role === 'hq') groups.push({ type: 'Team', items: people.map((p) => ({ id: p.id, label: p.name, sub: p.assignments.map((a) => a.role).join(', '), href: '/team' })) });
+      const groups: SearchGroup[] = [];
+      if (locs.length && ctx.role !== 'staff') groups.push({ type: 'locations', items: locs.map((l) => ({ id: l.id, label: l.name, sub: `${l.address.city} · ${l.currency} · ${l.timeZone}`, href: `/locations?open=${l.id}` })) });
+      if (people.length && ctx.role === 'hq') groups.push({ type: 'team', items: people.map((p) => ({ id: p.id, label: p.name, sub: p.assignments.map((a) => a.role).join(', '), subMsg: ref('search.roles', { roles: p.assignments.map((a) => ref(`role.${a.roleKey ?? a.role}`, undefined, a.role)) }, p.assignments.map((a) => a.role).join(', ')), href: '/team' })) });
       return groups;
     }, () => [], 180),
   notifications: (ctx) =>
@@ -830,16 +832,21 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       const f = FIXTURES[ctx.industry];
       const locs = f.locations.filter((l) => ids.includes(l.id));
       const short = (n: string) => n.split(' – ').pop()!.split(' ')[0]!;
+      const R = (key: string, text: string, params?: MsgParams) => ref(`report.${key}`, params, text);
       const reports: Report[] = [
-        { id: 'enq', title: 'Enquiries by location · 30 days', freshness: 'Updated 4 min ago', unit: 'count', bars: locs.map((l, i) => ({ label: short(l.name), value: [42, 31, 28, 19, 24, 9, 17][i % 7]! })), note: 'Source: website forms. Attribution beyond the form source is not measured.' },
+        { id: 'enq', title: 'Inquiries by location · 30 days', titleMsg: R('title.inquiriesByLocation', 'Inquiries by location · 30 days', { days: 30 }), freshness: 'Updated 4 min ago', freshnessMsg: R('fresh.updatedMinAgo', 'Updated 4 min ago', { count: 4 }), unit: 'count', bars: locs.map((l, i) => ({ label: short(l.name), value: [42, 31, 28, 19, 24, 9, 17][i % 7]! })), note: 'Source: website forms. Attribution beyond the form source is not measured.', noteMsg: R('note.formsAttribution', 'Source: website forms. Attribution beyond the form source is not measured.') },
       ];
       const byCur = new Map<Currency, typeof locs>();
       for (const l of locs) byCur.set(l.currency, [...(byCur.get(l.currency) ?? []), l]);
       for (const [cur, ls] of byCur) {
-        reports.push({ id: `rev_${cur}`, title: `Revenue · ${cur} · 7 days`, freshness: 'Stripe · 6 min ago', unit: 'money', currency: cur, bars: ls.map((l) => ({ label: short(l.name), value: l.revenue7d.amount > 0 ? l.revenue7d.amount : null })), note: ls.some((l) => l.revenue7d.amount === 0) ? 'Missing bars are Unavailable or Not connected — never zero. Refunds shown separately.' : 'Refunds shown separately.' });
+        const missing = ls.some((l) => l.revenue7d.amount === 0);
+        const note = missing ? 'Missing bars are Unavailable or Not connected — never zero. Refunds shown separately.' : 'Refunds shown separately.';
+        reports.push({ id: `rev_${cur}`, title: `Revenue · ${cur} · 7 days`, titleMsg: R('title.revenue', `Revenue · ${cur} · 7 days`, { currency: cur, days: 7 }), freshness: 'Stripe · 6 min ago', freshnessMsg: R('fresh.providerMinAgo', 'Stripe · 6 min ago', { provider: 'Stripe', count: 6 }), unit: 'money', currency: cur, bars: ls.map((l) => ({ label: short(l.name), value: l.revenue7d.amount > 0 ? l.revenue7d.amount : null })), note, noteMsg: R(missing ? 'note.missingRefundsSeparate' : 'note.refundsSeparate', note) });
       }
-      reports.push({ id: 'cmb', title: 'Combined revenue', freshness: 'Not calculated', unit: 'money', bars: [], note: byCur.size > 1 ? `Not shown: no conversion method is defined for ${[...byCur.keys()].join(' + ')}.` : 'Only one currency in this scope.' });
-      reports.push({ id: 'occ', title: ctx.industry === 'foods' ? 'Pickup capacity used where connected' : 'Occupancy where connected', freshness: 'Booking system · some locations stale', stale: locs.some((l) => l.sync === 'attention'), unit: 'percent', bars: locs.map((l, i) => ({ label: short(l.name), value: l.sync === 'attention' || l.site === 'unpublished' ? null : [78, 64, 71, 59, 66, 70, 62][i % 7]! })), note: 'Missing bars mean Unavailable or Not connected, never zero.' });
+      const cmbNote = byCur.size > 1 ? `Not shown: no conversion method is defined for ${[...byCur.keys()].join(' + ')}.` : 'Only one currency in this scope.';
+      reports.push({ id: 'cmb', title: 'Combined revenue', titleMsg: R('title.combined', 'Combined revenue'), freshness: 'Not calculated', freshnessMsg: R('fresh.notCalculated', 'Not calculated'), unit: 'money', bars: [], note: cmbNote, noteMsg: byCur.size > 1 ? R('note.noConversion', cmbNote, { list: [...byCur.keys()].join(' + ') }) : R('note.oneCurrency', cmbNote) });
+      const occTitle = ctx.industry === 'foods' ? 'Pickup capacity used where connected' : 'Occupancy where connected';
+      reports.push({ id: 'occ', title: occTitle, titleMsg: R(ctx.industry === 'foods' ? 'title.pickupCapacity' : 'title.occupancyConnected', occTitle), freshness: 'Booking system · some locations stale', freshnessMsg: R('fresh.bookingSomeStale', 'Booking system · some locations stale'), stale: locs.some((l) => l.sync === 'attention'), unit: 'percent', bars: locs.map((l, i) => ({ label: short(l.name), value: l.sync === 'attention' || l.site === 'unpublished' ? null : [78, 64, 71, 59, 66, 70, 62][i % 7]! })), note: 'Missing bars mean Unavailable or Not connected, never zero.', noteMsg: R('note.missingBars', 'Missing bars mean Unavailable or Not connected, never zero.') });
       return reports;
     }, () => []);
   },
@@ -893,16 +900,16 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       return lines.map((line, i): ImportRow => {
         const c = line.split(',').map((x) => x.trim());
         const row = { row: i + 2, name: c[col('name')] ?? '', code: c[col('code')] ?? '', country: (c[col('country')] ?? '').toUpperCase(), timeZone: c[col('timezone')] ?? '', currency: (c[col('currency')] ?? '').toUpperCase(), errors: [] as ImportRow['errors'] };
-        if (!row.name) row.errors.push({ field: 'name', message: 'Name is required' });
-        if (!row.code) row.errors.push({ field: 'code', message: 'Internal code is required' });
-        else if (codes.has(row.code)) row.errors.push({ field: 'code', message: `Duplicate code ${row.code}` });
+        if (!row.name) row.errors.push({ field: 'name', message: 'Name is required', textKey: 'import.nameRequired' });
+        if (!row.code) row.errors.push({ field: 'code', message: 'Internal code is required', textKey: 'import.codeRequired' });
+        else if (codes.has(row.code)) row.errors.push({ field: 'code', message: `Duplicate code ${row.code}`, textKey: 'import.duplicateCode', textParams: { code: row.code } });
         codes.add(row.code);
         const country = LAUNCH_COUNTRIES.find((x) => x.code === row.country);
-        if (!country) row.errors.push({ field: 'country', message: row.country ? `${row.country} isn’t a supported country yet` : 'Country is required' });
-        if (!row.timeZone) row.errors.push({ field: 'timeZone', message: 'Time zone missing' });
-        else if (!isValidTimeZone(row.timeZone)) row.errors.push({ field: 'timeZone', message: `“${row.timeZone}” isn’t a valid time zone` });
-        if (!(SUPPORTED_CURRENCIES as readonly string[]).includes(row.currency)) row.errors.push({ field: 'currency', message: 'Currency not supported' });
-        else if (country && country.currency !== row.currency) row.errors.push({ field: 'currency', message: `Expected ${country.currency} for ${country.name} — confirm before import` });
+        if (!country) row.errors.push(row.country ? { field: 'country', message: `${row.country} isn’t a supported country yet`, textKey: 'import.unsupportedCountry', textParams: { country: row.country } } : { field: 'country', message: 'Country is required', textKey: 'import.countryRequired' });
+        if (!row.timeZone) row.errors.push({ field: 'timeZone', message: 'Time zone missing', textKey: 'import.timeZoneMissing' });
+        else if (!isValidTimeZone(row.timeZone)) row.errors.push({ field: 'timeZone', message: `“${row.timeZone}” isn’t a valid time zone`, textKey: 'import.invalidTimeZone', textParams: { zone: row.timeZone } });
+        if (!(SUPPORTED_CURRENCIES as readonly string[]).includes(row.currency)) row.errors.push({ field: 'currency', message: 'Currency not supported', textKey: 'import.currencyUnsupported' });
+        else if (country && country.currency !== row.currency) row.errors.push({ field: 'currency', message: `Expected ${country.currency} for ${country.name} — confirm before import`, textKey: 'import.currencyMismatch', textParams: { currency: country.currency } });
         return row;
       });
     },
@@ -927,20 +934,27 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
   },
 
   ai: {
-    suggestions: (ctx) => read(() => AI[ctx.industry].suggestions, undefined, 120),
-    ask: async (ctx, question) => {
+    suggestions: (ctx) => read(() => AI[ctx.industry].suggestions.map((x, i): AiSuggestion => ({ id: `s${i}`, text: plain(x.text), textMsg: x.text, multiLocation: x.multiLocation, action: x.action })), undefined, 120),
+    ask: async (ctx, question, suggestionId) => {
       await sleep(1100);
       if (demo() === 'ai-down') throw new ApiError('ai_unavailable', 'BranchHarbor AI is unavailable right now. Everything else keeps working.', 503);
       const a = AI[ctx.industry];
-      const label = scopeOptions(ctx.industry, ctx.role).find((o) => o.id === ctx.scopeId)?.label ?? 'All authorised locations';
-      const wantsAction = /draft|campaign|plan|notice|reply|send|promotion/i.test(question);
+      const opt = scopeOptions(ctx.industry, ctx.role).find((o) => o.id === ctx.scopeId);
+      const scope: Txt = !opt || opt.kind === 'all' ? ref('scope.allAuthorized', undefined, 'All authorized locations') : opt.label;
+      const picked = suggestionId ? a.suggestions[Number(suggestionId.slice(1))] : undefined;
+      // Typed questions in any app language: draft / campaign / plan / reply / send / promotion.
+      const wantsAction = picked ? !!picked.action : /draft|campaign|plan|notice|reply|send|promotion|brouillon|rédig|campagne|réponse|envoi|promo|borrador|redact|campaña|respuesta|envi|promoci|entwurf|entwirf|kampagne|antwort|aktion|rascunho|redij|campanha|resposta|promoç/i.test(question);
       const perm = a.action.kind === 'draft' ? 'marketing.draft' : 'marketing.publish';
+      const txts = (xs: Txt[]) => ({ list: xs.map(plain), msgs: xs.map((x) => (isRef(x) ? x : null)) });
+      const affected = txts(a.action.affected);
+      const excluded = txts(a.action.excluded);
       return {
         id: `ai_${Date.now()}`, question,
-        answer: a.answer,
-        assumptions: `${a.assumptions} Scope: ${label}.`,
-        sources: a.sources.map(([l, fr]) => ({ label: l, freshness: fr })),
-        action: wantsAction ? { id: 'act_1', title: a.action.title, kind: a.action.kind, affected: a.action.affected, excluded: a.action.excluded, requires: perm } : undefined,
+        answer: plain(a.answer), answerMsg: a.answer,
+        assumptions: `${plain(a.assumptions)} Scope: ${plain(scope)}.`,
+        assumptionsMsg: ref('ai.withScope', { text: a.assumptions, scope }, `${plain(a.assumptions)} Scope: ${plain(scope)}.`),
+        sources: a.sources.map(([l, fr]) => ({ label: plain(l), labelMsg: l, freshness: plain(fr), ...(isRef(fr) ? { freshnessMsg: fr } : {}) })),
+        action: wantsAction ? { id: 'act_1', title: plain(a.action.title), titleMsg: a.action.title, kind: a.action.kind, affected: affected.list, affectedMsg: affected.msgs, excluded: excluded.list, excludedMsg: excluded.msgs, requires: perm } : undefined,
       };
     },
   },

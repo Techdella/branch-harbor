@@ -32,11 +32,12 @@ export function ScopeSelector({ options, value, onChange }: { options: ScopeOpti
 
 /** Shows where a value comes from: inherited from HQ, set locally, or locked. */
 export function OriginTag({ origin }: { origin: 'hq' | 'local' | 'locked' | 'approval' }) {
+  const ui = useUiLabels();
   const map = {
-    hq: { label: 'From headquarters', icon: 'building', cls: 'bg-canvas text-graphite' },
-    local: { label: 'Set locally', icon: 'pin', cls: 'bg-lime-soft text-ink' },
-    locked: { label: 'Locked by HQ', icon: 'lock', cls: 'bg-ink text-white' },
-    approval: { label: 'Approval required', icon: 'shield', cls: 'bg-warning-bg text-warning' },
+    hq: { label: ui.originHq, icon: 'building', cls: 'bg-canvas text-graphite' },
+    local: { label: ui.originLocal, icon: 'pin', cls: 'bg-lime-soft text-ink' },
+    locked: { label: ui.originLocked, icon: 'lock', cls: 'bg-ink text-white' },
+    approval: { label: ui.originApproval, icon: 'shield', cls: 'bg-warning-bg text-warning' },
   } as const;
   const o = map[origin];
   return (

@@ -14,6 +14,7 @@ import type {
   BookInput, CalendarDay, CancellationPreview, ClientPackage, ClientProfile, ClientRow, Draft, ImpactItem, MoveResult, PackagePlan, RebookAction, RebookResult,
   ServiceInput, Slot, Voucher, WaitlistEntry, WException, WPractitioner, WReport, WResource, WService, Window, Policy,
 } from './types';
+import { useLocalizeErrorRef } from '../useErrorText';
 
 export interface WellnessApi {
   readonly mode: 'live' | 'mock';
@@ -167,6 +168,7 @@ export type WRes<T> = { status: 'loading'; data?: T; error?: undefined } | { sta
 /** Like useApi, for the wellness client. */
 export function useWellness<T>(locations: Location[], fn: (api: WellnessApi) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<WRes<T>>({ status: 'loading' });
+  const localize = useLocalizeErrorRef();
   const seq = useRef(0);
   const fnRef = useRef(fn);
   fnRef.current = fn;
@@ -181,7 +183,7 @@ export function useWellness<T>(locations: Location[], fn: (api: WellnessApi) => 
         const data = await fnRef.current(api);
         if (id === seq.current) setRes({ status: 'ready', data });
       } catch (e) {
-        if (id === seq.current) setRes({ status: 'error', error: toApiError(e) });
+        if (id === seq.current) setRes({ status: 'error', error: localize.current(toApiError(e)) });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,6 +199,7 @@ export function useWellness<T>(locations: Location[], fn: (api: WellnessApi) => 
 export function useWellnessAction(locations: Location[]) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeErrorRef();
   const locRef = useRef(locations);
   locRef.current = locations;
   const run = useCallback(async <R,>(fn: (api: WellnessApi) => Promise<R>): Promise<R | undefined> => {
@@ -205,7 +208,7 @@ export function useWellnessAction(locations: Location[]) {
     try {
       return await fn(await getWellnessApi(locRef.current));
     } catch (e) {
-      setError(toApiError(e));
+      setError(localize.current(toApiError(e)));
       return undefined;
     } finally {
       setPending(false);

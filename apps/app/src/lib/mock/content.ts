@@ -3,7 +3,7 @@ import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
 import type { AttentionItem, Cell, IndustryKey, Metric, MetricValue, TableData } from '../types';
 import { FIXTURES, PASTEL as P, at, loc } from './orgs';
-import { moneyArg, type MsgParams } from '../msg';
+import { dateArg, dayArg, isRef, lbl, moneyArg, plain, ref, tbl, timeArg, zoneArg, type MsgParams, type MsgRef, type Txt } from '../msg';
 
 /* ------------------------------------------------------------------ */
 /* Overview                                                            */
@@ -225,14 +225,38 @@ export function buildOverview(ind: IndustryKey, locIds: string[]) {
 /* Generic tables                                                      */
 /* ------------------------------------------------------------------ */
 
-const tx = (v: string, sub?: string, strong?: boolean): Cell => ({ t: 'text', v, sub, strong });
-const b = (v: string, tone: Tone, icon?: IconName): Cell => ({ t: 'badge', v, tone, icon });
-const mo = (major: number, currency: Currency, sub?: string): Cell => ({ t: 'money', v: { amount: Math.round(major * 100), currency }, sub });
+/** UI text in cells is a catalogue reference (`tbl`/`lbl`, namespace "data" → `table.*`); plain strings are sample business data. */
+const tx = (v: Txt, sub?: Txt, strong?: boolean): Cell => ({
+  t: 'text',
+  v: plain(v),
+  ...(isRef(v) ? { vMsg: v } : {}),
+  ...(sub ? { sub: plain(sub), ...(isRef(sub) ? { subMsg: sub } : {}) } : {}),
+  strong,
+});
+/** Badge labels are always UI text: plain strings are keyed by their slug (`table.badge.*`). */
+const b = (v: Txt, tone: Tone, icon?: IconName): Cell => {
+  const m = typeof v === 'string' ? lbl('badge', v) : v;
+  return { t: 'badge', v: plain(m), vMsg: m, tone, icon };
+};
+const mo = (major: number, currency: Currency, sub?: Txt): Cell => ({ t: 'money', v: { amount: Math.round(major * 100), currency }, ...(sub ? { sub: plain(sub), ...(isRef(sub) ? { subMsg: sub } : {}) } : {}) });
 const og = (v: 'hq' | 'local' | 'locked' | 'approval'): Cell => ({ t: 'origin', v });
-const na = (reason?: string): Cell => ({ t: 'unavailable', reason });
+const na = (reason?: string): Cell => (reason ? { t: 'unavailable', reason, reasonMsg: lbl('na', reason) } : { t: 'unavailable' });
+
+/* Composed UI text for the sample rows. */
+const c = (english: string) => lbl('cell', english);
+const tzOf = (ind: IndustryKey, id: string) => loc(ind, id).timeZone;
+const zone = (ind: IndustryKey, id: string) => tbl('cell.value', { value: zoneArg(tzOf(ind, id)) }, tzOf(ind, id));
+const todayAt = (ind: IndustryKey, id: string, hhmm: string) => tbl('cell.todayAt', { time: timeArg(at(tzOf(ind, id), hhmm), tzOf(ind, id)) }, `Today ${hhmm}`);
+const todayAtPlace = (ind: IndustryKey, id: string, hhmm: string, place: string) => tbl('cell.todayAtPlace', { time: timeArg(at(tzOf(ind, id), hhmm), tzOf(ind, id)), place }, `Today ${hhmm} · ${place}`);
+const dayAtPlace = (ind: IndustryKey, id: string, days: number, hhmm: string, place: string) => tbl('cell.whenAtPlace', { when: { t: 'date', at: at(tzOf(ind, id), hhmm, days), tz: tzOf(ind, id), style: 'dayTime' }, place }, `${hhmm} · ${place}`);
+const day = (iso: string) => tbl('cell.value', { value: dayArg(`${iso}T12:00:00Z`) }, iso);
+const daysFromNow = (n: number) => new Date(Date.now() + n * 86400_000).toISOString().slice(0, 10);
+const minutes = (n: number) => tbl('cell.minutes', { count: n }, `${n} min`);
+const hoursRange = (ind: IndustryKey, id: string, from: string, to: string) => tbl('cell.timeRange', { from: timeArg(at(tzOf(ind, id), from), tzOf(ind, id)), to: timeArg(at(tzOf(ind, id), to), tzOf(ind, id)) }, `${from}–${to}`);
 
 type RowSpec = [id: string, tags: string[], cells: Cell[], locId?: string];
 interface TableSpec {
+  /** Column headers, filter labels, source, description and primary action are UI text keyed by slug (`table.col.*`, …). */
   columns: [string, string, ('left' | 'right')?][];
   filters: [string, string][];
   source: string;
@@ -241,88 +265,89 @@ interface TableSpec {
   rows: RowSpec[];
 }
 
-const TABLES: Record<string, TableSpec> = {
+/** Built per call so relative times ("today 17:00") follow the clock. */
+const tables = (): Record<string, TableSpec> => ({
   /* Studios */
   offers: { columns: [['offer', 'Offer'], ['eligibility', 'Eligibility'], ['locations', 'Locations'], ['valid', 'Valid'], ['status', 'Status']], filters: [['all', 'All'], ['active', 'Active'], ['pending', 'Needs approval']], source: 'BranchHarbor offers', primaryAction: 'New offer',
     rows: [
-      ['o1', ['active'], [tx('New Year Intro', '3 classes · CA$39 / US$35 / £29 / €32 / A$45', true), tx('New members only'), tx('All locations'), tx('2–31 Jan'), b('Active', 'success')]],
-      ['o2', ['active'], [tx('First class free', 'Local override', true), tx('New members'), tx('Toronto – Queen West'), tx('Ongoing'), b('Local', 'info')], 'qw'],
-      ['o3', ['pending'], [tx('Friends week', 'Bring a friend', true), tx('Members'), tx('Toronto – Leslieville'), tx('9–15 Nov'), b('Needs approval', 'warning')], 'ls'],
-      ['o4', ['active'], [tx('Neujahrs-Intro', 'Berlin launch offer', true), tx('New members'), tx('Berlin – Prenzlauer Berg'), tx('From 4 Nov'), b('Scheduled', 'neutral', 'clock')], 'pb'],
+      ['o1', ['active'], [tx('New Year Intro', tbl('cell.classesPrices', { count: 3, prices: [moneyArg(3900, 'CAD'), moneyArg(3500, 'USD'), moneyArg(2900, 'GBP'), moneyArg(3200, 'EUR'), moneyArg(4500, 'AUD')] }, '3 classes · CA$39 / US$35 / £29 / €32 / A$45'), true), tx(c('New members only')), tx(c('All locations')), tx(tbl('cell.dateRange', { from: dayArg('2027-01-02T12:00:00Z'), to: dayArg('2027-01-31T12:00:00Z') }, '2–31 Jan')), b('Active', 'success')]],
+      ['o2', ['active'], [tx('First class free', c('Local override'), true), tx(c('New members')), tx('Toronto – Queen West'), tx(c('Ongoing')), b('Local', 'info')], 'qw'],
+      ['o3', ['pending'], [tx('Friends week', 'Bring a friend', true), tx(c('Members')), tx('Toronto – Leslieville'), tx(tbl('cell.dateRange', { from: dayArg('2026-11-09T12:00:00Z'), to: dayArg('2026-11-15T12:00:00Z') }, '9–15 Nov')), b('Needs approval', 'warning')], 'ls'],
+      ['o4', ['active'], [tx('Neujahrs-Intro', 'Berlin launch offer', true), tx(c('New members')), tx('Berlin – Prenzlauer Berg'), tx(tbl('cell.fromDate', { date: dayArg('2026-11-04T12:00:00Z') }, 'From 4 Nov')), b('Scheduled', 'neutral', 'clock')], 'pb'],
     ] },
   members: { columns: [['member', 'Member'], ['plan', 'Plan'], ['home', 'Home studio'], ['attendance', 'Attendance (30d)', 'right'], ['consent', 'Consent'], ['state', 'State']], filters: [['all', 'All'], ['active', 'Active'], ['low', 'Low balance'], ['trial', 'Trial']], source: 'Booking connection · consent from BranchHarbor',
     rows: [
       ['m1', ['active'], [tx('Ava Chen', 'ava@…', true), tx('Unlimited monthly'), tx('Toronto – Queen West'), tx('14'), b('Email', 'success'), b('Active', 'success')], 'qw'],
-      ['m2', ['low'], [tx('Liam Ortiz', 'liam@…', true), tx('10-class pack', '3 left · expires 30 Nov'), tx('Toronto – Queen West'), tx('6'), b('Email', 'success'), b('Low balance', 'warning')], 'qw'],
-      ['m3', ['trial'], [tx('Noor Haddad', 'noor@…', true), tx('Intro offer', '2 of 3 used'), tx('Toronto – Leslieville'), tx('2'), b('None', 'neutral', 'minus'), b('Trial', 'info')], 'ls'],
+      ['m2', ['low'], [tx('Liam Ortiz', 'liam@…', true), tx('10-class pack', tbl('cell.creditsLeftExpires', { count: 3, date: dayArg('2026-11-30T12:00:00Z') }, '3 left · expires 30 Nov')), tx('Toronto – Queen West'), tx('6'), b('Email', 'success'), b('Low balance', 'warning')], 'qw'],
+      ['m3', ['trial'], [tx('Noor Haddad', 'noor@…', true), tx('Intro offer', tbl('cell.usedOf', { used: 2, total: 3 }, '2 of 3 used')), tx('Toronto – Leslieville'), tx('2'), b('None', 'neutral', 'minus'), b('Trial', 'info')], 'ls'],
       ['m4', ['active'], [tx('Ben Ross', 'ben@…', true), tx('Unlimited monthly'), tx('Vancouver – Kitsilano'), na('Sync degraded'), b('Email', 'success'), b('Payment failed', 'danger')], 'kt'],
-      ['m5', ['active'], [tx('Harriet Cole', 'harriet@…', true), tx('8-class pack', '5 left'), tx('London – Shoreditch'), tx('9'), b('Email + SMS', 'success'), b('Active', 'success')], 'sh'],
-      ['m6', ['trial'], [tx('Jack Nguyen', 'jack@…', true), tx('Intro offer', '1 of 3 used'), tx('Sydney – Surry Hills'), tx('1'), b('Email', 'success'), b('Trial', 'info')], 'sy'],
+      ['m5', ['active'], [tx('Harriet Cole', 'harriet@…', true), tx('8-class pack', tbl('cell.creditsLeft', { count: 5 }, '5 left')), tx('London – Shoreditch'), tx('9'), b('Email + SMS', 'success'), b('Active', 'success')], 'sh'],
+      ['m6', ['trial'], [tx('Jack Nguyen', 'jack@…', true), tx('Intro offer', tbl('cell.usedOf', { used: 1, total: 3 }, '1 of 3 used')), tx('Sydney – Surry Hills'), tx('1'), b('Email', 'success'), b('Trial', 'info')], 'sy'],
     ] },
   /* Sports */
-  programmes: { columns: [['programme', 'Programme'], ['ages', 'Ages'], ['venue', 'Venue'], ['fee', 'Fee', 'right'], ['registration', 'Registration'], ['capacity', 'Capacity', 'right']], filters: [['all', 'All'], ['open', 'Open'], ['closed', 'Closed']], source: 'BranchHarbor programmes', primaryAction: 'New programme',
+  programmes: { columns: [['programme', 'Program'], ['ages', 'Ages'], ['venue', 'Venue'], ['fee', 'Fee', 'right'], ['registration', 'Registration'], ['capacity', 'Capacity', 'right']], filters: [['all', 'All'], ['open', 'Open'], ['closed', 'Closed']], source: 'BranchHarbor programs', primaryAction: 'New program',
     rows: [
-      ['p1', ['open'], [tx('U10 Autumn', 'Season · 12 weeks', true), tx('Born 2016'), tx('Vancouver – Riverside Park'), mo(240, 'CAD'), b('Open to 25 Oct', 'success'), tx('30 / 32')], 'rp'],
-      ['p2', ['open'], [tx('U12 Camp', 'Half-term · 5 days', true), tx('Born 2014'), tx('Vancouver – Riverside Park'), mo(180, 'CAD'), b('Open', 'success'), tx('22 / 24')], 'rp'],
-      ['p3', ['closed'], [tx('U8 Fundamentals', 'Season', true), tx('Born 2018'), tx('Toronto – Hillcrest Dome'), mo(190, 'CAD'), b('Closed', 'neutral', 'minus'), tx('20 / 20')], 'hc'],
-      ['p4', ['open'], [tx('U14 Development', 'Season · 10 weeks', true), tx('Born 2012'), tx('Manchester – Didsbury'), mo(165, 'GBP'), b('Open', 'success'), tx('18 / 22')], 'mc'],
-      ['p5', ['closed'], [tx('Spring Juniors', 'Season', true), tx('Born 2017–2018'), tx('Dublin – Ringsend'), mo(150, 'EUR'), b('Payments not enabled', 'warning'), tx('0 / 24')], 'dn'],
+      ['p1', ['open'], [tx('U10 Autumn', tbl('cell.seasonWeeks', { count: 12 }, 'Season · 12 weeks'), true), tx(tbl('cell.born', { year: '2016' }, 'Born 2016')), tx('Vancouver – Riverside Park'), mo(240, 'CAD'), b(tbl('badge.openUntil', { date: dayArg('2026-10-25T12:00:00Z') }, 'Open to 25 Oct'), 'success'), tx('30 / 32')], 'rp'],
+      ['p2', ['open'], [tx('U12 Camp', tbl('cell.halfTermDays', { count: 5 }, 'Half-term · 5 days'), true), tx(tbl('cell.born', { year: '2014' }, 'Born 2014')), tx('Vancouver – Riverside Park'), mo(180, 'CAD'), b('Open', 'success'), tx('22 / 24')], 'rp'],
+      ['p3', ['closed'], [tx('U8 Fundamentals', c('Season'), true), tx(tbl('cell.born', { year: '2018' }, 'Born 2018')), tx('Toronto – Hillcrest Dome'), mo(190, 'CAD'), b('Closed', 'neutral', 'minus'), tx('20 / 20')], 'hc'],
+      ['p4', ['open'], [tx('U14 Development', tbl('cell.seasonWeeks', { count: 10 }, 'Season · 10 weeks'), true), tx(tbl('cell.born', { year: '2012' }, 'Born 2012')), tx('Manchester – Didsbury'), mo(165, 'GBP'), b('Open', 'success'), tx('18 / 22')], 'mc'],
+      ['p5', ['closed'], [tx('Spring Juniors', c('Season'), true), tx(tbl('cell.bornRange', { from: '2017', to: '2018' }, 'Born 2017–2018')), tx('Dublin – Ringsend'), mo(150, 'EUR'), b('Payments not enabled', 'warning'), tx('0 / 24')], 'dn'],
     ] },
-  teams: { columns: [['group', 'Group'], ['coach', 'Coach'], ['programme', 'Programme'], ['roster', 'Roster', 'right'], ['next', 'Next session']], filters: [['all', 'All'], ['open', 'Open'], ['full', 'Full']], source: 'BranchHarbor groups',
+  teams: { columns: [['group', 'Group'], ['coach', 'Coach'], ['programme', 'Program'], ['roster', 'Roster', 'right'], ['next', 'Next session']], filters: [['all', 'All'], ['open', 'Open'], ['full', 'Full']], source: 'BranchHarbor groups',
     rows: [
-      ['t1', ['open'], [tx('U10 Blue', '', true), tx('Coach Ortiz'), tx('U10 Autumn'), tx('14 / 16'), tx('Today 17:00 · Pitch 2')], 'rp'],
-      ['t2', ['full'], [tx('U10 Green', '', true), tx('Coach Ahmed'), tx('U10 Autumn'), b('16 / 16 · Full', 'warning'), tx('Wed 17:00 · Pitch 1')], 'rp'],
-      ['t3', ['open'], [tx('U12 Camp', '', true), tx('Coach Lee'), tx('U12 Camp'), tx('22 / 24'), tx('Today 17:00 · Pitch 2')], 'rp'],
-      ['t4', ['open'], [tx('U14 Reds', '', true), tx('Coach Hale'), tx('U14 Development'), tx('18 / 22'), tx('Today 18:00 · Main pitch')], 'mc'],
+      ['t1', ['open'], [tx('U10 Blue', '', true), tx('Coach Ortiz'), tx('U10 Autumn'), tx('14 / 16'), tx(todayAtPlace('sports', 'rp', '17:00', 'Pitch 2'))], 'rp'],
+      ['t2', ['full'], [tx('U10 Green', '', true), tx('Coach Ahmed'), tx('U10 Autumn'), b(tbl('badge.rosterFull', { count: 16, capacity: 16 }, '16 / 16 · Full'), 'warning'), tx(dayAtPlace('sports', 'rp', 2, '17:00', 'Pitch 1'))], 'rp'],
+      ['t3', ['open'], [tx('U12 Camp', '', true), tx('Coach Lee'), tx('U12 Camp'), tx('22 / 24'), tx(todayAtPlace('sports', 'rp', '17:00', 'Pitch 2'))], 'rp'],
+      ['t4', ['open'], [tx('U14 Reds', '', true), tx('Coach Hale'), tx('U14 Development'), tx('18 / 22'), tx(todayAtPlace('sports', 'mc', '18:00', 'Main pitch'))], 'mc'],
     ] },
   schedule: { columns: [['when', 'When'], ['group', 'Group'], ['venue', 'Venue'], ['coach', 'Coach'], ['check', 'Check']], filters: [['all', 'This week'], ['conflict', 'Conflicts']], source: 'Schedule · venue bookings',
     rows: [
-      ['s1', [], [tx('Today 16:00', 'Pacific time'), tx('U8 Red', '', true), tx('Riverside Park · Pitch 1'), tx('Coach Diaz'), b('Clear', 'success')], 'rp'],
-      ['s2', ['conflict'], [tx('Today 17:00', 'Pacific time'), tx('U10 Blue', '', true), tx('Riverside Park · Pitch 2'), tx('Coach Ortiz'), b('Venue clash', 'danger')], 'rp'],
-      ['s3', ['conflict'], [tx('Today 17:00', 'Pacific time'), tx('U12 Camp', '', true), tx('Riverside Park · Pitch 2'), tx('Coach Lee'), b('Venue clash', 'danger')], 'rp'],
-      ['s4', [], [tx('Today 18:00', 'UK time'), tx('U14 Reds', '', true), tx('Didsbury · Main pitch'), tx('Coach Hale'), b('Clear', 'success')], 'mc'],
+      ['s1', [], [tx(todayAt('sports', 'rp', '16:00'), zone('sports', 'rp')), tx('U8 Red', '', true), tx('Riverside Park · Pitch 1'), tx('Coach Diaz'), b('Clear', 'success')], 'rp'],
+      ['s2', ['conflict'], [tx(todayAt('sports', 'rp', '17:00'), zone('sports', 'rp')), tx('U10 Blue', '', true), tx('Riverside Park · Pitch 2'), tx('Coach Ortiz'), b('Venue clash', 'danger')], 'rp'],
+      ['s3', ['conflict'], [tx(todayAt('sports', 'rp', '17:00'), zone('sports', 'rp')), tx('U12 Camp', '', true), tx('Riverside Park · Pitch 2'), tx('Coach Lee'), b('Venue clash', 'danger')], 'rp'],
+      ['s4', [], [tx(todayAt('sports', 'mc', '18:00'), zone('sports', 'mc')), tx('U14 Reds', '', true), tx('Didsbury · Main pitch'), tx('Coach Hale'), b('Clear', 'success')], 'mc'],
     ] },
   participants: { columns: [['participant', 'Participant'], ['age', 'Age', 'right'], ['group', 'Group'], ['guardian', 'Guardian'], ['status', 'Status']], filters: [['all', 'All'], ['active', 'Active'], ['waitlisted', 'Waitlisted']], source: 'Registrations',
     rows: [
-      ['pa1', ['active'], [tx('Ella M.', '', true), tx('9'), tx('U10 Blue'), tx('Sara M.', 'Verified'), b('Active', 'success')], 'rp'],
-      ['pa2', ['active'], [tx('Jonah P.', '', true), tx('11'), tx('U12 Camp'), tx('Dev P.', 'Verified'), b('Active', 'success')], 'rp'],
-      ['pa3', ['waitlisted'], [tx('Leo R.', '', true), tx('9'), tx('—'), tx('Kim R.', 'Invitation pending'), b('Waitlisted', 'info')], 'rp'],
-      ['pa4', ['active'], [tx('Freddie W.', '', true), tx('13'), tx('U14 Reds'), tx('Claire W.', 'Verified'), b('Active', 'success')], 'mc'],
+      ['pa1', ['active'], [tx('Ella M.', '', true), tx('9'), tx('U10 Blue'), tx('Sara M.', c('Verified')), b('Active', 'success')], 'rp'],
+      ['pa2', ['active'], [tx('Jonah P.', '', true), tx('11'), tx('U12 Camp'), tx('Dev P.', c('Verified')), b('Active', 'success')], 'rp'],
+      ['pa3', ['waitlisted'], [tx('Leo R.', '', true), tx('9'), tx('—'), tx('Kim R.', c('Invitation pending')), b('Waitlisted', 'info')], 'rp'],
+      ['pa4', ['active'], [tx('Freddie W.', '', true), tx('13'), tx('U14 Reds'), tx('Claire W.', c('Verified')), b('Active', 'success')], 'mc'],
     ] },
   /* Wellness */
   services: { columns: [['service', 'Service'], ['duration', 'Duration'], ['price', 'Price', 'right'], ['buffer', 'Buffer'], ['needs', 'Needs'], ['status', 'Status']], filters: [['all', 'All'], ['active', 'Active'], ['paused', 'Paused']], source: 'BranchHarbor services', primaryAction: 'New service',
     rows: [
-      ['sv1', ['active'], [tx('Deep tissue', 'Toronto', true), tx('60 min'), mo(120, 'CAD'), tx('15 min'), tx('Room A or B'), b('Active', 'success')], 'hf'],
-      ['sv2', ['active'], [tx('Hot stone', 'Toronto', true), tx('90 min'), mo(165, 'CAD'), tx('20 min'), tx('Room B · stone heater'), b('Active', 'success')], 'hf'],
-      ['sv3', ['paused'], [tx('Facial', 'Toronto', true), tx('45 min'), mo(95, 'CAD'), tx('10 min'), tx('Room C'), b('Paused', 'neutral', 'minus')], 'yv'],
-      ['sv4', ['active'], [tx('Deep tissue', 'London', true), tx('60 min'), mo(85, 'GBP'), tx('15 min'), tx('Treatment room 1'), b('Active', 'success')], 'mb'],
-      ['sv5', ['active'], [tx('Remedial massage', 'Melbourne', true), tx('60 min'), mo(125, 'AUD'), tx('15 min'), tx('Room 2'), b('Active', 'success')], 'fz'],
+      ['sv1', ['active'], [tx('Deep tissue', 'Toronto', true), tx(minutes(60)), mo(120, 'CAD'), tx(minutes(15)), tx('Room A or B'), b('Active', 'success')], 'hf'],
+      ['sv2', ['active'], [tx('Hot stone', 'Toronto', true), tx(minutes(90)), mo(165, 'CAD'), tx(minutes(20)), tx('Room B · stone heater'), b('Active', 'success')], 'hf'],
+      ['sv3', ['paused'], [tx('Facial', 'Toronto', true), tx(minutes(45)), mo(95, 'CAD'), tx(minutes(10)), tx('Room C'), b('Paused', 'neutral', 'minus')], 'yv'],
+      ['sv4', ['active'], [tx('Deep tissue', 'London', true), tx(minutes(60)), mo(85, 'GBP'), tx(minutes(15)), tx('Treatment room 1'), b('Active', 'success')], 'mb'],
+      ['sv5', ['active'], [tx('Remedial massage', 'Melbourne', true), tx(minutes(60)), mo(125, 'AUD'), tx(minutes(15)), tx('Room 2'), b('Active', 'success')], 'fz'],
     ] },
   practitioners: { columns: [['practitioner', 'Practitioner'], ['services', 'Services'], ['locations', 'Locations'], ['week', 'This week']], filters: [['all', 'All'], ['today', 'Available today']], source: 'Practitioner calendars',
     rows: [
-      ['pr1', ['today'], [tx('Rina K.', '', true), tx('Deep tissue, hot stone'), tx('Harbourfront'), tx('31 h booked')], 'hf'],
-      ['pr2', ['today'], [tx('Tom B.', '', true), tx('Facial'), tx('Harbourfront, Yorkville'), tx('18 h booked')], 'hf'],
-      ['pr3', [], [tx('Ana L.', '', true), tx('Deep tissue'), tx('Yorkville'), b('Absent Fri', 'warning')], 'yv'],
-      ['pr4', ['today'], [tx('Grace O.', '', true), tx('Deep tissue, facial'), tx('Marylebone'), tx('22 h booked')], 'mb'],
+      ['pr1', ['today'], [tx('Rina K.', '', true), tx('Deep tissue, hot stone'), tx('Harbourfront'), tx(tbl('cell.hoursBooked', { count: 31 }, '31 h booked'))], 'hf'],
+      ['pr2', ['today'], [tx('Tom B.', '', true), tx('Facial'), tx('Harbourfront, Yorkville'), tx(tbl('cell.hoursBooked', { count: 18 }, '18 h booked'))], 'hf'],
+      ['pr3', [], [tx('Ana L.', '', true), tx('Deep tissue'), tx('Yorkville'), b(tbl('badge.absentOn', { date: dayArg(`${daysFromNow(2)}T12:00:00Z`) }, 'Absent Fri'), 'warning')], 'yv'],
+      ['pr4', ['today'], [tx('Grace O.', '', true), tx('Deep tissue, facial'), tx('Marylebone'), tx(tbl('cell.hoursBooked', { count: 22 }, '22 h booked'))], 'mb'],
     ] },
   forms: { columns: [['form', 'Form'], ['used', 'Used by'], ['version', 'Consent version'], ['ai', 'AI access']], filters: [['all', 'All']], source: 'BranchHarbor forms', description: 'Administrative questions only. Responses are excluded from AI context by default.',
     rows: [
-      ['f1', [], [tx('New client intake', '', true), tx('All services'), tx('v3 · Sep 2026'), b('Excluded', 'neutral', 'lock')]],
+      ['f1', [], [tx('New client intake', '', true), tx(c('All services')), tx(tbl('cell.versionSince', { version: 'v3', date: { t: 'date', at: '2026-09-01T12:00:00Z', style: 'monthYear' } }, 'v3 · Sep 2026')), b('Excluded', 'neutral', 'lock')]],
       ['f2', [], [tx('Hot stone screening', '', true), tx('Hot stone'), tx('v1'), b('Excluded', 'neutral', 'lock')]],
     ] },
   clients: { columns: [['client', 'Client'], ['last', 'Last visit'], ['next', 'Next'], ['prefs', 'Preferences'], ['notes', 'Notes']], filters: [['all', 'All'], ['upcoming', 'Upcoming']], source: 'Calendar · scoped notes',
     rows: [
-      ['c1', ['upcoming'], [tx('Jordan P.', '', true), tx('2 Oct'), tx('Today 10:00'), tx('Medium pressure'), b('Scoped', 'info', 'lock')], 'hf'],
-      ['c2', ['upcoming'], [tx('Kai S.', '', true), tx('20 Sep'), tx('Today 11:30'), tx('Quiet room'), b('None', 'neutral', 'minus')], 'hf'],
-      ['c3', [], [tx('Amelia F.', '', true), tx('28 Sep'), tx('—'), tx('Unscented oils'), b('None', 'neutral', 'minus')], 'mb'],
+      ['c1', ['upcoming'], [tx('Jordan P.', '', true), tx(day('2026-10-02')), tx(todayAt('wellness', 'hf', '10:00')), tx('Medium pressure'), b('Scoped', 'info', 'lock')], 'hf'],
+      ['c2', ['upcoming'], [tx('Kai S.', '', true), tx(day('2026-09-20')), tx(todayAt('wellness', 'hf', '11:30')), tx('Quiet room'), b('None', 'neutral', 'minus')], 'hf'],
+      ['c3', [], [tx('Amelia F.', '', true), tx(day('2026-09-28')), tx('—'), tx('Unscented oils'), b('None', 'neutral', 'minus')], 'mb'],
     ] },
   /* Commerce */
-  catalogue: { columns: [['product', 'Product'], ['variants', 'Variants', 'right'], ['editable', 'Editable locally'], ['stores', 'Stores'], ['sync', 'Sync']], filters: [['all', 'All'], ['published', 'Published'], ['draft', 'Draft'], ['failed', 'Failed']], source: 'Master catalogue · WooCommerce', primaryAction: 'New product',
+  catalogue: { columns: [['product', 'Product'], ['variants', 'Variants', 'right'], ['editable', 'Editable locally'], ['stores', 'Stores'], ['sync', 'Sync']], filters: [['all', 'All'], ['published', 'Published'], ['draft', 'Draft'], ['failed', 'Failed']], source: 'Master catalog · WooCommerce', primaryAction: 'New product',
     rows: [
-      ['pr1', ['published'], [tx('Linen overshirt', 'SKU FN-LO', true), tx('4'), tx('Price ±10%, availability'), tx('5 of 5'), b('Synced', 'success')]],
-      ['pr2', ['failed'], [tx('Merino crew', 'SKU FN-MC', true), tx('6'), tx('Availability'), tx('3 of 5'), b('2 failed · XS mismatch', 'warning')]],
-      ['pr3', ['draft'], [tx('Canvas tote', 'SKU FN-CT', true), tx('1'), tx('—'), tx('0'), b('Draft', 'neutral', 'minus')]],
-      ['pr4', ['published'], [tx('Field notebook set', 'SKU FN-NB', true), tx('2'), tx('Price ±10%'), tx('5 of 5'), b('Synced', 'success')]],
+      ['pr1', ['published'], [tx('Linen overshirt', tbl('cell.sku', { sku: 'FN-LO' }, 'SKU FN-LO'), true), tx('4'), tx(c('Price ±10%, availability')), tx(tbl('cell.ofTotal', { count: 5, total: 5 }, '5 of 5')), b('Synced', 'success')]],
+      ['pr2', ['failed'], [tx('Merino crew', tbl('cell.sku', { sku: 'FN-MC' }, 'SKU FN-MC'), true), tx('6'), tx(c('Availability')), tx(tbl('cell.ofTotal', { count: 3, total: 5 }, '3 of 5')), b(tbl('badge.failedSizeMismatch', { count: 2, size: 'XS' }, '2 failed · XS mismatch'), 'warning')]],
+      ['pr3', ['draft'], [tx('Canvas tote', tbl('cell.sku', { sku: 'FN-CT' }, 'SKU FN-CT'), true), tx('1'), tx('—'), tx('0'), b('Draft', 'neutral', 'minus')]],
+      ['pr4', ['published'], [tx('Field notebook set', tbl('cell.sku', { sku: 'FN-NB' }, 'SKU FN-NB'), true), tx('2'), tx(c('Price ±10%')), tx(tbl('cell.ofTotal', { count: 5, total: 5 }, '5 of 5')), b('Synced', 'success')]],
     ] },
   assortment: { columns: [['item', 'Item'], ['onhand', 'On hand', 'right'], ['price', 'Price', 'right'], ['origin', 'Origin'], ['availability', 'Availability']], filters: [['all', 'All'], ['low', 'Low'], ['overrides', 'Overrides']], source: 'Local assortment',
     rows: [
@@ -334,11 +359,11 @@ const TABLES: Record<string, TableSpec> = {
   inventory: { columns: [['when', 'When'], ['item', 'Item'], ['change', 'Change', 'right'], ['reason', 'Reason'], ['balance', 'On hand after', 'right'], ['by', 'By']], filters: [['all', 'All'], ['adjust', 'Adjustments'], ['sale', 'Sales'], ['reserved', 'Reservations']], source: 'Inventory history (movements, not just counts)',
     description: 'Every change to stock with its reason. Reservations hold units for unpaid orders and do not change on-hand stock.',
     rows: [
-      ['iv1', ['sale'], [tx('Today 09:12', 'Pacific time'), tx('Linen overshirt · L', 'Portland', true), tx('−1'), tx('Sale', '#5521'), tx('1'), tx('WooCommerce')], 'pd'],
-      ['iv4', ['reserved'], [tx('Today 08:40', 'Pacific time'), tx('Field notebook set', 'Portland', true), tx('−2'), b('Reserved · unpaid order', 'info', 'clock'), na('Not on-hand'), tx('System')], 'pd'],
-      ['iv2', ['adjust'], [tx('Yesterday', 'Pacific time'), tx('Merino crew · S', 'Portland', true), tx('+12'), tx('Received', 'PO-2411'), tx('19'), tx('Kim L. (Portland)')], 'pd'],
-      ['iv3', ['adjust'], [tx('Yesterday', 'Central European time'), tx('Canvas tote', 'Amsterdam', true), tx('−2'), tx('Damaged / write-off', 'Scuffed in transit'), tx('7'), tx('Sanne V. (Amsterdam)')], 'am'],
-      ['iv5', ['adjust'], [tx('3 days ago', 'Eastern time'), tx('Merino crew · S', 'Montréal', true), tx('−1'), tx('Stock count', 'Cycle count'), tx('7'), tx('Luc T. (Montréal)')], 'me'],
+      ['iv1', ['sale'], [tx(todayAt('commerce', 'pd', '09:12'), zone('commerce', 'pd')), tx('Linen overshirt · L', 'Portland', true), tx('−1'), tx(lbl('reason', 'Sale'), '#5521'), tx('1'), tx('WooCommerce')], 'pd'],
+      ['iv4', ['reserved'], [tx(todayAt('commerce', 'pd', '08:40'), zone('commerce', 'pd')), tx('Field notebook set', 'Portland', true), tx('−2'), b('Reserved · unpaid order', 'info', 'clock'), na('Not on-hand'), tx(c('System'))], 'pd'],
+      ['iv2', ['adjust'], [tx(c('Yesterday'), zone('commerce', 'pd')), tx('Merino crew · S', 'Portland', true), tx('+12'), tx(lbl('reason', 'Received'), 'PO-2411'), tx('19'), tx('Kim L. (Portland)')], 'pd'],
+      ['iv3', ['adjust'], [tx(c('Yesterday'), zone('commerce', 'am')), tx('Canvas tote', 'Amsterdam', true), tx('−2'), tx(tbl('reason.damage', undefined, 'Damaged / write-off'), 'Scuffed in transit'), tx('7'), tx('Sanne V. (Amsterdam)')], 'am'],
+      ['iv5', ['adjust'], [tx(tbl('cell.daysAgo', { count: 3 }, '3 days ago'), zone('commerce', 'me')), tx('Merino crew · S', 'Montréal', true), tx('−1'), tx(tbl('reason.count', undefined, 'Stock count'), 'Cycle count'), tx('7'), tx('Luc T. (Montréal)')], 'me'],
     ] },
   shoppers: { columns: [['customer', 'Customer'], ['orders', 'Orders', 'right'], ['store', 'Store'], ['consent', 'Consent']], filters: [['all', 'All']], source: 'WooCommerce customers',
     rows: [
@@ -349,11 +374,11 @@ const TABLES: Record<string, TableSpec> = {
   /* Foods */
   pickup: { columns: [['setting', 'Setting'], ['ballard', 'Ballard'], ['borough', 'Borough'], ['origin', 'Origin']], filters: [['all', 'All']], source: 'Pickup settings',
     rows: [
-      ['pk1', [], [tx('Opening hours', 'Local time', true), tx('11:00–22:00'), tx('12:00–22:00'), og('local')]],
-      ['pk2', [], [tx('Slot length', '', true), tx('15 min'), tx('15 min'), og('hq')]],
-      ['pk3', [], [tx('Orders per slot', '', true), tx('8'), tx('6'), og('local')]],
-      ['pk4', [], [tx('Order cutoff', '', true), tx('20 min before close'), tx('20 min before close'), og('hq')]],
-      ['pk5', [], [tx('Prep buffer', '', true), tx('12 min'), tx('15 min'), og('local')]],
+      ['pk1', [], [tx(lbl('setting', 'Opening hours'), c('Local time'), true), tx(hoursRange('foods', 'bl', '11:00', '22:00')), tx(hoursRange('foods', 'bo', '12:00', '22:00')), og('local')]],
+      ['pk2', [], [tx(lbl('setting', 'Slot length'), '', true), tx(minutes(15)), tx(minutes(15)), og('hq')]],
+      ['pk3', [], [tx(lbl('setting', 'Orders per slot'), '', true), tx('8'), tx('6'), og('local')]],
+      ['pk4', [], [tx(lbl('setting', 'Order cutoff'), '', true), tx(tbl('cell.minBeforeClose', { count: 20 }, '20 min before close')), tx(tbl('cell.minBeforeClose', { count: 20 }, '20 min before close')), og('hq')]],
+      ['pk5', [], [tx(lbl('setting', 'Prep buffer'), '', true), tx(minutes(12)), tx(minutes(15)), og('local')]],
     ] },
   guests: { columns: [['guest', 'Guest'], ['orders', 'Orders', 'right'], ['location', 'Location'], ['consent', 'Consent']], filters: [['all', 'All']], source: 'Pickup ordering',
     rows: [
@@ -362,38 +387,40 @@ const TABLES: Record<string, TableSpec> = {
       ['g3', [], [tx('Oliver P.', '', true), tx('5'), tx('London – Borough'), b('Email', 'success')], 'bo'],
     ] },
   /* Real Estate */
-  realtyClients: { columns: [['client', 'Client'], ['kind', 'Type'], ['office', 'Office'], ['agent', 'Agent'], ['consent', 'Consent']], filters: [['all', 'All']], source: 'Enquiries and contacts',
+  realtyClients: { columns: [['client', 'Client'], ['kind', 'Type'], ['office', 'Office'], ['agent', 'Agent'], ['consent', 'Consent']], filters: [['all', 'All']], source: 'Inquiries and contacts',
     description: 'Buyers, tenants, vendors and landlords. Agents see their own clients; office managers see their office. HQ reports never include client details.',
     rows: [
-      ['rc1', [], [tx('Omar & Sara H.', '', true), tx('Buyer'), tx('Toronto Midtown'), tx('Nadia Hassan'), b('Email', 'success')], 'tor'],
-      ['rc2', [], [tx('Margaret & Paul L.', '', true), tx('Vendor'), tx('Toronto Midtown'), tx('Nadia Hassan'), b('None', 'neutral', 'minus')], 'tor'],
-      ['rc3', [], [tx('Charlotte E.', '', true), tx('Buyer'), tx('London Hampstead'), tx('James Whitfield'), b('Email', 'success')], 'lon'],
-      ['rc4', [], [tx('Carmen D.', '', true), tx('Buyer'), tx('Madrid Salamanca'), tx('Lucía Romero'), b('None', 'neutral', 'minus')], 'mad'],
+      ['rc1', [], [tx('Omar & Sara H.', '', true), tx(c('Buyer')), tx('Toronto Midtown'), tx('Nadia Hassan'), b('Email', 'success')], 'tor'],
+      ['rc2', [], [tx('Margaret & Paul L.', '', true), tx(c('Vendor')), tx('Toronto Midtown'), tx('Nadia Hassan'), b('None', 'neutral', 'minus')], 'tor'],
+      ['rc3', [], [tx('Charlotte E.', '', true), tx(c('Buyer')), tx('London Hampstead'), tx('James Whitfield'), b('Email', 'success')], 'lon'],
+      ['rc4', [], [tx('Carmen D.', '', true), tx(c('Buyer')), tx('Madrid Salamanca'), tx('Lucía Romero'), b('None', 'neutral', 'minus')], 'mad'],
     ] },
   /* Shared */
   marketing: { columns: [['campaign', 'Campaign'], ['scope', 'Scope'], ['channel', 'Channel'], ['status', 'Status'], ['updated', 'Updated']], filters: [['all', 'All'], ['draft', 'Draft'], ['scheduled', 'Scheduled']], source: 'BranchHarbor campaigns', primaryAction: 'New campaign',
     description: 'Campaign reporting uses observed form and booking data only. Attribution beyond the form source is not measured.',
     rows: [
-      ['mk1', ['draft'], [tx('New year, new practice', 'AI draft · not sent', true), tx('Canadian locations (3)'), tx('Web + email'), b('Draft', 'info', 'edit'), tx('Today')]],
-      ['mk2', ['scheduled'], [tx('Teacher training info night', '', true), tx('Toronto – Queen West'), tx('Web'), b('Scheduled', 'success', 'clock'), tx('2 Oct')]],
-      ['mk3', [], [tx('Spring open house', '', true), tx('All locations'), tx('Web + email'), b('Completed', 'neutral', 'check'), tx('12 Apr')]],
-      ['mk4', ['draft'], [tx('Herbst-Eröffnung Berlin', 'German copy', true), tx('Berlin – Prenzlauer Berg'), tx('Web'), b('Needs approval', 'warning', 'shield'), tx('Yesterday')]],
+      ['mk1', ['draft'], [tx('New year, new practice', c('AI draft · not sent'), true), tx(tbl('cell.canadianLocations', { count: 3 }, 'Canadian locations (3)')), tx(lbl('channel', 'Web + email')), b('Draft', 'info', 'edit'), tx(c('Today'))]],
+      ['mk2', ['scheduled'], [tx('Teacher training info night', '', true), tx('Toronto – Queen West'), tx(lbl('channel', 'Web')), b('Scheduled', 'success', 'clock'), tx(day('2026-10-02'))]],
+      ['mk3', [], [tx('Spring open house', '', true), tx(c('All locations')), tx(lbl('channel', 'Web + email')), b('Completed', 'neutral', 'check'), tx(day('2026-04-12'))]],
+      ['mk4', ['draft'], [tx('Herbst-Eröffnung Berlin', c('German copy'), true), tx('Berlin – Prenzlauer Berg'), tx(lbl('channel', 'Web')), b('Needs approval', 'warning', 'shield'), tx(c('Yesterday'))]],
     ] },
-};
+});
 
 const CUSTOMER_TABLE: Record<IndustryKey, string> = { studios: 'members', sports: 'participants', wellness: 'clients', commerce: 'shoppers', foods: 'guests', realty: 'realtyClients' };
 
 export function buildTable(ind: IndustryKey, key: string, locIds: string[]): TableData | null {
   const k = key === 'customers' ? CUSTOMER_TABLE[ind] : key;
-  const spec = TABLES[k];
+  const spec = tables()[k];
   if (!spec) return null;
   return {
     key: k,
-    description: spec.description,
-    columns: spec.columns.map(([key, label, align]) => ({ key, label, align })),
-    filters: spec.filters.map(([key, label]) => ({ key, label })),
+    ...(spec.description ? { description: spec.description, descriptionMsg: tbl(`desc.${k}`, undefined, spec.description) } : {}),
+    // Pickup columns are location names (business data); every other header is UI text.
+    columns: spec.columns.map(([key, label, align]) => ({ key, label, ...(k === 'pickup' && key !== 'setting' && key !== 'origin' ? {} : { labelMsg: lbl('col', label) }), align })),
+    filters: spec.filters.map(([key, label]) => ({ key, label, labelMsg: lbl('filter', label) })),
     source: spec.source,
-    primaryAction: spec.primaryAction,
+    sourceMsg: lbl('source', spec.source),
+    ...(spec.primaryAction ? { primaryAction: spec.primaryAction, primaryActionMsg: lbl('action', spec.primaryAction) } : {}),
     rows: spec.rows
       .filter(([, , , lid]) => !lid || locIds.includes(lid))
       .map(([id, tags, cells]) => ({ id, tags, cells: Object.fromEntries(spec.columns.map(([ck], i) => [ck, cells[i]!])) })),
@@ -404,47 +431,83 @@ export function buildTable(ind: IndustryKey, key: string, locIds: string[]): Tab
 /* AI                                                                  */
 /* ------------------------------------------------------------------ */
 
-export const AI: Record<IndustryKey, { suggestions: string[]; answer: string; assumptions: string; sources: [string, string][]; action: { title: string; kind: 'draft' | 'publish' | 'send'; affected: string[]; excluded: string[] } }> = {
+/** Mock AI: suggested prompts and the sample answer per industry. UI text is keyed under `ai.mock.<industry>.*` (namespace
+ * "data"); location and people names in `affected` are business data and stay plain. */
+interface MockAi {
+  suggestions: { text: MsgRef; multiLocation?: boolean; action?: boolean }[];
+  answer: MsgRef;
+  assumptions: MsgRef;
+  sources: [MsgRef, MsgRef | string][];
+  action: { title: MsgRef; kind: 'draft' | 'publish' | 'send'; affected: Txt[]; excluded: Txt[] };
+}
+const ai = (ind: IndustryKey, key: string, text: string, params?: MsgParams) => ref(`ai.mock.${ind}.${key}`, params, text);
+const updated = (min: number) => ref('ai.fresh.updatedMinAgo', { count: min }, `Updated ${min} min ago`);
+
+export const AI: Record<IndustryKey, MockAi> = {
   studios: {
-    suggestions: ['Summarise attendance changes this month', 'Draft a multi-location New Year campaign', 'Draft a class description for Slow Flow'],
-    answer: 'Occupancy rose at Queen West (+6 pts) and Leslieville (+3) versus September. Shoreditch is flat and Surry Hills is down 2 pts. Kitsilano can’t be compared: its booking sync has been degraded since 09:40 local time. I can’t tell why attendance changed from occupancy alone.',
-    assumptions: 'Compared 1–13 Oct with the same days in September, in each studio’s own time zone.',
-    sources: [['Booking connection · class occurrences', 'Updated 4 min ago'], ['Kitsilano booking sync', 'Last success 2 h ago']],
-    action: { title: 'Draft “New year, new practice” campaign for 3 Canadian studios', kind: 'draft', affected: ['Toronto – Queen West', 'Toronto – Leslieville', 'Vancouver – Kitsilano'], excluded: ['Seattle – Capitol Hill (different offer pricing)', 'London, Berlin, Sydney (not in campaign scope)'] },
+    suggestions: [
+      { text: ai('studios', 's0', 'Summarize attendance changes this month') },
+      { text: ai('studios', 's1', 'Draft a multi-location New Year campaign'), multiLocation: true, action: true },
+      { text: ai('studios', 's2', 'Draft a class description for Slow Flow'), action: true },
+    ],
+    answer: ai('studios', 'answer', 'Occupancy rose at Queen West (+6 pts) and Leslieville (+3) versus September. Shoreditch is flat and Surry Hills is down 2 pts. Kitsilano can’t be compared: its booking sync has been degraded since 09:40 local time. I can’t tell why attendance changed from occupancy alone.'),
+    assumptions: ai('studios', 'assumptions', 'Compared 1–13 Oct with the same days in September, in each studio’s own time zone.'),
+    sources: [[ai('studios', 'src0', 'Booking connection · class occurrences'), updated(4)], [ai('studios', 'src1', 'Kitsilano booking sync'), ref('ai.fresh.lastSuccessHoursAgo', { count: 2 }, 'Last success 2 h ago')]],
+    action: { title: ai('studios', 'actionTitle', 'Draft “New year, new practice” campaign for 3 Canadian studios'), kind: 'draft', affected: ['Toronto – Queen West', 'Toronto – Leslieville', 'Vancouver – Kitsilano'], excluded: [ai('studios', 'excluded0', 'Seattle – Capitol Hill (different offer pricing)'), ai('studios', 'excluded1', 'London, Berlin, Sydney (not in campaign scope)')] },
   },
   sports: {
-    suggestions: ['Suggest a fix for the Pitch 2 clash', 'Summarise U10 enrolment', 'Draft the camp announcement'],
-    answer: 'Move U12 Camp to Pitch 1 at 17:00 (free until 18:30), or shift U10 Blue to 16:00 at Hillcrest Dome. Both only affect those two groups. I won’t select or move participants — that stays with your coaches.',
-    assumptions: 'Uses venue bookings for today at Riverside Park, Pacific time.',
-    sources: [['Schedule · venue bookings', 'Updated 2 min ago']],
-    action: { title: 'Draft notice to U12 Camp guardians about the pitch change', kind: 'send', affected: ['U12 Camp · 22 guardians at Riverside Park'], excluded: ['All other groups and venues'] },
+    suggestions: [
+      { text: ai('sports', 's0', 'Suggest a fix for the Pitch 2 clash') },
+      { text: ai('sports', 's1', 'Summarize U10 enrollment') },
+      { text: ai('sports', 's2', 'Draft the camp announcement'), action: true },
+    ],
+    answer: ai('sports', 'answer', 'Move U12 Camp to Pitch 1 at 17:00 (free until 18:30), or shift U10 Blue to 16:00 at Hillcrest Dome. Both only affect those two groups. I won’t select or move participants — that stays with your coaches.'),
+    assumptions: ai('sports', 'assumptions', 'Uses venue bookings for today at Riverside Park, Pacific time.'),
+    sources: [[ai('sports', 'src0', 'Schedule · venue bookings'), updated(2)]],
+    action: { title: ai('sports', 'actionTitle', 'Draft notice to U12 Camp guardians about the pitch change'), kind: 'send', affected: [ai('sports', 'affected0', 'U12 Camp · 22 guardians at Riverside Park')], excluded: [ai('sports', 'excluded0', 'All other groups and venues')] },
   },
   wellness: {
-    suggestions: ['Draft a reply using our cancellation policy', 'Summarise utilisation by practitioner', 'Write copy for Hot stone'],
-    answer: 'Draft: “Hi Jordan, you can move your appointment free of charge up to 24 hours before. I’ve found Thu 17:00 with Rina if that suits.” I didn’t use any intake form details.',
-    assumptions: 'Cancellation policy v2 applies to Harbourfront. Intake form responses are excluded from AI context.',
-    sources: [['Policies › Cancellation v2', 'Published 1 Sep 2026'], ['Calendar · Harbourfront', 'Live']],
-    action: { title: 'Send reply to Jordan P. by email', kind: 'send', affected: ['Jordan P. · Toronto – Harbourfront'], excluded: [] },
+    suggestions: [
+      { text: ai('wellness', 's0', 'Draft a reply using our cancellation policy'), action: true },
+      { text: ai('wellness', 's1', 'Summarize utilization by practitioner') },
+      { text: ai('wellness', 's2', 'Write copy for Hot stone') },
+    ],
+    answer: ai('wellness', 'answer', 'Draft: “Hi Jordan, you can move your appointment free of charge up to 24 hours before. I’ve found Thu 17:00 with Rina if that suits.” I didn’t use any intake form details.'),
+    assumptions: ai('wellness', 'assumptions', 'Cancellation policy v2 applies to Harbourfront. Intake form responses are excluded from AI context.'),
+    sources: [[ai('wellness', 'src0', 'Policies › Cancellation v2'), ref('ai.fresh.publishedOn', { date: dateArg('2026-09-01T12:00:00Z') }, 'Published 1 Sep 2026')], [ai('wellness', 'src1', 'Calendar · Harbourfront'), ref('ai.fresh.live', undefined, 'Live')]],
+    action: { title: ai('wellness', 'actionTitle', 'Send reply to Jordan P. by email'), kind: 'send', affected: ['Jordan P. · Toronto – Harbourfront'], excluded: [] },
   },
   commerce: {
-    suggestions: ['Explain this week’s stock trend', 'Draft copy for Canvas tote from its spec sheet', 'Which stores failed the last sync?'],
-    answer: 'Linen overshirt L sold 9 units at Portland in 7 days against 3 the week before; stock is 1. Merino crew is flat. This is based on WooCommerce orders only; in-store sales aren’t connected, and Austin is excluded while disconnected.',
-    assumptions: 'Revenue is reported per currency (USD, CAD, EUR) and never combined.',
-    sources: [['WooCommerce orders', 'Updated 1 min ago'], ['Inventory history', 'Updated 6 min ago']],
-    action: { title: 'Draft reorder note for Linen overshirt L at Portland', kind: 'draft', affected: ['Portland store'], excluded: ['Austin store (disconnected)'] },
+    suggestions: [
+      { text: ai('commerce', 's0', 'Explain this week’s stock trend') },
+      { text: ai('commerce', 's1', 'Draft copy for Canvas tote from its spec sheet'), action: true },
+      { text: ai('commerce', 's2', 'Which stores failed the last sync?'), multiLocation: true },
+    ],
+    answer: ai('commerce', 'answer', 'Linen overshirt L sold 9 units at Portland in 7 days against 3 the week before; stock is 1. Merino crew is flat. This is based on WooCommerce orders only; in-store sales aren’t connected, and Austin is excluded while disconnected.'),
+    assumptions: ai('commerce', 'assumptions', 'Revenue is reported per currency (USD, CAD, EUR) and never combined.'),
+    sources: [[ai('commerce', 'src0', 'WooCommerce orders'), updated(1)], [ai('commerce', 'src1', 'Inventory history'), updated(6)]],
+    action: { title: ai('commerce', 'actionTitle', 'Draft reorder note for Linen overshirt L at Portland'), kind: 'draft', affected: ['Portland store'], excluded: [ai('commerce', 'excluded0', 'Austin store (disconnected)')] },
   },
   foods: {
-    suggestions: ['Summarise today’s production by item', 'Draft menu copy for the flatbread', 'Plan a lunch promotion across Seattle'],
-    answer: 'Ballard so far: 14 Ember bowls, 8 brisket sandwiches, 6 flatbreads, 11 lemonades. Fremont is missing because its kitchen screen is offline, though orders still arrived there. I can’t change prices, dietary labels or order acceptance.',
-    assumptions: 'Counts orders accepted since opening, Pacific time.',
-    sources: [['Orders · Ballard', '11:00–12:10'], ['Fremont kitchen screen', 'Offline since 11:42']],
-    action: { title: 'Draft “Weekday lunch” promotion for Seattle locations', kind: 'draft', affected: ['Seattle – Ballard', 'Seattle – Fremont'], excluded: ['Vancouver, London, Berlin (outside requested scope)'] },
+    suggestions: [
+      { text: ai('foods', 's0', 'Summarize today’s production by item') },
+      { text: ai('foods', 's1', 'Draft menu copy for the flatbread'), action: true },
+      { text: ai('foods', 's2', 'Plan a lunch promotion across Seattle'), multiLocation: true, action: true },
+    ],
+    answer: ai('foods', 'answer', 'Ballard so far: 14 Ember bowls, 8 brisket sandwiches, 6 flatbreads, 11 lemonades. Fremont is missing because its kitchen screen is offline, though orders still arrived there. I can’t change prices, dietary labels or order acceptance.'),
+    assumptions: ai('foods', 'assumptions', 'Counts orders accepted since opening, Pacific time.'),
+    sources: [[ai('foods', 'src0', 'Orders · Ballard'), '11:00–12:10'], [ai('foods', 'src1', 'Fremont kitchen screen'), ref('ai.fresh.offlineSince', { time: '11:42' }, 'Offline since 11:42')]],
+    action: { title: ai('foods', 'actionTitle', 'Draft “Weekday lunch” promotion for Seattle locations'), kind: 'draft', affected: ['Seattle – Ballard', 'Seattle – Fremont'], excluded: [ai('foods', 'excluded0', 'Vancouver, London, Berlin (outside requested scope)')] },
   },
   realty: {
-    suggestions: ['Summarise viewing feedback for 42 Birchmount Cres', 'Draft a description for Suite 1806 from its facts', 'Who should I follow up with this week?'],
-    answer: 'Three viewings at 42 Birchmount Cres logged feedback: two rated it 4–5 and liked the kitchen and garden; one raised the basement ceiling height. One buyer asked about closing dates. I only used the logged feedback — buyer identities were not shared with me.',
-    assumptions: 'Feedback from completed viewings in the last 14 days, Toronto time. No-shows are excluded.',
-    sources: [['Viewings · feedback', 'Updated 6 min ago']],
-    action: { title: 'Draft follow-up emails for 2 interested buyers', kind: 'draft', affected: ['Toronto Midtown · 2 buyers'], excluded: ['Buyers without email consent'] },
+    suggestions: [
+      { text: ai('realty', 's0', 'Summarize viewing feedback for 42 Birchmount Cres') },
+      { text: ai('realty', 's1', 'Draft a description for Suite 1806 from its facts'), action: true },
+      { text: ai('realty', 's2', 'Who should I follow up with this week?') },
+    ],
+    answer: ai('realty', 'answer', 'Three viewings at 42 Birchmount Cres logged feedback: two rated it 4–5 and liked the kitchen and garden; one raised the basement ceiling height. One buyer asked about closing dates. I only used the logged feedback — buyer identities were not shared with me.'),
+    assumptions: ai('realty', 'assumptions', 'Feedback from completed viewings in the last 14 days, Toronto time. No-shows are excluded.'),
+    sources: [[ai('realty', 'src0', 'Viewings · feedback'), updated(6)]],
+    action: { title: ai('realty', 'actionTitle', 'Draft follow-up emails for 2 interested buyers'), kind: 'draft', affected: [ai('realty', 'affected0', 'Toronto Midtown · 2 buyers')], excluded: [ai('realty', 'excluded0', 'Buyers without email consent')] },
   },
 };

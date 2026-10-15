@@ -131,7 +131,8 @@ changed `message`).
 
 | API text | Structured field(s) | Phrased from |
 | --- | --- | --- |
-| Error `message` | `code` (+ `details`, e.g. `days`, `freeCancelHours`) | sites `messages/fallback/*.json` → `apiError.*` (applied in `lib/client.ts`, `portal.ts`, `shop.ts`); mobile `apiError.*` (`lib/errors.ts` `localizedApiMessage`) |
+| Error `message` | `code` (+ `details`, e.g. `days`, `freeCancelHours`) | sites `messages/fallback/*.json` → `apiError.*` (applied in `lib/client.ts`, `portal.ts`, `shop.ts`); mobile `apiError.*` (`lib/errors.ts` `localizedApiMessage`); app `messages/*.json` → `apiError.*` (applied in the load/mutation hooks via `lib/useErrorText.ts`) |
+| Error `fields` (per-field validation) | known message patterns (required, email, length, range…) | app `apiError.field.*` (`fieldMessage` in `lib/useErrorText.ts`); unknown patterns show the API text |
 | Studio cancellation policy `lines` | `terms` | sites / mobile `studio.terms.*` |
 | Pack / membership `access` | `accessDetail` (`policy`, `currency`, `locationCount`, `locationName`) | `studio.access.*` |
 | Membership `terms` | `termsDetail` (`billingCurrency`, `noticeDays`, `maxPauseDays`, `classesPerPeriod`) | `studio.membershipTerms.*` |
@@ -141,6 +142,6 @@ changed `message`).
 
 In the business app, text the data layer builds itself (metric names, roles, history and timeline entries, connection
 status, approval details) travels in the view models as keys plus arguments (`labelKey`, `roleKey`,
-`titleKey`/`titleParams`, `textKey`/`textParams`, …) and is translated in the components from the `data` namespace
+`titleKey`/`titleParams`, `textKey`/`textParams`, and `…Msg` references on table cells, reports and AI answers, …) and is translated in the components from the `data` namespace
 (`messages/data/*.json`, see `src/lib/msg.ts`). Names, places and other business data are passed as arguments and
 never translated.

@@ -8,5 +8,6 @@ import { UiLabelsProvider } from '@bh/ui';
 export function UiLabels({ children }: { children: ReactNode }) {
   const t = useTranslations('common');
   const shell = useTranslations('shell');
-  return <UiLabelsProvider labels={{ optional: t('optional').toLowerCase(), close: t('close'), scope: shell('scope') }}>{children}</UiLabelsProvider>;
+  const overview = useTranslations('overview');
+  return <UiLabelsProvider labels={{ optional: t('optional').toLowerCase(), close: t('close'), scope: shell('scope'), notConnected: overview('notConnected'), unavailable: overview('unavailable'), originHq: t('origin.hq'), originLocal: t('origin.local'), originLocked: t('origin.locked'), originApproval: t('origin.approval') }}>{children}</UiLabelsProvider>;
 }

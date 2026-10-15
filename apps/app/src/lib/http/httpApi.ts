@@ -14,9 +14,9 @@ import type { Tone } from '@bh/ui';
 import type { BranchHarborApi, SiteAddress } from '../api';
 import { ApiError } from '../errors';
 import { addDays, fmtDay, fmtTime, moneyWithCode, zoneLabel, zonedToUtc } from '../format';
-import type { AiAnswer, ApprovalItem, ApprovalRequest, AttentionItem, Cell, ClassOccurrence, Connection, ConnectionState, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, IndustryKey, Location, Member, MenuItem, Metric, OnboardingProgress, OnboardingStep, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, PaymentState, ReconciliationItem, RefundState, Report, RequestContext, ShiftView, TableData, TimelineEvent, Transaction, UpcomingItem, WebsiteField, WebsitePage } from '../types';
+import type { AiAnswer, AiSuggestion, SearchGroup, ApprovalItem, ApprovalRequest, AttentionItem, Cell, ClassOccurrence, Connection, ConnectionState, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, IndustryKey, Location, Member, MenuItem, Metric, OnboardingProgress, OnboardingStep, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, PaymentState, ReconciliationItem, RefundState, Report, RequestContext, ShiftView, TableData, TimelineEvent, Transaction, UpcomingItem, WebsiteField, WebsitePage } from '../types';
 import { ONBOARDING_STEPS } from '../types';
-import { dateArg, moneyArg, ref, type MsgParam, type MsgParams } from '../msg';
+import { dateArg, dayArg, isRef, lbl, moneyArg, plain, ref, tbl, zoneArg, type MsgParam, type MsgParams, type MsgRef, type Txt } from '../msg';
 import { httpBusiness } from './business';
 import { http, login, logout, resendVerification, signup, verifyEmail } from './client';
 import {
@@ -304,13 +304,14 @@ async function upcoming(ctx: RequestContext): Promise<{ title: string; titleKey:
   return { title: 'Upcoming', titleKey: 'upcoming.title.generic', items: [] };
 }
 
-const AI_SUGGESTIONS: Record<IndustryKey, string[]> = {
-  studios: ['Summarise class occupancy this month', 'Draft a multi-location campaign', 'Which locations need attention?'],
-  sports: ['Summarise registrations awaiting review', 'Draft a programme announcement', 'Which teams are nearly full?'],
-  wellness: ['Summarise appointments this week', 'Draft a reply using our cancellation policy', 'Which practitioners are fully booked?'],
-  commerce: ['Explain this week’s order trend', 'Draft product copy', 'Which stores failed the last sync?'],
-  foods: ['Summarise today’s orders by location', 'Draft menu copy', 'Plan a lunch promotion'],
-  realty: ['Which offices need attention?', 'Draft a campaign for new listings', 'Summarise enquiries this week'],
+/** Suggested prompts per industry (data `ai.liveSuggest.<industry>.s<n>`; the first is also the overview prompt `ai.live.*`). */
+const AI_SUGGESTIONS: Record<IndustryKey, [text: string, multiLocation?: boolean, action?: boolean][]> = {
+  studios: [['Summarize class occupancy this month'], ['Draft a multi-location campaign', true, true], ['Which locations need attention?', true]],
+  sports: [['Summarize registrations awaiting review'], ['Draft a program announcement', false, true], ['Which teams are nearly full?']],
+  wellness: [['Summarize appointments this week'], ['Draft a reply using our cancellation policy', false, true], ['Which practitioners are fully booked?']],
+  commerce: [['Explain this week’s order trend'], ['Draft product copy', false, true], ['Which stores failed the last sync?', true]],
+  foods: [['Summarize today’s orders by location', true], ['Draft menu copy', false, true], ['Plan a lunch promotion', false, true]],
+  realty: [['Which offices need attention?', true], ['Draft a campaign for new listings', false, true], ['Summarize inquiries this week']],
 };
 
 /* ------------------------------------------------------------------ */
@@ -420,6 +421,7 @@ interface ApiAppointment {
 interface ApiOffer {
   id: string; locationId: string | null; locationName: string | null; name: string; kind: string; prices: Record<string, number>; credits: number | null; validDays: number;
   rules: string[]; status: string; startsAt: string | null; endsAt: string | null; redemptions: number;
+  eligibility?: { newCustomersOnly?: boolean; maxPerCustomer?: number | null; minAge?: number | null; locationIds?: string[] | null };
 }
 interface ApiSportsSession {
   id: string; kind: 'training' | 'fixture'; status: string; startsAt: string; endsAt: string; venue: string | null;
@@ -673,6 +675,7 @@ async function pageView(locationId: string, page?: ApiPage): Promise<WebsitePage
       return {
         key: f.key,
         label: f.label,
+        labelMsg: ref(`website.field.${f.key}`, undefined, f.label),
         policy: f.origin === 'locked' ? 'locked' : f.origin === 'approval' ? 'approval' : 'editable',
         value: str(f.value),
         hqValue: f.origin === 'locked' ? undefined : str(f.hqValue),
@@ -685,7 +688,8 @@ async function pageView(locationId: string, page?: ApiPage): Promise<WebsitePage
     ...(await Promise.all(approvals.filter((a) => a.payload?.pageId === p.id).map(async (a) => {
       const name = await personName(a.requestedBy);
       const field = p.fields.find((f) => f.key === a.payload?.fieldKey)?.label ?? a.payload?.fieldKey ?? '';
-      return { at: a.createdAt, text: `${name} requested a change to ${field}`, textKey: 'website.changeRequested', textParams: { name, field } };
+      const fieldRef = a.payload?.fieldKey ? ref(`website.field.${a.payload.fieldKey}`, undefined, field) : field;
+      return { at: a.createdAt, text: `${name} requested a change to ${field}`, textKey: 'website.changeRequested', textParams: { name, field: fieldRef } };
     }))),
   ].sort((a, b) => b.at.localeCompare(a.at));
   return { locationId, locationName: nameOfLoc(locationId), page: p.title || 'Home', version: versions.length, fields, activity };
@@ -829,14 +833,56 @@ function connectionView(c: ApiConnection): Connection {
 /* tables                                                              */
 /* ------------------------------------------------------------------ */
 
-const tx = (v: string, sub?: string, strong?: boolean): Cell => ({ t: 'text', v, sub, strong });
-const badge = (v: string, tone: Tone): Cell => ({ t: 'badge', v, tone });
-const moneyCell = (v: Money, sub?: string): Cell => ({ t: 'money', v, sub });
-const na = (reason?: string): Cell => ({ t: 'unavailable', reason });
+/** UI text in cells travels as catalogue references (namespace "data", `table.*`); plain strings are business data. */
+const tx = (v: Txt, sub?: Txt, strong?: boolean): Cell => ({
+  t: 'text',
+  v: plain(v),
+  ...(isRef(v) ? { vMsg: v } : {}),
+  ...(sub ? { sub: plain(sub), ...(isRef(sub) ? { subMsg: sub } : {}) } : {}),
+  strong,
+});
+/** Badge labels are UI text: plain strings are keyed by their slug (`table.badge.*`). */
+const badge = (v: Txt, tone: Tone): Cell => {
+  const m = typeof v === 'string' ? lbl('badge', v) : v;
+  return { t: 'badge', v: plain(m), vMsg: m, tone };
+};
+/** A record status from the API (`table.status.<status>`, English fallback humanised). */
+const statusText = (s: string) => tbl(`status.${s}`, undefined, humanise(s));
+const moneyCell = (v: Money, sub?: Txt): Cell => ({ t: 'money', v, ...(sub ? { sub: plain(sub), ...(isRef(sub) ? { subMsg: sub } : {}) } : {}) });
+const na = (reason?: string): Cell => (reason ? { t: 'unavailable', reason, reasonMsg: lbl('na', reason) } : { t: 'unavailable' });
 const fmtDate = (iso: string | null | undefined, tz = 'UTC') => (iso ? new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', timeZone: tz }).format(new Date(iso)) : '—');
+/** A date shown as day + month in the viewer's locale. */
+const dateText = (iso: string | null | undefined, tz?: string): Txt => (iso ? tbl('cell.value', { value: dayArg(iso, tz) }, fmtDate(iso, tz)) : '—');
+const whenText = (iso: string, tz: string): Txt => tbl('cell.value', { value: { t: 'date', at: iso, tz, style: 'dayTime' } }, `${fmtDay(iso, tz, 'en')} ${fmtTime(iso, tz, 'en')}`);
+const zoneText = (tz: string, at?: string): Txt => tbl('cell.value', { value: zoneArg(tz, at) }, zoneLabel(tz, 'en'));
+const minutesText = (n: number): Txt => tbl('cell.minutes', { count: n }, `${n} min`);
 
-function tableOf(key: string, columns: [string, string, ('left' | 'right')?][], rows: TableData['rows'], source: string, extra: Partial<TableData> = {}): TableData {
-  return { key, columns: columns.map(([k, label, align]) => ({ key: k, label, align })), rows, filters: [{ key: 'all', label: 'All' }], source, ...extra };
+/** Columns marked `raw` are business data (location names) and are not translated. */
+type ColSpec = [key: string, label: string, align?: 'left' | 'right', raw?: boolean];
+function tableOf(key: string, columns: ColSpec[], rows: TableData['rows'], source: string, extra: { description?: string; primaryAction?: string; filters?: [string, string][] } = {}): TableData {
+  const filters = extra.filters ?? [['all', 'All']];
+  return {
+    key,
+    columns: columns.map(([k, label, align, raw]) => ({ key: k, label, ...(raw ? {} : { labelMsg: lbl('col', label) }), align })),
+    rows,
+    filters: filters.map(([k, label]) => ({ key: k, label, labelMsg: lbl('filter', label) })),
+    source,
+    sourceMsg: lbl('source', source),
+    ...(extra.description ? { description: extra.description, descriptionMsg: tbl(`desc.${key}`, undefined, extra.description) } : {}),
+    ...(extra.primaryAction ? { primaryAction: extra.primaryAction, primaryActionMsg: lbl('action', extra.primaryAction) } : {}),
+  };
+}
+
+/** Offer eligibility in the viewer's language, from the stored rules (the API's `rules` are the English fallback). */
+function eligibilityText(x: ApiOffer): Txt {
+  const e = x.eligibility ?? {};
+  const parts: MsgRef[] = [];
+  if (e.newCustomersOnly) parts.push(tbl('rule.newCustomersOnly', undefined, 'New customers only'));
+  if (e.maxPerCustomer) parts.push(tbl('rule.maxPerCustomer', { count: e.maxPerCustomer }, e.maxPerCustomer === 1 ? 'Once per customer' : `Up to ${e.maxPerCustomer} times per customer`));
+  if (e.minAge) parts.push(tbl('rule.minAge', { age: e.minAge }, `Ages ${e.minAge}+`));
+  if (e.locationIds?.length) parts.push(tbl('rule.locations', { count: e.locationIds.length }, `At ${e.locationIds.length} selected locations`));
+  if (!x.eligibility) return x.rules.join(' · ') || tbl('rule.anyone', undefined, 'Anyone');
+  return parts.length ? tbl('cell.list', { items: parts }, x.rules.join(' · ')) : tbl('rule.anyone', undefined, 'Anyone');
 }
 
 async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
@@ -846,47 +892,49 @@ async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
     case 'customers': {
       const list = await http.get<{ items: { id: string; locationId: string | null; name: string; email: string | null; phone: string | null; createdAt: string; erasedAt: string | null }[] }>(o('/customers'), { limit: 200 }).then(items);
       return tableOf('customers', [['name', 'Name'], ['contact', 'Contact'], ['home', 'Home location'], ['since', 'Since'], ['state', 'State']],
-        list.filter((c) => inS(c.locationId)).map((c) => ({ id: c.id, tags: [c.erasedAt ? 'erased' : 'active'], cells: { name: tx(c.erasedAt ? 'Erased customer' : c.name, undefined, true), contact: c.email ? tx(c.email, c.phone ?? undefined) : na('Not provided'), home: tx(nameOfLoc(c.locationId)), since: tx(fmtDate(c.createdAt, tzOf(c.locationId))), state: c.erasedAt ? badge('Erased', 'neutral') : badge('Active', 'success') } })),
-        'BranchHarbor customers', { filters: [{ key: 'all', label: 'All' }, { key: 'active', label: 'Active' }] });
+        list.filter((c) => inS(c.locationId)).map((c) => ({ id: c.id, tags: [c.erasedAt ? 'erased' : 'active'], cells: { name: tx(c.erasedAt ? lbl('cell', 'Erased customer') : c.name, undefined, true), contact: c.email ? tx(c.email, c.phone ?? undefined) : na('Not provided'), home: tx(nameOfLoc(c.locationId)), since: tx(dateText(c.createdAt, tzOf(c.locationId))), state: c.erasedAt ? badge('Erased', 'neutral') : badge('Active', 'success') } })),
+        'BranchHarbor customers', { filters: [['all', 'All'], ['active', 'Active']] });
     }
     case 'marketing': {
       const list = await http.get<{ items: { id: string; name: string; channel: string | null; status: string; scopeKind?: string; scopeId?: string; scope?: { kind: string; id: string }; updatedAt?: string; createdAt: string }[] }>(o('/campaigns')).then(items);
       return tableOf('marketing', [['campaign', 'Campaign'], ['scope', 'Scope'], ['channel', 'Channel'], ['status', 'Status'], ['updated', 'Updated']],
         list.map((c) => {
           const sc = c.scope ?? (c.scopeKind ? { kind: c.scopeKind, id: c.scopeId ?? '' } : null);
-          return { id: c.id, tags: [c.status], cells: { campaign: tx(c.name, undefined, true), scope: tx(sc ? scopeLabel(sc) : 'Organisation'), channel: tx(humanise(c.channel ?? 'email')), status: badge(humanise(c.status), c.status === 'draft' ? 'neutral' : c.status === 'scheduled' ? 'info' : 'success'), updated: tx(fmtDate(c.updatedAt ?? c.createdAt)) } };
+          const sm = sc ? scopeMsg(sc) : { scopeLabel: 'Organization', scopeKey: 'scope.organization' };
+          const channel = c.channel ?? 'email';
+          return { id: c.id, tags: [c.status], cells: { campaign: tx(c.name, undefined, true), scope: tx(sm.scopeKey ? ref(sm.scopeKey, sm.scopeParams, sm.scopeLabel) : sm.scopeLabel), channel: tx(tbl(`channelCode.${channel}`, undefined, humanise(channel))), status: badge(statusText(c.status), c.status === 'draft' ? 'neutral' : c.status === 'scheduled' ? 'info' : 'success'), updated: tx(dateText(c.updatedAt ?? c.createdAt)) } };
         }),
-        'BranchHarbor campaigns', { primaryAction: 'New campaign', filters: [{ key: 'all', label: 'All' }, { key: 'draft', label: 'Draft' }, { key: 'scheduled', label: 'Scheduled' }] });
+        'BranchHarbor campaigns', { primaryAction: 'New campaign', filters: [['all', 'All'], ['draft', 'Draft'], ['scheduled', 'Scheduled']] });
     }
     case 'programmes': {
       const list = await http.get<{ items: ApiProgramme[] }>(o('/sports/programmes')).then(items);
-      return tableOf('programmes', [['programme', 'Programme'], ['ages', 'Ages'], ['venue', 'Venue'], ['fee', 'Fee', 'right'], ['registration', 'Registration'], ['capacity', 'Capacity', 'right']],
-        list.filter((p) => inS(p.locationId)).map((p) => ({ id: p.id, tags: [p.status === 'published' ? 'open' : 'closed'], cells: { programme: tx(p.name, undefined, true), ages: tx(p.ageMin != null || p.ageMax != null ? `${p.ageMin ?? '?'}–${p.ageMax ?? '?'}` : 'All ages'), venue: tx(nameOfLoc(p.locationId)), fee: moneyCell(m(p.feeMinor, p.currency)), registration: badge(humanise(p.status), p.status === 'published' ? 'success' : 'neutral'), capacity: p.capacity != null ? tx(String(p.capacity)) : na('No limit set') } })),
-        'BranchHarbor programmes');
+      return tableOf('programmes', [['programme', 'Program'], ['ages', 'Ages'], ['venue', 'Venue'], ['fee', 'Fee', 'right'], ['registration', 'Registration'], ['capacity', 'Capacity', 'right']],
+        list.filter((p) => inS(p.locationId)).map((p) => ({ id: p.id, tags: [p.status === 'published' ? 'open' : 'closed'], cells: { programme: tx(p.name, undefined, true), ages: tx(p.ageMin != null || p.ageMax != null ? `${p.ageMin ?? '?'}–${p.ageMax ?? '?'}` : lbl('cell', 'All ages')), venue: tx(nameOfLoc(p.locationId)), fee: moneyCell(m(p.feeMinor, p.currency)), registration: badge(statusText(p.status), p.status === 'published' ? 'success' : 'neutral'), capacity: p.capacity != null ? tx(String(p.capacity)) : na('No limit set') } })),
+        'BranchHarbor programs');
     }
     case 'teams': {
       const [teams, progs] = await Promise.all([http.get<{ items: ApiTeam[] }>(o('/sports/teams')).then(items), http.get<{ items: ApiProgramme[] }>(o('/sports/programmes')).then(items)]);
-      return tableOf('teams', [['group', 'Group'], ['coach', 'Coach'], ['programme', 'Programme'], ['roster', 'Capacity', 'right'], ['next', 'Venue']],
+      return tableOf('teams', [['group', 'Group'], ['coach', 'Coach'], ['programme', 'Program'], ['roster', 'Capacity', 'right'], ['next', 'Venue']],
         await Promise.all(teams.filter((t) => inS(t.locationId)).map(async (t) => ({ id: t.id, tags: [], cells: { group: tx(t.name, undefined, true), coach: t.coachUserId ? tx(await personName(t.coachUserId)) : na('No coach assigned'), programme: tx(progs.find((p) => p.id === t.programmeId)?.name ?? '—'), roster: t.capacity != null ? tx(String(t.capacity)) : na(), next: tx(nameOfLoc(t.locationId)) } }))),
         'BranchHarbor groups');
     }
     case 'services': {
       const list = await http.get<{ items: ApiService[] }>(o('/wellness/services')).then(items);
       return tableOf('services', [['service', 'Service'], ['duration', 'Duration'], ['price', 'Price', 'right'], ['buffer', 'Buffer'], ['needs', 'Needs'], ['status', 'Status']],
-        list.filter((s) => inS(s.locationId)).map((s) => ({ id: s.id, tags: [s.active ? 'active' : 'paused'], cells: { service: tx(s.name, s.locationId ? nameOfLoc(s.locationId) : 'All locations', true), duration: tx(`${s.durationMinutes} min`), price: moneyCell(m(s.priceMinor, s.currency), s.depositMinor ? `Deposit ${(s.depositMinor / 100).toFixed(2)}` : undefined), buffer: tx(`${s.bufferBeforeMinutes}/${s.bufferAfterMinutes} min`), needs: tx(s.requiredResourceType ? humanise(s.requiredResourceType) : '—'), status: badge(s.active ? 'Active' : 'Paused', s.active ? 'success' : 'neutral') } })),
+        list.filter((s) => inS(s.locationId)).map((s) => ({ id: s.id, tags: [s.active ? 'active' : 'paused'], cells: { service: tx(s.name, s.locationId ? nameOfLoc(s.locationId) : lbl('cell', 'All locations'), true), duration: tx(minutesText(s.durationMinutes)), price: moneyCell(m(s.priceMinor, s.currency), s.depositMinor ? tbl('cell.deposit', { amount: moneyArg(s.depositMinor, s.currency) }, `Deposit ${(s.depositMinor / 100).toFixed(2)}`) : undefined), buffer: tx(tbl('cell.bufferMinutes', { before: s.bufferBeforeMinutes, after: s.bufferAfterMinutes }, `${s.bufferBeforeMinutes}/${s.bufferAfterMinutes} min`)), needs: tx(s.requiredResourceType ? tbl(`resource.${s.requiredResourceType}`, undefined, humanise(s.requiredResourceType)) : '—'), status: badge(s.active ? 'Active' : 'Paused', s.active ? 'success' : 'neutral') } })),
         'BranchHarbor services', { primaryAction: 'New service' });
     }
     case 'practitioners': {
       const [list, services] = await Promise.all([http.get<{ items: ApiPractitioner[] }>(o('/wellness/practitioners')).then(items), maybe(http.get<{ items: ApiService[] }>(o('/wellness/services')).then(items), [] as ApiService[])]);
       return tableOf('practitioners', [['practitioner', 'Practitioner'], ['services', 'Services'], ['locations', 'Locations'], ['week', 'Weekly availability']],
-        list.filter((p) => inS(p.locationId)).map((p) => ({ id: p.id, tags: [], cells: { practitioner: tx(p.name, undefined, true), services: tx(p.serviceIds.map((id) => services.find((s) => s.id === id)?.name).filter(Boolean).join(', ') || '—'), locations: tx(nameOfLoc(p.locationId)), week: tx(p.availability.length ? `${p.availability.length} windows` : 'Not set') } })),
+        list.filter((p) => inS(p.locationId)).map((p) => ({ id: p.id, tags: [], cells: { practitioner: tx(p.name, undefined, true), services: tx(p.serviceIds.map((id) => services.find((s) => s.id === id)?.name).filter(Boolean).join(', ') || '—'), locations: tx(nameOfLoc(p.locationId)), week: tx(p.availability.length ? tbl('cell.windows', { count: p.availability.length }, `${p.availability.length} windows`) : lbl('cell', 'Not set')) } })),
         'Practitioner calendars');
     }
     case 'catalogue': {
       const list = await http.get<{ items: { id: string; sku: string; name: string; status: string; variants?: unknown[]; lockedFields?: string[] }[] }>(o('/commerce/products')).then(items);
       return tableOf('catalogue', [['product', 'Product'], ['variants', 'Variants', 'right'], ['editable', 'Locked fields'], ['status', 'Status']],
-        list.map((p) => ({ id: p.id, tags: [p.status === 'active' ? 'published' : p.status], cells: { product: tx(p.name, p.sku, true), variants: tx(String(p.variants?.length ?? 0)), editable: tx((p.lockedFields ?? []).join(', ') || '—'), status: badge(humanise(p.status), p.status === 'active' ? 'success' : 'neutral') } })),
-        'Master catalogue', { primaryAction: 'New product' });
+        list.map((p) => ({ id: p.id, tags: [p.status === 'active' ? 'published' : p.status], cells: { product: tx(p.name, p.sku, true), variants: tx(String(p.variants?.length ?? 0)), editable: tx((p.lockedFields ?? []).length ? tbl('cell.list', { items: (p.lockedFields ?? []).map((f) => tbl(`field.${f.replace(/\./g, '_')}`, undefined, f)) }, (p.lockedFields ?? []).join(', ')) : '—'), status: badge(statusText(p.status), p.status === 'active' ? 'success' : 'neutral') } })),
+        'Master catalog', { primaryAction: 'New product' });
     }
     case 'assortment': {
       const list = (await http.get<{ items: ApiInventoryRow[] }>(o('/commerce/inventory')).then(items)).filter((x) => inS(x.locationId));
@@ -896,27 +944,33 @@ async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
           cells: {
             item: tx(`${v.productName} · ${v.name}`, `${v.sku} · ${v.locationName}`, true), onhand: tx(String(v.onHand)), reserved: tx(String(v.reserved)), available: tx(String(v.available)),
             price: v.price.amount != null ? moneyCell(m(v.price.amount, v.price.currency)) : na('No price in this currency'),
-            availability: !v.sellable ? badge('Hidden', 'neutral') : v.lowStock ? badge(`Low · reorder at ${v.reorderPoint}`, 'warning') : badge('In stock', 'success'),
+            availability: !v.sellable ? badge('Hidden', 'neutral') : v.lowStock ? badge(tbl('badge.lowReorderAt', { count: v.reorderPoint ?? 0 }, `Low · reorder at ${v.reorderPoint}`), 'warning') : badge('In stock', 'success'),
           },
         })),
-        'Local assortment · stock per location', { filters: [{ key: 'all', label: 'All' }, { key: 'low', label: 'Low' }] });
+        'Local assortment · stock per location', { filters: [['all', 'All'], ['low', 'Low']] });
     }
     case 'offers': {
       const list = await http.get<{ items: ApiOffer[] }>(o('/studios/offers')).then(items);
+      const priceList = (p: Record<string, number>) => Object.entries(p).map(([c, a]) => moneyArg(a, c));
       const prices = (p: Record<string, number>) => Object.entries(p).map(([c, a]) => moneyWithCode(m(a, c as Currency), 'en')).join(' / ');
       const tone: Record<string, Tone> = { active: 'success', draft: 'neutral', paused: 'warning', ended: 'neutral' };
       return tableOf('offers', [['offer', 'Offer'], ['eligibility', 'Eligibility'], ['locations', 'Locations'], ['valid', 'Valid'], ['status', 'Status']],
         list.filter((x) => inS(x.locationId)).map((x) => ({
           id: x.id, tags: [x.status],
           cells: {
-            offer: tx(x.name, `${x.credits ? `${x.credits} class${x.credits === 1 ? '' : 'es'} · ` : ''}${prices(x.prices) || 'No price set'}`, true),
-            eligibility: tx(x.rules.join(' · ') || 'Anyone', x.redemptions ? `${x.redemptions} redeemed` : undefined),
-            locations: tx(x.locationId ? x.locationName ?? nameOfLoc(x.locationId) : 'All locations', x.locationId ? 'Local offer' : 'Network offer'),
-            valid: tx(x.startsAt || x.endsAt ? `${x.startsAt ? fmtDate(x.startsAt) : 'Now'} – ${x.endsAt ? fmtDate(x.endsAt) : 'ongoing'}` : 'Ongoing', `Use within ${x.validDays} days`),
-            status: badge(humanise(x.status), tone[x.status] ?? 'neutral'),
+            offer: tx(x.name, Object.keys(x.prices).length ? tbl(x.credits ? 'cell.classesPrices' : 'cell.prices', { count: x.credits ?? 0, prices: priceList(x.prices) }, `${x.credits ? `${x.credits} class${x.credits === 1 ? '' : 'es'} · ` : ''}${prices(x.prices)}`) : lbl('cell', 'No price set'), true),
+            eligibility: tx(eligibilityText(x), x.redemptions ? tbl('cell.redeemed', { count: x.redemptions }, `${x.redemptions} redeemed`) : undefined),
+            locations: tx(x.locationId ? x.locationName ?? nameOfLoc(x.locationId) : lbl('cell', 'All locations'), x.locationId ? lbl('cell', 'Local offer') : lbl('cell', 'Network offer')),
+            valid: tx(
+              x.startsAt || x.endsAt
+                ? tbl('cell.validRange', { from: x.startsAt ? dayArg(x.startsAt) : tbl('cell.now', undefined, 'Now'), to: x.endsAt ? dayArg(x.endsAt) : tbl('cell.ongoingLower', undefined, 'ongoing') }, `${x.startsAt ? fmtDate(x.startsAt) : 'Now'} – ${x.endsAt ? fmtDate(x.endsAt) : 'ongoing'}`)
+                : lbl('cell', 'Ongoing'),
+              tbl('cell.useWithinDays', { count: x.validDays }, `Use within ${x.validDays} days`),
+            ),
+            status: badge(statusText(x.status), tone[x.status] ?? 'neutral'),
           },
         })),
-        'BranchHarbor offers', { primaryAction: 'New offer', filters: [{ key: 'all', label: 'All' }, { key: 'active', label: 'Active' }, { key: 'draft', label: 'Draft' }, { key: 'ended', label: 'Ended' }] });
+        'BranchHarbor offers', { primaryAction: 'New offer', filters: [['all', 'All'], ['active', 'Active'], ['draft', 'Draft'], ['ended', 'Ended']] });
     }
     case 'schedule': {
       const from = new Date(Date.now() - 12 * 3600_000).toISOString();
@@ -926,14 +980,14 @@ async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
         list.filter((x) => inS(x.location.id)).map((x) => ({
           id: x.id, tags: [x.venueConflict ? 'conflict' : 'clear', x.kind],
           cells: {
-            when: tx(`${fmtDay(x.startsAt, x.location.timeZone, 'en')} ${fmtTime(x.startsAt, x.location.timeZone, 'en')}`, zoneLabel(x.location.timeZone, 'en')),
-            group: tx(x.team.name, x.kind === 'fixture' ? 'Fixture' : 'Training', true),
-            venue: tx(x.venue ?? 'Venue not set', x.location.name),
+            when: tx(whenText(x.startsAt, x.location.timeZone), zoneText(x.location.timeZone, x.startsAt)),
+            group: tx(x.team.name, x.kind === 'fixture' ? lbl('cell', 'Fixture') : lbl('cell', 'Training'), true),
+            venue: tx(x.venue ?? lbl('cell', 'Venue not set'), x.location.name),
             coach: x.team.coach ? tx(x.team.coach.name) : na('No coach assigned'),
-            check: x.status === 'cancelled' ? badge('Cancelled', 'neutral') : x.venueConflict ? badge(`Venue clash · ${x.conflicts.map((c) => c.teamName).join(', ')}`, 'danger') : badge('Clear', 'success'),
+            check: x.status === 'cancelled' ? badge('Canceled', 'neutral') : x.venueConflict ? badge(tbl('badge.venueClashWith', { teams: x.conflicts.map((c) => c.teamName).join(', ') }, `Venue clash · ${x.conflicts.map((c) => c.teamName).join(', ')}`), 'danger') : badge('Clear', 'success'),
           },
         })),
-        'Schedule · venue bookings', { filters: [{ key: 'all', label: 'Next 2 weeks' }, { key: 'conflict', label: 'Conflicts' }, { key: 'fixture', label: 'Fixtures' }] });
+        'Schedule · venue bookings', { filters: [['all', 'Next 2 weeks'], ['conflict', 'Conflicts'], ['fixture', 'Fixtures']] });
     }
     case 'forms': {
       const [list, services] = await Promise.all([http.get<{ items: ApiIntakeForm[] }>(o('/wellness/intake-forms')).then(items), maybe(http.get<{ items: ApiService[] }>(o('/wellness/services')).then(items), [] as ApiService[])]);
@@ -941,56 +995,71 @@ async function liveTable(ctx: RequestContext, key: string): Promise<TableData> {
         list.filter((f) => inS(f.locationId)).map((f) => ({
           id: f.id, tags: [f.status],
           cells: {
-            form: tx(f.name, `${f.questions.length} questions · ${humanise(f.status)}`, true),
-            used: tx(f.serviceIds.length ? [...new Set(f.serviceIds.map((id) => services.find((s) => s.id === id)?.name).filter(Boolean))].join(', ') : 'All services', f.locationId ? f.locationName ?? nameOfLoc(f.locationId) : 'All locations'),
-            version: tx(`${f.consentVersion} · form v${f.version}`),
+            form: tx(f.name, tbl('cell.questionsStatus', { count: f.questions.length, status: statusText(f.status) }, `${f.questions.length} questions · ${humanise(f.status)}`), true),
+            used: tx(f.serviceIds.length ? [...new Set(f.serviceIds.map((id) => services.find((s) => s.id === id)?.name).filter(Boolean))].join(', ') : lbl('cell', 'All services'), f.locationId ? f.locationName ?? nameOfLoc(f.locationId) : lbl('cell', 'All locations')),
+            version: tx(tbl('cell.formVersion', { consent: f.consentVersion, version: f.version }, `${f.consentVersion} · form v${f.version}`)),
             responses: tx(String(f.responses)),
             ai: badge('Excluded', 'neutral'),
           },
         })),
-        'BranchHarbor forms', { description: 'Administrative questions only. Responses are excluded from AI context by default.', filters: [{ key: 'all', label: 'All' }, { key: 'active', label: 'Active' }, { key: 'draft', label: 'Draft' }] });
+        'BranchHarbor forms', { description: 'Administrative questions only. Responses are excluded from AI context by default.', filters: [['all', 'All'], ['active', 'Active'], ['draft', 'Draft']] });
     }
     case 'inventory': {
       const list = await http.get<{ items: ApiStockMovement[] }>(o('/commerce/stock-movements'), { limit: 300 }).then(items);
       const sign = (n: number) => (n > 0 ? `+${n}` : `−${Math.abs(n)}`);
       return tableOf('inventory', [['when', 'When'], ['item', 'Item'], ['change', 'Change', 'right'], ['reason', 'Reason'], ['balance', 'On hand after', 'right'], ['by', 'By']],
-        list.filter((x) => inS(x.locationId)).map((x) => ({
-          id: x.id, tags: [x.reason === 'sale' ? 'sale' : x.affectsOnHand ? 'adjust' : 'reserved'],
-          cells: {
-            when: tx(`${fmtDay(x.createdAt, x.location.timeZone, 'en')} ${fmtTime(x.createdAt, x.location.timeZone, 'en')}`, zoneLabel(x.location.timeZone, 'en')),
-            item: tx(`${x.variant.productName} · ${x.variant.name}`, `${x.variant.sku} · ${x.location.name}`, true),
-            change: tx(sign(x.quantity)),
-            reason: x.affectsOnHand ? tx(x.reasonLabel, x.note ?? x.reference ?? undefined) : badge(x.reasonLabel, 'info'),
-            balance: x.balanceAfter == null ? na('Not on-hand') : tx(String(x.balanceAfter)),
-            by: tx(x.createdByName),
-          },
-        })),
-        'Inventory history (movements, not just counts)', { description: 'Every change to stock with its reason. Reservations hold units for unpaid orders and do not change on-hand stock.', filters: [{ key: 'all', label: 'All' }, { key: 'adjust', label: 'Adjustments' }, { key: 'sale', label: 'Sales' }, { key: 'reserved', label: 'Reservations' }] });
+        list.filter((x) => inS(x.locationId)).map((x) => {
+          const reason = tbl(`reason.${x.reason}`, undefined, x.reasonLabel);
+          return {
+            id: x.id, tags: [x.reason === 'sale' ? 'sale' : x.affectsOnHand ? 'adjust' : 'reserved'],
+            cells: {
+              when: tx(whenText(x.createdAt, x.location.timeZone), zoneText(x.location.timeZone, x.createdAt)),
+              item: tx(`${x.variant.productName} · ${x.variant.name}`, `${x.variant.sku} · ${x.location.name}`, true),
+              change: tx(sign(x.quantity)),
+              reason: x.affectsOnHand ? tx(reason, x.note ?? x.reference ?? undefined) : badge(reason, 'info'),
+              balance: x.balanceAfter == null ? na('Not on-hand') : tx(String(x.balanceAfter)),
+              by: tx(x.createdByName),
+            },
+          };
+        }),
+        'Inventory history (movements, not just counts)', { description: 'Every change to stock with its reason. Reservations hold units for unpaid orders and do not change on-hand stock.', filters: [['all', 'All'], ['adjust', 'Adjustments'], ['sale', 'Sales'], ['reserved', 'Reservations']] });
     }
     case 'pickup': {
       const list = (await http.get<{ items: ApiPickupSettings[] }>(o('/foods/pickup-settings')).then(items)).filter((x) => inS(x.locationId));
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const hoursOf = (x: ApiPickupSettings) => {
-        const byDay = new Map<string, string[]>();
-        for (const h of [...x.hours].sort((a, b) => ((a.weekday + 6) % 7) - ((b.weekday + 6) % 7) || a.open.localeCompare(b.open))) byDay.set(days[h.weekday]!, [...(byDay.get(days[h.weekday]!) ?? []), `${h.open}–${h.close}`]);
-        const groups = new Map<string, string[]>();
-        for (const [d, w] of byDay) groups.set(w.join(', '), [...(groups.get(w.join(', ')) ?? []), d]);
-        return [...groups.entries()].map(([w, ds]) => `${ds.length > 2 ? `${ds[0]}–${ds[ds.length - 1]}` : ds.join(', ')} ${w}`).join(' · ') || 'No pickup hours';
+      // A fixed week (4–10 Jan 2026, Sunday first) gives each weekday a date to format in the viewer's language.
+      const dayRef = (wd: number): MsgParam => ({ t: 'date', at: `2026-01-0${4 + wd}T12:00:00Z`, style: 'weekday' });
+      const wall = (hhmm: string): MsgParam => ({ t: 'date', at: `2026-01-01T${hhmm}:00Z`, style: 'time' });
+      const hoursOf = (x: ApiPickupSettings): Txt => {
+        const byDay = new Map<number, { open: string; close: string }[]>();
+        for (const h of [...x.hours].sort((a, b) => ((a.weekday + 6) % 7) - ((b.weekday + 6) % 7) || a.open.localeCompare(b.open))) byDay.set(h.weekday, [...(byDay.get(h.weekday) ?? []), h]);
+        const groups = new Map<string, { days: number[]; windows: { open: string; close: string }[] }>();
+        for (const [d, w] of byDay) {
+          const k = w.map((h) => `${h.open}–${h.close}`).join(', ');
+          groups.set(k, { days: [...(groups.get(k)?.days ?? []), d], windows: w });
+        }
+        if (!groups.size) return lbl('cell', 'No pickup hours');
+        const parts = [...groups.values()].map(({ days: ds, windows }) => {
+          const daysPart: MsgRef = ds.length > 2 ? tbl('cell.dayRange', { from: dayRef(ds[0]!), to: dayRef(ds[ds.length - 1]!) }, `${days[ds[0]!]}–${days[ds[ds.length - 1]!]}`) : tbl('cell.list', { items: ds.map((d) => tbl('cell.value', { value: dayRef(d) }, days[d])) }, ds.map((d) => days[d]).join(', '));
+          const winPart: MsgRef = tbl('cell.list', { items: windows.map((h) => tbl('cell.timeRange', { from: wall(h.open), to: wall(h.close) }, `${h.open}–${h.close}`)) }, windows.map((h) => `${h.open}–${h.close}`).join(', '));
+          return tbl('cell.daysHours', { days: daysPart, hours: winPart }, `${plain(daysPart)} ${plain(winPart)}`);
+        });
+        return parts.reduce((acc, p) => tbl('cell.dot', { a: acc, b: p }, `${plain(acc)} · ${plain(p)}`));
       };
       const settingRows: [string, string, string | undefined, (x: ApiPickupSettings) => Cell][] = [
-        ['hours', 'Opening hours', 'Local time', (x) => tx(hoursOf(x), zoneLabel(x.location.timeZone, 'en'))],
-        ['slot', 'Slot length', undefined, (x) => tx(`${x.slotMinutes} min`)],
+        ['hours', 'Opening hours', 'Local time', (x) => tx(hoursOf(x), zoneText(x.location.timeZone))],
+        ['slot', 'Slot length', undefined, (x) => tx(minutesText(x.slotMinutes))],
         ['capacity', 'Orders per slot', undefined, (x) => tx(String(x.slotCapacity))],
-        ['cutoff', 'Order cut-off', undefined, (x) => tx(`${x.cutoffMinutes} min before pickup`)],
-        ['buffer', 'Prep buffer', 'Earliest pickup after ordering', (x) => tx(`${x.prepBufferMinutes} min`)],
-        ['horizon', 'Days bookable ahead', undefined, (x) => tx(`${x.horizonDays} day${x.horizonDays === 1 ? '' : 's'}`)],
-        ['closed', 'Closed dates', undefined, (x) => tx(x.closedDates.length ? x.closedDates.map((d) => fmtDate(`${d}T12:00:00Z`)).join(', ') : 'None')],
+        ['cutoff', 'Order cutoff', undefined, (x) => tx(tbl('cell.minBeforePickup', { count: x.cutoffMinutes }, `${x.cutoffMinutes} min before pickup`))],
+        ['buffer', 'Prep buffer', 'Earliest pickup after ordering', (x) => tx(minutesText(x.prepBufferMinutes))],
+        ['horizon', 'Days bookable ahead', undefined, (x) => tx(tbl('cell.days', { count: x.horizonDays }, `${x.horizonDays} day${x.horizonDays === 1 ? '' : 's'}`))],
+        ['closed', 'Closed dates', undefined, (x) => tx(x.closedDates.length ? tbl('cell.list', { items: x.closedDates.map((d) => tbl('cell.value', { value: dayArg(`${d}T12:00:00Z`) }, d)) }, x.closedDates.map((d) => fmtDate(`${d}T12:00:00Z`)).join(', ')) : lbl('cell', 'None'))],
         ['accepting', 'Taking pickup orders', undefined, (x) => (x.acceptingOrders ? badge('Yes', 'success') : badge('Paused', 'warning'))],
-        ['next', 'Next 24 h', 'Booked / capacity', (x) => tx(`${x.next24h.booked} / ${x.next24h.capacity}`, `${x.next24h.slots} slots`)],
+        ['next', 'Next 24 h', 'Booked / capacity', (x) => tx(`${x.next24h.booked} / ${x.next24h.capacity}`, tbl('cell.slots', { count: x.next24h.slots }, `${x.next24h.slots} slots`))],
         ['origin', 'Settings', undefined, (x) => (x.configured ? { t: 'origin', v: 'local' } : { t: 'origin', v: 'hq' })],
       ];
-      return tableOf('pickup', [['setting', 'Setting'], ...list.map((x): [string, string] => [x.locationId, x.location.name])],
-        settingRows.map(([id, label, sub, cell]) => ({ id, tags: [], cells: { setting: tx(label, sub, true), ...Object.fromEntries(list.map((x) => [x.locationId, cell(x)])) } })),
+      return tableOf('pickup', [['setting', 'Setting'], ...list.map((x): ColSpec => [x.locationId, x.location.name, undefined, true])],
+        settingRows.map(([id, label, sub, cell]) => ({ id, tags: [], cells: { setting: tx(lbl('setting', label), sub ? lbl('cell', sub) : undefined, true), ...Object.fromEntries(list.map((x) => [x.locationId, cell(x)])) } })),
         'Pickup settings · slots are generated from these', { description: 'Pickup slots are generated from each location’s hours, slot length and capacity. Orders close at the cut-off and never earlier than the preparation buffer allows.' });
     }
     default:
@@ -1197,7 +1266,7 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     const ind = ws().orgView?.industry ?? ctx.industry;
     // Roles without reports.read (e.g. staff) still get their upcoming work and alerts, just no metrics.
     const [r, up, attention] = await Promise.all([allowedFor(ctx, 'reports.read') ? report(ctx) : null, upcoming(ctx), attentionItems(ctx)]);
-    return { metrics: r ? overviewMetrics(ind, r) : [], upcomingTitle: up.title, upcomingTitleKey: up.titleKey, upcoming: up.items, attention: attention.map(({ at: _at, ...a }) => a), aiPrompt: AI_SUGGESTIONS[ind][0]!, aiPromptKey: `ai.live.${ind}` } satisfies Overview;
+    return { metrics: r ? overviewMetrics(ind, r) : [], upcomingTitle: up.title, upcomingTitleKey: up.titleKey, upcoming: up.items, attention: attention.map(({ at: _at, ...a }) => a), aiPrompt: AI_SUGGESTIONS[ind][0]![0], aiPromptKey: `ai.live.${ind}` } satisfies Overview;
   },
   table: (ctx, key) => liveTable(ctx, key),
   search: async (ctx, q) => {
@@ -1205,10 +1274,10 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     if (!needle) return [];
     const scope = inScope(ctx);
     const locs = ws().locations.filter((l) => scope.has(l.id) && (l.name.toLowerCase().includes(needle) || l.address.city.toLowerCase().includes(needle) || l.code.toLowerCase().includes(needle)));
-    const groups: { type: string; items: { id: string; label: string; sub: string; href: string }[] }[] = [];
-    if (locs.length) groups.push({ type: 'Locations', items: locs.map((l) => ({ id: l.id, label: l.name, sub: `${l.address.city} · ${l.currency} · ${l.timeZone}`, href: `/locations?open=${l.id}` })) });
+    const groups: SearchGroup[] = [];
+    if (locs.length) groups.push({ type: 'locations', items: locs.map((l) => ({ id: l.id, label: l.name, sub: `${l.address.city} · ${l.currency} · ${l.timeZone}`, href: `/locations?open=${l.id}` })) });
     const people = (await members()).filter((p) => p.user.name.toLowerCase().includes(needle) || p.user.email.toLowerCase().includes(needle));
-    if (people.length) groups.push({ type: 'Team', items: people.map((p) => ({ id: p.user.id, label: p.user.name, sub: p.assignments.map((a) => ROLE_LABEL[a.role] ?? a.role).join(', '), href: '/team' })) });
+    if (people.length) groups.push({ type: 'team', items: people.map((p) => ({ id: p.user.id, label: p.user.name, sub: p.assignments.map((a) => ROLE_LABEL[a.role] ?? a.role).join(', '), subMsg: ref('search.roles', { roles: p.assignments.map((a) => ref(`role.${a.role}`, undefined, ROLE_LABEL[a.role] ?? a.role)) }), href: '/team' })) });
     return groups;
   },
   notifications: async (ctx) => (await attentionItems(ctx)).map((a) => ({ id: a.id, kind: a.kind, title: a.title, titleKey: a.titleKey, titleParams: a.titleParams, at: a.at, href: a.href })),
@@ -1482,33 +1551,46 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     const r = await report(ctx);
     const short = (n: string) => n.split(' – ').pop()!;
     const out: Report[] = [];
+    const R = (key: string, text: string, params?: MsgParams) => ref(`report.${key}`, params, text);
     const fresh = (f: ApiMetric<unknown>['freshness']) => `${f.source}${f.lastSyncAt ? ` · synced ${new Date(f.lastSyncAt).toISOString().slice(11, 16)} UTC` : ''}`;
+    const freshMsg = (f: ApiMetric<unknown>['freshness']) => { const x = freshnessMsg(f); return ref(x.sourceKey, x.sourceParams, fresh(f)); };
+    const revenueTitle = (cur: string) => R('title.revenue', `Revenue · ${cur} · 30 days`, { currency: cur, days: 30 });
     // Independent businesses: one location, so totals per currency without a per-location breakdown.
     const indep = ws().orgView?.model === 'independent';
     if (indep) {
       for (const row of r.metrics.revenue.value ?? []) {
-        out.push({ id: `rev_${row.currency}`, title: `Revenue · ${row.currency} · 30 days`, freshness: fresh(r.metrics.revenue.freshness), unit: 'money', currency: row.currency, bars: [{ label: ws().orgView!.name, value: row.netMinor }], note: 'Net of refunds.' });
+        out.push({ id: `rev_${row.currency}`, title: `Revenue · ${row.currency} · 30 days`, titleMsg: revenueTitle(row.currency), freshness: fresh(r.metrics.revenue.freshness), freshnessMsg: freshMsg(r.metrics.revenue.freshness), unit: 'money', currency: row.currency, bars: [{ label: ws().orgView!.name, value: row.netMinor }], note: 'Net of refunds.', noteMsg: R('note.net', 'Net of refunds.') });
       }
     }
     const currencies = [...new Set(r.revenueByLocation.map((x) => x.currency))];
     for (const cur of currencies) {
       const locs = r.revenueByLocation.filter((x) => x.currency === cur);
+      const missing = locs.some((x) => !x.revenue.length);
+      const note = missing ? 'Missing bars are Unavailable or Not connected — never zero. Refunds are excluded (net).' : 'Net of refunds.';
       out.push({
-        id: `rev_${cur}`, title: `Revenue · ${cur} · 30 days`, freshness: fresh(r.metrics.revenue.freshness), unit: 'money', currency: cur,
+        id: `rev_${cur}`, title: `Revenue · ${cur} · 30 days`, titleMsg: revenueTitle(cur), freshness: fresh(r.metrics.revenue.freshness), freshnessMsg: freshMsg(r.metrics.revenue.freshness), unit: 'money', currency: cur,
         bars: locs.map((x) => {
           const row = x.revenue.find((v) => v.currency === cur);
           return { label: short(x.name), value: row ? row.netMinor : locationById(x.locationId)?.site === 'live' || row ? 0 : null };
         }),
-        note: locs.some((x) => !x.revenue.length) ? 'Missing bars are Unavailable or Not connected — never zero. Refunds are excluded (net).' : 'Net of refunds.',
+        note, noteMsg: R(missing ? 'note.missingNet' : 'note.net', note),
       });
     }
-    if (!indep) out.push({ id: 'cmb', title: 'Combined revenue', freshness: 'Not calculated', unit: 'money', bars: [], note: r.metrics.combinedRevenue.unavailableReason ?? (currencies.length > 1 ? `Not shown: no conversion method is defined for ${currencies.join(' + ')}.` : 'Only one currency in this scope.') });
-    const single = (id: string, title: string, mt: ApiMetric<number>, unit: Report['unit'], scale = 1) =>
-      out.push({ id, title, freshness: fresh(mt.freshness), stale: !mt.freshness.complete, unit, bars: [{ label: indep ? ws().orgView!.name : `${r.scope.locationCount} locations`, value: mt.value == null ? null : Math.round(mt.value * scale) }], note: mt.unavailableReason ?? mt.definition });
-    single('leads', 'Enquiries · 30 days', r.metrics.leads, 'count');
+    if (!indep) {
+      const cmb = r.metrics.combinedRevenue;
+      const note = cmb.unavailableReason ?? (currencies.length > 1 ? `Not shown: no conversion method is defined for ${currencies.join(' + ')}.` : 'Only one currency in this scope.');
+      const noteMsg = cmb.unavailableCode ? ref(`metricReason.${cmb.unavailableCode}`, { ...(cmb.unavailableParams ?? {}) }, note) : cmb.unavailableReason ? undefined : currencies.length > 1 ? R('note.noConversion', note, { list: currencies.join(' + ') }) : R('note.oneCurrency', note);
+      out.push({ id: 'cmb', title: 'Combined revenue', titleMsg: R('title.combined', 'Combined revenue'), freshness: 'Not calculated', freshnessMsg: R('fresh.notCalculated', 'Not calculated'), unit: 'money', bars: [], note, ...(noteMsg ? { noteMsg } : {}) });
+    }
+    const single = (id: string, title: MsgRef, mt: ApiMetric<number>, unit: Report['unit'], defKey: string, scale = 1) => {
+      const note = mt.unavailableReason ?? mt.definition;
+      const noteMsg = mt.unavailableCode ? ref(`metricReason.${mt.unavailableCode}`, { ...(mt.unavailableParams ?? {}) }, note) : mt.unavailableReason ? undefined : ref(defKey, undefined, note);
+      out.push({ id, title: plain(title), titleMsg: title, freshness: fresh(mt.freshness), freshnessMsg: freshMsg(mt.freshness), stale: !mt.freshness.complete, unit, bars: [{ label: indep ? ws().orgView!.name : `${r.scope.locationCount} locations`, value: mt.value == null ? null : Math.round(mt.value * scale) }], note, ...(noteMsg ? { noteMsg } : {}) });
+    };
+    single('leads', R('title.inquiries', 'Inquiries · 30 days', { days: 30 }), r.metrics.leads, 'count', 'metric.live.enquiries.definition');
     const ind = ws().orgView?.industry;
-    if (ind === 'studios') single('occ', 'Occupancy', r.metrics.occupancy, 'percent', 100);
-    if (ind === 'wellness') single('appts', 'Appointments', r.metrics.appointments, 'count');
+    if (ind === 'studios') single('occ', R('title.occupancy', 'Occupancy'), r.metrics.occupancy, 'percent', 'metric.live.occupancy.definition', 100);
+    if (ind === 'wellness') single('appts', R('title.appointments', 'Appointments'), r.metrics.appointments, 'count', 'metric.live.appointments.definition');
     return out;
   },
 
@@ -1620,7 +1702,10 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
   },
 
   ai: {
-    suggestions: async (ctx) => AI_SUGGESTIONS[ws().orgView?.industry ?? ctx.industry],
+    suggestions: async (ctx) => {
+      const ind = ws().orgView?.industry ?? ctx.industry;
+      return AI_SUGGESTIONS[ind].map(([text, multiLocation, action], i): AiSuggestion => ({ id: `s${i}`, text, textMsg: ref(`ai.liveSuggest.${ind}.s${i}`, undefined, text), multiLocation, action }));
+    },
     ask: async (ctx, question) => {
       const status = await http.get<{ available: boolean; message?: string }>(o('/ai/status'));
       if (!status.available) throw new ApiError('ai_unavailable', status.message ?? 'BranchHarbor AI is unavailable right now. Everything else keeps working.', 503);
@@ -1630,8 +1715,9 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
       const a = r.proposedActions[0];
       const kind: NonNullable<AiAnswer['action']>['kind'] = a?.kind.includes('campaign') ? 'draft' : a?.kind.includes('page') ? 'publish' : 'draft';
       return {
-        id: conv.id, question, answer: r.reply, assumptions: r.scope?.label ? `Scope: ${r.scope.label}.` : undefined,
-        sources: r.sources.map((s) => ({ label: s, freshness: 'Live' })),
+        id: conv.id, question, answer: r.reply,
+        ...(r.scope?.label ? { assumptions: `Scope: ${r.scope.label}.`, assumptionsMsg: ref('ai.scopeOnly', { scope: r.scope.label }, `Scope: ${r.scope.label}.`) } : {}),
+        sources: r.sources.map((s) => ({ label: s, freshness: 'Live', freshnessMsg: ref('ai.fresh.live', undefined, 'Live') })),
         action: a ? { id: a.id, title: a.summary, kind, affected: [scopeLabel({ kind: a.scopeKind, id: a.scopeId })], excluded: [], requires: kind === 'publish' ? 'website.publish' : 'marketing.draft' } : undefined,
       };
     },

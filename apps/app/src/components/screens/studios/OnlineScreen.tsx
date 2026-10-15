@@ -10,10 +10,22 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty, LoadingBlock } from '../../ui/States';
 import { ErrorLine, Labeled, StudioAsync, fmtMoney, inputCls, toMinor } from './shared';
+import { useDataText } from '../../ui/useDataText';
+
+/** Access rules in the viewer's language, from the same flags the API phrases `rules` from (data `onlineRule.*`). */
+function onlineRuleCodes(c: OnlineItem): string[] {
+  const r: string[] = [];
+  if (c.allowFree) r.push('free_with_registration');
+  if (c.allowMembers) r.push('members');
+  if (c.allowPackHolders) r.push('pack_holders');
+  if (Object.keys(c.prices).length) r.push('buy');
+  return r.length ? r : ['not_available'];
+}
 
 /** Online classes: livestreams and the recordings library with access permissions. Join links are revealed only to entitled, registered customers. */
 export function OnlineScreen() {
   const t = useTranslations('studiosFull.online');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const [tab, setTab] = useState<'livestream' | 'on_demand'>('livestream');
@@ -40,7 +52,7 @@ export function OnlineScreen() {
                       <span className="ml-auto text-xs">{t('registrationsN', { n: c.registrations ?? 0 })}</span>
                     </div>
                     <div className="text-xs text-graphite">{[c.instructorName, c.locationName ?? t('network'), c.startsAt ? fmtDateTime(c.startsAt, app.locations.find((l) => l.id === c.locationId)?.timeZone ?? 'UTC', locale) : null, c.durationMinutes ? t('minutes', { n: c.durationMinutes }) : null, t(`provider.${c.provider}`)].filter(Boolean).join(' · ')}</div>
-                    <div className="flex flex-wrap gap-1.5">{c.rules.map((r) => <Badge key={r} tone="info">{r}</Badge>)}{Object.entries(c.prices).map(([cur, a]) => <Badge key={cur} tone="neutral">{fmtMoney(a, cur, locale)}</Badge>)}</div>
+                    <div className="flex flex-wrap gap-1.5">{onlineRuleCodes(c).map((code, i) => <Badge key={code} tone="info">{dt(`onlineRule.${code}`, undefined, c.rules[i] ?? code)}</Badge>)}{Object.entries(c.prices).map(([cur, a]) => <Badge key={cur} tone="neutral">{fmtMoney(a, cur, locale)}</Badge>)}</div>
                     <div className="flex flex-wrap items-center gap-2 text-xs">
                       {c.providerUrl && (showUrl === c.id ? <code className="rounded bg-canvas px-2 py-0.5">{c.providerUrl}</code> : <Button size="sm" variant="ghost" icon="eye" onClick={() => setShowUrl(c.id)}>{t('revealLink')}</Button>)}
                       <Button size="sm" variant="ghost" icon="users" onClick={() => setOpen(c)}>{t('registrations')}</Button>

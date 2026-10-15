@@ -12,6 +12,7 @@ import type { ViewRole } from '../types';
 import type {
   Agent, AiResult, Enquiry, FeedPreview, ListingDetail, ListingInput, Offer, Office, Portal, RealtyListing, RealtyMe, RealtyReport, SyndicationRow, Viewing,
 } from './types';
+import { useLocalizeErrorRef } from '../useErrorText';
 
 export interface RealtyCtx {
   role: ViewRole;
@@ -128,6 +129,7 @@ const asErr = (e: unknown) => (e instanceof ApiError ? e : new ApiError('unknown
 /** Loads realty data; same contract as useApi (loading / ready / error, reload, setData). */
 export function useRealty<T>(fn: (api: RealtyApi) => Promise<T>, deps: unknown[]) {
   const [res, setRes] = useState<Res<T>>({ status: 'loading' });
+  const localize = useLocalizeErrorRef();
   const seq = useRef(0);
   const fnRef = useRef(fn);
   fnRef.current = fn;
@@ -139,7 +141,7 @@ export function useRealty<T>(fn: (api: RealtyApi) => Promise<T>, deps: unknown[]
         const data = await fnRef.current(await getRealtyApi());
         if (id === seq.current) setRes({ status: 'ready', data });
       } catch (e) {
-        if (id === seq.current) setRes({ status: 'error', error: asErr(e) });
+        if (id === seq.current) setRes({ status: 'error', error: localize.current(asErr(e)) });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,6 +153,7 @@ export function useRealty<T>(fn: (api: RealtyApi) => Promise<T>, deps: unknown[]
 export function useRealtyMutation<A extends unknown[], R>(fn: (api: RealtyApi, ...args: A) => Promise<R>) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeErrorRef();
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const run = useCallback(async (...args: A): Promise<R | undefined> => {
@@ -159,7 +162,7 @@ export function useRealtyMutation<A extends unknown[], R>(fn: (api: RealtyApi, .
     try {
       return await fnRef.current(await getRealtyApi(), ...args);
     } catch (e) {
-      setError(asErr(e));
+      setError(localize.current(asErr(e)));
       return undefined;
     } finally {
       setPending(false);

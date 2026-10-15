@@ -1,17 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, DataTable, Icon, cx, type Column } from '@bh/ui';
 import type { IconName } from '@bh/icons';
 import type { Permission } from '@bh/shared';
-import type { TableData } from '@/lib/types';
+import type { Cell, TableData } from '@/lib/types';
 import { useApi } from '@/lib/useApi';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, Banner, Empty, LoadingBlock } from '../ui/States';
 import { CellView } from './CellView';
+import { useTxt } from '../ui/useDataText';
 
 type Row = TableData['rows'][number];
 
@@ -24,10 +25,11 @@ export function TableScreen({ tableKey, title, icon, permission, description }: 
   const [q, setQ] = useState('');
   const [planned, setPlanned] = useState(false);
   const res = useApi((api) => api.table(app.ctx, tableKey), [app.industry, app.role, app.scopeId, tableKey]);
+  const tt = useTxt();
 
   const actions = res.status === 'ready' && res.data.primaryAction ? (
     <Button icon="plus" onClick={() => setPlanned(true)}>
-      {res.data.primaryAction}
+      {tt(res.data.primaryAction, res.data.primaryActionMsg)}
     </Button>
   ) : null;
 
@@ -48,20 +50,28 @@ export function TableScreen({ tableKey, title, icon, permission, description }: 
 
 function TableBody({ data, filter, setFilter, q, setQ, scopeLabel }: { data: TableData; filter: string; setFilter: (f: string) => void; q: string; setQ: (q: string) => void; scopeLabel: string }) {
   const t = useTranslations('table');
-  const rows = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    return data.rows.filter((r) => (filter === 'all' || r.tags.includes(filter)) && (!needle || JSON.stringify(r.cells).toLowerCase().includes(needle)));
-  }, [data, filter, q]);
-  const columns: Column<Row>[] = data.columns.map((c) => ({ key: c.key, header: c.label, align: c.align, render: (r) => <CellView c={r.cells[c.key]} /> }));
+  const tt = useTxt();
+  // Search what the viewer sees (translated labels, business data as is).
+  const cellText = (c: Cell | undefined): string => {
+    if (!c) return '';
+    if (c.t === 'text') return `${tt(c.v, c.vMsg)} ${c.sub ? tt(c.sub, c.subMsg) : ''}`;
+    if (c.t === 'badge') return tt(c.v, c.vMsg);
+    if (c.t === 'money') return c.sub ? tt(c.sub, c.subMsg) : '';
+    if (c.t === 'unavailable') return c.reason ? tt(c.reason, c.reasonMsg) : '';
+    return '';
+  };
+  const needle = q.trim().toLocaleLowerCase();
+  const rows = data.rows.filter((r) => (filter === 'all' || r.tags.includes(filter)) && (!needle || Object.values(r.cells).map(cellText).join(' ').toLocaleLowerCase().includes(needle)));
+  const columns: Column<Row>[] = data.columns.map((c) => ({ key: c.key, header: tt(c.label, c.labelMsg), align: c.align, render: (r) => <CellView c={r.cells[c.key]} /> }));
 
   return (
     <section className="rounded-xl bg-surface p-3.5">
-      {data.description && <p className="px-1 pb-3 text-sm text-stone">{data.description}</p>}
+      {data.description && <p className="px-1 pb-3 text-sm text-stone">{tt(data.description, data.descriptionMsg)}</p>}
       <div className="flex flex-wrap items-center gap-2 px-1 pb-3">
         <div role="group" aria-label={t('filters')} className="flex flex-wrap gap-2">
           {data.filters.map((f) => (
             <button key={f.key} type="button" aria-pressed={filter === f.key} onClick={() => setFilter(f.key)} className={cx('h-9 rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold', filter === f.key ? 'border-ink bg-ink text-white' : 'border-line-soft bg-surface hover:border-ink')}>
-              {f.label}
+              {tt(f.label, f.labelMsg)}
             </button>
           ))}
         </div>
@@ -83,7 +93,7 @@ function TableBody({ data, filter, setFilter, q, setQ, scopeLabel }: { data: Tab
       )}
       <p className="flex items-center gap-1.5 px-1 pt-3 text-xs text-stone">
         <Icon name="info" size={12} />
-        {t('source', { source: data.source })}
+        {t('source', { source: tt(data.source, data.sourceMsg) })}
       </p>
     </section>
   );

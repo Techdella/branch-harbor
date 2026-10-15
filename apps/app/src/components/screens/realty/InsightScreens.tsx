@@ -11,6 +11,8 @@ import { fmtNumber, money, relativeTime } from '@/lib/format';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty } from '../../ui/States';
 import { RAsync, Stat, useRealtyCtx } from './common';
+import { reportSourceKey } from '@/lib/msg';
+import { useDataText } from '../../ui/useDataText';
 
 function Volumes({ rows }: { rows: VolumeRow[] }) {
   const t = useTranslations('realty');
@@ -26,6 +28,7 @@ function Volumes({ rows }: { rows: VolumeRow[] }) {
 /** Network/office pulse: listings, days on market, funnel and volume per currency (never combined). */
 export function PulseScreen() {
   const t = useTranslations('realty');
+  const dt = useDataText();
   const tOps = useTranslations('ops.realty.pulse');
   const locale = useLocale();
   const ctx = useRealtyCtx();
@@ -69,8 +72,8 @@ export function PulseScreen() {
                   ))}
                 </tbody>
               </table>
-              <p className="mt-2 text-xs text-stone">{r.definitions?.daysOnMarket} {r.definitions?.funnel} {t('pulse.privacy')}</p>
-              {r.generatedAt && <p className="text-xs text-mute">{t('pulse.freshness', { when: relativeTime(r.generatedAt, locale), source: r.source ?? '' })}</p>}
+              <p className="mt-2 text-xs text-stone">{r.definitions?.daysOnMarket && dt('realtyReport.definition.daysOnMarket', undefined, r.definitions.daysOnMarket)} {r.definitions?.funnel && dt('realtyReport.definition.funnel', undefined, r.definitions.funnel)} {t('pulse.privacy')}</p>
+              {r.generatedAt && <p className="text-xs text-mute">{t('pulse.freshness', { when: relativeTime(r.generatedAt, locale), source: r.source ? dt(reportSourceKey(r.source), undefined, r.source) : '' })}</p>}
             </section>
           </div>
         )}
@@ -83,6 +86,7 @@ export function PulseScreen() {
 export function PortalsScreen() {
   const t = useTranslations('realty');
   const tp = useTranslations('partners');
+  const dt = useDataText();
   const tOps = useTranslations('ops.realty.portals');
   const locale = useLocale();
   const ctx = useRealtyCtx();
@@ -124,7 +128,7 @@ export function PortalsScreen() {
                   <Badge tone={p.live ? 'success' : 'warning'} icon={p.live ? 'check-circle' : 'lock'}>{p.live ? tp('status.live') : t('portals.sandbox')}</Badge>
                   <Badge tone="neutral">{p.format.toUpperCase()}</Badge>
                 </div>
-                <p className="text-xs text-stone">{p.description} · {p.countries.join(', ')} · {tp(`portals.delivery.${p.delivery}`)}</p>
+                <p className="text-xs text-stone">{dt(`realtyPortal.description.${p.id}`, undefined, p.description)} · {p.countries.join(', ')} · {tp(`portals.delivery.${p.delivery}`)}</p>
                 <p className="text-xs">{t('portals.optedIn', { count: p.optedInListings })}{p.invalidListings ? ` · ${t('portals.issues', { count: p.invalidListings })}` : ''} · {p.lastExportedAt ? t('portals.lastExport', { when: relativeTime(p.lastExportedAt, locale) }) : t('portals.neverExported')}</p>
                 <div>
                   <h3 className="text-xs font-bold uppercase text-stone">{tp('portals.statusTitle')}</h3>
@@ -134,7 +138,7 @@ export function PortalsScreen() {
                         <li key={o.locationId} className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="font-semibold">{o.name}</span>
                           <Badge tone={tone(o.status)}>{tp(`status.${o.status}`)}</Badge>
-                          <span className="text-stone">{o.lastPush ? tp('portals.lastPush', { action: o.lastPush.action.replace('_', ' '), status: o.lastPush.status, when: relativeTime(o.lastPush.at, locale) }) : o.statusReason}</span>
+                          <span className="text-stone">{o.lastPush ? tp('portals.lastPush', { action: o.lastPush.action.replace('_', ' '), status: o.lastPush.status, when: relativeTime(o.lastPush.at, locale) }) : o.status === 'sandbox' || o.status === 'not_configured' ? dt(`realtyPortal.reason.${o.status}`, undefined, o.statusReason) : o.statusReason}</span>
                         </li>
                       ))}
                     </ul>

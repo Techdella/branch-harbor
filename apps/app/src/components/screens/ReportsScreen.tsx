@@ -9,6 +9,7 @@ import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, DeniedState, Empty, LoadingBlock } from '../ui/States';
+import { useTxt } from '../ui/useDataText';
 
 function fmt(r: Report, v: number, locale: string) {
   if (r.unit === 'percent') return `${v}%`;
@@ -18,6 +19,7 @@ function fmt(r: Report, v: number, locale: string) {
 
 export function ReportsScreen() {
   const t = useTranslations('reports');
+  const tt = useTxt();
   const locale = useLocale();
   const app = useApp();
   const scopeLabel = useScopeLabel();
@@ -38,10 +40,10 @@ export function ReportsScreen() {
               return (
                 <section key={r.id} className="flex flex-col gap-3 rounded-xl bg-surface p-5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-base font-bold">{r.title}</h2>
+                    <h2 className="text-base font-bold">{tt(r.title, r.titleMsg)}</h2>
                     <span className={r.stale ? 'flex items-center gap-1 rounded-full bg-warning-bg px-2 py-0.5 text-[11px] font-bold text-warning' : 'flex items-center gap-1 text-[11px] text-stone'}>
                       <Icon name={r.stale ? 'alert' : 'clock'} size={11} />
-                      {r.freshness}
+                      {tt(r.freshness, r.freshnessMsg)}
                     </span>
                   </div>
                   {independent && r.bars.length === 1 ? (
@@ -50,7 +52,7 @@ export function ReportsScreen() {
                     </div>
                   ) : r.bars.length > 0 ? (
                     <figure>
-                      <div className="flex h-[150px] items-end gap-2" role="img" aria-label={t('chartLabel', { title: r.title, values: r.bars.map((b) => `${b.label}: ${b.value == null ? t('unavailable') : fmt(r, b.value, locale)}`).join('; ') })}>
+                      <div className="flex h-[150px] items-end gap-2" role="img" aria-label={t('chartLabel', { title: tt(r.title, r.titleMsg), values: r.bars.map((b) => `${b.label}: ${b.value == null ? t('unavailable') : fmt(r, b.value, locale)}`).join('; ') })}>
                         {r.bars.map((b) => (
                           <div key={b.label} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
                             <span className="tabular text-[10px] font-bold">{b.value == null ? t('na') : fmt(r, b.value, locale)}</span>
@@ -65,7 +67,7 @@ export function ReportsScreen() {
                       <strong className="text-lg">{t('notShown')}</strong>
                     </div>
                   )}
-                  <p className="text-[11px] leading-normal text-stone">{r.note}</p>
+                  <p className="text-[11px] leading-normal text-stone">{tt(r.note, r.noteMsg)}</p>
                 </section>
               );
             })}

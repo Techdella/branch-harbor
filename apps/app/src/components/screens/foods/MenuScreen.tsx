@@ -10,6 +10,7 @@ import { moneyWithCode } from '@/lib/format';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, LoadingBlock } from '../../ui/States';
+import { useDataText, useTxt } from '../../ui/useDataText';
 
 function Origin({ f }: { f: MenuField }) {
   const t = useTranslations('menu');
@@ -25,6 +26,8 @@ function Origin({ f }: { f: MenuField }) {
 
 export function MenuScreen() {
   const t = useTranslations('menu');
+  const tt = useTxt();
+  const dt = useDataText();
   const tOps = useTranslations('ops.foods.menu');
   const locale = useLocale();
   const app = useApp();
@@ -67,14 +70,14 @@ export function MenuScreen() {
                   {m.statusNote && (
                     <p className="flex items-center gap-1.5 text-xs font-semibold text-warning">
                       <Icon name="alert" size={12} />
-                      {m.statusNote}
+                      {tt(m.statusNote, m.statusNoteMsg)}
                     </p>
                   )}
                   {m.fields.map((f) => (
                     <div key={f.key} className="flex items-center justify-between gap-2 rounded-[14px] bg-canvas-raised px-2.5 py-2 text-[13px]">
-                      <span className="text-stone">{f.label}</span>
+                      <span className="text-stone">{dt(`menu.field.${f.key === 'price' && !f.money ? 'marketPrices' : f.key}`, undefined, f.label)}</span>
                       <span className="flex flex-wrap items-center justify-end gap-1.5 text-right">
-                        <strong className={cx('tabular', f.key === 'availability' && f.value === 'Sold out' && 'text-danger')}>{f.money ? moneyWithCode(f.money, locale) : f.value}</strong>
+                        <strong className={cx('tabular', f.key === 'availability' && f.value === 'Sold out' && 'text-danger')}>{f.money ? moneyWithCode(f.money, locale) : f.key === 'availability' ? dt(f.value === 'Available' ? 'menu.availability.available' : f.value === 'Sold out' ? 'menu.availability.soldOut' : undefined, undefined, f.value) : f.value}</strong>
                         <Origin f={f} />
                         {f.resettable && (
                           <button

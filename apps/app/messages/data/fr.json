@@ -350,6 +350,115 @@
       "commerce": "Expliquer la tendance des commandes cette semaine",
       "foods": "Résumer les commandes du jour par établissement",
       "realty": "Quelles agences demandent de l’attention ?"
+    },
+    "withScope": "{text} Périmètre : {scope}.",
+    "scopeOnly": "Périmètre : {scope}.",
+    "fresh": {
+      "updatedMinAgo": "Mis à jour il y a {count} min",
+      "lastSuccessHoursAgo": "Dernière réussite il y a {count} h",
+      "publishedOn": "Publié le {date}",
+      "live": "En direct",
+      "offlineSince": "Hors ligne depuis {time}"
+    },
+    "liveSuggest": {
+      "studios": {
+        "s0": "Résumer le taux de remplissage des cours ce mois-ci",
+        "s1": "Rédiger une campagne multi-établissements",
+        "s2": "Quels établissements demandent de l’attention ?"
+      },
+      "sports": {
+        "s0": "Résumer les inscriptions à examiner",
+        "s1": "Rédiger l’annonce d’un programme",
+        "s2": "Quelles équipes sont presque complètes ?"
+      },
+      "wellness": {
+        "s0": "Résumer les rendez-vous de la semaine",
+        "s1": "Rédiger une réponse selon notre politique d’annulation",
+        "s2": "Quels praticiens sont complets ?"
+      },
+      "commerce": {
+        "s0": "Expliquer la tendance des commandes cette semaine",
+        "s1": "Rédiger un texte produit",
+        "s2": "Quelles boutiques ont échoué à la dernière synchronisation ?"
+      },
+      "foods": {
+        "s0": "Résumer les commandes du jour par établissement",
+        "s1": "Rédiger un texte pour la carte",
+        "s2": "Préparer une promotion du midi"
+      },
+      "realty": {
+        "s0": "Quelles agences demandent de l’attention ?",
+        "s1": "Rédiger une campagne pour les nouvelles annonces",
+        "s2": "Résumer les demandes de la semaine"
+      }
+    },
+    "mock": {
+      "studios": {
+        "s0": "Résumer l’évolution de la fréquentation ce mois-ci",
+        "s1": "Rédiger une campagne du Nouvel An multi-établissements",
+        "s2": "Rédiger la description du cours Slow Flow",
+        "answer": "L’occupation a augmenté à Queen West (+6 pts) et à Leslieville (+3) par rapport à septembre. Shoreditch est stable et Surry Hills recule de 2 pts. Kitsilano ne peut pas être comparé : sa synchronisation des réservations est dégradée depuis 09:40, heure locale. L’occupation seule ne me permet pas de dire pourquoi la fréquentation a changé.",
+        "assumptions": "Comparaison du 1er au 13 octobre avec les mêmes jours de septembre, dans le fuseau horaire de chaque studio.",
+        "src0": "Connexion de réservation · séances de cours",
+        "src1": "Synchronisation des réservations de Kitsilano",
+        "actionTitle": "Rédiger la campagne « New year, new practice » pour 3 studios canadiens",
+        "excluded0": "Seattle – Capitol Hill (tarifs d’offre différents)",
+        "excluded1": "Londres, Berlin, Sydney (hors du périmètre de la campagne)"
+      },
+      "sports": {
+        "s0": "Proposer une solution au conflit sur le terrain 2",
+        "s1": "Résumer les inscriptions des U10",
+        "s2": "Rédiger l’annonce du stage",
+        "answer": "Déplacez U12 Camp sur le terrain 1 à 17:00 (libre jusqu’à 18:30), ou décalez U10 Blue à 16:00 au Hillcrest Dome. Les deux options ne concernent que ces deux groupes. Je ne sélectionne ni ne déplace de participants — cela reste du ressort de vos entraîneurs.",
+        "assumptions": "Utilise les réservations de terrains d’aujourd’hui à Riverside Park, heure du Pacifique.",
+        "src0": "Planning · réservations de terrains",
+        "actionTitle": "Rédiger un avis aux responsables légaux de U12 Camp sur le changement de terrain",
+        "affected0": "U12 Camp · 22 responsables légaux à Riverside Park",
+        "excluded0": "Tous les autres groupes et terrains"
+      },
+      "wellness": {
+        "s0": "Rédiger une réponse selon notre politique d’annulation",
+        "s1": "Résumer le taux d’occupation par praticien",
+        "s2": "Rédiger un texte pour Hot stone",
+        "answer": "Brouillon : « Bonjour Jordan, vous pouvez déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant. J’ai trouvé jeudi 17:00 avec Rina si cela vous convient. » Je n’ai utilisé aucune donnée du formulaire d’accueil.",
+        "assumptions": "La politique d’annulation v2 s’applique à Harbourfront. Les réponses aux formulaires d’accueil sont exclues du contexte de l’IA.",
+        "src0": "Politiques › Annulation v2",
+        "src1": "Agenda · Harbourfront",
+        "actionTitle": "Envoyer la réponse à Jordan P. par e-mail"
+      },
+      "commerce": {
+        "s0": "Expliquer la tendance des stocks cette semaine",
+        "s1": "Rédiger un texte pour Canvas tote à partir de sa fiche technique",
+        "s2": "Quelles boutiques ont échoué à la dernière synchronisation ?",
+        "answer": "Linen overshirt L s’est vendu à 9 unités à Portland en 7 jours, contre 3 la semaine précédente ; il en reste 1 en stock. Merino crew est stable. Ces chiffres ne reposent que sur les commandes WooCommerce : les ventes en boutique ne sont pas connectées et Austin est exclue tant qu’elle est déconnectée.",
+        "assumptions": "Le chiffre d’affaires est présenté par devise (USD, CAD, EUR) et jamais additionné.",
+        "src0": "Commandes WooCommerce",
+        "src1": "Historique de stock",
+        "actionTitle": "Rédiger une note de réassort pour Linen overshirt L à Portland",
+        "excluded0": "Boutique d’Austin (déconnectée)"
+      },
+      "foods": {
+        "s0": "Résumer la production du jour par article",
+        "s1": "Rédiger le texte de la carte pour la flatbread",
+        "s2": "Préparer une promotion du midi pour Seattle",
+        "answer": "Ballard pour l’instant : 14 Ember bowls, 8 sandwichs au brisket, 6 flatbreads, 11 citronnades. Fremont manque, car son écran cuisine est hors ligne, même si des commandes y sont arrivées. Je ne peux pas modifier les prix, les mentions alimentaires ni l’acceptation des commandes.",
+        "assumptions": "Compte les commandes acceptées depuis l’ouverture, heure du Pacifique.",
+        "src0": "Commandes · Ballard",
+        "src1": "Écran cuisine de Fremont",
+        "actionTitle": "Rédiger la promotion « Weekday lunch » pour les établissements de Seattle",
+        "excluded0": "Vancouver, Londres, Berlin (hors du périmètre demandé)"
+      },
+      "realty": {
+        "s0": "Résumer les retours de visite pour 42 Birchmount Cres",
+        "s1": "Rédiger une description de la Suite 1806 à partir de ses caractéristiques",
+        "s2": "Qui dois-je relancer cette semaine ?",
+        "answer": "Trois visites au 42 Birchmount Cres ont donné lieu à un retour : deux l’ont noté 4–5 et ont aimé la cuisine et le jardin ; une a soulevé la hauteur sous plafond du sous-sol. Un acheteur a posé des questions sur les dates de signature. Je n’ai utilisé que les retours enregistrés — l’identité des acheteurs ne m’a pas été communiquée.",
+        "assumptions": "Retours des visites effectuées ces 14 derniers jours, heure de Toronto. Les absences non signalées sont exclues.",
+        "src0": "Visites · retours",
+        "actionTitle": "Rédiger des e-mails de relance pour 2 acheteurs intéressés",
+        "affected0": "Toronto Midtown · 2 acheteurs",
+        "excluded0": "Acheteurs sans consentement e-mail"
+      }
     }
   },
   "cover": {
@@ -447,7 +556,19 @@
     "approvedComment": "{name} a validé « {field} » · « {comment} »",
     "rejected": "{name} a refusé « {field} »",
     "rejectedComment": "{name} a refusé « {field} » · « {comment} »",
-    "resetToHq": "« {field} » rétabli à la valeur par défaut du siège"
+    "resetToHq": "« {field} » rétabli à la valeur par défaut du siège",
+    "field": {
+      "brand": "Nom de la marque",
+      "nav": "Navigation de l’en-tête",
+      "headline": "Titre principal",
+      "offer": "Ligne d’offre d’essai",
+      "hours": "Horaires d’ouverture",
+      "phone": "Numéro de téléphone",
+      "about": "À propos du studio",
+      "brand_tagline": "Slogan de la marque",
+      "hero_title": "Titre principal",
+      "intro_offer": "Offre d’essai"
+    }
   },
   "order": {
     "event": {
@@ -616,6 +737,453 @@
       "finishVerification": "Terminer la vérification",
       "viewAndRetry": "Voir les éléments concernés et réessayer",
       "sendTestOrder": "Envoyer une commande de test"
+    }
+  },
+  "table": {
+    "col": {
+      "age": "Âge",
+      "agent": "Agent",
+      "ages": "Âges",
+      "aiAccess": "Accès IA",
+      "attendance30d": "Présence (30 j)",
+      "availability": "Disponibilité",
+      "available": "Disponible",
+      "buffer": "Battement",
+      "by": "Par",
+      "campaign": "Campagne",
+      "capacity": "Capacité",
+      "change": "Variation",
+      "channel": "Canal",
+      "check": "Contrôle",
+      "client": "Client",
+      "coach": "Entraîneur",
+      "consent": "Consentement",
+      "consentVersion": "Version du consentement",
+      "contact": "Contact",
+      "customer": "Client",
+      "duration": "Durée",
+      "editableLocally": "Modifiable localement",
+      "eligibility": "Conditions",
+      "fee": "Tarif",
+      "form": "Formulaire",
+      "group": "Groupe",
+      "guardian": "Responsable légal",
+      "guest": "Client",
+      "homeLocation": "Établissement de rattachement",
+      "homeStudio": "Studio de rattachement",
+      "item": "Article",
+      "lastVisit": "Dernière visite",
+      "location": "Établissement",
+      "locations": "Établissements",
+      "lockedFields": "Champs verrouillés",
+      "member": "Membre",
+      "name": "Nom",
+      "needs": "Besoins",
+      "next": "Prochain",
+      "nextSession": "Prochaine séance",
+      "notes": "Notes",
+      "offer": "Offre",
+      "office": "Agence",
+      "onHand": "En stock",
+      "onHandAfter": "Stock après",
+      "orders": "Commandes",
+      "origin": "Origine",
+      "participant": "Participant",
+      "plan": "Formule",
+      "practitioner": "Praticien",
+      "preferences": "Préférences",
+      "price": "Prix",
+      "product": "Produit",
+      "program": "Programme",
+      "reason": "Motif",
+      "registration": "Inscription",
+      "reserved": "Réservé",
+      "responses": "Réponses",
+      "roster": "Effectif",
+      "scope": "Périmètre",
+      "service": "Prestation",
+      "services": "Prestations",
+      "setting": "Paramètre",
+      "since": "Depuis",
+      "state": "État",
+      "status": "Statut",
+      "store": "Boutique",
+      "stores": "Boutiques",
+      "sync": "Synchronisation",
+      "thisWeek": "Cette semaine",
+      "type": "Type",
+      "updated": "Mis à jour",
+      "usedBy": "Utilisé par",
+      "valid": "Validité",
+      "variants": "Variantes",
+      "venue": "Terrain",
+      "weeklyAvailability": "Disponibilités hebdomadaires",
+      "when": "Quand"
+    },
+    "filter": {
+      "active": "Actifs",
+      "adjustments": "Ajustements",
+      "all": "Tous",
+      "availableToday": "Disponibles aujourd’hui",
+      "closed": "Fermés",
+      "conflicts": "Conflits",
+      "draft": "Brouillons",
+      "ended": "Terminées",
+      "failed": "En échec",
+      "fixtures": "Matchs",
+      "full": "Complets",
+      "low": "Stock bas",
+      "lowBalance": "Solde faible",
+      "needsApproval": "À valider",
+      "next2Weeks": "2 prochaines semaines",
+      "open": "Ouverts",
+      "overrides": "Modifications locales",
+      "paused": "En pause",
+      "published": "Publiés",
+      "reservations": "Réservations",
+      "sales": "Ventes",
+      "scheduled": "Programmées",
+      "thisWeek": "Cette semaine",
+      "trial": "Essai",
+      "upcoming": "À venir",
+      "waitlisted": "Liste d’attente"
+    },
+    "source": {
+      "bookingConnectionConsentFromBranchharbor": "Connexion de réservation · consentement depuis BranchHarbor",
+      "branchharborCampaigns": "Campagnes BranchHarbor",
+      "branchharborCustomers": "Clients BranchHarbor",
+      "branchharborForms": "Formulaires BranchHarbor",
+      "branchharborGroups": "Groupes BranchHarbor",
+      "branchharborOffers": "Offres BranchHarbor",
+      "branchharborPrograms": "Programmes BranchHarbor",
+      "branchharborServices": "Prestations BranchHarbor",
+      "calendarScopedNotes": "Agenda · notes à accès restreint",
+      "inquiriesAndContacts": "Demandes et contacts",
+      "inventoryHistoryMovementsNotJustCounts": "Historique de stock (mouvements, pas seulement les quantités)",
+      "localAssortment": "Assortiment local",
+      "localAssortmentStockPerLocation": "Assortiment local · stock par établissement",
+      "masterCatalog": "Catalogue principal",
+      "masterCatalogWoocommerce": "Catalogue principal · WooCommerce",
+      "pickupOrdering": "Commande à retirer",
+      "pickupSettings": "Paramètres de retrait",
+      "pickupSettingsSlotsAreGeneratedFromThese": "Paramètres de retrait · les créneaux en sont générés",
+      "practitionerCalendars": "Agendas des praticiens",
+      "registrations": "Inscriptions",
+      "scheduleVenueBookings": "Planning · réservations de terrains",
+      "woocommerceCustomers": "Clients WooCommerce"
+    },
+    "desc": {
+      "forms": "Questions administratives uniquement. Par défaut, les réponses sont exclues du contexte de l’IA.",
+      "inventory": "Chaque variation de stock avec son motif. Les réservations bloquent des unités pour les commandes non payées sans modifier le stock disponible.",
+      "marketing": "Les rapports de campagne n’utilisent que les données observées des formulaires et des réservations. L’attribution au-delà de la source du formulaire n’est pas mesurée.",
+      "realtyClients": "Acheteurs, locataires, vendeurs et bailleurs. Les agents voient leurs propres clients ; les responsables d’agence voient leur agence. Les rapports du siège n’incluent jamais les coordonnées des clients.",
+      "pickup": "Les créneaux de retrait sont générés à partir des horaires, de la durée des créneaux et de la capacité de chaque établissement. Les commandes ferment à l’heure limite, jamais plus tôt que le délai de préparation ne le permet."
+    },
+    "action": {
+      "newCampaign": "Nouvelle campagne",
+      "newOffer": "Nouvelle offre",
+      "newProduct": "Nouveau produit",
+      "newProgram": "Nouveau programme",
+      "newService": "Nouvelle prestation"
+    },
+    "badge": {
+      "absentOn": "Absent le {date}",
+      "active": "Actif",
+      "canceled": "Annulé",
+      "clear": "Libre",
+      "closed": "Fermé",
+      "completed": "Terminée",
+      "draft": "Brouillon",
+      "email": "E-mail",
+      "emailSms": "E-mail + SMS",
+      "erased": "Effacé",
+      "excluded": "Exclu",
+      "failedSizeMismatch": "{count} en échec · taille {size} incohérente",
+      "hidden": "Masqué",
+      "inStock": "En stock",
+      "local": "Local",
+      "low": "Stock bas",
+      "lowBalance": "Solde faible",
+      "lowReorderAt": "Stock bas · réassort à {count}",
+      "needsApproval": "À valider",
+      "none": "Aucun",
+      "open": "Ouvert",
+      "openUntil": "Ouvert jusqu’au {date}",
+      "paused": "En pause",
+      "paymentFailed": "Paiement échoué",
+      "paymentsNotEnabled": "Paiements non activés",
+      "reservedUnpaidOrder": "Réservé · commande non payée",
+      "rosterFull": "{count} / {capacity} · Complet",
+      "scheduled": "Programmé",
+      "scoped": "Accès restreint",
+      "sms": "SMS",
+      "synced": "Synchronisé",
+      "trial": "Essai",
+      "venueClash": "Conflit de terrain",
+      "venueClashWith": "Conflit de terrain · {teams}",
+      "waitlisted": "Liste d’attente",
+      "yes": "Oui"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "pending_approval": "En attente de validation",
+      "scheduled": "Programmé",
+      "active": "Actif",
+      "completed": "Terminé",
+      "archived": "Archivé",
+      "published": "Publié",
+      "closed": "Fermé",
+      "paused": "En pause",
+      "ended": "Terminé",
+      "sent": "Envoyé",
+      "cancelled": "Annulé"
+    },
+    "channelCode": {
+      "email": "E-mail",
+      "sms": "SMS",
+      "web": "Web",
+      "social": "Réseaux sociaux",
+      "push": "Notification push",
+      "print": "Imprimé"
+    },
+    "channel": {
+      "web": "Web",
+      "webEmail": "Web + e-mail"
+    },
+    "resource": {
+      "room": "Salle",
+      "equipment": "Équipement",
+      "chair": "Fauteuil",
+      "bed": "Table de soin",
+      "suite": "Suite",
+      "stone_kit": "Kit de pierres chaudes"
+    },
+    "field": {
+      "sku": "Référence",
+      "name": "Nom",
+      "description": "Description",
+      "images": "Images",
+      "options": "Options",
+      "translations": "Traductions",
+      "variants_sku": "Référence de variante",
+      "price": "Prix"
+    },
+    "rule": {
+      "newCustomersOnly": "Nouveaux clients uniquement",
+      "maxPerCustomer": "{count, plural, one {Une fois par client} other {Jusqu’à # fois par client}}",
+      "minAge": "À partir de {age} ans",
+      "locations": "{count, plural, one {Dans # établissement sélectionné} other {Dans # établissements sélectionnés}}",
+      "anyone": "Tout le monde"
+    },
+    "reason": {
+      "adjustment": "Ajustement",
+      "count": "Inventaire",
+      "received": "Réception",
+      "sale": "Vente",
+      "return": "Retour",
+      "damage": "Endommagé / mise au rebut",
+      "transfer_in": "Transfert entrant",
+      "transfer_out": "Transfert sortant",
+      "reservation": "Réservé pour une commande non payée",
+      "release": "Réservation libérée",
+      "shrinkage": "Démarque (perte/vol)",
+      "found": "Stock retrouvé",
+      "correction": "Correction",
+      "supplier_return": "Retour fournisseur"
+    },
+    "na": {
+      "notOnHand": "Hors stock disponible",
+      "syncDegraded": "Synchronisation dégradée",
+      "notProvided": "Non renseigné",
+      "noLimitSet": "Aucune limite définie",
+      "noCoachAssigned": "Aucun entraîneur assigné",
+      "noPriceInThisCurrency": "Pas de prix dans cette devise"
+    },
+    "setting": {
+      "openingHours": "Horaires d’ouverture",
+      "orderCutoff": "Heure limite de commande",
+      "ordersPerSlot": "Commandes par créneau",
+      "prepBuffer": "Délai de préparation",
+      "slotLength": "Durée des créneaux",
+      "daysBookableAhead": "Jours réservables à l’avance",
+      "closedDates": "Dates de fermeture",
+      "takingPickupOrders": "Commandes à retirer acceptées",
+      "next24H": "Prochaines 24 h",
+      "settings": "Paramètres"
+    },
+    "cell": {
+      "value": "{value}",
+      "list": "{items}",
+      "dot": "{a} · {b}",
+      "aiDraftNotSent": "Brouillon IA · non envoyé",
+      "allAges": "Tous âges",
+      "allLocations": "Tous les établissements",
+      "allServices": "Toutes les prestations",
+      "availability": "Disponibilité",
+      "bookedCapacity": "Réservé / capacité",
+      "born": "Né(e) en {year}",
+      "bornRange": "Né(e)s en {from}–{to}",
+      "bufferMinutes": "{before}/{after} min",
+      "buyer": "Acheteur",
+      "canadianLocations": "Établissements canadiens ({count})",
+      "classesPrices": "{count, plural, one {# cours} other {# cours}} · {prices}",
+      "creditsLeft": "{count} restant(s)",
+      "creditsLeftExpires": "{count} restant(s) · expire le {date}",
+      "dateRange": "{from} – {to}",
+      "dayRange": "{from}–{to}",
+      "days": "{count, plural, one {# jour} other {# jours}}",
+      "daysAgo": "{count, plural, one {il y a # jour} other {il y a # jours}}",
+      "daysHours": "{days} {hours}",
+      "deposit": "Acompte {amount}",
+      "earliestPickupAfterOrdering": "Retrait au plus tôt après la commande",
+      "erasedCustomer": "Client effacé",
+      "fixture": "Match",
+      "formVersion": "{consent} · formulaire v{version}",
+      "fromDate": "À partir du {date}",
+      "germanCopy": "Texte en allemand",
+      "halfTermDays": "Vacances scolaires · {count, plural, one {# jour} other {# jours}}",
+      "hoursBooked": "{count} h réservées",
+      "invitationPending": "Invitation en attente",
+      "localOffer": "Offre locale",
+      "localOverride": "Modification locale",
+      "localTime": "Heure locale",
+      "members": "Membres",
+      "minBeforeClose": "{count} min avant la fermeture",
+      "minBeforePickup": "{count} min avant le retrait",
+      "minutes": "{count} min",
+      "networkOffer": "Offre du réseau",
+      "newMembers": "Nouveaux membres",
+      "newMembersOnly": "Nouveaux membres uniquement",
+      "noPickupHours": "Aucun horaire de retrait",
+      "noPriceSet": "Aucun prix défini",
+      "none": "Aucune",
+      "notSet": "Non défini",
+      "now": "Maintenant",
+      "ofTotal": "{count} sur {total}",
+      "ongoing": "Sans fin",
+      "ongoingLower": "sans fin",
+      "price10": "Prix ±10 %",
+      "price10Availability": "Prix ±10 %, disponibilité",
+      "prices": "{prices}",
+      "questionsStatus": "{count, plural, one {# question} other {# questions}} · {status}",
+      "redeemed": "{count} utilisée(s)",
+      "season": "Saison",
+      "seasonWeeks": "Saison · {count, plural, one {# semaine} other {# semaines}}",
+      "sku": "Réf. {sku}",
+      "slots": "{count, plural, one {# créneau} other {# créneaux}}",
+      "system": "Système",
+      "timeRange": "{from}–{to}",
+      "today": "Aujourd’hui",
+      "todayAt": "Aujourd’hui {time}",
+      "todayAtPlace": "Aujourd’hui {time} · {place}",
+      "training": "Entraînement",
+      "usedOf": "{used} sur {total} utilisé(s)",
+      "useWithinDays": "À utiliser sous {count, plural, one {# jour} other {# jours}}",
+      "validRange": "{from} – {to}",
+      "vendor": "Vendeur",
+      "venueNotSet": "Terrain non défini",
+      "verified": "Vérifié",
+      "versionSince": "{version} · {date}",
+      "whenAtPlace": "{when} · {place}",
+      "windows": "{count, plural, one {# plage} other {# plages}}",
+      "yesterday": "Hier"
+    }
+  },
+  "search": {
+    "roles": "{roles}"
+  },
+  "import": {
+    "nameRequired": "Le nom est obligatoire",
+    "codeRequired": "Le code interne est obligatoire",
+    "duplicateCode": "Code {code} en double",
+    "unsupportedCountry": "{country} n’est pas encore un pays pris en charge",
+    "countryRequired": "Le pays est obligatoire",
+    "timeZoneMissing": "Fuseau horaire manquant",
+    "invalidTimeZone": "« {zone} » n’est pas un fuseau horaire valide",
+    "currencyUnsupported": "Devise non prise en charge",
+    "currencyMismatch": "{currency} attendu pour ce pays — confirmez avant l’import"
+  },
+  "report": {
+    "title": {
+      "inquiriesByLocation": "Demandes par établissement · {days} jours",
+      "inquiries": "Demandes · {days} jours",
+      "revenue": "Chiffre d’affaires · {currency} · {days} jours",
+      "combined": "Chiffre d’affaires combiné",
+      "pickupCapacity": "Capacité de retrait utilisée (établissements connectés)",
+      "occupancyConnected": "Taux de remplissage (établissements connectés)",
+      "occupancy": "Taux de remplissage",
+      "appointments": "Rendez-vous"
+    },
+    "fresh": {
+      "updatedMinAgo": "Mis à jour il y a {count} min",
+      "providerMinAgo": "{provider} · il y a {count} min",
+      "notCalculated": "Non calculé",
+      "bookingSomeStale": "Système de réservation · certains établissements pas à jour"
+    },
+    "note": {
+      "formsAttribution": "Source : formulaires du site. L’attribution au-delà de la source du formulaire n’est pas mesurée.",
+      "missingRefundsSeparate": "Les barres manquantes signifient Indisponible ou Non connecté — jamais zéro. Remboursements affichés à part.",
+      "refundsSeparate": "Remboursements affichés à part.",
+      "noConversion": "Non affiché : aucune méthode de conversion définie pour {list}.",
+      "oneCurrency": "Une seule devise dans ce périmètre.",
+      "missingBars": "Les barres manquantes signifient Indisponible ou Non connecté, jamais zéro.",
+      "missingNet": "Les barres manquantes signifient Indisponible ou Non connecté — jamais zéro. Remboursements déduits (net).",
+      "net": "Net des remboursements."
+    }
+  },
+  "onlineRule": {
+    "free_with_registration": "Gratuit sur inscription",
+    "members": "Inclus dans l’abonnement",
+    "pack_holders": "Inclus pour les détenteurs d’un carnet de cours",
+    "buy": "Disponible à l’achat",
+    "not_available": "Pas encore disponible"
+  },
+  "studioReport": {
+    "definition": {
+      "occupancy": "Places réservées (confirmées, présentes, absences non signalées) ÷ capacité des cours programmés commençant dans la période.",
+      "attendance": "Présents ÷ places réservées avec présence enregistrée, par semaine (lundi, UTC). Les réservations sans présence enregistrée sont affichées à part.",
+      "churn": "Abonnements récurrents se terminant dans le mois ÷ abonnements actifs au début du mois.",
+      "revenue": "Paiements réussis sur la période, nets des remboursements, par devise. Les devises ne sont jamais additionnées."
+    }
+  },
+  "realtyReport": {
+    "definition": {
+      "daysOnMarket": "Jours depuis la première mise en ligne de l’annonce (annonces clôturées : jusqu’à la vente ou la location).",
+      "funnel": "Fiches créées sur la période. Les visites annulées sont exclues.",
+      "volume": "Prix final des biens vendus ou loués sur la période, dans la devise de l’annonce. Les devises ne sont jamais additionnées."
+    }
+  },
+  "reportSource": {
+    "sample": "Données d’exemple",
+    "studiosNative": "Réservations et paiements natifs BranchHarbor (les systèmes de réservation connectés ne sont pas inclus).",
+    "realtyNative": "Annonces, demandes, visites et offres BranchHarbor"
+  },
+  "menu": {
+    "statusNote": {
+      "failedAt": "Échec à {place}"
+    },
+    "field": {
+      "marketPrices": "Prix par marché",
+      "price": "Prix",
+      "dietary": "Mentions alimentaires",
+      "modifiers": "Suppléments",
+      "availability": "Disponibilité"
+    },
+    "availability": {
+      "available": "Disponible",
+      "soldOut": "Épuisé"
+    }
+  },
+  "realtyPortal": {
+    "description": {
+      "rightmove": "Rightmove Real Time Datafeed (RTDF) — ventes et locations au Royaume-Uni, envoyées annonce par annonce",
+      "idealista": "Fichier d’import JSON idealista (Espagne, Portugal, Italie) servi à une URL signée",
+      "reso_xml": "Flux d’annonces compatible Zillow (XML) pour les annonces aux États-Unis et au Canada, servi à une URL signée",
+      "reaxml": "Flux REAXML pour les annonces en Australie et en Nouvelle-Zélande, servi à une URL signée"
+    },
+    "reason": {
+      "sandbox": "Mode test — données d’exemple, jamais connecté",
+      "not_configured": "Non configuré"
     }
   }
 }

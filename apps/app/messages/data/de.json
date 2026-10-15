@@ -350,6 +350,115 @@
       "commerce": "Bestellentwicklung dieser Woche erklären",
       "foods": "Heutige Bestellungen nach Standort zusammenfassen",
       "realty": "Welche Büros brauchen Aufmerksamkeit?"
+    },
+    "withScope": "{text} Bereich: {scope}.",
+    "scopeOnly": "Bereich: {scope}.",
+    "fresh": {
+      "updatedMinAgo": "Vor {count} Min. aktualisiert",
+      "lastSuccessHoursAgo": "Zuletzt erfolgreich vor {count} Std.",
+      "publishedOn": "Veröffentlicht am {date}",
+      "live": "Live",
+      "offlineSince": "Offline seit {time}"
+    },
+    "liveSuggest": {
+      "studios": {
+        "s0": "Kursauslastung in diesem Monat zusammenfassen",
+        "s1": "Standortübergreifende Kampagne entwerfen",
+        "s2": "Welche Standorte brauchen Aufmerksamkeit?"
+      },
+      "sports": {
+        "s0": "Zu prüfende Anmeldungen zusammenfassen",
+        "s1": "Programmankündigung entwerfen",
+        "s2": "Welche Teams sind fast voll?"
+      },
+      "wellness": {
+        "s0": "Termine dieser Woche zusammenfassen",
+        "s1": "Antwort gemäß unserer Stornobedingungen entwerfen",
+        "s2": "Welche Behandler sind ausgebucht?"
+      },
+      "commerce": {
+        "s0": "Bestellentwicklung dieser Woche erklären",
+        "s1": "Produkttext entwerfen",
+        "s2": "Welche Geschäfte sind bei der letzten Synchronisierung fehlgeschlagen?"
+      },
+      "foods": {
+        "s0": "Heutige Bestellungen nach Standort zusammenfassen",
+        "s1": "Speisekartentexte entwerfen",
+        "s2": "Mittagsaktion planen"
+      },
+      "realty": {
+        "s0": "Welche Büros brauchen Aufmerksamkeit?",
+        "s1": "Kampagne für neue Inserate entwerfen",
+        "s2": "Anfragen dieser Woche zusammenfassen"
+      }
+    },
+    "mock": {
+      "studios": {
+        "s0": "Veränderungen der Teilnahme in diesem Monat zusammenfassen",
+        "s1": "Standortübergreifende Neujahrskampagne entwerfen",
+        "s2": "Kursbeschreibung für Slow Flow entwerfen",
+        "answer": "Die Auslastung stieg in Queen West (+6 Pkt.) und Leslieville (+3) gegenüber September. Shoreditch ist unverändert, Surry Hills liegt 2 Pkt. darunter. Kitsilano lässt sich nicht vergleichen: Die Buchungssynchronisierung ist dort seit 09:40 Ortszeit gestört. Allein aus der Auslastung kann ich nicht ableiten, warum sich die Anwesenheit verändert hat.",
+        "assumptions": "Vergleich vom 1. bis 13. Oktober mit denselben Tagen im September, jeweils in der Zeitzone des Studios.",
+        "src0": "Buchungsverbindung · Kurstermine",
+        "src1": "Buchungssynchronisierung Kitsilano",
+        "actionTitle": "Kampagne „New year, new practice“ für 3 Studios in Kanada entwerfen",
+        "excluded0": "Seattle – Capitol Hill (andere Angebotspreise)",
+        "excluded1": "London, Berlin, Sydney (nicht im Kampagnenbereich)"
+      },
+      "sports": {
+        "s0": "Lösung für die Doppelbelegung von Platz 2 vorschlagen",
+        "s1": "U10-Anmeldungen zusammenfassen",
+        "s2": "Ankündigung für das Camp entwerfen",
+        "answer": "Verlegen Sie U12 Camp um 17:00 auf Platz 1 (frei bis 18:30) oder verschieben Sie U10 Blue auf 16:00 in den Hillcrest Dome. Beides betrifft nur diese zwei Gruppen. Ich wähle keine Teilnehmer aus und verschiebe auch keine – das bleibt bei Ihren Trainern.",
+        "assumptions": "Verwendet die heutigen Sportstättenbuchungen im Riverside Park, pazifische Zeit.",
+        "src0": "Zeitplan · Sportstättenbuchungen",
+        "actionTitle": "Hinweis an die Erziehungsberechtigten von U12 Camp zum Platzwechsel entwerfen",
+        "affected0": "U12 Camp · 22 Erziehungsberechtigte im Riverside Park",
+        "excluded0": "Alle anderen Gruppen und Sportstätten"
+      },
+      "wellness": {
+        "s0": "Antwort gemäß unserer Stornobedingungen entwerfen",
+        "s1": "Auslastung je Behandler zusammenfassen",
+        "s2": "Text für Hot stone schreiben",
+        "answer": "Entwurf: „Hallo Jordan, Sie können Ihren Termin bis 24 Stunden vorher kostenlos verschieben. Ich habe Donnerstag 17:00 bei Rina gefunden, falls das passt.“ Ich habe keine Angaben aus dem Aufnahmeformular verwendet.",
+        "assumptions": "Für Harbourfront gilt die Stornierungsrichtlinie v2. Antworten aus Aufnahmeformularen sind vom KI-Kontext ausgeschlossen.",
+        "src0": "Richtlinien › Stornierung v2",
+        "src1": "Kalender · Harbourfront",
+        "actionTitle": "Antwort per E-Mail an Jordan P. senden"
+      },
+      "commerce": {
+        "s0": "Bestandsentwicklung dieser Woche erklären",
+        "s1": "Text für Canvas tote aus dem Datenblatt entwerfen",
+        "s2": "Welche Geschäfte sind bei der letzten Synchronisierung fehlgeschlagen?",
+        "answer": "Linen overshirt L wurde in Portland in 7 Tagen 9-mal verkauft, in der Woche davor 3-mal; Bestand: 1. Merino crew ist unverändert. Grundlage sind nur WooCommerce-Bestellungen; Verkäufe im Geschäft sind nicht angebunden, und Austin ist ausgeschlossen, solange die Verbindung getrennt ist.",
+        "assumptions": "Umsatz wird je Währung (USD, CAD, EUR) ausgewiesen und nie zusammengerechnet.",
+        "src0": "WooCommerce-Bestellungen",
+        "src1": "Bestandsverlauf",
+        "actionTitle": "Nachbestellnotiz für Linen overshirt L in Portland entwerfen",
+        "excluded0": "Geschäft Austin (Verbindung getrennt)"
+      },
+      "foods": {
+        "s0": "Heutige Produktion nach Artikel zusammenfassen",
+        "s1": "Speisekartentext für das Fladenbrot entwerfen",
+        "s2": "Mittagsaktion für Seattle planen",
+        "answer": "Ballard bisher: 14 Ember Bowls, 8 Brisket-Sandwiches, 6 Fladenbrote, 11 Limonaden. Fremont fehlt, weil das Küchendisplay offline ist, obwohl dort weiterhin Bestellungen eingingen. Preise, Allergen- und Ernährungsangaben sowie die Bestellannahme kann ich nicht ändern.",
+        "assumptions": "Zählt seit Öffnung angenommene Bestellungen, pazifische Zeit.",
+        "src0": "Bestellungen · Ballard",
+        "src1": "Küchendisplay Fremont",
+        "actionTitle": "Aktion „Weekday lunch“ für die Standorte in Seattle entwerfen",
+        "excluded0": "Vancouver, London, Berlin (außerhalb des angefragten Bereichs)"
+      },
+      "realty": {
+        "s0": "Besichtigungsfeedback zu 42 Birchmount Cres zusammenfassen",
+        "s1": "Beschreibung für Suite 1806 aus den Objektdaten entwerfen",
+        "s2": "Bei wem sollte ich mich diese Woche melden?",
+        "answer": "Zu drei Besichtigungen in 42 Birchmount Cres liegt Feedback vor: Zwei vergaben 4–5 Punkte und mochten Küche und Garten; einmal wurde die Deckenhöhe im Keller angemerkt. Ein Käufer fragte nach Übergabeterminen. Ich habe nur das erfasste Feedback verwendet – die Identität der Käufer wurde mir nicht mitgeteilt.",
+        "assumptions": "Feedback aus abgeschlossenen Besichtigungen der letzten 14 Tage, Zeitzone Toronto. Nichterscheinen ist ausgeschlossen.",
+        "src0": "Besichtigungen · Feedback",
+        "actionTitle": "Nachfass-E-Mails für 2 interessierte Käufer entwerfen",
+        "affected0": "Toronto Midtown · 2 Käufer",
+        "excluded0": "Käufer ohne E-Mail-Einwilligung"
+      }
     }
   },
   "cover": {
@@ -447,7 +556,19 @@
     "approvedComment": "{name} hat „{field}“ freigegeben · „{comment}“",
     "rejected": "{name} hat „{field}“ abgelehnt",
     "rejectedComment": "{name} hat „{field}“ abgelehnt · „{comment}“",
-    "resetToHq": "„{field}“ auf den Standard der Zentrale zurückgesetzt"
+    "resetToHq": "„{field}“ auf den Standard der Zentrale zurückgesetzt",
+    "field": {
+      "brand": "Markenname",
+      "nav": "Kopfzeilennavigation",
+      "headline": "Hauptüberschrift",
+      "offer": "Zeile zum Einstiegsangebot",
+      "hours": "Öffnungszeiten",
+      "phone": "Telefonnummer",
+      "about": "Über dieses Studio",
+      "brand_tagline": "Marken-Slogan",
+      "hero_title": "Haupttitel",
+      "intro_offer": "Einstiegsangebot"
+    }
   },
   "order": {
     "event": {
@@ -616,6 +737,453 @@
       "finishVerification": "Verifizierung abschließen",
       "viewAndRetry": "Betroffene ansehen und wiederholen",
       "sendTestOrder": "Testbestellung senden"
+    }
+  },
+  "table": {
+    "col": {
+      "age": "Alter",
+      "agent": "Makler",
+      "ages": "Altersgruppe",
+      "aiAccess": "KI-Zugriff",
+      "attendance30d": "Anwesenheit (30 T.)",
+      "availability": "Verfügbarkeit",
+      "available": "Verfügbar",
+      "buffer": "Puffer",
+      "by": "Von",
+      "campaign": "Kampagne",
+      "capacity": "Kapazität",
+      "change": "Änderung",
+      "channel": "Kanal",
+      "check": "Prüfung",
+      "client": "Kunde",
+      "coach": "Trainer",
+      "consent": "Einwilligung",
+      "consentVersion": "Einwilligungsversion",
+      "contact": "Kontakt",
+      "customer": "Kunde",
+      "duration": "Dauer",
+      "editableLocally": "Lokal bearbeitbar",
+      "eligibility": "Bedingungen",
+      "fee": "Gebühr",
+      "form": "Formular",
+      "group": "Gruppe",
+      "guardian": "Erziehungsberechtigte(r)",
+      "guest": "Gast",
+      "homeLocation": "Stammstandort",
+      "homeStudio": "Stammstudio",
+      "item": "Artikel",
+      "lastVisit": "Letzter Besuch",
+      "location": "Standort",
+      "locations": "Standorte",
+      "lockedFields": "Gesperrte Felder",
+      "member": "Mitglied",
+      "name": "Name",
+      "needs": "Benötigt",
+      "next": "Nächster Termin",
+      "nextSession": "Nächste Einheit",
+      "notes": "Notizen",
+      "offer": "Angebot",
+      "office": "Büro",
+      "onHand": "Bestand",
+      "onHandAfter": "Bestand danach",
+      "orders": "Bestellungen",
+      "origin": "Herkunft",
+      "participant": "Teilnehmer",
+      "plan": "Tarif",
+      "practitioner": "Behandler",
+      "preferences": "Vorlieben",
+      "price": "Preis",
+      "product": "Produkt",
+      "program": "Programm",
+      "reason": "Grund",
+      "registration": "Anmeldung",
+      "reserved": "Reserviert",
+      "responses": "Antworten",
+      "roster": "Kader",
+      "scope": "Bereich",
+      "service": "Leistung",
+      "services": "Leistungen",
+      "setting": "Einstellung",
+      "since": "Seit",
+      "state": "Status",
+      "status": "Status",
+      "store": "Geschäft",
+      "stores": "Geschäfte",
+      "sync": "Synchronisierung",
+      "thisWeek": "Diese Woche",
+      "type": "Art",
+      "updated": "Aktualisiert",
+      "usedBy": "Verwendet für",
+      "valid": "Gültigkeit",
+      "variants": "Varianten",
+      "venue": "Sportstätte",
+      "weeklyAvailability": "Wöchentliche Verfügbarkeit",
+      "when": "Wann"
+    },
+    "filter": {
+      "active": "Aktiv",
+      "adjustments": "Korrekturen",
+      "all": "Alle",
+      "availableToday": "Heute verfügbar",
+      "closed": "Geschlossen",
+      "conflicts": "Konflikte",
+      "draft": "Entwürfe",
+      "ended": "Beendet",
+      "failed": "Fehlgeschlagen",
+      "fixtures": "Spiele",
+      "full": "Voll",
+      "low": "Niedriger Bestand",
+      "lowBalance": "Geringes Guthaben",
+      "needsApproval": "Freigabe nötig",
+      "next2Weeks": "Nächste 2 Wochen",
+      "open": "Offen",
+      "overrides": "Lokale Änderungen",
+      "paused": "Pausiert",
+      "published": "Veröffentlicht",
+      "reservations": "Reservierungen",
+      "sales": "Verkäufe",
+      "scheduled": "Geplant",
+      "thisWeek": "Diese Woche",
+      "trial": "Probe",
+      "upcoming": "Anstehend",
+      "waitlisted": "Warteliste"
+    },
+    "source": {
+      "bookingConnectionConsentFromBranchharbor": "Buchungsverbindung · Einwilligung aus BranchHarbor",
+      "branchharborCampaigns": "BranchHarbor-Kampagnen",
+      "branchharborCustomers": "BranchHarbor-Kunden",
+      "branchharborForms": "BranchHarbor-Formulare",
+      "branchharborGroups": "BranchHarbor-Gruppen",
+      "branchharborOffers": "BranchHarbor-Angebote",
+      "branchharborPrograms": "BranchHarbor-Programme",
+      "branchharborServices": "BranchHarbor-Leistungen",
+      "calendarScopedNotes": "Kalender · Notizen mit eingeschränktem Zugriff",
+      "inquiriesAndContacts": "Anfragen und Kontakte",
+      "inventoryHistoryMovementsNotJustCounts": "Bestandsverlauf (Bewegungen, nicht nur Mengen)",
+      "localAssortment": "Lokales Sortiment",
+      "localAssortmentStockPerLocation": "Lokales Sortiment · Bestand je Standort",
+      "masterCatalog": "Hauptkatalog",
+      "masterCatalogWoocommerce": "Hauptkatalog · WooCommerce",
+      "pickupOrdering": "Bestellung zur Abholung",
+      "pickupSettings": "Abholeinstellungen",
+      "pickupSettingsSlotsAreGeneratedFromThese": "Abholeinstellungen · daraus werden die Zeitfenster erzeugt",
+      "practitionerCalendars": "Behandlerkalender",
+      "registrations": "Anmeldungen",
+      "scheduleVenueBookings": "Zeitplan · Sportstättenbuchungen",
+      "woocommerceCustomers": "WooCommerce-Kunden"
+    },
+    "desc": {
+      "forms": "Nur organisatorische Fragen. Antworten sind standardmäßig vom KI-Kontext ausgeschlossen.",
+      "inventory": "Jede Bestandsänderung mit Grund. Reservierungen halten Einheiten für unbezahlte Bestellungen zurück und ändern den Bestand nicht.",
+      "marketing": "Kampagnenberichte nutzen nur beobachtete Formular- und Buchungsdaten. Eine Zuordnung über die Formularquelle hinaus wird nicht gemessen.",
+      "realtyClients": "Käufer, Mieter, Verkäufer und Vermieter. Makler sehen ihre eigenen Kunden, Büroleitungen ihr Büro. Berichte der Zentrale enthalten nie Kundendaten.",
+      "pickup": "Abholzeitfenster werden aus den Öffnungszeiten, der Fensterlänge und der Kapazität jedes Standorts erzeugt. Bestellungen schließen zum Bestellschluss und nie früher, als es der Vorbereitungspuffer zulässt."
+    },
+    "action": {
+      "newCampaign": "Neue Kampagne",
+      "newOffer": "Neues Angebot",
+      "newProduct": "Neues Produkt",
+      "newProgram": "Neues Programm",
+      "newService": "Neue Leistung"
+    },
+    "badge": {
+      "absentOn": "Abwesend am {date}",
+      "active": "Aktiv",
+      "canceled": "Abgesagt",
+      "clear": "Frei",
+      "closed": "Geschlossen",
+      "completed": "Abgeschlossen",
+      "draft": "Entwurf",
+      "email": "E-Mail",
+      "emailSms": "E-Mail + SMS",
+      "erased": "Gelöscht",
+      "excluded": "Ausgeschlossen",
+      "failedSizeMismatch": "{count} fehlgeschlagen · Größe {size} passt nicht",
+      "hidden": "Ausgeblendet",
+      "inStock": "Auf Lager",
+      "local": "Lokal",
+      "low": "Niedrig",
+      "lowBalance": "Geringes Guthaben",
+      "lowReorderAt": "Niedrig · nachbestellen bei {count}",
+      "needsApproval": "Freigabe nötig",
+      "none": "Keine",
+      "open": "Offen",
+      "openUntil": "Offen bis {date}",
+      "paused": "Pausiert",
+      "paymentFailed": "Zahlung fehlgeschlagen",
+      "paymentsNotEnabled": "Zahlungen nicht aktiviert",
+      "reservedUnpaidOrder": "Reserviert · unbezahlte Bestellung",
+      "rosterFull": "{count} / {capacity} · Voll",
+      "scheduled": "Geplant",
+      "scoped": "Eingeschränkt",
+      "sms": "SMS",
+      "synced": "Synchronisiert",
+      "trial": "Probe",
+      "venueClash": "Sportstättenkonflikt",
+      "venueClashWith": "Sportstättenkonflikt · {teams}",
+      "waitlisted": "Warteliste",
+      "yes": "Ja"
+    },
+    "status": {
+      "draft": "Entwurf",
+      "pending_approval": "Freigabe ausstehend",
+      "scheduled": "Geplant",
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
+      "archived": "Archiviert",
+      "published": "Veröffentlicht",
+      "closed": "Geschlossen",
+      "paused": "Pausiert",
+      "ended": "Beendet",
+      "sent": "Gesendet",
+      "cancelled": "Abgesagt"
+    },
+    "channelCode": {
+      "email": "E-Mail",
+      "sms": "SMS",
+      "web": "Web",
+      "social": "Social Media",
+      "push": "Push-Mitteilung",
+      "print": "Druck"
+    },
+    "channel": {
+      "web": "Web",
+      "webEmail": "Web + E-Mail"
+    },
+    "resource": {
+      "room": "Raum",
+      "equipment": "Ausstattung",
+      "chair": "Stuhl",
+      "bed": "Behandlungsliege",
+      "suite": "Suite",
+      "stone_kit": "Hot-Stone-Set"
+    },
+    "field": {
+      "sku": "Artikelnummer",
+      "name": "Name",
+      "description": "Beschreibung",
+      "images": "Bilder",
+      "options": "Optionen",
+      "translations": "Übersetzungen",
+      "variants_sku": "Varianten-Artikelnummer",
+      "price": "Preis"
+    },
+    "rule": {
+      "newCustomersOnly": "Nur Neukunden",
+      "maxPerCustomer": "{count, plural, one {Einmal pro Kunde} other {Bis zu #-mal pro Kunde}}",
+      "minAge": "Ab {age} Jahren",
+      "locations": "{count, plural, one {An # ausgewähltem Standort} other {An # ausgewählten Standorten}}",
+      "anyone": "Alle"
+    },
+    "reason": {
+      "adjustment": "Korrektur",
+      "count": "Inventur",
+      "received": "Wareneingang",
+      "sale": "Verkauf",
+      "return": "Rücksendung",
+      "damage": "Beschädigt / Abschreibung",
+      "transfer_in": "Umlagerung (Eingang)",
+      "transfer_out": "Umlagerung (Ausgang)",
+      "reservation": "Für unbezahlte Bestellung reserviert",
+      "release": "Reservierung aufgehoben",
+      "shrinkage": "Schwund (Verlust/Diebstahl)",
+      "found": "Bestand gefunden",
+      "correction": "Berichtigung",
+      "supplier_return": "An Lieferanten zurück"
+    },
+    "na": {
+      "notOnHand": "Nicht im Bestand",
+      "syncDegraded": "Synchronisierung gestört",
+      "notProvided": "Nicht angegeben",
+      "noLimitSet": "Kein Limit festgelegt",
+      "noCoachAssigned": "Kein Trainer zugewiesen",
+      "noPriceInThisCurrency": "Kein Preis in dieser Währung"
+    },
+    "setting": {
+      "openingHours": "Öffnungszeiten",
+      "orderCutoff": "Bestellschluss",
+      "ordersPerSlot": "Bestellungen pro Zeitfenster",
+      "prepBuffer": "Vorbereitungspuffer",
+      "slotLength": "Länge der Zeitfenster",
+      "daysBookableAhead": "Im Voraus buchbare Tage",
+      "closedDates": "Schließtage",
+      "takingPickupOrders": "Nimmt Abholbestellungen an",
+      "next24H": "Nächste 24 Std.",
+      "settings": "Einstellungen"
+    },
+    "cell": {
+      "value": "{value}",
+      "list": "{items}",
+      "dot": "{a} · {b}",
+      "aiDraftNotSent": "KI-Entwurf · nicht gesendet",
+      "allAges": "Alle Altersgruppen",
+      "allLocations": "Alle Standorte",
+      "allServices": "Alle Leistungen",
+      "availability": "Verfügbarkeit",
+      "bookedCapacity": "Gebucht / Kapazität",
+      "born": "Jahrgang {year}",
+      "bornRange": "Jahrgang {from}–{to}",
+      "bufferMinutes": "{before}/{after} Min.",
+      "buyer": "Käufer",
+      "canadianLocations": "Standorte in Kanada ({count})",
+      "classesPrices": "{count, plural, one {# Kurs} other {# Kurse}} · {prices}",
+      "creditsLeft": "Noch {count}",
+      "creditsLeftExpires": "Noch {count} · läuft am {date} ab",
+      "dateRange": "{from} – {to}",
+      "dayRange": "{from}–{to}",
+      "days": "{count, plural, one {# Tag} other {# Tage}}",
+      "daysAgo": "{count, plural, one {vor # Tag} other {vor # Tagen}}",
+      "daysHours": "{days} {hours}",
+      "deposit": "Anzahlung {amount}",
+      "earliestPickupAfterOrdering": "Früheste Abholung nach der Bestellung",
+      "erasedCustomer": "Gelöschter Kunde",
+      "fixture": "Spiel",
+      "formVersion": "{consent} · Formular v{version}",
+      "fromDate": "Ab {date}",
+      "germanCopy": "Deutscher Text",
+      "halfTermDays": "Ferien · {count, plural, one {# Tag} other {# Tage}}",
+      "hoursBooked": "{count} Std. gebucht",
+      "invitationPending": "Einladung ausstehend",
+      "localOffer": "Lokales Angebot",
+      "localOverride": "Lokale Änderung",
+      "localTime": "Ortszeit",
+      "members": "Mitglieder",
+      "minBeforeClose": "{count} Min. vor Schließung",
+      "minBeforePickup": "{count} Min. vor Abholung",
+      "minutes": "{count} Min.",
+      "networkOffer": "Netzwerkangebot",
+      "newMembers": "Neue Mitglieder",
+      "newMembersOnly": "Nur neue Mitglieder",
+      "noPickupHours": "Keine Abholzeiten",
+      "noPriceSet": "Kein Preis festgelegt",
+      "none": "Keine",
+      "notSet": "Nicht festgelegt",
+      "now": "Jetzt",
+      "ofTotal": "{count} von {total}",
+      "ongoing": "Unbefristet",
+      "ongoingLower": "unbefristet",
+      "price10": "Preis ±10 %",
+      "price10Availability": "Preis ±10 %, Verfügbarkeit",
+      "prices": "{prices}",
+      "questionsStatus": "{count, plural, one {# Frage} other {# Fragen}} · {status}",
+      "redeemed": "{count} eingelöst",
+      "season": "Saison",
+      "seasonWeeks": "Saison · {count, plural, one {# Woche} other {# Wochen}}",
+      "sku": "Art.-Nr. {sku}",
+      "slots": "{count, plural, one {# Zeitfenster} other {# Zeitfenster}}",
+      "system": "System",
+      "timeRange": "{from}–{to}",
+      "today": "Heute",
+      "todayAt": "Heute {time}",
+      "todayAtPlace": "Heute {time} · {place}",
+      "training": "Training",
+      "usedOf": "{used} von {total} genutzt",
+      "useWithinDays": "Innerhalb von {count, plural, one {# Tag} other {# Tagen}} nutzen",
+      "validRange": "{from} – {to}",
+      "vendor": "Verkäufer",
+      "venueNotSet": "Sportstätte nicht festgelegt",
+      "verified": "Bestätigt",
+      "versionSince": "{version} · {date}",
+      "whenAtPlace": "{when} · {place}",
+      "windows": "{count, plural, one {# Zeitfenster} other {# Zeitfenster}}",
+      "yesterday": "Gestern"
+    }
+  },
+  "search": {
+    "roles": "{roles}"
+  },
+  "import": {
+    "nameRequired": "Name ist erforderlich",
+    "codeRequired": "Interner Code ist erforderlich",
+    "duplicateCode": "Doppelter Code {code}",
+    "unsupportedCountry": "{country} wird noch nicht unterstützt",
+    "countryRequired": "Land ist erforderlich",
+    "timeZoneMissing": "Zeitzone fehlt",
+    "invalidTimeZone": "„{zone}“ ist keine gültige Zeitzone",
+    "currencyUnsupported": "Währung nicht unterstützt",
+    "currencyMismatch": "Für dieses Land wird {currency} erwartet – vor dem Import bestätigen"
+  },
+  "report": {
+    "title": {
+      "inquiriesByLocation": "Anfragen je Standort · {days} Tage",
+      "inquiries": "Anfragen · {days} Tage",
+      "revenue": "Umsatz · {currency} · {days} Tage",
+      "combined": "Gesamtumsatz",
+      "pickupCapacity": "Genutzte Abholkapazität (verbundene Standorte)",
+      "occupancyConnected": "Auslastung (verbundene Standorte)",
+      "occupancy": "Auslastung",
+      "appointments": "Termine"
+    },
+    "fresh": {
+      "updatedMinAgo": "Vor {count} Min. aktualisiert",
+      "providerMinAgo": "{provider} · vor {count} Min.",
+      "notCalculated": "Nicht berechnet",
+      "bookingSomeStale": "Buchungssystem · einige Standorte nicht aktuell"
+    },
+    "note": {
+      "formsAttribution": "Quelle: Website-Formulare. Eine Zuordnung über die Formularquelle hinaus wird nicht gemessen.",
+      "missingRefundsSeparate": "Fehlende Balken bedeuten Nicht verfügbar oder Nicht verbunden – nie null. Rückerstattungen werden separat ausgewiesen.",
+      "refundsSeparate": "Rückerstattungen werden separat ausgewiesen.",
+      "noConversion": "Nicht angezeigt: Für {list} ist keine Umrechnungsmethode festgelegt.",
+      "oneCurrency": "In diesem Bereich gibt es nur eine Währung.",
+      "missingBars": "Fehlende Balken bedeuten Nicht verfügbar oder Nicht verbunden, nie null.",
+      "missingNet": "Fehlende Balken bedeuten Nicht verfügbar oder Nicht verbunden – nie null. Rückerstattungen sind abgezogen (netto).",
+      "net": "Abzüglich Rückerstattungen."
+    }
+  },
+  "onlineRule": {
+    "free_with_registration": "Kostenlos mit Anmeldung",
+    "members": "In der Mitgliedschaft enthalten",
+    "pack_holders": "Für Inhaber einer Kurskarte enthalten",
+    "buy": "Einzeln erhältlich",
+    "not_available": "Noch nicht verfügbar"
+  },
+  "studioReport": {
+    "definition": {
+      "occupancy": "Gebuchte Plätze (bestätigt, anwesend, nicht erschienen) ÷ Kapazität der geplanten Kurse, die im Zeitraum beginnen.",
+      "attendance": "Anwesend ÷ gebuchte Plätze mit erfasster Anwesenheit, pro Woche (Montag, UTC). Nicht erfasste Buchungen werden separat angezeigt.",
+      "churn": "Im Monat endende wiederkehrende Mitgliedschaften ÷ zu Monatsbeginn aktive Mitgliedschaften.",
+      "revenue": "Erfolgreiche Zahlungen im Zeitraum, abzüglich Rückerstattungen, je Währung. Währungen werden nie zusammengerechnet."
+    }
+  },
+  "realtyReport": {
+    "definition": {
+      "daysOnMarket": "Tage seit der ersten Aktivierung des Inserats (geschlossene Inserate: bis zum Verkauf oder zur Vermietung).",
+      "funnel": "Im Zeitraum angelegte Einträge. Abgesagte Besichtigungen sind ausgeschlossen.",
+      "volume": "Endpreis der im Zeitraum verkauften oder vermieteten Objekte in der Inseratswährung. Währungen werden nie zusammengerechnet."
+    }
+  },
+  "reportSource": {
+    "sample": "Beispieldaten",
+    "studiosNative": "Native BranchHarbor-Buchungen und -Zahlungen (verbundene Buchungssysteme sind nicht enthalten).",
+    "realtyNative": "BranchHarbor-Inserate, -Anfragen, -Besichtigungen und -Angebote"
+  },
+  "menu": {
+    "statusNote": {
+      "failedAt": "Fehlgeschlagen in {place}"
+    },
+    "field": {
+      "marketPrices": "Preise je Markt",
+      "price": "Preis",
+      "dietary": "Ernährungsangaben",
+      "modifiers": "Extras",
+      "availability": "Verfügbarkeit"
+    },
+    "availability": {
+      "available": "Verfügbar",
+      "soldOut": "Ausverkauft"
+    }
+  },
+  "realtyPortal": {
+    "description": {
+      "rightmove": "Rightmove Real Time Datafeed (RTDF) – Verkauf und Vermietung in Großbritannien, je Inserat übertragen",
+      "idealista": "idealista-JSON-Importdatei (Spanien, Portugal, Italien) unter einer signierten URL",
+      "reso_xml": "Zillow-kompatibler Inseratsfeed (XML) für Inserate in den USA und Kanada unter einer signierten URL",
+      "reaxml": "REAXML-Feed für Inserate in Australien und Neuseeland unter einer signierten URL"
+    },
+    "reason": {
+      "sandbox": "Testmodus – Beispieldaten, nie verbunden",
+      "not_configured": "Nicht eingerichtet"
     }
   }
 }

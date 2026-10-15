@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, getApi, type BranchHarborApi } from './api';
+import { useLocalizeError } from './useErrorText';
 
 export type Resource<T> =
   | { status: 'loading'; data?: T; error?: undefined }
@@ -20,6 +21,9 @@ function toApiError(e: unknown): ApiError {
  */
 export function useApi<T>(fn: (api: BranchHarborApi) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<Resource<T>>({ status: 'loading' });
+  const localizeError = useLocalizeError();
+  const localize = useRef(localizeError);
+  localize.current = localizeError;
   const seq = useRef(0);
   const fnRef = useRef(fn);
   fnRef.current = fn;
@@ -34,7 +38,7 @@ export function useApi<T>(fn: (api: BranchHarborApi) => Promise<T>, deps: unknow
         const data = await fnRef.current(api);
         if (id === seq.current) setRes({ status: 'ready', data });
       } catch (e) {
-        if (id === seq.current) setRes({ status: 'error', error: toApiError(e) });
+        if (id === seq.current) setRes({ status: 'error', error: localize.current(toApiError(e)) });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,6 +57,9 @@ export function useApi<T>(fn: (api: BranchHarborApi) => Promise<T>, deps: unknow
 export function useMutation<A extends unknown[], R>(fn: (api: BranchHarborApi, ...args: A) => Promise<R>) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeError();
+  const localizeRef = useRef(localize);
+  localizeRef.current = localize;
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const run = useCallback(
@@ -63,7 +70,7 @@ export function useMutation<A extends unknown[], R>(fn: (api: BranchHarborApi, .
         const api = await getApi();
         return await fnRef.current(api, ...args);
       } catch (e) {
-        setError(toApiError(e));
+        setError(localizeRef.current(toApiError(e)));
         return undefined;
       } finally {
         setPending(false);

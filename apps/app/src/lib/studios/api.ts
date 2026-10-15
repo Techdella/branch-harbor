@@ -12,6 +12,7 @@ import type {
   AiAttendance, AiAudience, AiDescription, ClassTypeVM, EditChanges, EditPreview, EditResult, EditScope, Instructor, MemberDetail, MemberRow, MembershipPlan, MembershipVM, NotificationRow,
   OnlineInput, OnlineItem, PackProduct, PackVM, Policies, PolicyVM, Room, Roster, SeriesInput, SeriesPreview, SeriesVM, StudioReport,
 } from './types';
+import { useLocalizeErrorRef } from '../useErrorText';
 
 export interface StudioApi {
   rooms(locationId?: string): Promise<Room[]>;
@@ -152,6 +153,7 @@ const toErr = (e: unknown) => (e instanceof ApiError ? e : new ApiError('unknown
 
 export function useStudio<T>(fn: (api: StudioApi) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<StudioResource<T>>({ status: 'loading' });
+  const localize = useLocalizeErrorRef();
   const seq = useRef(0);
   const fnRef = useRef(fn);
   fnRef.current = fn;
@@ -163,7 +165,7 @@ export function useStudio<T>(fn: (api: StudioApi) => Promise<T>, deps: unknown[]
         const data = await fnRef.current(await getStudioApi());
         if (id === seq.current) setRes({ status: 'ready', data });
       } catch (e) {
-        if (id === seq.current) setRes({ status: 'error', error: toErr(e) });
+        if (id === seq.current) setRes({ status: 'error', error: localize.current(toErr(e)) });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -178,6 +180,7 @@ export function useStudio<T>(fn: (api: StudioApi) => Promise<T>, deps: unknown[]
 export function useStudioMutation<A extends unknown[], R>(fn: (api: StudioApi, ...args: A) => Promise<R>) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const localize = useLocalizeErrorRef();
   const fnRef = useRef(fn);
   fnRef.current = fn;
   const run = useCallback(async (...args: A): Promise<R | undefined> => {
@@ -186,7 +189,7 @@ export function useStudioMutation<A extends unknown[], R>(fn: (api: StudioApi, .
     try {
       return await fnRef.current(await getStudioApi(), ...args);
     } catch (e) {
-      setError(toErr(e));
+      setError(localize.current(toErr(e)));
       return undefined;
     } finally {
       setPending(false);

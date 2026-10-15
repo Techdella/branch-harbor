@@ -10,12 +10,15 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, DeniedState, Empty, LoadingBlock, SectionCard } from '../../ui/States';
 import { Loadable, LocationSelect, Money, pct, useScopeLocations } from './shared';
+import { reportSourceKey } from '@/lib/msg';
+import { useDataText } from '../../ui/useDataText';
 
 type Range = '7' | '30' | '90';
 
 export function InsightsView() {
   const t = useTranslations('wellnessFull.insights');
   const tw = useTranslations('wellnessFull');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const locs = useScopeLocations();
@@ -54,7 +57,7 @@ export function InsightsView() {
       <Loadable res={res} loading={<LoadingBlock variant="detail" />}>
         {(r: WReport) => (
           <div className="flex flex-col gap-3">
-            <p className="px-1 text-xs text-stone">{t('freshness', { source: r.source, at: fmtDateTime(r.asOf, tz, locale) })}</p>
+            <p className="px-1 text-xs text-stone">{t('freshness', { source: dt(reportSourceKey(r.source), undefined, r.source), at: fmtDateTime(r.asOf, tz, locale) })}</p>
             <div className="grid gap-3 lg:grid-cols-2">
               <SectionCard title={t('revenue')}>
                 {r.revenue.length ? (

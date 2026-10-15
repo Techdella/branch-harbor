@@ -14,7 +14,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { IndependentWebsite } from './independent/IndependentWebsite';
-import { useDataText } from '../ui/useDataText';
+import { useDataText, useTxt } from '../ui/useDataText';
 
 type Tab = 'editor' | 'approvals' | 'publish' | 'domains';
 
@@ -48,6 +48,7 @@ export function WebsitesScreen() {
 function Editor() {
   const t = useTranslations('websites');
   const dt = useDataText();
+  const tt = useTxt();
   const locale = useLocale();
   const app = useApp();
   const locs = app.locations.filter((l) => app.scope.locationIds.includes(l.id));
@@ -109,7 +110,8 @@ function Editor() {
                   {e!.message}
                 </Banner>
               ))}
-              {page.fields.map((f) => {
+              {page.fields.map((f0) => {
+                const f = { ...f0, label: tt(f0.label, f0.labelMsg) };
                 const isEditing = editing === f.key;
                 const overridden = f.hqValue != null && f.value !== f.hqValue;
                 const needsApproval = !isHq && f.policy === 'approval';
