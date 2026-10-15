@@ -214,6 +214,9 @@ async function main() {
   console.log('Studios:', await (await import('./seed-studios.ts')).seedStudios({ db, today, swId, demo, maya }));
   await (await import('./seed-commerce.ts')).seedCommerce({ db, orgId: ops.orgs.fieldnote, demo, upsertUser });
   const foods = await seedFoods({ db, today, meId, demo, carlos, upsertUser });
+  // Network workspaces (Community, Help desk, Training academy) for the franchise demo networks.
+  const network = await (await import('./seed-community.ts')).seedCommunity({ db, swId, meId, demo, maya, priya, upsertUser });
+  const training = await (await import('./seed-training.ts')).seedTraining({ db, swId, meId, demo, maya, ...network });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
@@ -231,6 +234,8 @@ async function main() {
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Real Estate:   Keystone Realty Network (${realty.orgId}) — Toronto/Vancouver CAD, London GBP, Madrid EUR, Dubai AED, Sydney AUD; ${realty.listings} listings · ${realty.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
+  console.log(` Network:       Community, Training and Help desk for Stillwater · ${network.users.join(', ')} (same password)`);
+  console.log(`                public course: ${cfg.SITES_BASE_URL}/stillwater-yoga/courses/${training.publicCourse}`);
   await seedIndependent({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   console.log('─────────────────────────────────────────────────\n');
 }
