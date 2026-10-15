@@ -13,3 +13,5 @@ coverage
 next-env.d.ts
 *.tsbuildinfo
 .claude/worktrees/
+# MapLibre worker and CSS copied at dev / build time (scripts/vendor-maplibre.mjs)
+apps/*/public/vendor/

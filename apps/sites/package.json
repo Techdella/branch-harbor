@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3002",
-    "build": "next build",
+    "dev": "node scripts/vendor-maplibre.mjs && next dev --port 3002",
+    "build": "node scripts/vendor-maplibre.mjs && next build",
     "start": "next start --port 3002",
     "typecheck": "tsc --noEmit",
     "check:messages": "node scripts/check-messages.mjs",
@@ -19,6 +19,7 @@
     "@bh/ui": "workspace:*",
     "@stripe/react-stripe-js": "6.12.0",
     "@stripe/stripe-js": "9.17.0",
+    "maplibre-gl": "6.11.2",
     "next": "16.4.0",
     "next-intl": "4.14.9",
     "react": "19.3.0",

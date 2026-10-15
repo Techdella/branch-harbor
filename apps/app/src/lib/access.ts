@@ -35,6 +35,7 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'sales.franchise_pipeline': [
     { key: 'pipeline', href: '/franchise/pipeline', icon: 'flag', msg: 'franchise.nav.pipeline' },
     { key: 'territories', href: '/franchise/territories', icon: 'map', msg: 'franchise.nav.territories' },
+    { key: 'validation', href: '/franchise/validation', icon: 'phone', msg: 'fdev.nav.validation' },
   ],
   // Website builder (pages, themes, master pages) and the websites list (domains, publishing).
   'marketing.website_builder': [
@@ -74,6 +75,15 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'operations.audits': [{ key: 'audits', href: '/audits', icon: 'check-circle' }],
   'legal.compliance_documents': [{ key: 'compliance', href: '/compliance', icon: 'shield' }],
   'network.league_table': [{ key: 'leagueTable', href: '/league-table', icon: 'trophy' }],
+  // Franchise development: territory map, validation calls, surveys, agreement lifecycle, master franchise, royalty splits.
+  'sales.territories': [{ key: 'territories', href: '/franchise/territories', icon: 'map', msg: 'franchise.nav.territories' }],
+  'community.surveys': [{ key: 'surveys', href: '/surveys', icon: 'chart', msg: 'fdev.nav.surveys' }],
+  'legal.lifecycle': [
+    { key: 'lifecycle', href: '/franchise/lifecycle', icon: 'repeat', msg: 'fdev.nav.lifecycle' },
+    { key: 'development', href: '/franchise/development', icon: 'building', msg: 'fdev.nav.development' },
+  ],
+  'sales.master_franchise': [{ key: 'master', href: '/franchise/master', icon: 'globe', msg: 'fdev.nav.master' }],
+  'finance.royalty_splits': [{ key: 'royaltySplits', href: '/finance/royalty-splits', icon: 'share', msg: 'fdev.nav.royaltySplits' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],
@@ -130,6 +140,10 @@ const EXTRA_ROUTE_MODULES: Record<string, readonly string[]> = {
   '/franchise/prospect': ['sales.franchise_pipeline'],
   '/franchise/agreements': ['sales.franchise_pipeline', 'network.onboarding'],
   '/franchise/rules': ['sales.franchise_pipeline'],
+  // Franchisees volunteer as validators from Surveys & validation; the master franchisee's statements live on the master page too.
+  '/franchise/validation': ['sales.franchise_pipeline', 'community.surveys'],
+  '/franchise/master': ['sales.master_franchise', 'finance.royalty_splits'],
+  '/surveys': ['community.surveys'],
 };
 
 /**

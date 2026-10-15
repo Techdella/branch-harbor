@@ -8,6 +8,7 @@ import {
   royaltyStatements, type SplitStatementLine,
 } from '../db/schema/index.ts';
 import { transferToMaster } from '../integrations/master-payouts.ts';
+import { mapConfig } from '../services/franchise-dev/territories.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { renderPdf } from '../lib/pdf.ts';
 import { authenticate } from '../plugins/auth.ts';
@@ -124,7 +125,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
     const docs = await db.select().from(franchiseDocuments).where(and(eq(franchiseDocuments.organizationId, orgId), eq(franchiseDocuments.kind, 'disclosure'), eq(franchiseDocuments.status, 'current')));
     const myDocs = docs.filter((d) => d.jurisdictions.some((j) => m.countries.includes(j.slice(0, 2))));
     return {
-      agreement: masterOut(m, null),
+      agreement: masterOut(m, null), map: mapConfig(s.cfg),
       prospects: pros.map((p) => serializeProspect(p, { territoryName: terr.find((t) => t.id === p.territoryId)?.name ?? null })),
       territories: terr.filter((t) => !m.regions.length || (t.region && m.regions.includes(t.region))).map((t) => ({ id: t.id, name: t.name, country: t.country, region: t.region, status: t.status, geometry: t.geometry ?? null, postcodes: t.postcodes, centroid: t.centroid ?? null })),
       documents: myDocs.map((d) => ({ id: d.id, title: d.title, version: d.version, jurisdictions: d.jurisdictions, issuedOn: d.issuedOn })),

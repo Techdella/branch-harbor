@@ -1,10 +1,10 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   TERRITORY_EXCLUSIVITY, TERRITORY_STATUSES, findOverlaps, parsePostcodeList, territoryGeometrySchema, type TerritoryExclusivity, type TerritoryGeometry,
 } from '@bh/shared';
-import { franchiseTerritories, organizations, ownerGroups } from '../db/schema/index.ts';
+import { franchiseTerritories, locations, organizations, ownerGroups } from '../db/schema/index.ts';
 import { validationError } from '../lib/errors.ts';
 import { renderPdf, type PdfPage } from '../lib/pdf.ts';
 import { authenticate } from '../plugins/auth.ts';
@@ -60,8 +60,10 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     await requireTerritories(req, db, orgId, 'view');
     const rows = (await orgTerritories(db, orgId)).sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
     const [org] = await db.select().from(organizations).where(eq(organizations.id, orgId));
+    const locs = await db.select({ id: locations.id, name: locations.name, geo: locations.geo, status: locations.status }).from(locations).where(and(eq(locations.organizationId, orgId), isNull(locations.archivedAt)));
     return {
-      items: await listOut(orgId, rows), settings: territorySettings(org!), map: mapConfig(s.cfg), brandSlug: org!.slug,
+      items: await listOut(orgId, rows), settings: territorySettings(org!), map: mapConfig(s.cfg), brandSlug: org!.slug, homeCountry: org!.country,
+      locations: locs.filter((l) => l.geo).map((l) => ({ id: l.id, name: l.name, status: l.status, lat: l.geo!.lat, lng: l.geo!.lng })),
       demographics: { census: !!s.cfg.CENSUS_API_KEY },
       can: { edit: await canTerritories(req, db, orgId, 'edit'), publish: await canTerritories(req, db, orgId, 'publish'), export: await canTerritories(req, db, orgId, 'export') },
     };

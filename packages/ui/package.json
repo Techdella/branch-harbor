@@ -9,10 +9,27 @@
     ".": "./src/index.ts",
     "./site": "./src/site/index.ts",
     "./styles.css": "./src/styles.css",
-    "./site.css": "./src/site/site.css"
+    "./site.css": "./src/site/site.css",
+    "./map": "./src/map/TerritoryMap.tsx"
   },
-  "scripts": { "typecheck": "tsc --noEmit" },
-  "dependencies": { "@bh/icons": "workspace:*", "@bh/tokens": "workspace:*", "@bh/shared": "workspace:*" },
-  "peerDependencies": { "react": ">=19", "react-dom": ">=19" },
-  "devDependencies": { "@types/react": "19.3.0", "@types/react-dom": "19.3.0", "react": "19.3.0", "react-dom": "19.3.0", "typescript": "5.9.3" }
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bh/icons": "workspace:*",
+    "@bh/tokens": "workspace:*",
+    "@bh/shared": "workspace:*",
+    "maplibre-gl": "6.11.2"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "5.9.3"
+  }
 }
