@@ -84,8 +84,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <ProductPreview />
 
       {/* 4. Industry selector */}
-      <section id="industries" aria-labelledby="industries-title" className="grid gap-[var(--edge)] sm:grid-cols-2 lg:grid-cols-3 min-[1800px]:grid-cols-4">
-        <div className="flex min-h-[300px] flex-col justify-between gap-6 rounded-[28px] bg-sage p-7 text-white md:rounded-2xl md:p-9 lg:col-span-2 min-[1800px]:col-span-1 min-[1920px]:p-12">
+      <section id="industries" aria-labelledby="industries-title" className="rail-wide grid gap-[var(--edge)] sm:grid-cols-2 lg:grid-cols-3 min-[112.5rem]:grid-cols-4">
+        <div className="flex min-h-[300px] flex-col justify-between gap-6 rounded-[28px] bg-sage p-7 text-white md:rounded-2xl md:p-9 lg:col-span-2 min-[112.5rem]:col-span-1 min-[120rem]:p-12">
           <H2 id="industries-title">{t('industries.title')}</H2>
           <div className="flex flex-col gap-4">
             <p className="text-[15px] leading-relaxed text-white">{t('industries.body')}</p>
@@ -108,7 +108,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Link
               key={k}
               href={`/industries/${k}`}
-              className="group relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[28px] focus-visible:outline-3 focus-visible:outline-offset-2 md:rounded-2xl min-[1920px]:min-h-[460px]"
+              className="group relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[28px] focus-visible:outline-3 focus-visible:outline-offset-2 md:rounded-2xl min-[120rem]:min-h-[460px]"
               style={{ background: ind.pastel }}
             >
               <Image src={ind.image} alt="" fill sizes="(min-width: 1800px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.03]" />
@@ -131,7 +131,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* 5. Headquarters and locations */}
-      <section aria-labelledby="hqlocal-title" className="grid gap-[var(--edge)] md:grid-cols-2">
+      <section aria-labelledby="hqlocal-title" className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         <h2 id="hqlocal-title" className="sr-only">
           {t('hqLocal.title')}
         </h2>
@@ -215,7 +215,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </Panel>
 
       {/* 8. Hosted vs WordPress */}
-      <section aria-labelledby="delivery-title" className="grid gap-[var(--edge)] md:grid-cols-2">
+      <section aria-labelledby="delivery-title" className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         <h2 id="delivery-title" className="sr-only">
           {t('delivery.title')}
         </h2>
@@ -269,7 +269,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </Panel>
 
       {/* 10. Evidence + 11. Pricing preview */}
-      <section aria-label={`${t('evidence.eyebrow')} · ${t('pricing.eyebrow')}`} className="grid gap-[var(--edge)] md:grid-cols-2">
+      <section aria-label={`${t('evidence.eyebrow')} · ${t('pricing.eyebrow')}`} className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         <div className="flex flex-col items-start gap-4 rounded-[28px] bg-surface p-7 md:rounded-2xl md:p-10">
           <span className="text-label font-extrabold text-stone uppercase">{t('evidence.eyebrow')}</span>
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">{t('evidence.title')}</h2>

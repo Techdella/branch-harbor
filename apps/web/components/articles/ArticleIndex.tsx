@@ -72,9 +72,9 @@ export function ArticleIndex({ articles }: { articles: ArticleMeta[] }) {
       {list.length === 0 ? (
         <p className="rounded-[24px] border-[1.5px] border-dashed border-line p-8 text-center text-stone">{t('empty')}</p>
       ) : (
-        <ul className="grid gap-[var(--edge)] sm:grid-cols-2 lg:grid-cols-3 min-[1800px]:grid-cols-4">
+        <ul className="grid gap-[var(--edge)] sm:grid-cols-2 lg:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {first && (
-            <li className={cx(!filtered && 'sm:col-span-2 lg:col-span-3 min-[1800px]:col-span-4')}>
+            <li className={cx(!filtered && 'sm:col-span-2 lg:col-span-3 min-[112.5rem]:col-span-4')}>
               <ArticleCard a={first} featured={!filtered} headingLevel="h2" />
             </li>
           )}

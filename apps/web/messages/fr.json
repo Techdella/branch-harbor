@@ -1960,7 +1960,7 @@
     "perMonthOneLocation": "/ mois · un établissement",
     "soloTotal": "Un établissement. Passez à Réseau pour en ajouter d’autres.",
     "soloAnnual": "Un établissement, facturé à l’année.",
-    "geoNote": "Prix affichés en {currency} pour {country}. Vous êtes facturé dans la devise de votre pays de facturation.",
+    "geoNote": "Prix affichés en {currency} pour votre pays ({country}). Vous êtes facturé dans la devise de votre pays de facturation.",
     "geoNoteUnknown": "Prix affichés en {currency}. Vous êtes facturé dans la devise de votre pays de facturation.",
     "demoTitle": "Pas encore prêt à vous inscrire ?",
     "demoBody": "Explorez une entreprise d’exemple dans la démo, ou réservez un appel pour passer en revue vos établissements avec nous."

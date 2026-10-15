@@ -23,7 +23,7 @@ export default async function ResourcesPage({ params }: Props) {
   return (
     <>
       <PageHero kicker={t('kicker')} kickerIcon="book" title={t('headline')} intro={t('intro')} />
-      <section aria-label={`${ta('blog.kicker')} · ${ta('guides.kicker')}`} className="grid gap-[var(--edge)] md:grid-cols-2">
+      <section aria-label={`${ta('blog.kicker')} · ${ta('guides.kicker')}`} className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         {hubs.map((h) => (
           <Link key={h.kind} href={`/${h.kind}`} className="group flex flex-col gap-4 rounded-[28px] p-7 transition hover:brightness-[0.98] md:rounded-2xl md:p-10" style={{ background: h.bg }}>
             <span className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-surface">

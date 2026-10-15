@@ -45,7 +45,7 @@ function NavMenu({
           'absolute top-[calc(100%+14px)] z-40 rounded-[28px] bg-surface p-3 shadow-pop transition duration-150 ease-bh starting:-translate-y-1 starting:opacity-0',
           // Pointer arrow, centred on the button (center) or near its start edge (start).
           'before:absolute before:-top-1.5 before:h-3 before:w-3 before:rotate-45 before:rounded-[3px] before:bg-surface',
-          align === 'center' ? 'start-1/2 -translate-x-1/2 before:start-1/2 before:-ms-1.5 rtl:translate-x-1/2' : 'start-0 before:start-8',
+          align === 'center' ? 'start-1/2 -translate-x-1/2 before:start-1/2 before:-ms-1.5 rtl:translate-x-1/2' : 'start-0 before:start-12',
           width,
         )}
       >
@@ -57,7 +57,7 @@ function NavMenu({
 
 const navItem = (on: boolean) =>
   cx(
-    'inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-bold whitespace-nowrap transition duration-150 ease-bh',
+    'inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-sm font-bold whitespace-nowrap min-[100rem]:px-4 transition duration-150 ease-bh',
     on ? 'bg-surface shadow-card' : 'hover:bg-surface/70',
   );
 
@@ -138,10 +138,10 @@ export function SiteHeader() {
           <Logo size={34} />
         </Link>
 
-        <nav aria-label={t('main')} className="mx-auto hidden xl:block">
+        <nav aria-label={t('main')} className="mx-auto hidden min-[85rem]:block">
           <ul ref={navRef} className="flex items-center gap-0.5 rounded-full bg-canvas p-1">
             <li className="relative">
-              <NavMenu id={indId} label={t('industries')} open={open === 'industries'} active={active('/industries')} onToggle={() => toggle('industries')} align="center" width="w-[min(800px,92vw)]">
+              <NavMenu id={indId} label={t('industries')} open={open === 'industries'} active={active('/industries')} onToggle={() => toggle('industries')} align="start" width="w-[min(800px,92vw)]">
                 <ul className="grid grid-cols-2 gap-1">
                   {INDUSTRY_KEYS.map((k) => {
                     const ind = INDUSTRIES[k];
@@ -225,11 +225,11 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="ms-auto hidden items-center gap-1 xl:ms-0 xl:flex">
+        <div className="ms-auto hidden items-center gap-1 min-[85rem]:ms-0 min-[85rem]:flex">
           <a href={`${APP_URL}/sign-in`} className="rounded-full px-3 py-2 text-sm font-bold transition hover:bg-canvas">
             {tc('signIn')}
           </a>
-          <Link href="/demo" className="hidden rounded-full px-3 py-2 text-sm font-bold transition hover:bg-canvas min-[1440px]:inline-flex">
+          <Link href="/demo" className="hidden rounded-full px-3 py-2 text-sm font-bold transition hover:bg-canvas min-[90rem]:inline-flex">
             {tc('requestDemo')}
           </Link>
           {/* No lime here: the page's own primary CTA carries the single lime signal (brand rule). */}
@@ -238,7 +238,7 @@ export function SiteHeader() {
           </LinkButton>
         </div>
 
-        <div className="ms-auto flex items-center gap-2 xl:hidden">
+        <div className="ms-auto flex items-center gap-2 min-[85rem]:hidden">
           <span className="hidden sm:block">
             <LinkButton href={DEMO_URL} external>
               {tc('tryDemo')}
@@ -262,7 +262,7 @@ export function SiteHeader() {
         id={menuId}
         aria-label={t('mobileMenu')}
         hidden={!menuOpen}
-        className="band max-h-[calc(100dvh-var(--header-h)-3*var(--edge))] overflow-y-auto overscroll-contain border-t border-line-soft pt-3 pb-6 xl:hidden"
+        className="band max-h-[calc(100dvh-var(--header-h)-3*var(--edge))] overflow-y-auto overscroll-contain border-t border-line-soft pt-3 pb-6 min-[85rem]:hidden"
       >
         <p className="px-1 pt-1 pb-2 text-xs font-bold text-stone">{t('industries')}</p>
         <ul className="grid gap-1.5 sm:grid-cols-2">

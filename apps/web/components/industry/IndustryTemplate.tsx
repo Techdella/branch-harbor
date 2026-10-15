@@ -141,7 +141,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
       </Panel>
 
       {/* HQ / local permissions */}
-      <section aria-labelledby="perm-title" className="grid gap-[var(--edge)] md:grid-cols-2">
+      <section aria-labelledby="perm-title" className="rail-wide grid gap-[var(--edge)] md:grid-cols-2">
         <div className="rounded-[28px] bg-surface p-7 md:col-span-2 md:rounded-2xl md:p-10">
           <H2 id="perm-title">{t('permissionsTitle')}</H2>
           <Lead className="mt-3">{t('permissionsBody')}</Lead>
@@ -163,7 +163,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
       </section>
 
       {/* First release + connected systems */}
-      <section aria-label={`${t('firstTitle')} · ${t('connectedTitle')}`} className="grid gap-[var(--edge)] lg:grid-cols-2">
+      <section aria-label={`${t('firstTitle')} · ${t('connectedTitle')}`} className="rail-wide grid gap-[var(--edge)] lg:grid-cols-2">
         <div className="flex flex-col gap-4 rounded-[28px] bg-surface p-7 md:rounded-2xl md:p-10">
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">{t('firstTitle')}</h2>
           <p className="text-[15px] text-stone">{t('firstBody', { name })}</p>
@@ -192,7 +192,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
       </section>
 
       {/* Later capabilities + sample network */}
-      <section aria-label={`${t('laterTitle')} · ${t('sampleTitle')}`} className="grid gap-[var(--edge)] lg:grid-cols-2">
+      <section aria-label={`${t('laterTitle')} · ${t('sampleTitle')}`} className="rail-wide grid gap-[var(--edge)] lg:grid-cols-2">
         <div className="flex flex-col gap-4 rounded-[28px] border-[1.5px] border-dashed border-line bg-canvas-raised p-7 md:rounded-2xl md:p-10">
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">{t('laterTitle')}</h2>
           <p className="text-[15px] text-stone">{t('laterBody')}</p>

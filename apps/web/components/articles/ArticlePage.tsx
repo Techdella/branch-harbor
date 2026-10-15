@@ -139,7 +139,7 @@ export async function ArticlePage({ kind, slug }: { kind: ArticleKind; slug: str
         </div>
       </Panel>
 
-      <Panel className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 min-[1920px]:grid-cols-[minmax(0,1fr)_320px]">
+      <Panel className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 min-[120rem]:grid-cols-[minmax(0,1fr)_320px]">
         <aside className="lg:order-2">
           <div className="flex flex-col gap-6 lg:sticky lg:top-[calc(var(--header-h)+2*var(--edge)+16px)]">
             {toc.length > 1 && (

@@ -31,7 +31,7 @@ export function ProductPreview() {
   const ok = (l: PreviewLocation) => l.sync.state === 'connected';
 
   return (
-    <section aria-labelledby="preview-title" className="grid gap-3 lg:grid-cols-3">
+    <section aria-labelledby="preview-title" className="rail-wide grid gap-[var(--edge)] lg:grid-cols-3">
       <h2 id="preview-title" className="sr-only">
         {t('heading')}
       </h2>

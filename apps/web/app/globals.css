@@ -34,7 +34,7 @@
     --edge: clamp(8px, 0.75vw, 20px);
     --band-pad: 20px;
     --rail: 1440px;
-    --rail-wide: 2200px;
+    --rail-wide: 1920px;
     --header-h: 68px;
   }
   @media (min-width: 640px) {
