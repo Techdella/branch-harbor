@@ -1,0 +1,398 @@
+{
+  "nav": {
+    "reviews": "Reseñas"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "reviews": {
+          "name": "Reseñas",
+          "description": "Solicitudes de reseña tras visitas y pedidos, comentarios privados, reseñas de Google con respuestas y valoraciones por ubicación."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "already_reviewed": "Ya se recibió un comentario para esta solicitud.",
+    "reply_in_inbox": "Los comentarios privados se responden desde la conversación de la bandeja.",
+    "awaiting_approval": "Esta respuesta está pendiente de aprobación de la central.",
+    "not_pending": "Esta respuesta no está pendiente de aprobación.",
+    "google_not_configured": "El acceso con Google aún no está configurado. Añade una conexión sandbox mientras tanto.",
+    "mandate_text_changed": "El texto de la autorización cambió. Léelo de nuevo antes de aceptar.",
+    "no_reply": "Escribe primero una respuesta."
+  },
+  "mkt": {
+    "auto": {
+      "trigger": {
+        "review": {
+          "received": "Reseña recibida"
+        }
+      },
+      "action": {
+        "send_review_request": "Enviar solicitud de reseña"
+      },
+      "field": {
+        "event": {
+          "rating": "Valoración (1–5)"
+        }
+      },
+      "reason": {
+        "no_location": "sin ubicación",
+        "test_run": "no se envía en una prueba",
+        "opted_out": "dado de baja",
+        "frequency_cap": "se le pidió hace poco",
+        "reviews_disabled": "solicitudes de reseña desactivadas",
+        "location_unavailable": "ubicación no disponible",
+        "not_scheduled": "ya gestionado"
+      }
+    }
+  },
+  "reviews": {
+    "stars": "{n} de 5 estrellas",
+    "title": "Reseñas",
+    "description": "Pide reseñas tras cada visita, lee los comentarios privados y las reseñas de Google, y responde.",
+    "tab": {
+      "overview": "Resumen",
+      "reviews": "Reseñas",
+      "requests": "Solicitudes",
+      "settings": "Ajustes",
+      "connections": "Google"
+    },
+    "filter": {
+      "location": "Ubicación",
+      "allLocations": "Todas las ubicaciones visibles",
+      "bucket": "Agrupar por",
+      "month": "Mes",
+      "week": "Semana",
+      "source": "Origen",
+      "allSources": "Todos los orígenes",
+      "show": "Mostrar",
+      "all": "Todas las reseñas",
+      "negative": "Negativas (2★ o menos)",
+      "unanswered": "Google, sin responder",
+      "pending": "Respuestas pendientes de aprobación",
+      "search": "Buscar"
+    },
+    "hours": "{n} h",
+    "days": "{n} días",
+    "kpi": {
+      "average": "Valoración media",
+      "averageSub": "de {n} reseñas",
+      "volume": "Reseñas",
+      "volumeSub": "{public} públicas · {negative} negativas",
+      "responseRate": "Tasa de respuesta",
+      "responseRateSub": "Respuestas en Google y en la bandeja",
+      "pendingApproval": "{n} pendientes de aprobación de la central",
+      "responseTime": "Tiempo medio de respuesta",
+      "responseTimeSub": "desde la reseña hasta la primera respuesta",
+      "requests": "Solicitudes enviadas",
+      "requestsSub": "{completed} respondidas ({rate})"
+    },
+    "chart": {
+      "rating": "Valoración media en el tiempo",
+      "volume": "Reseñas por periodo",
+      "empty": "Aún no hay reseñas en este periodo.",
+      "ratingCaption": "Gráfico de barras de la valoración media por periodo, de 0 a 5.",
+      "volumeCaption": "Gráfico de barras del número de reseñas por periodo."
+    },
+    "byLocation": "Por ubicación",
+    "col": {
+      "location": "Ubicación",
+      "average": "Media",
+      "reviews": "Reseñas",
+      "responseRate": "Tasa de respuesta",
+      "responseTime": "Tiempo de respuesta",
+      "customer": "Cliente",
+      "source": "Después de",
+      "channel": "Canal",
+      "when": "Cuándo",
+      "status": "Estado"
+    },
+    "source": {
+      "google": "Google",
+      "branchharbor": "Comentario privado"
+    },
+    "anonymous": "Anónimo",
+    "noComment": "Sin comentario, solo valoración.",
+    "replyStatus": {
+      "none": "Sin responder",
+      "draft": "Borrador de respuesta",
+      "pending_approval": "Pendiente de aprobación",
+      "published": "Respondida",
+      "rejected": "Respuesta rechazada",
+      "failed": "Respuesta no publicada"
+    },
+    "sandboxReply": "Sandbox: no publicada",
+    "sandboxReplyLong": "Guardada en BranchHarbor. Esta conexión está en sandbox, así que no se publicó nada en Google.",
+    "empty": "Aún no hay reseñas",
+    "emptyBody": "Activa las solicitudes de reseña o conecta Google Business Profile para ver reseñas aquí.",
+    "drawer": {
+      "title": "Reseña",
+      "privateHint": "Los comentarios privados llegan a la bandeja de la ubicación. Responde al cliente desde esa conversación.",
+      "pendingTitle": "Pendiente de aprobación de la central",
+      "pendingBody": "Enviada por {name}. Se publicará cuando la central la apruebe.",
+      "rejectedTitle": "La central rechazó esta respuesta",
+      "publishedTitle": "Respuesta publicada",
+      "externalReply": "Respondida directamente en Google.",
+      "publishedBody": "Publicada en Google.",
+      "reply": "Tu respuesta",
+      "suggest": "Sugerir respuesta",
+      "aiNote": "Sugerida por la IA de BranchHarbor. Revísala antes de publicar.",
+      "replyLabel": "Respuesta pública",
+      "replyHint": "Todos pueden leerla en Google. Sin promesas de reembolso ni datos personales.",
+      "needsApproval": "La central aprueba las respuestas a esta reseña antes de publicarlas.",
+      "sentForApproval": "Enviada a la central para su aprobación.",
+      "published": "Respuesta publicada.",
+      "submit": "Enviar para aprobación",
+      "publish": "Publicar respuesta",
+      "saved": "Borrador guardado.",
+      "saveDraft": "Guardar borrador",
+      "decisionNote": "Nota para el autor",
+      "approve": "Aprobar y publicar",
+      "reject": "Rechazar",
+      "rejected": "Respuesta rechazada."
+    },
+    "send": {
+      "title": "Enviar una solicitud de reseña",
+      "hint": "Las solicitudes también se envían automáticamente tras cada visita completada si están activadas. Siempre se respetan las bajas, el consentimiento, el límite de frecuencia y el horario de silencio.",
+      "run": "Ejecutar ahora",
+      "ran": "{n} solicitudes nuevas programadas.",
+      "search": "Buscar un cliente",
+      "customer": "Cliente",
+      "choose": "Elegir…",
+      "button": "Enviar solicitud"
+    },
+    "outcome": {
+      "sent": "Solicitud enviada.",
+      "sandboxed": "Solicitud registrada (sandbox: no se entregó ningún mensaje).",
+      "skipped": "No enviada: {reason}.",
+      "failed": "Error al enviar: {reason}.",
+      "deferred": "Programada para el final del horario de silencio."
+    },
+    "skip": {
+      "not_scheduled": "ya gestionada",
+      "location_unavailable": "ubicación no disponible",
+      "reviews_disabled": "solicitudes desactivadas",
+      "no_contact": "sin datos de contacto",
+      "no_email": "sin correo electrónico",
+      "no_phone": "sin número de teléfono",
+      "opted_out": "dado de baja",
+      "no_consent": "sin consentimiento de marketing",
+      "frequency_cap": "ya se le pidió hace poco (límite de frecuencia)",
+      "quiet_hours": "horario de silencio",
+      "send_failed": "el proveedor rechazó el mensaje"
+    },
+    "requests": {
+      "empty": "Aún no hay solicitudes de reseña",
+      "emptyBody": "Activa las solicitudes en Ajustes o envía una a un cliente."
+    },
+    "trigger": {
+      "class_visit": "Clase asistida",
+      "booking": "Cita completada",
+      "order": "Pedido completado",
+      "hotel_checkout": "Salida del hotel",
+      "property_viewing": "Visita a inmueble",
+      "manual": "Enviada por el equipo",
+      "automation": "Automatización"
+    },
+    "channel": {
+      "email": "Correo electrónico",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "requestStatus": {
+      "scheduled": "Programada",
+      "sending": "Enviando",
+      "sent": "Enviada",
+      "sandboxed": "Sandbox",
+      "opened": "Abierta",
+      "completed": "Reseña dejada",
+      "skipped": "No enviada",
+      "failed": "Error"
+    },
+    "settings": {
+      "scope": "Ajustes para",
+      "scopeHint": "Los valores de la central se aplican en todas partes; una ubicación puede sustituirlos.",
+      "hqDefaults": "Valores de la central (todas las ubicaciones)",
+      "requests": "Solicitudes de reseña",
+      "enabled": "Enviar automáticamente",
+      "after": "Enviar después de",
+      "delay": "Retraso (horas)",
+      "delayHint": "Tiempo tras finalizar la visita.",
+      "channel": "Canal",
+      "cap": "Como máximo una solicitud cada (días)",
+      "capHint": "Por cliente, en todas las ubicaciones.",
+      "quietStart": "Inicio del horario de silencio",
+      "quietHint": "Los SMS y WhatsApp esperan al final del horario de silencio (hora local).",
+      "quietEnd": "Fin del horario de silencio",
+      "consent": "A quién se puede pedir",
+      "consentHint": {
+        "marketing": "Solo clientes que aceptaron marketing en este canal.",
+        "service": "Un seguimiento puntual de la visita, si la ley local lo permite. Las bajas siempre se respetan."
+      },
+      "consentMode": {
+        "marketing": "Clientes con consentimiento de marketing",
+        "service": "Seguimiento del servicio"
+      },
+      "template": "Mensaje",
+      "templateHint": "Déjalo vacío para usar el texto predeterminado en cada idioma. Usa '{name}', '{location}', '{business}' y '{link}'.",
+      "language": "Idioma",
+      "subject": "Asunto del correo",
+      "body": "Texto",
+      "bodyHint": "Debe incluir '{link}'. Los SMS añaden automáticamente la línea de baja.",
+      "links": "Enlaces de reseñas públicas",
+      "noGating": "Todos los clientes ven estos enlaces tras valorar, sea cual sea la valoración. Mostrarlos solo a clientes satisfechos («review gating») incumple la política de reseñas de Google.",
+      "linkKind": "Sitio",
+      "linkLabel": "Etiqueta",
+      "linkUrl": "Enlace",
+      "remove": "Quitar",
+      "addLink": "Añadir enlace",
+      "approval": "Aprobación de respuestas",
+      "approvalLabel": "La central aprueba las respuestas de las ubicaciones",
+      "approvalHint": "El marketing de la central siempre puede publicar directamente.",
+      "approvalMode": {
+        "none": "Nunca (las ubicaciones publican)",
+        "negative": "Para reseñas negativas (2★ o menos)",
+        "all": "Para cada respuesta"
+      },
+      "saved": "Ajustes guardados.",
+      "save": "Guardar ajustes"
+    },
+    "linkKind": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "tripadvisor": "Tripadvisor",
+      "yelp": "Yelp",
+      "trustpilot": "Trustpilot",
+      "other": "Otro"
+    },
+    "connections": {
+      "connected": "Cuenta de Google conectada. Vincula sus ubicaciones abajo.",
+      "title": "Google Business Profile",
+      "intro": "Conecta una cuenta de Google que gestione varias ubicaciones (central), o deja que una ubicación conecte la suya. Las reseñas se obtienen cada 30 minutos.",
+      "owner": "Gestionada por",
+      "hq": "Central (varias ubicaciones)",
+      "location": "Una ubicación",
+      "connectGoogle": "Conectar con Google",
+      "sandboxAdded": "Conexión sandbox añadida.",
+      "addSandbox": "Añadir conexión sandbox",
+      "notConfigured": "El acceso con Google aún no está configurado en esta plataforma. Mientras tanto, una conexión sandbox funciona: no obtiene reseñas y nunca las inventa.",
+      "empty": "Aún no hay conexión con Google",
+      "hqAccount": "Cuenta de Google de la central",
+      "locationAccount": "Cuenta de Google de {name}",
+      "mode": {
+        "live": "Activa",
+        "sandbox": "Sandbox"
+      },
+      "status": {
+        "connected": "Conectada",
+        "error": "Requiere atención",
+        "disconnected": "Desconectada"
+      },
+      "sandboxNote": "Sandbox: no se obtiene nada de Google y las respuestas se quedan en BranchHarbor.",
+      "lastFetched": "Última obtención {at}",
+      "neverFetched": "Aún no obtenido",
+      "syncedSandbox": "Sandbox: nada que obtener.",
+      "synced": "{n} reseñas nuevas.",
+      "sync": "Obtener ahora",
+      "googleLocation": "Ubicación de Google",
+      "googleLocationId": "ID de ubicación de Google",
+      "googleLocationIdHint": "Del administrador del Perfil de Empresa.",
+      "placeholder": "locations/1234567890",
+      "linked": "Ubicación vinculada.",
+      "link": "Vincular"
+    },
+    "nav": {
+      "reviews": "Reseñas"
+    }
+  },
+  "royaltyDebit": {
+    "noGroups": "Aún no hay ninguna empresa franquiciada que configurar.",
+    "intro": "La central cobra las facturas de regalías, fondo de marketing y tarifas desde esta cuenta tras emitirlas. Una domiciliación bancaria cuesta mucho menos que una tarjeta.",
+    "active": "Autorizado",
+    "none": "Sin configurar",
+    "type": {
+      "card": "Tarjeta",
+      "us_bank_account": "Débito bancario ACH",
+      "acss_debit": "Débito preautorizado (PAD)",
+      "bacs_debit": "Domiciliación Bacs",
+      "sepa_debit": "Adeudo directo SEPA",
+      "au_becs_debit": "Domiciliación BECS",
+      "manual": "Transferencia (registrada)"
+    },
+    "ending": "que termina en {last4}",
+    "revoked": "Autorización revocada.",
+    "revoke": "Revocar",
+    "pendingTitle": "{method}: pendiente de confirmación",
+    "verifyingTitle": "{method}: verifica tu cuenta",
+    "pendingBody": "Termina de introducir los datos de la cuenta. La domiciliación se activa cuando el banco confirma el mandato.",
+    "verifyingBody": "Llegarán dos pequeños depósitos a la cuenta en 1 o 2 días hábiles. Introdúcelos en la página de verificación para activar el débito.",
+    "verifyLink": "Abrir la página de verificación",
+    "mandateAccepted": "Autorización aceptada",
+    "confirmed": "Método de pago actualizado.",
+    "sandboxConfirm": "Confirmar (sandbox)",
+    "sandboxDecline": "Simular una cuenta que falla",
+    "checked": "Estado comprobado.",
+    "check": "Comprobar estado",
+    "choose": "¿Cómo debe cobrar la central?",
+    "recommended": "Menos comisiones",
+    "about": {
+      "card": "Se cobra en la fecha de vencimiento. Mayores comisiones de tarjeta para la central; funciona en cualquier país.",
+      "us_bank_account": "Se debita de una cuenta bancaria de EE. UU. por ACH. Se liquida en unos 4 días hábiles.",
+      "acss_debit": "Débito preautorizado empresarial desde una cuenta canadiense. Se liquida en unos 5 días hábiles.",
+      "bacs_debit": "Domiciliación desde una cuenta del Reino Unido, protegida por la Direct Debit Guarantee. Se liquida en unos 3 días hábiles.",
+      "sepa_debit": "Adeudo desde una cuenta en euros (IBAN). Se liquida en unos 5 días hábiles; se puede pedir reembolso en 8 semanas.",
+      "au_becs_debit": "Domiciliación desde una cuenta australiana (BSB). Se liquida en unos 3 días hábiles."
+    },
+    "noBankDebit": "La domiciliación en {currency} no está disponible en la cuenta de cobro de la central, así que solo se puede usar tarjeta.",
+    "mandateTitle": "Autorización que vas a aceptar",
+    "accept": "Estoy autorizado a firmar por {group} y acepto esta autorización. Se guardan el texto exacto, mi nombre, la hora y mi dirección IP.",
+    "started": "Autorización registrada. Confirma la cuenta para activarla.",
+    "replace": "Sustituir por este método",
+    "authorise": "Autorizar",
+    "settleNote": "Las domiciliaciones aparecen en proceso unos días. Si una falla, recibes un correo y la central reintenta en las fechas de su política de cobro.",
+    "statements": {
+      "tab": "Extractos mensuales",
+      "issued": "{n} extractos emitidos, {emailed} enviados por correo.",
+      "period": "Periodo",
+      "issue": "Emitir extractos",
+      "issueHint": "Un extracto por franquiciado y moneda. Los nuevos se envían por correo a los franquiciados; volver a emitir actualiza las cifras.",
+      "empty": "Aún no hay extractos mensuales",
+      "emptyBody": "La central los emite tras cerrar un periodo.",
+      "franchisee": "Franquiciado",
+      "gross": "Ventas brutas",
+      "total": "Total",
+      "collected": "Cobrado",
+      "paid": "Pagado",
+      "outstanding": "Pendiente",
+      "pdf": "Descargar PDF",
+      "source": {
+        "branchharbor": "Ventas de pagos de BranchHarbor",
+        "external_pos": "Ventas declaradas desde un TPV externo",
+        "mixed": "Pagos de BranchHarbor y TPV externo",
+        "none": "Sin ventas"
+      },
+      "royaltyAt": "Regalía ({rate})",
+      "fundAt": "Fondo de marketing ({rate})",
+      "adjustments": "Ajustes",
+      "feesTax": "Tarifas e impuestos",
+      "amount": "Importe",
+      "collection": "Cobro",
+      "status": {
+        "processing": "en proceso",
+        "succeeded": "cobrado",
+        "failed": "fallido",
+        "requires_action": "requiere acción"
+      },
+      "notCollected": "Aún no cobrado",
+      "collectionFee": "Tarifa de cobro de BranchHarbor (pagada por la central)",
+      "invoice": "Factura {number}, vence el {due}",
+      "royalty": "Regalías",
+      "fund": "Fondo de marketing",
+      "feeNote": "La tarifa fija de cobro de BranchHarbor de este periodo fue {fee}. La paga la central; nunca se suma a lo que debes.",
+      "method": "Cobrado por {method} que termina en {last4}.",
+      "emailed": "Enviado por correo a {n} personas el {at}.",
+      "notEmailed": "No enviado (no hay franquiciado registrado)."
+    }
+  }
+}

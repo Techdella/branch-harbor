@@ -1,0 +1,31 @@
+{
+  "reviewPage": {
+    "invalidTitle": "This review link isn’t valid",
+    "invalidBody": "Open the link from your message again, or contact the location.",
+    "title": "How was {location}?",
+    "thanksTitle": "Thank you!",
+    "askNamed": "{name}, how would you rate your visit?",
+    "ask": "How would you rate your visit?",
+    "ratingLabel": "Your rating",
+    "starLabel": "{n} out of 5 stars",
+    "scale": {
+      "1": "Very poor",
+      "2": "Poor",
+      "3": "Okay",
+      "4": "Good",
+      "5": "Excellent"
+    },
+    "commentLabel": "Anything you’d like to tell the team? (optional)",
+    "privateNote": "Your rating and comment go privately to the team at {location}.",
+    "send": "Send",
+    "chooseRating": "Choose 1 to 5 stars.",
+    "thanksBody": "Your feedback has been sent to the team at {location}.",
+    "publicBefore": "Prefer to post a public review?",
+    "publicAfter": "Would you also share a public review?",
+    "publicBody": "It helps other people find us. Every review is welcome, whatever your rating.",
+    "reviewOn": "Review us on {site}",
+    "otherSite": "another site",
+    "optOut": "Stop review requests",
+    "optedOut": "Done. You won’t be asked for reviews again."
+  }
+}

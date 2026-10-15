@@ -1,0 +1,398 @@
+{
+  "nav": {
+    "reviews": "Bewertungen"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "reviews": {
+          "name": "Bewertungen",
+          "description": "Bewertungsanfragen nach Besuchen und Bestellungen, privates Feedback, Google-Bewertungen mit Antworten und Bewertungen pro Standort."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "already_reviewed": "Für diese Anfrage wurde bereits Feedback abgegeben.",
+    "reply_in_inbox": "Privates Feedback wird in der Posteingangs-Unterhaltung beantwortet.",
+    "awaiting_approval": "Diese Antwort wartet auf Freigabe durch die Zentrale.",
+    "not_pending": "Diese Antwort wartet nicht auf Freigabe.",
+    "google_not_configured": "Die Google-Anmeldung ist noch nicht eingerichtet. Fügen Sie bis dahin eine Sandbox-Verbindung hinzu.",
+    "mandate_text_changed": "Der Autorisierungstext hat sich geändert. Lesen Sie ihn vor dem Akzeptieren erneut.",
+    "no_reply": "Schreiben Sie zuerst eine Antwort."
+  },
+  "mkt": {
+    "auto": {
+      "trigger": {
+        "review": {
+          "received": "Bewertung erhalten"
+        }
+      },
+      "action": {
+        "send_review_request": "Bewertungsanfrage senden"
+      },
+      "field": {
+        "event": {
+          "rating": "Bewertung (1–5)"
+        }
+      },
+      "reason": {
+        "no_location": "kein Standort",
+        "test_run": "im Test nicht gesendet",
+        "opted_out": "abgemeldet",
+        "frequency_cap": "kürzlich gefragt",
+        "reviews_disabled": "Bewertungsanfragen aus",
+        "location_unavailable": "Standort nicht verfügbar",
+        "not_scheduled": "bereits erledigt"
+      }
+    }
+  },
+  "reviews": {
+    "stars": "{n} von 5 Sternen",
+    "title": "Bewertungen",
+    "description": "Bitten Sie Kunden nach dem Besuch um Bewertungen, lesen Sie privates Feedback und Google-Bewertungen und antworten Sie.",
+    "tab": {
+      "overview": "Übersicht",
+      "reviews": "Bewertungen",
+      "requests": "Anfragen",
+      "settings": "Einstellungen",
+      "connections": "Google"
+    },
+    "filter": {
+      "location": "Standort",
+      "allLocations": "Alle sichtbaren Standorte",
+      "bucket": "Gruppieren nach",
+      "month": "Monat",
+      "week": "Woche",
+      "source": "Quelle",
+      "allSources": "Alle Quellen",
+      "show": "Anzeigen",
+      "all": "Alle Bewertungen",
+      "negative": "Negativ (2★ oder weniger)",
+      "unanswered": "Google, unbeantwortet",
+      "pending": "Antworten zur Freigabe",
+      "search": "Suchen"
+    },
+    "hours": "{n} Std.",
+    "days": "{n} Tage",
+    "kpi": {
+      "average": "Durchschnittliche Bewertung",
+      "averageSub": "aus {n} Bewertungen",
+      "volume": "Bewertungen",
+      "volumeSub": "{public} öffentlich · {negative} negativ",
+      "responseRate": "Antwortquote",
+      "responseRateSub": "Google-Antworten und Posteingang",
+      "pendingApproval": "{n} warten auf Freigabe durch die Zentrale",
+      "responseTime": "Durchschnittliche Antwortzeit",
+      "responseTimeSub": "von der Bewertung bis zur ersten Antwort",
+      "requests": "Gesendete Anfragen",
+      "requestsSub": "{completed} beantwortet ({rate})"
+    },
+    "chart": {
+      "rating": "Durchschnittsbewertung im Zeitverlauf",
+      "volume": "Bewertungen pro Zeitraum",
+      "empty": "Noch keine Bewertungen in diesem Zeitraum.",
+      "ratingCaption": "Balkendiagramm der Durchschnittsbewertung pro Zeitraum, von 0 bis 5.",
+      "volumeCaption": "Balkendiagramm der Anzahl Bewertungen pro Zeitraum."
+    },
+    "byLocation": "Nach Standort",
+    "col": {
+      "location": "Standort",
+      "average": "Durchschnitt",
+      "reviews": "Bewertungen",
+      "responseRate": "Antwortquote",
+      "responseTime": "Antwortzeit",
+      "customer": "Kunde",
+      "source": "Nach",
+      "channel": "Kanal",
+      "when": "Wann",
+      "status": "Status"
+    },
+    "source": {
+      "google": "Google",
+      "branchharbor": "Privates Feedback"
+    },
+    "anonymous": "Anonym",
+    "noComment": "Kein Kommentar, nur Bewertung.",
+    "replyStatus": {
+      "none": "Unbeantwortet",
+      "draft": "Antwortentwurf",
+      "pending_approval": "Wartet auf Freigabe",
+      "published": "Beantwortet",
+      "rejected": "Antwort abgelehnt",
+      "failed": "Antwort nicht veröffentlicht"
+    },
+    "sandboxReply": "Sandbox: nicht veröffentlicht",
+    "sandboxReplyLong": "In BranchHarbor gespeichert. Diese Verbindung ist im Sandbox-Modus, daher wurde nichts bei Google veröffentlicht.",
+    "empty": "Noch keine Bewertungen",
+    "emptyBody": "Aktivieren Sie Bewertungsanfragen oder verbinden Sie Google Business Profile, um hier Bewertungen zu sehen.",
+    "drawer": {
+      "title": "Bewertung",
+      "privateHint": "Privates Feedback landet im Posteingang des Standorts. Antworten Sie dem Kunden in dieser Unterhaltung.",
+      "pendingTitle": "Wartet auf Freigabe durch die Zentrale",
+      "pendingBody": "Eingereicht von {name}. Sie wird nach Freigabe durch die Zentrale veröffentlicht.",
+      "rejectedTitle": "Die Zentrale hat diese Antwort abgelehnt",
+      "publishedTitle": "Antwort veröffentlicht",
+      "externalReply": "Direkt bei Google beantwortet.",
+      "publishedBody": "Bei Google veröffentlicht.",
+      "reply": "Ihre Antwort",
+      "suggest": "Antwort vorschlagen",
+      "aiNote": "Von BranchHarbor AI vorgeschlagen. Vor dem Veröffentlichen prüfen.",
+      "replyLabel": "Öffentliche Antwort",
+      "replyHint": "Für alle bei Google sichtbar. Keine Erstattungszusagen oder persönlichen Daten.",
+      "needsApproval": "Die Zentrale gibt Antworten auf diese Bewertung vor dem Veröffentlichen frei.",
+      "sentForApproval": "Zur Freigabe an die Zentrale gesendet.",
+      "published": "Antwort veröffentlicht.",
+      "submit": "Zur Freigabe senden",
+      "publish": "Antwort veröffentlichen",
+      "saved": "Entwurf gespeichert.",
+      "saveDraft": "Entwurf speichern",
+      "decisionNote": "Hinweis an den Verfasser",
+      "approve": "Freigeben und veröffentlichen",
+      "reject": "Ablehnen",
+      "rejected": "Antwort abgelehnt."
+    },
+    "send": {
+      "title": "Bewertungsanfrage senden",
+      "hint": "Anfragen werden bei Aktivierung auch automatisch nach abgeschlossenen Besuchen gesendet. Abmeldungen, Einwilligung, Häufigkeitsgrenze und Ruhezeiten gelten immer.",
+      "run": "Jetzt ausführen",
+      "ran": "{n} neue Anfragen geplant.",
+      "search": "Kunden suchen",
+      "customer": "Kunde",
+      "choose": "Auswählen…",
+      "button": "Anfrage senden"
+    },
+    "outcome": {
+      "sent": "Anfrage gesendet.",
+      "sandboxed": "Anfrage erfasst (Sandbox: keine Nachricht zugestellt).",
+      "skipped": "Nicht gesendet: {reason}.",
+      "failed": "Senden fehlgeschlagen: {reason}.",
+      "deferred": "Für das Ende der Ruhezeit geplant."
+    },
+    "skip": {
+      "not_scheduled": "bereits erledigt",
+      "location_unavailable": "Standort nicht verfügbar",
+      "reviews_disabled": "Anfragen deaktiviert",
+      "no_contact": "keine Kontaktdaten",
+      "no_email": "keine E-Mail-Adresse",
+      "no_phone": "keine Telefonnummer",
+      "opted_out": "abgemeldet",
+      "no_consent": "keine Marketing-Einwilligung",
+      "frequency_cap": "kürzlich gefragt (Häufigkeitsgrenze)",
+      "quiet_hours": "Ruhezeit",
+      "send_failed": "der Anbieter hat die Nachricht abgelehnt"
+    },
+    "requests": {
+      "empty": "Noch keine Bewertungsanfragen",
+      "emptyBody": "Aktivieren Sie Anfragen in den Einstellungen oder senden Sie eine an einen Kunden."
+    },
+    "trigger": {
+      "class_visit": "Kursbesuch",
+      "booking": "Abgeschlossener Termin",
+      "order": "Abgeschlossene Bestellung",
+      "hotel_checkout": "Hotel-Check-out",
+      "property_viewing": "Objektbesichtigung",
+      "manual": "Vom Team gesendet",
+      "automation": "Automatisierung"
+    },
+    "channel": {
+      "email": "E-Mail",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "requestStatus": {
+      "scheduled": "Geplant",
+      "sending": "Wird gesendet",
+      "sent": "Gesendet",
+      "sandboxed": "Sandbox",
+      "opened": "Geöffnet",
+      "completed": "Bewertet",
+      "skipped": "Nicht gesendet",
+      "failed": "Fehlgeschlagen"
+    },
+    "settings": {
+      "scope": "Einstellungen für",
+      "scopeHint": "Die Vorgaben der Zentrale gelten überall; ein Standort kann sie überschreiben.",
+      "hqDefaults": "Vorgaben der Zentrale (alle Standorte)",
+      "requests": "Bewertungsanfragen",
+      "enabled": "Automatisch senden",
+      "after": "Senden nach",
+      "delay": "Verzögerung (Stunden)",
+      "delayHint": "Zeit nach dem Ende des Besuchs.",
+      "channel": "Kanal",
+      "cap": "Höchstens eine Anfrage alle (Tage)",
+      "capHint": "Pro Kunde, über alle Standorte.",
+      "quietStart": "Beginn der Ruhezeit",
+      "quietHint": "SMS und WhatsApp warten bis zum Ende der Ruhezeit (Ortszeit).",
+      "quietEnd": "Ende der Ruhezeit",
+      "consent": "Wer gefragt werden darf",
+      "consentHint": {
+        "marketing": "Nur Kunden mit Marketing-Einwilligung für diesen Kanal.",
+        "service": "Eine einmalige Nachfrage zum Besuch, wo das örtliche Recht es erlaubt. Abmeldungen werden immer beachtet."
+      },
+      "consentMode": {
+        "marketing": "Kunden mit Marketing-Einwilligung",
+        "service": "Service-Nachfrage"
+      },
+      "template": "Nachricht",
+      "templateHint": "Leer lassen, um den Standardtext jeder Sprache zu verwenden. Verwenden Sie '{name}', '{location}', '{business}' und '{link}'.",
+      "language": "Sprache",
+      "subject": "E-Mail-Betreff",
+      "body": "Text",
+      "bodyHint": "Muss '{link}' enthalten. SMS erhalten automatisch den Abmeldehinweis.",
+      "links": "Öffentliche Bewertungslinks",
+      "noGating": "Jeder Kunde sieht diese Links nach der Bewertung, unabhängig von der Note. Sie nur zufriedenen Kunden zu zeigen („Review Gating“) verstößt gegen die Bewertungsrichtlinie von Google.",
+      "linkKind": "Website",
+      "linkLabel": "Bezeichnung",
+      "linkUrl": "Link",
+      "remove": "Entfernen",
+      "addLink": "Link hinzufügen",
+      "approval": "Freigabe von Antworten",
+      "approvalLabel": "Die Zentrale gibt Antworten der Standorte frei",
+      "approvalHint": "Das Marketing der Zentrale kann immer direkt veröffentlichen.",
+      "approvalMode": {
+        "none": "Nie (Standorte veröffentlichen)",
+        "negative": "Bei negativen Bewertungen (2★ oder weniger)",
+        "all": "Für jede Antwort"
+      },
+      "saved": "Einstellungen gespeichert.",
+      "save": "Einstellungen speichern"
+    },
+    "linkKind": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "tripadvisor": "Tripadvisor",
+      "yelp": "Yelp",
+      "trustpilot": "Trustpilot",
+      "other": "Andere"
+    },
+    "connections": {
+      "connected": "Google-Konto verbunden. Verknüpfen Sie unten die Standorte.",
+      "title": "Google Business Profile",
+      "intro": "Verbinden Sie ein Google-Konto für viele Standorte (Zentrale) oder lassen Sie einen Standort sein eigenes verbinden. Bewertungen werden alle 30 Minuten abgerufen.",
+      "owner": "Verwaltet von",
+      "hq": "Zentrale (viele Standorte)",
+      "location": "Ein Standort",
+      "connectGoogle": "Mit Google verbinden",
+      "sandboxAdded": "Sandbox-Verbindung hinzugefügt.",
+      "addSandbox": "Sandbox-Verbindung hinzufügen",
+      "notConfigured": "Die Google-Anmeldung ist auf dieser Plattform noch nicht eingerichtet. Bis dahin funktioniert eine Sandbox-Verbindung: Sie ruft keine Bewertungen ab und erfindet nie welche.",
+      "empty": "Noch keine Google-Verbindung",
+      "hqAccount": "Google-Konto der Zentrale",
+      "locationAccount": "Google-Konto von {name}",
+      "mode": {
+        "live": "Live",
+        "sandbox": "Sandbox"
+      },
+      "status": {
+        "connected": "Verbunden",
+        "error": "Prüfen",
+        "disconnected": "Getrennt"
+      },
+      "sandboxNote": "Sandbox: Es wird nichts von Google abgerufen und Antworten bleiben in BranchHarbor.",
+      "lastFetched": "Zuletzt abgerufen {at}",
+      "neverFetched": "Noch nicht abgerufen",
+      "syncedSandbox": "Sandbox: nichts abzurufen.",
+      "synced": "{n} neue Bewertungen.",
+      "sync": "Jetzt abrufen",
+      "googleLocation": "Google-Standort",
+      "googleLocationId": "Google-Standort-ID",
+      "googleLocationIdHint": "Aus dem Unternehmensprofil-Manager.",
+      "placeholder": "locations/1234567890",
+      "linked": "Standort verknüpft.",
+      "link": "Verknüpfen"
+    },
+    "nav": {
+      "reviews": "Bewertungen"
+    }
+  },
+  "royaltyDebit": {
+    "noGroups": "Noch keine Franchise-Gesellschaft einzurichten.",
+    "intro": "Die Zentrale zieht Rechnungen für Lizenzgebühren, Marketingfonds und Gebühren nach Ausstellung von diesem Konto ein. Eine Lastschrift kostet viel weniger als eine Karte.",
+    "active": "Autorisiert",
+    "none": "Nicht eingerichtet",
+    "type": {
+      "card": "Karte",
+      "us_bank_account": "ACH-Lastschrift",
+      "acss_debit": "Vorautorisierte Lastschrift (PAD)",
+      "bacs_debit": "Bacs-Lastschrift",
+      "sepa_debit": "SEPA-Lastschrift",
+      "au_becs_debit": "BECS-Lastschrift",
+      "manual": "Überweisung (erfasst)"
+    },
+    "ending": "endet auf {last4}",
+    "revoked": "Autorisierung widerrufen.",
+    "revoke": "Widerrufen",
+    "pendingTitle": "{method}: wartet auf Bestätigung",
+    "verifyingTitle": "{method}: Konto bestätigen",
+    "pendingBody": "Geben Sie die Kontodaten vollständig ein. Die Lastschrift wird aktiv, sobald die Bank das Mandat bestätigt.",
+    "verifyingBody": "Zwei kleine Gutschriften gehen in 1–2 Werktagen ein. Geben Sie sie auf der Bestätigungsseite ein, um die Lastschrift zu aktivieren.",
+    "verifyLink": "Bestätigungsseite öffnen",
+    "mandateAccepted": "Akzeptierte Autorisierung",
+    "confirmed": "Zahlungsmethode aktualisiert.",
+    "sandboxConfirm": "Bestätigen (Sandbox)",
+    "sandboxDecline": "Fehlerhaftes Konto simulieren",
+    "checked": "Status geprüft.",
+    "check": "Status prüfen",
+    "choose": "Wie soll die Zentrale einziehen?",
+    "recommended": "Geringere Gebühren",
+    "about": {
+      "card": "Am Fälligkeitstag belastet. Höhere Kartengebühren für die Zentrale; funktioniert überall.",
+      "us_bank_account": "Abbuchung von einem US-Bankkonto über ACH. Gutschrift nach etwa 4 Werktagen.",
+      "acss_debit": "Vorautorisierte Firmenlastschrift von einem kanadischen Konto. Gutschrift nach etwa 5 Werktagen.",
+      "bacs_debit": "Lastschrift von einem britischen Konto, geschützt durch die Direct Debit Guarantee. Gutschrift nach etwa 3 Werktagen.",
+      "sepa_debit": "Lastschrift von einem Euro-Konto (IBAN). Gutschrift nach etwa 5 Werktagen; Erstattung binnen 8 Wochen möglich.",
+      "au_becs_debit": "Lastschrift von einem australischen Konto (BSB). Gutschrift nach etwa 3 Werktagen."
+    },
+    "noBankDebit": "Lastschrift in {currency} ist auf dem Einzugskonto der Zentrale nicht verfügbar, daher nur Karte.",
+    "mandateTitle": "Autorisierung, die Sie gleich akzeptieren",
+    "accept": "Ich bin für {group} zeichnungsberechtigt und akzeptiere diese Autorisierung. Der genaue Text, mein Name, die Uhrzeit und meine IP-Adresse werden gespeichert.",
+    "started": "Autorisierung erfasst. Bestätigen Sie das Konto, um sie zu aktivieren.",
+    "replace": "Durch diese Methode ersetzen",
+    "authorise": "Autorisieren",
+    "settleNote": "Lastschriften sind einige Tage in Bearbeitung. Schlägt eine fehl, werden Sie per E-Mail informiert und die Zentrale versucht es an den Terminen ihrer Inkasso-Richtlinie erneut.",
+    "statements": {
+      "tab": "Monatsabrechnungen",
+      "issued": "{n} Abrechnungen erstellt, {emailed} per E-Mail versendet.",
+      "period": "Zeitraum",
+      "issue": "Abrechnungen erstellen",
+      "issueHint": "Eine Abrechnung pro Franchisenehmer und Währung. Neue Abrechnungen gehen per E-Mail an die Franchisenehmer; erneutes Erstellen aktualisiert die Zahlen.",
+      "empty": "Noch keine Monatsabrechnungen",
+      "emptyBody": "Die Zentrale erstellt sie nach Abschluss eines Zeitraums.",
+      "franchisee": "Franchisenehmer",
+      "gross": "Bruttoumsatz",
+      "total": "Gesamt",
+      "collected": "Eingezogen",
+      "paid": "Bezahlt",
+      "outstanding": "Offen",
+      "pdf": "PDF herunterladen",
+      "source": {
+        "branchharbor": "Umsatz aus BranchHarbor-Zahlungen",
+        "external_pos": "Umsatz aus externem Kassensystem gemeldet",
+        "mixed": "BranchHarbor-Zahlungen und externes Kassensystem",
+        "none": "Kein Umsatz"
+      },
+      "royaltyAt": "Lizenzgebühr ({rate})",
+      "fundAt": "Marketingfonds ({rate})",
+      "adjustments": "Anpassungen",
+      "feesTax": "Gebühren und Steuern",
+      "amount": "Betrag",
+      "collection": "Einzug",
+      "status": {
+        "processing": "in Bearbeitung",
+        "succeeded": "eingezogen",
+        "failed": "fehlgeschlagen",
+        "requires_action": "Aktion nötig"
+      },
+      "notCollected": "Noch nicht eingezogen",
+      "collectionFee": "BranchHarbor-Einzugsgebühr (zahlt die Zentrale)",
+      "invoice": "Rechnung {number}, fällig am {due}",
+      "royalty": "Lizenzgebühr",
+      "fund": "Marketingfonds",
+      "feeNote": "Die pauschale BranchHarbor-Einzugsgebühr für diesen Zeitraum betrug {fee}. Die Zentrale zahlt sie; sie wird nie zu Ihrem Betrag addiert.",
+      "method": "Eingezogen per {method}, endet auf {last4}.",
+      "emailed": "Am {at} an {n} Personen gesendet.",
+      "notEmailed": "Nicht gesendet (kein Franchisenehmer hinterlegt)."
+    }
+  }
+}

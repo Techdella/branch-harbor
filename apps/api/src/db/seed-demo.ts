@@ -11,7 +11,7 @@
  *   pnpm db:seed:demo        (SEED_DEMO_PASSWORD=... to choose the password; the demo picker needs none)
  */
 import { inArray, sql } from 'drizzle-orm';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { config } from '../config.ts';
 import { createDb, type Db } from './client.ts';
 import * as t from './schema/index.ts';
@@ -271,8 +271,111 @@ async function main() {
     await consumePendingSpendEvents(db, northlight.orgId);
   }
   console.log(` Finance:       closed royalty periods, a disputed statement, an overdue invoice and fund spend with receipts (sandbox). Finance lead: ${financeSeed.logins.join(', ')}`);
+  const reviewsSeed = await seedReviewsAndDebitDemo(northlight.orgId);
+  console.log(` Reviews:       ${reviewsSeed.reviews} demo reviews (Google sandbox + private feedback), ${reviewsSeed.requests} review requests; hosted page: ${reviewsSeed.link}`);
+  console.log(` Bank debit:    Thames Hot Yoga on SEPA Direct Debit (EUR); ${reviewsSeed.statements} monthly franchisee statements issued`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
+}
+
+/**
+ * Demo data for Marketing → Reviews and bank-debit royalty collection (Northlight). Everything here is labelled demo /
+ * sandbox: the Google reviews are sample rows on a sandbox connection (the live adapter never invents reviews).
+ */
+async function seedReviewsAndDebitDemo(orgId: string) {
+  const { reviewSettingsSchema } = await import('@bh/shared');
+  const { tokenHashFor, reviewPageUrl } = await import('../services/reviews.ts');
+  const { confirmSandboxMethod, startPaymentMethodSetup } = await import('../services/finance/invoices.ts');
+  const { issueFranchiseeStatements } = await import('../services/finance/franchisee-statements.ts');
+  const noop = () => {};
+  const s = { cfg, db, payments: { mode: 'sandbox', client: null, publishableKey: null }, log: { info: noop, warn: noop, error: noop, debug: noop }, mailer: { mode: 'log', outbox: [], send: async () => ({ id: null, delivered: false }) } } as unknown as import('../context.ts').Services;
+  const [org] = await db.select().from(t.organizations).where(sql`${t.organizations.id} = ${orgId}`);
+  const user = async (local: string) => (await db.select().from(t.users).where(sql`${t.users.email} = ${`${local}@northlight.demo.branchharbor.com`}`))[0]!;
+  const cmo = await user('hannah.cho');
+  const noah = await user('noah.williams');
+  const oliver = await user('oliver.grant');
+  const finance = await user('ruth.adeyemi');
+  const locs = await db.select().from(t.locations).where(sql`${t.locations.organizationId} = ${orgId} and ${t.locations.status} = 'operating'`);
+  const byCode = Object.fromEntries(locs.map((l) => [l.code, l]));
+  const now = Date.now();
+  const ago = (days: number, hours = 0) => new Date(now - days * 86_400_000 - hours * 3_600_000);
+
+  // HQ defaults: requests after class visits, email, 2 h delay, Google + Facebook links, HQ approves negative replies.
+  await db.insert(t.reviewSettings).values({
+    organizationId: orgId, locationId: null, enabledAt: ago(120), updatedBy: cmo.id,
+    settings: reviewSettingsSchema.parse({ enabled: true, sources: ['class_visit'], delayMinutes: 120, channel: 'email', frequencyCapDays: 60, consentMode: 'marketing', replyApproval: 'negative', links: [{ kind: 'facebook', label: '', url: 'https://www.facebook.com/northlightyoga/reviews' }] }),
+  });
+  if (byCode['LON-HK']) await db.insert(t.reviewSettings).values({ organizationId: orgId, locationId: byCode['LON-HK'].id, enabledAt: ago(120), updatedBy: noah.id, settings: { delayMinutes: 180, templates: { 'en-GB': { subject: 'How was your class at Hackney?', body: '' } } } });
+
+  // A sandbox Google connection (HQ) with listings: replies stay in BranchHarbor.
+  const [conn] = await db.insert(t.reviewConnections).values({ organizationId: orgId, ownerKind: 'hq', mode: 'sandbox', status: 'connected', accountName: 'accounts/demo', accountEmail: 'marketing@northlight.demo.branchharbor.com', connectedBy: cmo.id, lastSyncAt: ago(0, 1) }).returning();
+  for (const l of locs) await db.insert(t.reviewListings).values({ organizationId: orgId, connectionId: conn!.id, locationId: l.id, externalLocationName: `locations/demo-${l.code.toLowerCase()}`, title: `Northlight Yoga ${l.name}`, reviewUrl: `https://search.google.com/local/writereview?placeid=demo-${l.code.toLowerCase()}`, lastFetchedAt: ago(0, 1) });
+
+  const SAMPLE: Array<[number, string | null, string]> = [
+    [5, 'The hot flow classes are the best in the city. Teachers know everyone by name.', 'Jordan P.'],
+    [5, 'Spotless studio and a really welcoming front desk.', 'Amelia R.'],
+    [4, 'Great classes, the 7am slot gets crowded though.', 'Sam K.'],
+    [5, null, 'Lucas M.'],
+    [2, 'Changing rooms were cold and two showers were out of order.', 'Priya D.'],
+    [4, 'Lovely yin class, would love more evening options.', 'Hiro T.'],
+    [1, 'Booked a class that was cancelled 20 minutes before, no message.', 'Daniel F.'],
+    [5, 'Intro month was fantastic value.', 'Grace L.'],
+    [3, 'Good teachers, music was a bit loud.', 'Ellie W.'],
+    [5, 'Feels like a community, not a gym.', 'Marco S.'],
+  ];
+  let reviews = 0;
+  let requests = 0;
+  let link = '';
+  for (const [li, loc] of locs.entries()) {
+    // Google reviews (sample data on the sandbox connection), spread over ~5 months, some answered.
+    for (let i = 0; i < 7; i++) {
+      const [rating, comment, author] = SAMPLE[(i + li * 3) % SAMPLE.length]!;
+      const at = ago(5 + i * 19 + li * 3, i);
+      const answered = rating >= 4 ? i % 2 === 0 : i % 3 !== 0;
+      const pending = rating <= 2 && !answered;
+      await db.insert(t.reviews).values({
+        organizationId: orgId, locationId: loc.id, source: 'google', externalId: `accounts/demo/locations/demo-${loc.code.toLowerCase()}/reviews/r${i}`, authorName: author, rating, comment, language: loc.locale, reviewedAt: at, sandbox: true,
+        alertedAt: rating <= 2 ? at : null,
+        ...(answered ? { replyStatus: 'published', replyText: rating >= 4 ? `Thank you, ${author.split(' ')[0]}! We’re so glad you enjoy practising with us at ${loc.name}.` : `Thank you for telling us, ${author.split(' ')[0]}. We’re sorry about this — please write to ${loc.name} so we can make it right.`, replyBy: cmo.id, repliedAt: new Date(at.getTime() + (6 + i * 5) * 3_600_000), replyAiSuggested: i % 2 === 1 } : {}),
+        ...(pending ? { replyStatus: 'pending_approval', replyText: `We’re sorry, ${author.split(' ')[0]}. The team at ${loc.name} would like to hear more — please contact the studio.`, replyBy: noah.id, replySubmittedAt: ago(1), replyAiSuggested: true } : {}),
+      });
+      reviews++;
+    }
+    // Review requests after classes; some answered with private feedback (in the inbox), some skipped.
+    const custs = await db.select().from(t.customers).where(sql`${t.customers.locationId} = ${loc.id}`).limit(6);
+    for (const [ci, c] of custs.entries()) {
+      const id = randomUUID();
+      const sentAt = ago(2 + ci * 6 + li, 3);
+      const status = ci === 5 ? 'skipped' : ci % 2 === 0 ? 'completed' : 'sandboxed';
+      await db.insert(t.reviewRequests).values({
+        id, organizationId: orgId, locationId: loc.id, customerId: c.id, contact: { name: c.name, email: c.email, phone: c.phone, locale: loc.locale }, channel: 'email', source: 'class_visit', triggerKey: `demo:${id}`,
+        status, skipReason: status === 'skipped' ? 'no_consent' : null, tokenHash: tokenHashFor(s, id), locale: loc.locale, sendAt: sentAt, sentAt: status === 'skipped' ? null : sentAt,
+        openedAt: status === 'completed' ? new Date(sentAt.getTime() + 3_600_000) : null, completedAt: status === 'completed' ? new Date(sentAt.getTime() + 3_700_000) : null,
+      });
+      requests++;
+      if (status === 'completed') {
+        const rating = [5, 4, 2][ci / 2]!;
+        await db.insert(t.reviews).values({ organizationId: orgId, locationId: loc.id, source: 'branchharbor', requestId: id, customerId: c.id, authorName: c.name, rating, comment: rating >= 4 ? 'Loved the class, thank you!' : 'The room was too hot for a beginner class.', language: loc.locale, reviewedAt: new Date(sentAt.getTime() + 3_700_000), alertedAt: rating <= 2 ? sentAt : null });
+        reviews++;
+      }
+      if (!link && status === 'sandboxed') link = reviewPageUrl(s, org!, loc, (await import('../services/reviews.ts')).requestToken(s, id));
+    }
+  }
+
+  // Thames Hot Yoga (London + Dublin): EUR royalties collected by SEPA Direct Debit.
+  const thames = (await db.select().from(t.ownerGroups).where(sql`${t.ownerGroups.organizationId} = ${orgId} and ${t.ownerGroups.name} like 'Thames%'`))[0];
+  if (thames) {
+    const m = await startPaymentMethodSetup(s, orgId, { ownerGroupId: thames.id, currency: 'EUR', methodType: 'sepa_debit', acceptMandate: true, locale: 'en-GB' }, { userId: oliver.id, ip: null });
+    await confirmSandboxMethod(s, orgId, m.id, 'ok', oliver.id);
+  }
+  // Monthly franchisee statements for the invoiced periods (emails go to the sandbox log).
+  let statements = 0;
+  const periods = await db.select().from(t.royaltyPeriods).where(sql`${t.royaltyPeriods.organizationId} = ${orgId}`);
+  for (const p of periods) {
+    const invoiced = await db.select({ id: t.financeInvoices.id }).from(t.financeInvoices).innerJoin(t.royaltyStatements, sql`${t.royaltyStatements.id} = ${t.financeInvoices.statementId}`).where(sql`${t.royaltyStatements.periodId} = ${p.id}`).limit(1);
+    if (invoiced.length) statements += (await issueFranchiseeStatements(s, orgId, p.id, finance.id)).items.length;
+  }
+  return { reviews, requests, link, statements };
 }
 
 main()

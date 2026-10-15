@@ -1,0 +1,398 @@
+{
+  "nav": {
+    "reviews": "Reviews"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "reviews": {
+          "name": "Reviews",
+          "description": "Review requests after visits and orders, private feedback, Google reviews with replies, and ratings per location."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "already_reviewed": "Feedback was already received for this request.",
+    "reply_in_inbox": "Private feedback is answered from the inbox conversation.",
+    "awaiting_approval": "This reply is waiting for HQ approval.",
+    "not_pending": "This reply is not waiting for approval.",
+    "google_not_configured": "Google sign-in is not set up on this platform yet. Add a sandbox connection meanwhile.",
+    "mandate_text_changed": "The authorisation text changed. Read it again before accepting.",
+    "no_reply": "Write a reply first."
+  },
+  "mkt": {
+    "auto": {
+      "trigger": {
+        "review": {
+          "received": "Review received"
+        }
+      },
+      "action": {
+        "send_review_request": "Send review request"
+      },
+      "field": {
+        "event": {
+          "rating": "Rating (1–5)"
+        }
+      },
+      "reason": {
+        "no_location": "no location",
+        "test_run": "not sent in a test",
+        "opted_out": "opted out",
+        "frequency_cap": "asked recently",
+        "reviews_disabled": "review requests off",
+        "location_unavailable": "location unavailable",
+        "not_scheduled": "already handled"
+      }
+    }
+  },
+  "reviews": {
+    "stars": "{n} out of 5 stars",
+    "title": "Reviews",
+    "description": "Ask customers for reviews after a visit, read private feedback and Google reviews, and reply.",
+    "tab": {
+      "overview": "Overview",
+      "reviews": "Reviews",
+      "requests": "Requests",
+      "settings": "Settings",
+      "connections": "Google"
+    },
+    "filter": {
+      "location": "Location",
+      "allLocations": "All locations in scope",
+      "bucket": "Group by",
+      "month": "Month",
+      "week": "Week",
+      "source": "Source",
+      "allSources": "All sources",
+      "show": "Show",
+      "all": "All reviews",
+      "negative": "Negative (2★ or less)",
+      "unanswered": "Google, not answered",
+      "pending": "Replies awaiting approval",
+      "search": "Search"
+    },
+    "hours": "{n} h",
+    "days": "{n} days",
+    "kpi": {
+      "average": "Average rating",
+      "averageSub": "from {n} reviews",
+      "volume": "Reviews",
+      "volumeSub": "{public} public · {negative} negative",
+      "responseRate": "Response rate",
+      "responseRateSub": "Google replies and inbox answers",
+      "pendingApproval": "{n} awaiting HQ approval",
+      "responseTime": "Average response time",
+      "responseTimeSub": "from review to first reply",
+      "requests": "Requests sent",
+      "requestsSub": "{completed} answered ({rate})"
+    },
+    "chart": {
+      "rating": "Average rating over time",
+      "volume": "Reviews per period",
+      "empty": "No reviews in this period yet.",
+      "ratingCaption": "Bar chart of the average star rating per period, from 0 to 5.",
+      "volumeCaption": "Bar chart of the number of reviews per period."
+    },
+    "byLocation": "By location",
+    "col": {
+      "location": "Location",
+      "average": "Average",
+      "reviews": "Reviews",
+      "responseRate": "Response rate",
+      "responseTime": "Response time",
+      "customer": "Customer",
+      "source": "After",
+      "channel": "Channel",
+      "when": "When",
+      "status": "Status"
+    },
+    "source": {
+      "google": "Google",
+      "branchharbor": "Private feedback"
+    },
+    "anonymous": "Anonymous",
+    "noComment": "No comment, rating only.",
+    "replyStatus": {
+      "none": "Not answered",
+      "draft": "Draft reply",
+      "pending_approval": "Awaiting approval",
+      "published": "Replied",
+      "rejected": "Reply rejected",
+      "failed": "Reply not posted"
+    },
+    "sandboxReply": "Sandbox: not posted",
+    "sandboxReplyLong": "Saved in BranchHarbor. This connection is in sandbox, so nothing was posted to Google.",
+    "empty": "No reviews yet",
+    "emptyBody": "Switch on review requests or connect Google Business Profile to see reviews here.",
+    "drawer": {
+      "title": "Review",
+      "privateHint": "Private feedback goes to the location’s inbox. Reply to the customer from that conversation.",
+      "pendingTitle": "Waiting for HQ approval",
+      "pendingBody": "Submitted by {name}. It is posted once HQ approves it.",
+      "rejectedTitle": "HQ rejected this reply",
+      "publishedTitle": "Reply published",
+      "externalReply": "Answered directly on Google.",
+      "publishedBody": "Posted to Google.",
+      "reply": "Your reply",
+      "suggest": "Suggest a reply",
+      "aiNote": "Suggested by BranchHarbor AI. Check it before publishing.",
+      "replyLabel": "Public reply",
+      "replyHint": "Everyone can read it on Google. No promises of refunds or personal details.",
+      "needsApproval": "HQ approves replies to this review before they are posted.",
+      "sentForApproval": "Sent to HQ for approval.",
+      "published": "Reply published.",
+      "submit": "Send for approval",
+      "publish": "Publish reply",
+      "saved": "Draft saved.",
+      "saveDraft": "Save draft",
+      "decisionNote": "Note to the author",
+      "approve": "Approve and publish",
+      "reject": "Reject",
+      "rejected": "Reply rejected."
+    },
+    "send": {
+      "title": "Send a review request",
+      "hint": "Requests are also sent automatically after completed visits when switched on. Opt-outs, consent, the frequency cap and quiet hours always apply.",
+      "run": "Run now",
+      "ran": "{n} new requests scheduled.",
+      "search": "Find a customer",
+      "customer": "Customer",
+      "choose": "Choose…",
+      "button": "Send request"
+    },
+    "outcome": {
+      "sent": "Request sent.",
+      "sandboxed": "Request recorded (sandbox: no message was delivered).",
+      "skipped": "Not sent: {reason}.",
+      "failed": "Sending failed: {reason}.",
+      "deferred": "Scheduled for the end of quiet hours."
+    },
+    "skip": {
+      "not_scheduled": "already handled",
+      "location_unavailable": "location unavailable",
+      "reviews_disabled": "requests switched off",
+      "no_contact": "no contact details",
+      "no_email": "no email address",
+      "no_phone": "no phone number",
+      "opted_out": "opted out",
+      "no_consent": "no marketing consent",
+      "frequency_cap": "asked recently (frequency cap)",
+      "quiet_hours": "quiet hours",
+      "send_failed": "the provider refused the message"
+    },
+    "requests": {
+      "empty": "No review requests yet",
+      "emptyBody": "Switch on review requests in Settings, or send one to a customer."
+    },
+    "trigger": {
+      "class_visit": "Class visit",
+      "booking": "Completed appointment",
+      "order": "Completed order",
+      "hotel_checkout": "Hotel checkout",
+      "property_viewing": "Property viewing",
+      "manual": "Sent by the team",
+      "automation": "Automation"
+    },
+    "channel": {
+      "email": "Email",
+      "sms": "Text message",
+      "whatsapp": "WhatsApp"
+    },
+    "requestStatus": {
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent",
+      "sandboxed": "Sandbox",
+      "opened": "Opened",
+      "completed": "Reviewed",
+      "skipped": "Not sent",
+      "failed": "Failed"
+    },
+    "settings": {
+      "scope": "Settings for",
+      "scopeHint": "HQ defaults apply everywhere; a location can override them.",
+      "hqDefaults": "HQ defaults (all locations)",
+      "requests": "Review requests",
+      "enabled": "Send automatically",
+      "after": "Send after",
+      "delay": "Delay (hours)",
+      "delayHint": "Time after the visit ends.",
+      "channel": "Channel",
+      "cap": "At most one request every (days)",
+      "capHint": "Per customer, across all locations.",
+      "quietStart": "Quiet hours start",
+      "quietHint": "Texts and WhatsApp wait until quiet hours end (local time).",
+      "quietEnd": "Quiet hours end",
+      "consent": "Who can be asked",
+      "consentHint": {
+        "marketing": "Only customers who agreed to marketing on this channel.",
+        "service": "A one-off follow-up about the visit, where local law allows it. Opt-outs are always respected."
+      },
+      "consentMode": {
+        "marketing": "Customers with marketing consent",
+        "service": "Service follow-up"
+      },
+      "template": "Message",
+      "templateHint": "Leave empty to use the default text in each language. Use '{name}', '{location}', '{business}' and '{link}'.",
+      "language": "Language",
+      "subject": "Email subject",
+      "body": "Text",
+      "bodyHint": "Must include '{link}'. Texts add the opt-out line automatically.",
+      "links": "Public review links",
+      "noGating": "Every customer sees these links after rating, whatever the rating. Showing them only to happy customers (review gating) breaks Google’s review policy.",
+      "linkKind": "Site",
+      "linkLabel": "Label",
+      "linkUrl": "Link",
+      "remove": "Remove",
+      "addLink": "Add a link",
+      "approval": "Reply approval",
+      "approvalLabel": "HQ approves replies from locations",
+      "approvalHint": "HQ marketing can always publish directly.",
+      "approvalMode": {
+        "none": "Never (locations publish)",
+        "negative": "For negative reviews (2★ or less)",
+        "all": "For every reply"
+      },
+      "saved": "Settings saved.",
+      "save": "Save settings"
+    },
+    "linkKind": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "tripadvisor": "Tripadvisor",
+      "yelp": "Yelp",
+      "trustpilot": "Trustpilot",
+      "other": "Other"
+    },
+    "connections": {
+      "connected": "Google account connected. Link its locations below.",
+      "title": "Google Business Profile",
+      "intro": "Connect one Google account that manages many locations (HQ), or let a location connect its own. Reviews are fetched every 30 minutes.",
+      "owner": "Managed by",
+      "hq": "HQ (many locations)",
+      "location": "One location",
+      "connectGoogle": "Connect with Google",
+      "sandboxAdded": "Sandbox connection added.",
+      "addSandbox": "Add a sandbox connection",
+      "notConfigured": "Google sign-in is not set up on this platform yet. A sandbox connection works meanwhile: it fetches no reviews and never invents any.",
+      "empty": "No Google connection yet",
+      "hqAccount": "HQ Google account",
+      "locationAccount": "Google account of {name}",
+      "mode": {
+        "live": "Live",
+        "sandbox": "Sandbox"
+      },
+      "status": {
+        "connected": "Connected",
+        "error": "Needs attention",
+        "disconnected": "Disconnected"
+      },
+      "sandboxNote": "Sandbox: nothing is fetched from Google and replies stay in BranchHarbor.",
+      "lastFetched": "Last fetched {at}",
+      "neverFetched": "Not fetched yet",
+      "syncedSandbox": "Sandbox: nothing to fetch.",
+      "synced": "{n} new reviews.",
+      "sync": "Fetch now",
+      "googleLocation": "Google location",
+      "googleLocationId": "Google location ID",
+      "googleLocationIdHint": "From the Business Profile Manager.",
+      "placeholder": "locations/1234567890",
+      "linked": "Location linked.",
+      "link": "Link"
+    },
+    "nav": {
+      "reviews": "Reviews"
+    }
+  },
+  "royaltyDebit": {
+    "noGroups": "No franchise company to set up yet.",
+    "intro": "HQ collects royalty, marketing fund and fee invoices from this account after each invoice is issued. A bank debit costs far less than a card.",
+    "active": "Authorised",
+    "none": "Not set up",
+    "type": {
+      "card": "Card",
+      "us_bank_account": "ACH bank debit",
+      "acss_debit": "Pre-authorized debit (PAD)",
+      "bacs_debit": "Bacs Direct Debit",
+      "sepa_debit": "SEPA Direct Debit",
+      "au_becs_debit": "BECS Direct Debit",
+      "manual": "Bank transfer (recorded)"
+    },
+    "ending": "ending {last4}",
+    "revoked": "Authorisation revoked.",
+    "revoke": "Revoke",
+    "pendingTitle": "{method}: waiting for confirmation",
+    "verifyingTitle": "{method}: verify your account",
+    "pendingBody": "Finish entering the account details. Bank debits activate once the bank confirms the mandate.",
+    "verifyingBody": "Two small deposits will reach the account in 1–2 business days. Enter them on the verification page to activate the debit.",
+    "verifyLink": "Open the verification page",
+    "mandateAccepted": "Authorisation you accepted",
+    "confirmed": "Payment method updated.",
+    "sandboxConfirm": "Confirm (sandbox)",
+    "sandboxDecline": "Simulate a failing account",
+    "checked": "Status checked.",
+    "check": "Check status",
+    "choose": "How should HQ collect?",
+    "recommended": "Lower fees",
+    "about": {
+      "card": "Charged on the due date. Higher card fees for HQ; works in any country.",
+      "us_bank_account": "Debited from a US bank account through ACH. Settles in about 4 business days.",
+      "acss_debit": "Business pre-authorized debit from a Canadian account. Settles in about 5 business days.",
+      "bacs_debit": "Direct Debit from a UK bank account, protected by the Direct Debit Guarantee. Settles in about 3 business days.",
+      "sepa_debit": "Direct Debit from a euro bank account (IBAN). Settles in about 5 business days; refunds can be claimed within 8 weeks.",
+      "au_becs_debit": "Direct Debit from an Australian bank account (BSB). Settles in about 3 business days."
+    },
+    "noBankDebit": "Bank debit in {currency} is not available on HQ’s collection account, so only a card can be used.",
+    "mandateTitle": "Authorisation you are about to accept",
+    "accept": "I am authorised to sign for {group} and accept this authorisation. The exact text, my name, the time and my IP address are stored.",
+    "started": "Authorisation recorded. Confirm the account to activate it.",
+    "replace": "Replace with this method",
+    "authorise": "Authorise",
+    "settleNote": "Bank debits show as processing for a few days. If one fails, you are told by email and HQ retries on the dates in its collection policy.",
+    "statements": {
+      "tab": "Monthly statements",
+      "issued": "{n} statements issued, {emailed} emailed.",
+      "period": "Period",
+      "issue": "Issue statements",
+      "issueHint": "One statement per franchisee and currency. New statements are emailed to the franchise owners; issuing again refreshes the figures.",
+      "empty": "No monthly statements yet",
+      "emptyBody": "HQ issues them after closing a period.",
+      "franchisee": "Franchisee",
+      "gross": "Gross sales",
+      "total": "Total",
+      "collected": "Collected",
+      "paid": "Paid",
+      "outstanding": "Outstanding",
+      "pdf": "Download PDF",
+      "source": {
+        "branchharbor": "Sales from BranchHarbor payments",
+        "external_pos": "Sales reported from an external POS",
+        "mixed": "BranchHarbor payments and external POS",
+        "none": "No sales"
+      },
+      "royaltyAt": "Royalty ({rate})",
+      "fundAt": "Marketing fund ({rate})",
+      "adjustments": "Adjustments",
+      "feesTax": "Fees and tax",
+      "amount": "Amount",
+      "collection": "Collection",
+      "status": {
+        "processing": "processing",
+        "succeeded": "collected",
+        "failed": "failed",
+        "requires_action": "needs action"
+      },
+      "notCollected": "Not collected yet",
+      "collectionFee": "BranchHarbor collection fee (paid by HQ)",
+      "invoice": "Invoice {number}, due {due}",
+      "royalty": "Royalty",
+      "fund": "Marketing fund",
+      "feeNote": "BranchHarbor’s flat collection fee for this period was {fee}. HQ pays it; it is never added to what you owe.",
+      "method": "Collected by {method} ending {last4}.",
+      "emailed": "Emailed to {n} people on {at}.",
+      "notEmailed": "Not emailed (no franchise owner on file)."
+    }
+  }
+}
