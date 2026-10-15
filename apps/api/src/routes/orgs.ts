@@ -108,15 +108,19 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         aiTrainingOptOut: z.boolean().optional().describe('true (default): business data is never used to train AI models'),
         refundApprovalThresholds: z.partialRecord(currency, z.number().int().min(0)).optional().describe('Refunds above this amount (minor units, per currency) need approval'),
         websiteApprovals: z.enum(WEBSITE_APPROVAL_MODES).optional().describe('Independent businesses only. off (default): edits apply and publish directly. staff: edits by people without approval rights need the owner\'s approval.'),
+        industry: z.string().optional().describe('Read-only. The industry is fixed when the business account is created (one industry per account); sending a different value returns 409 industry_locked.'),
       }),
     },
   }, async (req) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'org.manage', { organizationId: orgId, kind: 'organization', id: orgId });
-    const { customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, websiteApprovals, ...orgFields } = req.body;
+    const { customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, websiteApprovals, industry, ...orgFields } = req.body;
     if (req.body.defaultTimeZone && !isValidTimeZone(req.body.defaultTimeZone)) throw validationError('Unknown timezone', { defaultTimeZone: 'Invalid IANA timezone' });
     const [before] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     if (!before) throw notFound('Organisation');
+    if (industry !== undefined && industry !== before.industry) {
+      throw new AppError(409, 'industry_locked', 'The industry is fixed when a business account is created. To run another industry, create a second business account under the same login.');
+    }
     if (req.body.dataRegion && req.body.dataRegion !== before.dataRegion) {
       throw new AppError(409, 'data_region_locked', 'Data region cannot be changed after creation without a migration. Contact support.');
     }
@@ -127,7 +131,7 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     const policyChanges = Object.fromEntries(Object.entries({ customerDataSharing, aiTrainingOptOut, refundApprovalThresholds, websiteApprovals }).filter(([, v]) => v !== undefined));
     const settings = Object.keys(policyChanges).length ? { ...before.settings, ...policyChanges } : before.settings;
     const [org] = await s.db.update(organizations).set({ ...orgFields, settings, updatedAt: new Date() }).where(eq(organizations.id, orgId)).returning();
-    await audit(s.db, { organizationId: orgId, ...actor(req), action: 'org.updated', scopeKind: 'organization', scopeId: orgId, targetType: 'organization', targetId: orgId, metadata: { changes: req.body } });
+    await audit(s.db, { organizationId: orgId, ...actor(req), action: 'org.updated', scopeKind: 'organization', scopeId: orgId, targetType: 'organization', targetId: orgId, metadata: { changes: { ...req.body, industry: undefined } } });
     const locs = await activeLocations(s.db, orgId);
     return { ...serializeOrg(org!), businessMode: businessModeView(org!, locs[0]?.id ?? null) };
   });

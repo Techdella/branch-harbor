@@ -4,7 +4,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { appointments, classBookings, classOccurrences, connections, foodOrders, leads, locations, menus, organizations, paymentReferences, registrations, webhookEvents } from '../db/schema/index.ts';
 import { metric, revenueByCurrency, type Freshness } from '../domain/reports.ts';
 import { authenticate } from '../plugins/auth.ts';
-import { authorisedLocations, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, capabilityLocations, requirePerm } from '../services/authz.ts';
 import { orgParams, secured } from './_common.ts';
 
 export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -46,20 +46,26 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
     const conns = await s.db.select().from(connections).where(eq(connections.organizationId, orgId));
     const fresh = (source: string, sourceCode: string, lastSyncAt: Date | null = null, complete = true): Freshness => ({ asOf: now, source, sourceCode, lastSyncAt: lastSyncAt?.toISOString() ?? null, complete });
 
-    // Revenue
-    const paymentsConnected = scoped.some((l) => l.paymentsEnabled);
-    const payRows = locIds.length
+    // Revenue is financial data: it needs Payments (view) at each location, not just Reports. Locations the person
+    // can't see finances for are left out (and the metric says it is incomplete); with none, revenue is unavailable.
+    const financeAllowed = await capabilityLocations(req, s.db, orgId, 'finance.payments', 'view');
+    const financeLocs = scoped.filter((l) => financeAllowed === 'all' || financeAllowed.has(l.id));
+    const financeIds = financeLocs.map((l) => l.id);
+    const paymentsConnected = financeLocs.some((l) => l.paymentsEnabled);
+    const payRows = financeIds.length
       ? await s.db.select({ amountMinor: paymentReferences.amountMinor, currency: paymentReferences.currency, state: paymentReferences.state, refundedMinor: paymentReferences.refundedMinor, locationId: paymentReferences.locationId })
-        .from(paymentReferences).where(and(eq(paymentReferences.organizationId, orgId), inLocs(paymentReferences.locationId), gte(paymentReferences.createdAt, from), lt(paymentReferences.createdAt, to)))
+        .from(paymentReferences).where(and(eq(paymentReferences.organizationId, orgId), inArray(paymentReferences.locationId, financeIds), gte(paymentReferences.createdAt, from), lt(paymentReferences.createdAt, to)))
       : [];
-    const revenue = metric(
-      paymentsConnected || payRows.length ? revenueByCurrency(payRows) : null,
-      'Succeeded online payments in the period, gross and net of refunds, grouped by currency. Excludes payments taken outside BranchHarbor.',
-      fresh('BranchHarbor payments (Stripe)', 'payments', lastWebhook?.at ?? null, true),
-      'No payment account connected for these locations',
-      { code: 'no_payment_account' },
-    );
-    const revenueByLocation = scoped.map((l) => ({ locationId: l.id, name: l.name, currency: l.currency, revenue: revenueByCurrency(payRows.filter((p) => p.locationId === l.id)) }));
+    const revenue = !financeIds.length && locIds.length
+      ? metric<null>(null, 'Succeeded online payments in the period, grouped by currency.', fresh('BranchHarbor payments (Stripe)', 'payments', null, false), 'Revenue needs access to Payments', { code: 'no_finance_access' })
+      : metric(
+        paymentsConnected || payRows.length ? revenueByCurrency(payRows) : null,
+        'Succeeded online payments in the period, gross and net of refunds, grouped by currency. Excludes payments taken outside BranchHarbor.',
+        fresh('BranchHarbor payments (Stripe)', 'payments', lastWebhook?.at ?? null, financeIds.length === locIds.length),
+        'No payment account connected for these locations',
+        { code: 'no_payment_account' },
+      );
+    const revenueByLocation = financeLocs.map((l) => ({ locationId: l.id, name: l.name, currency: l.currency, revenue: revenueByCurrency(payRows.filter((p) => p.locationId === l.id)) }));
 
     // Studios
     const bookingProvider = conns.find((c) => c.kind === 'booking' && c.authoritative === 'external');

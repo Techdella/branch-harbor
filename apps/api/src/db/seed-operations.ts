@@ -4,7 +4,7 @@
  *  - Harbourline Wellness (wellness, administrative records only — no clinical data): Toronto CAD, Dublin EUR, Melbourne AUD
  *  - Fieldnote Goods (commerce): Portland USD, Montréal CAD, Amsterdam EUR
  *  - plus shifts, offers, intake forms, pickup settings, stock movements and pending approvals for every org.
- * Called by seed.ts after the Stillwater and Maple & Ember organisations exist. Re-running replaces it all.
+ * Called by seed-demo.ts after the Stillwater and Maple & Ember organisations exist. Re-running replaces it all.
  */
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';

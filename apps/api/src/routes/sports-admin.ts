@@ -16,7 +16,7 @@ import { hasPermissionInScope, type Assignment } from '../domain/scope.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, hasPerm, requireLocationPerm, resolveScopeChain } from '../services/authz.ts';
+import { authorisedLocations, hasPerm, requireLocationPerm, resolveScopeChain, withEffectiveAccess } from '../services/authz.ts';
 import {
   adjustFees, balanceOf, BUILT_IN_QUESTIONS, coachTeamIds, isCoachOf, placesHeld, requireDirector, requireTeamAccess, runInstalmentReminders, serializeInstalment, teamRosterCount, todayIn, withdrawRegistration,
 } from '../services/sports-core.ts';
@@ -70,12 +70,13 @@ export const sportsAdminRoutes: FastifyPluginAsyncZod = async (app) => {
     const coachCandidates = async (orgId: string, locationId: string) => {
       const rows = await s.db.select({ ra: roleAssignments, u: { id: users.id, name: users.name, email: users.email } }).from(roleAssignments).innerJoin(users, eq(users.id, roleAssignments.userId)).where(and(eq(roleAssignments.organizationId, orgId), isNull(users.deletedAt)));
       const chain = await resolveScopeChain(s.db, { organizationId: orgId, kind: 'location', id: locationId });
+      const access = await withEffectiveAccess(s.db, orgId, rows.map((r) => r.ra));
       const byUser = new Map<string, { u: (typeof rows)[number]['u']; a: Assignment[] }>();
-      for (const r of rows) {
+      rows.forEach((r, i) => {
         const e = byUser.get(r.u.id) ?? { u: r.u, a: [] };
-        e.a.push({ id: r.ra.id, role: r.ra.role as Role, scopeKind: r.ra.scopeKind as Assignment['scopeKind'], scopeId: r.ra.scopeId, expiresAt: r.ra.expiresAt });
+        e.a.push(access[i]!);
         byUser.set(r.u.id, e);
-      }
+      });
       return [...byUser.values()].filter((e) => hasPermissionInScope(e.a, 'operations.write', chain)).map((e) => ({ id: e.u.id, name: e.u.name, email: e.u.email, roles: [...new Set(e.a.map((a) => a.role))] }));
     };
     const assertCoaches = async (orgId: string, locationId: string, ids: string[]) => {

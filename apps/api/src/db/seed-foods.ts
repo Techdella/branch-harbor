@@ -4,7 +4,7 @@
  * to Seattle (USD) and Vancouver (CAD); delivery zones, tables/QR codes and tabs, KDS stations, drivers,
  * preorder dates, catering packages and enquiries, meal plans and subscriptions, ingredients and
  * recipes, order history across channels and two payment recovery cases.
- * Called by seed.ts after the Maple & Ember organisation exists. Re-running seed.ts replaces it all.
+ * Called by seed-demo.ts after the Maple & Ember organisation exists. Re-running seed.ts replaces it all.
  */
 import { and, eq, sql } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';

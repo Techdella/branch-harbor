@@ -61,6 +61,11 @@ const envSchema = z.object({
   ENCRYPTION_KEY: z.string().default('0000000000000000000000000000000000000000000000000000000000000000'),
   /** In non-production, expose verification/invite tokens in API responses so flows can be tested without email. */
   EXPOSE_DEV_TOKENS: bool(true),
+  /**
+   * Demo site only (e.g. demo.branchharbor.com against a database seeded with `pnpm db:seed:demo`): enables the
+   * demo-account list and one-click demo sign-in. Never set it on the production database.
+   */
+  DEMO_MODE: bool(false),
 
   // Email
   EMAIL_FROM: z.string().default('BranchHarbor <no-reply@branchharbor.com>'),

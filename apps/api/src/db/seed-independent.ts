@@ -6,7 +6,7 @@
  *
  * Both are organisations with model "independent", one location, the Solo plan, a published home page and the
  * industry data their customer site needs (classes / menu + pickup slots). Sample data only. Idempotent: re-running
- * replaces these two organisations. Called from seed.ts.
+ * replaces these two organisations. Called from seed-demo.ts.
  */
 import { inArray, sql } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';

@@ -26,6 +26,8 @@ import { pickupSettingsRoutes } from './pickupSettings.ts';
 
 /** All /v1 routes. Public and webhook routes are unauthenticated; everything else requires a bearer token. */
 export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
+  // Access model: organisation routes are refused (403 module_not_available) for members without the module.
+  app.addHook('preHandler', (await import('../services/module-guard.ts')).moduleGuard);
   await app.register(publicRoutes);
   await app.register(authRoutes);
   await app.register(webhookRoutes);
@@ -38,6 +40,10 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register(orgRoutes);
   await app.register(locationRoutes);
   await app.register(memberRoutes);
+  await app.register((await import('./access.ts')).accessCatalogueRoutes);
+  await app.register((await import('./access.ts')).accessRoutes);
+  await app.register((await import('./platform.ts')).platformRoutes);
+  await app.register((await import('./platform.ts')).demoRoutes);
   await app.register(websiteRoutes);
   await app.register(domainRoutes);
   await app.register(connectionRoutes);

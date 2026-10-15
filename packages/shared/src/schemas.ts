@@ -3,6 +3,7 @@ import { INDUSTRIES } from './industries.ts';
 import { SUPPORTED_CURRENCIES } from './money.ts';
 import { SUPPORTED_LOCALES, DATA_REGIONS } from './locale.ts';
 import { ROLES } from './permissions.ts';
+import { WORKSPACES } from './access.ts';
 
 /** API contracts shared by the web app, mobile app and backend. */
 
@@ -73,10 +74,31 @@ export const createLocationSchema = z.object({
   templateId: id.optional(),
 });
 
+export const scopeSchema = z.object({ kind: z.enum(['organization', 'region', 'owner_group', 'location']), id });
+
+/** Invite with a system role, or with `role: 'custom'` + `customRoleId` (a role the organisation created). */
 export const inviteMemberSchema = z.object({
   email: z.string().email(),
-  role: z.enum(ROLES),
-  scope: z.object({ kind: z.enum(['organization', 'region', 'owner_group', 'location']), id }),
+  role: z.enum([...ROLES, 'custom']),
+  customRoleId: z.string().uuid().optional(),
+  scope: scopeSchema,
+}).refine((v) => (v.role === 'custom') === !!v.customRoleId, { message: 'Pick a custom role (role "custom" needs customRoleId)', path: ['customRoleId'] });
+
+/** A custom role: a name and the module actions it grants (`<module>:<action>`). */
+export const customRoleSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  description: z.string().trim().max(300).optional(),
+  baseRole: z.enum(ROLES).optional(),
+  primaryWorkspace: z.enum(WORKSPACES).optional(),
+  capabilities: z.array(z.string().max(80)).max(400),
+});
+
+/** What one person's role assignment gives them: a role (system or custom) plus per-person overrides. */
+export const assignmentAccessSchema = z.object({
+  role: z.enum([...ROLES, 'custom']).optional(),
+  customRoleId: z.string().uuid().nullable().optional(),
+  grants: z.array(z.string().max(80)).max(400).default([]),
+  revokes: z.array(z.string().max(80)).max(400).default([]),
 });
 
 export const paymentStates = ['created', 'requires_action', 'processing', 'succeeded', 'failed', 'cancelled'] as const;

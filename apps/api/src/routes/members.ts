@@ -2,13 +2,14 @@ import { and, eq, gt } from 'drizzle-orm';
 import { z } from 'zod';
 import { inviteMemberSchema, type Role, type ScopeKind } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { invitations, locations, organizations, roleAssignments, users } from '../db/schema/index.ts';
-import { canGrantRole, hasPermissionInScope, type ScopeChain } from '../domain/scope.ts';
+import { customRoles, invitations, locations, organizations, roleAssignments, users } from '../db/schema/index.ts';
+import { assignmentCovers, canGrantCapabilities, canGrantRole, hasCapabilityInScope, type ScopeChain } from '../domain/scope.ts';
 import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, badRequest, conflict, forbidden, notFound } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { requireMember, resolveScopeChain } from '../services/authz.ts';
+import { requireMember, resolveScopeChain, withEffectiveAccess } from '../services/authz.ts';
+import { assignmentCaps, loadCustomRole, roleName } from '../services/access.ts';
 import { assertRoleForModel } from '../services/businessMode.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
 
@@ -38,12 +39,13 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
         ownerGroupId: r.a.scopeKind === 'owner_group' ? r.a.scopeId : l?.ownerGroupId,
         locationId: r.a.scopeKind === 'location' ? r.a.scopeId : undefined,
       };
-      return hasPermissionInScope(mine, 'members.manage', chain);
+      return hasCapabilityInScope(mine, 'settings.team', 'view', chain);
     });
-    const byUser = new Map<string, { user: { id: string; name: string; email: string }; assignments: Array<{ id: string; role: string; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string | null }> }>();
+    const custom = await s.db.select({ id: customRoles.id, name: customRoles.name }).from(customRoles).where(eq(customRoles.organizationId, orgId));
+    const byUser = new Map<string, { user: { id: string; name: string; email: string }; assignments: Array<{ id: string; role: string; roleName: string; customRoleId: string | null; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string | null }> }>();
     for (const r of visible) {
       const entry = byUser.get(r.u.id) ?? { user: r.u, assignments: [] };
-      entry.assignments.push({ id: r.a.id, role: r.a.role, scope: { kind: r.a.scopeKind, id: r.a.scopeId, name: r.a.scopeKind === 'location' ? locById.get(r.a.scopeId)?.name ?? null : null }, expiresAt: iso(r.a.expiresAt), createdAt: iso(r.a.createdAt) });
+      entry.assignments.push({ id: r.a.id, role: r.a.role, roleName: roleName(r.a.role, custom.find((c) => c.id === r.a.customRoleId)), customRoleId: r.a.customRoleId, scope: { kind: r.a.scopeKind, id: r.a.scopeId, name: r.a.scopeKind === 'location' ? locById.get(r.a.scopeId)?.name ?? null : null }, expiresAt: iso(r.a.expiresAt), createdAt: iso(r.a.createdAt) });
       byUser.set(r.u.id, entry);
     }
     return { items: [...byUser.values()] };
@@ -57,15 +59,24 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     const b = req.body;
     if (b.role === 'customer') throw badRequest('Customers are not invited as team members');
     const mine = await requireMember(req, s.db, orgId);
-    const [orgModel] = await s.db.select({ model: organizations.model }).from(organizations).where(eq(organizations.id, orgId));
-    if (orgModel) assertRoleForModel(orgModel, b.role, b.scope.kind);
+    const [orgModel] = await s.db.select({ model: organizations.model, industry: organizations.industry }).from(organizations).where(eq(organizations.id, orgId));
+    if (!orgModel) throw notFound('Organisation');
     const chain = await chainFor(orgId, b.scope.kind, b.scope.id);
-    if (!canGrantRole(mine, b.role, chain)) throw forbidden('You cannot grant this role in this scope');
+    if (b.role === 'custom') {
+      // Custom roles: the inviter must hold every module action the role gives in that scope.
+      await loadCustomRole(s.db, orgId, b.customRoleId!);
+      const caps = await assignmentCaps(s.db, orgModel.industry, { role: 'custom', customRoleId: b.customRoleId!, scopeKind: b.scope.kind });
+      if (orgModel.model === 'independent' && (b.scope.kind === 'region' || b.scope.kind === 'owner_group')) assertRoleForModel(orgModel, 'staff', b.scope.kind);
+      if (!canGrantCapabilities(mine, caps, chain)) throw forbidden('You cannot grant this role in this scope');
+    } else {
+      assertRoleForModel(orgModel, b.role, b.scope.kind);
+      if (!canGrantRole(mine, b.role, chain, orgModel.industry)) throw forbidden('You cannot grant this role in this scope');
+    }
     const token = randomToken();
     const [org] = await s.db.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, orgId));
     const inv = await s.db.transaction(async (tx) => {
       const [inv] = await tx.insert(invitations).values({
-        organizationId: orgId, email: b.email.toLowerCase(), role: b.role, scopeKind: b.scope.kind, scopeId: b.scope.id,
+        organizationId: orgId, email: b.email.toLowerCase(), role: b.role, customRoleId: b.role === 'custom' ? b.customRoleId! : null, scopeKind: b.scope.kind, scopeId: b.scope.id,
         tokenHash: sha256(token), invitedBy: req.user!.id, expiresAt: new Date(Date.now() + 7 * 86400_000),
       }).returning();
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'member.invited', scopeKind: b.scope.kind, scopeId: b.scope.id, targetType: 'invitation', targetId: inv!.id, metadata: { email: b.email, role: b.role } });
@@ -74,11 +85,11 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     await s.jobs.enqueue('email.send', {
       to: b.email,
       subject: `You're invited to ${org?.name ?? 'BranchHarbor'}`,
-      text: `You've been invited to join ${org?.name} on BranchHarbor as ${b.role.replace('_', ' ')}.\nAccept: ${s.cfg.APP_URL}/invitations/accept?token=${encodeURIComponent(token)}\nThis invitation expires in 7 days.`,
+      text: `You've been invited to join ${org?.name} on BranchHarbor as ${b.role === 'custom' ? 'a team member' : roleName(b.role).toLowerCase()}.\nAccept: ${s.cfg.APP_URL}/invitations/accept?token=${encodeURIComponent(token)}\nThis invitation expires in 7 days.`,
       tag: 'invitation',
     });
     return reply.code(201).send({
-      id: inv.id, email: inv.email, role: inv.role, scope: { kind: inv.scopeKind, id: inv.scopeId }, status: inv.status, expiresAt: iso(inv.expiresAt),
+      id: inv.id, email: inv.email, role: inv.role, customRoleId: inv.customRoleId, scope: { kind: inv.scopeKind, id: inv.scopeId }, status: inv.status, expiresAt: iso(inv.expiresAt),
       ...(s.cfg.NODE_ENV !== 'production' && s.cfg.EXPOSE_DEV_TOKENS && s.mailer.mode === 'log' ? { devInvitationToken: token } : {}),
     });
   });
@@ -90,8 +101,8 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     const out = [];
     for (const r of rows) {
       const chain = await chainFor(orgId, r.scopeKind, r.scopeId).catch(() => null);
-      if (chain && hasPermissionInScope(mine, 'members.manage', chain))
-        out.push({ id: r.id, email: r.email, role: r.role, scope: { kind: r.scopeKind, id: r.scopeId }, status: r.status === 'pending' && r.expiresAt < new Date() ? 'expired' : r.status, expiresAt: iso(r.expiresAt), createdAt: iso(r.createdAt) });
+      if (chain && hasCapabilityInScope(mine, 'settings.team', 'view', chain))
+        out.push({ id: r.id, email: r.email, role: r.role, customRoleId: r.customRoleId, scope: { kind: r.scopeKind, id: r.scopeId }, status: r.status === 'pending' && r.expiresAt < new Date() ? 'expired' : r.status, expiresAt: iso(r.expiresAt), createdAt: iso(r.createdAt) });
     }
     return { items: out };
   });
@@ -101,7 +112,7 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     const mine = await requireMember(req, s.db, orgId);
     const [inv] = await s.db.select().from(invitations).where(and(eq(invitations.id, id), eq(invitations.organizationId, orgId)));
     if (!inv) throw notFound('Invitation');
-    if (!hasPermissionInScope(mine, 'members.manage', await chainFor(orgId, inv.scopeKind, inv.scopeId))) throw forbidden();
+    if (!hasCapabilityInScope(mine, 'settings.team', 'edit', await chainFor(orgId, inv.scopeKind, inv.scopeId))) throw forbidden();
     await s.db.update(invitations).set({ status: 'revoked' }).where(eq(invitations.id, id));
     await audit(s.db, { organizationId: orgId, ...actor(req), action: 'member.invitation_revoked', targetType: 'invitation', targetId: id });
     return { id, status: 'revoked' };
@@ -115,7 +126,10 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     const [a] = await s.db.select().from(roleAssignments).where(and(eq(roleAssignments.id, id), eq(roleAssignments.organizationId, orgId)));
     if (!a) throw notFound('Role assignment');
     const chain = await chainFor(orgId, a.scopeKind, a.scopeId);
-    if (!canGrantRole(mine, a.role as Role, chain)) throw forbidden('You cannot remove this role in this scope');
+    // You can remove an assignment only when you could have granted everything it gives.
+    const [target] = await withEffectiveAccess(s.db, orgId, [a]);
+    const allowed = a.role === 'org_owner' ? mine.some((m) => m.role === 'org_owner' && assignmentCovers(m, chain)) : canGrantCapabilities(mine, target?.capabilities ?? new Set(), chain);
+    if (!allowed) throw forbidden('You cannot remove this role in this scope');
     if (a.role === 'org_owner') {
       const owners = await s.db.select({ id: roleAssignments.id }).from(roleAssignments).where(and(eq(roleAssignments.organizationId, orgId), eq(roleAssignments.role, 'org_owner')));
       if (owners.length <= 1) throw conflict('last_owner', 'An organisation must keep at least one owner');
@@ -136,11 +150,11 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!inv) throw badRequest('This invitation is invalid, revoked or expired');
     if (inv.email.toLowerCase() !== me.email.toLowerCase()) throw new AppError(403, 'invitation_email_mismatch', 'Sign in with the email address the invitation was sent to');
     await s.db.transaction(async (tx) => {
-      await tx.insert(roleAssignments).values({ organizationId: inv.organizationId, userId: me.id, role: inv.role, scopeKind: inv.scopeKind, scopeId: inv.scopeId, createdBy: inv.invitedBy }).onConflictDoNothing();
+      await tx.insert(roleAssignments).values({ organizationId: inv.organizationId, userId: me.id, role: inv.role, customRoleId: inv.customRoleId, scopeKind: inv.scopeKind, scopeId: inv.scopeId, createdBy: inv.invitedBy }).onConflictDoNothing();
       await tx.update(invitations).set({ status: 'accepted', acceptedAt: new Date(), acceptedBy: me.id }).where(eq(invitations.id, inv.id));
       await audit(tx, { organizationId: inv.organizationId, ...actor(req), action: 'member.invitation_accepted', scopeKind: inv.scopeKind, scopeId: inv.scopeId, targetType: 'invitation', targetId: inv.id, metadata: { role: inv.role } });
     });
-    return { organizationId: inv.organizationId, role: inv.role, scope: { kind: inv.scopeKind, id: inv.scopeId } };
+    return { organizationId: inv.organizationId, role: inv.role, customRoleId: inv.customRoleId, scope: { kind: inv.scopeKind, id: inv.scopeId } };
   });
 };
 

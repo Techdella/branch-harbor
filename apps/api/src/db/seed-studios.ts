@@ -4,7 +4,7 @@
  * memberships with billing history (incl. a failed renewal in grace, a suspended, a paused and a
  * cancelling membership), booking policies and fees, attendance, intro-offer redemptions, online
  * livestreams and an on-demand library, instructor availability and a cancelled class with its
- * customer notifications. Called once from seed.ts after the base Stillwater data exists.
+ * customer notifications. Called once from seed-demo.ts after the base Stillwater data exists.
  */
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';

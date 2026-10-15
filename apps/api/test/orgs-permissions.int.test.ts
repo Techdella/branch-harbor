@@ -48,7 +48,10 @@ describe.skipIf(!hasDb)('organisations, locations, members and scoped permission
     const inv2 = await call(app, 'POST', `/v1/orgs/${org.id}/invitations`, { token: owner.token, body: { email: hq.email, role: 'hq_admin', scope: { kind: 'organization', id: org.id } } });
     await call(app, 'POST', '/v1/invitations/accept', { token: hq.token, body: { token: inv2.body.devInvitationToken } });
     expect((await call(app, 'GET', `/v1/orgs/${org.id}/reports/overview`, { token: hq.token })).status).toBe(200);
-    expect((await call(app, 'GET', `/v1/orgs/${org.id}/customers`, { token: hq.token })).body.items).toEqual([]);
+    // Customers are not part of the HQ admin's access at all: the API refuses the area (no empty padlocked list).
+    const hqCustomers = await call(app, 'GET', `/v1/orgs/${org.id}/customers`, { token: hq.token });
+    expect(hqCustomers.status).toBe(403);
+    expect(hqCustomers.body.error.code).toBe('module_not_available');
 
     // Revocation removes access on the very next request (same access token).
     const members = await call(app, 'GET', `/v1/orgs/${org.id}/members`, { token: owner.token });

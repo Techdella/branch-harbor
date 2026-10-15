@@ -66,3 +66,20 @@ describe('scope resolution', () => {
     expect(canGrantRole([owner], 'org_owner', orgScope)).toBe(true);
   });
 });
+
+describe('capabilities on assignments', () => {
+  it('custom capabilities drive permissions, and HQ-private modules need an organisation-wide assignment', async () => {
+    const { withAccess, hasCapabilityInScope, canGrantCapabilities } = await import('../src/domain/scope.ts');
+    const custom = withAccess({ role: 'custom', scopeKind: 'location', scopeId: 'L1' }, 'studios', { customCapabilities: ['sales.customers:view', 'finance.royalties:view'] });
+    expect([...custom.capabilities].sort()).toEqual(['sales.customers:view']);
+    expect(hasPermissionInScope([custom], 'customers.read', loc('L1'))).toBe(true);
+    expect(hasPermissionInScope([custom], 'customers.read', loc('L2'))).toBe(false);
+    expect(hasCapabilityInScope([custom], 'sales.customers', 'view', loc('L1'))).toBe(true);
+    const owner = withAccess({ role: 'org_owner', scopeKind: 'organization', scopeId: ORG }, 'studios');
+    expect(canGrantCapabilities([owner], ['finance.royalties:view'], orgScope)).toBe(true);
+    const fo = withAccess({ role: 'franchise_owner', scopeKind: 'owner_group', scopeId: 'G1' }, 'studios');
+    expect(canGrantCapabilities([fo], ['operations.classes:edit'], loc('L1', null, 'G1'))).toBe(true);
+    expect(canGrantCapabilities([fo], ['settings.connections:edit'], loc('L1', null, 'G1'))).toBe(false);
+    expect(canGrantCapabilities([fo], ['operations.classes:edit'], loc('L2', null, 'G2'))).toBe(false);
+  });
+});

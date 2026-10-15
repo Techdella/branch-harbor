@@ -129,11 +129,11 @@ export async function buildApp(opts: BuildOptions = {}): Promise<FastifyInstance
     schema: {
       tags: ['public'],
       summary: 'Health and integration status',
-      response: { 200: z.object({ status: z.enum(['ok', 'degraded']), database: z.enum(['up', 'down']), version: z.string(), time: z.string(), integrations: z.record(z.string(), z.string()) }) },
+      response: { 200: z.object({ status: z.enum(['ok', 'degraded']), database: z.enum(['up', 'down']), version: z.string(), time: z.string(), demoMode: z.boolean(), integrations: z.record(z.string(), z.string()) }) },
     },
   }, async () => {
     const database = await services.db.execute(sql`select 1`).then(() => 'up' as const).catch(() => 'down' as const);
-    return { status: database === 'up' ? ('ok' as const) : ('degraded' as const), database, version: '0.1.0', time: new Date().toISOString(), integrations: integrationStatus(cfg) as Record<string, string> };
+    return { status: database === 'up' ? ('ok' as const) : ('degraded' as const), database, version: '0.1.0', time: new Date().toISOString(), demoMode: cfg.DEMO_MODE, integrations: integrationStatus(cfg) as Record<string, string> };
   });
 
   await app.register(registerRoutes, { prefix: '/v1' });

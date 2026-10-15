@@ -15,19 +15,35 @@ pnpm install
 docker compose up -d postgres redis mailpit     # or a local Postgres 16 with role bh/bh and db branchharbor
 cp apps/api/.env.example apps/api/.env          # optional — every value has a dev default
 pnpm --filter @bh/api db:migrate                # applies apps/api/drizzle/*.sql
-pnpm --filter @bh/api db:seed                   # demo data; prints the demo password
+pnpm --filter @bh/api db:seed                   # production-safe: no businesses (optional platform admin)
+pnpm --filter @bh/api db:seed:demo              # demo data — demo site / local development only
 pnpm --filter @bh/api dev                       # http://localhost:4000, docs at /docs
 ```
 
-Demo login after seeding: `demo@branchharbor.com` with the password printed by the seed
-(set `SEED_DEMO_PASSWORD` to choose it). The demo owner holds `org_owner` in all five demo organisations:
-Stillwater Yoga (studios), Maple & Ember (foods), North Shore Football Academy (sports: Toronto CAD, Manchester GBP,
-Austin USD), Harbourline Wellness (wellness, administrative records only: Toronto CAD, Dublin EUR, Melbourne AUD) and
-Fieldnote Goods (commerce: Portland USD, Montréal CAD, Amsterdam EUR), with shifts (one running now for clock-in),
-offers, intake forms, pickup settings, stock history and pending approvals (refunds, ad spend, shift swaps). The seed
-prints the extra staff/manager accounts (same password). Also seeded: `maya.rao@demo.branchharbor.com` (location
-manager, Queen West), `priya.anand@demo.branchharbor.com` (regional manager, Europe),
-`carlos.ortega@demo.branchharbor.com` (staff, Ballard) — same password.
+**Production has no sample data.** `db:seed` creates nothing but, when `PLATFORM_ADMIN_EMAIL` and
+`PLATFORM_ADMIN_PASSWORD` are set, one BranchHarbor platform admin (the only account allowed on `/v1/platform/*`).
+Businesses are created by signing up. All demo data lives in `db:seed:demo` (`src/db/seed-demo.ts`, which orchestrates
+the `seed-*.ts` files) and must only run against a demo or development database.
+
+**Demo site** (e.g. `demo.branchharbor.com`): the same code against its own database seeded with `db:seed:demo`, with
+`DEMO_MODE=true` on the API (and `NEXT_PUBLIC_DEMO_MODE=true` / `EXPO_PUBLIC_DEMO_MODE=true` on the clients). Demo mode
+adds a "Demo environment" ribbon and a sign-in picker listing every demo account by business and role
+(`GET /v1/demo/accounts`, one-click `POST /v1/demo/login` for demo accounts only); both return 404 when `DEMO_MODE` is off.
+
+Demo logins after `db:seed:demo` (password printed by the seed, or `SEED_DEMO_PASSWORD`): `demo@branchharbor.com` holds
+`org_owner` in the demo organisations — Stillwater Yoga (studios), Maple & Ember (foods), North Shore Football Academy
+(sports: Toronto CAD, Manchester GBP, Austin USD), Harbourline Wellness (wellness, administrative records only: Toronto
+CAD, Dublin EUR, Melbourne AUD), Fieldnote Goods (commerce: Portland USD, Montréal CAD, Amsterdam EUR) and Keystone Realty
+— so it shows the account switcher (one industry per business account). Also seeded: `maya.rao@demo.branchharbor.com`
+(location manager, Queen West), `priya.anand@demo.branchharbor.com` (regional manager, Europe),
+`carlos.ortega@demo.branchharbor.com` (staff, Ballard) and the staff/manager accounts the seed prints.
+
+**Northlight Yoga International** (studios franchisor, `*@northlight.demo.branchharbor.com`) shows the access model, one
+login per role: Elena Marsh (CEO, owner), Daniel Okafor (VP Franchise), Sofia Lindqvist and Marcus Bell
+(instructor-trainers), Hannah Cho (CMO), Théo Laurent (brand lead), Priyanka Shah (digital marketer), Grace Kim
+(operations manager, plus a per-person grant of brand templates), Liam O'Connor / Ava Thompson / Oliver Grant (franchise
+owners of three owner groups), Mia Rossi and Noah Williams (location managers), Chloe Martin and Ethan Brown (staff) and
+Zara Ahmed (custom role "Front desk lead").
 
 | Script | What it does |
 |---|---|
@@ -36,7 +52,7 @@ manager, Queen West), `priya.anand@demo.branchharbor.com` (regional manager, Eur
 | `typecheck` / `build` | `tsc -p tsconfig.json` (no emit) |
 | `test` | vitest (unit + integration) |
 | `db:generate` | `drizzle-kit generate` after schema changes |
-| `db:migrate` / `db:seed` / `db:reset` | migrate, seed demo data, drop+recreate (non-production only) |
+| `db:migrate` / `db:seed` / `db:seed:demo` / `db:reset` | migrate; production-safe seed (no businesses, optional platform admin); demo data (demo site only); drop+recreate (non-production only) |
 
 ### Build decision
 
@@ -55,7 +71,10 @@ pnpm --filter @bh/api test
 `test/setup/global.ts` drops and recreates a **separate** database (`TEST_DATABASE_URL`, default
 `postgres://bh:bh@localhost:5432/branchharbor_test`; the name must contain `test`) and migrates it.
 If Postgres is unreachable, DB-backed suites are skipped with a clear message and pure unit tests
-still run. Coverage includes: permission/scope resolution, money per currency in reports, domain
+still run. Coverage includes: the access model (`test/access.int.test.ts`: catalogue, location manager refused owner/HQ data,
+marketing-only user refused operations/finance, custom roles grant exactly what was ticked, no granting beyond your own
+access, HQ-private modules, franchisee A vs B isolation, immediate revocation, industry lock + audited platform change,
+multi-account `/auth/me`, demo endpoints only in demo mode), permission/scope resolution, money per currency in reports, domain
 state machine, Stripe webhook idempotency (duplicate + concurrent deliveries processed once),
 signature rejection, partial refunds, reconciliation + "recreate record", food-order state machine
 with refund on rejection, studio capacity/holds/waitlist/concurrency, wellness reschedule
@@ -104,7 +123,7 @@ src/
   integrations/*.ts      adapters: Stripe, Cloudflare, email, SMS/WhatsApp, BullMQ, connectors, Anthropic, FX, maps, storage
   routes/*.ts            Zod-typed route modules registered under /v1
   jobs/handlers.ts       background job handlers
-drizzle/                 generated SQL migrations (+ 0001 custom constraints; 0003 shifts, approvals columns, offers, intake, pickup settings, push log; 0004 wellness full product; 0005 custom wellness resource-hold exclusion constraint + triggers)
+drizzle/                 generated SQL migrations (+ 0001 custom constraints; 0003 shifts, approvals columns, offers, intake, pickup settings, push log; 0004 wellness full product; 0005 custom wellness resource-hold exclusion constraint + triggers; 0013 access model: custom roles, role capabilities, member access overrides, platform role)
 ```
 
 **Conventions**
@@ -121,13 +140,31 @@ access tokens (`Authorization: Bearer`), rotating refresh tokens in an httpOnly 
 (`bh_refresh`, path `/v1/auth`) — mobile clients send `X-BH-Client: mobile` to also receive the
 refresh token in the body. Reusing a rotated refresh token revokes the whole token family.
 
-**Authorisation.** Roles live in `role_assignments` (role + scope kind/id) and are loaded from the
-DB on every request (never embedded in tokens), so revocation is immediate. `requirePerm` /
-`requirePermission(permission, scopeResolver)` resolve the target's ancestry (organisation →
-region → owner group → location) and check coverage: an org assignment covers all its
-locations; region/owner-group assignments cover their locations; a location assignment covers only
-that location. List endpoints filter by `authorisedLocations`. Inviters can only grant roles whose
-permissions they hold in that scope. HQ report access does not imply customer access.
+**Authorisation — the access model** (`packages/shared/src/access.ts`, docs/PRODUCT_PLAN.md "Access model").
+Access is built from **workspaces → modules → actions**: workspaces Network, Operations, Sales, Marketing, Finance,
+Legal & compliance, Training and Community (plus Settings under every workspace); modules such as
+`marketing.website_builder` or `finance.payments` (Operations modules come from the organisation's industry); actions
+`view`, `edit`, `publish` (publish / approve) and `export`. A capability is `<module>:<action>`.
+
+- *Roles* are capability sets: system role templates (Owner, HQ admin, VP Franchise, CMO, Brand lead, Digital marketer,
+  Instructor-trainer, Operations manager, Finance, Legal, Regional manager, Franchise owner, Location manager, Staff,
+  Customer) or **custom roles** an organisation creates (`custom_roles` + `role_capabilities`).
+- *Assignments* (`role_assignments`: role or `custom` + `custom_role_id`, scope kind/id) can carry **per-person
+  overrides** (`member_access_overrides`: grant or revoke a capability; revoking `view` removes the module).
+- *Scope*: organisation → region → owner group → location, as before. HQ-private modules (franchise pipeline, legal,
+  royalties, payouts, billing) only take effect on organisation-wide assignments, so a franchise owner never gets them.
+- *Enforcement*: assignments, custom roles and overrides are loaded from the DB on every request (never in tokens), so
+  changes apply immediately. (1) A module guard (`services/module-guard.ts`) refuses organisation routes whose modules
+  the member holds nowhere — 403 `module_not_available` (no empty padlocked lists). (2) Every route still checks its
+  permission in the target scope: the legacy `PERMISSIONS` (`requirePerm`, `authorisedLocations`) are derived from
+  capabilities (`PERMISSION_CAPABILITIES`), and new code can call `requireCapability(req, db, module, action, target)` /
+  `capabilityLocations(...)`. List endpoints filter by scope. (3) Sensitive fields are filtered by capability: revenue in
+  reports needs `finance.payments:view` at each location (otherwise `null` with `no_finance_access`), customer records
+  need `sales.customers`.
+- *Granting*: nobody can grant (or change) access they don't hold in that scope; only owners grant ownership; every
+  change is audited (`access.role_created|updated|deleted`, `access.assignment_created|updated`, `member.*`).
+- *Industry*: fixed at creation — `PATCH /orgs/:id` with a different `industry` returns 409 `industry_locked`; only a
+  platform admin can change it (`PUT /v1/platform/orgs/:orgId/industry`, audited `platform.org_industry_changed`).
 
 **Key flows**
 
@@ -433,6 +470,27 @@ Full foods product (routes/foods-ext.ts: foods-public, foods-menu-admin, foods-o
 - `DELETE /v1/orgs/{orgId}/invitations/{id}`
 - `DELETE /v1/orgs/{orgId}/role-assignments/{id}`
 - `POST /v1/invitations/accept`
+
+**access** (access model — see Architecture)
+
+- `GET /v1/access/catalogue?industry=&model=` — workspaces, modules (with `status`, `hqOnly`), actions, role templates
+- `GET /v1/orgs/{orgId}/access/me` — my workspaces, settings modules, landing workspace, capabilities per assignment
+- `GET /v1/orgs/{orgId}/roles` · `POST /v1/orgs/{orgId}/roles` · `PATCH|DELETE /v1/orgs/{orgId}/roles/{id}` — templates + custom roles
+- `GET /v1/orgs/{orgId}/access/assignments` — assignments you manage with role names and workspaces
+- `GET /v1/orgs/{orgId}/members/{userId}/access` — "What can this person see?"
+- `PUT /v1/orgs/{orgId}/role-assignments/{id}/access` — role (system/custom) + per-person grants/revokes
+- `POST /v1/orgs/{orgId}/role-assignments` — give an existing member another role in a scope
+- `POST /v1/orgs/{orgId}/access/preview` — workspaces and navigation a role or ticked set would give
+- `GET /v1/auth/me` — each organisation now carries `access` (capabilities, workspaces, settings, primaryWorkspace); `user.platformAdmin`; `demoMode`
+
+**platform** (platform admins only, audited)
+
+- `PUT /v1/platform/orgs/{orgId}/industry`
+
+**demo** (404 unless `DEMO_MODE=true`)
+
+- `GET /v1/demo/accounts`
+- `POST /v1/demo/login`
 
 **websites**
 

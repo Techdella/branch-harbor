@@ -87,6 +87,8 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash'),
   locale: text('locale').notNull().default('en'),
   timeZone: text('time_zone'),
+  /** BranchHarbor staff only: `admin` may use the audited /v1/platform endpoints. Never set through the API. */
+  platformRole: text('platform_role'),
   emailVerifiedAt: ts('email_verified_at'),
   deletionRequestedAt: ts('deletion_requested_at'),
   deletedAt: ts('deleted_at'),
@@ -121,7 +123,10 @@ export const roleAssignments = pgTable('role_assignments', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  /** A system role key (packages/shared ROLES) or `custom` with `customRoleId`. */
   role: text('role').notNull(),
+  /** References custom_roles (FK in migration 0013); null for system roles. */
+  customRoleId: uuid('custom_role_id'),
   scopeKind: text('scope_kind').notNull(), // organization | region | owner_group | location
   scopeId: uuid('scope_id').notNull(),
   createdBy: uuid('created_by'),
@@ -130,7 +135,7 @@ export const roleAssignments = pgTable('role_assignments', {
   createdAt: createdAt(),
 }, (t) => [
   index('role_assignments_user_org_idx').on(t.userId, t.organizationId),
-  uniqueIndex('role_assignments_uq').on(t.userId, t.role, t.scopeKind, t.scopeId),
+  uniqueIndex('role_assignments_uq').on(t.userId, t.role, t.scopeKind, t.scopeId, sql`coalesce(${t.customRoleId}, '00000000-0000-0000-0000-000000000000'::uuid)`),
 ]);
 
 export const invitations = pgTable('invitations', {
@@ -138,6 +143,7 @@ export const invitations = pgTable('invitations', {
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   email: text('email').notNull(),
   role: text('role').notNull(),
+  customRoleId: uuid('custom_role_id'),
   scopeKind: text('scope_kind').notNull(),
   scopeId: uuid('scope_id').notNull(),
   tokenHash: text('token_hash').notNull().unique(),

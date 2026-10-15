@@ -5,7 +5,7 @@
  * reports, upcoming bookings made through the booking engine, packages (active/shared/expired), gift vouchers,
  * notes (incl. confidential), preferences, consent, waitlist, a weekly series and reminder settings.
  *
- * Called from seed.ts after seed-operations created the organisation. Idempotent: the organisation is recreated
+ * Called from seed-demo.ts after seed-operations created the organisation. Idempotent: the organisation is recreated
  * on every seed run and everything here hangs off it.
  */
 import { and, eq, inArray, like } from 'drizzle-orm';

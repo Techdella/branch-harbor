@@ -64,8 +64,8 @@ describe.skipIf(!hasDb)('approvals inbox: refunds over the org threshold, local 
     expect((await call(app, 'POST', `/v1/orgs/${orgId}/refund-requests`, { token: manager.token, body: { paymentId: pay, amountMinor: 100, currency: 'USD', reason: 'x' } })).status).toBe(400);
     expect((await call(app, 'POST', `/v1/orgs/${orgId}/refund-requests`, { token: staff.token, body: { paymentId: pay, amountMinor: 100, currency: 'CAD', reason: 'x' } })).status).toBe(403);
 
-    // Inbox visibility: staff see nothing; finance and owner can decide; the manager sees their own request.
-    expect((await call(app, 'GET', `/v1/orgs/${orgId}/approvals`, { token: staff.token })).body.items).toEqual([]);
+    // Inbox visibility: the approvals inbox isn't part of staff access (refused); finance and owner can decide; the manager sees their own request.
+    expect((await call(app, 'GET', `/v1/orgs/${orgId}/approvals`, { token: staff.token })).status).toBe(403);
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/approvals`, { token: manager.token })).body.items.map((a: any) => a.id)).toContain(id);
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/approvals?kind=refund`, { token: finance.token })).body.items.find((a: any) => a.id === id).canDecide).toBe(true);
     expect((await decide(manager.token, id, 'approve')).status).toBe(403);

@@ -3,7 +3,8 @@ import type { Permission, Role, ScopeKind } from '@bh/shared';
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import { consentRecords, customers, locations, pushNotifications, pushTokens, roleAssignments, users } from '../db/schema/index.ts';
-import { hasPermissionInScope, type Assignment, type ScopeChain } from '../domain/scope.ts';
+import { hasPermissionInScope, type ScopeChain } from '../domain/scope.ts';
+import { loadOrgAssignments } from './authz.ts';
 
 export type PushCategory = 'order_status' | 'approval_request' | 'cover_request' | 'waitlist_promotion' | 'class_update';
 
@@ -86,9 +87,7 @@ export async function usersWithPermissionAt(db: Exec, organizationId: string, lo
     const [l] = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.id, locationId));
     if (l) chain = { organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
   }
-  const rows = await db.select().from(roleAssignments).where(and(eq(roleAssignments.organizationId, organizationId), or(isNull(roleAssignments.expiresAt), sql`${roleAssignments.expiresAt} > now()`)));
-  const byUser = new Map<string, Assignment[]>();
-  for (const r of rows) byUser.set(r.userId, [...(byUser.get(r.userId) ?? []), { role: r.role as Role, scopeKind: r.scopeKind as ScopeKind, scopeId: r.scopeId, expiresAt: r.expiresAt }]);
+  const byUser = await loadOrgAssignments(db, organizationId);
   return [...byUser.entries()].filter(([, a]) => hasPermissionInScope(a, permission, chain) && (!alsoPermission || hasPermissionInScope(a, alsoPermission, chain))).map(([id]) => id);
 }
 

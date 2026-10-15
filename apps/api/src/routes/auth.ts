@@ -8,6 +8,7 @@ import { AppError, badRequest, conflict, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser, signAccessToken } from '../plugins/auth.ts';
 import { audit } from '../services/audit.ts';
 import { businessModeView } from '../services/businessMode.ts';
+import { accessSummaryFor, withEffectiveAccess } from '../services/authz.ts';
 import {
   REFRESH_COOKIE, clearRefreshCookie, createVerificationToken, findUserByEmail, hashPassword, issueTokens, revokeRefreshToken,
   rotateRefreshToken, sendVerificationEmail, serializeUser, setRefreshCookie, verifyPassword, wantsBodyToken,
@@ -151,14 +152,21 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
         .where(and(inArray(locations.organizationId, indepIds), isNull(locations.archivedAt))).orderBy(asc(locations.createdAt));
       for (const l of locs) if (!primary.has(l.organizationId)) primary.set(l.organizationId, l.id);
     }
-    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
+    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; customRoleId: string | null; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
     const orgs = new Map<string, MeOrg>();
     for (const r of rows) {
       const { settings, model: _model, ...base } = r.org;
       const o = orgs.get(r.org.id) ?? { ...base, ...businessModeView({ model: r.org.model, settings }, primary.get(r.org.id) ?? null), roles: [] };
-      o.roles.push({ id: r.assignment.id, role: r.assignment.role, scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
+      o.roles.push({ id: r.assignment.id, role: r.assignment.role, customRoleId: r.assignment.customRoleId, scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
       orgs.set(r.org.id, o);
     }
-    return { user: serializeUser(u), organizations: [...orgs.values()] };
+    // What each organisation shows this person (workspaces, settings, landing workspace) — for navigation only;
+    // every endpoint still checks module + action + scope.
+    const out = [];
+    for (const o of orgs.values()) {
+      const assignments = await withEffectiveAccess(s.db, o.id, rows.filter((r) => r.org.id === o.id && (!r.assignment.expiresAt || r.assignment.expiresAt > new Date())).map((r) => r.assignment), o.industry);
+      out.push({ ...o, access: await accessSummaryFor(s.db, assignments, o.industry) });
+    }
+    return { user: { ...serializeUser(u), platformAdmin: u.platformRole === 'admin' }, organizations: out, demoMode: s.cfg.DEMO_MODE };
   });
 };
