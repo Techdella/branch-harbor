@@ -8,7 +8,8 @@
  * Where the API has no endpoint for something the UI shows, the client derives it honestly from data the
  * API does return (notifications, search, publish plan) or reports it as unavailable — it never invents data.
  */
-import { can as canDo, type Currency, type Money, type Permission, type Role } from '@bh/shared';
+import { type Currency, type Money, type Permission, type Role } from '@bh/shared';
+import { permissionsOf } from '../access';
 import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
 import type { BranchHarborApi, SiteAddress } from '../api';
@@ -26,6 +27,7 @@ import {
   effectiveRole,
   loadWorkspace,
   locationById,
+  orgAccess,
   orgId,
   refreshWorkspace,
   scopeLocationIds,
@@ -60,7 +62,10 @@ function ws() {
 const role = () => activeViewRole();
 const inScope = (ctx: RequestContext) => new Set(scopeLocationIds(ctx.scopeId, effectiveRole(ctx.role)));
 /** Permission check for the active "Viewing as" persona (server enforces; this only avoids pointless calls). */
-const allowedFor = (ctx: RequestContext, perm: Permission) => canDo(sessionOf(effectiveRole(ctx.role), ws()).assignments, perm);
+/** Legacy permission from the person's capabilities in the selected account (custom roles and overrides included). */
+const allowedFor = (_ctx: RequestContext, perm: Permission) => permissionsOf(orgAccess(ws()).capabilities).has(perm);
+/** Holds view on a module (only call endpoints of modules the person has: the API refuses the others). */
+const holds = (module: string) => orgAccess(ws()).capabilities.includes(`${module}:view` as never);
 
 /** Runs a read that may be forbidden for this role; forbidden → fallback, everything else propagates. */
 async function maybe<T>(p: Promise<T>, fallback: T): Promise<T> {
@@ -219,10 +224,10 @@ async function attentionItems(ctx: RequestContext): Promise<(AttentionItem & { a
   const allowed = (p: Permission) => allowedFor(ctx, p);
   const [recon, approvals, conns, foods, cover] = await Promise.all([
     allowed('payments.read') ? maybe(http.get<ApiRecon>(o('/payments/reconciliation')), null) : null,
-    allowed('locations.read') ? maybe(http.get<{ items: (ApiApproval & { canDecide?: boolean; kindLabel?: string })[] }>(o('/approvals')).then((r) => r.items.filter((a) => a.canDecide !== false)), [] as ApiApproval[]) : [],
-    maybe(http.get<{ items: ApiConnection[] }>(o('/connections')).then(items), [] as ApiConnection[]),
-    w.orgView?.industry === 'foods' ? maybe(http.get<{ items: ApiFoodOrder[] }>(o('/foods/orders'), { status: 'awaiting_acceptance' }).then(items), [] as ApiFoodOrder[]) : [],
-    w.orgView?.industry === 'studios' ? maybe(http.get<{ items: ApiCover[] }>(o('/studios/cover-requests'), { status: 'open' }).then(items), [] as ApiCover[]) : [],
+    holds('network.approvals') ? maybe(http.get<{ items: (ApiApproval & { canDecide?: boolean; kindLabel?: string })[] }>(o('/approvals')).then((r) => r.items.filter((a) => a.canDecide !== false)), [] as ApiApproval[]) : [],
+    holds('settings.connections') ? maybe(http.get<{ items: ApiConnection[] }>(o('/connections')).then(items), [] as ApiConnection[]) : [],
+    w.orgView?.industry === 'foods' && holds('operations.food_orders') ? maybe(http.get<{ items: ApiFoodOrder[] }>(o('/foods/orders'), { status: 'awaiting_acceptance' }).then(items), [] as ApiFoodOrder[]) : [],
+    w.orgView?.industry === 'studios' && holds('operations.classes') ? maybe(http.get<{ items: ApiCover[] }>(o('/studios/cover-requests'), { status: 'open' }).then(items), [] as ApiCover[]) : [],
   ]);
   for (const c of conns.filter((x) => x.state !== 'connected' && inS(x.locationId)))
     out.push({

@@ -1652,7 +1652,7 @@
     },
     "footer": "El acceso de soporte está autorizado, tiene un límite de tiempo y queda registrado.",
     "tab": {
-      "members": "Miembros y roles"
+      "members": "Personas"
     },
     "schedule": {
       "title": "Horario del equipo",
@@ -1721,7 +1721,7 @@
     "billedNoPrice": "Facturada"
   },
   "auth": {
-    "legal": "Entorno de ejemplo. No introduzcas datos reales de clientes.",
+    "legal": "Al continuar, aceptas los términos del servicio y la política de privacidad de BranchHarbor.",
     "promise": "Un hogar para cada sede.",
     "promiseSub": "Gestionad la marca juntos. Dirige cada sede con confianza.",
     "checkFields": "Revisa los campos marcados.",

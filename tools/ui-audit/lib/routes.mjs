@@ -67,7 +67,7 @@ export function webRoutes() {
   return dedupe(out).map((r) => ({ ...r, app: 'web', key: WEB_KEY.has(r.path) }));
 }
 
-// ───────────────────────── app (dashboard, sample mode) ─────────────────────────
+// ───────────────────────── app (dashboard, signed in as demo accounts) ─────────────────────────
 const OPS = parseOps();
 function parseOps() {
   const src = fs.readFileSync(path.join(ROOT, 'apps/app/src/lib/nav.ts'), 'utf8');
@@ -82,28 +82,35 @@ function parseOps() {
   }
   return ops;
 }
-const SHARED = ['/overview', '/locations', '/locations/new', '/approvals', '/customers', '/websites', '/marketing', '/payments', '/team', '/community', '/reports', '/connections', '/settings'];
-const appState = (industry, role = 'hq', business = 'network') => ({ bh_app_state: JSON.stringify({ industry, role, scopeId: 'all', aiOpen: false, navCollapsed: false, orgId: null, business }) });
+const SHARED = ['/overview', '/locations', '/locations/new', '/approvals', '/customers', '/websites', '/marketing', '/payments', '/schedule', '/team', '/reports', '/connections', '/settings'];
+/** Dashboard routes sign in as seeded demo accounts (there is no sample-data mode): see lib/session.mjs. */
+const as = (who, extra = {}) => ({ session: { app: 'app', as: who, ...extra } });
 const APP_KEY = new Set(['studios /overview', 'foods /ops/kitchen', 'commerce /ops/orders', 'sports /ops/registrations', 'studios /payments', 'realty /ops/listings', 'auth /sign-in']);
+/** Industries with dashboard screens today (hospitality screens arrive with the Hospitality release). */
+const AUDITED = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'];
 
 export function appRoutes() {
   const patterns = nextPatterns(path.join(ROOT, 'apps/app/src/app'));
   const out = [];
   for (const p of ['/sign-in', '/sign-up', '/forgot-password', '/verify-email', '/onboarding']) out.push({ path: p, pattern: p, label: `auth ${p}`, storage: {} });
-  for (const ind of Object.keys(OPS)) {
-    for (const s of SHARED) out.push({ path: s, pattern: s, label: `${ind} ${s}`, storage: appState(ind) });
-    for (const k of OPS[ind]) out.push({ path: `/ops/${k}`, pattern: '/ops/[screen]', label: `${ind} /ops/${k}`, storage: appState(ind) });
+  for (const ind of AUDITED) {
+    for (const s of SHARED) out.push({ path: s, pattern: s, label: `${ind} ${s}`, ...as('owner', { industry: ind }) });
+    for (const k of OPS[ind] ?? []) out.push({ path: `/ops/${k}`, pattern: '/ops/[screen]', label: `${ind} /ops/${k}`, ...as('owner', { industry: ind }) });
   }
-  // Personas on the overview and one ops screen.
-  for (const role of ['local', 'staff']) {
-    out.push({ path: '/overview', pattern: '/overview', label: `studios(${role}) /overview`, storage: appState('studios', role) });
-    out.push({ path: '/ops/classes', pattern: '/ops/[screen]', label: `studios(${role}) /ops/classes`, storage: appState('studios', role) });
-  }
-  out.push({ path: '/overview', pattern: '/overview', label: 'independent /overview', storage: appState('studios', 'hq', 'independent') });
-  out.push({ path: '/settings', pattern: '/settings', label: 'independent /settings', storage: appState('studios', 'hq', 'independent') });
+  // Access-model personas: workspace homes and one screen each, plus a route outside their access ("not available").
+  out.push({ path: '/overview', pattern: '/overview', label: 'studios(manager) /overview', ...as('manager') });
+  out.push({ path: '/ops/classes', pattern: '/ops/[screen]', label: 'studios(manager) /ops/classes', ...as('manager') });
+  out.push({ path: '/overview', pattern: '/overview', label: 'foods(staff) /overview', ...as('staff') });
+  out.push({ path: '/ops/kitchen', pattern: '/ops/[screen]', label: 'foods(staff) /ops/kitchen', ...as('staff') });
+  out.push({ path: '/payments', pattern: '/payments', label: 'foods(staff) /payments (not available)', ...as('staff') });
+  out.push({ path: '/overview', pattern: '/overview', label: 'northlight(cmo) /overview', ...as('cmo') });
+  out.push({ path: '/overview', pattern: '/overview', label: 'northlight(franchisee) /overview', ...as('franchisee') });
+  out.push({ path: '/team', pattern: '/team', label: 'northlight(franchisee) /team', ...as('franchisee') });
+  out.push({ path: '/overview', pattern: '/overview', label: 'independent /overview', ...as('independent') });
+  out.push({ path: '/settings', pattern: '/settings', label: 'independent /settings', ...as('independent') });
   out.push({ path: '/does-not-exist', pattern: '(not-found)', label: 'not-found', storage: {} });
   const covered = new Set(out.map((r) => r.pattern));
-  for (const p of patterns) if (p !== '/' && !covered.has(p)) out.push({ path: p, pattern: p, label: `extra ${p}`, storage: appState('studios') });
+  for (const p of patterns) if (p !== '/' && !covered.has(p)) out.push({ path: p, pattern: p, label: `extra ${p}`, ...as('owner', { industry: 'studios' }) });
   return out.map((r) => ({ ...r, app: 'app', key: APP_KEY.has(r.label) }));
 }
 
@@ -198,7 +205,9 @@ export async function sitesRoutes() {
 }
 
 // ───────────────────────── mobile (Expo web export) ─────────────────────────
-const mobileState = (experience, brand = 'stillwater') => ({ 'bh.token': 'mock.audit', 'bh.experience': experience, 'bh.brand': brand });
+/** Mobile routes sign in too: customer screens as a guest, staff and owner screens as demo accounts. */
+const mobileSession = (experience, brand) =>
+  experience === 'customer' ? { session: { app: 'mobile', as: 'guest', brand } } : { session: { app: 'mobile', as: experience === 'staff' ? 'staff' : 'owner', experience, industry: experience === 'staff' ? 'foods' : 'studios', brand } };
 const MOBILE_KEY = new Set(['/customer/home', '/customer/book', '/staff/today', '/owner/pulse', '/customer/checkout']);
 
 export function mobileRoutes() {
@@ -208,8 +217,8 @@ export function mobileRoutes() {
     if (p === '/') continue;
     const concrete = p.replace(/\[id\]/, 'audit-placeholder');
     const exp = p.startsWith('/staff') ? 'staff' : p.startsWith('/owner') ? 'owner' : 'customer';
-    const brands = p.startsWith('/customer/') && /\/(home|bookings|inbox|profile|checkout|locations)$/.test(p) ? ['stillwater', 'maple'] : [p.includes('/order') || /item|delivery|meal-plans|orders/.test(p) ? 'maple' : 'stillwater'];
-    for (const b of brands) out.push({ path: concrete, pattern: p, label: `${b} ${concrete}`, storage: mobileState(exp, b), key: MOBILE_KEY.has(concrete) && b === 'stillwater' });
+    const brands = p.startsWith('/customer/') && /\/(home|bookings|inbox|profile|checkout|locations)$/.test(p) ? ['stillwater-yoga', 'maple-and-ember'] : [p.includes('/order') || /item|delivery|meal-plans|orders/.test(p) ? 'maple-and-ember' : 'stillwater-yoga'];
+    for (const b of brands) out.push({ path: concrete, pattern: p, label: `${b} ${concrete}`, ...mobileSession(exp, b), key: MOBILE_KEY.has(concrete) && b === 'stillwater-yoga' });
   }
   return out.map((r) => ({ ...r, app: 'mobile' }));
 }

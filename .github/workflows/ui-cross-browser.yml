@@ -4,7 +4,7 @@ on:
     branches: [main]
   pull_request:
 
-# Builds the four front ends, starts them against a seeded API and runs tools/ui-audit smoke tests in
+# Builds the four front ends, starts them against an API seeded with the demo data (pnpm db:seed:demo) and runs tools/ui-audit smoke tests in
 # Chromium, Firefox, WebKit, Mobile Safari (WebKit iPhone) and Mobile Chrome (Pixel).
 jobs:
   smoke:
@@ -42,13 +42,13 @@ jobs:
         working-directory: tools/ui-audit
         run: npx playwright install --with-deps
       - name: Migrate and seed the API database
-        run: pnpm --filter @bh/api db:migrate && pnpm --filter @bh/api db:seed
+        run: pnpm --filter @bh/api db:migrate && pnpm --filter @bh/api db:seed:demo
       - name: Build apps
         run: |
           NEXT_PUBLIC_APP_URL=http://localhost:6402 NEXT_PUBLIC_SITE_URL=http://localhost:6401 pnpm --filter @bh/web build
-          NEXT_PUBLIC_USE_MOCKS=true pnpm --filter @bh/app build
+          pnpm --filter @bh/app build
           SITES_BASE_URL=http://localhost:6403 pnpm --filter @bh/sites build
-          cd apps/mobile && EXPO_PUBLIC_USE_MOCKS=true npx expo export --platform web --output-dir dist
+          cd apps/mobile && EXPO_PUBLIC_API_URL=http://localhost:6400 npx expo export --platform web --output-dir dist
       - name: Start servers
         run: |
           (cd apps/api && PORT=6400 CORS_ORIGINS=http://localhost:6401,http://localhost:6402,http://localhost:6403,http://localhost:6404 LOG_LEVEL=warn nohup pnpm start > /tmp/api.log 2>&1 &)

@@ -18,6 +18,8 @@ export function useNavLabel() {
     if (l.screen) return t(`ops.${app.industry}.${l.screen}.title`);
     if (l.key === 'customers') return t(`industries.${app.industry}.customers`);
     if (l.key === 'schedule') return t('access.nav.schedule');
+    // Inside the Marketing workspace the campaigns screen is called what it is.
+    if (l.key === 'marketing') return t('access.modules.marketing.campaigns.name');
     return t(`nav.${l.key}`);
   };
 }

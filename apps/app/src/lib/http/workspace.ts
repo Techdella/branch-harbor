@@ -179,14 +179,18 @@ const settle = async <T>(p: Promise<T>, fallback: T): Promise<T> => {
 async function loadDirectory(meOrg: ApiMeOrg): Promise<Omit<Workspace, 'user' | 'orgs'>> {
   const id = meOrg.id;
   const items = <T>(p: Promise<{ items: T[] }>) => settle(p.then((r) => r.items), [] as T[]);
+  // Only ask for directory lists the person's modules cover (the API refuses the rest with 403).
+  const caps = new Set(meOrg.access?.capabilities ?? []);
+  const holds = (...mods: string[]) => !meOrg.access || mods.some((m) => caps.has(`${m}:view`));
+  const none = <T>() => Promise.resolve([] as T[]);
   const [org, locs, regions, ownerGroups, websites, connections, templates] = await Promise.all([
     http.get<ApiOrg>(`/orgs/${id}`),
     items(http.get<{ items: ApiLocation[] }>(`/orgs/${id}/locations`)),
     items(http.get<{ items: ApiNamed[] }>(`/orgs/${id}/regions`)),
     items(http.get<{ items: ApiNamed[] }>(`/orgs/${id}/owner-groups`)),
-    items(http.get<{ items: ApiWebsite[] }>(`/orgs/${id}/websites`)),
-    items(http.get<{ items: ApiConnection[] }>(`/orgs/${id}/connections`)),
-    items(http.get<{ items: ApiNamed[] }>(`/orgs/${id}/templates`)),
+    holds('marketing.website_builder', 'network.templates') ? items(http.get<{ items: ApiWebsite[] }>(`/orgs/${id}/websites`)) : none<ApiWebsite>(),
+    holds('settings.connections') ? items(http.get<{ items: ApiConnection[] }>(`/orgs/${id}/connections`)) : none<ApiConnection>(),
+    holds('marketing.website_builder', 'network.templates') ? items(http.get<{ items: ApiNamed[] }>(`/orgs/${id}/templates`)) : none<ApiNamed>(),
   ]);
   const assignments = meOrg.roles.map((r) => ({ id: r.id, role: r.role as Role, scope: r.scope }));
   // Roles without locations.read (e.g. staff) get an empty directory; fill their assigned locations from the

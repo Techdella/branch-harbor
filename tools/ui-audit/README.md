@@ -13,14 +13,14 @@ Two tools that run against **production builds** of the four front ends:
 pnpm install                                   # from the repo root
 # Postgres 16 with role bh/bh, then a seeded API
 DATABASE_URL=postgres://bh:bh@localhost:5432/bh_ui pnpm --filter @bh/api db:migrate
-DATABASE_URL=postgres://bh:bh@localhost:5432/bh_ui SEED_DEMO_PASSWORD='HarborDemo2026!' pnpm --filter @bh/api db:seed
+DATABASE_URL=postgres://bh:bh@localhost:5432/bh_ui SEED_DEMO_PASSWORD='HarborDemo2026!' pnpm --filter @bh/api db:seed:demo
 (cd apps/api && DATABASE_URL=… PORT=6400 CORS_ORIGINS=http://localhost:6401,http://localhost:6402,http://localhost:6403,http://localhost:6404 pnpm start)
 
 # production builds (NEXT_PUBLIC_* are inlined at build time)
 NEXT_PUBLIC_API_URL=http://localhost:6400 NEXT_PUBLIC_APP_URL=http://localhost:6402 pnpm --filter @bh/web build
-NEXT_PUBLIC_API_URL=http://localhost:6400 NEXT_PUBLIC_USE_MOCKS=true pnpm --filter @bh/app build
+NEXT_PUBLIC_API_URL=http://localhost:6400 pnpm --filter @bh/app build
 NEXT_PUBLIC_API_URL=http://localhost:6400 SITES_BASE_URL=http://localhost:6403 pnpm --filter @bh/sites build
-(cd apps/mobile && EXPO_PUBLIC_USE_MOCKS=true npx expo export --platform web --output-dir dist)
+(cd apps/mobile && EXPO_PUBLIC_API_URL=http://localhost:6400 npx expo export --platform web --output-dir dist)
 
 # serve
 (cd apps/web && npx next start -p 6401) & (cd apps/app && npx next start -p 6402) &
@@ -29,7 +29,10 @@ node tools/ui-audit/serve-static.mjs apps/mobile/dist 6404 &
 ```
 
 Ports and URLs are overridable: `UI_AUDIT_WEB_URL`, `UI_AUDIT_APP_URL`, `UI_AUDIT_SITES_URL`, `UI_AUDIT_MOBILE_URL`,
-`UI_AUDIT_API_URL`, `UI_AUDIT_SITE_BRANDS` (comma-separated seeded brand slugs). Chromium resolves from the
+`UI_AUDIT_API_URL`, `UI_AUDIT_SITE_BRANDS` (comma-separated seeded brand slugs). The dashboard and the mobile app have no
+sample-data mode, so audited pages sign in as demo accounts (`lib/session.mjs`, password `UI_AUDIT_PASSWORD` or
+`SEED_DEMO_PASSWORD`, default `HarborDemo2026!`): tokens are fetched from the API when a route runs and seeded into
+localStorage, with the app's `bh_session` marker cookie. Chromium resolves from the
 Playwright install (`PLAYWRIGHT_BROWSERS_PATH`, e.g. `/opt/pw-browsers`); `npx playwright install` otherwise.
 
 ## Audit
@@ -51,12 +54,12 @@ after a full-page screenshot on a reused page). The large-text configuration inj
 excludes that self-inflicted re-layout from CLS (runs before this fix count it).
 
 **Routes.** `lib/routes.mjs` reads each router (`apps/*/app/**/page.tsx`, `apps/mobile/app/**/*.tsx`) and resolves dynamic
-segments: the marketing site in `en` (plus `de`, `fr`, `ar` on a subset); the dashboard in sample mode for all six industries'
-ops screens and every shared screen, plus the location-manager, staff and independent-business personas (seeded through the
-`bh_app_state` localStorage key); customer sites for every seeded brand and every public location, each module page linked
+segments: the marketing site in `en` (plus `de`, `fr`, `ar` on a subset); the dashboard signed in as the demo owner of each industry's
+business account for every ops and shared screen, plus access-model personas (location manager, staff — including a route
+outside their access —, Northlight CMO and franchise owner, independent owner); customer sites for every seeded brand and every public location, each module page linked
 from a location, one detail page per pattern (crawled from the server-rendered HTML) and the token pages (with an
-unknown id, i.e. their error state); the Expo web export for every screen of the customer (studio and food brand), staff and
-owner experiences (session seeded via `bh.token` / `bh.experience` / `bh.brand`). The summary lists file-system routes that
+unknown id, i.e. their error state); the Expo web export for every screen of the customer (studio and food brand, as a guest), staff and
+owner experiences (signed in; session seeded via `bh.token` / `bh.refresh` / `bh.experience` / `bh.account` / `bh.brand`). The summary lists file-system routes that
 were not visited.
 
 **Configurations** (`lib/config.mjs`):

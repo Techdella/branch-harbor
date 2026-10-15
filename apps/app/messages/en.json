@@ -1652,7 +1652,7 @@
     },
     "footer": "Support access is authorized, time-limited and logged.",
     "tab": {
-      "members": "Members & roles"
+      "members": "People"
     },
     "schedule": {
       "title": "Team schedule",
@@ -1721,7 +1721,7 @@
     "billedNoPrice": "Billed"
   },
   "auth": {
-    "legal": "Sample environment. Don't enter real customer data.",
+    "legal": "By continuing you agree to the BranchHarbor Terms of Service and Privacy Policy.",
     "promise": "One home for every location.",
     "promiseSub": "Manage your brand together. Run each location with confidence.",
     "checkFields": "Check the highlighted fields.",

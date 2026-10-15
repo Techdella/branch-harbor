@@ -1652,7 +1652,7 @@
     },
     "footer": "L’accès de l’assistance est autorisé, limité dans le temps et journalisé.",
     "tab": {
-      "members": "Membres et rôles"
+      "members": "Personnes"
     },
     "schedule": {
       "title": "Planning de l’équipe",
@@ -1721,7 +1721,7 @@
     "billedNoPrice": "Facturé"
   },
   "auth": {
-    "legal": "Environnement d’exemple. N’indiquez pas de vraies données clients.",
+    "legal": "En continuant, vous acceptez les conditions d’utilisation et la politique de confidentialité de BranchHarbor.",
     "promise": "Un seul foyer pour chaque établissement.",
     "promiseSub": "Gérez votre marque ensemble. Pilotez chaque établissement en confiance.",
     "checkFields": "Vérifiez les champs signalés.",

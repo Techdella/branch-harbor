@@ -71,7 +71,6 @@ export function CoverScreen() {
                   </li>
                 ))}
               </ul>
-              {c.status === 'open' && !app.live && <p className="text-xs text-stone">{t('simulateHint')}</p>}
               {c.status === 'open' && app.live && (
                 <Button size="sm" icon="check" loading={accept.pending} onClick={async () => apply(await accept.run(c.id, app.session.user.id))} className="self-start">
                   {t('acceptSelf')}
@@ -94,11 +93,6 @@ export function CoverScreen() {
                   <Banner tone="success" live="polite">
                     {t('confirmed', { count: c.bookedCustomers })}
                   </Banner>
-                  {!app.live && (
-                    <Button size="sm" variant="secondary" icon="refresh" onClick={async () => apply(await reset.run(c.id))}>
-                      {t('restart')}
-                    </Button>
-                  )}
                 </div>
               )}
             </section>

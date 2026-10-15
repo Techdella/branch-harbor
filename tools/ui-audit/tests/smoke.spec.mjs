@@ -2,22 +2,26 @@
 // (desktop projects resize; phone projects use the device viewport).
 import { expect, test } from '@playwright/test';
 import { BASE } from '../lib/config.mjs';
+import { sessionCookies, storageFor } from '../lib/session.mjs';
 
-const appState = (industry) => ({ bh_app_state: JSON.stringify({ industry, role: 'hq', scopeId: 'all', aiOpen: false, navCollapsed: false, orgId: null, business: 'network' }) });
-const mobileState = (experience, brand = 'stillwater') => ({ 'bh.token': 'mock.smoke', 'bh.experience': experience, 'bh.brand': brand });
+// The dashboard and mobile app have no sample-data mode: these pages sign in as seeded demo accounts (pnpm db:seed:demo).
+const app = (industry, as = 'owner') => ({ session: { app: 'app', as, industry } });
+const mobile = (experience, brand = 'stillwater-yoga') =>
+  experience === 'customer' ? { session: { app: 'mobile', as: 'guest', brand } } : { session: { app: 'mobile', as: experience === 'staff' ? 'staff' : 'owner', experience, industry: experience === 'staff' ? 'foods' : 'studios', brand } };
 
-/** [app, path, localStorage seed, text the page must show] */
+/** [app, path, route session or localStorage seed, text the page must show] */
 const PAGES = [
   ['web', '/en', null, /BranchHarbor/i],
   ['web', '/en/pricing', null, /pric/i],
   ['web', '/en/industries/foods', null, /food/i],
   ['web', '/de/demo', null, /demo/i],
   ['app', '/sign-in', {}, /sign in/i],
-  ['app', '/overview', appState('studios'), /overview/i],
-  ['app', '/ops/classes', appState('studios'), /class/i],
-  ['app', '/ops/kitchen', appState('foods'), /kitchen/i],
-  ['app', '/ops/orders', appState('commerce'), /order/i],
-  ['app', '/payments', appState('studios'), /payment/i],
+  ['app', '/overview', app('studios'), /network/i],
+  ['app', '/ops/classes', app('studios'), /class/i],
+  ['app', '/ops/kitchen', app('foods'), /kitchen/i],
+  ['app', '/ops/orders', app('commerce'), /order/i],
+  ['app', '/payments', app('studios'), /payment/i],
+  ['app', '/payments', app('foods', 'staff'), /not available/i],
   ['sites', '/stillwater-yoga', null, /stillwater/i],
   ['sites', '/stillwater-yoga/queen-west', null, /queen west/i],
   ['sites', '/stillwater-yoga/queen-west/classes', null, /class/i],
@@ -25,9 +29,9 @@ const PAGES = [
   ['sites', '/fieldnote-goods/portland/shop', null, /shop|product/i],
   ['sites', '/keystone-realty/properties', null, /propert/i],
   ['mobile', '/', {}, /BranchHarbor/i],
-  ['mobile', '/customer/home', mobileState('customer'), /Stillwater/i],
-  ['mobile', '/staff/today', mobileState('staff'), /today/i],
-  ['mobile', '/owner/pulse', mobileState('owner'), /pulse/i],
+  ['mobile', '/customer/home', mobile('customer'), /Stillwater/i],
+  ['mobile', '/staff/today', mobile('staff'), /today/i],
+  ['mobile', '/owner/pulse', mobile('owner'), /pulse/i],
 ];
 
 const apps = (process.env.SMOKE_APPS ?? 'web,app,sites,mobile').split(',');
@@ -39,10 +43,12 @@ async function overflow(page) {
   });
 }
 
-for (const [app, path, seed, text] of PAGES.filter((p) => apps.includes(p[0]))) {
-  test(`${app} ${path}`, async ({ page, isMobile }, info) => {
+for (const [app, path, route, text] of PAGES.filter((p) => apps.includes(p[0]))) {
+  test(`${app} ${path}${route?.session ? ` (${route.session.as})` : ''}`, async ({ page, context, isMobile }, info) => {
     // External photos/fonts may be unreachable in CI: abort them instead of waiting.
     await page.route(/^https?:\/\/(?!localhost|127\.0\.0\.1)/, (r) => r.abort());
+    const seed = route?.session ? await storageFor(route) : route;
+    for (const c of route?.session ? sessionCookies(route) : []) await context.addCookies([{ ...c, url: BASE[app] }]);
     if (seed) {
       await page.addInitScript((data) => {
         if (sessionStorage.getItem('__seeded')) return;

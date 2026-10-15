@@ -14,6 +14,7 @@ import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
 import { APPS, AXE_TAGS, BASE, TAP_MIN, TAP_MIN_AA, tiers } from './lib/config.mjs';
 import { coverage, routesFor } from './lib/routes.mjs';
+import { sessionCookies, storageFor } from './lib/session.mjs';
 import { INIT_SCRIPT, LARGE_TEXT_CSS, focusCheck, pageChecks } from './lib/checks.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -64,9 +65,11 @@ async function runTask(page, ctx, task, logs) {
   const url = BASE[route.app] + route.path;
   const host = new URL(BASE[route.app]).hostname;
   await ctx.clearCookies();
-  if (route.storage) {
-    await ctx.addCookies([{ name: STORAGE_COOKIE, value: encodeURIComponent(JSON.stringify(route.storage)), domain: host, path: '/' }]);
+  const storage = await storageFor(route);
+  if (storage) {
+    await ctx.addCookies([{ name: STORAGE_COOKIE, value: encodeURIComponent(JSON.stringify(storage)), domain: host, path: '/' }]);
   }
+  for (const c of sessionCookies(route)) await ctx.addCookies([{ ...c, domain: host, path: '/' }]);
   logs.console.length = 0;
   logs.failed.length = 0;
   let status = null;

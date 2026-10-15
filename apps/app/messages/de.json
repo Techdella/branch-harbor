@@ -1652,7 +1652,7 @@
     },
     "footer": "Support-Zugriff ist autorisiert, zeitlich begrenzt und protokolliert.",
     "tab": {
-      "members": "Mitglieder & Rollen"
+      "members": "Personen"
     },
     "schedule": {
       "title": "Dienstplan des Teams",
@@ -1721,7 +1721,7 @@
     "billedNoPrice": "Abgerechnet"
   },
   "auth": {
-    "legal": "Beispielumgebung. Geben Sie keine echten Kundendaten ein.",
+    "legal": "Mit dem Fortfahren stimmen Sie den Nutzungsbedingungen und der Datenschutzerklärung von BranchHarbor zu.",
     "promise": "Ein Zuhause für jeden Standort.",
     "promiseSub": "Gemeinsam die Marke führen. Jeden Standort mit Zuversicht betreiben.",
     "checkFields": "Prüfen Sie die markierten Felder.",

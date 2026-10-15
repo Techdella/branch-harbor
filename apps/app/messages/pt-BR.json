@@ -1652,7 +1652,7 @@
     },
     "footer": "O acesso do suporte é autorizado, temporário e registrado.",
     "tab": {
-      "members": "Membros e funções"
+      "members": "Pessoas"
     },
     "schedule": {
       "title": "Escala da equipe",
@@ -1721,7 +1721,7 @@
     "billedNoPrice": "Cobrada"
   },
   "auth": {
-    "legal": "Ambiente de exemplo. Não informe dados reais de clientes.",
+    "legal": "Ao continuar, você concorda com os Termos de Serviço e a Política de Privacidade da BranchHarbor.",
     "promise": "Um lar para cada unidade.",
     "promiseSub": "Gerenciem a marca juntos. Conduza cada unidade com confiança.",
     "checkFields": "Confira os campos destacados.",
