@@ -3,6 +3,7 @@ export * from './money.ts';
 export * from './time.ts';
 export * from './industries.ts';
 export * from './permissions.ts';
+export * from './access.ts';
 export * from './schemas.ts';
 export * from './api-contracts.ts';
 export * from './business-mode.ts';

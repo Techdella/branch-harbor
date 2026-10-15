@@ -22,14 +22,17 @@ export function asBusinessModel(v: unknown): BusinessModel {
 
 /** Roles an independent business can grant (spec §5, without HQ/regional/franchise roles). */
 export const INDEPENDENT_ROLES = ['org_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance'] as const satisfies readonly Role[];
-/** Roles that only make sense in a network. */
-export const NETWORK_ONLY_ROLES = ['hq_admin', 'regional_manager', 'franchise_owner'] as const satisfies readonly Role[];
+/** Roles that only make sense in a network (franchise development, HQ teams, regions and franchisees). */
+export const NETWORK_ONLY_ROLES = ['hq_admin', 'vp_franchise', 'cmo', 'brand_lead', 'instructor_trainer', 'legal', 'regional_manager', 'franchise_owner'] as const satisfies readonly Role[];
 
 /** Team-member roles offered when inviting, by business model (customers are never invited as team). */
 export function inviteRolesFor(model: BusinessModel): Role[] {
   return model === 'independent'
     ? [...INDEPENDENT_ROLES]
-    : ['org_owner', 'hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance'];
+    : [
+        'org_owner', 'hq_admin', 'vp_franchise', 'cmo', 'brand_lead', 'digital_marketer', 'instructor_trainer', 'operations_manager', 'finance', 'legal',
+        'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor',
+      ];
 }
 
 export function roleAllowedFor(model: BusinessModel, role: Role): boolean {
