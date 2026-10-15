@@ -76,7 +76,8 @@ export interface ModuleDef {
   hqOnly?: boolean;
   /**
    * HQ-private module that a territory (sub-network) also runs for itself: effective on territory assignments too,
-   * filtered to the territory's records (master franchisees, area developers).
+   * filtered to the territory's records (master franchisees, area developers). Franchise agreements and Disclosure are
+   * not in any partner template: HQ grants them to a territory explicitly (its prospects, owner groups and country).
    */
   territoryOk?: boolean;
   /** Franchise / multi-location only: independent businesses never see it. */
@@ -173,8 +174,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'finance.marketing_fund', area: 'finance', name: 'Marketing fund', description: 'Fund contributions, spend on network campaigns with receipts, balance per currency and the transparency report.', actions: VEX, actionNotes: { view: 'See the transparency report and the contributions of the locations in scope.', edit: 'Record fund spend and campaigns (organisation-wide access only).' }, status: 'available', sensitive: 'finance' },
   { key: 'finance.payouts', area: 'finance', name: 'Payouts', description: 'Payouts, fees, refunds and chargebacks per location, reconciliation and accounting exports.', actions: ALL, status: 'available', hqOnly: true, sensitive: 'finance' },
   // Legal & compliance
-  { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'The agreements register, executed agreements, the legal document vault, renewals and expiries.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal' },
-  { key: 'legal.disclosure', area: 'legal', name: 'Disclosure & jurisdiction rules', description: 'Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction.', actions: ALL, actionNotes: { publish: 'Record franchise counsel’s review of a jurisdiction rule.' }, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal' },
+  { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'The agreements register, executed agreements, the legal document vault, renewals and expiries.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, sensitive: 'legal' },
+  { key: 'legal.disclosure', area: 'legal', name: 'Disclosure & jurisdiction rules', description: 'Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction.', actions: ALL, actionNotes: { publish: 'Record franchise counsel’s review of a jurisdiction rule.' }, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, sensitive: 'legal' },
   // Training
   { key: 'training.academy', area: 'training', name: 'Academy', description: 'Courses, lessons, quizzes and certificates for staff and franchisees, and public courses sold on the brand site.', actions: ALL, actionNotes: { view: 'Take courses and earn certificates.', edit: 'Write courses (your own and co-taught).', publish: 'Manage every course, learning path and certificate.', export: 'Training reports.' }, status: 'available' },
   { key: 'training.assignments', area: 'training', name: 'Assignments & progress', description: 'Assign courses to the people in your scope and follow their progress.', actions: VE, status: 'available' },

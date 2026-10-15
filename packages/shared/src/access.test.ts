@@ -80,6 +80,10 @@ test('territories run their own franchise pipeline; other HQ-private modules sta
   assert.ok(mf.has('sales.franchise_pipeline:publish'));
   assert.ok(mf.has('network.onboarding:edit') && mf.has('finance.invoices:view') && mf.has('community.announcements:publish') && mf.has('settings.team:edit'));
   assert.ok(!mf.has('finance.royalties:view') && !mf.has('legal.agreements:view') && !mf.has('settings.billing:view'));
+  // Franchise legal is never in the template, but HQ can grant it on a territory (not on an owner group).
+  const granted = effectiveCapabilities({ role: 'master_franchisee', scopeKind: 'territory', grants: ['legal.disclosure:edit', 'legal.agreements:edit'] }, 'studios');
+  assert.ok(granted.has('legal.disclosure:edit') && granted.has('legal.agreements:view'));
+  assert.ok(!effectiveCapabilities({ role: 'franchise_owner', scopeKind: 'owner_group', grants: ['legal.disclosure:edit'] }, 'studios').has('legal.disclosure:edit'));
   const ad = caps('area_developer', 'territory');
   assert.ok(ad.has('sales.franchise_pipeline:view') && ad.has('operations.classes:edit') && ad.has('finance.payments:view'));
   // The same template at a region does not get the pipeline (it is not a sub-network).
