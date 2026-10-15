@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DEFAULT_PAYMENT_APPLICATION_FEE_BPS } from '@bh/shared';
 
 /**
  * Environment configuration. Every third-party integration is optional: when its key is
@@ -106,7 +107,21 @@ const envSchema = z.object({
   /** Publishable key returned to browsers/apps (only when STRIPE_SECRET_KEY is set; never a secret). */
   STRIPE_PUBLISHABLE_KEY: optional,
   STRIPE_CONNECT_CLIENT_ID: optional,
-  STRIPE_APPLICATION_FEE_BPS: z.coerce.number().int().min(0).max(10000).default(100),
+  /** Application fee on online consumer payments (basis points). Default = DEFAULT_PAYMENT_APPLICATION_FEE_BPS in @bh/shared (shown on the pricing page). */
+  STRIPE_APPLICATION_FEE_BPS: z.coerce.number().int().min(0).max(10000).default(DEFAULT_PAYMENT_APPLICATION_FEE_BPS),
+  /**
+   * BranchHarbor plan billing. STRIPE_TAX_ENABLED=true turns on Stripe Tax (automatic_tax) for the subscription, so
+   * VAT/GST/sales tax is calculated and collected on top of the tax-exclusive list prices (register the tax
+   * registrations in the Stripe Dashboard first).
+   */
+  STRIPE_TAX_ENABLED: bool(false),
+  /**
+   * When true, organisations without a paid trial or plan (subscription status checkout_required / canceled) can read
+   * but not change data, apart from billing, onboarding and data export. Defaults to on in production.
+   */
+  BILLING_ENFORCE: optional,
+  /** How often the billing sweep runs (trial reminders 3 and 1 days before the end, sandbox conversions), in minutes. */
+  BILLING_SWEEP_MINUTES: z.coerce.number().int().min(1).default(60),
   BOOKING_HOLD_MINUTES: z.coerce.number().int().default(10),
 
   // Push notifications (Expo Push API). Without either value pushes are logged (sandbox), not sent.
@@ -196,6 +211,12 @@ export function config(): Config {
   return cached;
 }
 
+/** Whether organisations need a paid trial or plan before changing data (BILLING_ENFORCE, default on in production). */
+export function billingEnforced(cfg: Pick<Config, 'BILLING_ENFORCE' | 'NODE_ENV'>): boolean {
+  const v = cfg.BILLING_ENFORCE?.toLowerCase();
+  return v ? v === 'true' || v === '1' : cfg.NODE_ENV === 'production';
+}
+
 /** Summary of which integrations are live vs disabled/sandbox, logged at boot and exposed at /health. */
 export function integrationStatus(cfg: Config) {
   const mode = (on: boolean, off: 'disabled' | 'sandbox' = 'disabled') => (on ? 'live' : off);
@@ -206,6 +227,8 @@ export function integrationStatus(cfg: Config) {
     stripe: mode(!!cfg.STRIPE_SECRET_KEY, 'sandbox'),
     stripeWebhooks: cfg.STRIPE_WEBHOOK_SECRET ? 'verified' : 'disabled (unsigned events rejected)',
     stripeConnectWebhooks: cfg.STRIPE_CONNECT_WEBHOOK_SECRET ? 'verified' : 'disabled (connected-account events rejected)',
+    stripeTax: cfg.STRIPE_TAX_ENABLED ? 'automatic tax on plan invoices' : 'off (tax-exclusive prices, no tax collected)',
+    billingEnforcement: billingEnforced(cfg) ? 'on' : 'off',
     stripeCardEntry: cfg.STRIPE_SECRET_KEY && cfg.STRIPE_PUBLISHABLE_KEY ? 'live' : 'sandbox (simulated payments)',
     ai: mode(!!cfg.ANTHROPIC_API_KEY),
     push: mode(!!cfg.EXPO_ACCESS_TOKEN || cfg.ENABLE_EXPO_PUSH, 'sandbox'),

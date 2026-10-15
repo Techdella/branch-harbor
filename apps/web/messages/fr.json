@@ -1866,7 +1866,10 @@
     "metaTitle": "Tarifs",
     "kicker": "Tarifs",
     "headline": "Un tarif simple par établissement.",
-    "intro": "Choisissez comment vous gérez votre site, puis payez pour chaque établissement que vous autorisez. Les prix sont affichés dans votre devise locale.",
+    "intro": "Choisissez comment vous gérez votre site et payez par établissement. Les réseaux ajoutent des frais de plateforme pour le siège. Les prix sont affichés dans votre devise locale.",
+    "trialLine": "Essayez pendant {days} jours pour {price}.",
+    "trialLineSub": "Votre offre démarre ensuite automatiquement, sauf si vous résiliez. Pas d’offre gratuite, pas de frais de résiliation.",
+    "trialHow": "Comment fonctionne l’essai",
     "billingLabel": "Facturation",
     "monthly": "Mensuelle",
     "annual": "Annuelle · 2 mois offerts",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / mois pour {count, plural, one {# établissement} other {# établissements}}",
     "totalAnnual": "{amount} / mois pour {count, plural, one {# établissement} other {# établissements}}, facturé annuellement",
     "listPriceNote": "Les prix catalogue sont fixés pour chaque marché et ajustés au pouvoir d’achat local. Ce ne sont pas des conversions au taux de change du jour.",
-    "taxNote": "Des taxes comme la TVA, la GST ou la sales tax peuvent s’appliquer selon votre pays ; elles sont affichées avant le paiement.",
+    "taxNote": "Prix hors taxes. La TVA ou la GST est ajoutée au paiement selon votre pays de facturation.",
+    "taxNoteUs": "Prix hors sales tax, ajoutée au paiement lorsqu’elle s’applique.",
     "proposedNote": "Nous revoyons nos prix régulièrement. Les abonnements existants sont prévenus à l’avance de tout changement.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Réseau",
         "for": "Franchises et groupes",
-        "tag": "Sur devis",
+        "tag": "Utilisateurs illimités",
         "features": [
+          "Développement de franchise, Juridique, Finance, Formation et Communauté",
           "Régions et groupes de franchisés",
           "Modèles verrouillés / modifiables / soumis à approbation",
-          "Publication groupée avec retour arrière",
-          "Accompagnement au déploiement"
+          "Publication groupée avec retour arrière"
         ],
-        "cta": "Demander un devis"
+        "cta": "Commencer mon offre"
       }
     },
-    "ctaNote": "L’inscription est en libre-service pour tous les secteurs. Les offres Réseau commencent par un devis pour planifier la mise en route avec vous.",
+    "platformFee": "/ mois · frais de plateforme du siège",
+    "networkIncludes": "Comprend {count} établissements. Ensuite {price} / établissement / mois.",
+    "quoteLink": "Vous préférez un devis et un accompagnement ? Parlons-en",
+    "ctaNote": "L’inscription est en libre-service pour tous les secteurs et toutes les offres, en commençant par l’essai payant.",
     "faqTitle": "Questions sur les tarifs",
     "faqs": [
+      {
+        "q": "Comment fonctionne l’essai payant ?",
+        "a": "Vous payez de petits frais d’essai (affichés ci-dessus dans votre devise) pour 14 jours de l’offre choisie. Le 15e jour, l’offre démarre automatiquement sauf si vous résiliez avant ; nous vous écrivons 3 jours et 1 jour avant. Il n’y a ni offre gratuite ni essai gratuit ; la démo est libre d’accès. Un essai par entreprise."
+      },
+      {
+        "q": "Puis-je résilier à tout moment ?",
+        "a": "Oui, dans Paramètres → Facturation, sans frais de résiliation. Si vous résiliez pendant l’essai, rien d’autre n’est prélevé. Pour une offre payante, elle court jusqu’à la fin de la période déjà payée."
+      },
       {
         "q": "Pourquoi les prix varient-ils selon les pays ?",
         "a": "Chaque marché a son propre prix catalogue, ajusté au pouvoir d’achat local. Nous ne convertissons pas avec un taux de change du jour. Vous payez le prix de votre pays de facturation, dans sa devise, taxes applicables en sus."
@@ -1941,12 +1956,16 @@
         "a": "Non. TVA, GST, sales tax ou équivalent peuvent s’appliquer selon votre pays et votre entreprise. Les taxes applicables s’affichent avant votre confirmation."
       },
       {
+        "q": "Pourquoi ma carte doit-elle correspondre à mon pays de facturation ?",
+        "a": "Les prix sont fixés par pays. Au paiement, vous indiquez votre pays de facturation ; nous recalculons le prix et le verrouillons. La carte doit être émise dans ce pays, ou vous pouvez ajouter un identifiant fiscal d’entreprise de ce pays, comme un numéro de TVA. Changer de pays de facturation plus tard exige une carte correspondante et s’applique à la période suivante."
+      },
+      {
         "q": "Les établissements peuvent-ils payer dans des devises différentes ?",
-        "a": "Les réseaux peuvent être facturés par établissement ou de façon centralisée. Chaque facture utilise une seule devise ; nous n’additionnons jamais des montants en devises différentes."
+        "a": "Oui, lorsque le siège répercute les frais d’établissement sur les franchisés : chaque franchisé paie dans la devise de son propre pays de facturation. Chaque facture utilise une seule devise ; nous n’additionnons jamais des montants en devises différentes."
       },
       {
         "q": "Les frais de traitement des paiements sont-ils inclus ?",
-        "a": "Non. Les paiements passent par un prestataire connecté comme Stripe, qui facture ses propres frais dans votre pays."
+        "a": "Non. Les paiements clients en ligne comportent nos frais d’application (indiqués ci-dessus) plus les frais de traitement du prestataire de paiement, qui varient selon le pays."
       },
       {
         "q": "Que se passe-t-il si j’ouvre un deuxième établissement ?",
@@ -1955,6 +1974,10 @@
       {
         "q": "Puis-je payer dans une autre devise ?",
         "a": "Non. La devise suit votre pays de facturation, et le paiement la vérifie avec votre adresse de facturation et votre carte. Si votre entreprise est facturée depuis un autre pays, c’est le prix de ce pays qui s’applique."
+      },
+      {
+        "q": "Puis-je récupérer mes données ?",
+        "a": "Oui. Le propriétaire peut exporter gratuitement les données de l’entreprise à tout moment depuis Paramètres → Exporter vos données. Nous envoyons par e-mail un lien vers un ZIP de fichiers CSV : établissements, équipe, clients, réservations, commandes, factures, prospects, etc. Le lien est valable 7 jours."
       }
     ],
     "perMonthOneLocation": "/ mois · un établissement",
@@ -1963,7 +1986,62 @@
     "geoNote": "Prix affichés en {currency} pour votre pays ({country}). Vous êtes facturé dans la devise de votre pays de facturation.",
     "geoNoteUnknown": "Prix affichés en {currency}. Vous êtes facturé dans la devise de votre pays de facturation.",
     "demoTitle": "Pas encore prêt à vous inscrire ?",
-    "demoBody": "Explorez une entreprise d’exemple dans la démo, ou réservez un appel pour passer en revue vos établissements avec nous."
+    "demoBody": "Explorez une entreprise d’exemple dans la démo, ou réservez un appel pour passer en revue vos établissements avec nous.",
+    "trialTitle": "Comment fonctionne l’essai de {days} jours",
+    "trialIntro": "Il n’y a ni offre gratuite ni essai gratuit : la démo est libre d’accès. Quand vous êtes prêt, de petits frais d’essai vous donnent accès au vrai produit avec vos propres données.",
+    "trialSteps": {
+      "pay": {
+        "title": "Payez {price} aujourd’hui",
+        "body": "Choisissez votre offre et ajoutez une carte émise dans votre pays de facturation. Les frais d’essai sont prélevés une seule fois."
+      },
+      "use": {
+        "title": "Utilisez-le pendant {days} jours",
+        "body": "Tout ce que comprend l’offre choisie, avec vos propres données et un nombre illimité d’utilisateurs."
+      },
+      "remind": {
+        "title": "Deux rappels",
+        "body": "Nous vous écrivons 3 jours et 1 jour avant la fin de l’essai, avec le prix de votre offre."
+      },
+      "start": {
+        "title": "Votre offre démarre le jour {day}",
+        "body": "Sauf si vous résiliez avant dans Paramètres → Facturation. La résiliation est gratuite."
+      }
+    },
+    "whoPays": {
+      "title": "Qui paie chaque établissement ?",
+      "intro": "Avec l’offre Réseau, le siège paie des frais de plateforme de {platform} par mois. Ils comprennent {count} établissements et les espaces Développement de franchise, Juridique, Finance, Formation et Communauté. Chaque établissement supplémentaire coûte {price} par mois, et le siège choisit qui le paie, par établissement ou par groupe de franchisés. Modifiable à tout moment dans Paramètres → Facturation.",
+      "hq": {
+        "title": "Le siège",
+        "body": "Le siège paie les frais de l’établissement sur sa propre facture."
+      },
+      "franchisee": {
+        "title": "Le franchisé",
+        "body": "Le franchisé paie depuis son propre compte de facturation, dans la devise de son pays de facturation."
+      },
+      "split": {
+        "title": "Un partage",
+        "body": "Le siège et le franchisé paient chacun la part que vous choisissez, par exemple 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Les autres frais, en toute transparence",
+      "collection": {
+        "title": "Collecte des redevances et du fonds marketing",
+        "body": "{fee} par prélèvement, plafonné à {cap} par établissement et par mois. Un montant fixe, jamais un pourcentage de vos redevances."
+      },
+      "payments": {
+        "title": "Paiements clients en ligne",
+        "body": "Des frais d’application de {percent} sur les paiements en ligne de vos clients, plus les frais de traitement du prestataire de paiement. Les deux figurent sur chaque virement."
+      }
+    },
+    "terms": {
+      "title": "Des conditions équitables",
+      "monthly": "Facturation mensuelle par défaut. Résiliable à tout moment.",
+      "annual": "La facturation annuelle inclut 2 mois offerts.",
+      "noFee": "Aucun frais de résiliation ni engagement long.",
+      "export": "Exportez toutes vos données gratuitement, à tout moment.",
+      "lock": "Votre prix est lié à votre pays de facturation et confirmé par votre carte."
+    }
   },
   "demo": {
     "metaTitle": "Demander une démo",

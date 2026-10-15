@@ -1866,7 +1866,10 @@
     "metaTitle": "Pricing",
     "kicker": "Pricing",
     "headline": "Simple per-location pricing.",
-    "intro": "Choose how you run your website, then pay for each location you authorize. Prices are shown in your local currency.",
+    "intro": "Choose how you run your website and pay per location. Networks add one platform fee for headquarters. Prices are shown in your local currency.",
+    "trialLine": "Try it for {days} days for {price}.",
+    "trialLineSub": "Then your plan starts automatically unless you cancel. No free plan, no cancellation fees.",
+    "trialHow": "How the trial works",
     "billingLabel": "Billing",
     "monthly": "Monthly",
     "annual": "Annual · 2 months included",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / month for {count, plural, one {# location} other {# locations}}",
     "totalAnnual": "{amount} / month for {count, plural, one {# location} other {# locations}}, billed annually",
     "listPriceNote": "List prices are set for each market and adjusted for local purchasing power. They are not live exchange-rate conversions.",
-    "taxNote": "Taxes such as VAT, GST or sales tax may apply depending on your country and are shown before you pay.",
+    "taxNote": "Prices exclude tax. VAT or GST is added at checkout according to your billing country.",
+    "taxNoteUs": "Prices exclude sales tax, which is added at checkout where it applies.",
     "proposedNote": "We review prices periodically. Existing subscriptions are told about any change in advance.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Network",
         "for": "Franchises and groups",
-        "tag": "Quote available",
+        "tag": "Unlimited users",
         "features": [
+          "Franchise development, Legal, Finance, Training and Community",
           "Regions and owner groups",
           "Locked / editable / approval templates",
-          "Group publishing with rollback",
-          "Guided onboarding"
+          "Group publishing with rollback"
         ],
-        "cta": "Request a quote"
+        "cta": "Start your plan"
       }
     },
-    "ctaNote": "Sign-up is self-service for every industry. Network plans start with a quote so we can plan onboarding with you.",
+    "platformFee": "/ month · HQ platform fee",
+    "networkIncludes": "Includes {count} locations. Then {price} / location / month.",
+    "quoteLink": "Prefer a quote and guided onboarding? Talk to us",
+    "ctaNote": "Sign-up is self-service for every industry and every plan, starting with the paid trial.",
     "faqTitle": "Pricing questions",
     "faqs": [
+      {
+        "q": "How does the paid trial work?",
+        "a": "You pay a small trial fee (shown above in your currency) for 14 days of the plan you chose. On day 15 the plan starts automatically unless you cancel before then, and we email you 3 days and 1 day before. There is no free plan or free trial; the demo is free to explore. One trial per business."
+      },
+      {
+        "q": "Can I cancel at any time?",
+        "a": "Yes, in Settings → Billing, with no cancellation fee. Cancel during the trial and nothing more is charged. On a paid plan, it runs to the end of the period you've paid for."
+      },
       {
         "q": "Why do prices differ between countries?",
         "a": "Each market has its own list price, adjusted for local purchasing power. We don’t convert with a live exchange rate. You pay the price for your billing country, in its currency, plus any applicable tax."
@@ -1941,12 +1956,16 @@
         "a": "No. VAT, GST, sales tax or similar may apply depending on your country and business details. Applicable tax is shown before you confirm."
       },
       {
+        "q": "Why must my card match my billing country?",
+        "a": "Prices are set per country. At checkout you enter your billing country; we recompute the price for it and lock it. The card must be issued in that country, or you can add a business tax ID from it, such as a VAT number. Changing your billing country later needs a matching card and applies from the next billing period."
+      },
+      {
         "q": "Can different locations pay in different currencies?",
-        "a": "Networks can be billed per location or centrally. Each invoice uses one currency; we never add amounts in different currencies together."
+        "a": "Yes, when headquarters passes location fees to franchisees: each franchisee pays in the currency of their own billing country. Each invoice uses one currency; we never add amounts in different currencies together."
       },
       {
         "q": "Are payment-processing fees included?",
-        "a": "No. Payments go through a connected provider such as Stripe, which charges its own fees in your country."
+        "a": "No. Online customer payments carry our application fee (shown above) plus the payment provider's own processing fee, which varies by country."
       },
       {
         "q": "What happens if I open a second location?",
@@ -1955,6 +1974,10 @@
       {
         "q": "Can I pay in a different currency?",
         "a": "No. The currency follows your billing country, and checkout confirms it against your billing address and card. If your business is billed from another country, that country’s price applies."
+      },
+      {
+        "q": "Can I take my data with me?",
+        "a": "Yes. The owner can export the business's data for free at any time from Settings → Export your data. We email a link to a ZIP of CSV files: locations, people, customers, bookings, orders, invoices, leads and more. The link works for 7 days."
       }
     ],
     "perMonthOneLocation": "/ month · one location",
@@ -1963,7 +1986,62 @@
     "geoNote": "Prices shown in {currency} for {country}. You’re billed in the currency of your billing country.",
     "geoNoteUnknown": "Prices shown in {currency}. You’re billed in the currency of your billing country.",
     "demoTitle": "Not ready to sign up?",
-    "demoBody": "Explore a sample business in the demo, or book a call and we’ll walk through your locations with you."
+    "demoBody": "Explore a sample business in the demo, or book a call and we’ll walk through your locations with you.",
+    "trialTitle": "How the {days}-day trial works",
+    "trialIntro": "There is no free plan or free trial: the demo is free to explore. When you're ready, a small trial fee gets you the real product with your own data.",
+    "trialSteps": {
+      "pay": {
+        "title": "Pay {price} today",
+        "body": "Choose your plan and add a card issued in your billing country. The trial fee is charged once."
+      },
+      "use": {
+        "title": "Use it for {days} days",
+        "body": "Everything in the plan you chose, with your own data and unlimited users."
+      },
+      "remind": {
+        "title": "Two reminders",
+        "body": "We email you 3 days and 1 day before the trial ends, with the price of your plan."
+      },
+      "start": {
+        "title": "Your plan starts on day {day}",
+        "body": "Unless you cancel before then in Settings → Billing. Cancelling is free."
+      }
+    },
+    "whoPays": {
+      "title": "Who pays for each location?",
+      "intro": "On Network, headquarters pays the platform fee of {platform} a month. It includes {count} locations and the Franchise development, Legal, Finance, Training and Community workspaces. Each further location costs {price} a month, and HQ chooses who pays it, per location or per owner group. Change it any time in Settings → Billing.",
+      "hq": {
+        "title": "Headquarters",
+        "body": "HQ pays the location fee on its own invoice."
+      },
+      "franchisee": {
+        "title": "The franchisee",
+        "body": "The franchisee pays from their own billing account, in the currency of their billing country."
+      },
+      "split": {
+        "title": "A split",
+        "body": "HQ and the franchisee each pay a share you choose, for example 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Other fees, in full",
+      "collection": {
+        "title": "Royalty and marketing-fund collection",
+        "body": "{fee} per collection, capped at {cap} per location per month. A flat fee, never a percentage of your royalties."
+      },
+      "payments": {
+        "title": "Online customer payments",
+        "body": "A {percent} application fee on payments your customers make online, plus the payment provider's own processing fee. Both are shown on every payout."
+      }
+    },
+    "terms": {
+      "title": "Fair terms",
+      "monthly": "Monthly billing by default. Cancel any time.",
+      "annual": "Annual billing includes 2 months free.",
+      "noFee": "No cancellation fees and no long contracts.",
+      "export": "Export all your data for free, at any time.",
+      "lock": "Your price is locked to your billing country and confirmed by your card."
+    }
   },
   "demo": {
     "metaTitle": "Request a demo",

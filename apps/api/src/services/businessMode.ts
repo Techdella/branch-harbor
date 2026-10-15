@@ -1,6 +1,7 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import {
-  asBusinessModel, inviteRolesFor, soloPrice, LIST_PRICES_MINOR, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES,
+  asBusinessModel, inviteRolesFor, isPriceListKey, listPriceMinor, priceListCurrency, priceListForCountry, soloPrice, NETWORK_INCLUDED_LOCATIONS, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES,
+  type PriceListKey,
   type BusinessModel, type Role, type WebsiteApprovalMode,
 } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
@@ -87,22 +88,37 @@ export function assertRoleForModel(o: Pick<Org, 'model'>, role: Role, scopeKind:
   }
 }
 
+/** Price list of a subscription (set at checkout from the billing country; older rows fall back to their currency). */
+function listOf(sub: Pick<typeof subscriptions.$inferSelect, 'priceList' | 'currency' | 'billingCountry'>): PriceListKey {
+  if (isPriceListKey(sub.priceList)) return sub.priceList;
+  if (sub.billingCountry) return priceListForCountry(sub.billingCountry).key;
+  return isPriceListKey(sub.currency) ? sub.currency : 'USD';
+}
+
+const PLAN_NAMES: Record<string, string> = { solo: 'Solo', connector: 'Connector', hosted: 'Hosted', network: 'Network', trial: 'Network' };
+
 /** Plan summary for the subscription endpoint and the upgrade preview. */
 export function planView(sub: typeof subscriptions.$inferSelect, model: BusinessModel) {
+  const list = listOf(sub);
+  const currency = priceListCurrency(list);
   if (model === 'independent' || sub.plan === 'solo') {
-    const price = soloPrice(sub.currency);
-    return { key: 'solo' as const, name: 'Solo', pricing: 'flat' as const, maxLocations: 1, price: price ? { amount: price.amount, currency: price.currency, interval: price.interval } : null };
+    const price = soloPrice(list);
+    return { key: 'solo' as const, name: 'Solo', pricing: 'flat' as const, maxLocations: 1, price: price ? { amount: price.amount, currency: price.currency, interval: price.interval } : null, platformFee: null };
   }
+  const key = sub.plan === 'trial' ? 'network' : sub.plan;
+  const months = sub.billingInterval === 'year' ? 10 : 1;
+  // The price stored at checkout (kept until customers are told about a change), else today's list price.
+  const per = sub.pricePerLocationMinor ?? (['connector', 'hosted', 'network'].includes(key) ? listPriceMinor(list, key as 'connector') * months : null);
   return {
-    key: sub.plan, name: sub.plan === 'network' ? 'Network' : sub.plan === 'trial' ? 'Trial' : sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1),
-    pricing: 'per_location' as const, maxLocations: null,
-    price: sub.pricePerLocationMinor != null ? { amount: sub.pricePerLocationMinor, currency: sub.currency, interval: sub.billingInterval } : null,
+    key, name: PLAN_NAMES[key] ?? key, pricing: 'per_location' as const, maxLocations: null,
+    price: per != null ? { amount: per, currency, interval: sub.billingInterval } : null,
+    platformFee: key === 'network' ? { amount: listPriceMinor(list, 'platform') * months, currency, interval: sub.billingInterval, includedLocations: NETWORK_INCLUDED_LOCATIONS } : null,
   };
 }
 
-/** Network per-location list price for the org currency (null = quote). */
-export function networkPrice(currency: string): number | null {
-  return (LIST_PRICES_MINOR as Record<string, { network: number }>)[currency]?.network ?? null;
+/** Network per-location list price for a price list or currency (null = quote). */
+export function networkPrice(list: string): number | null {
+  return isPriceListKey(list) ? listPriceMinor(list, 'network') : null;
 }
 
 /**
@@ -117,8 +133,10 @@ export async function upgradeToNetwork(tx: Exec, org: Org, opts: { actorUserId: 
   const [updated] = await tx.update(organizations).set({ model: 'network', settings, updatedAt: new Date() }).where(eq(organizations.id, org.id)).returning();
   if (sub && (sub.plan === 'solo' || sub.plan === 'trial')) {
     await tx.update(subscriptions).set({
-      plan: sub.plan === 'trial' ? 'trial' : 'network',
-      pricePerLocationMinor: networkPrice(sub.currency),
+      plan: 'network',
+      pricePerLocationMinor: networkPrice(listOf(sub)),
+      platformFeeMinor: networkPrice(listOf(sub)) != null ? listPriceMinor(listOf(sub), 'platform') : null,
+      includedLocations: NETWORK_INCLUDED_LOCATIONS,
       updatedAt: new Date(),
     }).where(eq(subscriptions.id, sub.id));
   }

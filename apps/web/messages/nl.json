@@ -1866,7 +1866,10 @@
     "metaTitle": "Prijzen",
     "kicker": "Prijzen",
     "headline": "Eenvoudige prijzen per vestiging.",
-    "intro": "Kies hoe je je website beheert en betaal per vestiging die je autoriseert. Prijzen worden getoond in je lokale valuta.",
+    "intro": "Kies hoe je je website beheert en betaal per vestiging. Netwerken betalen daarnaast één platformvergoeding voor het hoofdkantoor. Prijzen worden in je lokale valuta getoond.",
+    "trialLine": "Probeer het {days} dagen voor {price}.",
+    "trialLineSub": "Daarna start je abonnement automatisch, tenzij je opzegt. Geen gratis abonnement, geen opzegkosten.",
+    "trialHow": "Zo werkt de proefperiode",
     "billingLabel": "Facturering",
     "monthly": "Maandelijks",
     "annual": "Jaarlijks · 2 maanden inbegrepen",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / maand voor {count, plural, one {# vestiging} other {# vestigingen}}",
     "totalAnnual": "{amount} / maand voor {count, plural, one {# vestiging} other {# vestigingen}}, jaarlijks gefactureerd",
     "listPriceNote": "Lijstprijzen worden per markt vastgesteld en aangepast aan de lokale koopkracht. Het zijn geen omrekeningen tegen de dagkoers.",
-    "taxNote": "Afhankelijk van je land kunnen belastingen zoals btw, GST of sales tax van toepassing zijn; die zie je vóór het betalen.",
+    "taxNote": "Prijzen exclusief belasting. Btw of GST wordt bij het afrekenen toegevoegd op basis van je factuurland.",
+    "taxNoteUs": "Prijzen exclusief sales tax, die bij het afrekenen wordt toegevoegd waar die geldt.",
     "proposedNote": "We herzien onze prijzen regelmatig. Bestaande abonnementen horen vooraf over elke wijziging.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Network",
         "for": "Franchiseketens en groepen",
-        "tag": "Offerte mogelijk",
+        "tag": "Onbeperkt gebruikers",
         "features": [
-          "Regio’s en eigenaarsgroepen",
-          "Sjablonen: vergrendeld / aanpasbaar / goedkeuring",
-          "Groepspublicatie met terugdraaien",
-          "Begeleide onboarding"
+          "Franchiseontwikkeling, Juridisch, Financiën, Training en Community",
+          "Regio's en eigenaarsgroepen",
+          "Sjablonen: vergrendeld / bewerkbaar / met goedkeuring",
+          "Groepspublicatie met terugdraaien"
         ],
-        "cta": "Offerte aanvragen"
+        "cta": "Start je abonnement"
       }
     },
-    "ctaNote": "Aanmelden kan voor elke branche zelf. Netwerkabonnementen beginnen met een offerte zodat we de onboarding samen kunnen plannen.",
+    "platformFee": "/ maand · platformvergoeding hoofdkantoor",
+    "networkIncludes": "Inclusief {count} vestigingen. Daarna {price} / vestiging / maand.",
+    "quoteLink": "Liever een offerte en begeleide onboarding? Neem contact op",
+    "ctaNote": "Aanmelden gaat zelfstandig voor elke branche en elk abonnement, te beginnen met de betaalde proefperiode.",
     "faqTitle": "Vragen over prijzen",
     "faqs": [
+      {
+        "q": "Hoe werkt de betaalde proefperiode?",
+        "a": "Je betaalt een kleine proefvergoeding (hierboven in jouw valuta) voor 14 dagen van het gekozen abonnement. Op dag 15 start het abonnement automatisch, tenzij je eerder opzegt; we mailen je 3 dagen en 1 dag van tevoren. Er is geen gratis abonnement en geen gratis proefperiode; de demo kun je vrij verkennen. Eén proefperiode per bedrijf."
+      },
+      {
+        "q": "Kan ik op elk moment opzeggen?",
+        "a": "Ja, via Instellingen → Facturering, zonder opzegkosten. Zeg je op tijdens de proefperiode, dan wordt er niets meer afgeschreven. Een betaald abonnement loopt door tot het einde van de betaalde periode."
+      },
       {
         "q": "Waarom verschillen de prijzen per land?",
         "a": "Elke markt heeft een eigen lijstprijs, aangepast aan de lokale koopkracht. We rekenen niet om tegen een dagkoers. Je betaalt de prijs van je factuurland, in de valuta van dat land, plus eventuele belastingen."
@@ -1941,12 +1956,16 @@
         "a": "Nee. Afhankelijk van je land en bedrijfsgegevens kunnen btw, GST, sales tax of vergelijkbare belastingen gelden. De toepasselijke belasting zie je voordat je bevestigt."
       },
       {
+        "q": "Waarom moet mijn kaart bij mijn factuurland passen?",
+        "a": "Prijzen worden per land vastgesteld. Bij het afrekenen geef je je factuurland op; we berekenen de prijs daarvoor opnieuw en leggen die vast. De kaart moet in dat land zijn uitgegeven, of je voegt een fiscaal nummer van je bedrijf uit dat land toe, zoals een btw-nummer. Later van factuurland wisselen vraagt om een passende kaart en geldt vanaf de volgende factuurperiode."
+      },
+      {
         "q": "Kunnen vestigingen in verschillende valuta betalen?",
-        "a": "Netwerken kunnen per vestiging of centraal gefactureerd worden. Elke factuur gebruikt één valuta; we tellen nooit bedragen in verschillende valuta bij elkaar op."
+        "a": "Ja, wanneer het hoofdkantoor vestigingsvergoedingen doorbelast aan franchisenemers: elke franchisenemer betaalt in de valuta van het eigen factuurland. Elke factuur gebruikt één valuta; we tellen nooit bedragen in verschillende valuta bij elkaar op."
       },
       {
         "q": "Zijn transactiekosten voor betalingen inbegrepen?",
-        "a": "Nee. Betalingen lopen via een gekoppelde provider zoals Stripe, die in jouw land eigen kosten rekent."
+        "a": "Nee. Online betalingen van klanten dragen onze applicatievergoeding (hierboven vermeld) plus de verwerkingskosten van de betaalprovider, die per land verschillen."
       },
       {
         "q": "Wat gebeurt er als ik een tweede vestiging open?",
@@ -1955,6 +1974,10 @@
       {
         "q": "Kan ik in een andere valuta betalen?",
         "a": "Nee. De valuta volgt je factuurland, en bij het afrekenen wordt die gecontroleerd aan de hand van je factuuradres en kaart. Wordt je bedrijf vanuit een ander land gefactureerd, dan geldt de prijs van dat land."
+      },
+      {
+        "q": "Kan ik mijn gegevens meenemen?",
+        "a": "Ja. De eigenaar kan de gegevens van het bedrijf op elk moment gratis exporteren via Instellingen → Je gegevens exporteren. We mailen een link naar een ZIP met CSV-bestanden: vestigingen, mensen, klanten, boekingen, bestellingen, facturen, leads en meer. De link werkt 7 dagen."
       }
     ],
     "perMonthOneLocation": "/ maand · één vestiging",
@@ -1963,7 +1986,62 @@
     "geoNote": "Prijzen in {currency} voor {country}. Je wordt gefactureerd in de valuta van je factuurland.",
     "geoNoteUnknown": "Prijzen in {currency}. Je wordt gefactureerd in de valuta van je factuurland.",
     "demoTitle": "Nog niet klaar om je aan te melden?",
-    "demoBody": "Verken een voorbeeldbedrijf in de demo, of plan een gesprek waarin we je vestigingen samen doorlopen."
+    "demoBody": "Verken een voorbeeldbedrijf in de demo, of plan een gesprek waarin we je vestigingen samen doorlopen.",
+    "trialTitle": "Zo werkt de proefperiode van {days} dagen",
+    "trialIntro": "Er is geen gratis abonnement en geen gratis proefperiode: de demo kun je vrij verkennen. Ben je er klaar voor, dan krijg je voor een kleine proefvergoeding het echte product met je eigen gegevens.",
+    "trialSteps": {
+      "pay": {
+        "title": "Betaal vandaag {price}",
+        "body": "Kies je abonnement en voeg een kaart toe die is uitgegeven in je factuurland. De proefvergoeding wordt één keer afgeschreven."
+      },
+      "use": {
+        "title": "Gebruik het {days} dagen",
+        "body": "Alles uit het gekozen abonnement, met je eigen gegevens en onbeperkt gebruikers."
+      },
+      "remind": {
+        "title": "Twee herinneringen",
+        "body": "We mailen je 3 dagen en 1 dag voor het einde van de proefperiode, met de prijs van je abonnement."
+      },
+      "start": {
+        "title": "Je abonnement start op dag {day}",
+        "body": "Tenzij je eerder opzegt via Instellingen → Facturering. Opzeggen is gratis."
+      }
+    },
+    "whoPays": {
+      "title": "Wie betaalt welke vestiging?",
+      "intro": "Bij Network betaalt het hoofdkantoor een platformvergoeding van {platform} per maand. Die omvat {count} vestigingen en de werkruimtes Franchiseontwikkeling, Juridisch, Financiën, Training en Community. Elke extra vestiging kost {price} per maand, en het hoofdkantoor kiest wie die betaalt, per vestiging of per eigenaarsgroep. Altijd aan te passen via Instellingen → Facturering.",
+      "hq": {
+        "title": "Het hoofdkantoor",
+        "body": "Het hoofdkantoor betaalt de vestigingsvergoeding op de eigen factuur."
+      },
+      "franchisee": {
+        "title": "De franchisenemer",
+        "body": "De franchisenemer betaalt via een eigen factuuraccount, in de valuta van het eigen factuurland."
+      },
+      "split": {
+        "title": "Een verdeling",
+        "body": "Hoofdkantoor en franchisenemer betalen elk een deel dat jij kiest, bijvoorbeeld 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Overige kosten, volledig transparant",
+      "collection": {
+        "title": "Inning van royalty's en marketingfonds",
+        "body": "{fee} per inning, met een maximum van {cap} per vestiging per maand. Een vast bedrag, nooit een percentage van je royalty's."
+      },
+      "payments": {
+        "title": "Online betalingen van klanten",
+        "body": "Een applicatievergoeding van {percent} op online betalingen van je klanten, plus de verwerkingskosten van de betaalprovider. Beide staan op elke uitbetaling."
+      }
+    },
+    "terms": {
+      "title": "Eerlijke voorwaarden",
+      "monthly": "Standaard maandelijkse facturering. Altijd opzegbaar.",
+      "annual": "Jaarlijkse facturering bevat 2 maanden gratis.",
+      "noFee": "Geen opzegkosten en geen lange contracten.",
+      "export": "Exporteer al je gegevens gratis, op elk moment.",
+      "lock": "Je prijs is gekoppeld aan je factuurland en wordt bevestigd door je kaart."
+    }
   },
   "demo": {
     "metaTitle": "Demo aanvragen",

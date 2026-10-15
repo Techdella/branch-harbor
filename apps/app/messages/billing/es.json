@@ -1,0 +1,209 @@
+{
+  "billing": {
+    "title": "Plan y facturación",
+    "description": "Tu plan de BranchHarbor, la prueba, las facturas y quién paga cada local. Independiente de los pagos de clientes.",
+    "separate": "Independiente de los pagos de clientes",
+    "status": {
+      "checkout_required": "Sin empezar",
+      "trialing": "Prueba",
+      "active": "Activo",
+      "past_due": "Pago pendiente",
+      "canceled": "Finalizado"
+    },
+    "plans": {
+      "solo": "Solo",
+      "connector": "Conector",
+      "hosted": "Alojado",
+      "network": "Red"
+    },
+    "planFor": {
+      "solo": "Un local, precio mensual fijo",
+      "connector": "Mantén tu web WordPress · por local",
+      "hosted": "Web alojada por BranchHarbor · por local",
+      "network": "Cuota de plataforma de la central + por local · usuarios ilimitados"
+    },
+    "interval": {
+      "month": "Mensual",
+      "year": "Anual · 2 meses incluidos"
+    },
+    "per": {
+      "month": "/ mes",
+      "year": "/ año"
+    },
+    "common": {
+      "cancel": "Cancelar"
+    },
+    "link": {
+      "trial": "Prueba hasta el {date}. Gestiona tu plan, tus facturas y quién paga cada local.",
+      "start": "Empieza tu prueba de {days} días por {fee}.",
+      "manage": "Gestiona tu plan, tus facturas y quién paga cada local."
+    },
+    "checkout": {
+      "title": "Empieza tu prueba de {days} días",
+      "restartTitle": "Reactiva tu plan",
+      "intro": "No hay plan gratuito ni prueba gratuita. Paga {fee} hoy, úsalo todo durante {days} días y después tu plan empieza automáticamente salvo que canceles.",
+      "plan": "Plan",
+      "interval": "Facturación",
+      "country": "País de facturación",
+      "countryHint": "Tu precio, moneda e impuestos siguen tu país de facturación. La tarjeta debe estar emitida allí, o añade un identificador fiscal de empresa de ese país.",
+      "locations": "Locales",
+      "today": "A pagar hoy",
+      "todayTrial": "Pago único por la prueba de {days} días.",
+      "noTrial": "Ya se usó una prueba para este negocio, tarjeta o dominio de correo, así que tu plan empieza hoy.",
+      "from": "Desde el {date}",
+      "then": "Después",
+      "taxExclusive": "Precios sin impuestos. El IVA o GST se añade según tu país de facturación.",
+      "taxUs": "Precios sin sales tax, que se añade cuando corresponde.",
+      "terms": {
+        "autoStart": "Tu plan {plan} empieza automáticamente el {date} salvo que canceles antes.",
+        "reminders": "Te escribimos 3 días y 1 día antes de que termine la prueba.",
+        "cancel": "Cancela cuando quieras en Ajustes → Facturación. Sin penalización.",
+        "export": "Exporta todos tus datos gratis, en cualquier momento.",
+        "lock": "Tu precio queda fijado a tu país de facturación y confirmado por tu tarjeta."
+      },
+      "taxId": "Identificador fiscal de la empresa",
+      "taxIdHint": "Solo si tu tarjeta está emitida en otro país, por ejemplo un número de IVA.",
+      "agree": "Acepto pagar {fee} hoy por una prueba de {days} días. El {date} mi plan {plan} empieza a {amount} más impuestos, salvo que cancele antes.",
+      "agreeNoTrial": "Acepto pagar {amount} más impuestos desde hoy, hasta que cancele.",
+      "agreeRequired": "Marca la casilla para aceptar las condiciones de la prueba.",
+      "continue": "Continuar a la tarjeta",
+      "payTrial": "Pagar {fee} y empezar la prueba",
+      "payPlan": "Pagar {amount} y empezar el plan",
+      "linePlatform": "Cuota de plataforma (incluye {count} locales)",
+      "linePlan": "Solo, un local",
+      "lineLocations": "{count, plural, one {# local} other {# locales}} × {price}"
+    },
+    "card": {
+      "title": "Tarjeta",
+      "sandbox": "Modo de prueba",
+      "sandboxNote": "Sin cargo real: la API funciona sin claves de Stripe. Elige el país de emisión de la tarjeta simulada.",
+      "issuedIn": "Tarjeta emitida en",
+      "unavailable": "No se pueden introducir tarjetas ahora mismo. Inténtalo más tarde.",
+      "failed": "No se pudo confirmar la tarjeta. Prueba con otra."
+    },
+    "current": {
+      "title": "Tu plan",
+      "canceling": "Cancelado",
+      "platformFee": "Cuota de plataforma {amount}, incluye {count} locales",
+      "taxNote": "Sin impuestos",
+      "daysLeft": "{count, plural, one {Queda # día} other {Quedan # días}}",
+      "trialCanceled": "Tu prueba termina el {date}. No se cobrará nada más.",
+      "startsOn": "Tu plan {plan} empieza el {date} a {amount}.",
+      "endsOn": "Tu plan termina el {date}. No se cobrará nada más.",
+      "nextCharge": "Próximo cobro el {date}: {amount}.",
+      "pastDue": "No pudimos cobrar el último pago. Actualiza tu tarjeta para mantener tu plan.",
+      "country": "País de facturación",
+      "evidence": {
+        "card": "confirmado por la tarjeta",
+        "tax_id": "confirmado por el identificador fiscal"
+      },
+      "card": "Tarjeta",
+      "cardValue": "{brand} •••• {last4}, emitida en {country}",
+      "resume": "No cancelar",
+      "cancelTitle": "¿Cancelar tu plan?",
+      "cancelTrialBody": "Tu prueba termina el {date} y no se cobra nada más. Sin penalización.",
+      "cancelPlanBody": "Tu plan sigue activo hasta el {date}. Sin penalización.",
+      "confirmCancel": "Sí, cancelar",
+      "keep": "Mantener mi plan",
+      "cancelTrial": "Cancelar la prueba",
+      "cancelPlan": "Cancelar el plan"
+    },
+    "country": {
+      "title": "País de facturación",
+      "body": "¿Tu negocio cambia de país? El nuevo país de facturación requiere una tarjeta emitida allí (o un identificador fiscal de empresa de ese país) y se aplica desde el siguiente periodo de facturación.",
+      "pending": "Cambio a {country} ({currency}) el {date}.",
+      "keepCurrent": "Mantener el país actual",
+      "change": "Cambiar el país de facturación",
+      "newCountry": "Nuevo país de facturación",
+      "continue": "Continuar",
+      "newPrice": "Nuevo precio: {amount}",
+      "confirm": "Confirmar el cambio"
+    },
+    "payers": {
+      "title": "Quién paga cada local",
+      "intro": "Tu cuota de plataforma cubre tus primeros {count} locales. Para cada local adicional, elige quién paga su cuota mensual de {price}: la central, el franquiciado o un reparto.",
+      "included": "Incluido en la cuota de plataforma",
+      "hqPays": "La central paga {amount}",
+      "franchiseePays": "El franquiciado paga {amount} ({pct} %)",
+      "fromGroup": "según el grupo de propietarios",
+      "payerFor": "Quién paga {name}",
+      "ownerGroups": "Grupos de propietarios",
+      "ownerGroupHint": "Se aplica a los locales del grupo salvo que un local tenga su propio ajuste.",
+      "totals": "La central paga {hq} · los franquiciados pagan {franchisee} al mes en total",
+      "inherit": "Por defecto",
+      "hq": "Central",
+      "franchisee": "Franquiciado",
+      "split": "Reparto",
+      "share": "Parte del franquiciado (%)",
+      "save": "Guardar"
+    },
+    "invoices": {
+      "title": "Facturas",
+      "empty": "Aún no hay facturas.",
+      "kinds": {
+        "trial_fee": "Prueba de 14 días",
+        "subscription": "Plan",
+        "franchisee_fee": "Cuotas de locales"
+      },
+      "statuses": {
+        "paid": "Pagada",
+        "open": "Abierta",
+        "void": "Anulada",
+        "uncollectible": "Impagada"
+      },
+      "view": "Ver"
+    },
+    "fees": {
+      "title": "Otras comisiones",
+      "collection": "Cobro de royalties y fondo de marketing: {fee} por cobro, con un máximo de {cap} por local y mes. Nunca un porcentaje de los royalties.",
+      "payments": "Pagos online de clientes: comisión de aplicación del {percent} más la comisión del proveedor de pagos.",
+      "terms": "Condiciones mensuales, facturación anual con 2 meses incluidos, sin penalizaciones por cancelar, exportación de datos gratuita."
+    },
+    "banner": {
+      "trial": "Prueba: {count, plural, one {queda # día} other {quedan # días}}. Tu plan {plan} empieza el {date}.",
+      "trialCanceled": "Tu prueba termina el {date}. No se cobrará nada más.",
+      "required": "Empieza tu prueba de {days} días por {fee} para hacer cambios y publicar.",
+      "canceled": "Tu plan ha terminado. Reactívalo para hacer cambios; puedes seguir exportando tus datos.",
+      "pastDue": "No pudimos cobrar el último pago de tu plan.",
+      "start": "Empezar la prueba",
+      "manage": "Gestionar la facturación"
+    },
+    "export": {
+      "title": "Exportar tus datos",
+      "body": "Descarga un ZIP con archivos CSV de los datos principales de tu negocio: locales, personas, clientes, reservas, pedidos, facturas, leads y más. Gratis, en cualquier momento. También te enviamos el enlace por correo; funciona 7 días.",
+      "requested": "Estamos preparando tu exportación. Te escribiremos cuando esté lista.",
+      "request": "Exportar tus datos",
+      "files": "{count, plural, one {# archivo} other {# archivos}}",
+      "expires": "disponible hasta el {date}",
+      "status": {
+        "queued": "Preparando",
+        "running": "Preparando",
+        "ready": "Lista",
+        "failed": "Error",
+        "expired": "Caducada"
+      },
+      "download": "Descargar"
+    },
+    "franchisee": {
+      "title": "Cuotas de locales",
+      "description": "Las cuotas de BranchHarbor que la central te traslada por tus locales.",
+      "locations": "Tus locales",
+      "intro": "La central te traslada toda o parte de la cuota de estos locales. Pagas desde tu propia cuenta de facturación, en la moneda de tu país de facturación.",
+      "none": "La central paga las cuotas de tus locales. No tienes nada que pagar.",
+      "included": "Incluido en la cuota de plataforma de la central",
+      "hqPays": "Lo paga la central",
+      "share": "tu parte {pct} %",
+      "perMonth": "/ mes",
+      "ownerGroupAccount": "Cuenta de facturación",
+      "locationAccount": "Cuenta de facturación de este local",
+      "active": "Activa",
+      "needsCard": "Falta la tarjeta",
+      "cardOnFile": "{brand} •••• {last4} · facturado en {currency}",
+      "setup": "Configurar la facturación",
+      "saveCard": "Guardar tarjeta"
+    }
+  },
+  "shell": {
+    "locationFees": "Cuotas de locales"
+  }
+}

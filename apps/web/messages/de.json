@@ -1866,7 +1866,10 @@
     "metaTitle": "Preise",
     "kicker": "Preise",
     "headline": "Einfache Preise pro Standort.",
-    "intro": "Wählen Sie, wie Sie Ihre Website betreiben, und zahlen Sie dann für jeden Standort, den Sie freigeben. Preise werden in Ihrer Landeswährung angezeigt.",
+    "intro": "Wählen Sie, wie Sie Ihre Website betreiben, und zahlen Sie pro Standort. Netzwerke zahlen zusätzlich eine Plattformgebühr für die Zentrale. Preise werden in Ihrer Landeswährung angezeigt.",
+    "trialLine": "{days} Tage testen für {price}.",
+    "trialLineSub": "Danach startet Ihr Tarif automatisch, wenn Sie nicht kündigen. Kein Gratis-Tarif, keine Kündigungsgebühren.",
+    "trialHow": "So funktioniert der Test",
     "billingLabel": "Abrechnung",
     "monthly": "Monatlich",
     "annual": "Jährlich · 2 Monate inklusive",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / Monat für {count, plural, one {# Standort} other {# Standorte}}",
     "totalAnnual": "{amount} / Monat für {count, plural, one {# Standort} other {# Standorte}}, jährliche Abrechnung",
     "listPriceNote": "Listenpreise werden für jeden Markt festgelegt und an die lokale Kaufkraft angepasst. Es sind keine Umrechnungen zum Tageskurs.",
-    "taxNote": "Je nach Land können Steuern wie Umsatzsteuer, GST oder Sales Tax anfallen; sie werden vor der Zahlung angezeigt.",
+    "taxNote": "Preise zzgl. Steuern. Umsatzsteuer bzw. GST wird beim Bezahlen je nach Rechnungsland hinzugefügt.",
+    "taxNoteUs": "Preise zzgl. Sales Tax, die beim Bezahlen hinzugefügt wird, wo sie anfällt.",
     "proposedNote": "Wir überprüfen unsere Preise regelmäßig. Bestehende Abonnements werden über Änderungen vorab informiert.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Network",
         "for": "Franchise-Systeme und Gruppen",
-        "tag": "Angebot möglich",
+        "tag": "Unbegrenzte Nutzer",
         "features": [
+          "Franchise-Entwicklung, Recht, Finanzen, Schulung und Community",
           "Regionen und Inhabergruppen",
           "Vorlagen: gesperrt / bearbeitbar / freigabepflichtig",
-          "Gruppenveröffentlichung mit Rücksetzung",
-          "Begleitetes Onboarding"
+          "Gruppenveröffentlichung mit Rücksetzung"
         ],
-        "cta": "Angebot anfordern"
+        "cta": "Tarif starten"
       }
     },
-    "ctaNote": "Die Registrierung per Selbstbedienung steht allen Branchen offen. Network-Tarife beginnen mit einem Angebot, damit wir das Onboarding gemeinsam planen können.",
+    "platformFee": "/ Monat · Plattformgebühr der Zentrale",
+    "networkIncludes": "Enthält {count} Standorte. Danach {price} / Standort / Monat.",
+    "quoteLink": "Lieber ein Angebot und begleitetes Onboarding? Sprechen Sie mit uns",
+    "ctaNote": "Die Registrierung per Selbstbedienung steht allen Branchen und Tarifen offen und beginnt mit dem kostenpflichtigen Test.",
     "faqTitle": "Fragen zu den Preisen",
     "faqs": [
+      {
+        "q": "Wie funktioniert der kostenpflichtige Test?",
+        "a": "Sie zahlen eine kleine Testgebühr (oben in Ihrer Währung angezeigt) für 14 Tage des gewählten Tarifs. An Tag 15 startet der Tarif automatisch, wenn Sie nicht vorher kündigen; wir erinnern Sie 3 Tage und 1 Tag vorher per E-Mail. Es gibt keinen Gratis-Tarif und keinen kostenlosen Test; die Demo können Sie frei erkunden. Ein Test pro Unternehmen."
+      },
+      {
+        "q": "Kann ich jederzeit kündigen?",
+        "a": "Ja, unter Einstellungen → Abrechnung, ohne Kündigungsgebühr. Kündigen Sie während des Tests, wird nichts weiter belastet. Ein bezahlter Tarif läuft bis zum Ende des bezahlten Zeitraums."
+      },
       {
         "q": "Warum unterscheiden sich die Preise je nach Land?",
         "a": "Jeder Markt hat einen eigenen Listenpreis, angepasst an die lokale Kaufkraft. Wir rechnen nicht mit einem Tageskurs um. Sie zahlen den Preis Ihres Rechnungslandes in dessen Währung, zuzüglich anfallender Steuern."
@@ -1941,12 +1956,16 @@
         "a": "Nein. Je nach Land und Unternehmensangaben können Umsatzsteuer, GST, Sales Tax oder Ähnliches anfallen. Die anfallende Steuer wird vor Ihrer Bestätigung angezeigt."
       },
       {
+        "q": "Warum muss meine Karte zu meinem Rechnungsland passen?",
+        "a": "Die Preise werden pro Land festgelegt. Beim Bezahlen geben Sie Ihr Rechnungsland an; wir berechnen den Preis dafür neu und legen ihn fest. Die Karte muss in diesem Land ausgestellt sein, oder Sie geben eine Steuernummer Ihres Unternehmens aus diesem Land an, etwa eine USt-IdNr. Ein späterer Wechsel des Rechnungslandes braucht eine passende Karte und gilt ab dem nächsten Abrechnungszeitraum."
+      },
+      {
         "q": "Können Standorte in unterschiedlichen Währungen zahlen?",
-        "a": "Netzwerke können pro Standort oder zentral abgerechnet werden. Jede Rechnung nutzt eine Währung; Beträge in verschiedenen Währungen addieren wir nie."
+        "a": "Ja, wenn die Zentrale Standortgebühren an Franchisenehmer weitergibt: Jeder Franchisenehmer zahlt in der Währung seines eigenen Rechnungslandes. Jede Rechnung verwendet eine Währung; Beträge in verschiedenen Währungen addieren wir nie."
       },
       {
         "q": "Sind Gebühren für die Zahlungsabwicklung enthalten?",
-        "a": "Nein. Zahlungen laufen über einen verbundenen Anbieter wie Stripe, der in Ihrem Land eigene Gebühren berechnet."
+        "a": "Nein. Online-Zahlungen Ihrer Kunden tragen unsere Anwendungsgebühr (oben angegeben) plus die Bearbeitungsgebühr des Zahlungsanbieters, die je nach Land variiert."
       },
       {
         "q": "Was passiert, wenn ich einen zweiten Standort eröffne?",
@@ -1955,6 +1974,10 @@
       {
         "q": "Kann ich in einer anderen Währung zahlen?",
         "a": "Nein. Die Währung richtet sich nach Ihrem Rechnungsland, und der Bezahlvorgang prüft sie anhand Ihrer Rechnungsadresse und Karte. Wird Ihr Unternehmen aus einem anderen Land abgerechnet, gilt der Preis dieses Landes."
+      },
+      {
+        "q": "Kann ich meine Daten mitnehmen?",
+        "a": "Ja. Der Inhaber kann die Daten des Unternehmens jederzeit kostenlos unter Einstellungen → Daten exportieren exportieren. Wir senden per E-Mail einen Link zu einer ZIP-Datei mit CSV-Dateien: Standorte, Personen, Kunden, Buchungen, Bestellungen, Rechnungen, Leads und mehr. Der Link ist 7 Tage gültig."
       }
     ],
     "perMonthOneLocation": "/ Monat · ein Standort",
@@ -1963,7 +1986,62 @@
     "geoNote": "Preise in {currency} für {country}. Abgerechnet wird in der Währung Ihres Rechnungslandes.",
     "geoNoteUnknown": "Preise in {currency}. Abgerechnet wird in der Währung Ihres Rechnungslandes.",
     "demoTitle": "Noch nicht bereit für die Registrierung?",
-    "demoBody": "Entdecken Sie in der Demo ein Beispielunternehmen oder buchen Sie ein Gespräch, in dem wir Ihre Standorte gemeinsam durchgehen."
+    "demoBody": "Entdecken Sie in der Demo ein Beispielunternehmen oder buchen Sie ein Gespräch, in dem wir Ihre Standorte gemeinsam durchgehen.",
+    "trialTitle": "So funktioniert der {days}-Tage-Test",
+    "trialIntro": "Es gibt keinen Gratis-Tarif und keinen kostenlosen Test: Die Demo können Sie frei erkunden. Wenn Sie so weit sind, erhalten Sie gegen eine kleine Testgebühr das echte Produkt mit Ihren eigenen Daten.",
+    "trialSteps": {
+      "pay": {
+        "title": "Heute {price} zahlen",
+        "body": "Wählen Sie Ihren Tarif und hinterlegen Sie eine Karte aus Ihrem Rechnungsland. Die Testgebühr wird einmal belastet."
+      },
+      "use": {
+        "title": "{days} Tage nutzen",
+        "body": "Alles aus dem gewählten Tarif, mit Ihren eigenen Daten und unbegrenzt vielen Nutzern."
+      },
+      "remind": {
+        "title": "Zwei Erinnerungen",
+        "body": "Wir schreiben Ihnen 3 Tage und 1 Tag vor Testende, mit dem Preis Ihres Tarifs."
+      },
+      "start": {
+        "title": "Ihr Tarif startet an Tag {day}",
+        "body": "Außer Sie kündigen vorher unter Einstellungen → Abrechnung. Die Kündigung ist kostenlos."
+      }
+    },
+    "whoPays": {
+      "title": "Wer zahlt für welchen Standort?",
+      "intro": "Im Network-Tarif zahlt die Zentrale eine Plattformgebühr von {platform} pro Monat. Sie enthält {count} Standorte sowie die Bereiche Franchise-Entwicklung, Recht, Finanzen, Schulung und Community. Jeder weitere Standort kostet {price} pro Monat, und die Zentrale legt fest, wer ihn bezahlt – pro Standort oder pro Inhabergruppe. Jederzeit änderbar unter Einstellungen → Abrechnung.",
+      "hq": {
+        "title": "Die Zentrale",
+        "body": "Die Zentrale zahlt die Standortgebühr über ihre eigene Rechnung."
+      },
+      "franchisee": {
+        "title": "Der Franchisenehmer",
+        "body": "Der Franchisenehmer zahlt über sein eigenes Abrechnungskonto, in der Währung seines Rechnungslandes."
+      },
+      "split": {
+        "title": "Eine Aufteilung",
+        "body": "Zentrale und Franchisenehmer zahlen jeweils einen von Ihnen gewählten Anteil, zum Beispiel 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Weitere Gebühren, vollständig offengelegt",
+      "collection": {
+        "title": "Einzug von Lizenzgebühren und Marketingfonds",
+        "body": "{fee} pro Einzug, höchstens {cap} pro Standort und Monat. Ein fester Betrag, nie ein Prozentsatz Ihrer Lizenzgebühren."
+      },
+      "payments": {
+        "title": "Online-Zahlungen Ihrer Kunden",
+        "body": "Eine Anwendungsgebühr von {percent} auf Online-Zahlungen Ihrer Kunden, plus die Bearbeitungsgebühr des Zahlungsanbieters. Beides steht auf jeder Auszahlung."
+      }
+    },
+    "terms": {
+      "title": "Faire Bedingungen",
+      "monthly": "Standardmäßig monatliche Abrechnung. Jederzeit kündbar.",
+      "annual": "Bei jährlicher Abrechnung sind 2 Monate gratis.",
+      "noFee": "Keine Kündigungsgebühren und keine langen Verträge.",
+      "export": "Exportieren Sie alle Ihre Daten jederzeit kostenlos.",
+      "lock": "Ihr Preis ist an Ihr Rechnungsland gebunden und wird durch Ihre Karte bestätigt."
+    }
   },
   "demo": {
     "metaTitle": "Demo anfragen",
