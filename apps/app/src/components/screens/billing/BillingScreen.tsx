@@ -404,14 +404,18 @@ function PayerControl({ value, pct, onSave, label }: { value: Payer | 'inherit';
   const dirty = payer !== value || (payer === 'split' && share !== pct);
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Select aria-label={label} value={payer} onChange={(e) => setPayer(e.target.value as Payer | 'inherit')} className="h-9 w-auto min-w-36">
+      <div className="w-40">
+      <Select aria-label={label} value={payer} onChange={(e) => setPayer(e.target.value as Payer | 'inherit')} className="h-9">
         <option value="inherit">{t('inherit')}</option>
         <option value="hq">{t('hq')}</option>
         <option value="franchisee">{t('franchisee')}</option>
         <option value="split">{t('split')}</option>
       </Select>
+      </div>
       {payer === 'split' && (
-        <Input aria-label={t('share')} type="number" min={1} max={99} value={share} onChange={(e) => setShare(Math.max(1, Math.min(99, Number(e.target.value) || 1)))} className="h-9 w-20" />
+        <div className="w-20">
+          <Input aria-label={t('share')} type="number" min={1} max={99} value={share} onChange={(e) => setShare(Math.max(1, Math.min(99, Number(e.target.value) || 1)))} className="h-9" />
+        </div>
       )}
       {dirty && (
         <Button size="sm" loading={busy} onClick={async () => { setBusy(true); try { await onSave(payer, share); } finally { setBusy(false); } }}>

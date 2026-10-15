@@ -40,8 +40,8 @@ const ltrIsolate = (s: string) => `⁦${s}⁩`;
  * left-to-right isolate so symbols that mix letters and punctuation (US$, A$, CA$) keep their shape inside
  * right-to-left text instead of rendering as "$US".
  */
-export function formatPrice(amount: number, currency: PriceCurrency, locale: string): string {
-  const digits = Number.isInteger(amount) || currency === 'JPY' ? 0 : 2;
+export function formatPrice(amount: number, currency: PriceCurrency, locale: string, opts: { cents?: boolean } = {}): string {
+  const digits = currency === 'JPY' ? 0 : !Number.isInteger(amount) || (opts.cents && amount < 10) ? 2 : 0;
   return new Intl.NumberFormat(numberLocale(locale), { style: 'currency', currency, maximumFractionDigits: digits, minimumFractionDigits: digits })
     .formatToParts(amount)
     .map((p) => (p.type === 'currency' ? ltrIsolate(p.value) : p.value))

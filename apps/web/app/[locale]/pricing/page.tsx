@@ -38,6 +38,7 @@ export default async function PricingPage({ params }: Props) {
   const tc = await getTranslations('common');
   const { currency, country, priceList } = await visitorPricing();
   const fmt = (n: number) => formatPrice(n, currency, locale);
+  const fmtFee = (n: number) => formatPrice(n, currency, locale, { cents: true });
   const trial = fmt(listPrice(priceList, 'trial'));
   const percent = new Intl.NumberFormat(numberLocale(locale), { style: 'percent', maximumFractionDigits: 2 }).format(DEFAULT_PAYMENT_APPLICATION_FEE_BPS / 10_000);
   const notes = ['listPriceNote', country === 'US' ? 'taxNoteUs' : 'taxNote', 'proposedNote', 'ctaNote'] as const;
@@ -121,7 +122,7 @@ export default async function PricingPage({ params }: Props) {
           <H2 id="fees-title">{t('fees.title')}</H2>
           <div className="flex flex-col gap-1.5 rounded-[24px] bg-butter p-5" data-testid="collection-fee">
             <h3 className="text-base font-extrabold">{t('fees.collection.title')}</h3>
-            <p className="text-sm leading-relaxed">{t('fees.collection.body', { fee: fmt(listPrice(priceList, 'collection')), cap: fmt(listPrice(priceList, 'collectionCap')) })}</p>
+            <p className="text-sm leading-relaxed">{t('fees.collection.body', { fee: fmtFee(listPrice(priceList, 'collection')), cap: fmtFee(listPrice(priceList, 'collectionCap')) })}</p>
           </div>
           <div className="flex flex-col gap-1.5 rounded-[24px] bg-canvas p-5" data-testid="payment-fee">
             <h3 className="text-base font-extrabold">{t('fees.payments.title')}</h3>
