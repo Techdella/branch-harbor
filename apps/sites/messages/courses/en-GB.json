@@ -1,0 +1,38 @@
+{
+  "courses": {
+    "title": "Courses & trainings",
+    "intro": "Trainings and courses from {brand}, open to everyone.",
+    "none": "No courses are open for booking right now.",
+    "starts": "Starts {date}",
+    "seatsLeft": "{count, plural, one {# place left} other {# places left}}",
+    "full": "Fully booked",
+    "all": "All courses",
+    "startsLabel": "Starts",
+    "schedule": "Schedule",
+    "trainers": "Trainers",
+    "certificateLabel": "Certificate",
+    "certificate": "Certificate on completion",
+    "curriculum": "What you'll learn",
+    "enrolled": "You're enrolled on {course}. We've emailed you the details.",
+    "enquired": "Thanks! A trainer will be in touch soon.",
+    "payFor": "Pay to confirm your place on {course}.",
+    "payCta": "Pay {amount}",
+    "paymentFailed": "The payment didn't go through. Please try again.",
+    "required": "Required",
+    "invalidEmail": "Enter a valid email address",
+    "acceptRequired": "Please accept the terms to enrol",
+    "fixFields": "Please check the highlighted fields.",
+    "mode": {
+      "enrol": "Enrol now",
+      "enquire": "Ask a question"
+    },
+    "name": "Your name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Your question",
+    "terms": "I agree to the course terms and cancellation policy.",
+    "consent": "Keep me updated about future courses.",
+    "enrolCta": "Enrol · {amount}",
+    "enquireCta": "Send enquiry"
+  }
+}

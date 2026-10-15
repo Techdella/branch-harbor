@@ -1,0 +1,38 @@
+{
+  "courses": {
+    "title": "Cursussen & opleidingen",
+    "intro": "Opleidingen en cursussen van {brand}, voor iedereen.",
+    "none": "Er zijn nu geen cursussen open voor inschrijving.",
+    "starts": "Start {date}",
+    "seatsLeft": "{count, plural, one {Nog # plek} other {Nog # plekken}}",
+    "full": "Volgeboekt",
+    "all": "Alle cursussen",
+    "startsLabel": "Start",
+    "schedule": "Rooster",
+    "trainers": "Trainers",
+    "certificateLabel": "Certificaat",
+    "certificate": "Certificaat na afronding",
+    "curriculum": "Wat je leert",
+    "enrolled": "Je bent ingeschreven voor {course}. We hebben je de details gemaild.",
+    "enquired": "Bedankt! Een trainer neemt snel contact op.",
+    "payFor": "Betaal om je plek bij {course} te bevestigen.",
+    "payCta": "{amount} betalen",
+    "paymentFailed": "De betaling is niet gelukt. Probeer het opnieuw.",
+    "required": "Verplicht",
+    "invalidEmail": "Vul een geldig e-mailadres in",
+    "acceptRequired": "Accepteer de voorwaarden om je in te schrijven",
+    "fixFields": "Controleer de gemarkeerde velden.",
+    "mode": {
+      "enrol": "Nu inschrijven",
+      "enquire": "Stel een vraag"
+    },
+    "name": "Je naam",
+    "email": "E-mail",
+    "phone": "Telefoon",
+    "message": "Je vraag",
+    "terms": "Ik ga akkoord met de cursusvoorwaarden en het annuleringsbeleid.",
+    "consent": "Houd me op de hoogte van toekomstige cursussen.",
+    "enrolCta": "Inschrijven · {amount}",
+    "enquireCta": "Vraag versturen"
+  }
+}

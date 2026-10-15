@@ -233,6 +233,10 @@
         "franchise_pipeline": {
           "name": "Funil de franquias",
           "description": "Interessados em franquias, qualificação, etapas de divulgação e contrato, territórios e negócios de novas unidades."
+        },
+        "course_leads": {
+          "name": "Interessados em cursos",
+          "description": "Pessoas interessadas na formação de professores e em cursos abertos. Instrutores veem os interessados atribuídos a eles; publicar na Academia em toda a empresa vê e atribui todos."
         }
       },
       "marketing": {
@@ -285,6 +289,34 @@
         "disclosure": {
           "name": "Divulgação e regras por jurisdição",
           "description": "Documentos de divulgação (COF), registros e regras por jurisdição (prazos de espera e de arrependimento). Aprovar = registrar a revisão de uma regra pelo advogado."
+        }
+      },
+      "training": {
+        "academy": {
+          "name": "Academia",
+          "description": "Cursos, aulas, quizzes e certificados para equipe e franqueados, e cursos abertos vendidos no site da marca. Editar = escrever cursos; publicar = gerenciar todos os cursos, trilhas e certificados."
+        },
+        "assignments": {
+          "name": "Atribuições e progresso",
+          "description": "Atribua cursos às pessoas do seu escopo e acompanhe o progresso."
+        }
+      },
+      "community": {
+        "announcements": {
+          "name": "Comunicados",
+          "description": "Notícias e leituras obrigatórias da franqueadora para a rede, com confirmação de leitura. Publicar = enviar comunicados."
+        },
+        "discussions": {
+          "name": "Discussões e eventos",
+          "description": "Espaços de discussão, eventos e conversas privadas de mentoria entre a franqueadora e os franqueados. Editar = publicar e responder; publicar = moderar."
+        },
+        "library": {
+          "name": "Biblioteca de recursos",
+          "description": "Manuais, arquivos da marca e guias compartilhados com a rede. Editar = gerenciar pastas e arquivos."
+        },
+        "help_desk": {
+          "name": "Central de ajuda",
+          "description": "Dúvidas e chamados das unidades para a franqueadora. Ver = abrir e acompanhar seus chamados; editar = responder como agente da franqueadora."
         }
       }
     },

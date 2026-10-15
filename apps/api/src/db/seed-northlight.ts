@@ -176,6 +176,11 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     onboarding: { ownerGroupId: thames!.id, locationId: L['DUB-PB']!.id, prospect: { name: team.foThames.name, email: team.foThames.email, country: 'IE', city: 'Dublin', currency: 'EUR' } },
   });
 
+  // ── Community, Training academy, course leads and help desk ──
+  const network = await (await import('./seed-northlight-network.ts')).seedNorthlightNetwork({
+    db, orgId, team, regions: { na: na!.id, eu: eu!.id }, groups: { pacific: pacific!.id, thames: thames!.id }, L,
+  });
+
   const logins = Object.values(team).map((x) => x.email);
-  return { orgId, logins, franchise };
+  return { orgId, logins, franchise, network };
 }

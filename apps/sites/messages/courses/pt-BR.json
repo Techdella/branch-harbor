@@ -1,0 +1,38 @@
+{
+  "courses": {
+    "title": "Cursos e formações",
+    "intro": "Formações e cursos de {brand}, abertos a todos.",
+    "none": "Nenhum curso com inscrições abertas no momento.",
+    "starts": "Começa em {date}",
+    "seatsLeft": "{count, plural, one {Resta # vaga} other {Restam # vagas}}",
+    "full": "Esgotado",
+    "all": "Todos os cursos",
+    "startsLabel": "Início",
+    "schedule": "Agenda",
+    "trainers": "Instrutores",
+    "certificateLabel": "Certificado",
+    "certificate": "Certificado ao concluir",
+    "curriculum": "O que você vai aprender",
+    "enrolled": "Você está matriculado em {course}. Enviamos os detalhes por e-mail.",
+    "enquired": "Obrigado! Um instrutor entrará em contato em breve.",
+    "payFor": "Pague para confirmar sua vaga em {course}.",
+    "payCta": "Pagar {amount}",
+    "paymentFailed": "O pagamento não foi concluído. Tente novamente.",
+    "required": "Obrigatório",
+    "invalidEmail": "Informe um e-mail válido",
+    "acceptRequired": "Aceite os termos para se matricular",
+    "fixFields": "Confira os campos destacados.",
+    "mode": {
+      "enrol": "Matricular-me",
+      "enquire": "Fazer uma pergunta"
+    },
+    "name": "Seu nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "message": "Sua pergunta",
+    "terms": "Aceito os termos do curso e a política de cancelamento.",
+    "consent": "Quero receber novidades sobre próximos cursos.",
+    "enrolCta": "Matricular-me · {amount}",
+    "enquireCta": "Enviar pergunta"
+  }
+}

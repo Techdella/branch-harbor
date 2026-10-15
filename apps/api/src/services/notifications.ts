@@ -6,7 +6,7 @@ import { consentRecords, customers, locations, pushNotifications, pushTokens, ro
 import { hasPermissionInScope, type ScopeChain } from '../domain/scope.ts';
 import { loadOrgAssignments } from './authz.ts';
 
-export type PushCategory = 'order_status' | 'approval_request' | 'cover_request' | 'waitlist_promotion' | 'class_update';
+export type PushCategory = 'order_status' | 'approval_request' | 'cover_request' | 'waitlist_promotion' | 'class_update' | 'network_update';
 
 /**
  * Preference purposes (append-only consent records, `POST /v1/me/consents`). Push is transactional,
@@ -18,6 +18,7 @@ export const PUSH_PURPOSE: Record<PushCategory, 'push_updates' | 'push_work'> = 
   approval_request: 'push_work',
   cover_request: 'push_work',
   class_update: 'push_updates',
+  network_update: 'push_work',
 };
 
 export interface NotifyInput {

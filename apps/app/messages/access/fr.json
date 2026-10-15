@@ -233,6 +233,10 @@
         "franchise_pipeline": {
           "name": "Pipeline de franchise",
           "description": "Demandes de franchise, qualification, étapes de divulgation et de contrat, territoires et projets de nouveaux établissements."
+        },
+        "course_leads": {
+          "name": "Prospects formations",
+          "description": "Personnes intéressées par la formation de professeurs et les cours publics. Les formateurs voient les prospects qui leur sont attribués ; la publication Académie sur toute l’entreprise les voit et les attribue tous."
         }
       },
       "marketing": {
@@ -285,6 +289,34 @@
         "disclosure": {
           "name": "Divulgation et règles par juridiction",
           "description": "Documents de divulgation, enregistrements et règles par juridiction (délais d’attente et de rétractation). Approuver = consigner la revue d’une règle par l’avocat."
+        }
+      },
+      "training": {
+        "academy": {
+          "name": "Académie",
+          "description": "Cours, leçons, quiz et certificats pour le personnel et les franchisés, et cours publics vendus sur le site de la marque. Modifier = rédiger des cours ; publier = gérer tous les cours, parcours et certificats."
+        },
+        "assignments": {
+          "name": "Attributions et progression",
+          "description": "Attribuer des cours aux personnes de votre périmètre et suivre leur progression."
+        }
+      },
+      "community": {
+        "announcements": {
+          "name": "Annonces",
+          "description": "Actualités et lectures obligatoires du siège pour le réseau, avec accusés de lecture. Publier = envoyer des annonces."
+        },
+        "discussions": {
+          "name": "Discussions et événements",
+          "description": "Espaces de discussion, événements et fils de coaching privés entre le siège et les franchisés. Modifier = publier et répondre ; publier = modérer."
+        },
+        "library": {
+          "name": "Bibliothèque de ressources",
+          "description": "Manuels, fichiers de marque et guides partagés avec le réseau. Modifier = gérer dossiers et fichiers."
+        },
+        "help_desk": {
+          "name": "Assistance",
+          "description": "Questions et demandes d’assistance des établissements au siège. Voir = créer et suivre ses demandes ; modifier = répondre en tant qu’agent du siège."
         }
       }
     },

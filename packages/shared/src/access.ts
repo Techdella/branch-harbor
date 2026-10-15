@@ -103,7 +103,7 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'sales.customers', area: 'sales', name: 'Customers', description: 'Customer records with contact details and history (personal data).', actions: VEX, status: 'available', sensitive: 'personal_data' },
   { key: 'sales.customer_pipeline', area: 'sales', name: 'Leads & enquiries', description: 'New enquiries and trial customers to follow up.', actions: ALL, status: 'planned', sensitive: 'personal_data' },
   { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'personal_data' },
-  { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and courses.', actions: VEX, status: 'planned', sensitive: 'personal_data' },
+  { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and public courses. Trainers see the leads assigned to them; Academy publish organisation-wide sees and assigns all.', actions: VEX, status: 'available', sensitive: 'personal_data' },
   // Marketing
   { key: 'marketing.website_builder', area: 'marketing', name: 'Websites', description: 'Location websites: pages, approvals, publishing and domains.', actions: VEP, status: 'available' },
   { key: 'marketing.campaigns', area: 'marketing', name: 'Campaigns', description: 'Marketing campaigns and offers for the locations in scope.', actions: VEP, status: 'available' },
@@ -121,10 +121,13 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'The agreements register, executed agreements, the legal document vault, renewals and expiries.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal' },
   { key: 'legal.disclosure', area: 'legal', name: 'Disclosure & jurisdiction rules', description: 'Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction.', actions: ALL, actionNotes: { publish: 'Record franchise counsel’s review of a jurisdiction rule.' }, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal' },
   // Training
-  { key: 'training.academy', area: 'training', name: 'Academy', description: 'Courses, lessons and certifications for staff and franchisees.', actions: ALL, status: 'planned' },
+  { key: 'training.academy', area: 'training', name: 'Academy', description: 'Courses, lessons, quizzes and certificates for staff and franchisees, and public courses sold on the brand site.', actions: ALL, actionNotes: { view: 'Take courses and earn certificates.', edit: 'Write courses (your own and co-taught).', publish: 'Manage every course, learning path and certificate.', export: 'Training reports.' }, status: 'available' },
+  { key: 'training.assignments', area: 'training', name: 'Assignments & progress', description: 'Assign courses to the people in your scope and follow their progress.', actions: VE, status: 'available' },
   // Community
-  { key: 'community.announcements', area: 'community', name: 'Announcements', description: 'News and updates from HQ to the network.', actions: VEP, status: 'planned' },
-  { key: 'community.help_desk', area: 'community', name: 'Help desk', description: 'Questions and support requests from locations.', actions: VE, status: 'planned' },
+  { key: 'community.announcements', area: 'community', name: 'Announcements', description: 'News and required reads from HQ to the network, with read receipts.', actions: VEP, actionNotes: { publish: 'Send announcements (within your own scope unless organisation-wide).' }, status: 'available' },
+  { key: 'community.discussions', area: 'community', name: 'Discussions & events', description: 'Discussion spaces, events and private coaching threads between HQ and franchisees.', actions: VEP, actionNotes: { edit: 'Post and reply.', publish: 'Moderate; organisation-wide also manages spaces, events and account managers.' }, status: 'available' },
+  { key: 'community.library', area: 'community', name: 'Resource library', description: 'Manuals, brand files and how-tos shared with the network.', actions: VE, actionNotes: { edit: 'Manage folders and files.' }, status: 'available' },
+  { key: 'community.help_desk', area: 'community', name: 'Help desk', description: 'Questions and support requests from locations to HQ.', actions: VE, actionNotes: { view: 'Raise and follow your own requests.', edit: 'Answer requests as an HQ agent.' }, status: 'available' },
   // Settings (under every workspace)
   { key: 'settings.business', area: 'settings', name: 'Business settings', description: 'Business details, defaults, data sharing and AI preferences.', actions: VE, status: 'available' },
   { key: 'settings.team', area: 'settings', name: 'Team & access', description: 'Invite people and decide what each person can see.', actions: VE, status: 'available' },
@@ -291,6 +294,20 @@ export const PERMISSION_CAPABILITIES: Record<Permission, readonly string[]> = {
   'disclosure.view': ['legal.disclosure:view'],
   'disclosure.edit': ['legal.disclosure:edit'],
   'disclosure.approve': ['legal.disclosure:publish'],
+  'community.read': ['community.announcements:view', 'community.discussions:view', 'community.library:view'],
+  'community.post': ['community.discussions:edit'],
+  'community.announce': ['community.announcements:publish'],
+  'community.moderate': ['community.discussions:publish'],
+  'community.manage': ['community.discussions:publish'],
+  'library.manage': ['community.library:edit'],
+  'training.learn': ['training.academy:view'],
+  'training.author': ['training.academy:edit'],
+  'training.manage': ['training.academy:publish'],
+  'training.assign': ['training.assignments:edit'],
+  'courseleads.read': ['sales.course_leads:view'],
+  'courseleads.edit': ['sales.course_leads:edit'],
+  'helpdesk.raise': ['community.help_desk:view'],
+  'helpdesk.agent': ['community.help_desk:edit'],
 };
 
 function holds(caps: ReadonlySet<string>, pattern: string): boolean {
@@ -327,7 +344,8 @@ export interface RoleTemplate {
   grants: GrantSpec;
 }
 
-const everyone: GrantSpec = { 'training.academy': V, 'community.*': V };
+/** Everyone in a business (docs/PRODUCT_PLAN.md): read the community and take part, learn, ask HQ for help. */
+const everyone: GrantSpec = { 'training.academy': V, 'community.*': V, 'community.discussions': VE };
 
 export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   org_owner: {
@@ -347,7 +365,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'sales', defaultScope: 'organization', networkOnly: true,
     grants: {
       'sales.franchise_pipeline': ALL, 'legal.disclosure': VE, 'legal.agreements': VE, 'training.*': ALL, 'network.locations': VE, 'network.franchisees': VE,
-      'network.onboarding': VE, 'network.reports': V, 'sales.course_leads': V, 'community.*': V, 'settings.ai': V,
+      'network.onboarding': VE, 'network.reports': V, 'sales.course_leads': V, ...everyone, 'settings.ai': V,
     },
   },
   cmo: {
@@ -377,7 +395,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   instructor_trainer: {
     key: 'instructor_trainer', name: 'Instructor-trainer', description: 'Teacher training courses and course leads, plus read-only operations to see classes.',
     primaryWorkspace: 'training', defaultScope: 'organization', networkOnly: true,
-    grants: { 'training.*': ALL, 'sales.course_leads': VE, 'operations.*': V, 'community.*': V, 'settings.ai': V },
+    // Trainers write courses and work their own course leads; managing every course (and all leads) is Academy publish.
+    grants: { ...everyone, 'training.academy': ['view', 'edit', 'export'], 'training.assignments': VE, 'sales.course_leads': VE, 'operations.*': V, 'settings.ai': V },
   },
   operations_manager: {
     key: 'operations_manager', name: 'Operations manager', description: 'Payments and finance, websites, connections, customers and day-to-day operations.',
@@ -390,19 +409,19 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   finance: {
     key: 'finance', name: 'Finance', description: 'Payments, refunds, reconciliation and financial reports. Royalties and payouts at HQ level.',
     primaryWorkspace: 'finance', defaultScope: 'organization',
-    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': V },
+    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': V, ...everyone },
   },
   legal: {
     key: 'legal', name: 'Legal', description: 'Franchise agreements, disclosure and compliance across the network.',
     primaryWorkspace: 'legal', defaultScope: 'organization', networkOnly: true,
-    grants: { 'legal.*': ALL, 'sales.franchise_pipeline': V, 'network.franchisees': V, 'network.locations': V, 'settings.ai': V },
+    grants: { 'legal.*': ALL, 'sales.franchise_pipeline': V, 'network.franchisees': V, 'network.locations': V, ...everyone, 'settings.ai': V },
   },
   regional_manager: {
     key: 'regional_manager', name: 'Regional manager', description: 'Oversight of the locations in a region: operations, reports, website approvals and campaign drafts.',
     primaryWorkspace: 'network', defaultScope: 'region', networkOnly: true,
     grants: {
       'network.locations': V, 'network.onboarding': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V,
-      'operations.*': V, ...everyone, 'settings.ai': V,
+      'operations.*': V, ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'training.assignments': VE, 'settings.ai': V,
     },
   },
   franchise_owner: {
@@ -412,7 +431,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
       'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': V,
       'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX,
-      'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone,
+      'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
     },
   },
   location_manager: {
@@ -420,7 +439,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'location',
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE,
-      'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone,
+      'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
     },
   },
   staff: {
@@ -431,7 +450,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   marketing_contributor: {
     key: 'marketing_contributor', name: 'Marketing contributor', description: 'Drafts website and campaign changes; publishing needs someone with publish rights.',
     primaryWorkspace: 'marketing', defaultScope: 'location',
-    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'settings.ai': V },
+    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, ...everyone, 'settings.ai': V },
   },
   customer: {
     key: 'customer', name: 'Customer', description: 'Their own bookings, orders and preferences in the customer app.', primaryWorkspace: 'operations', defaultScope: 'location', hidden: true,

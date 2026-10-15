@@ -38,12 +38,19 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   ],
   'marketing.website_builder': [{ key: 'websites', href: '/websites', icon: 'globe' }],
   'marketing.campaigns': [{ key: 'marketing', href: '/marketing', icon: 'megaphone' }],
+  'sales.course_leads': [{ key: 'courseLeads', href: '/course-leads', icon: 'users', msg: 'training.leads.title' }],
   'finance.payments': [{ key: 'payments', href: '/payments', icon: 'card' }],
   'legal.agreements': [{ key: 'agreements', href: '/franchise/agreements', icon: 'scale', msg: 'franchise.nav.agreements' }],
   'legal.disclosure': [
     { key: 'agreements', href: '/franchise/agreements', icon: 'scale', msg: 'franchise.nav.agreements' },
     { key: 'rules', href: '/franchise/rules', icon: 'shield', msg: 'franchise.nav.rules' },
   ],
+  'training.academy': [{ key: 'training', href: '/training', icon: 'book' }],
+  'training.assignments': [{ key: 'training', href: '/training', icon: 'book' }],
+  'community.announcements': [{ key: 'community', href: '/community', icon: 'message' }],
+  'community.discussions': [{ key: 'community', href: '/community', icon: 'message' }],
+  'community.library': [{ key: 'community', href: '/community', icon: 'message' }],
+  'community.help_desk': [{ key: 'help', href: '/help', icon: 'help' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],
@@ -114,7 +121,6 @@ export function routeModules(pathname: string, industry: IndustryKey): string[] 
     const m = modulesFor(industry).find((x) => x.area === 'operations' && x.status === 'available' && x.screens?.includes(screen));
     return m ? [m.key] : [];
   }
-  if (first === 'community') return [];
   // Two-segment screens (/franchise/pipeline) first, then one-segment ones (/customers).
   for (const href of seg.length > 1 ? [`/${first}/${seg[1]}`, `/${first}`] : [`/${first}`]) {
     const matches = [

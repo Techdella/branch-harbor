@@ -233,6 +233,10 @@
         "franchise_pipeline": {
           "name": "Embudo de franquicias",
           "description": "Solicitudes de franquicia, calificación, pasos de divulgación y contrato, territorios y acuerdos de nuevas ubicaciones."
+        },
+        "course_leads": {
+          "name": "Interesados en cursos",
+          "description": "Personas interesadas en la formación de profesores y en los cursos públicos. Los formadores ven los interesados que tienen asignados; la publicación de Academia en todo el negocio los ve y asigna todos."
         }
       },
       "marketing": {
@@ -285,6 +289,34 @@
         "disclosure": {
           "name": "Divulgación y normas por jurisdicción",
           "description": "Documentos de divulgación, registros y normas por jurisdicción (plazos de espera y de desistimiento). Aprobar = registrar la revisión de una norma por el abogado."
+        }
+      },
+      "training": {
+        "academy": {
+          "name": "Academia",
+          "description": "Cursos, lecciones, cuestionarios y certificados para el personal y los franquiciados, y cursos públicos vendidos en el sitio de la marca. Editar = escribir cursos; publicar = gestionar todos los cursos, itinerarios y certificados."
+        },
+        "assignments": {
+          "name": "Asignaciones y progreso",
+          "description": "Asigna cursos a las personas de tu ámbito y sigue su progreso."
+        }
+      },
+      "community": {
+        "announcements": {
+          "name": "Anuncios",
+          "description": "Noticias y lecturas obligatorias de la central para la red, con confirmaciones de lectura. Publicar = enviar anuncios."
+        },
+        "discussions": {
+          "name": "Debates y eventos",
+          "description": "Espacios de debate, eventos e hilos privados de coaching entre la central y los franquiciados. Editar = publicar y responder; publicar = moderar."
+        },
+        "library": {
+          "name": "Biblioteca de recursos",
+          "description": "Manuales, archivos de marca y guías compartidos con la red. Editar = gestionar carpetas y archivos."
+        },
+        "help_desk": {
+          "name": "Soporte",
+          "description": "Preguntas y solicitudes de soporte de las ubicaciones a la central. Ver = abrir y seguir tus solicitudes; editar = responder como agente de la central."
         }
       }
     },

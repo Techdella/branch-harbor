@@ -27,6 +27,8 @@ export const ROLES = [
   'staff',
   'marketing_contributor',
   'customer',
+  /** Network instructor-trainer: authors courses (HQ approves publishing) and follows up course leads. */
+  'instructor_trainer',
 ] as const;
 export type Role = (typeof ROLES)[number];
 
@@ -45,6 +47,11 @@ export const PERMISSIONS = [
   'onboarding.view', 'onboarding.edit',
   'legal.view', 'legal.edit',
   'disclosure.view', 'disclosure.edit', 'disclosure.approve',
+  // Community, Training academy and Help desk (network workspaces) and course leads (Sales).
+  'community.read', 'community.post', 'community.announce', 'community.moderate', 'community.manage', 'library.manage',
+  'training.learn', 'training.author', 'training.assign', 'training.manage',
+  'courseleads.read', 'courseleads.edit',
+  'helpdesk.raise', 'helpdesk.agent',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 

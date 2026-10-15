@@ -1,0 +1,38 @@
+{
+  "courses": {
+    "title": "Cours et formations",
+    "intro": "Formations et cours proposés par {brand}, ouverts à tous.",
+    "none": "Aucun cours n’est ouvert aux inscriptions pour le moment.",
+    "starts": "Début le {date}",
+    "seatsLeft": "{count, plural, one {# place restante} other {# places restantes}}",
+    "full": "Complet",
+    "all": "Tous les cours",
+    "startsLabel": "Début",
+    "schedule": "Calendrier",
+    "trainers": "Formateurs",
+    "certificateLabel": "Certificat",
+    "certificate": "Certificat à la fin",
+    "curriculum": "Au programme",
+    "enrolled": "Vous êtes inscrit(e) à {course}. Nous vous avons envoyé les détails par e-mail.",
+    "enquired": "Merci ! Un formateur vous contactera bientôt.",
+    "payFor": "Payez pour confirmer votre place à {course}.",
+    "payCta": "Payer {amount}",
+    "paymentFailed": "Le paiement n’a pas abouti. Veuillez réessayer.",
+    "required": "Obligatoire",
+    "invalidEmail": "Saisissez une adresse e-mail valide",
+    "acceptRequired": "Acceptez les conditions pour vous inscrire",
+    "fixFields": "Vérifiez les champs signalés.",
+    "mode": {
+      "enrol": "S’inscrire",
+      "enquire": "Poser une question"
+    },
+    "name": "Votre nom",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "message": "Votre question",
+    "terms": "J’accepte les conditions du cours et la politique d’annulation.",
+    "consent": "Tenez-moi informé(e) des prochains cours.",
+    "enrolCta": "S’inscrire · {amount}",
+    "enquireCta": "Envoyer la demande"
+  }
+}

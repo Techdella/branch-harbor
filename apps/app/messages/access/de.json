@@ -233,6 +233,10 @@
         "franchise_pipeline": {
           "name": "Franchise-Pipeline",
           "description": "Franchise-Anfragen, Qualifizierung, Offenlegungs- und Vertragsschritte, Gebiete und neue Standorte."
+        },
+        "course_leads": {
+          "name": "Kurs-Interessenten",
+          "description": "Interessenten für Lehrerausbildungen und öffentliche Kurse. Ausbilder sehen die ihnen zugewiesenen Interessenten; Akademie-Veröffentlichen im ganzen Unternehmen sieht und verteilt alle."
         }
       },
       "marketing": {
@@ -285,6 +289,34 @@
         "disclosure": {
           "name": "Offenlegung & Rechtsordnungsregeln",
           "description": "Offenlegungsdokumente, Registrierungen und die Regeln je Rechtsordnung (Warte- und Widerrufsfristen). Genehmigen = die Prüfung einer Regel durch den Anwalt erfassen."
+        }
+      },
+      "training": {
+        "academy": {
+          "name": "Akademie",
+          "description": "Kurse, Lektionen, Quiz und Zertifikate für Mitarbeitende und Franchisenehmer sowie öffentliche Kurse auf der Markenseite. Bearbeiten = Kurse schreiben; veröffentlichen = alle Kurse, Lernpfade und Zertifikate verwalten."
+        },
+        "assignments": {
+          "name": "Zuweisungen & Fortschritt",
+          "description": "Kurse an Personen in Ihrem Bereich zuweisen und deren Fortschritt verfolgen."
+        }
+      },
+      "community": {
+        "announcements": {
+          "name": "Ankündigungen",
+          "description": "Neuigkeiten und Pflichtlektüre der Zentrale für das Netzwerk, mit Lesebestätigungen. Veröffentlichen = Ankündigungen senden."
+        },
+        "discussions": {
+          "name": "Diskussionen & Events",
+          "description": "Diskussionsräume, Events und private Coaching-Verläufe zwischen Zentrale und Franchisenehmern. Bearbeiten = posten und antworten; veröffentlichen = moderieren."
+        },
+        "library": {
+          "name": "Ressourcenbibliothek",
+          "description": "Handbücher, Markendateien und Anleitungen für das Netzwerk. Bearbeiten = Ordner und Dateien verwalten."
+        },
+        "help_desk": {
+          "name": "Helpdesk",
+          "description": "Fragen und Supportanfragen der Standorte an die Zentrale. Ansehen = eigene Anfragen stellen und verfolgen; bearbeiten = als Agent der Zentrale antworten."
         }
       }
     },

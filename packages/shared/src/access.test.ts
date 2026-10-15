@@ -57,12 +57,11 @@ test('custom roles give exactly what was ticked (plus implied view) and override
 
 test('workspaces only appear for available modules and industry modules follow the industry', () => {
   const marketer = expandGrants(ROLE_TEMPLATES.digital_marketer.grants, 'studios');
-  assert.deepEqual(workspacesFor(marketer, 'studios').map((w) => w.key), ['network', 'marketing']);
+  assert.deepEqual(workspacesFor(marketer, 'studios').map((w) => w.key), ['network', 'marketing', 'training', 'community']);
   const trainer = expandGrants(ROLE_TEMPLATES.instructor_trainer.grants, 'studios');
-  // Training is not built yet, so the trainer lands in Operations rather than an empty Training workspace.
   const ws = workspacesFor(trainer, 'studios').map((w) => w.key);
-  assert.deepEqual(ws, ['operations']);
-  assert.equal(primaryWorkspace([{ role: 'instructor_trainer' }], ws), 'operations');
+  assert.deepEqual(ws, ['operations', 'sales', 'training', 'community']);
+  assert.equal(primaryWorkspace([{ role: 'instructor_trainer' }], ws), 'training');
   const foodsStaff = expandGrants(ROLE_TEMPLATES.staff.grants, 'foods');
   assert.ok(foodsStaff.has('operations.menu:edit'));
   assert.ok(!foodsStaff.has('operations.classes:view'));
@@ -80,5 +79,19 @@ test('franchise development and legal follow the templates; franchise owners onl
   assert.ok(fo.has('onboarding.edit'));
   for (const p of ['franchise.pipeline.view', 'legal.view', 'disclosure.view'] as const) assert.ok(!fo.has(p), p);
   const ws = workspacesFor(effectiveCapabilities({ role: 'vp_franchise', scopeKind: 'organization' }, 'studios'), 'studios').map((w) => w.key);
-  assert.deepEqual(ws, ['network', 'sales', 'legal']);
+  assert.deepEqual(ws, ['network', 'sales', 'legal', 'training', 'community']);
+});
+
+test('everyone reads and posts in the community, learns and raises help requests; HQ teams run them', () => {
+  const perms = (role: Role, scopeKind: 'organization' | 'location' | 'owner_group' = 'organization') => permissionsFromCapabilities(effectiveCapabilities({ role, scopeKind }, 'studios'));
+  for (const r of ['staff', 'location_manager', 'finance', 'legal', 'marketing_contributor', 'franchise_owner'] as const) {
+    const p = perms(r, r === 'staff' || r === 'location_manager' || r === 'marketing_contributor' ? 'location' : r === 'franchise_owner' ? 'owner_group' : 'organization');
+    for (const k of ['community.read', 'community.post', 'training.learn', 'helpdesk.raise'] as const) assert.ok(p.has(k), `${r} ${k}`);
+    assert.ok(!p.has('helpdesk.agent') && !p.has('community.announce'), r);
+  }
+  const trainer = perms('instructor_trainer');
+  assert.ok(trainer.has('training.author') && trainer.has('courseleads.edit') && !trainer.has('training.manage'));
+  const cmo = perms('cmo');
+  assert.ok(cmo.has('community.announce') && cmo.has('community.manage') && cmo.has('helpdesk.agent') && cmo.has('training.author'));
+  assert.ok(perms('location_manager', 'location').has('training.assign'));
 });

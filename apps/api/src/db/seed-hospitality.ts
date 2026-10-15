@@ -136,7 +136,7 @@ export async function seedHospitality(c: { db: Db; upsertUser: (email: string, n
   // People.
   const ines = await c.upsertUser('ines.costa@demo.branchharbor.com', 'Inês Costa', 'pt-BR');
   const rui = await c.upsertUser('rui.matos@demo.branchharbor.com', 'Rui Matos', 'en');
-  const chloe = await c.upsertUser('amelia.hart@demo.branchharbor.com', 'Amelia Hart', 'en-GB');
+  const chloe = await c.upsertUser('freya.lund@demo.branchharbor.com', 'Freya Lund', 'en-GB');
   await db.insert(t.roleAssignments).values([
     { organizationId: orgId, userId: c.demo.id, role: 'org_owner', scopeKind: 'organization', scopeId: orgId },
     { organizationId: orgId, userId: ines.id, role: 'location_manager', scopeKind: 'location', scopeId: by.LIS.id },

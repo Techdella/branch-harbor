@@ -16,6 +16,8 @@ const hospitalitySweep = setInterval(() => void (async () => {
   await m.expireHolds(app.ctx);
   await (await import('./services/hospitality-ops.ts')).runGuestMessages(app.ctx);
 })().catch((err) => app.log.warn({ err }, 'hospitality sweep failed')), 5 * 60_000);
+// Network workspaces: scheduled announcements, required-read reminders, help desk SLA alerts, re-certification, email digests.
+const networkSweep = setInterval(() => void import('./services/community.ts').then((m) => m.runNetworkHousekeeping(app.ctx)).catch((err) => app.log.error({ err }, 'network housekeeping failed')), 5 * 60_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
@@ -23,6 +25,7 @@ const shutdown = async (signal: string) => {
   clearInterval(realtySweep);
   clearInterval(franchiseSweep);
   clearInterval(hospitalitySweep);
+  clearInterval(networkSweep);
   await app.close();
   process.exit(0);
 };

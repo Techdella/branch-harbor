@@ -83,7 +83,7 @@ describe.skipIf(!hasDb)('access model (DB)', () => {
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/campaigns`, { token: dm.token })).status).toBe(200);
     const me = await call(app, 'GET', '/v1/auth/me', { token: dm.token });
     const access = me.body.organizations.find((o: any) => o.id === orgId).access;
-    expect(access.workspaces.map((w: any) => w.key)).toEqual(['network', 'marketing']);
+    expect(access.workspaces.map((w: any) => w.key)).toEqual(['network', 'marketing', 'training', 'community']);
     expect(access.primaryWorkspace).toBe('marketing');
     expect(access.capabilities).not.toContain('finance.payments:view');
     // Reports without Payments: revenue is withheld server-side.
@@ -157,7 +157,7 @@ describe.skipIf(!hasDb)('access model (DB)', () => {
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/subscription`, { token: foA.token })).status).toBe(403);
     const access = (await call(app, 'GET', `/v1/orgs/${orgId}/access/me`, { token: foA.token })).body;
     expect(access.capabilities.some((c: string) => c.startsWith('finance.royalties') || c.startsWith('legal.') || c.startsWith('sales.franchise_pipeline'))).toBe(false);
-    expect(access.workspaces.map((w: any) => w.key)).toEqual(['network', 'operations', 'sales', 'marketing', 'finance']);
+    expect(access.workspaces.map((w: any) => w.key)).toEqual(['network', 'operations', 'sales', 'marketing', 'finance', 'training', 'community']);
     expect(access.primaryWorkspace).toBe('operations');
   });
 

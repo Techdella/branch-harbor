@@ -32,6 +32,11 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   // projects and agreement through New locations; each route checks the module it needs.
   franchise: ['sales.franchise_pipeline', 'legal.*', 'network.onboarding'],
   legal: ['legal.*', 'network.onboarding'],
+  // Community (announcements, discussions, events, coaching), resource library, Training academy (+ course leads), help desk.
+  community: ['community.*'],
+  resources: ['community.library'],
+  training: ['training.*', 'sales.course_leads'],
+  helpdesk: ['community.help_desk'],
   // Finance
   payments: ['finance.payments'],
   'refund-requests': ['finance.payments'],

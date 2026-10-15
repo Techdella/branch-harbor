@@ -224,6 +224,9 @@ async function main() {
   const lucia = await upsertUser('lucia.reyes@demo.branchharbor.com', 'Lucia Reyes');
   await db.insert(t.roleAssignments).values({ organizationId: swId, userId: lucia.id, role: 'vp_franchise', scopeKind: 'organization', scopeId: swId });
   const franchise = await (await import('./seed-franchise.ts')).seedFranchise({ db, orgId: swId, demo, lead: lucia, brand: 'Stillwater', collectLocationCode: 'TOR-QW' });
+  // Network workspaces (Community, Help desk, Training academy) for Stillwater and Maple & Ember.
+  const network = await (await import('./seed-community.ts')).seedCommunity({ db, swId, meId, demo, maya, priya, upsertUser });
+  const training = await (await import('./seed-training.ts')).seedTraining({ db, swId, meId, demo, maya, ...network });
   // Hospitality (Tidewater Stays): front-desk manager and staff logins appear in the demo picker.
   const hospitality = await (await import('./seed-hospitality.ts')).seedHospitality({ db, upsertUser, demo });
 
@@ -245,6 +248,8 @@ async function main() {
   console.log(` Franchise:     Stillwater pipeline (${franchise.prospects} prospects; ${franchise.blocked.waitingPeriod} waiting period, ${franchise.blocked.registration} registration pending, ${franchise.readyToSign} ready to sign, ${franchise.onboarding} onboarding) · ${franchise.lead} (VP Franchise)`);
   console.log(` Hospitality:   Tidewater Stays (${hospitality.orgId}) — Lisbon EUR (hotel + outlet), Vancouver CAD, London GBP, Sydney AUD (hostel); ${hospitality.rooms} rooms · ${hospitality.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
+  console.log(` Network:       Community, Training and Help desk for Stillwater · ${network.users.join(', ')} (same password)`);
+  console.log(`                public course: ${cfg.SITES_BASE_URL}/stillwater-yoga/courses/${training.publicCourse}`);
   await seedIndependent({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   const northlight = await seedNorthlight({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   console.log(` Access model:  Northlight Yoga International (${northlight.orgId}) — franchisor team, one login per role (same password):`);

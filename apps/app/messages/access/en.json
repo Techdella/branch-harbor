@@ -233,6 +233,10 @@
         "franchise_pipeline": {
           "name": "Franchise pipeline",
           "description": "Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals."
+        },
+        "course_leads": {
+          "name": "Course leads",
+          "description": "People interested in teacher training and public courses. Trainers see the leads assigned to them; Academy publish across the business sees and assigns all."
         }
       },
       "marketing": {
@@ -285,6 +289,34 @@
         "disclosure": {
           "name": "Disclosure & jurisdiction rules",
           "description": "Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction. Approve = record counsel’s review of a rule."
+        }
+      },
+      "training": {
+        "academy": {
+          "name": "Academy",
+          "description": "Courses, lessons, quizzes and certificates for staff and franchisees, and public courses sold on the brand site. Edit = write courses; publish = manage every course, path and certificate."
+        },
+        "assignments": {
+          "name": "Assignments & progress",
+          "description": "Assign courses to the people in your scope and follow their progress."
+        }
+      },
+      "community": {
+        "announcements": {
+          "name": "Announcements",
+          "description": "News and required reads from HQ to the network, with read receipts. Publish = send announcements."
+        },
+        "discussions": {
+          "name": "Discussions & events",
+          "description": "Discussion spaces, events and private coaching threads between HQ and franchisees. Edit = post and reply; publish = moderate."
+        },
+        "library": {
+          "name": "Resource library",
+          "description": "Manuals, brand files and how-tos shared with the network. Edit = manage folders and files."
+        },
+        "help_desk": {
+          "name": "Help desk",
+          "description": "Questions and support requests from locations to HQ. View = raise and follow your own requests; edit = answer as an HQ agent."
         }
       }
     },
