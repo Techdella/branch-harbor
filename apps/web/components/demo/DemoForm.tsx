@@ -330,7 +330,7 @@ export function DemoForm() {
             <option value="">{t('form.industryPlaceholder')}</option>
             {INDUSTRY_LIST.map((k) => (
               <option key={k} value={k}>
-                {k === 'realty' ? t('form.realtyOption') : tm(`${k}.name`)}
+                {k === 'realty' ? t('form.realtyOption') : k === 'hospitality' ? t('form.hospitalityOption') : tm(`${k}.name`)}
               </option>
             ))}
           </SelectBox>

@@ -349,7 +349,8 @@
       "wellness": "Résumer les rendez-vous de la semaine",
       "commerce": "Expliquer la tendance des commandes cette semaine",
       "foods": "Résumer les commandes du jour par établissement",
-      "realty": "Quelles agences demandent de l’attention ?"
+      "realty": "Quelles agences demandent de l’attention ?",
+      "hospitality": "Quels établissements ont le plus d’arrivées aujourd’hui ?"
     },
     "withScope": "{text} Périmètre : {scope}.",
     "scopeOnly": "Périmètre : {scope}.",
@@ -390,6 +391,11 @@
         "s0": "Quelles agences demandent de l’attention ?",
         "s1": "Rédiger une campagne pour les nouvelles annonces",
         "s2": "Résumer les demandes de la semaine"
+      },
+      "hospitality": {
+        "s0": "Quels établissements ont le plus d’arrivées aujourd’hui ?",
+        "s1": "Rédiger un message avant l’arrivée",
+        "s2": "Résumer l’occupation de la semaine"
       }
     },
     "mock": {

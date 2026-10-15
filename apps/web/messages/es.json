@@ -1834,7 +1834,8 @@
       "consent": "Envíame novedades del producto por correo de vez en cuando. Puedes darte de baja en cualquier momento.",
       "submit": "Solicitar demo",
       "sending": "Enviando…",
-      "securityCheck": "Verificación de seguridad"
+      "securityCheck": "Verificación de seguridad",
+      "hospitalityOption": "Hostelería (hoteles, B&B, hostales)"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Hay # problema en este formulario} other {Hay # problemas en este formulario}}",

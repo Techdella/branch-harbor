@@ -349,7 +349,8 @@
       "wellness": "Termine dieser Woche zusammenfassen",
       "commerce": "Bestellentwicklung dieser Woche erklären",
       "foods": "Heutige Bestellungen nach Standort zusammenfassen",
-      "realty": "Welche Büros brauchen Aufmerksamkeit?"
+      "realty": "Welche Büros brauchen Aufmerksamkeit?",
+      "hospitality": "Welche Unterkünfte haben heute die meisten Anreisen?"
     },
     "withScope": "{text} Bereich: {scope}.",
     "scopeOnly": "Bereich: {scope}.",
@@ -390,6 +391,11 @@
         "s0": "Welche Büros brauchen Aufmerksamkeit?",
         "s1": "Kampagne für neue Inserate entwerfen",
         "s2": "Anfragen dieser Woche zusammenfassen"
+      },
+      "hospitality": {
+        "s0": "Welche Unterkünfte haben heute die meisten Anreisen?",
+        "s1": "Eine Nachricht vor Anreise entwerfen",
+        "s2": "Die Auslastung dieser Woche zusammenfassen"
       }
     },
     "mock": {

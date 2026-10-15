@@ -224,6 +224,8 @@ async function main() {
   const lucia = await upsertUser('lucia.reyes@demo.branchharbor.com', 'Lucia Reyes');
   await db.insert(t.roleAssignments).values({ organizationId: swId, userId: lucia.id, role: 'vp_franchise', scopeKind: 'organization', scopeId: swId });
   const franchise = await (await import('./seed-franchise.ts')).seedFranchise({ db, orgId: swId, demo, lead: lucia, brand: 'Stillwater', collectLocationCode: 'TOR-QW' });
+  // Hospitality (Tidewater Stays): front-desk manager and staff logins appear in the demo picker.
+  const hospitality = await (await import('./seed-hospitality.ts')).seedHospitality({ db, upsertUser, demo });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
@@ -241,6 +243,7 @@ async function main() {
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Real Estate:   Keystone Realty Network (${realty.orgId}) — Toronto/Vancouver CAD, London GBP, Madrid EUR, Dubai AED, Sydney AUD; ${realty.listings} listings · ${realty.users.join(', ')}`);
   console.log(` Franchise:     Stillwater pipeline (${franchise.prospects} prospects; ${franchise.blocked.waitingPeriod} waiting period, ${franchise.blocked.registration} registration pending, ${franchise.readyToSign} ready to sign, ${franchise.onboarding} onboarding) · ${franchise.lead} (VP Franchise)`);
+  console.log(` Hospitality:   Tidewater Stays (${hospitality.orgId}) — Lisbon EUR (hotel + outlet), Vancouver CAD, London GBP, Sydney AUD (hostel); ${hospitality.rooms} rooms · ${hospitality.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
   await seedIndependent({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   const northlight = await seedNorthlight({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });

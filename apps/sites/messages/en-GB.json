@@ -91,7 +91,9 @@
     "commerce": "Shop this store",
     "commerceCta": "Browse products",
     "realty": "Properties",
-    "realtyCta": "Search homes"
+    "realtyCta": "Search homes",
+    "hospitality": "Book a stay",
+    "hospitalityCta": "Check availability"
   },
   "schedule": {
     "title": "Class schedule",
@@ -1133,6 +1135,131 @@
       "awaiting_transfer": "On its way to the store",
       "stock_conflict": "Store will contact you",
       "cancelled": "Cancelled"
+    }
+  },
+  "stay": {
+    "title": "Book your stay at {name}",
+    "times": "Check-in from {checkIn} · check-out by {checkOut}",
+    "restaurant": "Restaurant on site",
+    "taxesTitle": "Taxes charged by the property",
+    "included": "included in the price",
+    "houseRules": "House rules:",
+    "search": {
+      "label": "Find a room",
+      "arrival": "Check-in",
+      "departure": "Check-out",
+      "adults": "Adults",
+      "children": "Children",
+      "rooms": "Rooms",
+      "cta": "Check availability"
+    },
+    "results": {
+      "title": "{nights, plural, one {# night} other {# nights}} · {from} → {to}",
+      "none": "Nothing is available for these dates. Try other dates or fewer rooms.",
+      "dormBed": "Bed in a shared dorm",
+      "sleeps": "Sleeps {count}",
+      "size": "{size} m²",
+      "soldOut": "sold out",
+      "left": "{count} left",
+      "breakfast": "Breakfast included",
+      "deposit": "Deposit today: {amount}",
+      "noDeposit": "Nothing to pay today",
+      "inclTaxes": "total incl. taxes",
+      "taxIncluded": "taxes included",
+      "noTaxes": "total for your stay",
+      "select": "Select",
+      "selectAria": "Select {room}, {rate}"
+    },
+    "reason": {
+      "invalid_dates": "Choose a check-out date after check-in",
+      "too_many_guests": "Too many guests for this room",
+      "no_price": "Not available on these dates",
+      "closed": "Not available on one of these nights",
+      "closed_to_arrival": "No arrivals on this date",
+      "closed_to_departure": "No departures on this date",
+      "min_stay": "Needs a longer stay",
+      "max_stay": "Only for shorter stays"
+    },
+    "policy": {
+      "nonRefundable": "Non-refundable",
+      "noFreeWindow": "Cancellation fees apply at any time",
+      "freeUntil": "Free cancellation until {hours} hours before arrival, then {fee}",
+      "feeFirstNight": "the first night is charged",
+      "feeFull": "the full stay is charged",
+      "feePercent": "{percent}% of the stay is charged",
+      "feeNone": "no fee",
+      "feeFixed": "a fixed fee is charged"
+    },
+    "guest": {
+      "title": "Your details",
+      "party": "{adults} adults, {children} children",
+      "nightly": "From {from} per night",
+      "total": "Total {amount}",
+      "depositNow": "{amount} deposit now, the rest at the property",
+      "payAtProperty": "Pay at the property",
+      "checkIn": "check-in from {time}",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "arrivalTime": "Expected arrival time",
+      "requests": "Requests for the property",
+      "consentEmail": "Email me arrival information before my stay",
+      "consentSms": "Text me check-in information on the day",
+      "terms": "I accept the rate, payment and cancellation terms of {business}",
+      "privacy": "We only ask for what the property needs to look after your booking.",
+      "holdCta": "Continue to payment",
+      "bookCta": "Confirm booking"
+    },
+    "errors": {
+      "dates": "Choose a check-out date after check-in.",
+      "name": "Enter your name",
+      "email": "Enter a valid email",
+      "terms": "Accept the terms to continue",
+      "check": "Check your details"
+    },
+    "pay": {
+      "title": "Pay your deposit",
+      "held": "Your room is held while you pay (booking {code}).",
+      "depositToday": "Deposit today {amount} of {total}",
+      "cta": "Pay {amount}",
+      "failed": "The payment didn’t go through. Your room stays held for a few minutes — please try again."
+    },
+    "status": {
+      "hold": "Awaiting deposit",
+      "confirmed": "Confirmed",
+      "checked_in": "Checked in",
+      "checked_out": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No-show",
+      "expired": "Expired"
+    },
+    "manage": {
+      "title": "Your stay",
+      "greeting": "Hello {name}",
+      "code": "Booking {code}",
+      "nights": "{count, plural, one {# night} other {# nights}}",
+      "checkOut": "check-out by {time}",
+      "total": "Total",
+      "depositPaid": "Paid",
+      "dueAtProperty": "Due at the property",
+      "changeTitle": "Change dates",
+      "changeNote": "We secure the new nights first. If they are not available, your booking stays exactly as it is.",
+      "changeCta": "Change dates",
+      "changed": "Dates changed. The new price is {difference} {direction, select, more {more} other {less}}.",
+      "changedSame": "Dates changed. The price is the same.",
+      "cancelTitle": "Cancel booking",
+      "cancelFree": "Cancelling now is free. You get {refund} back.",
+      "cancelFee": "Cancelling now costs {fee}. You get {refund} back.",
+      "cancelOutstanding": "{amount} of the fee is not covered by your deposit; the property will contact you.",
+      "cancelCta": "Cancel booking",
+      "cancelConfirm": "Yes, cancel my booking",
+      "cancelled": "Your booking is cancelled."
+    },
+    "reg": {
+      "title": "Registration details",
+      "why": "The property is required by law to record these details. You can add them now to speed up check-in.",
+      "save": "Save details",
+      "saved": "Details saved."
     }
   }
 }

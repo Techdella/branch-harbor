@@ -1834,7 +1834,8 @@
       "consent": "Quero receber novidades do produto por e-mail ocasionalmente. Posso cancelar a qualquer momento.",
       "submit": "Solicitar demonstração",
       "sending": "Enviando…",
-      "securityCheck": "Verificação de segurança"
+      "securityCheck": "Verificação de segurança",
+      "hospitalityOption": "Hotelaria (hotéis, pousadas, hostels)"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Há # problema neste formulário} other {Há # problemas neste formulário}}",

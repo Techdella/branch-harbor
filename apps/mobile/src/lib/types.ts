@@ -14,6 +14,8 @@ export interface Me {
   accounts?: { id: string; name: string; industry: string }[];
   /** The active business account for the Staff and Owner experiences. */
   accountId?: string | null;
+  /** Capabilities (`<module>:<action>`) in the active business account: industry entry points follow them. */
+  capabilities?: string[];
   guest?: boolean;
   /** Owner of a single independent business (one location): no location switching or aggregation. */
   business?: { model: 'independent'; name: string; locationId: string | null };

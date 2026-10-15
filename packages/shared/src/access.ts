@@ -173,12 +173,12 @@ export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
     ops('enquiries', 'Enquiries & viewings', 'Enquiries, viewings and offers.', ['enquiries', 'viewings', 'offers']),
     ops('agents', 'Agents & offices', 'Agents, offices and lead routing.', ['agents']),
   ],
-  // Built by the Hospitality release: flip each module to 'available' (and list its screens) as it ships.
   hospitality: [
-    ops('reservations', 'Reservations', 'Bookings, availability and the front desk.', [], 'planned'),
-    ops('rooms', 'Rooms & rates', 'Room types, rates and restrictions.', [], 'planned'),
-    ops('housekeeping', 'Housekeeping', 'Room status and cleaning tasks.', [], 'planned'),
-    ops('outlets', 'Restaurant outlet', 'Restaurant and bar orders for guests.', [], 'planned'),
+    ops('reservations', 'Front desk & reservations', 'Today at the property, the room grid, reservations, check-in and check-out, folios and guest registration.', ['pulse', 'grid', 'reservations']),
+    ops('rooms', 'Rooms & rates', 'Room types, rooms, rate plans, seasons, restrictions, taxes, policies and channel exports. Changing them also needs Locations (edit).', ['rates', 'setup', 'channels']),
+    ops('housekeeping', 'Housekeeping', 'Room status and cleaning tasks.', ['housekeeping']),
+    ops('outlets', 'Restaurant outlet', 'Restaurant and bar orders for guests, charged to the room.', ['outlet']),
+    ops('hotel_reports', 'Hotel reports', 'Occupancy, ADR, RevPAR, pickup and cancellations per property.', ['hotelreports']),
   ],
 };
 

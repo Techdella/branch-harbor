@@ -203,6 +203,26 @@
         "agents": {
           "name": "Makler & Büros",
           "description": "Makler, Büros und Lead-Verteilung."
+        },
+        "reservations": {
+          "name": "Rezeption & Reservierungen",
+          "description": "Der Tag im Haus, der Zimmerplan, Reservierungen, Check-in und Check-out, Gästekonten und Meldeschein."
+        },
+        "rooms": {
+          "name": "Zimmer & Preise",
+          "description": "Zimmertypen, Zimmer, Ratenpläne, Saisons, Restriktionen, Steuern, Bedingungen und Kanal-Exporte. Änderungen erfordern zusätzlich Standorte (bearbeiten)."
+        },
+        "housekeeping": {
+          "name": "Housekeeping",
+          "description": "Zimmerstatus und Reinigungsaufgaben."
+        },
+        "outlets": {
+          "name": "Hotelrestaurant",
+          "description": "Restaurant- und Barbestellungen der Gäste, auf das Zimmer gebucht."
+        },
+        "hotel_reports": {
+          "name": "Hotelberichte",
+          "description": "Auslastung, ADR, RevPAR, Buchungseingang und Stornierungen je Haus."
         }
       },
       "sales": {

@@ -29,7 +29,7 @@ const stepsFor = (model: 'independent' | 'network'): readonly OnboardingStep[] =
 
 const STEP_ICON: Record<OnboardingStep, IconName> = { account: 'user', industry: 'grid', business: 'building', location: 'pin', website: 'globe', data: 'list', connect: 'plug', team: 'users', publish: 'eye' };
 const OPTIONAL: OnboardingStep[] = ['connect', 'team'];
-const INDUSTRIES: IndustryKey[] = ['studios', 'sports', 'wellness', 'commerce', 'foods'];
+const INDUSTRIES: IndustryKey[] = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'hospitality'];
 const SELF_SERVE: Record<IndustryKey, boolean> = { studios: true, sports: false, wellness: false, commerce: false, foods: false, realty: false, hospitality: false };
 
 const SAMPLE_CSV = `name,code,country,timezone,currency

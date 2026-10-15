@@ -203,6 +203,26 @@
         "agents": {
           "name": "Corretores e escritórios",
           "description": "Corretores, escritórios e distribuição de leads."
+        },
+        "reservations": {
+          "name": "Recepção e reservas",
+          "description": "O dia na propriedade, o mapa de quartos, reservas, check-in e check-out, contas e ficha de hóspedes."
+        },
+        "rooms": {
+          "name": "Quartos e tarifas",
+          "description": "Tipos de quarto, quartos, planos tarifários, temporadas, restrições, impostos, políticas e exportações para canais. Alterá-los também exige Unidades (editar)."
+        },
+        "housekeeping": {
+          "name": "Governança",
+          "description": "Status dos quartos e tarefas de limpeza."
+        },
+        "outlets": {
+          "name": "Restaurante do hotel",
+          "description": "Pedidos de restaurante e bar dos hóspedes, lançados no quarto."
+        },
+        "hotel_reports": {
+          "name": "Relatórios do hotel",
+          "description": "Ocupação, diária média, RevPAR, ritmo de reservas e cancelamentos por propriedade."
         }
       },
       "sales": {

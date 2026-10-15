@@ -728,6 +728,8 @@ export type FoodOrderFulfilment = {
   productionDateId?: string; productionDate?: string; collectionWindow?: string;
   mealPlanBoxId?: string; mealPlanSubscriptionId?: string; cateringEnquiryId?: string;
   serviceChargeLabel?: string;
+  /** Hospitality outlet: order charged to an in-house reservation's folio. */
+  roomCharge?: { reservationId: string; reservationCode: string; roomNumber: string | null };
   /** Set once slot capacity and stock held by a cancelled order were released. */
   resourcesReleased?: boolean;
   /** Delivery partner quote taken at checkout (Uber Direct). */

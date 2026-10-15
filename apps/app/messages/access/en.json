@@ -203,6 +203,26 @@
         "agents": {
           "name": "Agents & offices",
           "description": "Agents, offices and lead routing."
+        },
+        "reservations": {
+          "name": "Front desk & reservations",
+          "description": "Today at the property, the room grid, reservations, check-in and check-out, folios and guest registration."
+        },
+        "rooms": {
+          "name": "Rooms & rates",
+          "description": "Room types, rooms, rate plans, seasons, restrictions, taxes, policies and channel exports. Changing them also needs Locations (edit)."
+        },
+        "housekeeping": {
+          "name": "Housekeeping",
+          "description": "Room status and cleaning tasks."
+        },
+        "outlets": {
+          "name": "Restaurant outlet",
+          "description": "Restaurant and bar orders for guests, charged to the room."
+        },
+        "hotel_reports": {
+          "name": "Hotel reports",
+          "description": "Occupancy, ADR, RevPAR, pickup and cancellations per property."
         }
       },
       "sales": {

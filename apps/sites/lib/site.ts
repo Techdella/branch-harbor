@@ -70,11 +70,13 @@ export const resolveSiteLocale = cache(async (): Promise<{ locale: string; avail
     if (r.location) {
       const s = await getLocationSite(r.brand, r.location);
       const available = [...new Set([s.location.locale, ...s.brand.locales])].filter((l) => supported.includes(l));
-      return { locale: pick(r.requestedLang, available, s.location.locale), available };
+      // The location's locale only when the platform supports it (e.g. pt-PT is not a UI language): otherwise text
+      // would be English while dates and prices were formatted for another locale.
+      return { locale: pick(r.requestedLang, available, pick(s.location.locale, available, available[0] ?? 'en')), available };
     }
     const b = await getBrandSite(r.brand);
     const available = b.brand.locales.filter((l) => supported.includes(l));
-    return { locale: pick(r.requestedLang, available, b.brand.defaultLocale), available };
+    return { locale: pick(r.requestedLang, available, pick(b.brand.defaultLocale, available, available[0] ?? 'en')), available };
   } catch {
     return { locale: 'en', available: ['en'] };
   }

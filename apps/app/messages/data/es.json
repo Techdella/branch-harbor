@@ -349,7 +349,8 @@
       "wellness": "Resume las citas de esta semana",
       "commerce": "Explica la tendencia de pedidos de esta semana",
       "foods": "Resume los pedidos de hoy por sede",
-      "realty": "¿Qué oficinas necesitan atención?"
+      "realty": "¿Qué oficinas necesitan atención?",
+      "hospitality": "¿Qué alojamientos tienen más llegadas hoy?"
     },
     "withScope": "{text} Ámbito: {scope}.",
     "scopeOnly": "Ámbito: {scope}.",
@@ -390,6 +391,11 @@
         "s0": "¿Qué oficinas necesitan atención?",
         "s1": "Redacta una campaña para los nuevos anuncios",
         "s2": "Resume las consultas de esta semana"
+      },
+      "hospitality": {
+        "s0": "¿Qué alojamientos tienen más llegadas hoy?",
+        "s1": "Redactar un mensaje previo a la llegada",
+        "s2": "Resumir la ocupación de esta semana"
       }
     },
     "mock": {

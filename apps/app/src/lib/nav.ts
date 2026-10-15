@@ -79,8 +79,17 @@ export const OPS: Record<IndustryKey, OpsDef[]> = {
     { key: 'agents', icon: 'users', kind: 'screen' },
     { key: 'portals', icon: 'plug', kind: 'screen' },
   ],
-  // Screens arrive with the Hospitality release (operations modules in @bh/shared access.ts list them).
-  hospitality: [],
+  hospitality: [
+    { key: 'pulse', icon: 'grid', kind: 'screen' },
+    { key: 'grid', icon: 'calendar', kind: 'screen' },
+    { key: 'reservations', icon: 'list', kind: 'screen' },
+    { key: 'rates', icon: 'sliders', kind: 'screen' },
+    { key: 'housekeeping', icon: 'check-circle', kind: 'screen' },
+    { key: 'outlet', icon: 'utensils', kind: 'screen' },
+    { key: 'hotelreports', icon: 'chart', kind: 'screen' },
+    { key: 'setup', icon: 'settings', kind: 'screen' },
+    { key: 'channels', icon: 'plug', kind: 'screen' },
+  ],
 };
 
 export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }> = {

@@ -24,6 +24,7 @@ import { MenuScreen } from './foods/MenuScreen';
 import { FoodOrdersScreen } from './foods/FoodOrdersScreen';
 import { KitchenScreen } from './foods/KitchenScreen';
 import { RealtyScreen } from './realty/RealtyRouter';
+import { HospitalityScreen } from './hospitality/HospitalityRouter';
 import { foodsScreen } from './foods/ext';
 
 export function OpsRouter({ screen }: { screen: string }) {
@@ -79,5 +80,6 @@ export function OpsRouter({ screen }: { screen: string }) {
       return <KitchenScreen />;
   }
   if (app.industry === 'realty') return <RealtyScreen screen={def.key} />;
+  if (app.industry === 'hospitality') return <HospitalityScreen screen={def.key} />;
   return null;
 }

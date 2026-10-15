@@ -137,6 +137,9 @@ let selectedAccount: string | null = null;
 export function selectAccount(id: string | null) {
   selectedAccount = id;
 }
+export function selectedAccountId(): string | null {
+  return selectedAccount;
+}
 const teamAccounts = (m: RawMe | null) => (m?.organizations ?? []).filter(isTeam);
 const activeAccount = (m: RawMe | null): RawOrg | null => {
   const team = teamAccounts(m);
@@ -160,6 +163,7 @@ function toMe(m: RawMe): Me {
   const single = owned.length === 1 && owned[0]!.model === 'independent' ? owned[0]! : null;
   return {
     user: { id: m.user.id, name: m.user.name, email: m.user.email }, assignments, experiences, accounts, accountId: active?.id ?? null,
+    capabilities: active ? [...caps(active)] : [],
     ...(single ? { business: { model: 'independent' as const, name: single.name, locationId: single.primaryLocationId ?? null } } : {}),
   };
 }

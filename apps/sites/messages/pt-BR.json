@@ -91,7 +91,9 @@
     "commerce": "Comprar nesta loja",
     "commerceCta": "Ver produtos",
     "realty": "Imóveis",
-    "realtyCta": "Buscar imóveis"
+    "realtyCta": "Buscar imóveis",
+    "hospitality": "Reservar estadia",
+    "hospitalityCta": "Ver disponibilidade"
   },
   "schedule": {
     "title": "Grade de aulas",
@@ -1133,6 +1135,131 @@
       "awaiting_transfer": "A caminho da loja",
       "stock_conflict": "A loja vai entrar em contato",
       "cancelled": "Cancelado"
+    }
+  },
+  "stay": {
+    "title": "Reserve sua estadia em {name}",
+    "times": "Check-in a partir de {checkIn} · check-out até {checkOut}",
+    "restaurant": "Restaurante no local",
+    "taxesTitle": "Impostos cobrados pela propriedade",
+    "included": "incluído no preço",
+    "houseRules": "Regras da casa:",
+    "search": {
+      "label": "Encontrar um quarto",
+      "arrival": "Check-in",
+      "departure": "Check-out",
+      "adults": "Adultos",
+      "children": "Crianças",
+      "rooms": "Quartos",
+      "cta": "Ver disponibilidade"
+    },
+    "results": {
+      "title": "{nights, plural, one {# noite} other {# noites}} · {from} → {to}",
+      "none": "Nada disponível para essas datas. Tente outras datas ou menos quartos.",
+      "dormBed": "Cama em dormitório compartilhado",
+      "sleeps": "Para {count} pessoas",
+      "size": "{size} m²",
+      "soldOut": "esgotado",
+      "left": "restam {count}",
+      "breakfast": "Café da manhã incluído",
+      "deposit": "Depósito hoje: {amount}",
+      "noDeposit": "Nada a pagar hoje",
+      "inclTaxes": "total com impostos",
+      "taxIncluded": "impostos incluídos",
+      "noTaxes": "total da estadia",
+      "select": "Escolher",
+      "selectAria": "Escolher {room}, {rate}"
+    },
+    "reason": {
+      "invalid_dates": "Escolha uma saída após a chegada",
+      "too_many_guests": "Hóspedes demais para este quarto",
+      "no_price": "Indisponível nessas datas",
+      "closed": "Indisponível em uma dessas noites",
+      "closed_to_arrival": "Sem chegadas nesta data",
+      "closed_to_departure": "Sem saídas nesta data",
+      "min_stay": "Exige estadia mais longa",
+      "max_stay": "Somente para estadias mais curtas"
+    },
+    "policy": {
+      "nonRefundable": "Não reembolsável",
+      "noFreeWindow": "Taxas de cancelamento a qualquer momento",
+      "freeUntil": "Cancelamento grátis até {hours} h antes da chegada; depois, {fee}",
+      "feeFirstNight": "a primeira noite é cobrada",
+      "feeFull": "a estadia inteira é cobrada",
+      "feePercent": "{percent}% da estadia é cobrado",
+      "feeNone": "sem taxa",
+      "feeFixed": "cobra-se uma taxa fixa"
+    },
+    "guest": {
+      "title": "Seus dados",
+      "party": "{adults} adultos, {children} crianças",
+      "nightly": "A partir de {from} por noite",
+      "total": "Total {amount}",
+      "depositNow": "Depósito de {amount} agora, o restante na propriedade",
+      "payAtProperty": "Pagamento na propriedade",
+      "checkIn": "check-in a partir de {time}",
+      "name": "Nome completo",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "arrivalTime": "Horário previsto de chegada",
+      "requests": "Pedidos para a propriedade",
+      "consentEmail": "Enviar por e-mail informações de chegada antes da estadia",
+      "consentSms": "Enviar por SMS as informações de check-in no dia",
+      "terms": "Aceito as condições de tarifa, pagamento e cancelamento de {business}",
+      "privacy": "Pedimos apenas o que a propriedade precisa para cuidar da sua reserva.",
+      "holdCta": "Continuar para o pagamento",
+      "bookCta": "Confirmar reserva"
+    },
+    "errors": {
+      "dates": "Escolha uma saída após a chegada.",
+      "name": "Informe seu nome",
+      "email": "Informe um e-mail válido",
+      "terms": "Aceite as condições para continuar",
+      "check": "Confira seus dados"
+    },
+    "pay": {
+      "title": "Pague o depósito",
+      "held": "Seu quarto fica reservado enquanto você paga (reserva {code}).",
+      "depositToday": "Depósito hoje {amount} de {total}",
+      "cta": "Pagar {amount}",
+      "failed": "O pagamento não foi concluído. O quarto fica reservado por alguns minutos — tente novamente."
+    },
+    "status": {
+      "hold": "Aguardando depósito",
+      "confirmed": "Confirmada",
+      "checked_in": "Hospedado",
+      "checked_out": "Concluída",
+      "cancelled": "Cancelada",
+      "no_show": "Não compareceu",
+      "expired": "Expirada"
+    },
+    "manage": {
+      "title": "Sua estadia",
+      "greeting": "Olá, {name}",
+      "code": "Reserva {code}",
+      "nights": "{count, plural, one {# noite} other {# noites}}",
+      "checkOut": "check-out até {time}",
+      "total": "Total",
+      "depositPaid": "Pago",
+      "dueAtProperty": "A pagar na propriedade",
+      "changeTitle": "Alterar datas",
+      "changeNote": "Garantimos primeiro as novas noites. Se não houver disponibilidade, sua reserva fica como está.",
+      "changeCta": "Alterar",
+      "changed": "Datas alteradas. O novo preço é {difference} {direction, select, more {a mais} other {a menos}}.",
+      "changedSame": "Datas alteradas. O preço é o mesmo.",
+      "cancelTitle": "Cancelar reserva",
+      "cancelFree": "Cancelar agora é grátis. Você recebe {refund} de volta.",
+      "cancelFee": "Cancelar agora custa {fee}. Você recebe {refund} de volta.",
+      "cancelOutstanding": "{amount} da taxa não é coberto pelo depósito; a propriedade entrará em contato.",
+      "cancelCta": "Cancelar",
+      "cancelConfirm": "Sim, cancelar minha reserva",
+      "cancelled": "Sua reserva foi cancelada."
+    },
+    "reg": {
+      "title": "Dados de registro",
+      "why": "A propriedade é obrigada por lei a registrar esses dados. Adicione agora para agilizar o check-in.",
+      "save": "Salvar",
+      "saved": "Dados salvos."
     }
   }
 }

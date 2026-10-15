@@ -72,6 +72,12 @@
     "link_invalid": "Dieser Anmeldelink ist abgelaufen oder wurde bereits verwendet. Fordern Sie einen neuen an.",
     "portal_session_expired": "Ihre Sitzung ist beendet. Fordern Sie einen neuen Anmeldelink an.",
     "invalid_credentials": "E-Mail-Adresse oder Passwort ist falsch.",
-    "email_taken": "Mit dieser E-Mail-Adresse gibt es bereits ein Konto."
+    "email_taken": "Mit dieser E-Mail-Adresse gibt es bereits ein Konto.",
+    "sold_out": "Diese Daten sind gerade ausgebucht. Bitte andere Daten oder Zimmer wählen.",
+    "rate_min_stay": "Dieser Tarif erfordert einen längeren Aufenthalt.",
+    "rate_closed_to_arrival": "An diesem Datum ist mit diesem Tarif keine Anreise möglich.",
+    "not_modifiable": "Diese Buchung kann online nicht mehr geändert werden.",
+    "not_cancellable": "Diese Buchung kann nicht mehr storniert werden.",
+    "property_not_accepting_bookings": "Diese Unterkunft nimmt derzeit keine Buchungen an."
   }
 }

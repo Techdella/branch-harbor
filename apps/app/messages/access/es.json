@@ -203,6 +203,26 @@
         "agents": {
           "name": "Agentes y oficinas",
           "description": "Agentes, oficinas y asignación de prospectos."
+        },
+        "reservations": {
+          "name": "Recepción y reservas",
+          "description": "El día en el alojamiento, el cuadrante de habitaciones, las reservas, el check-in y el check-out, las cuentas y el registro de huéspedes."
+        },
+        "rooms": {
+          "name": "Habitaciones y tarifas",
+          "description": "Tipos de habitación, habitaciones, planes de tarifas, temporadas, restricciones, impuestos, políticas y exportaciones a canales. Cambiarlos también requiere Ubicaciones (editar)."
+        },
+        "housekeeping": {
+          "name": "Limpieza",
+          "description": "Estado de las habitaciones y tareas de limpieza."
+        },
+        "outlets": {
+          "name": "Restaurante del alojamiento",
+          "description": "Pedidos de restaurante y bar de los huéspedes, cargados a la habitación."
+        },
+        "hotel_reports": {
+          "name": "Informes hoteleros",
+          "description": "Ocupación, ADR, RevPAR, ritmo de reservas y cancelaciones por alojamiento."
         }
       },
       "sales": {

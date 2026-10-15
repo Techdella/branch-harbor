@@ -72,6 +72,12 @@
     "link_invalid": "Deze inloglink is verlopen of al gebruikt. Vraag een nieuwe aan.",
     "portal_session_expired": "Je sessie is afgelopen. Vraag een nieuwe inloglink aan.",
     "invalid_credentials": "E-mailadres of wachtwoord is onjuist.",
-    "email_taken": "Er bestaat al een account met dit e-mailadres."
+    "email_taken": "Er bestaat al een account met dit e-mailadres.",
+    "sold_out": "Deze data zijn net uitverkocht. Kies andere data of kamers.",
+    "rate_min_stay": "Dit tarief vereist een langer verblijf.",
+    "rate_closed_to_arrival": "Aankomst is op deze datum niet mogelijk met dit tarief.",
+    "not_modifiable": "Deze boeking kan niet meer online worden gewijzigd.",
+    "not_cancellable": "Deze boeking kan niet meer worden geannuleerd.",
+    "property_not_accepting_bookings": "Deze accommodatie neemt momenteel geen boekingen aan."
   }
 }

@@ -13,3 +13,4 @@ export * from './foods.ts';
 export * from './franchise.ts';
 export * from './franchise-rules.ts';
 export * from './site-paths.ts';
+export * from './hospitality.ts';

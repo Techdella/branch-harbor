@@ -203,6 +203,26 @@
         "agents": {
           "name": "Agents et agences",
           "description": "Agents, agences et attribution des prospects."
+        },
+        "reservations": {
+          "name": "Réception et réservations",
+          "description": "La journée de l’établissement, le planning des chambres, les réservations, l’arrivée et le départ, les folios et la fiche client."
+        },
+        "rooms": {
+          "name": "Chambres et tarifs",
+          "description": "Types de chambres, chambres, plans tarifaires, saisons, restrictions, taxes, conditions et exports vers les canaux. Les modifier nécessite aussi Établissements (modifier)."
+        },
+        "housekeeping": {
+          "name": "Ménage",
+          "description": "État des chambres et tâches de ménage."
+        },
+        "outlets": {
+          "name": "Restaurant de l’hôtel",
+          "description": "Commandes du restaurant et du bar pour les clients, imputées sur la chambre."
+        },
+        "hotel_reports": {
+          "name": "Rapports hôteliers",
+          "description": "Taux d’occupation, prix moyen, RevPAR, prises de réservations et annulations par établissement."
         }
       },
       "sales": {

@@ -205,9 +205,10 @@ function overviewMetrics(ind: IndustryKey, r: ApiReport): Metric[] {
     foods: [
       metricOf('orders', 'Pickup orders', 'receipt', P.blush, M.foodOrders, (v) => ({ kind: 'count', value: sumRecord(v) })),
     ],
-    hospitality: [],
     // Real Estate KPIs (listings, funnel, volume per currency) live on Operations → Pulse (/v1/orgs/:id/realty/reports).
     realty: [],
+    // Hospitality KPIs (occupancy, ADR, RevPAR per currency) live on Operations → Pulse (/v1/orgs/:id/hospitality/pulse).
+    hospitality: [],
   };
   const conns = r.connections;
   const sync: Metric = conns.length
@@ -320,7 +321,7 @@ const AI_SUGGESTIONS: Record<IndustryKey, [text: string, multiLocation?: boolean
   commerce: [['Explain this week’s order trend'], ['Draft product copy', false, true], ['Which stores failed the last sync?', true]],
   foods: [['Summarize today’s orders by location', true], ['Draft menu copy', false, true], ['Plan a lunch promotion', false, true]],
   realty: [['Which offices need attention?', true], ['Draft a campaign for new listings', false, true], ['Summarize inquiries this week']],
-  hospitality: [],
+  hospitality: [['Which properties have the most arrivals today?', true], ['Draft a pre-arrival message', false, true], ['Summarize occupancy this week', true]],
 };
 
 /* ------------------------------------------------------------------ */

@@ -72,6 +72,12 @@
     "link_invalid": "Questo link di accesso è scaduto o è già stato usato. Richiedine uno nuovo.",
     "portal_session_expired": "La sessione è terminata. Richiedi un nuovo link di accesso.",
     "invalid_credentials": "Email o password non corrette.",
-    "email_taken": "Esiste già un account con questa email."
+    "email_taken": "Esiste già un account con questa email.",
+    "sold_out": "Queste date sono appena esaurite. Scegli altre date o camere.",
+    "rate_min_stay": "Questa tariffa richiede un soggiorno più lungo.",
+    "rate_closed_to_arrival": "Non è possibile arrivare in questa data con questa tariffa.",
+    "not_modifiable": "Questa prenotazione non può più essere modificata online.",
+    "not_cancellable": "Questa prenotazione non può più essere cancellata.",
+    "property_not_accepting_bookings": "Questa struttura al momento non accetta prenotazioni."
   }
 }

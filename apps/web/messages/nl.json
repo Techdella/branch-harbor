@@ -1834,7 +1834,8 @@
       "consent": "Stuur me af en toe productnieuws per e-mail. Afmelden kan altijd.",
       "submit": "Demo aanvragen",
       "sending": "Bezig met verzenden…",
-      "securityCheck": "Beveiligingscontrole"
+      "securityCheck": "Beveiligingscontrole",
+      "hospitalityOption": "Horeca-verblijf (hotels, B&B’s, hostels)"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Er is # probleem met dit formulier} other {Er zijn # problemen met dit formulier}}",

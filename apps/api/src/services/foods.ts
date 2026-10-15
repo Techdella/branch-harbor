@@ -406,6 +406,9 @@ export async function createFoodOrder(s: Services, organizationId: string, locat
   return placeFoodOrder(s, organizationId, locationId, { ...input, channel: 'pickup', contact: { ...input.contact } });
 }
 
+/** Called inside the transition transaction (e.g. hospitality reverses a charge-to-room folio line on reject/cancel). */
+export const foodOrderTransitionHooks: Array<(tx: Tx, order: FoodOrderRow, from: FoodOrderState, to: FoodOrderState) => Promise<void>> = [];
+
 /** Restaurant-side status change. Server acknowledges every transition; rejection/cancellation reverses payment. */
 export async function transitionFoodOrder(s: Services, orderId: string, to: FoodOrderState, opts: { organizationId: string; actorUserId: string | null; note?: string; expectedFrom?: FoodOrderState }) {
   const updated = await s.db.transaction(async (tx) => {
@@ -423,6 +426,7 @@ export async function transitionFoodOrder(s: Services, orderId: string, to: Food
       await cancelKdsTickets(tx, o.id);
       await tx.update(foodDeliveries).set({ status: 'cancelled', updatedAt: new Date() }).where(and(eq(foodDeliveries.orderId, o.id), inArray(foodDeliveries.status, ['pending', 'assigned'])));
     }
+    for (const h of foodOrderTransitionHooks) await h(tx, u!, from, to);
     await audit(tx, { organizationId: o.organizationId, actorUserId: opts.actorUserId, action: `food_order.${to}`, scopeKind: 'location', scopeId: o.locationId, targetType: 'food_order', targetId: o.id, metadata: { from, to, note: opts.note } });
     return u!;
   });

@@ -8,7 +8,7 @@ import type { MsgParams, MsgRef } from './msg';
  * translate (see lib/msg.ts); the plain `x` string next to it is the English fallback.
  */
 
-/** Industries a business account can have (one per account; hospitality screens ship with the Hospitality release). */
+/** Industries a business account can have (one per account). */
 export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'] as const;
 export type IndustryKey = (typeof APP_INDUSTRIES)[number];
 
