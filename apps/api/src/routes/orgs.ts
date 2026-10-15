@@ -2,8 +2,7 @@ import { and, count, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import {
   createOrganizationSchema, onboardingStepUpdateSchema, ONBOARDING_STEPS, apiError, DATA_REGIONS, currency, locale, timeZone, isValidTimeZone,
-  firstLocationSchema, soloPrice, currencyForCountry, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel,
-} from '@bh/shared';
+  firstLocationSchema, soloPrice, currencyForCountry, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel, SCOPE_KINDS } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { locations, organizations, ownerGroups, regions, roleAssignments, subscriptions, users } from '../db/schema/index.ts';
 import { AppError, badRequest, forbidden, notFound, validationError } from '../lib/errors.ts';
@@ -264,7 +263,7 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   app.get('/orgs/:orgId/permissions', {
-    schema: { tags: ['orgs'], security: secured, params: orgParams, querystring: z.object({ scopeKind: z.enum(['organization', 'region', 'owner_group', 'location']).default('organization'), scopeId: z.uuid().optional() }), summary: 'Effective permissions in a scope (for hiding controls; enforcement is server-side)' },
+    schema: { tags: ['orgs'], security: secured, params: orgParams, querystring: z.object({ scopeKind: z.enum(SCOPE_KINDS).default('organization'), scopeId: z.uuid().optional() }), summary: 'Effective permissions in a scope (for hiding controls; enforcement is server-side)' },
   }, async (req) => {
     const { orgId } = req.params;
     const id = req.query.scopeId ?? orgId;

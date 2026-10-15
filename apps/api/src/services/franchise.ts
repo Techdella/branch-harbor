@@ -24,7 +24,7 @@ import { AppError, conflict, forbidden, notFound, validationError } from '../lib
 import { audit } from './audit.ts';
 import { hasPerm, requireMember, requirePerm } from './authz.ts';
 import { approvalExtensions, insertApproval, notifyApprovers } from './approvals.ts';
-import { usersWithPermissionAt } from './notifications.ts';
+import { responsibleUsersAt, usersWithPermissionAt } from './notifications.ts';
 import { createPaymentForTarget, paymentTargetExtensions, type TargetType } from './payments.ts';
 import { esignProviders, type ESignProviderKey } from '../integrations/esign.ts';
 import { uniqueSlug } from '../routes/locations.ts';
@@ -231,7 +231,8 @@ export async function createEnquiry(s: Services, org: typeof organizations.$infe
     return p!;
   });
   // Tell the development team.
-  const team = await usersWithPermissionAt(s.db, org.id, null, 'franchise.pipeline.edit');
+  // The development team; when nobody handles the pipeline yet, the owners (coverage fallback).
+  const team = (await responsibleUsersAt(s.db, org.id, null, 'franchise.pipeline.edit')).userIds;
   const recips = team.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, fs.defaultOwnerUserId ? [fs.defaultOwnerUserId] : team)) : [];
   for (const r of recips) {
     await s.jobs.enqueue('email.send', { to: r.email, subject: `New franchise enquiry: ${p.name} (${jurisdictionCode(p.country, p.region)})`, text: `${p.name} <${p.email}> asked about a franchise${p.desiredTerritory ? ` in ${p.desiredTerritory}` : ''}.\nOpen the pipeline: ${s.cfg.APP_URL}/franchise/prospects?id=${p.id}`, tag: 'franchise' });
@@ -664,7 +665,7 @@ export async function runFranchiseJobs(s: Services, now = new Date(), organizati
     const daysLeft = Math.ceil((new Date(`${a.endDate}T00:00:00Z`).getTime() - now.getTime()) / DAY);
     const step = EXPIRY_REMINDER_DAYS.filter((d) => daysLeft <= d && !a.remindersSent.includes(d)).sort((x, y) => x - y)[0];
     if (step === undefined) continue;
-    const legal = await usersWithPermissionAt(s.db, a.organizationId, null, 'legal.view');
+    const legal = (await responsibleUsersAt(s.db, a.organizationId, null, 'legal.edit')).userIds;
     const emailsTo = legal.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, legal)) : [];
     const [g] = a.ownerGroupId ? await s.db.select({ name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.id, a.ownerGroupId)) : [];
     for (const r of emailsTo) {
@@ -685,7 +686,7 @@ const money = (amount: number | null, currency: string | null) => (amount != nul
 export function serializeProspect(p: Prospect, extra: { territoryName?: string | null; ownerName?: string | null; compliance?: ComplianceResult | null } = {}) {
   return {
     id: p.id, name: p.name, email: p.email, phone: p.phone, country: p.country, region: p.region, city: p.city, jurisdiction: jurisdictionCode(p.country, p.region),
-    territoryId: p.territoryId, territoryName: extra.territoryName ?? null, desiredTerritory: p.desiredTerritory,
+    territoryId: p.territoryId, territoryName: extra.territoryName ?? null, desiredTerritory: p.desiredTerritory, scopeTerritoryId: p.scopeTerritoryId,
     liquidCapital: money(p.liquidCapitalMinor, p.currency), netWorth: money(p.netWorthMinor, p.currency), selfDeclared: true, units: p.units,
     source: p.source, campaignId: p.campaignId, attribution: p.attribution, message: p.message, stage: p.stage, stageEnteredAt: p.stageEnteredAt.toISOString(),
     ownerUserId: p.ownerUserId, ownerName: extra.ownerName ?? null, lostReason: p.lostReason, ownerGroupId: p.ownerGroupId, locale: p.locale,

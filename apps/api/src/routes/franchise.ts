@@ -13,7 +13,7 @@ import {
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { audit } from '../services/audit.ts';
-import { authorisedLocations, requireMember } from '../services/authz.ts';
+import { authorisedLocations, capabilityTerritories, requireMember, resolveScopeChain } from '../services/authz.ts';
 import { esignStatus, ESIGN_DISCLAIMER } from '../integrations/esign.ts';
 import {
   LEGAL_ONLY_KINDS, addActivity, generateCadenceTasks, assertCanReadDocument, assertProjectAccess, completeSignature, createFeeInvoice, decodeUpload, ensureFranchiseDefaults, franchiseSettings,
@@ -37,15 +37,40 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
   // Franchise pipeline, agreements or disclosure (capabilities sales.franchise_pipeline, legal.agreements, legal.disclosure).
   const VIEW = ['franchise.pipeline.view', 'legal.view', 'disclosure.view'] as const;
 
+  /**
+   * Franchise pipeline scope: 'all' organisation-wide, or the territories (sub-networks) the person runs the pipeline
+   * for — a master franchisee or area developer sees and works only their territory's prospects.
+   */
+  const pipeline = async (req: FastifyRequest, orgId: string, action: 'view' | 'edit') => {
+    const t = await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', action);
+    if (t !== 'all' && !t.size) throw forbidden(`Missing permission franchise.pipeline.${action}`);
+    return t;
+  };
+  const inPipeline = (t: 'all' | Set<string>, territoryId: string | null | undefined) => t === 'all' || (!!territoryId && t.has(territoryId));
+  /** A prospect inside the person's pipeline scope (404 outside it: no enumeration). */
+  const prospectIn = async (req: FastifyRequest, orgId: string, id: string, action: 'view' | 'edit') => {
+    const t = await pipeline(req, orgId, action);
+    const p = await getProspect(s.db, orgId, id);
+    if (!inPipeline(t, p.scopeTerritoryId)) throw notFound('Prospect');
+    return p;
+  };
+  /** Settings and rules: anyone with the pipeline (any territory), agreements or disclosure. */
+  const requireFranchiseView = async (req: FastifyRequest, orgId: string) => {
+    const t = await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'view');
+    if (t === 'all' || t.size) return;
+    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
+  };
+
   /* ------------------------------- settings ------------------------------ */
 
   app.get('/orgs/:orgId/franchise/settings', { schema: { tags, security: secured, params: orgParams, summary: 'Franchise development settings, e-signature providers and the compliance disclaimer' } }, async (req) => {
     const { orgId } = req.params;
-    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
+    await requireFranchiseView(req, orgId);
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
+    const editScope = await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'edit');
     return {
       ...franchiseSettings(org!), brandSlug: org!.slug, esign: esignStatus(), esignDisclaimer: ESIGN_DISCLAIMER, disclaimer: RULES_DISCLAIMER,
-      canEdit: await orgHas(req, s.db, orgId, 'franchise.pipeline.edit'), legal: { view: await orgHas(req, s.db, orgId, 'legal.view'), edit: await orgHas(req, s.db, orgId, 'legal.edit') },
+      canEdit: editScope === 'all' || editScope.size > 0, territoryScoped: editScope !== 'all' && (await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'view')) !== 'all', legal: { view: await orgHas(req, s.db, orgId, 'legal.view'), edit: await orgHas(req, s.db, orgId, 'legal.edit') },
       disclosure: { view: await orgHas(req, s.db, orgId, 'disclosure.view'), edit: await orgHas(req, s.db, orgId, 'disclosure.edit'), approve: await orgHas(req, s.db, orgId, 'disclosure.approve') },
     };
   });
@@ -67,7 +92,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/franchise/rules', { schema: { tags, security: secured, params: orgParams, summary: 'Jurisdiction rules (compliance aid, not legal advice): platform versions plus this organisation’s own versions' } }, async (req) => {
     const { orgId } = req.params;
-    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
+    await requireFranchiseView(req, orgId);
     const items = await loadRules(s.db, orgId);
     return { disclaimer: RULES_DISCLAIMER, reviewedCount: items.filter((r) => r.reviewedByCounsel).length, items };
   });
@@ -76,7 +101,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: orgParams, querystring: z.object({ country, region: region.optional(), franchisorRegion: region.optional() }), summary: 'Which rules, steps and documents apply to a prospect in a given country / state / province' },
   }, async (req) => {
     const { orgId } = req.params;
-    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
+    await requireFranchiseView(req, orgId);
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     const fs = franchiseSettings(org!);
     const regs = await s.db.select().from(franchiseRegistrations).where(eq(franchiseRegistrations.organizationId, orgId));
@@ -157,12 +182,13 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   /* ------------------------------ territories ----------------------------- */
 
-  const territoryOut = (t: typeof franchiseTerritories.$inferSelect) => ({ id: t.id, name: t.name, country: t.country, region: t.region, jurisdiction: jurisdictionCode(t.country, t.region), description: t.description, status: t.status, showOnSite: t.showOnSite, reservedForProspectId: t.reservedForProspectId, ownerGroupId: t.ownerGroupId });
+  const territoryOut = (t: typeof franchiseTerritories.$inferSelect) => ({ id: t.id, name: t.name, country: t.country, region: t.region, jurisdiction: jurisdictionCode(t.country, t.region), description: t.description, status: t.status, showOnSite: t.showOnSite, reservedForProspectId: t.reservedForProspectId, ownerGroupId: t.ownerGroupId, scopeTerritoryId: t.scopeTerritoryId });
 
   app.get('/orgs/:orgId/franchise/territories', { schema: { tags, security: secured, params: orgParams } }, async (req) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.view');
-    const rows = await s.db.select().from(franchiseTerritories).where(eq(franchiseTerritories.organizationId, orgId)).orderBy(asc(franchiseTerritories.country), asc(franchiseTerritories.name));
+    const scope = await pipeline(req, orgId, 'view');
+    const rows = (await s.db.select().from(franchiseTerritories).where(eq(franchiseTerritories.organizationId, orgId)).orderBy(asc(franchiseTerritories.country), asc(franchiseTerritories.name)))
+      .filter((t) => inPipeline(scope, t.scopeTerritoryId));
     const counts = await s.db.select({ territoryId: franchiseProspects.territoryId, n: sql<number>`count(*)::int` }).from(franchiseProspects)
       .where(and(eq(franchiseProspects.organizationId, orgId), sql`${franchiseProspects.stage} not in ('lost','opened')`)).groupBy(franchiseProspects.territoryId);
     return { items: rows.map((t) => ({ ...territoryOut(t), activeProspects: counts.find((c) => c.territoryId === t.id)?.n ?? 0 })) };
@@ -189,9 +215,10 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: orgParams, querystring: z.object({ stage: z.enum(FRANCHISE_STAGES).optional(), q: z.string().max(100).optional(), ownerUserId: z.uuid().optional() }), summary: 'Pipeline (franchise.pipeline.view). Prospects in the disclosure → agreement stages carry their signing status.' },
   }, async (req) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.view');
+    const scope = await pipeline(req, orgId, 'view');
     await ensureFranchiseDefaults(s.db, orgId);
     const conds = [eq(franchiseProspects.organizationId, orgId)];
+    if (scope !== 'all') conds.push(inArray(franchiseProspects.scopeTerritoryId, [...scope]));
     if (req.query.stage) conds.push(eq(franchiseProspects.stage, req.query.stage));
     if (req.query.ownerUserId) conds.push(eq(franchiseProspects.ownerUserId, req.query.ownerUserId));
     if (req.query.q) conds.push(or(ilike(franchiseProspects.name, `%${req.query.q}%`), ilike(franchiseProspects.email, `%${req.query.q}%`), ilike(franchiseProspects.city, `%${req.query.q}%`))!);
@@ -219,13 +246,21 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     territoryId: z.uuid().nullable().optional(), desiredTerritory: z.string().max(200).nullable().optional(),
     liquidCapitalMinor: z.number().int().min(0).nullable().optional(), netWorthMinor: z.number().int().min(0).nullable().optional(), currency: currency.optional(),
     units: z.number().int().min(1).max(100).optional(), source: z.enum(PROSPECT_SOURCES).default('other'), campaignId: z.uuid().nullable().optional(), message: z.string().max(4000).nullable().optional(), ownerUserId: z.uuid().nullable().optional(),
+    /** The sub-network (access territory) whose pipeline holds the prospect; null = HQ's own pipeline. */
+    scopeTerritoryId: z.uuid().nullable().optional(),
   });
 
   app.post('/orgs/:orgId/franchise/prospects', { schema: { tags, security: secured, params: orgParams, body: prospectBody } }, async (req, reply) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
+    const scope = await pipeline(req, orgId, 'edit');
     await ensureFranchiseDefaults(s.db, orgId);
-    const b = req.body;
+    const b = { ...req.body };
+    // A territory's pipeline only holds its own prospects: default to (and stay inside) the person's territory.
+    if (scope !== 'all') {
+      b.scopeTerritoryId ??= [...scope][0]!;
+      if (!scope.has(b.scopeTerritoryId)) throw forbidden('You can only add prospects to your own territory');
+    }
+    if (b.scopeTerritoryId) await resolveScopeChain(s.db, { organizationId: orgId, kind: 'territory', id: b.scopeTerritoryId });
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     const p = await s.db.transaction(async (tx) => {
       const [p] = await tx.insert(franchiseProspects).values({ ...b, organizationId: orgId, email: b.email.toLowerCase(), currency: b.currency ?? org!.defaultCurrency, ownerUserId: b.ownerUserId ?? req.user!.id, region: b.region ?? null }).returning();
@@ -238,8 +273,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/franchise/prospects/:id', { schema: { tags, security: secured, params: idParams, summary: 'Prospect detail: rules panel, timeline, tasks, documents, signatures, fee invoices, onboarding project' } }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.view');
-    const p = await getProspect(s.db, orgId, id);
+    const p = await prospectIn(req, orgId, id, 'view');
     const [terr] = p.territoryId ? await s.db.select().from(franchiseTerritories).where(eq(franchiseTerritories.id, p.territoryId)) : [];
     const acts = await listOrderedActivities(s.db, p.id);
     const tasks = await s.db.select().from(franchiseTasks).where(eq(franchiseTasks.prospectId, p.id)).orderBy(asc(franchiseTasks.dueAt));
@@ -261,14 +295,17 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/franchise/prospects/:id/compliance', { schema: { tags, security: secured, params: idParams } }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.view');
-    return prospectCompliance(s.db, await getProspect(s.db, orgId, id));
+    return prospectCompliance(s.db, await prospectIn(req, orgId, id, 'view'));
   });
 
   app.patch('/orgs/:orgId/franchise/prospects/:id', { schema: { tags, security: secured, params: idParams, body: prospectBody.partial() } }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const p = await getProspect(s.db, orgId, id);
+    const p = await prospectIn(req, orgId, id, 'edit');
+    if (req.body.scopeTerritoryId !== undefined) {
+      const scope = await pipeline(req, orgId, 'edit');
+      if (scope !== 'all' && !(req.body.scopeTerritoryId && scope.has(req.body.scopeTerritoryId))) throw forbidden('You can only keep prospects in your own territory');
+      if (req.body.scopeTerritoryId) await resolveScopeChain(s.db, { organizationId: orgId, kind: 'territory', id: req.body.scopeTerritoryId });
+    }
     if ((req.body.country || req.body.region !== undefined) && stageIndex(p.stage as FranchiseStage) >= stageIndex('disclosure_sent') && p.stage !== 'lost') {
       await addActivity(s.db, p, 'note', 'Location changed after disclosure: check that the right disclosure documents were given.', req.user!.id, { from: jurisdictionCode(p.country, p.region) });
     }
@@ -280,8 +317,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ to: z.enum(FRANCHISE_STAGES), note: z.string().max(2000).optional(), lostReason: z.string().max(500).optional() }), summary: 'Move a prospect by hand (enquiry → qualified → discovery call, or lost). Later stages follow from actions so the rules engine can check them.' },
   }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const p = await getProspect(s.db, orgId, id);
+    const p = await prospectIn(req, orgId, id, 'edit');
     const to = req.body.to;
     if (!MANUAL_STAGES.includes(to)) {
       throw conflict('stage_requires_action', to === 'disclosure_sent' ? 'Send a disclosure document to move to this stage.' : to === 'agreement_sent' ? 'Send the agreement to move to this stage.' : to === 'signed' ? 'The agreement is signed through e-signature, which checks the waiting period and registration first.' : to === 'opened' ? 'A location opens when HQ approves its go-live.' : 'This stage follows from an action (receipt, signature, onboarding).', { to });
@@ -301,8 +337,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ kind: z.enum(['note', 'call', 'meeting', 'email']), body: z.string().min(1).max(4000) }) },
   }, async (req, reply) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const p = await getProspect(s.db, orgId, id);
+    const p = await prospectIn(req, orgId, id, 'edit');
     await addActivity(s.db, p, req.body.kind, req.body.body, req.user!.id);
     await s.db.update(franchiseProspects).set({ updatedAt: new Date() }).where(eq(franchiseProspects.id, p.id));
     return reply.code(201).send({ ok: true });
@@ -312,8 +347,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ territoryId: z.uuid().nullable() }) },
   }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const p = await getProspect(s.db, orgId, id);
+    const p = await prospectIn(req, orgId, id, 'edit');
     return s.db.transaction(async (tx) => {
       await tx.update(franchiseTerritories).set({ status: 'available', reservedForProspectId: null }).where(and(eq(franchiseTerritories.organizationId, orgId), eq(franchiseTerritories.reservedForProspectId, p.id), eq(franchiseTerritories.status, 'reserved')));
       if (req.body.territoryId) {
@@ -331,8 +365,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ documentId: z.uuid() }), summary: 'Deliver a disclosure document by email link; the prospect signs an e-receipt (timestamp + IP) that starts the waiting period' },
   }, async (req, reply) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const out = await sendDisclosure(s, req, await getProspect(s.db, orgId, id), req.body.documentId);
+    const out = await sendDisclosure(s, req, await prospectIn(req, orgId, id, 'edit'), req.body.documentId);
     return reply.code(201).send({ deliveryId: out.delivery.id, stage: out.prospect.stage, link: out.link, warnings: out.warnings, ...(out.devToken ? { devToken: out.devToken } : {}) });
   });
 
@@ -344,8 +377,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     },
   }, async (req, reply) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const out = await sendAgreement(s, req, await getProspect(s.db, orgId, id), req.body);
+    const out = await sendAgreement(s, req, await prospectIn(req, orgId, id, 'edit'), req.body);
     return reply.code(201).send({ signatureId: out.signature.id, provider: out.signature.provider, stage: out.prospect.stage, link: out.link, disclaimer: ESIGN_DISCLAIMER, ...(out.devToken ? { devToken: out.devToken } : {}) });
   });
 
@@ -353,8 +385,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ signatureId: z.uuid(), signerName: z.string().min(2).max(120) }), summary: 'Record a signature completed outside the built-in flow (provider or wet ink). Same rule checks as e-signature.' },
   }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const p = await getProspect(s.db, orgId, id);
+    const p = await prospectIn(req, orgId, id, 'edit');
     const [sig] = await s.db.select().from(franchiseSignatures).where(and(eq(franchiseSignatures.id, req.body.signatureId), eq(franchiseSignatures.prospectId, p.id)));
     if (!sig) throw notFound('Agreement');
     const r = await completeSignature(s, sig.id, { name: req.body.signerName, ip: req.ip, userAgent: req.headers['user-agent'] ?? null, actorUserId: req.user!.id });
@@ -365,8 +396,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ amountMinor: z.number().int().positive(), currency, description: z.string().min(1).max(200), collectLocationId: z.uuid().optional() }), summary: 'Request a franchise fee through the existing payments (blocked until the payment waiting period ends and registrations are in effect)' },
   }, async (req, reply) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    const out = await createFeeInvoice(s, req, await getProspect(s.db, orgId, id), req.body);
+    const out = await createFeeInvoice(s, req, await prospectIn(req, orgId, id, 'edit'), req.body);
     return reply.code(201).send({ invoiceId: out.invoice.id, paymentId: out.payment.id, status: out.invoice.status, sandbox: out.sandbox });
   });
 
@@ -376,8 +406,9 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: orgParams, querystring: z.object({ mine: z.coerce.boolean().default(false), status: z.enum(['open', 'done', 'skipped', 'all']).default('open'), prospectId: z.uuid().optional(), projectId: z.uuid().optional() }) },
   }, async (req) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.view');
+    const scope = await pipeline(req, orgId, 'view');
     const conds = [eq(franchiseTasks.organizationId, orgId)];
+    if (scope !== 'all') conds.push(inArray(franchiseProspects.scopeTerritoryId, [...scope]));
     if (req.query.status !== 'all') conds.push(eq(franchiseTasks.status, req.query.status));
     if (req.query.mine) conds.push(eq(franchiseTasks.ownerUserId, req.user!.id));
     if (req.query.prospectId) conds.push(eq(franchiseTasks.prospectId, req.query.prospectId));
@@ -391,9 +422,10 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: orgParams, body: z.object({ prospectId: z.uuid().optional(), projectId: z.uuid().optional(), title: z.string().min(1).max(200), kind: z.enum(['email', 'call', 'task']).default('task'), dueAt: z.iso.datetime({ offset: true }).optional(), ownerUserId: z.uuid().optional(), section: z.string().max(40).optional() }) },
   }, async (req, reply) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
+    const scope = await pipeline(req, orgId, 'edit');
     const b = req.body;
-    if (b.prospectId) await getProspect(s.db, orgId, b.prospectId);
+    if (b.prospectId) await prospectIn(req, orgId, b.prospectId, 'edit');
+    else if (scope !== 'all' && !b.projectId) throw forbidden('Tasks in your territory belong to a prospect');
     if (b.projectId) await getProject(s.db, orgId, b.projectId);
     const [t] = await s.db.insert(franchiseTasks).values({ organizationId: orgId, prospectId: b.prospectId ?? null, projectId: b.projectId ?? null, title: b.title, kind: b.kind, section: b.section ?? null, dueAt: b.dueAt ? new Date(b.dueAt) : null, ownerUserId: b.ownerUserId ?? req.user!.id }).returning();
     return reply.code(201).send(serializeTask(t!));
@@ -407,6 +439,8 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
       const who = await assertProjectAccess(req, s.db, proj, true);
       if (who === 'owner' && t.assignee !== 'owner') throw forbidden('Only HQ can complete this task');
       if (proj.status !== 'active') throw conflict('project_locked', 'The checklist is locked while the opening is being approved');
+    } else if (t.prospectId) {
+      await prospectIn(req, orgId, t.prospectId, 'edit');
     } else {
       await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
     }
@@ -650,12 +684,23 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/franchise/team', { schema: { tags, security: secured, params: orgParams, summary: 'People who can own prospects (pipeline edit)' } }, async (req) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.view');
+    const scope = await pipeline(req, orgId, 'view');
     const { usersWithPermissionAt } = await import('../services/notifications.ts');
-    const ids = await usersWithPermissionAt(s.db, orgId, null, 'franchise.pipeline.edit');
+    const ids = scope === 'all'
+      ? await usersWithPermissionAt(s.db, orgId, null, 'franchise.pipeline.edit')
+      : [...new Set((await Promise.all([...scope].map((t) => usersWithCapabilityInTerritory(orgId, t)))).flat())];
     const names = await userNames(s.db, ids);
     return { items: ids.map((id) => ({ id, name: names.get(id) ?? '' })) };
   });
+
+  /** People who work the pipeline of a territory (its own team; HQ's development team is not listed to them). */
+  async function usersWithCapabilityInTerritory(orgId: string, territoryId: string) {
+    const { loadOrgAssignments } = await import('../services/authz.ts');
+    const { hasCapabilityInScope } = await import('../domain/scope.ts');
+    const chain = { organizationId: orgId, kind: 'territory' as const, territoryId };
+    return [...(await loadOrgAssignments(s.db, orgId)).entries()]
+      .filter(([, a]) => a.some((x) => x.scopeKind === 'territory') && hasCapabilityInScope(a, 'sales.franchise_pipeline', 'edit', chain)).map(([id]) => id);
+  }
 
   app.post('/orgs/:orgId/franchise/jobs/run', { schema: { tags, security: secured, params: orgParams, summary: 'Run due cadence emails, task reminders and agreement expiry reminders for this organisation now (also runs every 15 minutes)' } }, async (req) => {
     const { orgId } = req.params;

@@ -10,8 +10,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
 import {
   AUTOMATION_TRIGGERS, emailDocumentSchema, formDefinitionSchema, marketingSettingsSchema, segmentRulesSchema, unknownTokens, validateAutomationGraph,
-  type Permission, type ScopeKind,
-} from '@bh/shared';
+  type Permission, type ScopeKind, SCOPE_KINDS } from '@bh/shared';
 import {
   assetBlobs, automationRuns, automationSteps, automations, brandAssets, campaigns, contactTags, customers, emailSends, emailTemplates, formSubmissions, forms,
   locations, marketingTasks, organizations, contactSegments, users,
@@ -27,7 +26,7 @@ import { addTag, campaignContent, campaignStats, consentedCustomerIds, emailBran
 import { iso, isoDateTime, orgParams, secured } from './_common.ts';
 
 const idp = z.object({ orgId: z.uuid(), id: z.uuid() });
-const scopeSchema = z.object({ kind: z.enum(['organization', 'region', 'owner_group', 'location']), id: z.uuid() });
+const scopeSchema = z.object({ kind: z.enum(SCOPE_KINDS), id: z.uuid() });
 const MAX_UPLOAD = 10 * 1024 * 1024;
 const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml', 'image/avif', 'application/pdf', 'video/mp4', 'font/woff2'];
 

@@ -42,3 +42,21 @@ export const memberAccessOverrides = pgTable('member_access_overrides', {
   uniqueIndex('member_access_overrides_uq').on(t.assignmentId, t.capability),
   index('member_access_overrides_org_idx').on(t.organizationId),
 ]);
+
+/** A person in one business: a free-text job title (separate from their roles) and sensitive classes denied to them. */
+export const memberProfiles = pgTable('member_profiles', {
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  jobTitle: text('job_title'),
+  /** Sensitive data classes (finance | legal | personal_data) removed from every role the person holds. */
+  deniedClasses: text('denied_classes').array().notNull().default(sql`'{}'::text[]`),
+  updatedAt: updatedAt(),
+}, (t) => [primaryKey({ columns: [t.organizationId, t.userId] })]);
+
+/** The business's own display name for a system role (any template can be renamed). */
+export const roleLabels = pgTable('role_labels', {
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(),
+  name: text('name').notNull(),
+  updatedAt: updatedAt(),
+}, (t) => [primaryKey({ columns: [t.organizationId, t.role] })]);

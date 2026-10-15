@@ -11,6 +11,7 @@
 import { createHmac } from 'node:crypto';
 import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, or, sql } from 'drizzle-orm';
 import { delayMs, emailDocumentSchema, nextNode, personalise, type ActionConfig, type AutomationGraph, type AutomationNode, type ConditionConfig } from '@bh/shared';
+import { locationsInScope } from './authz.ts';
 import type { Services } from '../context.ts';
 import {
   automationRuns, automationSteps, automations, campaigns, classBookings, contactTags, customers, emailTemplates, foodOrders, leads, locations, marketingEvents,
@@ -30,8 +31,8 @@ async function scopeCovers(s: Services, a: AutomationRow, locationId: string | n
   if (a.scopeKind === 'organization') return true;
   if (!locationId) return false;
   if (a.scopeKind === 'location') return a.scopeId === locationId;
-  const [l] = await s.db.select({ regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.id, locationId));
-  return a.scopeKind === 'region' ? l?.regionId === a.scopeId : l?.ownerGroupId === a.scopeId;
+  const inScope = await locationsInScope(s.db, a.organizationId, a.scopeKind, a.scopeId);
+  return inScope === 'all' || inScope.has(locationId);
 }
 
 /** Start runs for one event (idempotent). */

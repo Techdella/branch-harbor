@@ -5,7 +5,7 @@ import { communityAnnouncements, enrolments, networkNotifications, ownerGroups, 
 import { signStripePayload } from '../src/integrations/payments.ts';
 import { runNetworkHousekeeping } from '../src/services/community.ts';
 import { runHelpdeskSla } from '../src/services/helpdesk.ts';
-import { call, createLocation, createOrg, enablePublicAndPayments, hasDb, makeApp, memberWithRole, uid, verifiedUser, WEBHOOK_SECRET } from './helpers.ts';
+import { call, createLocation, createOrg, enablePublicAndPayments, grantCaps, hasDb, makeApp, memberWithRole, uid, verifiedUser, WEBHOOK_SECRET } from './helpers.ts';
 
 type U = { token: string; userId: string; email: string };
 
@@ -36,8 +36,11 @@ describe.skipIf(!hasDb)('network workspaces: community, training academy, help d
     franB = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: groupB }, 'Fiona B');
     staffA = await memberWithRole(app, owner.token, orgId, 'staff', { kind: 'location', id: la1.id }, 'Sam A');
     staffB = await memberWithRole(app, owner.token, orgId, 'staff', { kind: 'location', id: lb1.id }, 'Sky B');
-    trainer = await memberWithRole(app, owner.token, orgId, 'instructor_trainer', { kind: 'location', id: la1.id }, 'Tara Trainer');
-    rmNorth = await memberWithRole(app, owner.token, orgId, 'regional_manager', { kind: 'region', id: north }, 'Rae North');
+    trainer = await memberWithRole(app, owner.token, orgId, 'trainer', { kind: 'location', id: la1.id }, 'Tara Trainer');
+    rmNorth = await memberWithRole(app, owner.token, orgId, 'field_consultant', { kind: 'region', id: north }, 'Rae North');
+    // Course leads for the trainer, and the regional duties the old regional-manager template had (migration 0023).
+    await grantCaps(app, owner.token, orgId, trainer.userId, ['sales.course_leads:view', 'sales.course_leads:edit']);
+    await grantCaps(app, owner.token, orgId, rmNorth.userId, ['network.approvals:publish', 'community.announcements:edit', 'community.announcements:publish', 'community.discussions:publish']);
     outsider = await verifiedUser(app, 'Out Sider');
   });
   afterAll(async () => { await app?.close(); });
