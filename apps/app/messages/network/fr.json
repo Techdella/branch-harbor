@@ -312,8 +312,7 @@
       "catalogue": "Catalogue",
       "authoring": "Création",
       "assign": "Attribuer",
-      "reports": "Suivi",
-      "leads": "Prospects"
+      "reports": "Suivi"
     },
     "home": {
       "todo": "À faire",
@@ -501,28 +500,6 @@
       "empty": "Aucune formation attribuée dans vos établissements pour l’instant.",
       "people": "Personnes de cet établissement",
       "done": "terminé"
-    },
-    "leads": {
-      "title": "Prospects de cours",
-      "status": "Statut",
-      "all": "Tous les statuts",
-      "statuses": {
-        "new": "Nouveau",
-        "contacted": "Contacté",
-        "enrolled": "Inscrit",
-        "lost": "Perdu"
-      },
-      "intro": "Demandes venant du site de la marque et des campagnes publicitaires. Une inscription payée marque automatiquement le prospect comme inscrit.",
-      "sources": {
-        "website": "Site web",
-        "ad_campaign": "Campagne publicitaire",
-        "manual": "Ajouté manuellement",
-        "import": "Importé"
-      },
-      "assignedTo": "Attribué à {name}",
-      "notes": "Notes",
-      "saveNotes": "Enregistrer les notes",
-      "empty": "Aucun prospect pour l’instant."
     }
   },
   "helpdesk": {

@@ -38,7 +38,12 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   ],
   'marketing.website_builder': [{ key: 'websites', href: '/websites', icon: 'globe' }],
   'marketing.campaigns': [{ key: 'marketing', href: '/marketing', icon: 'megaphone' }],
-  'sales.course_leads': [{ key: 'courseLeads', href: '/course-leads', icon: 'users', msg: 'training.leads.title' }],
+  'marketing.inbox': [{ key: 'inbox', href: '/marketing/inbox', icon: 'message' }],
+  'marketing.social': [{ key: 'social', href: '/marketing/social', icon: 'share' }],
+  'marketing.ads': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
+  'marketing.network_campaigns': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
+  'sales.customer_pipeline': [{ key: 'leads', href: '/sales/leads', icon: 'trending' }],
+  'sales.course_leads': [{ key: 'leads', href: '/sales/leads', icon: 'trending' }],
   'finance.payments': [{ key: 'payments', href: '/payments', icon: 'card' }],
   'legal.agreements': [{ key: 'agreements', href: '/franchise/agreements', icon: 'scale', msg: 'franchise.nav.agreements' }],
   'legal.disclosure': [
@@ -121,16 +126,14 @@ export function routeModules(pathname: string, industry: IndustryKey): string[] 
     const m = modulesFor(industry).find((x) => x.area === 'operations' && x.status === 'available' && x.screens?.includes(screen));
     return m ? [m.key] : [];
   }
-  // Two-segment screens (/franchise/pipeline) first, then one-segment ones (/customers).
-  for (const href of seg.length > 1 ? [`/${first}/${seg[1]}`, `/${first}`] : [`/${first}`]) {
-    const matches = [
-      ...Object.entries(MODULE_LINKS).filter(([, links]) => links.some((l) => l.href === href)).map(([k]) => k),
-      ...(EXTRA_ROUTE_MODULES[href] ?? []),
-    ];
-    if (matches.length) return [...new Set(matches)];
-  }
-  // Every franchise / legal screen is tied to a module: an unknown one is never available.
-  return first === 'franchise' ? [] : null;
+  // The longest link (or extra route) that is the path or a prefix of it decides (`/marketing/inbox` before `/marketing`).
+  const path = `/${seg.join('/')}`;
+  const hrefs = Object.values(MODULE_LINKS).flat().map((l) => l.href);
+  const best = [...new Set([...hrefs, ...Object.keys(EXTRA_ROUTE_MODULES)])].filter((h) => path === h || path.startsWith(`${h}/`)).sort((a, b) => b.length - a.length)[0];
+  // Unknown sub-screens of a module area (e.g. /franchise/x) are never available; other unknown routes aren't tied to a module.
+  if (!best) return seg.length > 1 && hrefs.some((h) => h.startsWith(`/${first}/`)) ? [] : null;
+  const matches = [...Object.entries(MODULE_LINKS).filter(([, links]) => links.some((l) => l.href === best)).map(([k]) => k), ...(EXTRA_ROUTE_MODULES[best] ?? [])];
+  return matches.length ? [...new Set(matches)] : null;
 }
 
 export function canSeeRoute(pathname: string, caps: ReadonlySet<string>, industry: IndustryKey): boolean {

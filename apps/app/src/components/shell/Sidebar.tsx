@@ -156,8 +156,12 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
   const settings = independent ? [] : settingsNav(app.capabilities, app.industry);
   const homeLabel = !independent && app.workspace && app.workspaces.length > 1 ? t('access.home.navLabel', { workspace: t(`access.workspace.${app.workspace}.name`) }) : t('nav.overview');
 
+  // Only the longest matching link is active (/marketing/inbox highlights Inbox, not Campaigns at /marketing).
+  const activeHref = ['/overview', ...main.map((l) => l.href), ...settings.map((l) => l.href)]
+    .filter((h) => path === h || path.startsWith(`${h}/`))
+    .sort((a, b) => b.length - a.length)[0];
   const item = (l: { key: string; href: string; icon: NavLink['icon'] }, text: string) => {
-    const active = path === l.href || path.startsWith(`${l.href}/`);
+    const active = l.href === activeHref;
     return (
       <li key={l.href}>
         <Link

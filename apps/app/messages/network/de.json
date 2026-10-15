@@ -312,8 +312,7 @@
       "catalogue": "Katalog",
       "authoring": "Erstellen",
       "assign": "Zuweisen",
-      "reports": "Abschlüsse",
-      "leads": "Kursinteressenten"
+      "reports": "Abschlüsse"
     },
     "home": {
       "todo": "Zu erledigen",
@@ -501,28 +500,6 @@
       "empty": "Ihren Standorten sind noch keine Schulungen zugewiesen.",
       "people": "Personen an diesem Standort",
       "done": "erledigt"
-    },
-    "leads": {
-      "title": "Kursinteressenten",
-      "status": "Status",
-      "all": "Alle Status",
-      "statuses": {
-        "new": "Neu",
-        "contacted": "Kontaktiert",
-        "enrolled": "Angemeldet",
-        "lost": "Verloren"
-      },
-      "intro": "Anfragen über die Markenwebsite und Kurs-Werbekampagnen. Bezahlte Anmeldungen markieren Interessenten automatisch als angemeldet.",
-      "sources": {
-        "website": "Website",
-        "ad_campaign": "Werbekampagne",
-        "manual": "Manuell hinzugefügt",
-        "import": "Importiert"
-      },
-      "assignedTo": "Zugewiesen an {name}",
-      "notes": "Notizen",
-      "saveNotes": "Notizen speichern",
-      "empty": "Noch keine Interessenten."
     }
   },
   "helpdesk": {

@@ -312,8 +312,7 @@
       "catalogue": "Catálogo",
       "authoring": "Criação",
       "assign": "Atribuir",
-      "reports": "Conclusão",
-      "leads": "Interessados"
+      "reports": "Conclusão"
     },
     "home": {
       "todo": "A fazer",
@@ -501,28 +500,6 @@
       "empty": "Ainda não há treinamentos atribuídos às suas unidades.",
       "people": "Pessoas desta unidade",
       "done": "concluído"
-    },
-    "leads": {
-      "title": "Interessados em cursos",
-      "status": "Status",
-      "all": "Todos os status",
-      "statuses": {
-        "new": "Novo",
-        "contacted": "Contatado",
-        "enrolled": "Matriculado",
-        "lost": "Perdido"
-      },
-      "intro": "Pedidos vindos do site da marca e das campanhas de anúncios. Matrículas pagas marcam o interessado como matriculado automaticamente.",
-      "sources": {
-        "website": "Site",
-        "ad_campaign": "Campanha de anúncios",
-        "manual": "Adicionado manualmente",
-        "import": "Importado"
-      },
-      "assignedTo": "Atribuído a {name}",
-      "notes": "Anotações",
-      "saveNotes": "Salvar anotações",
-      "empty": "Ainda não há interessados."
     }
   },
   "helpdesk": {

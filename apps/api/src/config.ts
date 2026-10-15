@@ -82,6 +82,21 @@ const envSchema = z.object({
   TWILIO_FROM_NUMBER: optional,
   WHATSAPP_CLOUD_TOKEN: optional,
   WHATSAPP_PHONE_NUMBER_ID: optional,
+  /** Meta app secret of the WhatsApp Business app (X-Hub-Signature-256 on webhooks). Falls back to META_APP_SECRET. */
+  WHATSAPP_APP_SECRET: optional,
+  /** Token Meta echoes when subscribing the WhatsApp / Messenger / Instagram webhook (hub.verify_token). */
+  META_WEBHOOK_VERIFY_TOKEN: optional,
+  /** Postmark inbound: the webhook URL carries HTTP basic auth `inbound:<token>` (Postmark signs nothing else). */
+  POSTMARK_INBOUND_TOKEN: optional,
+  /** Resend inbound / webhooks: Svix signing secret (whsec_…). */
+  RESEND_WEBHOOK_SECRET: optional,
+  /**
+   * Secret used to sign and verify sandbox webhooks (simulated inbound messages) for channels without provider
+   * credentials. Defaults to a key derived from ENCRYPTION_KEY, so it is never empty.
+   */
+  COMMS_SANDBOX_SECRET: optional,
+  /** First-reply SLA for new inbox conversations, in minutes. */
+  INBOX_REPLY_SLA_MINUTES: z.coerce.number().int().min(5).default(240),
 
   // Payments
   STRIPE_SECRET_KEY: optional,
@@ -130,6 +145,10 @@ const envSchema = z.object({
   GOOGLE_OAUTH_CLIENT_SECRET: optional,
   META_APP_ID: optional,
   META_APP_SECRET: optional,
+  LINKEDIN_CLIENT_ID: optional,
+  LINKEDIN_CLIENT_SECRET: optional,
+  /** Google Ads developer token (with GOOGLE_OAUTH_*). Without it, ad results are entered manually. */
+  GOOGLE_ADS_DEVELOPER_TOKEN: optional,
 
   // Connectors
   MINDBODY_API_KEY: optional,
@@ -205,5 +224,9 @@ export function integrationStatus(cfg: Config) {
     uberDirect: 'per-location credentials (sandbox without them)',
     deliverect: 'per-location credentials (sandbox without them)',
     propertyPortals: 'per-office credentials (sandbox without them)',
+    inboxEmail: cfg.POSTMARK_INBOUND_TOKEN || cfg.RESEND_WEBHOOK_SECRET ? 'live' : 'sandbox (simulated inbound)',
+    inboxMeta: cfg.META_APP_ID && cfg.META_APP_SECRET ? 'live (per-page tokens)' : 'sandbox (simulated inbound)',
+    socialPublishing: cfg.META_APP_ID && cfg.META_APP_SECRET ? 'meta live; linkedin/google business sandbox' : 'sandbox (posts simulated, never claimed as published)',
+    adsPlatforms: 'manual results entry (Meta/Google Ads OAuth scaffolding only)',
   } as const;
 }

@@ -26,7 +26,7 @@ export interface TrainingHome {
   can: { author: boolean; manage: boolean; assign: boolean; leads: boolean };
 }
 
-// Course leads live in Sales (/course-leads).
+// Course leads live in Sales (/sales/leads, Course leads tab).
 const TABS = ['learning', 'catalogue', 'authoring', 'assign', 'reports'] as const;
 type Tab = (typeof TABS)[number];
 

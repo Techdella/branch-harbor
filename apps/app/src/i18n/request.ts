@@ -10,6 +10,7 @@ import dataEn from '../../messages/data/en.json';
 import accessEn from '../../messages/access/en.json';
 import franchiseEn from '../../messages/franchise/en.json';
 import networkEn from '../../messages/network/en.json';
+import commsEn from '../../messages/comms/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -43,6 +44,8 @@ export default getRequestConfig(async () => {
   messages = merge(messages, franchiseEn as Messages);
   // Network workspaces (Community, Training academy, Help desk): messages/network/*.json, merged at the root.
   messages = merge(messages, networkEn as Messages);
+  // Marketing & sales communications (inbox, social, ad campaigns, leads): namespace "comms" plus nav/module/error keys.
+  messages = merge(messages, commsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
@@ -54,6 +57,7 @@ export default getRequestConfig(async () => {
     messages = merge(messages, (await import(`../../messages/access/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/franchise/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/network/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/comms/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

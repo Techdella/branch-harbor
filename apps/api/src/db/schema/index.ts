@@ -17,3 +17,4 @@ export * from './access.ts';
 export * from './franchise.ts';
 export * from './hospitality-ext.ts';
 export * from './network.ts';
+export * from './comms.ts';

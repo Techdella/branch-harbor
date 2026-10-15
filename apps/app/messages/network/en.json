@@ -312,8 +312,7 @@
       "catalogue": "Catalogue",
       "authoring": "Authoring",
       "assign": "Assign",
-      "reports": "Completion",
-      "leads": "Course leads"
+      "reports": "Completion"
     },
     "home": {
       "todo": "To do",
@@ -501,28 +500,6 @@
       "empty": "No training assigned in your locations yet.",
       "people": "People at this location",
       "done": "done"
-    },
-    "leads": {
-      "title": "Course leads",
-      "status": "Status",
-      "all": "All statuses",
-      "statuses": {
-        "new": "New",
-        "contacted": "Contacted",
-        "enrolled": "Enrolled",
-        "lost": "Lost"
-      },
-      "intro": "Enquiries from the brand website and course ad campaigns. Paid enrolments mark the lead as enrolled automatically.",
-      "sources": {
-        "website": "Website",
-        "ad_campaign": "Ad campaign",
-        "manual": "Added by hand",
-        "import": "Imported"
-      },
-      "assignedTo": "Assigned to {name}",
-      "notes": "Notes",
-      "saveNotes": "Save notes",
-      "empty": "No leads yet."
     }
   },
   "helpdesk": {

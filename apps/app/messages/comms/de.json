@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "inbox": "Posteingang",
+    "social": "Social Media",
+    "campaigns": "Werbekampagnen",
+    "leads": "Leads & Pipeline"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "inbox": {
+          "name": "Posteingang",
+          "description": "Ein Posteingang pro Standort für E-Mail, SMS, WhatsApp, Instagram und Messenger: Antworten, Notizen, Zuweisung und Segmente."
+        },
+        "social": {
+          "name": "Social Media",
+          "description": "Beiträge, Planung und Freigaben auf Markenkonten, mit Veröffentlichungsrechten für Standorte."
+        },
+        "ads": {
+          "name": "Anzeigen",
+          "description": "Lokale bezahlte Kampagnen, Budgets und Ergebnisse."
+        },
+        "network_campaigns": {
+          "name": "Netzwerkkampagnen",
+          "description": "Kampagnen der Zentrale für alle Standorte, auch für bald eröffnende."
+        }
+      },
+      "sales": {
+        "customer_pipeline": {
+          "name": "Leads & Pipeline",
+          "description": "Neue Anfragen, Vertriebspipeline (Deals, Aufgaben, Aktivitäten) und Lead-Routing."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "whatsapp_template_required": "Mehr als 24 Stunden seit der letzten Nachricht: Senden Sie eine genehmigte WhatsApp-Vorlage.",
+    "template_not_approved": "Nur von WhatsApp genehmigte Vorlagen können gesendet werden.",
+    "contact_opted_out": "Dieser Kontakt hat Nachrichten auf diesem Kanal abbestellt.",
+    "consent_required": "Dieser Kontakt hat dem Empfang von Nachrichten auf diesem Kanal nicht zugestimmt.",
+    "messaging_window_closed": "Das 24-Stunden-Fenster ist geschlossen. Warten Sie, bis der Kontakt erneut schreibt.",
+    "campaign_not_running": "Ergebnisse können nach dem Start der Kampagne erfasst werden.",
+    "awaiting_approval": "Diese Kampagne wartet auf die Budgetfreigabe.",
+    "channel_in_use": "Diese Adresse ist bereits mit einem Posteingang verbunden.",
+    "oauth_not_configured": "Für die Verbindung werden App-Zugangsdaten benötigt. Nutzen Sie bis dahin Sandbox-Konten.",
+    "account_disconnected": "Dieses Konto ist getrennt.",
+    "not_hq_account": "Nur Konten der Zentrale können übergeben werden.",
+    "not_scheduled": "Dieser Beitrag ist nicht geplant.",
+    "not_cancellable": "Dieser Beitrag kann nicht mehr storniert werden.",
+    "campaign_closed": "Diese Kampagne ist abgeschlossen.",
+    "not_customer_lead": "Kurs-Leads werden von Ausbildern betreut, nicht in Deals umgewandelt."
+  },
+  "comms": {
+    "common": {
+      "hq": "Zentrale",
+      "unknownLocation": "Anderer Standort"
+    },
+    "meta": {
+      "inbox": "Posteingang",
+      "social": "Social Media",
+      "campaigns": "Werbekampagnen",
+      "leads": "Leads & Pipeline"
+    },
+    "inbox": {
+      "title": "Posteingang",
+      "description": "E-Mail, SMS, WhatsApp, Instagram und Messenger an einem Ort, für die ausgewählten Standorte.",
+      "denied": "Der Posteingang gehört nicht zu Ihrem Zugriff.",
+      "status": {
+        "open": "Offen",
+        "pending": "Wartend",
+        "closed": "Geschlossen",
+        "all": "Alle"
+      },
+      "channel": {
+        "email": "E-Mail",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "messenger": "Messenger"
+      },
+      "channelFilter": "Kanal",
+      "allChannels": "Alle Kanäle",
+      "hqOnly": "Nur Zentrale",
+      "noChannels": {
+        "title": "Noch keine Kanäle verbunden",
+        "body": "Verbinden Sie eine Nummer, WhatsApp, eine Seite oder E-Mail-Adresse, um Nachrichten zu empfangen."
+      },
+      "listLabel": "Unterhaltungen",
+      "empty": "Keine Unterhaltungen",
+      "pick": "Wählen Sie eine Unterhaltung zum Lesen und Antworten.",
+      "unread": "Ungelesen",
+      "overdue": "Antwort überfällig",
+      "threadLabel": "Unterhaltung",
+      "back": "Zurück zu den Unterhaltungen",
+      "linkedCustomer": "Kunde: {name}",
+      "linkedLead": "Lead · {status}",
+      "leadStatus": {
+        "new": "Neu",
+        "contacted": "Kontaktiert",
+        "qualified": "Qualifiziert",
+        "converted": "Umgewandelt",
+        "lost": "Verloren"
+      },
+      "windowOpen": "Freie Antworten bis {time}",
+      "windowClosed": "24-Stunden-Fenster geschlossen",
+      "optedOut": "Abgemeldet",
+      "messagesLabel": "Nachrichten",
+      "note": "Interne Notiz",
+      "msgStatus": {
+        "sent": "Gesendet",
+        "sandboxed": "Simuliert (Sandbox)",
+        "failed": "Fehlgeschlagen",
+        "blocked": "Blockiert",
+        "received": "Empfangen",
+        "note": "Notiz"
+      },
+      "readOnly": "Sie können diese Unterhaltung lesen, aber nicht antworten.",
+      "statusLabel": "Status",
+      "assignLabel": "Zugewiesen an",
+      "unassigned": "Nicht zugewiesen",
+      "reply": "Antworten",
+      "addNote": "Interne Notiz",
+      "canned": "Gespeicherte Antworten",
+      "blocked": {
+        "contact_opted_out": {
+          "title": "Dieser Kontakt hat sich abgemeldet",
+          "body": "Er hat auf diesem Kanal STOP geantwortet. Mit START erhält er wieder Nachrichten."
+        },
+        "consent_required": {
+          "title": "Keine Einwilligung für diesen Kanal",
+          "body": "Dieser Kontakt hat Ihnen hier nie geschrieben und Nachrichten auf diesem Kanal nicht zugestimmt."
+        },
+        "messaging_window_closed": {
+          "title": "Nachrichtenfenster geschlossen",
+          "body": "Instagram und Messenger erlauben Antworten innerhalb von 24 Stunden nach der letzten Nachricht."
+        }
+      },
+      "template": {
+        "title": "Genehmigte Vorlage verwenden",
+        "body": "Der Kontakt hat vor über 24 Stunden geschrieben. WhatsApp erlaubt bis zur nächsten Nachricht nur genehmigte Vorlagen.",
+        "pick": "Vorlage",
+        "choose": "Vorlage wählen"
+      },
+      "noteLabel": "Notiz für Ihr Team",
+      "replyLabel": "Ihre Antwort",
+      "notePlaceholder": "Nur Ihr Team sieht das",
+      "replyPlaceholder": "Antwort schreiben…",
+      "saveNote": "Notiz speichern",
+      "sendTemplate": "Vorlage senden",
+      "send": "Senden",
+      "sandboxNote": "Sandbox-Kanäle speichern Antworten, ohne sie zu senden.",
+      "simulate": {
+        "open": "Nachricht simulieren",
+        "title": "Eingehende Nachricht simulieren",
+        "kicker": "Sandbox",
+        "body": "Sandbox-Kanäle haben noch keinen Anbieter. Die Nachricht wird signiert und über denselben Webhook wie eine echte zugestellt.",
+        "channel": "Kanal",
+        "from": "Von",
+        "name": "Name des Kontakts",
+        "message": "Nachricht",
+        "submit": "Nachricht empfangen",
+        "placeholder": {
+          "email": "name@beispiel.de",
+          "meta": "Absender-ID",
+          "phone": "+49 151 2345 6789"
+        }
+      }
+    },
+    "social": {
+      "title": "Social Media",
+      "description": "Beiträge auf Markenkonten und an Standorte übergebenen Konten planen, freigeben und veröffentlichen.",
+      "denied": "Social Media gehört nicht zu Ihrem Zugriff.",
+      "compose": "Neuer Beitrag",
+      "tab": {
+        "calendar": "Kalender",
+        "approvals": "Freigaben",
+        "accounts": "Konten"
+      },
+      "status": {
+        "draft": "Entwurf",
+        "pending_approval": "Wartet auf Freigabe",
+        "scheduled": "Geplant",
+        "publishing": "Wird veröffentlicht",
+        "published": "Veröffentlicht",
+        "sandboxed": "Simuliert (Sandbox)",
+        "partially_published": "Teilweise veröffentlicht",
+        "failed": "Fehlgeschlagen",
+        "rejected": "Änderungen angefragt",
+        "cancelled": "Storniert"
+      },
+      "result": {
+        "published": "veröffentlicht",
+        "sandboxed": "simuliert",
+        "failed": "fehlgeschlagen",
+        "cancelled": "storniert"
+      },
+      "unknownAccount": "Entferntes Konto",
+      "cancelPost": "Beitrag stornieren",
+      "approvals": {
+        "empty": "Nichts wartet auf Freigabe",
+        "comment": "Kommentar für den Autor",
+        "approve": "Freigeben",
+        "reject": "Änderungen anfragen"
+      },
+      "calendar": {
+        "empty": "Keine Beiträge geplant",
+        "emptyBody": "Schreiben Sie einen Beitrag und planen Sie ihn für ein oder mehrere Konten.",
+        "unscheduled": "Nicht geplant"
+      },
+      "composer": {
+        "title": "Neuer Beitrag",
+        "kicker": "Social Media",
+        "postAs": "Beitrag für",
+        "hq": "Zentrale (Marke)",
+        "accounts": "Konten",
+        "noAccounts": "Keine Konten verfügbar. Die Zentrale kann Veröffentlichungsrechte übergeben.",
+        "text": "Text",
+        "image": "Bild-Link",
+        "imageHint": "Aus der Markenbibliothek oder ein öffentlicher Bild-Link.",
+        "when": "Veröffentlichen am",
+        "whenHint": "Leer lassen, um nach der Freigabe sofort zu veröffentlichen.",
+        "approvalNote": "Die Zentrale gibt diesen Beitrag vor der Veröffentlichung frei.",
+        "previews": "Vorschauen",
+        "chars": "{n} / {max}",
+        "submitApproval": "Zur Freigabe senden",
+        "schedule": "Planen",
+        "publishNow": "Jetzt veröffentlichen",
+        "saveDraft": "Entwurf speichern"
+      },
+      "issue": {
+        "too_long": "Zu lang für dieses Netzwerk",
+        "media_required": "Benötigt ein Bild",
+        "too_many_media": "Zu viele Bilder",
+        "empty": "Schreiben Sie zuerst etwas"
+      },
+      "network": {
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "google_business": "Google-Unternehmensprofil"
+      },
+      "ownerHq": "Gehört der Zentrale",
+      "ownerLocation": "Eigenes Konto des Standorts",
+      "ownedBy": "Gehört {location}",
+      "sandbox": "Sandbox",
+      "live": "Verbunden",
+      "access": {
+        "post": "Posten",
+        "post_insights": "Posten + Statistiken",
+        "view": "Nur ansehen"
+      },
+      "accounts": {
+        "ownershipTitle": "Die Zentrale bleibt Eigentümerin",
+        "ownershipBody": "Standorte erhalten Veröffentlichungsrechte; Passwörter bleiben bei der Zentrale, Rechte sind jederzeit widerrufbar.",
+        "empty": "Noch keine Konten",
+        "rights": "Veröffentlichungsrechte",
+        "noRights": "Kein Standort kann darauf posten.",
+        "revoke": "Widerrufen",
+        "grant": "Gewähren",
+        "location": "Standort",
+        "chooseLocation": "Standort wählen",
+        "accessLabel": "Zugriff",
+        "addTitle": "Konto hinzufügen",
+        "addBody": "Konten werden als Sandbox angelegt; über Meta verbinden, um live zu veröffentlichen.",
+        "network": "Netzwerk",
+        "handle": "Name oder Handle",
+        "add": "Konto hinzufügen",
+        "terminateTitle": "Standort verlässt das Netzwerk",
+        "terminateBody": "Alle Rechte eines Standorts auf Zentralkonten widerrufen und geplante Beiträge stornieren.",
+        "terminate": "Alle Rechte widerrufen",
+        "terminated": "{grants} Rechte widerrufen, {posts} Beiträge storniert."
+      }
+    },
+    "campaigns": {
+      "title": "Werbekampagnen",
+      "description": "Netzwerk-, Eröffnungs-, Kurs- und lokale Kampagnen: Budgets pro Standort und Währung, Ergebnisse und zugeordnete Leads.",
+      "denied": "Werbekampagnen gehören nicht zu Ihrem Zugriff.",
+      "filter": "Kampagnentyp",
+      "kind": {
+        "all": "Alle",
+        "network": "Netzwerk",
+        "coming_soon": "Demnächst",
+        "course": "Kurs",
+        "local": "Lokal"
+      },
+      "status": {
+        "draft": "Entwurf",
+        "pending_approval": "Budget wartet auf Freigabe",
+        "scheduled": "Geplant",
+        "active": "Läuft",
+        "paused": "Pausiert",
+        "completed": "Abgeschlossen",
+        "rejected": "Abgelehnt",
+        "archived": "Archiviert"
+      },
+      "new": {
+        "network": "Neue Netzwerkkampagne",
+        "coming_soon": "Eröffnungskampagne",
+        "course": "Kurskampagne",
+        "local": "Lokale Kampagne",
+        "kicker": "Werbekampagne",
+        "create": "Kampagne erstellen",
+        "noOnboarding": "Derzeit ist kein Standort in Eröffnung.",
+        "localNote": "Das Budget geht zur Freigabe an die Zentrale; nach Freigabe wird die Kampagne geplant.",
+        "requestBudget": "Budget anfragen"
+      },
+      "empty": "Noch keine Kampagnen",
+      "emptyBody": "Erstellen Sie eine Kampagne für alle oder einige Standorte.",
+      "openingOn": "Eröffnung am {date}",
+      "totals": "Budget {budget} · ausgegeben {spend} · {leads, plural, one {# Lead} other {# Leads}}",
+      "locationsCount": "{count, plural, one {# Standort} other {# Standorte}}",
+      "open": "Details",
+      "platform": {
+        "meta": "Meta (Facebook & Instagram)",
+        "google": "Google Ads",
+        "linkedin": "LinkedIn Ads"
+      },
+      "field": {
+        "name": "Kampagnenname",
+        "locations": "Standorte",
+        "onboardingLocations": "Standorte in Eröffnung",
+        "allLocations": "Alle",
+        "platforms": "Plattformen",
+        "startsOn": "Beginn",
+        "endsOn": "Ende",
+        "budget": "Budget",
+        "budgetHint": "Ein Gesamtbetrag je Währung, gleichmäßig auf die Standorte verteilt.",
+        "budgetIn": "Gesamtbudget ({currency})",
+        "split": "Budget pro Standort",
+        "radius": "Radius um jeden Standort (km)",
+        "radiusHint": "Anzeigen erreichen Menschen in der Nähe jedes Standorts.",
+        "headline": "Überschrift",
+        "copy": "Anzeigentext",
+        "image": "Bild-Link",
+        "imageHint": "Aus der Markenbibliothek.",
+        "openingDate": "Eröffnungsdatum",
+        "presale": "Vorverkaufsangebot",
+        "location": "Standort",
+        "days": "Tage"
+      },
+      "detail": {
+        "title": "Kampagne",
+        "leadForm": "Formular-Endpunkt:",
+        "awaitingApproval": "Das Budget wartet im Freigabe-Eingang.",
+        "launch": "Starten",
+        "pause": "Pausieren",
+        "complete": "Als abgeschlossen markieren",
+        "byLocation": "Nach Standort",
+        "enterResults": "Ergebnisse erfassen",
+        "row": "Ausgegeben {spend} · {clicks} Klicks · {leads} Leads · {radius} km",
+        "cpl": "Kosten pro Lead {cpl}"
+      },
+      "results": {
+        "hint": "Werbeplattformen sind noch nicht verbunden: Ergebnisse täglich manuell erfassen. Ausgaben aus dem Marketingfonds gehen ins Fondsbuch.",
+        "day": "Tag",
+        "spend": "Ausgaben ({currency})",
+        "impressions": "Impressionen",
+        "clicks": "Klicks",
+        "save": "Ergebnisse speichern",
+        "saved": "Ergebnisse gespeichert."
+      }
+    },
+    "leads": {
+      "title": "Leads & Pipeline",
+      "description": "Anfragen, Kurs-Leads und Deals nachverfolgen. Routing-Regeln verteilen neue Leads.",
+      "denied": "Leads gehören nicht zu Ihrem Zugriff.",
+      "tab": {
+        "customer": "Kunden-Leads",
+        "course": "Kurs-Leads",
+        "pipeline": "Pipeline",
+        "routing": "Routing"
+      },
+      "status": {
+        "open": "Offen",
+        "new": "Neu",
+        "contacted": "Kontaktiert",
+        "qualified": "Qualifiziert",
+        "converted": "Umgewandelt",
+        "lost": "Verloren",
+        "all": "Alle"
+      },
+      "source": {
+        "website": "Website",
+        "manual": "Manuell erfasst",
+        "email": "E-Mail",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "messenger": "Messenger",
+        "ad_campaign": "Werbekampagne",
+        "coming_soon": "Eröffnungskampagne",
+        "course_campaign": "Kurskampagne",
+        "import": "Importiert"
+      },
+      "statusFilter": "Status",
+      "setStatus": "Status ändern",
+      "mine": "Mir zugewiesen",
+      "empty": "Keine Leads",
+      "assignedTo": "Zugewiesen an {name}",
+      "unassigned": "Noch nicht zugewiesen",
+      "convert": "In Deal umwandeln",
+      "openTasks": "{count, plural, one {# offene Aufgabe} other {# offene Aufgaben}}",
+      "moveTo": "In Phase verschieben",
+      "routing": {
+        "title": "Routing-Regeln",
+        "body": "Der Reihe nach geprüft. Die erste passende gilt.",
+        "empty": "Keine Regeln: Leads bleiben beim Standort.",
+        "off": "Aus",
+        "postal": "PLZ {list}",
+        "sources": "Quelle {list}",
+        "countries": "Land {list}",
+        "anyLead": "Jeder Lead",
+        "people": "{count, plural, one {# Person} other {# Personen im Wechsel}}",
+        "team": "Team von {location}, im Wechsel",
+        "testTitle": "Lead testen",
+        "postalLabel": "Postleitzahl",
+        "sourceLabel": "Quelle",
+        "test": "Wohin ginge er?",
+        "result": "Regel „{rule}“ → {target}",
+        "noMatch": "Keine Regel passt: Der Lead bleibt, wo er eingegangen ist."
+      },
+      "campaign": "Kampagne: {name}"
+    }
+  }
+}

@@ -294,9 +294,11 @@ describe.skipIf(!hasDb)('network workspaces: community, training academy, help d
 
     const lead = await call(app, 'POST', `/v1/public/courses/${orgSlug}/${c.body.slug}/leads`, { body: { name: 'Lee Learner', email: `lee-${uid()}@example.com`, message: 'Payment plans?', utm: { source: 'meta', campaign: 'ytt-spring' } } });
     expect(lead.status).toBe(201);
-    const tl = await call(app, 'GET', `${base()}/training/leads`, { token: trainer.token });
-    expect(tl.body.items.find((x: any) => x.id === lead.body.id)).toMatchObject({ source: 'ad_campaign', campaign: 'ytt-spring', assignedTo: { id: trainer.userId } });
-    expect((await call(app, 'GET', `${base()}/training/leads`, { token: franA.token })).status).toBe(403);
+    // Course leads are in the one leads pipeline (Sales → Course leads).
+    const tl = await call(app, 'GET', `${base()}/sales/leads?kind=course`, { token: trainer.token });
+    expect(tl.body.items.find((x: any) => x.id === lead.body.id)).toMatchObject({ kind: 'course', source: 'ad_campaign', campaign: 'ytt-spring', assignedUser: { id: trainer.userId } });
+    // A franchise owner has customer leads but no course leads: none are listed.
+    expect((await call(app, 'GET', `${base()}/sales/leads?kind=course&status=all`, { token: franA.token })).body.items).toEqual([]);
     expect((await notes(trainer.userId, 'course_lead')).length).toBeGreaterThan(0);
 
     const buyer = `buyer-${uid()}@example.com`;
@@ -316,7 +318,7 @@ describe.skipIf(!hasDb)('network workspaces: community, training academy, help d
     const status = await call(app, 'GET', `/v1/public/course-enrolments/${enrol.body.enrolmentId}?token=${enrol.body.accessToken}`);
     expect(status.body.status).toBe('active');
     // All course leads: Academy publish + Course leads organisation-wide (the owner; HQ admin has no course leads).
-    const leads = await call(app, 'GET', `${base()}/training/leads?status=enrolled`, { token: owner.token });
+    const leads = await call(app, 'GET', `${base()}/sales/leads?kind=course&status=converted`, { token: owner.token });
     expect(leads.body.items.map((x: any) => x.email)).toContain(buyer);
     expect((await call(app, 'POST', `/v1/public/courses/${orgSlug}/${c.body.slug}/enrol`, { body: { name: 'Bea Buyer', email: buyer, acceptTerms: true } })).body.error.code).toBe('already_enrolled');
     const recon = await call(app, 'GET', `${base()}/payments/reconciliation`, { token: owner.token });

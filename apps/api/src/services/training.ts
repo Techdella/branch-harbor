@@ -3,9 +3,10 @@ import { randomBytes } from 'node:crypto';
 import type { Services } from '../context.ts';
 import type { Exec, Tx } from '../db/client.ts';
 import {
-  certificates, courseLeads, courseLessons, courseModules, courses, enrolments, learningPaths, lessonProgress, quizAttempts, trainingAssignments, users,
+  certificates, courseLessons, leads, courseModules, courses, enrolments, learningPaths, lessonProgress, quizAttempts, trainingAssignments, users,
   type Audience, type QuizQuestion,
 } from '../db/schema/index.ts';
+import { routeLead } from './lead-routing.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
 import { audienceIncludes, orgViewers, type Viewer } from './network-access.ts';
@@ -229,26 +230,34 @@ export async function completionReport(db: Exec, organizationId: string, scopeLo
   }));
 }
 
-/** Course leads: pick the course trainer with the fewest open leads (round robin by load). */
+/** Course leads: pick the course trainer with the fewest open course leads (round robin by load). */
 export async function pickTrainer(db: Exec, c: Course | null): Promise<string | null> {
   const trainers = c?.trainerUserIds ?? [];
-  if (!trainers.length) return c?.authorId ?? null;
-  const load = await db.select({ userId: courseLeads.assignedTo, n: sql<number>`count(*)::int` }).from(courseLeads)
-    .where(and(inArray(courseLeads.assignedTo, trainers), inArray(courseLeads.status, ['new', 'contacted']))).groupBy(courseLeads.assignedTo);
+  if (!trainers.length) return null;
+  const load = await db.select({ userId: leads.assignedUserId, n: sql<number>`count(*)::int` }).from(leads)
+    .where(and(eq(leads.kind, 'course'), inArray(leads.assignedUserId, trainers), inArray(leads.status, ['new', 'contacted', 'qualified']))).groupBy(leads.assignedUserId);
   const m = new Map(load.map((l) => [l.userId, l.n]));
   return [...trainers].sort((a, b) => (m.get(a) ?? 0) - (m.get(b) ?? 0))[0] ?? null;
 }
 
+/**
+ * A course lead in the one leads pipeline (`leads`, kind `course`, Sales → Course leads), at the course's sale
+ * location. It goes to the course's trainers (least loaded) or, when the course names none, through the course lead
+ * routing rules (then the least-loaded instructor).
+ */
 export async function createCourseLead(s: Services, c: Course | null, organizationId: string, input: { name: string; email: string; phone?: string | null; message?: string | null; source: string; campaign?: string | null; utm?: Record<string, string>; marketingConsent?: boolean; assignedTo?: string | null }) {
-  const assignedTo = input.assignedTo ?? (await pickTrainer(s.db, c));
-  const [lead] = await s.db.insert(courseLeads).values({
-    organizationId, courseId: c?.id ?? null, name: input.name, email: input.email.toLowerCase(), phone: input.phone ?? null, message: input.message ?? null,
-    source: input.source, campaign: input.campaign ?? null, utm: input.utm ?? {}, assignedTo, marketingConsent: !!input.marketingConsent,
+  const [row] = await s.db.insert(leads).values({
+    organizationId, kind: 'course', courseId: c?.id ?? null, locationId: c?.saleLocationId ?? null, name: input.name, email: input.email.toLowerCase(), phone: input.phone ?? null, message: input.message ?? null,
+    source: input.source, campaign: input.campaign ?? null, utm: input.utm ?? {}, marketingConsent: !!input.marketingConsent, updatedAt: new Date(),
   }).returning();
-  if (assignedTo) {
-    await networkNotify(s, { organizationId, userIds: [assignedTo], kind: 'course_lead', title: `New course lead: ${input.name}`, body: c ? c.title : null, link: '/course-leads', data: { leadId: lead!.id } });
+  const trainer = input.assignedTo ?? (await pickTrainer(s.db, c));
+  const lead = trainer
+    ? (await s.db.update(leads).set({ assignedUserId: trainer, updatedAt: new Date() }).where(eq(leads.id, row!.id)).returning())[0]!
+    : await routeLead(s.db, row!);
+  if (lead.assignedUserId) {
+    await networkNotify(s, { organizationId, userIds: [lead.assignedUserId], kind: 'course_lead', title: `New course lead: ${input.name}`, body: c ? c.title : null, link: '/sales/leads?tab=course', data: { leadId: lead.id } });
   }
-  return lead!;
+  return lead;
 }
 
 /** Recertification: completions past their expiry become "expired" and the person is told to re-certify. */
@@ -276,8 +285,8 @@ paymentTargetExtensions.course_enrolment = {
     }
     await tx.update(enrolments).set({ status: 'active', paymentId: p.id, startedAt: new Date(), updatedAt: new Date() }).where(eq(enrolments.id, e.id));
     if (e.learnerEmail) {
-      await tx.update(courseLeads).set({ status: 'enrolled', enrolmentId: e.id, updatedAt: new Date() })
-        .where(and(eq(courseLeads.organizationId, e.organizationId), eq(courseLeads.email, e.learnerEmail.toLowerCase()), inArray(courseLeads.status, ['new', 'contacted'])));
+      await tx.update(leads).set({ status: 'converted', enrolmentId: e.id, updatedAt: new Date() })
+        .where(and(eq(leads.organizationId, e.organizationId), eq(leads.kind, 'course'), eq(leads.email, e.learnerEmail.toLowerCase()), inArray(leads.status, ['new', 'contacted', 'qualified'])));
     }
     await audit(tx, { organizationId: e.organizationId, actorUserId: null, actorType: 'webhook', action: 'training.enrolment_paid', targetType: 'enrolment', targetId: e.id, metadata: { paymentId: p.id } });
     return { fulfilled: true, note: 'Course enrolment confirmed' };

@@ -2,7 +2,7 @@ import { and, asc, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
 import {
-  certificates, courseLeads, courseLessons, courseModules, courses, enrolments, learningPaths, lessonProgress, locations, organizations, quizAttempts, trainingAssignments, users,
+  certificates, courseLessons, leads, courseModules, courses, enrolments, learningPaths, lessonProgress, locations, organizations, quizAttempts, trainingAssignments, users,
 } from '../db/schema/index.ts';
 import { sha256, randomToken } from '../lib/crypto.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
@@ -114,7 +114,7 @@ export const trainingRoutes: FastifyPluginAsyncZod = async (_root) => {
     const p = await createPaymentForTarget(s, { organizationId: org.id, locationId: c.saleLocationId, amountMinor: c.priceMinor, currency: c.currency, targetType: 'course_enrolment', targetId: e!.id, description: c.title, recordSnapshot: { courseId: c.id, learnerEmail: email } });
     await s.db.update(enrolments).set({ paymentId: p.payment.id }).where(eq(enrolments.id, e!.id));
     const u = Object.fromEntries(Object.entries(req.body.utm ?? {}).filter(([, val]) => !!val)) as Record<string, string>;
-    const [lead] = await s.db.select().from(courseLeads).where(and(eq(courseLeads.organizationId, org.id), eq(courseLeads.email, email), eq(courseLeads.courseId, c.id)));
+    const [lead] = await s.db.select().from(leads).where(and(eq(leads.organizationId, org.id), eq(leads.kind, 'course'), eq(leads.email, email), eq(leads.courseId, c.id)));
     if (!lead) await createCourseLead(s, c, org.id, { name: req.body.name, email, phone: req.body.phone, source: u.campaign || u.source ? 'ad_campaign' : 'website', campaign: u.campaign ?? null, utm: u, message: 'Started checkout' });
     reply.code(201);
     return { enrolmentId: e!.id, status: e!.status, accessToken: token, payment: { id: p.payment.id, clientSecret: p.clientSecret, sandbox: p.sandbox, amount: c.priceMinor, currency: c.currency } };
@@ -530,43 +530,6 @@ export const trainingRoutes: FastifyPluginAsyncZod = async (_root) => {
         })).sort((a, b) => a.name.localeCompare(b.name)),
       };
     });
-
-    // ── course leads ──
-    // Course leads (Sales → Course leads): Academy publish organisation-wide sees and assigns every lead; otherwise
-    // the leads assigned to you.
-    const leadsScope = (v: Viewer, write = false) => {
-      requireNetworkPerm(v, write ? 'courseleads.edit' : 'courseleads.read');
-      if (v.orgPerms.has('training.manage') && v.orgPerms.has(write ? 'courseleads.edit' : 'courseleads.read')) return 'all' as const;
-      return v.userId;
-    };
-    app.get(`${base}/leads`, { schema: { tags, security: secured, params: orgParams, querystring: z.object({ status: z.enum(['new', 'contacted', 'enrolled', 'lost']).optional(), courseId: z.uuid().optional() }), summary: 'Course leads (trainers see the leads assigned to them)' } }, async (req) => {
-      const v = await learner(req, req.params.orgId);
-      const scope = leadsScope(v);
-      const rows = await s.db.select({ l: courseLeads, course: courses.title }).from(courseLeads).leftJoin(courses, eq(courses.id, courseLeads.courseId))
-        .where(and(eq(courseLeads.organizationId, v.organizationId), ...(scope === 'all' ? [] : [eq(courseLeads.assignedTo, scope)]), ...(req.query.status ? [eq(courseLeads.status, req.query.status)] : []), ...(req.query.courseId ? [eq(courseLeads.courseId, req.query.courseId)] : [])))
-        .orderBy(desc(courseLeads.createdAt)).limit(500);
-      const names = await userNames(s.db, rows.map((r) => r.l.assignedTo));
-      return { items: rows.map(({ l, course }) => ({ id: l.id, courseId: l.courseId, courseTitle: course, name: l.name, email: l.email, phone: l.phone, message: l.message, source: l.source, campaign: l.campaign, utm: l.utm, status: l.status, notes: l.notes, assignedTo: l.assignedTo ? { id: l.assignedTo, name: names.get(l.assignedTo) ?? '' } : null, marketingConsent: l.marketingConsent, createdAt: l.createdAt.toISOString() })) };
-    });
-
-    app.post(`${base}/leads`, { schema: { tags, security: secured, params: orgParams, body: z.object({ courseId: z.uuid().nullable().optional(), ...contact, message: z.string().max(2000).nullable().optional(), source: z.enum(['manual', 'import', 'ad_campaign', 'website']).default('manual'), campaign: z.string().max(150).nullable().optional(), assignedTo: z.uuid().nullable().optional(), marketingConsent: z.boolean().default(false) }), summary: 'Add a lead (also used by ad campaign integrations)' } }, async (req, reply) => {
-      const v = await learner(req, req.params.orgId);
-      leadsScope(v, true);
-      const c = req.body.courseId ? await loadCourse(s.db, v.organizationId, req.body.courseId) : null;
-      const lead = await createCourseLead(s, c, v.organizationId, { ...req.body, assignedTo: req.body.assignedTo ?? (v.orgPerms.has('training.manage') ? null : v.userId) });
-      reply.code(201);
-      return { id: lead.id, assignedTo: lead.assignedTo };
-    });
-
-    app.patch(`${base}/leads/:id`, { schema: { tags, security: secured, params: idParams, body: z.object({ status: z.enum(['new', 'contacted', 'enrolled', 'lost']).optional(), notes: z.string().max(5000).nullable().optional(), assignedTo: z.uuid().nullable().optional() }) } }, async (req) => {
-      const v = await learner(req, req.params.orgId);
-      const scope = leadsScope(v, true);
-      const [l] = await s.db.select().from(courseLeads).where(and(eq(courseLeads.id, req.params.id), eq(courseLeads.organizationId, v.organizationId)));
-      if (!l || (scope !== 'all' && l.assignedTo !== scope)) throw notFound('Lead');
-      if (req.body.assignedTo !== undefined && scope !== 'all') throw forbidden('Only HQ can reassign leads');
-      const [u] = await s.db.update(courseLeads).set({ ...req.body, updatedAt: new Date() }).where(eq(courseLeads.id, l.id)).returning();
-      if (req.body.assignedTo && req.body.assignedTo !== l.assignedTo) await networkNotify(s, { organizationId: v.organizationId, userIds: [req.body.assignedTo], exclude: [v.userId], kind: 'course_lead', title: `Lead assigned to you: ${l.name}`, link: '/course-leads', data: { leadId: l.id } });
-      return { id: u!.id, status: u!.status, notes: u!.notes, assignedTo: u!.assignedTo };
-    });
+    // Course leads are worked in Sales → Course leads (/orgs/:orgId/sales/leads?kind=course).
   });
 };

@@ -312,8 +312,7 @@
       "catalogue": "Catálogo",
       "authoring": "Creación",
       "assign": "Asignar",
-      "reports": "Seguimiento",
-      "leads": "Interesados"
+      "reports": "Seguimiento"
     },
     "home": {
       "todo": "Pendiente",
@@ -501,28 +500,6 @@
       "empty": "Todavía no hay formación asignada en tus locales.",
       "people": "Personas de este local",
       "done": "hecho"
-    },
-    "leads": {
-      "title": "Interesados en cursos",
-      "status": "Estado",
-      "all": "Todos los estados",
-      "statuses": {
-        "new": "Nuevo",
-        "contacted": "Contactado",
-        "enrolled": "Inscrito",
-        "lost": "Perdido"
-      },
-      "intro": "Solicitudes desde la web de la marca y las campañas de anuncios. Las inscripciones pagadas marcan al interesado como inscrito automáticamente.",
-      "sources": {
-        "website": "Web",
-        "ad_campaign": "Campaña de anuncios",
-        "manual": "Añadido a mano",
-        "import": "Importado"
-      },
-      "assignedTo": "Asignado a {name}",
-      "notes": "Notas",
-      "saveNotes": "Guardar notas",
-      "empty": "Todavía no hay interesados."
     }
   },
   "helpdesk": {

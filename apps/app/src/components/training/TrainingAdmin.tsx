@@ -11,7 +11,6 @@ import type { TrainingHome } from './TrainingScreen';
 interface Assignment { id: string; targetType: string; targetId: string; title: string; audience: Audience; dueAt: string | null; dueInDays: number | null; source: string; createdAt: string }
 interface LocRow { locationId: string; locationName: string; people: number; assigned: number; completed: number; inProgress: number; overdue: number; expired: number; completionRate: number | null; averageScore: number | null }
 interface PersonRow { userId: string; name: string; roles: string[]; courses: { courseId: string; title: string; status: string; progressPct: number; overdue: boolean; dueAt: string | null }[] }
-interface Lead { id: string; courseTitle: string | null; name: string; email: string; phone: string | null; message: string | null; source: string; campaign: string | null; status: string; notes: string | null; assignedTo: { id: string; name: string } | null; createdAt: string }
 
 export function AssignPanel({ me, home }: { me: NetMe; home: TrainingHome }) {
   const t = useTranslations('training.assign');
@@ -118,46 +117,5 @@ export function ReportsPanel({ home }: { home: TrainingHome }) {
         </Panel>
       )}
     </div>
-  );
-}
-
-export function LeadsPanel({ home }: { home: TrainingHome }) {
-  const t = useTranslations('training.leads');
-  const locale = useLocale();
-  const [status, setStatus] = useState('');
-  const res = useNet<{ items: Lead[] }>(`/training/leads${status ? `?status=${status}` : ''}`, [status]);
-  const act = useNetAction();
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  void home;
-  return (
-    <Panel title={t('title')} actions={<Select aria-label={t('status')} value={status} onChange={(e) => setStatus(e.target.value)} className="max-w-[180px]"><option value="">{t('all')}</option>{(['new', 'contacted', 'enrolled', 'lost'] as const).map((s) => <option key={s} value={s}>{t(`statuses.${s}`)}</option>)}</Select>}>
-      <p className="-mt-1 text-[13px] text-stone">{t('intro')}</p>
-      <ErrorNote error={res.error ?? act.error} />
-      {res.loading && !res.data ? <LoadingBlock variant="table" rows={3} /> : (
-        <ul className="flex flex-col gap-2">
-          {(res.data?.items ?? []).map((l) => (
-            <li key={l.id} className="flex flex-col gap-1.5 rounded-lg border-[1.5px] border-line-soft p-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-bold">{l.name}</span>
-                <a href={`mailto:${l.email}`} className="text-[13px] underline">{l.email}</a>
-                {l.phone && <a href={`tel:${l.phone}`} className="text-[13px] underline">{l.phone}</a>}
-                <Badge tone={l.source === 'ad_campaign' ? 'info' : 'neutral'}>{t(`sources.${l.source}`)}{l.campaign ? ` · ${l.campaign}` : ''}</Badge>
-                <span className="ml-auto text-xs text-stone">{relativeTime(l.createdAt, locale)}</span>
-              </div>
-              <p className="text-[13px] text-stone">{l.courseTitle}{l.assignedTo ? ` · ${t('assignedTo', { name: l.assignedTo.name })}` : ''}</p>
-              {l.message && <p className="text-sm">“{l.message}”</p>}
-              <div className="flex flex-wrap items-end gap-2">
-                <Select aria-label={t('status')} value={l.status} className="max-w-[160px]" onChange={async (e) => { if (await act.run('patch', `/training/leads/${l.id}`, { status: e.target.value })) void res.reload(); }}>
-                  {(['new', 'contacted', 'enrolled', 'lost'] as const).map((s) => <option key={s} value={s}>{t(`statuses.${s}`)}</option>)}
-                </Select>
-                <Field label={t('notes')}>{(p) => <Input id={p.id} value={notes[l.id] ?? l.notes ?? ''} onChange={(e) => setNotes({ ...notes, [l.id]: e.target.value })} />}</Field>
-                <Button size="sm" variant="secondary" disabled={notes[l.id] === undefined} onClick={async () => { if (await act.run('patch', `/training/leads/${l.id}`, { notes: notes[l.id] })) void res.reload(); }}>{t('saveNotes')}</Button>
-              </div>
-            </li>
-          ))}
-          {!res.loading && !(res.data?.items ?? []).length && <li className="text-sm text-stone">{t('empty')}</li>}
-        </ul>
-      )}
-    </Panel>
   );
 }

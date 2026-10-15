@@ -254,6 +254,8 @@ async function main() {
   const northlight = await seedNorthlight({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   console.log(` Access model:  Northlight Yoga International (${northlight.orgId}) — franchisor team, one login per role (same password):`);
   for (const l of northlight.logins) console.log(`                ${l}`);
+  const comms = await (await import('./seed-comms.ts')).seedComms({ db, orgId: northlight.orgId });
+  console.log(` Marketing & sales: Northlight inboxes (sandbox; SMS ${comms.smsAddress}, WhatsApp ${comms.waAddress}), ${comms.conversations} conversations, social accounts, network / coming-soon / course / local campaigns`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

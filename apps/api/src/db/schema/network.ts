@@ -454,27 +454,7 @@ export const certificates = pgTable('certificates', {
   revokedAt: ts('revoked_at'),
 }, (t) => [index('certificates_org_idx').on(t.organizationId)]);
 
-export const courseLeads = pgTable('course_leads', {
-  id: pk(),
-  organizationId: org(),
-  courseId: uuid('course_id').references(() => courses.id, { onDelete: 'set null' }),
-  name: text('name').notNull(),
-  email: text('email').notNull(),
-  phone: text('phone'),
-  message: text('message'),
-  /** website | ad_campaign | manual | import */
-  source: text('source').notNull().default('website'),
-  campaign: text('campaign'),
-  utm: jsonb('utm').$type<Record<string, string>>().notNull().default({}),
-  assignedTo: uuid('assigned_to').references(() => users.id, { onDelete: 'set null' }),
-  /** new | contacted | enrolled | lost */
-  status: text('status').notNull().default('new'),
-  notes: text('notes'),
-  marketingConsent: boolean('marketing_consent').notNull().default(false),
-  enrolmentId: uuid('enrolment_id'),
-  createdAt: createdAt(),
-  updatedAt: updatedAt(),
-}, (t) => [index('course_leads_org_idx').on(t.organizationId, t.status)]);
+// Course leads live in `leads` (kind = 'course'): one leads pipeline with routing rules (Sales → Course leads).
 
 // ───────────────────────── Help desk ─────────────────────────
 

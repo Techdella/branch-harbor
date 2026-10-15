@@ -18,7 +18,10 @@ import { requireMember } from './authz.ts';
 export const ROUTE_MODULES: Record<string, readonly string[]> = {
   // Sales
   customers: ['sales.customers'],
-  leads: ['sales.customers', 'sales.customer_pipeline'],
+  leads: ['sales.customers', 'sales.customer_pipeline', 'sales.course_leads'],
+  sales: ['sales.customer_pipeline', 'sales.course_leads'],
+  contacts: ['sales.customers', 'marketing.inbox'],
+  segments: ['marketing.inbox', 'marketing.campaigns', 'sales.customer_pipeline', 'sales.customers'],
   // Marketing
   websites: ['marketing.website_builder', 'network.templates'],
   pages: ['marketing.website_builder', 'network.templates'],
@@ -28,6 +31,9 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   sites: ['marketing.website_builder'],
   campaigns: ['marketing.campaigns', 'marketing.*'],
   'ad-spend-requests': ['marketing.campaigns', 'marketing.ads'],
+  inbox: ['marketing.inbox'],
+  social: ['marketing.social'],
+  'ad-campaigns': ['marketing.ads', 'marketing.network_campaigns', 'finance.royalties'],
   // Franchise development (Sales), new locations (Network) and Legal. Franchise owners reach their own onboarding
   // projects and agreement through New locations; each route checks the module it needs.
   franchise: ['sales.franchise_pipeline', 'legal.*', 'network.onboarding'],
@@ -35,7 +41,7 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   // Community (announcements, discussions, events, coaching), resource library, Training academy (+ course leads), help desk.
   community: ['community.*'],
   resources: ['community.library'],
-  training: ['training.*', 'sales.course_leads'],
+  training: ['training.*'],
   helpdesk: ['community.help_desk'],
   // Finance
   payments: ['finance.payments'],

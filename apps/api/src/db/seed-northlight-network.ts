@@ -82,10 +82,10 @@ export async function seedNorthlightNetwork({ db, orgId, team, regions, groups, 
     trainerUserIds: [team.trainer1.id, team.trainer2.id], priceMinor: 329900, currency: 'CAD', saleLocationId: L['TOR-AX']!.id, seats: 20, startsOn: '2027-03-06', scheduleNote: '10 weekends at Toronto Annex',
   }, [{ title: 'Welcome', kind: 'text', body: 'Course manual and the first weekend plan.' }]);
   // Course leads from the spring ad campaign, routed to the two trainers.
-  await db.insert(t.courseLeads).values([
-    { organizationId: orgId, courseId: ytt.id, name: 'Nadia Petrov', email: 'nadia.petrov@example.com', message: 'Is there an early-bird price?', source: 'ad_campaign', campaign: 'ytt-spring', utm: { source: 'meta', campaign: 'ytt-spring' }, assignedTo: team.trainer1.id, status: 'new', marketingConsent: true, createdAt: ago(4 * H) },
-    { organizationId: orgId, courseId: ytt.id, name: 'Ben Carter', email: 'ben.carter@example.com', source: 'website', assignedTo: team.trainer1.id, status: 'contacted', notes: 'Sent the syllabus.', createdAt: ago(2 * D) },
-    { organizationId: orgId, courseId: ytt.id, name: 'Joanna Wu', email: 'joanna.wu@example.com', source: 'ad_campaign', campaign: 'ytt-spring', utm: { source: 'google', campaign: 'ytt-spring' }, assignedTo: team.trainer2.id, status: 'new', createdAt: ago(D) },
+  await db.insert(t.leads).values([
+    { organizationId: orgId, kind: 'course', locationId: L['TOR-AX']!.id, courseId: ytt.id, name: 'Nadia Petrov', email: 'nadia.petrov@example.com', message: 'Is there an early-bird price?', source: 'ad_campaign', campaign: 'ytt-spring', utm: { source: 'meta', campaign: 'ytt-spring' }, assignedUserId: team.trainer1.id, status: 'new', marketingConsent: true, createdAt: ago(4 * H) },
+    { organizationId: orgId, kind: 'course', locationId: L['TOR-AX']!.id, courseId: ytt.id, name: 'Ben Carter', email: 'ben.carter@example.com', source: 'website', assignedUserId: team.trainer1.id, status: 'contacted', notes: 'Sent the syllabus.', createdAt: ago(2 * D) },
+    { organizationId: orgId, kind: 'course', locationId: L['TOR-AX']!.id, courseId: ytt.id, name: 'Joanna Wu', email: 'joanna.wu@example.com', source: 'ad_campaign', campaign: 'ytt-spring', utm: { source: 'google', campaign: 'ytt-spring' }, assignedUserId: team.trainer2.id, status: 'new', createdAt: ago(D) },
   ]);
   return { courses: 2, publicCourse: ytt.slug, leads: 3 };
 }

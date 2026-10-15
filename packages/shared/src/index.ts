@@ -14,3 +14,4 @@ export * from './franchise.ts';
 export * from './franchise-rules.ts';
 export * from './site-paths.ts';
 export * from './hospitality.ts';
+export * from './comms.ts';

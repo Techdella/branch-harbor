@@ -76,8 +76,25 @@ export const leads = pgTable('leads', {
   phone: text('phone'),
   message: text('message'),
   status: text('status').notNull().default('new'),
+  /** customer (studio enquiries) | course (teacher training / courses, routed to instructors) */
+  kind: text('kind').notNull().default('customer'),
+  /** Paid campaign the lead came from (ad_campaigns). */
+  adCampaignId: uuid('ad_campaign_id'),
+  assignedUserId: uuid('assigned_user_id'),
+  routingRuleId: uuid('routing_rule_id'),
+  country: text('country'),
+  postalCode: text('postal_code'),
+  /** Course leads: the public course (Training academy) the person asked about, and their enrolment once they buy. */
+  courseId: uuid('course_id'),
+  enrolmentId: uuid('enrolment_id'),
+  /** Campaign name from the ad or link (utm_campaign), and the full UTM parameters. */
+  campaign: text('campaign'),
+  utm: jsonb('utm').$type<Record<string, string>>().notNull().default({}),
+  notes: text('notes'),
+  marketingConsent: boolean('marketing_consent').notNull().default(false),
+  updatedAt: ts('updated_at'),
   createdAt: createdAt(),
-}, (t) => [index('leads_org_created_idx').on(t.organizationId, t.createdAt)]);
+}, (t) => [index('leads_org_created_idx').on(t.organizationId, t.createdAt), index('leads_ad_campaign_idx').on(t.adCampaignId)]);
 
 /** Marketing-site demo enquiries. Not tenant-scoped. */
 export const demoRequests = pgTable('demo_requests', {

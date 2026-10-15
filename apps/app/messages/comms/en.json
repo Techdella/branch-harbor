@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "inbox": "Inbox",
+    "social": "Social",
+    "campaigns": "Ad campaigns",
+    "leads": "Leads & pipeline"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "inbox": {
+          "name": "Inbox",
+          "description": "One inbox per location for email, SMS, WhatsApp, Instagram and Messenger: replies, notes, assignment and contact segments."
+        },
+        "social": {
+          "name": "Social",
+          "description": "Social posts, scheduling and approvals on brand accounts, with posting rights handed over to locations."
+        },
+        "ads": {
+          "name": "Ads",
+          "description": "Local paid campaigns, budgets and results."
+        },
+        "network_campaigns": {
+          "name": "Network campaigns",
+          "description": "Campaigns HQ runs for all locations, including coming-soon locations."
+        }
+      },
+      "sales": {
+        "customer_pipeline": {
+          "name": "Leads & pipeline",
+          "description": "New enquiries, the customer sales pipeline (deals, tasks, activities) and lead routing."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "whatsapp_template_required": "More than 24 hours since the contact last wrote: send an approved WhatsApp template.",
+    "template_not_approved": "Only templates approved by WhatsApp can be sent.",
+    "contact_opted_out": "This contact opted out of messages on this channel.",
+    "consent_required": "This contact has not agreed to receive messages on this channel.",
+    "messaging_window_closed": "The 24-hour messaging window has closed. Wait for the contact to write again.",
+    "campaign_not_running": "Results can be entered once the campaign is launched.",
+    "awaiting_approval": "This campaign is waiting for budget approval.",
+    "channel_in_use": "This address is already connected to an inbox.",
+    "oauth_not_configured": "Connecting accounts needs the platform app credentials. Use sandbox accounts meanwhile.",
+    "account_disconnected": "This account is disconnected.",
+    "not_hq_account": "Only HQ-owned accounts are handed over.",
+    "not_scheduled": "This post isn’t scheduled.",
+    "not_cancellable": "This post can no longer be cancelled.",
+    "campaign_closed": "This campaign is closed.",
+    "not_customer_lead": "Course leads are followed up by instructors, not converted to deals."
+  },
+  "comms": {
+    "common": {
+      "hq": "HQ",
+      "unknownLocation": "Another location"
+    },
+    "meta": {
+      "inbox": "Inbox",
+      "social": "Social",
+      "campaigns": "Ad campaigns",
+      "leads": "Leads & pipeline"
+    },
+    "inbox": {
+      "title": "Inbox",
+      "description": "Email, SMS, WhatsApp, Instagram and Messenger in one place, for the locations in scope.",
+      "denied": "The inbox isn’t part of your access.",
+      "status": {
+        "open": "Open",
+        "pending": "Pending",
+        "closed": "Closed",
+        "all": "All"
+      },
+      "channel": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "messenger": "Messenger"
+      },
+      "channelFilter": "Channel",
+      "allChannels": "All channels",
+      "hqOnly": "HQ inbox only",
+      "noChannels": {
+        "title": "No channels connected yet",
+        "body": "Connect a phone number, WhatsApp number, page or email address to start receiving messages."
+      },
+      "listLabel": "Conversations",
+      "empty": "No conversations here",
+      "pick": "Choose a conversation to read and reply.",
+      "unread": "Unread",
+      "overdue": "Reply overdue",
+      "threadLabel": "Conversation",
+      "back": "Back to conversations",
+      "linkedCustomer": "Customer: {name}",
+      "linkedLead": "Lead · {status}",
+      "leadStatus": {
+        "new": "New",
+        "contacted": "Contacted",
+        "qualified": "Qualified",
+        "converted": "Converted",
+        "lost": "Lost"
+      },
+      "windowOpen": "Free replies until {time}",
+      "windowClosed": "24-hour window closed",
+      "optedOut": "Opted out",
+      "messagesLabel": "Messages",
+      "note": "Internal note",
+      "msgStatus": {
+        "sent": "Sent",
+        "sandboxed": "Simulated (sandbox)",
+        "failed": "Failed",
+        "blocked": "Blocked",
+        "received": "Received",
+        "note": "Note"
+      },
+      "readOnly": "You can read this conversation but not reply.",
+      "statusLabel": "Status",
+      "assignLabel": "Assigned to",
+      "unassigned": "Unassigned",
+      "reply": "Reply",
+      "addNote": "Internal note",
+      "canned": "Saved replies",
+      "blocked": {
+        "contact_opted_out": {
+          "title": "This contact opted out",
+          "body": "They replied STOP on this channel. They can write START to receive messages again."
+        },
+        "consent_required": {
+          "title": "No consent for this channel",
+          "body": "This contact never wrote to you here and hasn’t agreed to messages on this channel."
+        },
+        "messaging_window_closed": {
+          "title": "Messaging window closed",
+          "body": "Instagram and Messenger allow replies within 24 hours of the contact’s last message."
+        }
+      },
+      "template": {
+        "title": "Use an approved template",
+        "body": "The contact last wrote more than 24 hours ago. WhatsApp only allows approved templates until they write again.",
+        "pick": "Template",
+        "choose": "Choose a template"
+      },
+      "noteLabel": "Note for your team",
+      "replyLabel": "Your reply",
+      "notePlaceholder": "Only your team sees this",
+      "replyPlaceholder": "Write a reply…",
+      "saveNote": "Save note",
+      "sendTemplate": "Send template",
+      "send": "Send",
+      "sandboxNote": "Sandbox channels record replies without sending them.",
+      "simulate": {
+        "open": "Simulate a message",
+        "title": "Simulate an incoming message",
+        "kicker": "Sandbox",
+        "body": "Sandbox channels have no provider yet. The message is signed and delivered through the same webhook as a real one.",
+        "channel": "Channel",
+        "from": "From",
+        "name": "Contact name",
+        "message": "Message",
+        "submit": "Receive message",
+        "placeholder": {
+          "email": "name@example.com",
+          "meta": "Sender ID",
+          "phone": "+1 416 555 0123"
+        }
+      }
+    },
+    "social": {
+      "title": "Social",
+      "description": "Plan, approve and publish posts on the brand’s accounts and the accounts handed over to locations.",
+      "denied": "Social isn’t part of your access.",
+      "compose": "New post",
+      "tab": {
+        "calendar": "Calendar",
+        "approvals": "Approvals",
+        "accounts": "Accounts"
+      },
+      "status": {
+        "draft": "Draft",
+        "pending_approval": "Waiting for approval",
+        "scheduled": "Scheduled",
+        "publishing": "Publishing",
+        "published": "Published",
+        "sandboxed": "Simulated (sandbox)",
+        "partially_published": "Partly published",
+        "failed": "Failed",
+        "rejected": "Changes requested",
+        "cancelled": "Cancelled"
+      },
+      "result": {
+        "published": "published",
+        "sandboxed": "simulated",
+        "failed": "failed",
+        "cancelled": "cancelled"
+      },
+      "unknownAccount": "Removed account",
+      "cancelPost": "Cancel post",
+      "approvals": {
+        "empty": "Nothing waiting for approval",
+        "comment": "Comment for the author",
+        "approve": "Approve",
+        "reject": "Request changes"
+      },
+      "calendar": {
+        "empty": "No posts planned",
+        "emptyBody": "Write a post and schedule it for one or more accounts.",
+        "unscheduled": "Not scheduled"
+      },
+      "composer": {
+        "title": "New post",
+        "kicker": "Social",
+        "postAs": "Post for",
+        "hq": "HQ (brand)",
+        "accounts": "Accounts",
+        "noAccounts": "No accounts available. HQ can hand over posting rights on its accounts.",
+        "text": "Text",
+        "image": "Image link",
+        "imageHint": "From the brand asset library or any public image link.",
+        "when": "Publish at",
+        "whenHint": "Leave empty to publish as soon as it’s approved.",
+        "approvalNote": "HQ approves this post before it goes out.",
+        "previews": "Previews",
+        "chars": "{n} / {max}",
+        "submitApproval": "Send for approval",
+        "schedule": "Schedule",
+        "publishNow": "Publish now",
+        "saveDraft": "Save draft"
+      },
+      "issue": {
+        "too_long": "Too long for this network",
+        "media_required": "Needs an image",
+        "too_many_media": "Too many images",
+        "empty": "Write something first"
+      },
+      "network": {
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "google_business": "Google Business Profile"
+      },
+      "ownerHq": "Owned by HQ",
+      "ownerLocation": "Location’s own",
+      "ownedBy": "Owned by {location}",
+      "sandbox": "Sandbox",
+      "live": "Connected",
+      "access": {
+        "post": "Post",
+        "post_insights": "Post + insights",
+        "view": "View only"
+      },
+      "accounts": {
+        "ownershipTitle": "HQ stays the owner",
+        "ownershipBody": "Locations get posting rights on HQ accounts; passwords stay with HQ and rights can be revoked at any time.",
+        "empty": "No social accounts yet",
+        "rights": "Posting rights",
+        "noRights": "No location can post on it.",
+        "revoke": "Revoke",
+        "grant": "Grant",
+        "location": "Location",
+        "chooseLocation": "Choose a location",
+        "accessLabel": "Access",
+        "addTitle": "Add an account",
+        "addBody": "Accounts are added in sandbox; connect through Meta to publish live.",
+        "network": "Network",
+        "handle": "Name or handle",
+        "add": "Add account",
+        "terminateTitle": "Location leaving the network",
+        "terminateBody": "Revoke all of a location’s rights on HQ accounts and cancel its planned posts on them.",
+        "terminate": "Revoke all rights",
+        "terminated": "{grants} rights revoked, {posts} posts cancelled."
+      }
+    },
+    "campaigns": {
+      "title": "Ad campaigns",
+      "description": "Network, coming-soon, course and local campaigns: budgets per location and currency, results and attributed leads.",
+      "denied": "Ad campaigns aren’t part of your access.",
+      "filter": "Campaign type",
+      "kind": {
+        "all": "All",
+        "network": "Network",
+        "coming_soon": "Coming soon",
+        "course": "Course",
+        "local": "Local"
+      },
+      "status": {
+        "draft": "Draft",
+        "pending_approval": "Budget waiting for approval",
+        "scheduled": "Scheduled",
+        "active": "Running",
+        "paused": "Paused",
+        "completed": "Completed",
+        "rejected": "Rejected",
+        "archived": "Archived"
+      },
+      "new": {
+        "network": "New network campaign",
+        "coming_soon": "Coming-soon campaign",
+        "course": "Course campaign",
+        "local": "Local campaign",
+        "kicker": "Ad campaign",
+        "create": "Create campaign",
+        "noOnboarding": "No location is in onboarding right now.",
+        "localNote": "The budget goes to HQ’s approvals inbox; the campaign is scheduled once approved.",
+        "requestBudget": "Request budget"
+      },
+      "empty": "No campaigns yet",
+      "emptyBody": "Create a campaign for all or some locations.",
+      "openingOn": "Opens {date}",
+      "totals": "Budget {budget} · spent {spend} · {leads, plural, one {# lead} other {# leads}}",
+      "locationsCount": "{count, plural, one {# location} other {# locations}}",
+      "open": "Details",
+      "platform": {
+        "meta": "Meta (Facebook & Instagram)",
+        "google": "Google Ads",
+        "linkedin": "LinkedIn Ads"
+      },
+      "field": {
+        "name": "Campaign name",
+        "locations": "Locations",
+        "onboardingLocations": "Locations in onboarding",
+        "allLocations": "All of them",
+        "platforms": "Platforms",
+        "startsOn": "Starts",
+        "endsOn": "Ends",
+        "budget": "Budget",
+        "budgetHint": "One total per currency, split evenly over the locations budgeted in it.",
+        "budgetIn": "Total budget ({currency})",
+        "split": "Budget per location",
+        "radius": "Radius around each location (km)",
+        "radiusHint": "Ads target people near each location.",
+        "headline": "Headline",
+        "copy": "Ad text",
+        "image": "Image link",
+        "imageHint": "From the brand asset library.",
+        "openingDate": "Opening date",
+        "presale": "Pre-sale offer",
+        "location": "Location",
+        "days": "Days"
+      },
+      "detail": {
+        "title": "Campaign",
+        "leadForm": "Lead form endpoint:",
+        "awaitingApproval": "The budget is waiting in the approvals inbox.",
+        "launch": "Launch",
+        "pause": "Pause",
+        "complete": "Mark completed",
+        "byLocation": "By location",
+        "enterResults": "Enter results",
+        "row": "Spent {spend} · {clicks} clicks · {leads} leads · {radius} km",
+        "cpl": "Cost per lead {cpl}"
+      },
+      "results": {
+        "hint": "Ads platforms aren’t connected yet: enter each day’s results by hand. Spend paid by the marketing fund is sent to the fund ledger.",
+        "day": "Day",
+        "spend": "Spend ({currency})",
+        "impressions": "Impressions",
+        "clicks": "Clicks",
+        "save": "Save results",
+        "saved": "Results saved."
+      }
+    },
+    "leads": {
+      "title": "Leads & pipeline",
+      "description": "Follow up enquiries, course leads and deals. Routing rules decide who gets each new lead.",
+      "denied": "Leads aren’t part of your access.",
+      "tab": {
+        "customer": "Customer leads",
+        "course": "Course leads",
+        "pipeline": "Pipeline",
+        "routing": "Routing"
+      },
+      "status": {
+        "open": "Open",
+        "new": "New",
+        "contacted": "Contacted",
+        "qualified": "Qualified",
+        "converted": "Converted",
+        "lost": "Lost",
+        "all": "All"
+      },
+      "source": {
+        "website": "Website",
+        "manual": "Added by hand",
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "messenger": "Messenger",
+        "ad_campaign": "Ad campaign",
+        "coming_soon": "Coming-soon campaign",
+        "course_campaign": "Course campaign",
+        "import": "Imported"
+      },
+      "statusFilter": "Status",
+      "setStatus": "Change status",
+      "mine": "Assigned to me",
+      "empty": "No leads here",
+      "assignedTo": "Assigned to {name}",
+      "unassigned": "Not assigned yet",
+      "convert": "Convert to deal",
+      "openTasks": "{count, plural, one {# open task} other {# open tasks}}",
+      "moveTo": "Move to stage",
+      "routing": {
+        "title": "Routing rules",
+        "body": "Checked in order. The first match wins.",
+        "empty": "No rules: leads stay at their location.",
+        "off": "Off",
+        "postal": "Postal code {list}",
+        "sources": "Source {list}",
+        "countries": "Country {list}",
+        "anyLead": "Any lead",
+        "people": "{count, plural, one {# person} other {# people in turn}}",
+        "team": "Team at {location}, in turn",
+        "testTitle": "Test a lead",
+        "postalLabel": "Postal code",
+        "sourceLabel": "Source",
+        "test": "Where would it go?",
+        "result": "Rule “{rule}” → {target}",
+        "noMatch": "No rule matches: the lead stays where it came in."
+      },
+      "campaign": "Campaign: {name}"
+    }
+  }
+}
