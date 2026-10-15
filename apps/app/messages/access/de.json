@@ -132,11 +132,23 @@
         },
         "classes": {
           "name": "Kurse & Stundenplan",
-          "description": "Kursplan, Räume, Buchungen, Anwesenheit und Vertretungen."
+          "description": "Kursplan, Buchungen, Check-in, Anwesenheit und Vertretungen.",
+          "schedule_builder": {
+            "name": "Stundenplan-Editor",
+            "description": "Wiederkehrende Kursreihen, Kursarten und Buchungsregeln."
+          },
+          "rooms": {
+            "name": "Räume",
+            "description": "Räume je Standort, ihre Kapazität und Ausstattung."
+          }
         },
         "memberships": {
           "name": "Mitglieder & Preise",
-          "description": "Mitglieder, Mitgliedschaften, Kursguthaben, Angebote und On-Demand-Kurse."
+          "description": "Mitglieder, Mitgliedschaften und On-Demand-Kurse.",
+          "packs_offers": {
+            "name": "Preise, Kursguthaben & Angebote",
+            "description": "Mitgliedschaftstarife, Kursguthaben und Einstiegsangebote."
+          }
         },
         "studio_insights": {
           "name": "Studio-Auswertungen",
@@ -148,7 +160,11 @@
         },
         "teams": {
           "name": "Teams & Einheiten",
-          "description": "Teams, Spielplan, Anwesenheit, Ankündigungen und Erziehungsberechtigte."
+          "description": "Teams, Anwesenheit, Ankündigungen und Erziehungsberechtigte.",
+          "schedule_builder": {
+            "name": "Spielplan-Editor",
+            "description": "Saisonpläne, Planvorschläge und Spielstätten."
+          }
         },
         "sports_reports": {
           "name": "Sportberichte",
@@ -156,7 +172,11 @@
         },
         "appointments": {
           "name": "Termine",
-          "description": "Kalender, Behandler und ihre Zeiten."
+          "description": "Der Terminkalender.",
+          "practitioners": {
+            "name": "Behandler & Zeiten",
+            "description": "Behandler, ihre Arbeitszeiten sowie Räume oder Geräte."
+          }
         },
         "services": {
           "name": "Leistungen & Pakete",
@@ -180,7 +200,11 @@
         },
         "inventory": {
           "name": "Bestand",
-          "description": "Lagerbestand, Umlagerungen und Einkauf."
+          "description": "Lagerbestände und Inventuren.",
+          "purchasing": {
+            "name": "Umlagerungen & Einkauf",
+            "description": "Umlagerungen zwischen Standorten, Bestellungen und Lieferanten."
+          }
         },
         "commerce_insights": {
           "name": "Handels-Auswertungen",
@@ -192,7 +216,11 @@
         },
         "food_orders": {
           "name": "Bestellungen & Küche",
-          "description": "Bestellungen, Küchendisplay, Abholung, Lieferung, Tische, Catering und Essenspläne."
+          "description": "Bestellungen, Küchendisplay, Abholung, Lieferung und Tische.",
+          "catering": {
+            "name": "Catering & Essenspläne",
+            "description": "Catering-Menüs und -Veranstaltungen, Essenspläne und Produktionstage, Liefergebiete und -dienste."
+          }
         },
         "ordering_settings": {
           "name": "Bestelleinstellungen",
@@ -204,7 +232,11 @@
         },
         "listings": {
           "name": "Inserate",
-          "description": "Inserate, Freigaben und Portal-Feeds."
+          "description": "Inserate und Freigaben.",
+          "portals": {
+            "name": "Portal-Feeds",
+            "description": "Welche Inserate an welche Immobilienportale gehen."
+          }
         },
         "enquiries": {
           "name": "Anfragen & Besichtigungen",
@@ -212,7 +244,11 @@
         },
         "agents": {
           "name": "Makler & Büros",
-          "description": "Makler, Büros und Lead-Verteilung."
+          "description": "Makler und Büros nachschlagen.",
+          "manage": {
+            "name": "Makler & Büros verwalten",
+            "description": "Makler und Büros anlegen und ändern."
+          }
         },
         "reservations": {
           "name": "Rezeption & Reservierungen",
@@ -501,7 +537,8 @@
       "addRole": "Weitere Rolle hinzufügen",
       "addRoleTitle": "Weitere Rolle hinzufügen",
       "addRoleSave": "Rolle hinzufügen",
-      "removeRole": "Diese Rolle entfernen"
+      "removeRole": "Diese Rolle entfernen",
+      "subModule": "Bildschirm in {parent}"
     },
     "teams": {
       "leadership": "Leitung",

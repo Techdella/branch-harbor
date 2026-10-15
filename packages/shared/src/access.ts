@@ -90,6 +90,11 @@ export interface ModuleDef {
    * include it (e.g. audits are not part of every Operations role).
    */
   explicitGrant?: boolean;
+  /**
+   * Screen-level sub-module (see SCREEN_MODULES): the module whose front-line screens this management screen sits
+   * beside. Holding the parent never implies the sub-module; `operations.*` grants include both.
+   */
+  parent?: string;
 }
 
 const V = ['view'] as const;
@@ -196,17 +201,17 @@ const ops = (key: string, name: string, description: string, screens: readonly s
 /** Industry operations modules. The industry chosen at sign-up decides which of these an account has. */
 export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
   studios: [
-    ops('classes', 'Classes & schedule', 'Class timetable, rooms, bookings, attendance and cover.', ['classes', 'schedule', 'rooms', 'cover']),
-    ops('memberships', 'Members & pricing', 'Members, memberships, class packs, offers and on-demand classes.', ['members', 'pricing', 'offers', 'online']),
+    ops('classes', 'Classes & schedule', 'Class timetable, bookings, check-in, attendance and cover. The schedule builder and rooms are their own screens (below).', ['classes', 'cover']),
+    ops('memberships', 'Members & pricing', 'Members, memberships and on-demand classes. Pricing, packs and offers are their own screen (below).', ['members', 'online']),
     ops('studio_insights', 'Studio insights', 'Occupancy, attendance and churn.', ['insights']),
   ],
   sports: [
     ops('programmes', 'Programmes & registrations', 'Seasons, programmes, registrations and balances.', ['overview', 'programmes', 'registrations', 'balances']),
-    ops('teams', 'Teams & sessions', 'Teams, schedule, attendance, announcements and guardians.', ['teams', 'schedule', 'attendance', 'announcements', 'guardians']),
+    ops('teams', 'Teams & sessions', 'Teams, attendance, announcements and guardians. The schedule builder is its own screen (below).', ['teams', 'attendance', 'announcements', 'guardians']),
     ops('sports_reports', 'Sports reports', 'Enrolment and attendance reports.', ['reports']),
   ],
   wellness: [
-    ops('appointments', 'Appointments', 'Calendar, practitioners and their hours.', ['calendar', 'practitioners']),
+    ops('appointments', 'Appointments', 'The appointment calendar. Practitioners and their hours are their own screen (below).', ['calendar']),
     ops('services', 'Services & packages', 'Services, packages, gift vouchers and intake forms.', ['services', 'packages', 'forms']),
     ops('clients', 'Clients', 'Client history, preferences and notes.', ['clients']),
     ops('wellness_insights', 'Wellness insights', 'Utilisation, cancellations and revenue.', ['insights']),
@@ -214,19 +219,19 @@ export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
   commerce: [
     ops('orders', 'Orders', 'Orders, returns and gift cards.', ['pulse', 'orders', 'returns', 'giftcards']),
     ops('catalogue', 'Catalogue', 'Products, assortment per location and the online store.', ['catalogue', 'assortment', 'storefront']),
-    ops('inventory', 'Inventory', 'Stock, transfers and purchasing.', ['inventory', 'transfers', 'purchasing']),
+    ops('inventory', 'Inventory', 'Stock levels and counts. Transfers and purchasing are their own screen (below).', ['inventory']),
     ops('commerce_insights', 'Commerce insights', 'Sales and stock reports.', ['insights']),
   ],
   foods: [
     ops('menu', 'Menu', 'Menus, item builder, availability and ingredients.', ['menu', 'builder', 'availability', 'ingredients']),
-    ops('food_orders', 'Orders & kitchen', 'Orders, kitchen display, pickup, delivery, tables, catering and meal plans.', ['orders', 'kitchen', 'pickup', 'delivery', 'tables', 'catering', 'mealplans']),
+    ops('food_orders', 'Orders & kitchen', 'Orders, kitchen display, pickup, delivery and tables. Catering and meal plans are their own screen (below).', ['orders', 'kitchen', 'pickup', 'delivery', 'tables']),
     ops('ordering_settings', 'Ordering settings', 'Online ordering rules per location.', ['ordering']),
     ops('food_reports', 'Food reports', 'Sales, prep times and waste.', ['foodreports']),
   ],
   realty: [
-    ops('listings', 'Listings', 'Listings, approvals and portal feeds.', ['pulse', 'listings', 'portals']),
+    ops('listings', 'Listings', 'Listings and approvals. Portal feeds are their own screen (below).', ['pulse', 'listings']),
     ops('enquiries', 'Enquiries & viewings', 'Enquiries, viewings and offers.', ['enquiries', 'viewings', 'offers']),
-    ops('agents', 'Agents & offices', 'Agents, offices and lead routing.', ['agents']),
+    ops('agents', 'Agents & offices', 'Look up agents and offices. Managing them is its own screen (below).', []),
   ],
   hospitality: [
     ops('reservations', 'Front desk & reservations', 'Today at the property, the room grid, reservations, check-in and check-out, folios and guest registration.', ['pulse', 'grid', 'reservations']),
@@ -237,9 +242,54 @@ export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
   ],
 };
 
+/* ------------------------------------------------------------------ */
+/* Screen-level sub-modules (management screens)                       */
+/* ------------------------------------------------------------------ */
+
+const screen = (parent: string, key: string, name: string, description: string, screens: readonly string[]): ModuleDef => ({
+  key: `${parent}.${key}`, area: 'operations', name, description, actions: VE, status: 'available', screens, parent,
+});
+
+/**
+ * Management screens that sit inside a front-line Operations module, as their own capabilities. Staff hold the
+ * front-line module (classes, check-in, kitchen orders…) but not these; `operations.*` (location manager, franchise
+ * owner, operations lead and above) includes them. The API enforces them on changes (services/module-guard.ts
+ * `OPS_SUB_ROUTES`); reads stay with the parent module, because front-line screens look up rooms, class types and
+ * agents. Reports are already modules of their own (`operations.studio_insights`, `sports_reports`…).
+ */
+export const SCREEN_MODULES: Record<Industry, readonly ModuleDef[]> = {
+  studios: [
+    screen('operations.classes', 'schedule_builder', 'Schedule builder', 'Recurring class series, class types and booking policies.', ['schedule']),
+    screen('operations.classes', 'rooms', 'Rooms', 'Rooms per location, their capacity and features.', ['rooms']),
+    screen('operations.memberships', 'packs_offers', 'Pricing, packs & offers', 'Membership plans, class packs and introductory offers.', ['pricing', 'offers']),
+  ],
+  sports: [
+    screen('operations.teams', 'schedule_builder', 'Schedule builder', 'Season schedules, schedule proposals and venues.', ['schedule']),
+  ],
+  wellness: [
+    screen('operations.appointments', 'practitioners', 'Practitioners & hours', 'Practitioners, their working hours, and rooms or equipment.', ['practitioners']),
+  ],
+  commerce: [
+    screen('operations.inventory', 'purchasing', 'Transfers & purchasing', 'Stock transfers between locations, purchase orders and suppliers.', ['transfers', 'purchasing']),
+  ],
+  foods: [
+    screen('operations.food_orders', 'catering', 'Catering & meal plans', 'Catering menus and events, meal plans and production dates, delivery zones and providers.', ['catering', 'mealplans']),
+  ],
+  realty: [
+    screen('operations.listings', 'portals', 'Portal feeds', 'Which listings go to which property portals.', ['portals']),
+    screen('operations.agents', 'manage', 'Manage agents & offices', 'Add and change agents and offices.', ['agents']),
+  ],
+  hospitality: [],
+};
+
+/** Every Operations module of an industry, including its screen-level sub-modules. */
+export function industryModules(industry: Industry | string): ModuleDef[] {
+  return [...(INDUSTRY_MODULES[industry as Industry] ?? []), ...(SCREEN_MODULES[industry as Industry] ?? [])];
+}
+
 /** Every module an organisation of this industry has (core + its industry's operations modules). */
 export function modulesFor(industry: Industry | string): ModuleDef[] {
-  return [...CORE_MODULES, ...(INDUSTRY_MODULES[industry as Industry] ?? [])];
+  return [...CORE_MODULES, ...(INDUSTRY_MODULES[industry as Industry] ?? []), ...(SCREEN_MODULES[industry as Industry] ?? [])];
 }
 
 export function moduleDef(industry: Industry | string, key: string): ModuleDef | undefined {
@@ -433,7 +483,7 @@ export const PENDING_MODULES = ['operations.audits'] as const;
 export const AUDITS_MODULE = 'operations.audits';
 
 /** What sales sells, per industry: memberships and packs, packages, registrations or enquiries. */
-const SALES_PRODUCTS = ['operations.memberships', 'operations.services', 'operations.programmes', 'operations.enquiries'] as const;
+const SALES_PRODUCTS = ['operations.memberships', 'operations.memberships.packs_offers', 'operations.services', 'operations.programmes', 'operations.enquiries'] as const;
 /**
  * Front-line operations for staff, per industry: classes and check-in, team sessions, appointments and the clients
  * they see, store orders and stock, kitchen orders, the front desk and housekeeping, listings and enquiries.

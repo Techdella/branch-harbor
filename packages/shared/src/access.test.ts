@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  COMBINED_ROLES, COVERAGE_AREAS, PENDING_MODULES, ROLE_PERMISSIONS, ROLE_TEMPLATES, TEAM_ROLE_ORDER, TEAM_SHAPE_SUGGESTIONS, applyDenies, combinedRoleCapabilities, coverageAreasFor,
+  COMBINED_ROLES, COVERAGE_AREAS, PENDING_MODULES, ROLE_PERMISSIONS, ROLE_TEMPLATES, SCREEN_MODULES, industryModules, TEAM_ROLE_ORDER, TEAM_SHAPE_SUGGESTIONS, applyDenies, combinedRoleCapabilities, coverageAreasFor,
   effectiveCapabilities, expandGrants, modulesFor, parseCapability, permissionsFromCapabilities, primaryWorkspace, rolesByTeam, sensitiveClassesIn, templateCapabilities, workspacesFor,
 } from './access.ts';
 import { INDUSTRIES } from './industries.ts';
@@ -190,4 +190,23 @@ test('coverage areas name real capabilities and suggest a template that covers t
   }
   assert.ok(!coverageAreasFor('studios', 'independent').some((a) => a.key === 'royalties'));
   assert.ok(coverageAreasFor('studios', 'network').some((a) => a.key === 'royalties'));
+});
+
+test('screen-level sub-modules: staff get front-line screens only, location managers and above get every screen', () => {
+  for (const industry of INDUSTRIES) {
+    const staff = caps('staff', 'location', industry);
+    for (const m of SCREEN_MODULES[industry]) {
+      assert.ok(m.parent && modulesFor(industry).some((p) => p.key === m.parent), `${m.key} has a parent module`);
+      assert.ok(!staff.has(`${m.key}:view`), `staff never get ${m.key}`);
+      assert.ok(caps('location_manager', 'location', industry).has(`${m.key}:edit`), `location managers get ${m.key}`);
+      assert.ok(caps('franchise_owner', 'owner_group', industry).has(`${m.key}:edit`), `franchise owners get ${m.key}`);
+      assert.ok(caps('operations_lead', 'organization', industry).has(`${m.key}:edit`), `operations leads get ${m.key}`);
+      // A management screen belongs to its sub-module only (the parent no longer lists it).
+      for (const sc of m.screens ?? []) assert.ok(!modulesFor(industry).some((p) => p.key !== m.key && p.screens?.includes(sc)), `${sc} belongs to one module`);
+    }
+  }
+  const s = caps('staff', 'location', 'studios');
+  assert.ok(s.has('operations.classes:edit') && !s.has('operations.classes.schedule_builder:view') && !s.has('operations.classes.rooms:view'));
+  assert.ok(caps('sales_lead', 'organization', 'studios').has('operations.memberships.packs_offers:edit'));
+  assert.deepEqual(industryModules('studios').map((m) => m.key).filter((k) => k.split('.').length > 2), ['operations.classes.schedule_builder', 'operations.classes.rooms', 'operations.memberships.packs_offers']);
 });

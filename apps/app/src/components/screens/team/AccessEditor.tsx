@@ -87,7 +87,9 @@ export function ModuleGrid({ value, onChange, disabledReason }: { value: Readonl
   return (
     <div className="flex flex-col gap-4" data-testid="module-grid">
       {AREAS.map((area) => {
-        const list = mods.filter((m) => m.area === area);
+        // Screen-level sub-modules sit right under their parent module.
+        const inArea = mods.filter((m) => m.area === area);
+        const list = inArea.filter((m) => !m.parent || !inArea.some((p) => p.key === m.parent)).flatMap((m) => [m, ...inArea.filter((c) => c.parent === m.key)]);
         if (!list.length) return null;
         return (
           <fieldset key={area} className="flex flex-col gap-1.5">
@@ -96,8 +98,9 @@ export function ModuleGrid({ value, onChange, disabledReason }: { value: Readonl
               {text.area(area)}
             </legend>
             {list.map((m) => (
-              <div key={m.key} className={cx('flex flex-wrap items-start gap-x-4 gap-y-2 rounded-md px-3 py-2.5', value.has(capability(m.key, 'view')) ? 'bg-lime/30' : 'bg-canvas')}>
+              <div key={m.key} data-testid={`module-${m.key}`} className={cx('flex flex-wrap items-start gap-x-4 gap-y-2 rounded-md px-3 py-2.5', m.parent && 'ml-6 border-l-2 border-line-soft', value.has(capability(m.key, 'view')) ? 'bg-lime/30' : 'bg-canvas')}>
                 <div className="min-w-[200px] flex-1">
+                  {m.parent && <div className="text-[11px] font-semibold text-mute">{t('editor.subModule', { parent: (() => { const p = mods.find((x) => x.key === m.parent); return p ? text.name(p) : m.parent; })() })}</div>}
                   <div className="flex flex-wrap items-center gap-1.5 text-sm font-bold">
                     {text.name(m)}
                     {m.sensitive && <span className="rounded-full bg-surface px-2 py-0.5 text-[10px] font-semibold text-stone">{t(`sensitive.${m.sensitive}`)}</span>}

@@ -190,6 +190,13 @@
       "when": 1792099828745,
       "tag": "0026_migrate_legacy_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792107768439,
+      "tag": "0027_screen_submodules",
+      "breakpoints": true
     }
   ]
 }

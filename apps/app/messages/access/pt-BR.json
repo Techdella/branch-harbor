@@ -132,11 +132,23 @@
         },
         "classes": {
           "name": "Aulas e grade",
-          "description": "Grade de aulas, salas, reservas, presença e substituições."
+          "description": "Grade de aulas, reservas, check-in, presença e substituições.",
+          "schedule_builder": {
+            "name": "Montagem da grade",
+            "description": "Séries de aulas recorrentes, tipos de aula e políticas de reserva."
+          },
+          "rooms": {
+            "name": "Salas",
+            "description": "Salas por unidade, sua capacidade e recursos."
+          }
         },
         "memberships": {
           "name": "Membros e preços",
-          "description": "Membros, planos, pacotes de aulas, ofertas e aulas sob demanda."
+          "description": "Membros, planos de assinatura e aulas sob demanda.",
+          "packs_offers": {
+            "name": "Preços, pacotes e ofertas",
+            "description": "Planos de assinatura, pacotes de aulas e ofertas de boas-vindas."
+          }
         },
         "studio_insights": {
           "name": "Análises do estúdio",
@@ -148,7 +160,11 @@
         },
         "teams": {
           "name": "Equipes e sessões",
-          "description": "Equipes, calendário, presença, comunicados e responsáveis."
+          "description": "Equipes, presença, avisos e responsáveis.",
+          "schedule_builder": {
+            "name": "Montagem do calendário",
+            "description": "Calendários da temporada, propostas de calendário e locais."
+          }
         },
         "sports_reports": {
           "name": "Relatórios esportivos",
@@ -156,7 +172,11 @@
         },
         "appointments": {
           "name": "Agendamentos",
-          "description": "Agenda, profissionais e seus horários."
+          "description": "A agenda de atendimentos.",
+          "practitioners": {
+            "name": "Profissionais e horários",
+            "description": "Profissionais, seus horários de trabalho, e salas ou equipamentos."
+          }
         },
         "services": {
           "name": "Serviços e pacotes",
@@ -180,7 +200,11 @@
         },
         "inventory": {
           "name": "Estoque",
-          "description": "Estoque, transferências e compras."
+          "description": "Níveis de estoque e contagens.",
+          "purchasing": {
+            "name": "Transferências e compras",
+            "description": "Transferências de estoque entre unidades, pedidos de compra e fornecedores."
+          }
         },
         "commerce_insights": {
           "name": "Análises de varejo",
@@ -192,7 +216,11 @@
         },
         "food_orders": {
           "name": "Pedidos e cozinha",
-          "description": "Pedidos, tela da cozinha, retirada, entrega, mesas, eventos e planos de refeições."
+          "description": "Pedidos, tela da cozinha, retirada, entrega e mesas.",
+          "catering": {
+            "name": "Buffet e planos de refeição",
+            "description": "Cardápios e eventos de buffet, planos de refeição e datas de produção, zonas e parceiros de entrega."
+          }
         },
         "ordering_settings": {
           "name": "Configurações de pedidos",
@@ -204,7 +232,11 @@
         },
         "listings": {
           "name": "Imóveis",
-          "description": "Imóveis, aprovações e feeds para portais."
+          "description": "Imóveis e aprovações.",
+          "portals": {
+            "name": "Envio aos portais",
+            "description": "Quais imóveis vão para quais portais imobiliários."
+          }
         },
         "enquiries": {
           "name": "Consultas e visitas",
@@ -212,7 +244,11 @@
         },
         "agents": {
           "name": "Corretores e escritórios",
-          "description": "Corretores, escritórios e distribuição de leads."
+          "description": "Consultar corretores e escritórios.",
+          "manage": {
+            "name": "Gerenciar corretores e escritórios",
+            "description": "Adicionar e alterar corretores e escritórios."
+          }
         },
         "reservations": {
           "name": "Recepção e reservas",
@@ -501,7 +537,8 @@
       "addRole": "Adicionar outra função",
       "addRoleTitle": "Adicionar outra função",
       "addRoleSave": "Adicionar função",
-      "removeRole": "Remover esta função"
+      "removeRole": "Remover esta função",
+      "subModule": "Tela de {parent}"
     },
     "teams": {
       "leadership": "Diretoria",
