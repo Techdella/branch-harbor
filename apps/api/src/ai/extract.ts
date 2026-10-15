@@ -82,7 +82,7 @@ function unescapePdfString(s: string): string {
 function textFromContent(content: string): string {
   const out: string[] = [];
   // Literal strings inside BT … ET blocks: (text) Tj, [(a) 120 (b)] TJ, ' and ".
-  for (const block of content.match(/BT[\s\S]*?ET/g) ?? []) {
+  for (const block of content.match(/\bBT\b[\s\S]*?(?:\bET\b|$)/g) ?? []) {
     let line = '';
     for (const m of block.matchAll(/(\[(?:[^\]\\]|\\.)*\]\s*TJ)|(\((?:[^()\\]|\\.)*\)\s*(?:Tj|'|"))|(T\*|Td|TD|Tm)/g)) {
       if (m[3]) {
@@ -108,8 +108,11 @@ export function pdfText(buf: Buffer): string {
     const dict = m[1] ?? '';
     const start = m.index + m[0].length;
     const lenMatch = dict.match(/\/Length\s+(\d+)(?!\s+\d+\s+R)/);
-    let end = lenMatch ? start + Number(lenMatch[1]) : src.indexOf('endstream', start);
-    if (end < start || end > src.length) end = src.indexOf('endstream', start);
+    // Trust /Length only when "endstream" follows it; otherwise use the marker (hand-made or damaged files).
+    const byLen = lenMatch ? start + Number(lenMatch[1]) : -1;
+    const marker = src.indexOf('endstream', start);
+    let end = byLen > start && byLen <= src.length && src.slice(byLen, byLen + 12).includes('endstream') ? byLen : marker;
+    if (end > start && src[end - 1] === '\n') end -= src[end - 2] === '\r' ? 2 : 1;
     if (end < 0) break;
     let data = buf.subarray(start, end);
     if (/\/Subtype\s*\/Image/.test(dict) || /\/Type\s*\/XRef/.test(dict)) continue;
@@ -135,37 +138,56 @@ export function pdfText(buf: Buffer): string {
 
 export interface Chunk { heading: string | null; content: string }
 
+/** Splits a long paragraph on sentence ends (hard cut as a last resort). */
+function pieces(para: string, size: number): string[] {
+  if (para.length <= size) return [para];
+  const out: string[] = [];
+  let cur = '';
+  for (const sentence of para.split(/(?<=[.!?])\s+/)) {
+    for (let i = 0; i < sentence.length; i += size) {
+      const part = sentence.slice(i, i + size);
+      if (cur && cur.length + part.length + 1 > size) {
+        out.push(cur);
+        cur = '';
+      }
+      cur += (cur ? ' ' : '') + part;
+    }
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+
 /** Splits text into ~1,200-character chunks on headings and paragraphs, carrying the current heading. */
 export function chunkText(text: string, opts: { size?: number; overlap?: number } = {}): Chunk[] {
   const size = opts.size ?? 1200;
   const overlap = opts.overlap ?? 150;
   const chunks: Chunk[] = [];
   let heading: string | null = null;
-  let buf = '';
-  const flush = () => {
-    const c = buf.trim();
-    if (c) chunks.push({ heading, content: c });
-    buf = c.length > overlap ? c.slice(-overlap) : '';
+  let cur = '';
+  const push = () => {
+    if (cur.trim()) chunks.push({ heading, content: cur.trim() });
+    cur = '';
   };
   for (const raw of text.replace(/\r\n/g, '\n').split(/\n{2,}/)) {
     const para = raw.trim();
     if (!para) continue;
     const h = para.match(/^#{1,4}\s+(.{1,140})$/) ?? (para.length < 90 && !/[.:;,]$/.test(para) && /^[A-Z0-9][^a-z]*$/.test(para) ? [para, para] : null);
     if (h) {
-      flush();
-      buf = '';
+      push();
       heading = h[1]!.trim();
       continue;
     }
-    if (buf.length + para.length > size && buf.trim().length > overlap) flush();
-    if (para.length > size) {
-      for (let i = 0; i < para.length; i += size - overlap) {
-        buf += `${para.slice(i, i + size)}\n\n`;
-        if (buf.length >= size) flush();
+    for (const piece of pieces(para, size)) {
+      if (cur && cur.length + piece.length + 2 > size) {
+        // Carry a short tail (from a word boundary) into the next chunk of the same section.
+        const tail = overlap > 0 ? cur.slice(-overlap) : '';
+        const cut = tail.indexOf(' ');
+        push();
+        cur = overlap && cut >= 0 ? tail.slice(cut + 1) : '';
       }
-    } else buf += `${para}\n\n`;
+      cur += (cur ? '\n\n' : '') + piece;
+    }
   }
-  flush();
-  // Drop overlap-only tails.
-  return chunks.filter((c, i) => i === 0 || c.content.length > overlap + 20);
+  push();
+  return chunks;
 }

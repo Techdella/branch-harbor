@@ -90,10 +90,10 @@ export async function detectInsights(s: Services, orgId: string, now = new Date(
       const rows = (await s.db.execute(sql`
         select b.location_id as id, count(*)::int as n from (
           select location_id, customer_id from class_bookings
-          where organization_id = ${orgId} and created_at >= ${d90} and created_at < ${d30} and status in ('confirmed','attended')
+          where organization_id = ${orgId} and created_at >= ${d90.toISOString()}::timestamptz and created_at < ${d30.toISOString()}::timestamptz and status in ('confirmed','attended')
           group by location_id, customer_id having count(*) >= 3
         ) b
-        where not exists (select 1 from class_bookings c where c.customer_id = b.customer_id and c.created_at >= ${d30} and c.status in ('confirmed','attended','held'))
+        where not exists (select 1 from class_bookings c where c.customer_id = b.customer_id and c.created_at >= ${d30.toISOString()}::timestamptz and c.status in ('confirmed','attended','held'))
         group by b.location_id`)) as unknown as Array<{ id: string; n: number }>;
       for (const r of rows) {
         const l = locs.find((x) => x.id === r.id);
@@ -130,7 +130,7 @@ export async function detectInsights(s: Services, orgId: string, now = new Date(
   // Review rating drop: last 30 days vs the 90 days before (at least 3 reviews in each window).
   const r30 = new Date(now.getTime() - 30 * DAY);
   const r120 = new Date(now.getTime() - 120 * DAY);
-  const rr = await s.db.select({ id: reviews.locationId, recent: sql<number>`avg(${reviews.rating}) filter (where ${reviews.reviewedAt} >= ${r30})`, nRecent: sql<number>`count(*) filter (where ${reviews.reviewedAt} >= ${r30})::int`, before: sql<number>`avg(${reviews.rating}) filter (where ${reviews.reviewedAt} < ${r30})`, nBefore: sql<number>`count(*) filter (where ${reviews.reviewedAt} < ${r30})::int` })
+  const rr = await s.db.select({ id: reviews.locationId, recent: sql<number>`avg(${reviews.rating}) filter (where ${reviews.reviewedAt} >= ${r30.toISOString()}::timestamptz)`, nRecent: sql<number>`count(*) filter (where ${reviews.reviewedAt} >= ${r30.toISOString()}::timestamptz)::int`, before: sql<number>`avg(${reviews.rating}) filter (where ${reviews.reviewedAt} < ${r30.toISOString()}::timestamptz)`, nBefore: sql<number>`count(*) filter (where ${reviews.reviewedAt} < ${r30.toISOString()}::timestamptz)::int` })
     .from(reviews).where(and(eq(reviews.organizationId, orgId), gte(reviews.reviewedAt, r120))).groupBy(reviews.locationId);
   for (const r of rr) {
     const recent = Number(r.recent);

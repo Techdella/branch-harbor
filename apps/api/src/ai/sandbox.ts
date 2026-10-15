@@ -109,6 +109,7 @@ interface Rule {
 
 /** Keyword rules, most specific first. Inputs are only taken from the question itself. */
 const RULES: Rule[] = [
+  { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|where do (we|i)|comment |cómo |wie |como )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
   { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q) }) },
   { test: /(create|add|new) (a )?(task|to-?do)|crée une tâche|crear tarea|aufgabe/, tool: 'create_task', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 120) }) },
   { test: /(draft|write|create|prepare).*(email|newsletter)|(email|newsletter).*(draft|campaign)|rédige.*e-?mail|redacta.*correo/, tool: 'create_email_campaign_draft', input: (_q, raw) => ({ name: quoted(raw) ?? raw.slice(0, 80), subject: quoted(raw) ?? raw.slice(0, 80) }) },
@@ -235,7 +236,8 @@ export function createSandboxLlm(): MarinaLlm {
       }
       for (const r of RULES) {
         if (!r.test.test(q)) continue;
-        if (!offered.has(r.tool)) continue;
+        // The first matching rule decides: a tool outside the person's access is never replaced by another one.
+        if (!offered.has(r.tool)) break;
         const input = Object.fromEntries(Object.entries(r.input(q, text.trim())).filter(([, v]) => v !== undefined));
         words(p.checking + ' ', c.onText);
         return done([textBlock(p.checking), { type: 'tool_use', id: `toolu_${randomUUID().replace(/-/g, '')}`, name: r.tool, input, caller: { type: 'direct' } } as unknown as LlmContentBlock], 'tool_use');
