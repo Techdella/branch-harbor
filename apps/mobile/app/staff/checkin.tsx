@@ -106,6 +106,7 @@ function Choice({ label, icon, on, busy, tone, onPress }: { label: string; icon:
       accessibilityRole="radio"
       accessibilityLabel={label}
       accessibilityState={{ checked: on, busy }}
+      aria-checked={on}
       style={({ pressed }) => ({
         flex: 1, minHeight: MIN_TARGET + 4, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
         backgroundColor: on ? s.bg : color.canvas, borderWidth: 1.5, borderColor: on ? s.fg : 'transparent', opacity: busy ? 0.6 : pressed ? 0.85 : 1,

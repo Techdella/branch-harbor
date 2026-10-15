@@ -37,14 +37,14 @@ export default async function Programmes({ params, searchParams }: Props) {
   return (
     <main id="main" className="mx-auto max-w-3xl px-4 py-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-3xl font-extrabold tracking-tight">{t('module.sports')}</h1>
           <p className="mt-1 text-graphite">{data.brand.name} {data.location.name}</p>
         </div>
         <a href={links.location(location, '/programmes/portal')} className="btn btn-secondary">{t('sports.portalLink')}</a>
       </div>
       <form method="get" className="mt-5 flex flex-wrap items-end gap-3 rounded-2xl bg-canvas p-4" aria-label={t('sports.filterLabel')}>
-        <div>
+        <div className="min-w-0 max-w-full">
           <label htmlFor="dob-filter" className="mb-1 block text-sm font-semibold">{t('sports.filterDob')}</label>
           <input id="dob-filter" name="dob" type="date" defaultValue={dob} className="field" />
         </div>

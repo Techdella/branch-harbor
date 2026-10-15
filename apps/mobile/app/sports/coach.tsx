@@ -58,7 +58,7 @@ export default function CoachScreen() {
               const on = r.attendance === m;
               const tone = m === 'present' ? S.success : m === 'absent' ? S.danger : m === 'late' ? S.warning : S.info;
               return (
-                <Pressable key={m} accessibilityRole="radio" accessibilityState={{ checked: on, busy: pending === r.id }} onPress={() => void mark(r, m)}
+                <Pressable key={m} accessibilityRole="radio" accessibilityState={{ checked: on, busy: pending === r.id }} aria-checked={on} onPress={() => void mark(r, m)}
                   style={{ minHeight: MIN_TARGET, paddingHorizontal: 14, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: on ? tone.bg : color.canvas, borderWidth: 1.5, borderColor: on ? tone.fg : 'transparent', opacity: pending === r.id ? 0.6 : 1 }}>
                   <Text weight={700} color={on ? tone.fg : color.ink}>{t(`sports.${m}`)}</Text>
                 </Pressable>

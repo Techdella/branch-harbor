@@ -35,9 +35,9 @@ export function FoodReportsScreen() {
             <div className="grid gap-3 xl:grid-cols-2">
               <Section title={t('reports.revenue')}>
                 {r.revenueByCurrency.length === 0 ? <p className="text-sm text-stone">{t('reports.noOrders')}</p> : (
-                  <table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="p-1.5">{t('reports.currency')}</th><th className="p-1.5">{t('reports.orders')}</th><th className="p-1.5">{t('reports.gross')}</th><th className="p-1.5">{t('reports.avg')}</th><th className="p-1.5">{t('reports.tips')}</th></tr></thead>
+                  <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="p-1.5">{t('reports.currency')}</th><th className="p-1.5">{t('reports.orders')}</th><th className="p-1.5">{t('reports.gross')}</th><th className="p-1.5">{t('reports.avg')}</th><th className="p-1.5">{t('reports.tips')}</th></tr></thead>
                     <tbody>{r.revenueByCurrency.map((c) => <tr key={c.currency} className="border-t border-line-soft"><td className="p-1.5 font-bold">{c.currency}</td><td className="p-1.5 tabular">{fmtNumber(c.orders, locale)}</td><td className="p-1.5"><Money1 m={c.gross} /></td><td className="p-1.5"><Money1 m={c.averageOrder} /></td><td className="p-1.5"><Money1 m={c.tips} /></td></tr>)}</tbody>
-                  </table>
+                  </table></div>
                 )}
               </Section>
               <Section title={t('reports.byChannel')}>
@@ -45,9 +45,9 @@ export function FoodReportsScreen() {
               </Section>
               <Section title={t('reports.prep')}>
                 <p className="mb-2 text-xs text-stone">{r.prepTimes?.definition}</p>
-                <table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="p-1.5">{t('common.location')}</th><th className="p-1.5">{t('reports.median')}</th><th className="p-1.5">{t('reports.p90')}</th><th className="p-1.5">{t('reports.onTime')}</th></tr></thead>
+                <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="p-1.5">{t('common.location')}</th><th className="p-1.5">{t('reports.median')}</th><th className="p-1.5">{t('reports.p90')}</th><th className="p-1.5">{t('reports.onTime')}</th></tr></thead>
                   <tbody>{r.prepTimes?.locations.map((l) => <tr key={l.locationId} className="border-t border-line-soft"><td className="p-1.5">{l.name}</td><td className="p-1.5">{min(l.medianMinutes)}</td><td className="p-1.5">{min(l.p90Minutes)}</td><td className="p-1.5">{pct(l.onTimeRate)}</td></tr>)}</tbody>
-                </table>
+                </table></div>
                 {r.prepTimes?.stations ? <ul className="mt-2 text-xs">{r.prepTimes.stations.map((s) => <li key={s.stationId}>{s.name}: {min(s.medianMinutes)} ({t('reports.target', { n: s.targetMinutes })}, {t('reports.overTarget', { n: s.overTarget, of: s.tickets })})</li>)}</ul> : <p className="mt-2 text-xs text-stone">{r.prepTimes?.stationsUnavailableReason}</p>}
               </Section>
               <Section title={t('reports.soldOut')}>

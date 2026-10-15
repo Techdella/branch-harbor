@@ -15,7 +15,7 @@ export function LanguageSwitcher({ dark = false, className }: { dark?: boolean; 
   const id = useId();
 
   return (
-    <div className={cx('flex items-center gap-2', className)}>
+    <div className={cx('flex min-w-0 flex-wrap items-center gap-2', className)}>
       <label htmlFor={id} className={cx('flex items-center gap-1.5 text-[13px] font-bold', dark ? 'text-[#B9B9B3]' : 'text-stone')}>
         <Icon name="globe" size={15} />
         {t('language')}
@@ -32,7 +32,7 @@ export function LanguageSwitcher({ dark = false, className }: { dark?: boolean; 
           });
         }}
         className={cx(
-          'h-10 rounded-full border px-3 text-[13px] font-bold',
+          'h-10 min-w-0 max-w-full rounded-full border px-3 text-[13px] font-bold',
           dark ? 'border-[#3a3a3a] bg-ink-2 text-white' : 'border-line bg-surface text-ink',
         )}
       >

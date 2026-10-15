@@ -41,10 +41,10 @@ export function Popover({
     };
   }, [open]);
   return (
-    <div ref={root} className={cx('relative', className)}>
+    <div ref={root} className={cx('relative shrink-0', className)}>
       {trigger({ open, toggle: () => setOpen((o) => !o), id })}
       {open && (
-        <div id={id} role="dialog" aria-label={label} className={cx('absolute top-[calc(100%+8px)] z-40 w-[min(360px,calc(100vw-24px))] rounded-lg bg-surface p-2 shadow-pop', align === 'right' ? 'right-0' : 'left-0', panelClassName)}>
+        <div id={id} role="dialog" aria-label={label} className={cx('absolute top-[calc(100%+8px)] z-40 max-h-[min(70dvh,560px)] w-[min(360px,calc(100vw-24px))] overflow-y-auto overscroll-contain rounded-lg bg-surface p-2 shadow-pop', align === 'right' ? 'right-0' : 'left-0', panelClassName)}>
           {children(() => setOpen(false))}
         </div>
       )}

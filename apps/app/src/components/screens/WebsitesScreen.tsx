@@ -363,7 +363,7 @@ function Publish() {
                 {failed ? t('partialBody') : t('allDoneBody')}
               </Banner>
             )}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0}>
               <DataTable<PublishTarget>
                 rows={inScope}
                 rowKey={(r) => r.locationId}

@@ -381,7 +381,7 @@ function PublishTab({ menu, b, canEdit, reload }: { menu: BuilderMenu; b: Builde
         <p className="mb-3 text-sm text-stone">{t('builder.previewBody')}</p>
         <Async res={preview} loading={<LoadingBlock variant="table" rows={3} />}>
           {(p: PublishPreview) => (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0}>
               <table className="w-full min-w-[640px] text-sm">
                 <thead><tr className="text-left text-xs uppercase text-stone"><th className="p-2">{canEdit ? t('builder.include') : ''}</th><th className="p-2">{t('common.location')}</th><th className="p-2">{t('builder.wouldBe')}</th><th className="p-2">{t('builder.sellable')}</th><th className="p-2">{t('builder.notSellable')}</th><th className="p-2">{t('builder.lastPublish')}</th></tr></thead>
                 <tbody>

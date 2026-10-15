@@ -50,7 +50,7 @@ export function CommerceOverviewScreen() {
                     ))}
                   </div>
                   <p className="mb-3 flex items-center gap-1.5 text-xs text-stone"><Icon name="info" size={14} />{t('overview.noCombined')}</p>
-                  <table className="w-full text-sm">
+                  <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm">
                     <thead><tr className="border-b border-line-soft text-left text-xs uppercase text-stone"><th className="py-2">{t('common.store')}</th><th className="py-2 text-right">{t('overview.today')}</th><th className="py-2 text-right">{t('overview.last7')}</th><th className="hidden py-2 text-right md:table-cell">{t('overview.refunds7')}</th></tr></thead>
                     <tbody>
                       {d.sales.filter((s) => inScope(s.locationId)).map((s) => (
@@ -62,7 +62,7 @@ export function CommerceOverviewScreen() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </table></div>
                 </>
               )}
             </SectionCard>

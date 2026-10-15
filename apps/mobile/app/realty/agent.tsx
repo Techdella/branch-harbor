@@ -37,7 +37,7 @@ export default function AgentDay() {
             <Text variant="label">{s('interest')}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {['none', 'low', 'medium', 'high'].map((x) => (
-                <Pressable key={x} onPress={() => setFb({ ...fb, interest: x })} accessibilityRole="radio" accessibilityState={{ checked: fb.interest === x }} style={{ minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 22, backgroundColor: fb.interest === x ? color.ink : color.canvas }}>
+                <Pressable key={x} onPress={() => setFb({ ...fb, interest: x })} accessibilityRole="radio" accessibilityState={{ checked: fb.interest === x }} aria-checked={fb.interest === x} style={{ minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 22, backgroundColor: fb.interest === x ? color.ink : color.canvas }}>
                   <Text weight={700} color={fb.interest === x ? '#fff' : color.ink}>{dict.interestLevels[x]}</Text>
                 </Pressable>
               ))}
@@ -45,7 +45,7 @@ export default function AgentDay() {
             <Text variant="label">{s('rating')}</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {[1, 2, 3, 4, 5].map((n) => (
-                <Pressable key={n} onPress={() => setFb({ ...fb, rating: n })} accessibilityRole="radio" accessibilityLabel={`${n}`} accessibilityState={{ checked: fb.rating === n }} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: fb.rating === n ? color.ink : color.canvas }}>
+                <Pressable key={n} onPress={() => setFb({ ...fb, rating: n })} accessibilityRole="radio" accessibilityLabel={`${n}`} accessibilityState={{ checked: fb.rating === n }} aria-checked={fb.rating === n} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: fb.rating === n ? color.ink : color.canvas }}>
                   <Text weight={700} color={fb.rating === n ? '#fff' : color.ink}>{n}</Text>
                 </Pressable>
               ))}

@@ -12,6 +12,7 @@ export function ToggleRow({ label, sub, value, onChange, icon, disabled }: { lab
       accessibilityLabel={label}
       accessibilityHint={sub}
       accessibilityState={{ checked: value, disabled: !!disabled }}
+      aria-checked={value}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: space[3], minHeight: MIN_TARGET + 8, paddingVertical: 6, opacity: disabled ? 0.5 : pressed ? 0.8 : 1 })}
     >
       {icon ? <Icon name={icon} size={18} /> : null}

@@ -143,7 +143,7 @@ function Zones({ locationId, currency, canWrite, res }: { locationId: string; cu
         {(z) => (
           <>
             {z.geocoding === 'disabled' && <Banner tone="info" title={t('delivery.geocodingOff')}>{z.location.geo ? t('delivery.geocodingOffBody') : t('delivery.noCoordinates')}</Banner>}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0}>
               <table className="mt-2 w-full min-w-[560px] text-sm">
                 <thead><tr className="text-left text-xs uppercase text-stone"><th className="p-2">{t('delivery.zone')}</th><th className="p-2">{t('delivery.area')}</th><th className="p-2">{t('delivery.fee')}</th><th className="p-2">{t('delivery.minimum')}</th><th className="p-2">{t('delivery.freeAbove')}</th><th className="p-2" /></tr></thead>
                 <tbody>

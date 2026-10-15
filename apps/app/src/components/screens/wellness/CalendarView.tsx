@@ -88,7 +88,7 @@ function Grid({ d, view, canWrite, onOpen, onEmpty, onDrop }: { d: CalendarDay; 
   };
   if (!cols.length) return <Empty icon="user" title={t('noColumns')} />;
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" tabIndex={0}>
       <div className="grid min-w-[720px] gap-2" style={{ gridTemplateColumns: `56px repeat(${cols.length}, minmax(170px, 1fr))` }}>
         <div />
         {cols.map((c) => (
@@ -106,7 +106,7 @@ function Grid({ d, view, canWrite, onOpen, onEmpty, onDrop }: { d: CalendarDay; 
           ))}
         </div>
         {cols.map((c) => (
-          <div key={c.id} className={cx('relative rounded-md border border-line-soft', view === 'practitioners' ? 'bg-[repeating-linear-gradient(45deg,#F6F5F1,#F6F5F1_6px,#FBFAF7_6px,#FBFAF7_12px)]' : 'bg-[#FAFAF7]')} style={{ height }}
+          <div key={c.id} className={cx('relative rounded-md border border-line-soft', view === 'practitioners' ? 'bg-[repeating-linear-gradient(45deg,#F6F5F1,#F6F5F1_6px,#FBFAF7_6px,#FBFAF7_12px)]' : 'bg-canvas-raised')} style={{ height }}
             onDragOver={(e) => { if (dragId) e.preventDefault(); }}
             onDrop={(e) => { e.preventDefault(); const a = live.find((x) => x.id === dragId); setDragId(null); if (a) onDrop(a, c.id, minuteAt(e)); }}
             onDoubleClick={(e) => { if (view === 'practitioners') onEmpty(c.id, toHhmm(minuteAt(e as unknown as DragEvent<HTMLDivElement>))); }}

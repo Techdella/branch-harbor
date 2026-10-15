@@ -146,7 +146,7 @@ export async function SolutionPage({ which }: { which: Key }) {
         <H2 id="sol-cta" className="max-w-2xl">
           {t('ctaTitle')}
         </H2>
-        <p className="max-w-xl text-base leading-relaxed text-[#E6EEE7] md:text-lg">{t('ctaBody')}</p>
+        <p className="max-w-xl text-base leading-relaxed text-white md:text-lg">{t('ctaBody')}</p>
         <LinkButton href="/demo" size="lg" variant="light" iconRight="arrow-up-right">
           {t(`${which}.cta`)}
         </LinkButton>

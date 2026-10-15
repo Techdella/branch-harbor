@@ -35,7 +35,7 @@ export function IngredientsScreen() {
           <>
             {list.some((i) => i.stock?.lowStock) && <Banner tone="warning" title={t('ing.lowStockTitle')}>{list.filter((i) => i.stock?.lowStock).map((i) => `${i.name} (${i.stock!.onHand} ${i.unit})`).join(', ')}</Banner>}
             <Section title={t('ing.stock')}>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto" tabIndex={0}>
                 <table className="w-full min-w-[720px] text-sm">
                   <thead><tr className="text-left text-xs uppercase text-stone"><th className="p-2">{t('ing.ingredient')}</th><th className="p-2">{t('ing.onHand')}</th><th className="p-2">{t('ing.threshold')}</th><th className="p-2">{t('ing.autoSoldOut')}</th><th className="p-2">{t('ing.usedBy')}</th><th className="p-2">{t('ing.adjust')}</th></tr></thead>
                   <tbody>{list.map((i) => <Row key={i.id} i={i} canWrite={canWrite} onMove={async (r, q) => { const x = await move.run(i.id, r, q); if (x) { setMsg(x.soldOutItems.length ? t('ing.nowSoldOut', { name: i.name }) : t('ing.recorded', { name: i.name, n: x.onHand, unit: i.unit })); res.reload(); } }} onStock={async (b) => { if (await setStock.run(i.id, b)) res.reload(); }} />)}</tbody>

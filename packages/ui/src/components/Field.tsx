@@ -4,7 +4,7 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Selec
 import { cx } from '../cx';
 
 const control =
-  'w-full rounded-xs border border-line bg-surface px-3.5 text-sm font-medium text-ink placeholder:text-mute transition focus:border-ink focus:outline-none aria-[invalid=true]:border-danger';
+  'w-full rounded-xs border border-line bg-surface px-3.5 text-sm font-medium text-ink placeholder:text-mute transition focus:border-ink focus-visible:outline-offset-0 aria-[invalid=true]:border-danger';
 
 interface FieldWrapProps {
   label: string;
@@ -52,7 +52,7 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={cx('relative h-6 w-11 rounded-full transition', checked ? 'bg-ink' : 'bg-line')}
+      className={cx('hit-44 h-6 w-11 shrink-0 rounded-full transition', checked ? 'bg-ink' : 'bg-line')}
     >
       <span className={cx('absolute top-0.5 h-5 w-5 rounded-full bg-white transition', checked ? 'left-[22px]' : 'left-0.5')} />
     </button>

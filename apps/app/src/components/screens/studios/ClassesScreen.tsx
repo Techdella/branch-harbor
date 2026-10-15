@@ -55,7 +55,7 @@ export function ClassesScreen() {
       <PageHeader icon="calendar" title={tOps('title')} description={tOps('description')} actions={app.can('operations.write') ? <Link href="/ops/schedule" className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-bold text-white"><Icon name="plus" size={16} />{t('newClass')}</Link> : undefined} />
       <section className="rounded-xl bg-surface p-3.5">
         <div className="flex flex-wrap items-center gap-2 px-1 pb-3">
-          <label className="flex h-10 items-center gap-2 rounded-full border border-line-soft px-3 text-[13px] font-semibold">
+          <label className="flex h-11 items-center gap-2 rounded-full border border-line-soft px-3 text-[13px] font-semibold">
             <Icon name="pin" size={14} />
             <span className="sr-only">{t('location')}</span>
             <select value={locId} onChange={(e) => setLocId(e.target.value)} className="bg-transparent font-bold focus:outline-none">

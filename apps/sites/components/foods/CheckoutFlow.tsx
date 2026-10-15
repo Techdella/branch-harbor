@@ -383,7 +383,7 @@ function ItemDialog({ item, fmt, onClose, onAdd }: { item: MenuItemX; fmt: (n: n
   const unit = (item.price?.amount ?? 0) + item.modifierGroups.flatMap((g) => g.modifiers).filter((m) => ids.includes(m.id)).reduce((a, m) => a + (m.price?.amount ?? 0), 0);
   const valid = item.modifierGroups.every((g) => (picked[g.id]?.length ?? 0) >= g.minSelect && (picked[g.id]?.length ?? 0) <= g.maxSelect);
   return (
-    <dialog ref={ref} onClose={onClose} aria-labelledby="dlg-h" className="m-auto w-[min(520px,calc(100vw-24px))] rounded-3xl p-0 backdrop:bg-ink/50">
+    <dialog ref={ref} onClose={onClose} aria-labelledby="dlg-h" className="m-auto w-[min(520px,calc(100vw-24px))] rounded-3xl p-0 backdrop:bg-black/50">
       <form method="dialog" className="p-6" onSubmit={(e) => { e.preventDefault(); if (valid) onAdd(ids, qty); }}>
         <div className="flex items-start justify-between gap-3"><h2 id="dlg-h" className="text-xl font-extrabold">{item.name}</h2><button type="button" className="grid size-10 place-items-center rounded-full hover:bg-canvas" onClick={() => ref.current?.close()} aria-label={tc('close')}><Icon name="x" size={18} /></button></div>
         {item.description && <p className="mt-1 text-sm text-graphite">{item.description}</p>}

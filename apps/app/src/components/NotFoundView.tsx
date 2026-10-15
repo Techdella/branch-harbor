@@ -7,7 +7,7 @@ import { LogoMark } from '@bh/ui';
 export function NotFoundView() {
   const t = useTranslations('states');
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+    <main className="flex min-h-viewport flex-col items-center justify-center gap-4 p-6 text-center">
       <LogoMark size={44} />
       <h1 className="text-h2 font-bold">{t('notFoundTitle')}</h1>
       <p className="max-w-md text-sm text-stone">{t('notFoundBody')}</p>

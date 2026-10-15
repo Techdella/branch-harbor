@@ -92,7 +92,7 @@ function Relationships() {
           const rows = items.filter((r: SGuardianRel) => !ql || r.participant.name.toLowerCase().includes(ql) || r.guardian?.name.toLowerCase().includes(ql));
           return (
             <>
-              <div className="overflow-x-auto rounded-lg bg-surface">
+              <div className="overflow-x-auto rounded-lg bg-surface" tabIndex={0}>
                 <table className="w-full min-w-[640px] text-sm">
                   <thead><tr className="text-left text-xs text-stone"><th className="p-3">{t('participant')}</th><th>{t('guardian')}</th><th>{t('relationship')}</th><th>{t('status')}</th><th /></tr></thead>
                   <tbody>

@@ -131,7 +131,7 @@ export function AiPanel({ onClose, fullScreen }: { onClose: () => void; fullScre
   };
 
   return (
-    <aside aria-label={t('title')} role={fullScreen ? 'dialog' : undefined} aria-modal={fullScreen || undefined} className={cx('flex flex-col overflow-hidden bg-surface', fullScreen ? 'h-full' : 'max-h-[calc(100vh-24px)] rounded-xl')}>
+    <aside aria-label={t('title')} role={fullScreen ? 'dialog' : undefined} aria-modal={fullScreen || undefined} className={cx('flex flex-col overflow-hidden bg-surface', fullScreen ? 'h-full' : 'max-h-viewport-inset rounded-xl')}>
       <div className="flex flex-col gap-2.5 bg-[linear-gradient(135deg,#F1E7FB,#FDEDE4)] p-4">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-2.5 whitespace-nowrap text-base font-bold">

@@ -68,7 +68,7 @@ export default function ListingDetail() {
                 {slotsQ.loading ? <SkeletonCard /> : (slotsQ.data ?? []).length === 0 ? <Text tone="muted">{s('noSlots')}</Text> : (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                     {(slotsQ.data ?? []).map((x) => (
-                      <Pressable key={x.startsAt} onPress={() => setSlot(x)} accessibilityRole="radio" accessibilityState={{ checked: slot?.startsAt === x.startsAt }} style={{ minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 22, backgroundColor: slot?.startsAt === x.startsAt ? color.ink : color.surface }}>
+                      <Pressable key={x.startsAt} onPress={() => setSlot(x)} accessibilityRole="radio" accessibilityState={{ checked: slot?.startsAt === x.startsAt }} aria-checked={slot?.startsAt === x.startsAt} style={{ minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 22, backgroundColor: slot?.startsAt === x.startsAt ? color.ink : color.surface }}>
                         <Text weight={700} tabular color={slot?.startsAt === x.startsAt ? '#fff' : color.ink}>{fmtTime(x.startsAt, tz, intlLocale)}</Text>
                       </Pressable>
                     ))}

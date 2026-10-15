@@ -16,14 +16,14 @@ export function Drawer({ open, onClose, title, kicker, children, footer }: { ope
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-ink/30" onClick={onClose} aria-hidden="true" />
-      <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} className="relative flex h-full w-full flex-col bg-surface shadow-pop outline-none md:w-[480px] md:rounded-l-xl">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
+      <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} className="relative flex h-full w-full flex-col bg-surface pb-safe pt-safe shadow-pop outline-none md:w-[480px] md:rounded-l-xl">
         <div className="flex items-start justify-between gap-4 border-b border-line-soft p-6">
-          <div>
+          <div className="min-w-0">
             {kicker && <div className="text-label font-extrabold uppercase text-stone">{kicker}</div>}
             <h2 className="text-h2 font-bold">{title}</h2>
           </div>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-canvas" aria-label="Close">
+          <button type="button" onClick={onClose} className="-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-canvas" aria-label="Close">
             <Icon name="x" />
           </button>
         </div>

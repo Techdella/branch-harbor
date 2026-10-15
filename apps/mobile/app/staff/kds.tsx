@@ -45,7 +45,7 @@ export default function Kds() {
       <ToggleRow label={t('foodsx.sound')} value={sound} onChange={setSound} />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }} accessibilityRole="tablist">
         {[{ id: null as string | null, name: t('foodsx.expo') }, ...(q.data?.stations.filter((s) => !s.isExpo).map((s) => ({ id: s.id as string | null, name: `${s.name} (${s.open})` })) ?? [])].map((s) => (
-          <Pressable key={s.id ?? 'expo'} accessibilityRole="tab" accessibilityState={{ selected: stationId === s.id }} onPress={() => setStationId(s.id)}
+          <Pressable key={s.id ?? 'expo'} accessibilityRole="tab" accessibilityState={{ selected: stationId === s.id }} aria-selected={stationId === s.id} onPress={() => setStationId(s.id)}
             style={{ minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: stationId === s.id ? color.ink : color.surface }}>
             <Text weight={700} color={stationId === s.id ? color.surface : color.ink}>{s.name}</Text>
           </Pressable>

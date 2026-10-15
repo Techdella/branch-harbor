@@ -37,7 +37,7 @@ export default function GuardianScreen() {
         </View>
       ) : null}
       <View style={{ flexDirection: 'row', gap: 6 }} accessibilityRole="tablist">
-        {(['schedule', 'balances', 'messages'] as Tab[]).map((k) => <Tag key={k} label={t(`sports.tab${k[0]!.toUpperCase()}${k.slice(1)}`)} selected={tab === k} onPress={() => setTab(k)} />)}
+        {(['schedule', 'balances', 'messages'] as Tab[]).map((k) => <Tag key={k} tab label={t(`sports.tab${k[0]!.toUpperCase()}${k.slice(1)}`)} selected={tab === k} onPress={() => setTab(k)} />)}
       </View>
       {d && tab === 'schedule' ? <Schedule sessions={d.schedule} onDone={() => { toast(t('sports.absenceSaved')); void q.refresh(); }} /> : null}
       {d && tab === 'balances' ? (

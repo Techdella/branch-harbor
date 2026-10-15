@@ -46,7 +46,7 @@ export function BalancesScreen() {
               <p className="text-xs text-stone">{t('noCombined')}</p>
               <Tabs items={(['all', 'overdue', 'due', 'on_track', 'paid'] as Filter[]).map((k) => ({ key: k, label: t(`filter.${k}`), count: k === 'all' ? items.length : items.filter((r) => r.balance.state === k).length }))} value={filter} onChange={setFilter} />
               {rows.length === 0 ? <Empty icon="card" title={t('empty')} /> : (
-                <div className="overflow-x-auto rounded-lg bg-surface">
+                <div className="overflow-x-auto rounded-lg bg-surface" tabIndex={0}>
                   <table className="w-full min-w-[720px] text-sm">
                     <thead><tr className="text-left text-xs text-stone"><th className="p-3">{t('participant')}</th><th>{t('programme')}</th><th>{t('plan')}</th><th className="text-right">{t('paid')}</th><th className="text-right">{t('outstanding')}</th><th>{t('next')}</th><th>{t('state')}</th></tr></thead>
                     <tbody>

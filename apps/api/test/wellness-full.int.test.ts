@@ -241,7 +241,11 @@ describe.skipIf(!hasDb)('wellness full product (DB)', () => {
     let [cp] = await app.ctx.db.select().from(wellnessClientPackages).where(eq(wellnessClientPackages.id, pkgId));
     expect(cp!).toMatchObject({ sessionsUsed: 2, status: 'active' });
     // Late cancellation forfeits it (and charges no money on top).
-    const soon = new Date(Date.now() + 3 * 3600_000); soon.setUTCMinutes(0, 0, 0);
+    // Inside the late-cancel window (< 24 h away) and inside working hours (09:00–17:00 location time),
+    // whatever time of day the suite runs.
+    const localHour = (d: Date) => Number(new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', hourCycle: 'h23' }).format(d));
+    let soon = new Date(Date.now() + 2 * 3600_000); soon.setUTCMinutes(0, 0, 0);
+    while (localHour(soon) < 9 || localHour(soon) > 15) soon = new Date(soon.getTime() + 3600_000);
     const late = await use(owner, soon.toISOString());
     expect(late.status).toBe(201);
     const c2 = await call(app, 'POST', `/v1/orgs/${orgId}/wellness/appointments/${late.body.appointment.id}/cancel`, { token, body: {} });

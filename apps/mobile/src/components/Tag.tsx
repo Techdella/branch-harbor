@@ -3,8 +3,8 @@ import { color, radius, MIN_TARGET } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
-/** Pastel chip. With onPress it's a selectable chip (radio-like via `selected`). */
-export function Tag({ label, bg, icon, selected, onPress, disabled, sub, accessibilityLabel }: { label: string; bg?: string; icon?: IconName; selected?: boolean; onPress?: () => void; disabled?: boolean; sub?: string; accessibilityLabel?: string }) {
+/** Pastel chip. With onPress it's a selectable chip (radio-like via `selected`); `tab` when it sits in a tablist. */
+export function Tag({ label, bg, icon, selected, onPress, disabled, sub, accessibilityLabel, tab }: { label: string; bg?: string; icon?: IconName; selected?: boolean; onPress?: () => void; disabled?: boolean; sub?: string; accessibilityLabel?: string; tab?: boolean }) {
   const fg = selected ? color.surface : color.ink;
   const content = (
     <>
@@ -30,9 +30,10 @@ export function Tag({ label, bg, icon, selected, onPress, disabled, sub, accessi
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}
-      accessibilityRole="button"
+      accessibilityRole={tab ? 'tab' : 'button'}
       accessibilityLabel={accessibilityLabel ?? (sub ? `${label}, ${sub}` : label)}
       accessibilityState={{ selected: !!selected, disabled: !!disabled }}
+      aria-selected={tab ? !!selected : undefined}
       style={({ pressed }) => [style, { minHeight: MIN_TARGET, opacity: disabled ? 0.45 : pressed ? 0.8 : 1 }]}
     >
       {content}

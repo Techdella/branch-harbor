@@ -38,10 +38,10 @@ export function InsightsScreen() {
                   </div>
                 ))}
               </div>
-              <table className="w-full text-sm">
+              <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm">
                 <thead><tr className="border-b border-line-soft text-left text-xs uppercase text-stone"><th className="py-2">{t('common.store')}</th><th className="py-2 text-right">{t('insights.ordersCol')}</th><th className="py-2 text-right">{t('insights.net')}</th><th className="hidden py-2 text-right md:table-cell">{t('insights.avg')}</th></tr></thead>
                 <tbody>{inScope(r.salesByLocation).map((s) => <tr key={s.locationId} className="border-b border-line-soft"><td className="py-2 font-semibold">{s.locationName}</td><td className="py-2 text-right">{s.orders}</td><td className="py-2 text-right"><Money m={s.net} /></td><td className="hidden py-2 text-right md:table-cell"><Money m={s.averageOrder} /></td></tr>)}</tbody>
-              </table>
+              </table></div>
               <p className="mt-2 text-xs text-stone">{r.sources.map((s) => `${s.source}: ${s.note}`).join(' · ')}</p>
             </SectionCard>
             <div className="grid gap-4 lg:grid-cols-2">
@@ -49,16 +49,16 @@ export function InsightsScreen() {
                 <ol className="flex flex-col gap-1.5 text-sm">{r.topProducts.map((p, i) => <li key={p.name} className="flex flex-wrap items-center gap-2"><span className="w-5 text-stone">{i + 1}.</span><span className="flex-1 font-semibold">{p.name}</span><span className="text-xs text-stone">{t('insights.units', { n: p.units })}</span><MoneyList values={p.revenueByCurrency} /></li>)}</ol>
               </SectionCard>
               <SectionCard title={t('insights.turnover')}>
-                <table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('common.store')}</th><th className="py-1 text-right">{t('insights.sold')}</th><th className="py-1 text-right">{t('insights.turnoverCol')}</th><th className="py-1 text-right">{t('insights.cover')}</th></tr></thead>
-                  <tbody>{inScope(r.stockTurnover).map((s) => <tr key={s.locationId} className="border-t border-line-soft"><td className="py-2">{s.locationName}</td><td className="py-2 text-right">{s.unitsSold}</td><td className="py-2 text-right" title={s.turnoverUnavailableReason ?? undefined}>{s.turnover ?? t('common.unavailable')}</td><td className="py-2 text-right">{s.daysOfCover ?? t('common.unavailable')}</td></tr>)}</tbody></table>
+                <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('common.store')}</th><th className="py-1 text-right">{t('insights.sold')}</th><th className="py-1 text-right">{t('insights.turnoverCol')}</th><th className="py-1 text-right">{t('insights.cover')}</th></tr></thead>
+                  <tbody>{inScope(r.stockTurnover).map((s) => <tr key={s.locationId} className="border-t border-line-soft"><td className="py-2">{s.locationName}</td><td className="py-2 text-right">{s.unitsSold}</td><td className="py-2 text-right" title={s.turnoverUnavailableReason ?? undefined}>{s.turnover ?? t('common.unavailable')}</td><td className="py-2 text-right">{s.daysOfCover ?? t('common.unavailable')}</td></tr>)}</tbody></table></div>
               </SectionCard>
               <SectionCard title={t('insights.drift')}>
-                <table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('common.store')}</th><th className="py-1 text-right">{t('insights.countVar')}</th><th className="py-1 text-right">{t('insights.writeOffs')}</th><th className="py-1 text-right">{t('insights.transitLoss')}</th><th className="py-1 text-right">{t('insights.mismatch')}</th></tr></thead>
-                  <tbody>{inScope(r.inventoryDrift).map((s) => <tr key={s.locationId} className="border-t border-line-soft"><td className="py-2">{s.locationName}</td><td className="py-2 text-right">{s.countVarianceUnits}</td><td className="py-2 text-right">{s.writeOffUnits}</td><td className="py-2 text-right">{s.transitLossUnits}</td><td className="py-2 text-right">{s.ledgerMismatches ? <span className="font-bold text-danger">{s.ledgerMismatches}</span> : 0}</td></tr>)}</tbody></table>
+                <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('common.store')}</th><th className="py-1 text-right">{t('insights.countVar')}</th><th className="py-1 text-right">{t('insights.writeOffs')}</th><th className="py-1 text-right">{t('insights.transitLoss')}</th><th className="py-1 text-right">{t('insights.mismatch')}</th></tr></thead>
+                  <tbody>{inScope(r.inventoryDrift).map((s) => <tr key={s.locationId} className="border-t border-line-soft"><td className="py-2">{s.locationName}</td><td className="py-2 text-right">{s.countVarianceUnits}</td><td className="py-2 text-right">{s.writeOffUnits}</td><td className="py-2 text-right">{s.transitLossUnits}</td><td className="py-2 text-right">{s.ledgerMismatches ? <span className="font-bold text-danger">{s.ledgerMismatches}</span> : 0}</td></tr>)}</tbody></table></div>
               </SectionCard>
               <SectionCard title={t('insights.returns')}>
-                <table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('common.store')}</th><th className="py-1 text-right">{t('insights.returnsCol')}</th><th className="py-1 text-right">{t('insights.rate')}</th></tr></thead>
-                  <tbody>{inScope(r.returnsRate).map((s) => <tr key={s.locationId} className="border-t border-line-soft"><td className="py-2">{s.locationName}</td><td className="py-2 text-right">{s.returnedUnits}/{s.unitsSold}</td><td className="py-2 text-right" title={s.rateUnavailableReason ?? undefined}>{pct(s.rate)}</td></tr>)}</tbody></table>
+                <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('common.store')}</th><th className="py-1 text-right">{t('insights.returnsCol')}</th><th className="py-1 text-right">{t('insights.rate')}</th></tr></thead>
+                  <tbody>{inScope(r.returnsRate).map((s) => <tr key={s.locationId} className="border-t border-line-soft"><td className="py-2">{s.locationName}</td><td className="py-2 text-right">{s.returnedUnits}/{s.unitsSold}</td><td className="py-2 text-right" title={s.rateUnavailableReason ?? undefined}>{pct(s.rate)}</td></tr>)}</tbody></table></div>
               </SectionCard>
             </div>
           </div>

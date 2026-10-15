@@ -42,7 +42,7 @@ export function SportsReportsScreen() {
               )}
             </SectionCard>
             <SectionCard title={t('enrolment')}>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto" tabIndex={0}>
                 <table className="w-full min-w-[640px] text-sm">
                   <thead><tr className="text-left text-xs text-stone"><th className="py-2">{t('programme')}</th><th>{t('location')}</th><th className="text-right">{t('accepted')}</th><th className="text-right">{t('review')}</th><th className="text-right">{t('payment')}</th><th className="text-right">{t('waitlist')}</th><th className="text-right">{t('withdrawn')}</th><th className="text-right">{t('fill')}</th></tr></thead>
                   <tbody>

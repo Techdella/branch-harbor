@@ -22,7 +22,7 @@ export function ScreenHeader({ title, kicker, scope, back, right }: { title: str
     <View style={{ gap: 10 }}>
       {(back || right) && (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          {back ? <IconButton icon="arrow-left" label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} variant="secondary" size={40} /> : <View />}
+          {back ? <IconButton icon="arrow-left" label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} variant="secondary" size={44} /> : <View />}
           {right}
         </View>
       )}

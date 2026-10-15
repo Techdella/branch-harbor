@@ -80,7 +80,7 @@ export default function Entry() {
       </View>
       <Card>
         <TextField label={t('welcome.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" textContentType="emailAddress" error={fields.email} />
-        <TextField label={t('welcome.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="password" textContentType="password" error={fields.password} hint={env.useMocks ? t('welcome.demoPassword') : undefined} />
+        <TextField label={t('welcome.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" textContentType="password" error={fields.password} hint={env.useMocks ? t('welcome.demoPassword') : undefined} />
         {err && !err.fields ? <Banner tone="danger" title={err.code === 'invalid_credentials' ? t('welcome.signInError') : err.message} /> : null}
         <Button
           label={t('welcome.signIn')}

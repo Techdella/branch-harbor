@@ -80,7 +80,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="flex min-h-[300px] flex-col justify-between gap-6 rounded-[28px] bg-sage p-7 text-white md:rounded-2xl md:p-9">
           <H2 id="industries-title">{t('industries.title')}</H2>
           <div className="flex flex-col gap-4">
-            <p className="text-[15px] leading-relaxed text-[#E6EEE7]">{t('industries.body')}</p>
+            <p className="text-[15px] leading-relaxed text-white">{t('industries.body')}</p>
             <Link href="/solutions/independent-businesses" className="inline-flex items-center gap-2 text-sm font-bold text-white underline-offset-4 hover:underline">
               {t('industries.independent')}
               <Icon name="arrow-right" size={15} className="rtl:-scale-x-100" />
@@ -157,7 +157,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <li key={s.title} className="flex flex-col gap-3 rounded-[24px] bg-canvas-raised p-6">
               <div className="flex items-center justify-between">
                 <PastelIcon name={STEP_STYLE[i]?.icon ?? 'check'} bg={STEP_STYLE[i]?.pastel ?? PASTEL.canvas} size={48} />
-                <span className="tabular text-[40px] font-extrabold tracking-[-0.04em] text-line" aria-hidden="true">
+                <span className="tabular text-[40px] font-extrabold tracking-[-0.04em] text-[#8a8983]" aria-hidden="true">
                   0{i + 1}
                 </span>
               </div>
@@ -291,7 +291,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <H2 id="closing-title" className="max-w-2xl md:text-[56px]">
           {t('closing.title')}
         </H2>
-        <p className="max-w-xl text-base leading-relaxed text-[#E6EEE7] md:text-lg">{t('closing.body')}</p>
+        <p className="max-w-xl text-base leading-relaxed text-white md:text-lg">{t('closing.body')}</p>
         <div className="flex flex-wrap justify-center gap-2.5">
           <LinkButton href="/demo" size="lg" variant="light" iconRight="arrow-up-right">
             {t('closing.primary')}

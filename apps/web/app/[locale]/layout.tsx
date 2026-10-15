@@ -37,6 +37,8 @@ export const viewport: Viewport = {
   themeColor: '#F3F2EE',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'light',
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -58,8 +60,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const t = await getTranslations('common');
 
   return (
-    <html lang={locale} dir={isRtl(locale) ? 'rtl' : 'ltr'} className={`${jakarta.variable} ${arabic.variable}`}>
-      <body className="min-h-screen bg-canvas font-sans text-ink antialiased">
+    <html lang={locale} dir={isRtl(locale) ? 'rtl' : 'ltr'} className={`${jakarta.variable} ${arabic.variable}`} data-scroll-behavior="smooth">
+      <body className="min-h-viewport bg-canvas font-sans text-ink antialiased">
         <NextIntlClientProvider>
           <ConsentProvider>
           <a

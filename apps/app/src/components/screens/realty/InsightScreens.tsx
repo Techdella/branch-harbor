@@ -50,7 +50,7 @@ export function PulseScreen() {
               </div>
               <p className="mt-2 text-xs text-stone">{t('pulse.combined')}</p>
             </section>
-            <section className="overflow-x-auto rounded-xl bg-surface p-4">
+            <section className="overflow-x-auto rounded-xl bg-surface p-4" tabIndex={0}>
               <table className="w-full min-w-[720px] text-sm">
                 <caption className="mb-2 text-start text-sm font-bold">{t('pulse.byOffice')}</caption>
                 <thead><tr className="text-start text-xs text-stone"><th className="py-1 text-start">{t('pulse.office')}</th><th className="text-end">{t('pulse.active')}</th><th className="text-end">{t('pulse.domShort')}</th><th className="text-end">{t('pulse.enquiries')}</th><th className="text-end">{t('pulse.viewings')}</th><th className="text-end">{t('pulse.offers')}</th><th className="text-end">{t('pulse.conversion')}</th><th className="text-end">{t('pulse.sold')}</th></tr></thead>

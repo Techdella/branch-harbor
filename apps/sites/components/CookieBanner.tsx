@@ -30,7 +30,7 @@ export function CookieBanner() {
     <section
       role="region"
       aria-label={t('title')}
-      className="fixed inset-x-2 bottom-2 z-50 mx-auto max-w-xl rounded-2xl border border-line bg-white p-4 shadow-pop sm:bottom-4 sm:p-5"
+      className="fixed inset-x-2 bottom-safe z-50 mx-auto max-h-[calc(100dvh-24px)] max-w-xl overflow-y-auto rounded-2xl border border-line bg-white p-4 shadow-pop sm:p-5"
     >
       <h2 className="text-base font-bold">{t('title')}</h2>
       <p className="mt-1 text-sm text-graphite">{t('body')}</p>

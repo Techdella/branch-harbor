@@ -26,7 +26,8 @@ export default async function DemoPage({ params }: Props) {
           </h1>
           <Lead>{t('intro')}</Lead>
         </div>
-        <Suspense fallback={null}>
+        {/* The form renders on the client (search params); reserve its height so the page doesn't jump. */}
+        <Suspense fallback={<div aria-hidden="true" className="min-h-[1500px] md:min-h-[1000px]" />}>
           <DemoForm />
         </Suspense>
       </section>

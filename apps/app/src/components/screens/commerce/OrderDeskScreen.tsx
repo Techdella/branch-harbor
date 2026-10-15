@@ -48,7 +48,7 @@ export function OrderDeskScreen() {
             <ul className="flex flex-col gap-1">
               {rows.map((o) => (
                 <li key={o.id}>
-                  <button type="button" onClick={() => setOpen(o.id)} className={cx('grid w-full grid-cols-2 items-center gap-2 rounded-md px-3.5 py-3 text-left text-sm hover:outline hover:outline-1 hover:outline-ink md:grid-cols-[110px_minmax(160px,1.4fr)_120px_150px_170px_24px]', openId === o.id ? 'bg-canvas' : 'bg-[#FAFAF7]')}>
+                  <button type="button" onClick={() => setOpen(o.id)} className={cx('grid w-full grid-cols-2 items-center gap-2 rounded-md px-3.5 py-3 text-left text-sm hover:outline hover:outline-1 hover:outline-ink xl:grid-cols-[110px_minmax(160px,1.4fr)_120px_150px_170px_24px]', openId === o.id ? 'bg-canvas' : 'bg-canvas-raised')}>
                     <span className="font-extrabold">{o.number}</span>
                     <span className="min-w-0">
                       <span className="block truncate font-semibold">{o.lines.map((l) => (l.quantity > 1 ? `${l.name} ×${l.quantity}` : l.name)).join(', ')}</span>
@@ -57,7 +57,7 @@ export function OrderDeskScreen() {
                     <Money m={o.total} className="font-bold" />
                     <span className="flex flex-wrap gap-1"><StatusBadge kind="payment" value={o.paymentStatus} />{o.source !== 'native' && <Badge tone="neutral" icon="plug">{o.source}</Badge>}</span>
                     <StatusBadge kind="fulfilment" value={o.fulfilmentStatus} className="justify-self-start" />
-                    <Icon name="chevron-right" size={16} className="hidden md:block" />
+                    <Icon name="chevron-right" size={16} className="hidden xl:block" />
                   </button>
                 </li>
               ))}

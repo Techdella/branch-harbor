@@ -13,7 +13,7 @@ export const color = {
   ink2: '#2A2A2A',
   graphite: '#3E3E3A',
   stone: '#5D5D58', // secondary text, 6.6:1 on white
-  mute: '#9C9C96',
+  mute: '#6B6B65', // tertiary text / placeholders, 4.8:1 on canvas (was #9C9C96, 2.7:1)
   line: '#D8D6CF',
   lineSoft: '#E4E2DC',
   canvas: '#F3F2EE', // app + marketing background
@@ -24,6 +24,25 @@ export const color = {
   sage: '#5E7D68', // links/hover, white text 4.8:1
   sageDeep: '#2F6B3A',
   focus: '#2867AA',
+} as const;
+
+/** Dark scheme (apps/app + apps/sites via theme-dark.css). Neutrals invert; lime and pastels are unchanged. */
+export const darkColor = {
+  ink: '#F3F2EE',
+  ink2: '#E2E1DC',
+  graphite: '#CFCEC8',
+  stone: '#B4B3AC',
+  mute: '#8F8E88',
+  line: '#3D3D39',
+  lineSoft: '#2E2E2B',
+  canvas: '#141413',
+  canvasRaised: '#1A1A18',
+  surface: '#1F1F1D',
+  lime: '#D6F26B',
+  limeSoft: '#E2F5A6',
+  sage: '#9CC2A8',
+  sageDeep: '#A6D4AE',
+  focus: '#8AB8EE',
 } as const;
 
 export const pastel = {

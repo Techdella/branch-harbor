@@ -14,9 +14,9 @@ const variants: Record<ButtonVariant, string> = {
   danger: 'bg-danger text-white hover:brightness-110',
 };
 const sizes: Record<ButtonSize, string> = {
-  sm: 'h-9 px-4 text-[13px]',
-  md: 'h-11 px-5 text-sm',
-  lg: 'h-13 px-7 text-base',
+  sm: 'min-h-9 px-4 py-1.5 text-[13px] hit-44',
+  md: 'min-h-11 px-5 py-2 text-sm',
+  lg: 'min-h-13 px-7 py-2.5 text-base',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -39,7 +39,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
-        'inline-flex items-center justify-center gap-2 rounded-full font-bold whitespace-nowrap transition duration-150 ease-bh disabled:cursor-not-allowed disabled:opacity-50',
+        // Single line in normal use; long translations / large text wrap inside the pill instead of overflowing.
+        'inline-flex max-w-full items-center justify-center gap-2 rounded-full text-center leading-tight font-bold transition duration-150 ease-bh disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:shrink-0',
         variants[variant],
         sizes[size],
         className,

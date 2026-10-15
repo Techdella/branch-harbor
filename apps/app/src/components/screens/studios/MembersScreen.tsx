@@ -35,7 +35,7 @@ export function MembersScreen() {
       <PageHeader icon="users" title={t('title')} description={t('description')} />
       <section className="flex flex-col gap-3 rounded-xl bg-surface p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <label className="flex h-10 min-w-[240px] flex-1 items-center gap-2 rounded-full border border-line-soft px-3">
+          <label className="flex h-11 min-w-0 flex-1 items-center sm:min-w-[240px] gap-2 rounded-full border border-line-soft px-3">
             <Icon name="search" size={15} />
             <span className="sr-only">{t('search')}</span>
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('searchPlaceholder')} className="w-full bg-transparent text-sm focus:outline-none" />

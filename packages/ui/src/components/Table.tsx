@@ -9,12 +9,13 @@ export interface Column<T> {
   className?: string;
 }
 
-/** Data table on desktop; labelled cards below md. */
-export function DataTable<T>({ columns, rows, rowKey, onRowClick, empty }: { columns: Column<T>[]; rows: T[]; rowKey: (r: T) => string; onRowClick?: (r: T) => void; empty?: ReactNode }) {
+/** Data table from lg (1024 px); labelled cards below (two columns on tablets). Wide tables scroll inside their card. */
+export function DataTable<T>({ columns, rows, rowKey, onRowClick, empty, rowLabel }: { columns: Column<T>[]; rows: T[]; rowKey: (r: T) => string; onRowClick?: (r: T) => void; empty?: ReactNode; /** Accessible name of a card's "open" action (mobile). */ rowLabel?: (r: T) => string }) {
   if (!rows.length && empty) return <>{empty}</>;
   return (
     <>
-      <table className="hidden w-full border-collapse text-sm md:table">
+      <div className="hidden max-w-full overflow-x-auto lg:block" tabIndex={0}>
+      <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-line-soft text-left">
             {columns.map((c) => (
@@ -36,19 +37,34 @@ export function DataTable<T>({ columns, rows, rowKey, onRowClick, empty }: { col
           ))}
         </tbody>
       </table>
-      <ul className="flex flex-col gap-2 md:hidden">
+      </div>
+      <ul className="grid gap-2 sm:grid-cols-2 lg:hidden">
         {rows.map((r) => (
           <li key={rowKey(r)}>
-            <button type="button" onClick={onRowClick ? () => onRowClick(r) : undefined} className="w-full rounded-md border border-line-soft bg-surface p-4 text-left">
-              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-                {columns.map((c) => (
-                  <div key={c.key} className="contents">
-                    <dt className="text-xs font-bold text-stone">{c.header}</dt>
-                    <dd className="text-right font-medium">{c.render(r)}</dd>
-                  </div>
-                ))}
-              </dl>
-            </button>
+            {(() => {
+              const body = (
+                <dl className="grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
+                  {columns.map((c, i) => (
+                    <div key={c.key} className="contents">
+                      <dt className="text-xs font-bold text-stone">{c.header}</dt>
+                      <dd id={i === 0 ? `bh-row-${rowKey(r)}` : undefined} className={cx('min-w-0 text-right font-medium [overflow-wrap:anywhere]', c.align === 'right' && 'tabular')}>{c.render(r)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              );
+              const cls = 'block w-full rounded-md border border-line-soft bg-surface p-4 text-left';
+              // The whole card opens the row, but cells may hold their own controls (checkboxes, buttons):
+              // a full-card button sits underneath and the content lets clicks through except on controls,
+              // so no interactive element is nested inside another.
+              return onRowClick ? (
+                <div className={cx(cls, 'relative hover:border-line')}>
+                  <button type="button" onClick={() => onRowClick(r)} aria-label={rowLabel?.(r)} aria-labelledby={rowLabel ? undefined : `bh-row-${rowKey(r)}`} className="no-hit absolute inset-0 rounded-md" />
+                  <div className="pointer-events-none relative [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&_input]:pointer-events-auto [&_label]:pointer-events-auto [&_select]:pointer-events-auto">{body}</div>
+                </div>
+              ) : (
+                <div className={cls}>{body}</div>
+              );
+            })()}
           </li>
         ))}
       </ul>
