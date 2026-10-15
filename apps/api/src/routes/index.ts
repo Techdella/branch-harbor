@@ -28,6 +28,8 @@ import { pickupSettingsRoutes } from './pickupSettings.ts';
 export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   // Access model: organisation routes are refused (403 module_not_available) for members without the module.
   app.addHook('preHandler', (await import('../services/module-guard.ts')).moduleGuard);
+  // No free plan: without a paid trial or plan, organisation data is read-only (BILLING_ENFORCE, default on in production).
+  app.addHook('preHandler', (await import('../services/billing-gate.ts')).billingGate);
   await app.register(publicRoutes);
   await app.register(authRoutes);
   await app.register(webhookRoutes);
@@ -86,4 +88,13 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./marketing.ts')).marketingRoutes);
   await app.register((await import('./marketing-public.ts')).marketingPublicRoutes);
   await app.register((await import('./finance.ts')).financeRoutes);
+  // Marketing → Reviews (requests, hosted review page, Google Business Profile, replies, dashboard).
+  await app.register((await import('./reviews.ts')).reviewRoutes);
+  // BranchHarbor plan billing (paid trial, checkout with billing-country lock, who pays per location) and data export.
+  await app.register((await import('./billing.ts')).billingRoutes);
+  // Field audits, compliance documents, the league table, and signed links to their private files.
+  await app.register((await import('./audits.ts')).privateFileRoutes);
+  await app.register((await import('./audits.ts')).auditRoutes);
+  await app.register((await import('./compliance.ts')).complianceRoutes);
+  await app.register((await import('./league-table.ts')).leagueTableRoutes);
 };

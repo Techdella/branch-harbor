@@ -159,15 +159,36 @@
     {
       "idx": 22,
       "version": "7",
-      "when": 1792095730671,
-      "tag": "0022_team_templates_scopes",
+      "when": 1792096341177,
+      "tag": "0022_reviews_and_bank_debit",
       "breakpoints": true
     },
     {
       "idx": 23,
       "version": "7",
-      "when": 1792095736327,
-      "tag": "0023_migrate_legacy_roles",
+      "when": 1792098684794,
+      "tag": "0023_billing_paid_trial",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792099144124,
+      "tag": "0024_audits_compliance",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792099826441,
+      "tag": "0025_team_templates_scopes",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792099828745,
+      "tag": "0026_migrate_legacy_roles",
       "breakpoints": true
     }
   ]

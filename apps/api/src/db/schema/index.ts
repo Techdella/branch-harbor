@@ -20,3 +20,6 @@ export * from './network.ts';
 export * from './comms.ts';
 export * from './marketing.ts';
 export * from './finance.ts';
+export * from './reviews.ts';
+export * from './billing.ts';
+export * from './quality.ts';

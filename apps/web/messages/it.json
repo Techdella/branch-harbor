@@ -1866,7 +1866,10 @@
     "metaTitle": "Prezzi",
     "kicker": "Prezzi",
     "headline": "Prezzi semplici per sede.",
-    "intro": "Scegli come gestire il tuo sito, poi paghi per ogni sede che autorizzi. I prezzi sono mostrati nella tua valuta locale.",
+    "intro": "Scegli come gestire il tuo sito e paga per sede. Le reti aggiungono una quota di piattaforma per la sede centrale. I prezzi sono mostrati nella tua valuta locale.",
+    "trialLine": "Provalo per {days} giorni a {price}.",
+    "trialLineSub": "Poi il tuo piano parte automaticamente, a meno che tu non disdica. Nessun piano gratuito, nessuna penale di disdetta.",
+    "trialHow": "Come funziona la prova",
     "billingLabel": "Fatturazione",
     "monthly": "Mensile",
     "annual": "Annuale · 2 mesi inclusi",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / mese per {count, plural, one {# sede} other {# sedi}}",
     "totalAnnual": "{amount} / mese per {count, plural, one {# sede} other {# sedi}}, con fatturazione annuale",
     "listPriceNote": "I prezzi di listino sono fissati per ogni mercato e adeguati al potere d’acquisto locale. Non sono conversioni al cambio del giorno.",
-    "taxNote": "A seconda del paese possono applicarsi imposte come IVA, GST o sales tax; vengono mostrate prima del pagamento.",
+    "taxNote": "Prezzi IVA esclusa. L’IVA o la GST viene aggiunta al pagamento in base al paese di fatturazione.",
+    "taxNoteUs": "Prezzi esclusa la sales tax, aggiunta al pagamento dove prevista.",
     "proposedNote": "Rivediamo i prezzi periodicamente. Gli abbonamenti esistenti vengono avvisati in anticipo di ogni modifica.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Rete",
         "for": "Franchising e gruppi",
-        "tag": "Su preventivo",
+        "tag": "Utenti illimitati",
         "features": [
-          "Aree e gruppi di affiliati",
+          "Sviluppo franchising, Legale, Finanza, Formazione e Community",
+          "Regioni e gruppi di titolari",
           "Modelli bloccati / modificabili / con approvazione",
-          "Pubblicazione di gruppo con ripristino",
-          "Attivazione guidata"
+          "Pubblicazione di gruppo con ripristino"
         ],
-        "cta": "Richiedi un preventivo"
+        "cta": "Inizia il tuo piano"
       }
     },
-    "ctaNote": "La registrazione è in autonomia per tutti i settori. I piani Rete partono da un preventivo per pianificare insieme l’avvio.",
+    "platformFee": "/ mese · quota piattaforma della sede centrale",
+    "networkIncludes": "Include {count} sedi. Poi {price} / sede / mese.",
+    "quoteLink": "Preferisci un preventivo e un avvio assistito? Parla con noi",
+    "ctaNote": "La registrazione è self-service per ogni settore e ogni piano, a partire dalla prova a pagamento.",
     "faqTitle": "Domande sui prezzi",
     "faqs": [
+      {
+        "q": "Come funziona la prova a pagamento?",
+        "a": "Paghi una piccola quota di prova (indicata sopra nella tua valuta) per 14 giorni del piano scelto. Il 15° giorno il piano parte automaticamente, a meno che tu non disdica prima; ti scriviamo 3 giorni e 1 giorno prima. Non c’è un piano gratuito né una prova gratuita; la demo è liberamente esplorabile. Una prova per attività."
+      },
+      {
+        "q": "Posso disdire in qualsiasi momento?",
+        "a": "Sì, in Impostazioni → Fatturazione, senza penali. Se disdici durante la prova non viene addebitato altro. Un piano a pagamento resta attivo fino alla fine del periodo già pagato."
+      },
       {
         "q": "Perché i prezzi cambiano da paese a paese?",
         "a": "Ogni mercato ha il proprio prezzo di listino, adeguato al potere d’acquisto locale. Non convertiamo al cambio del giorno. Paghi il prezzo del tuo paese di fatturazione, nella sua valuta, più le imposte applicabili."
@@ -1941,12 +1956,16 @@
         "a": "No. A seconda del paese e dei dati della tua attività possono applicarsi IVA, GST, sales tax o imposte simili. Le imposte applicabili sono mostrate prima della conferma."
       },
       {
+        "q": "Perché la carta deve corrispondere al paese di fatturazione?",
+        "a": "I prezzi sono fissati per paese. Al pagamento indichi il paese di fatturazione; ricalcoliamo il prezzo e lo blocchiamo. La carta deve essere emessa in quel paese, oppure puoi aggiungere un identificativo fiscale aziendale di quel paese, come la partita IVA. Cambiare paese di fatturazione in seguito richiede una carta corrispondente e vale dal periodo successivo."
+      },
+      {
         "q": "Sedi diverse possono pagare in valute diverse?",
-        "a": "Le reti possono essere fatturate per sede o in modo centralizzato. Ogni fattura usa una sola valuta; non sommiamo mai importi in valute diverse."
+        "a": "Sì, quando la sede centrale riaddebita le quote delle sedi agli affiliati: ogni affiliato paga nella valuta del proprio paese di fatturazione. Ogni fattura usa una sola valuta; non sommiamo mai importi in valute diverse."
       },
       {
         "q": "Le commissioni sui pagamenti sono incluse?",
-        "a": "No. I pagamenti passano da un fornitore collegato come Stripe, che applica le proprie commissioni nel tuo paese."
+        "a": "No. I pagamenti online dei clienti prevedono la nostra commissione applicativa (indicata sopra) più la commissione di elaborazione del fornitore di pagamento, che varia per paese."
       },
       {
         "q": "Cosa succede se apro una seconda sede?",
@@ -1955,6 +1974,10 @@
       {
         "q": "Posso pagare in un’altra valuta?",
         "a": "No. La valuta segue il tuo paese di fatturazione e al pagamento viene verificata con l’indirizzo di fatturazione e la carta. Se la tua attività è fatturata da un altro paese, si applica il prezzo di quel paese."
+      },
+      {
+        "q": "Posso portare via i miei dati?",
+        "a": "Sì. Il titolare può esportare gratis i dati dell’attività in qualsiasi momento da Impostazioni → Esporta i tuoi dati. Inviamo via email un link a uno ZIP di file CSV: sedi, persone, clienti, prenotazioni, ordini, fatture, lead e altro. Il link è valido 7 giorni."
       }
     ],
     "perMonthOneLocation": "/ mese · una sede",
@@ -1963,7 +1986,62 @@
     "geoNote": "Prezzi in {currency} per {country}. La fatturazione avviene nella valuta del tuo paese di fatturazione.",
     "geoNoteUnknown": "Prezzi in {currency}. La fatturazione avviene nella valuta del tuo paese di fatturazione.",
     "demoTitle": "Non sei ancora pronto a registrarti?",
-    "demoBody": "Esplora un’attività di esempio nella demo oppure prenota una chiamata e analizziamo insieme le tue sedi."
+    "demoBody": "Esplora un’attività di esempio nella demo oppure prenota una chiamata e analizziamo insieme le tue sedi.",
+    "trialTitle": "Come funziona la prova di {days} giorni",
+    "trialIntro": "Non c’è un piano gratuito né una prova gratuita: la demo è liberamente esplorabile. Quando sei pronto, una piccola quota di prova ti dà il prodotto vero con i tuoi dati.",
+    "trialSteps": {
+      "pay": {
+        "title": "Paga {price} oggi",
+        "body": "Scegli il piano e aggiungi una carta emessa nel tuo paese di fatturazione. La quota di prova viene addebitata una sola volta."
+      },
+      "use": {
+        "title": "Usalo per {days} giorni",
+        "body": "Tutto ciò che include il piano scelto, con i tuoi dati e utenti illimitati."
+      },
+      "remind": {
+        "title": "Due promemoria",
+        "body": "Ti scriviamo 3 giorni e 1 giorno prima della fine della prova, con il prezzo del tuo piano."
+      },
+      "start": {
+        "title": "Il piano parte il giorno {day}",
+        "body": "A meno che tu non disdica prima in Impostazioni → Fatturazione. La disdetta è gratuita."
+      }
+    },
+    "whoPays": {
+      "title": "Chi paga ogni sede?",
+      "intro": "Con Rete, la sede centrale paga una quota di piattaforma di {platform} al mese. Include {count} sedi e gli spazi Sviluppo franchising, Legale, Finanza, Formazione e Community. Ogni sede in più costa {price} al mese e la sede centrale sceglie chi la paga, per sede o per gruppo di titolari. Modificabile in qualsiasi momento in Impostazioni → Fatturazione.",
+      "hq": {
+        "title": "La sede centrale",
+        "body": "La sede centrale paga la quota della sede nella propria fattura."
+      },
+      "franchisee": {
+        "title": "L’affiliato",
+        "body": "L’affiliato paga dal proprio account di fatturazione, nella valuta del proprio paese di fatturazione."
+      },
+      "split": {
+        "title": "Una ripartizione",
+        "body": "Sede centrale e affiliato pagano ciascuno la quota che scegli, ad esempio 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Le altre commissioni, tutte chiare",
+      "collection": {
+        "title": "Incasso di royalty e fondo marketing",
+        "body": "{fee} per incasso, con un tetto di {cap} per sede al mese. Un importo fisso, mai una percentuale delle tue royalty."
+      },
+      "payments": {
+        "title": "Pagamenti online dei clienti",
+        "body": "Una commissione applicativa del {percent} sui pagamenti online dei tuoi clienti, più la commissione di elaborazione del fornitore di pagamento. Entrambe compaiono su ogni accredito."
+      }
+    },
+    "terms": {
+      "title": "Condizioni corrette",
+      "monthly": "Fatturazione mensile di default. Disdici quando vuoi.",
+      "annual": "La fatturazione annuale include 2 mesi gratis.",
+      "noFee": "Nessuna penale di disdetta e nessun contratto lungo.",
+      "export": "Esporta tutti i tuoi dati gratis, in qualsiasi momento.",
+      "lock": "Il tuo prezzo è legato al paese di fatturazione e confermato dalla tua carta."
+    }
   },
   "demo": {
     "metaTitle": "Richiedi una demo",

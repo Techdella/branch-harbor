@@ -36,6 +36,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-font',
     ['expo-splash-screen', { image: './assets/splash-icon.png', imageWidth: 120, resizeMode: 'contain', backgroundColor: color.canvas, dark: { image: './assets/splash-icon.png', backgroundColor: color.ink } }],
     ['expo-notifications', { icon: './assets/notification-icon.png', color: '#D6F26B', defaultChannel: 'default' }],
+    // Audits and compliance documents: photos of checklist items, evidence of fixes and certificates.
+    ['expo-image-picker', { cameraPermission: 'BranchHarbor uses the camera for audit photos, evidence of fixes and compliance documents.', photosPermission: 'BranchHarbor attaches photos you choose to audits and compliance documents.' }],
     [
       '@stripe/stripe-react-native',
       { merchantIdentifier: process.env.STRIPE_MERCHANT_IDENTIFIER ?? 'merchant.com.branchharbor.app', enableGooglePay: true },

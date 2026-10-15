@@ -9,9 +9,11 @@ import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { downloadFile, financeApi, readUpload, useFinance, useFinanceAction, type ExternalSalesVM, type InvoiceVM, type StatementVM } from './api';
 import { InvoiceDrawer, StatementDrawer } from './Drawers';
+import { BankDebitAuthorisation } from './BankDebit';
+import { MonthlyStatements } from './MonthlyStatements';
 import { ActionError, CurrencyTiles, InvoiceBadge, PillTabs, SandboxNote, StatementBadge, toMinor, useDate, useMoney, usePeriodLabel } from './FinanceUi';
 
-type Tab = 'statements' | 'invoices' | 'method' | 'sales';
+type Tab = 'statements' | 'monthly' | 'invoices' | 'method' | 'sales';
 
 /**
  * Statements & invoices for the locations in the person's scope. A franchise owner sees only their own studios:
@@ -19,6 +21,7 @@ type Tab = 'statements' | 'invoices' | 'method' | 'sales';
  */
 export function StatementsScreen() {
   const t = useTranslations('finance');
+  const tm = useTranslations('royaltyDebit.statements');
   const app = useApp();
   const router = useRouter();
   const params = useSearchParams();
@@ -27,6 +30,7 @@ export function StatementsScreen() {
   const edit = app.capabilities.has('finance.invoices:edit');
   const tabs: Array<[Tab, string]> = [
     ['statements', t('mine.tab.statements')],
+    ['monthly', tm('tab')],
     ['invoices', t('mine.tab.invoices')],
     ...(edit ? ([['method', t('mine.tab.method')], ['sales', t('mine.tab.sales')]] as Array<[Tab, string]>) : []),
   ];
@@ -34,7 +38,7 @@ export function StatementsScreen() {
     <>
       <PageHeader icon="file" title={t('mine.title')} description={t('mine.description')} scope={false} />
       <PillTabs items={tabs} value={tab} onChange={(k) => router.replace(`?tab=${k}`, { scroll: false })} />
-      {tab === 'invoices' ? <MyInvoices /> : tab === 'method' && edit ? <PaymentMethod /> : tab === 'sales' && edit ? <SalesReports /> : <MyStatements />}
+      {tab === 'invoices' ? <MyInvoices /> : tab === 'monthly' ? <MonthlyStatements /> : tab === 'method' && edit ? <BankDebitAuthorisation /> : tab === 'sales' && edit ? <SalesReports /> : <MyStatements />}
     </>
   );
 }
@@ -108,74 +112,6 @@ function MyInvoices() {
       </Async>
       <InvoiceDrawer id={open} onClose={() => setOpen(null)} onChanged={() => (res.reload(), overview.reload())} hq={hq} canPay={canPay} sandbox={!!overview.data?.sandbox} />
     </>
-  );
-}
-
-function PaymentMethod() {
-  const t = useTranslations('finance');
-  const res = useFinance(() => financeApi.paymentMethods(), []);
-  const [choice, setChoice] = useState<Record<string, string>>({});
-  const [accepted, setAccepted] = useState<Record<string, boolean>>({});
-  const [msg, setMsg] = useState('');
-  const act = useFinanceAction(async (fn: () => Promise<unknown>, message: string) => {
-    await fn();
-    setMsg(message);
-    res.reload();
-  });
-  return (
-    <Async res={res} loading={<LoadingBlock variant="detail" />} isEmpty={(d) => d.ownerGroups.length === 0} empty={<Empty icon="card" title={t('method.noGroups')} />}>
-      {(d) => (
-        <>
-          <p className="text-sm text-stone">{t('method.intro')}</p>
-          {d.mode === 'sandbox' && <SandboxNote />}
-          <ActionError error={act.error} />
-          {msg && <Banner tone="success" live="polite">{msg}</Banner>}
-          {d.ownerGroups.flatMap((g) => g.currencies.map((c) => {
-            const key = `${g.id}:${c.currency}`;
-            const active = d.items.find((m) => m.ownerGroupId === g.id && m.currency === c.currency && m.status === 'active');
-            const pending = d.items.find((m) => m.ownerGroupId === g.id && m.currency === c.currency && m.status === 'pending');
-            const type = choice[key] ?? c.methodTypes[c.methodTypes.length - 1]!;
-            return (
-              <SectionCard key={key} title={`${g.name} · ${c.currency}`} aside={active ? <Badge tone="success">{t('method.active')}</Badge> : <Badge tone="warning">{t('method.none')}</Badge>}>
-                {active && (
-                  <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
-                    <span>{t('method.saved', { method: t(`method.${active.methodType}`), last4: active.display.last4 ?? '••••' })}</span>
-                    <Button size="sm" variant="ghost" loading={act.pending} onClick={() => void act.run(() => financeApi.revokeMethod(active.id), t('method.revoked'))}>{t('method.revoke')}</Button>
-                  </div>
-                )}
-                {pending ? (
-                  <div className="flex flex-col gap-2 text-sm">
-                    <p>{t('method.pending', { method: t(`method.${pending.methodType}`) })}</p>
-                    <p className="rounded-lg bg-canvas p-3 text-xs">{pending.mandateText}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {d.mode === 'sandbox' ? (
-                        <>
-                          <Button size="sm" loading={act.pending} onClick={() => void act.run(() => financeApi.sandboxConfirmMethod(pending.id, 'ok'), t('method.confirmed'))} data-testid="sandbox-confirm-method">{t('method.sandboxConfirm')}</Button>
-                          <Button size="sm" variant="ghost" loading={act.pending} onClick={() => void act.run(() => financeApi.sandboxConfirmMethod(pending.id, 'decline'), t('method.confirmed'))}>{t('method.sandboxDecline')}</Button>
-                        </>
-                      ) : <Button size="sm" variant="secondary" icon="refresh" loading={act.pending} onClick={() => void act.run(() => financeApi.refreshMethod(pending.id), t('method.checked'))}>{t('method.check')}</Button>}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    <Field label={t('method.type')}>{(p) => (
-                      <Select id={p.id} value={type} onChange={(e) => setChoice({ ...choice, [key]: e.target.value })}>
-                        {c.methodTypes.map((m) => <option key={m} value={m}>{t(`method.${m}`)}</option>)}
-                      </Select>
-                    )}</Field>
-                    <label className="flex items-start gap-2 text-sm">
-                      <input type="checkbox" className="mt-1" checked={!!accepted[key]} onChange={(e) => setAccepted({ ...accepted, [key]: e.target.checked })} data-testid="accept-mandate" />
-                      <span>{t('method.authorise', { group: g.name, currency: c.currency })}</span>
-                    </label>
-                    <div><Button size="sm" icon="card" loading={act.pending} disabled={!accepted[key]} onClick={() => void act.run(() => financeApi.setupMethod({ ownerGroupId: g.id, currency: c.currency, methodType: type, acceptMandate: true }), t('method.started'))} data-testid="setup-method">{active ? t('method.replace') : t('method.setUp')}</Button></div>
-                  </div>
-                )}
-              </SectionCard>
-            );
-          }))}
-        </>
-      )}
-    </Async>
   );
 }
 

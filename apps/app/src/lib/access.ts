@@ -48,6 +48,7 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'marketing.brand_assets': [{ key: 'assets', href: '/marketing/assets', icon: 'image', msg: 'mkt.nav.assets' }],
   'marketing.inbox': [{ key: 'inbox', href: '/marketing/inbox', icon: 'message' }],
   'marketing.social': [{ key: 'social', href: '/marketing/social', icon: 'share' }],
+  'marketing.reviews': [{ key: 'reviews', href: '/marketing/reviews', icon: 'star', msg: 'reviews.nav.reviews' }],
   'marketing.ads': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
   'marketing.network_campaigns': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
   'sales.customer_pipeline': [{ key: 'leads', href: '/sales/leads', icon: 'trending' }],
@@ -69,6 +70,10 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'finance.invoices': [{ key: 'financeStatements', href: '/finance/statements', icon: 'file' }],
   'finance.marketing_fund': [{ key: 'financeFund', href: '/finance/marketing-fund', icon: 'megaphone' }],
   'finance.payouts': [{ key: 'financePayouts', href: '/finance/payouts', icon: 'wallet' }],
+  // Field audits (Operations), compliance documents (Legal & compliance) and the league table (Network).
+  'operations.audits': [{ key: 'audits', href: '/audits', icon: 'check-circle' }],
+  'legal.compliance_documents': [{ key: 'compliance', href: '/compliance', icon: 'shield' }],
+  'network.league_table': [{ key: 'leagueTable', href: '/league-table', icon: 'trophy' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],

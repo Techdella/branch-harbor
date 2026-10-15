@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "audits": "Audits",
+    "compliance": "Documents de conformité",
+    "leagueTable": "Classement"
+  },
+  "access": {
+    "modules": {
+      "operations": {
+        "audits": {
+          "name": "Audits",
+          "description": "Visites terrain et audits : modèles de check-lists, audits planifiés avec photos et scores, actions correctives et contre-audits pour les établissements du périmètre."
+        }
+      },
+      "legal": {
+        "compliance_documents": {
+          "name": "Documents de conformité",
+          "description": "Attestations d’assurance, licences, permis et certificats sanitaires par établissement ou groupe de propriétaires, avec rappels d’échéance."
+        }
+      },
+      "network": {
+        "league_table": {
+          "name": "Classement",
+          "description": "Établissements du périmètre classés par chiffre d’affaires, croissance, réservations ou commandes, score d’audit et statut des redevances. Les franchisés voient leurs établissements face aux quartiles anonymisés du réseau."
+        }
+      }
+    }
+  },
+  "quality": {
+    "common": {
+      "all": "Tous",
+      "choose": "Choisir…",
+      "exportCsv": "Exporter en CSV",
+      "ownerGroup": "Groupe de propriétaires",
+      "region": "Région"
+    },
+    "col": {
+      "location": "Établissement",
+      "latestScore": "Dernier score",
+      "trend": "6 derniers mois",
+      "actions": "Actions correctives",
+      "nextDue": "Prochain audit",
+      "due": "Échéance",
+      "auditor": "Auditeur",
+      "status": "Statut",
+      "score": "Score",
+      "checklist": "Check-list",
+      "item": "Point"
+    },
+    "auditStatus": {
+      "scheduled": "Planifié",
+      "in_progress": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "actionStatus": {
+      "open": "À corriger",
+      "submitted": "En attente de vérification",
+      "verified": "Vérifiée"
+    },
+    "purpose": {
+      "routine": "Routine",
+      "pre_opening": "Pré-ouverture",
+      "reaudit": "Contre-audit"
+    },
+    "qtype": {
+      "yes_no": "Oui / non",
+      "scale": "Échelle 1–5",
+      "number": "Nombre",
+      "text": "Texte",
+      "photo": "Photo"
+    },
+    "reason": {
+      "no": "Réponse non",
+      "low_score": "Note de 2 ou moins",
+      "out_of_range": "Hors de la plage autorisée",
+      "photo_missing": "Photo manquante",
+      "unanswered": "Sans réponse"
+    },
+    "answer": {
+      "yes": "Oui",
+      "no": "Non",
+      "na": "N/A",
+      "scaleN": "{n} sur 5",
+      "scaleOf": "{n} / 5",
+      "range": "Conforme : de {min} à {max}",
+      "atLeast": "Conforme : au moins {min}",
+      "atMost": "Conforme : au plus {max}",
+      "photoTaken": "Photo prise"
+    },
+    "audits": {
+      "title": "Audits",
+      "description": "Visites terrain et audits des standards de marque : scores par établissement, actions correctives et contre-audits.",
+      "tab": {
+        "overview": "Vue d’ensemble",
+        "audits": "Audits",
+        "actions": "Actions correctives",
+        "templates": "Check-lists"
+      },
+      "filter": {
+        "open": "En cours",
+        "completed": "Terminés",
+        "all": "Tous"
+      },
+      "schedule": "Planifier un audit",
+      "scheduleSave": "Planifier",
+      "auditorHint": "Personnes ayant Audits (modifier) dans cet établissement.",
+      "empty": "Aucun audit pour l’instant",
+      "emptyBody": "Les audits planifiés et les rapports terminés apparaissent ici."
+    },
+    "dashboard": {
+      "averageScore": "Score moyen",
+      "lastMonths": "{count} derniers mois",
+      "completed": "Audits terminés",
+      "passed": "{count} réussis",
+      "openActions": "Actions correctives ouvertes",
+      "overdueActions": "Actions correctives en retard",
+      "overdueAudits": "Audits en retard",
+      "byLocation": "Scores par établissement",
+      "network": "Moyenne du réseau",
+      "noAudit": "Pas encore d’audit",
+      "open": "{count} ouvertes",
+      "overdue": "{count} en retard",
+      "noLocations": "Aucun établissement dans votre périmètre",
+      "overdueActionsTitle": "Actions correctives en retard",
+      "dueOn": "Échéance {date}",
+      "noOverdueActions": "Rien en retard.",
+      "upcomingTitle": "Audits en retard et à venir",
+      "noUpcoming": "Aucun audit planifié."
+    },
+    "audit": {
+      "pageTitle": "Audit",
+      "back": "Tous les audits",
+      "critical": "Critique",
+      "criticalFail": "Point critique non conforme",
+      "noAuditor": "Pas encore d’auditeur",
+      "photoRequired": "Photo obligatoire",
+      "photoOf": "Photo pour {item}"
+    },
+    "conduct": {
+      "description": "Échéance {date}. Les réponses s’enregistrent au fil de l’eau, même si la connexion coupe.",
+      "progress": "{done} sur {total} répondues",
+      "liveScore": "Score",
+      "saving": "Enregistrement…",
+      "saved": "Tout est enregistré",
+      "offline": "Hors ligne : les réponses restent sur cet appareil et seront enregistrées au retour de la connexion",
+      "saveError": "Non enregistré. Nouvel essai bientôt.",
+      "autosave": "Enregistrement automatique",
+      "sectionProgress": "{done}/{total}",
+      "addPhoto": "Ajouter une photo",
+      "uploading": "Envoi…",
+      "photoOffline": "Sur le web, les photos demandent une connexion. Utilisez l’application mobile pour photographier hors ligne.",
+      "removePhoto": "Retirer la photo",
+      "addNote": "Ajouter une note",
+      "note": "Note",
+      "notePlaceholder": "Qu’avez-vous constaté ?",
+      "willCreateAction": "deviendra une action corrective",
+      "finish": "Terminer l’audit",
+      "passMark": "Seuil de réussite {pct} %",
+      "failedItems": "Points non conformes",
+      "becomeActions": "Chacun devient une action corrective pour l’établissement",
+      "unanswered": "Reste à répondre",
+      "criticalBanner": "Un point critique n’est pas conforme : l’audit échoue quel que soit le score.",
+      "summary": "Synthèse pour l’établissement",
+      "complete": "Terminer l’audit",
+      "answerAll": "Répondez à chaque question (ou indiquez N/A) pour terminer l’audit."
+    },
+    "report": {
+      "completedOn": "Terminé le {date} par {auditor}",
+      "scheduledFor": "Planifié pour le {date}",
+      "notYet": "Le rapport apparaîtra ici quand {auditor} aura terminé l’audit.",
+      "passed": "Réussi",
+      "failed": "Échoué",
+      "previous": "Audit précédent : {score}",
+      "bySection": "Score par section",
+      "reaudit": "Contre-audit prévu le {date}",
+      "actions": "Actions correctives ({count})",
+      "noActions": "Aucune action corrective : tous les points sont conformes."
+    },
+    "actions": {
+      "filter": {
+        "active": "À faire",
+        "overdue": "En retard",
+        "verified": "Vérifiées"
+      },
+      "empty": "Aucune action corrective",
+      "overdue": "En retard",
+      "due": "Échéance {date}",
+      "auditorNote": "Auditeur :",
+      "reopened": "Rouverte : {note}",
+      "fix": "Correction :",
+      "evidenceOf": "Preuve pour {item}",
+      "verifiedBy": "Vérifiée par {name} le {date}",
+      "whatFixed": "Qu’avez-vous corrigé ?",
+      "addEvidence": "Ajouter une photo de preuve",
+      "markDone": "Marquer comme corrigée",
+      "evidenceNeeded": "Ajoutez d’abord une photo de la correction.",
+      "reviewNote": "Note pour l’établissement",
+      "reopen": "Rouvrir",
+      "verify": "Valider"
+    },
+    "templates": {
+      "active": "Actives",
+      "archived": "Archivées",
+      "fromStarter": "Partir d’un modèle",
+      "new": "Nouvelle check-list",
+      "untitled": "Check-list sans titre",
+      "empty": "Aucune check-list pour l’instant",
+      "emptyBody": "Partez d’une check-list prête à l’emploi pour votre secteur ou créez la vôtre.",
+      "questions": "{count, plural, one {# question} other {# questions}}",
+      "critical": "{count} critiques",
+      "passMark": "Réussite {pct} %",
+      "version": "v{n}",
+      "starterHint": "Des bases raisonnables. Copiez-en une et adaptez-la à vos standards de marque.",
+      "preOpening": "Pré-ouverture",
+      "added": "Ajoutée",
+      "useStarter": "Utiliser cette check-list"
+    },
+    "editor": {
+      "pageTitle": "Check-list",
+      "description": "Sections et questions, avec pondérations, points critiques et photos obligatoires.",
+      "back": "Check-lists",
+      "archive": "Archiver",
+      "restore": "Restaurer",
+      "save": "Enregistrer la check-list",
+      "saved": "Enregistrée en version {version}. Les audits pas encore commencés l’utilisent.",
+      "archivedNote": "Cette check-list est archivée : elle ne peut pas servir à de nouveaux audits.",
+      "name": "Nom",
+      "descriptionLabel": "Description",
+      "passMark": "Seuil de réussite (%)",
+      "passMarkHint": "Un point critique non conforme fait échouer l’audit de toute façon.",
+      "correctiveDays": "Jours pour corriger",
+      "correctiveDaysHint": "Moitié pour les points critiques.",
+      "reauditDays": "Contre-audit après (jours)",
+      "reauditDaysHint": "Fixé quand un audit échoue.",
+      "photoCount": "{count} avec photo",
+      "totalWeight": "Pondération totale {n}",
+      "section": "Section {n}",
+      "sectionPlaceholder": "p. ex. Devanture",
+      "question": "Question {n}",
+      "type": "Type de réponse",
+      "weight": "Pondération",
+      "min": "Conforme à partir de",
+      "max": "Conforme jusqu’à",
+      "unit": "Unité",
+      "guidance": "Consignes pour l’auditeur",
+      "critical": "Point critique",
+      "criticalHint": "Si ce point n’est pas conforme, tout l’audit échoue.",
+      "photoRequired": "Photo obligatoire",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "removeQuestion": "Supprimer la question",
+      "removeSection": "Supprimer la section",
+      "addQuestion": "Ajouter une question",
+      "addSection": "Ajouter une section"
+    },
+    "preOpening": {
+      "title": "Audit de pré-ouverture",
+      "passed": "Réussi",
+      "required": "Obligatoire avant l’ouverture",
+      "explain": "L’ouverture peut être demandée dès qu’un audit « {name} » est réussi.",
+      "none": "Utilisez une check-list d’audit pour les vérifications de pré-ouverture : le siège n’approuve l’ouverture qu’après sa réussite.",
+      "checklist": "Check-list",
+      "noChecklist": "Pas d’audit nécessaire",
+      "latestDone": "Dernier audit de pré-ouverture",
+      "latestDue": "Audit de pré-ouverture prévu le {date}",
+      "schedule": "Planifier l’audit de pré-ouverture",
+      "afterProvision": "Planifiez-le une fois l’établissement créé."
+    },
+    "state": {
+      "valid": "Valide",
+      "expiring": "Expire sous 30 jours",
+      "expired": "Expiré",
+      "missing": "Manquant",
+      "pending": "En attente de vérification",
+      "below_minimum": "Sous le minimum",
+      "not_applicable": "Non requis"
+    },
+    "docStatus": {
+      "pending": "En attente de vérification",
+      "approved": "Approuvé",
+      "rejected": "Refusé"
+    },
+    "category": {
+      "insurance": "Attestation d’assurance",
+      "licence": "Licence",
+      "permit": "Permis",
+      "health_certificate": "Certificat sanitaire / sécurité alimentaire",
+      "franchisee_document": "Document du franchisé"
+    },
+    "compliance": {
+      "title": "Documents de conformité",
+      "description": "Assurances, licences, permis et certificats sanitaires de chaque établissement, avec rappels d’échéance.",
+      "tab": {
+        "matrix": "Matrice",
+        "documents": "Documents",
+        "requirements": "Exigences"
+      },
+      "upload": "Déposer un document",
+      "uploadFor": "Déposer pour cet établissement",
+      "uploadSave": "Déposer",
+      "category": "Type",
+      "compliant": "Conforme",
+      "companyOwned": "En propre",
+      "noRequirements": "Aucune exigence pour l’instant",
+      "noRequirementsBody": "Le siège définit ce que chaque établissement doit détenir, p. ex. une assurance responsabilité civile d’un montant minimum.",
+      "noDocuments": "Aucun document pour l’instant",
+      "superseded": "Remplacé",
+      "issuer": "Assureur ou émetteur",
+      "reference": "N° de police ou de licence",
+      "coverage": "Couverture",
+      "coverageType": "Type de couverture",
+      "amount": "Montant",
+      "amountInvalid": "Utilisez des chiffres, p. ex. 2000000",
+      "currency": "Devise",
+      "expires": "Expire le",
+      "issued": "Délivré le",
+      "noExpiry": "Sans échéance",
+      "uploadedBy": "Déposé par",
+      "reviewNote": "Note de vérification",
+      "openFile": "Ouvrir le fichier",
+      "approve": "Approuver",
+      "reject": "Refuser",
+      "filter": {
+        "pending": "À vérifier"
+      },
+      "requirement": "Exigence",
+      "ownDocument": "Autre document (hors exigence du siège)",
+      "docTitle": "Titre",
+      "minimumHint": "Le siège exige au moins {amount}.",
+      "file": "Fichier",
+      "fileHint": "PDF ou photo, 10 Mo maximum.",
+      "autoApproved": "En tant que siège, votre dépôt est approuvé immédiatement.",
+      "reviewedByHq": "Le siège vérifie le document. Vous recevrez des rappels avant son échéance.",
+      "expiringTitle": "Documents de conformité : renouvellements et échéances",
+      "openMatrix": "Ouvrir la matrice de conformité",
+      "nothingExpiring": "Rien n’expire dans les 60 prochains jours.",
+      "inDays": "Dans {days} jours"
+    },
+    "requirements": {
+      "add": "Ajouter une exigence",
+      "save": "Enregistrer l’exigence",
+      "name": "Exigence",
+      "nameHint": "p. ex. Assurance responsabilité civile",
+      "description": "Description",
+      "minimum": "Montant minimum",
+      "where": "Juridictions",
+      "whereHint": "Codes pays ou pays-région, p. ex. US, CA-ON. Vide = tous les établissements.",
+      "everywhere": "Tous les établissements",
+      "heldBy": "Détenu par",
+      "per": {
+        "location": "Chaque établissement",
+        "owner_group": "Chaque groupe de propriétaires"
+      },
+      "requiresExpiry": "A une date d’échéance",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "league": {
+      "title": "Classement",
+      "description": "Établissements classés par chiffre d’affaires, croissance, activité, score d’audit et statut des redevances.",
+      "descriptionOwn": "Vos établissements classés, comparés aux quartiles anonymisés du réseau.",
+      "filters": "Filtres",
+      "period": "Période",
+      "preset": {
+        "last_month": "Mois dernier",
+        "this_month": "Ce mois-ci",
+        "last_quarter": "3 derniers mois",
+        "year": "Cette année",
+        "custom": "Personnalisée"
+      },
+      "from": "Du",
+      "to": "Au",
+      "rankBy": "Classer par",
+      "metric": {
+        "revenue": "Chiffre d’affaires",
+        "growth": "Croissance",
+        "occupancy": "Taux d’occupation",
+        "auditScore": "Score d’audit",
+        "royaltyStatus": "Redevances",
+        "reviewRating": "Avis"
+      },
+      "activity": {
+        "class_bookings": "Réservations",
+        "registrations": "Inscriptions",
+        "appointments": "Rendez-vous",
+        "orders": "Commandes",
+        "food_orders": "Commandes",
+        "enquiries": "Demandes",
+        "room_nights": "Nuitées",
+        "default": "Activité"
+      },
+      "royalty": {
+        "on_time": "À jour",
+        "overdue": "En retard",
+        "none": "Aucune facture"
+      },
+      "quartile": {
+        "1": "Top 25 %",
+        "2": "Au-dessus de la médiane",
+        "3": "Sous la médiane",
+        "4": "25 % inférieurs"
+      },
+      "col": {
+        "rank": "Rang",
+        "quartile": "Réseau",
+        "network": "Position"
+      },
+      "stars": "{rating} ★ ({count})",
+      "networkPosition": "{position}e sur {of}",
+      "empty": "Aucun établissement à classer",
+      "perCurrency": "Le chiffre d’affaires est classé dans chaque devise, jamais additionné : {currencies}.",
+      "benchmarksTitle": "Vous et le réseau",
+      "benchmarksNote": "Anonymisé : {count} établissements, aucun nom",
+      "revenueIn": "Chiffre d’affaires ({currency})",
+      "quartiles": "Quartile inférieur {q1} · médiane {median} · quartile supérieur {q3}",
+      "tooFew": "Pas assez d’établissements pour comparer anonymement.",
+      "quartilesOff": "Le siège ne partage pas les comparaisons réseau. Vos établissements sont classés entre eux.",
+      "onTimeNetwork": "{pct} des établissements du réseau paient leurs redevances à temps.",
+      "settingsTitle": "Ce que voient les franchisés",
+      "settingQuartiles": "Montrer les quartiles du réseau aux franchisés",
+      "settingQuartilesHint": "Ils voient leurs établissements face aux quartiles anonymisés et leur position, jamais les noms ni les chiffres des autres franchisés."
+    }
+  }
+}

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { and, eq, sql } from 'drizzle-orm';
-import { customers, franchiseProspects, memberAccessOverrides, paymentReferences, roleAssignments } from '../src/db/schema/index.ts';
+import { customers, franchiseProspects, locations, memberAccessOverrides, paymentReferences, roleAssignments } from '../src/db/schema/index.ts';
 import { responsibleUsersAt } from '../src/services/notifications.ts';
 import { call, createLocation, createOrg, grantCaps, hasDb, makeApp, memberWithRole, uid, verifiedUser } from './helpers.ts';
 
@@ -56,7 +56,7 @@ describe.skipIf(!hasDb)('team templates and scopes (DB)', () => {
     expect(roles.body.scopeKinds).toEqual(['organization', 'brand', 'territory', 'region', 'portfolio', 'owner_group', 'location']);
     const fc = roles.body.templates.find((t: any) => t.key === 'field_consultant');
     expect(fc).toMatchObject({ team: 'operations', support: true, defaultScope: 'portfolio', sensitive: [] });
-    expect(roles.body.templates.find((t: any) => t.key === 'franchise_owner').sensitive).toEqual(['finance', 'personal_data']);
+    expect(roles.body.templates.find((t: any) => t.key === 'franchise_owner').sensitive).toEqual(['finance', 'legal', 'personal_data']);
     const empty = await call(app, 'POST', `/v1/orgs/${orgId}/roles`, { token: owner.token, body: { name: `Empty ${uid()}`, capabilities: [] } });
     expect(empty.status).toBe(201);
     expect(empty.body.capabilities).toEqual([]);
@@ -140,6 +140,23 @@ describe.skipIf(!hasDb)('team templates and scopes (DB)', () => {
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/payments`, { token: dev.token })).status).toBe(200);
   });
 
+  it('league table filters by portfolio and by territory (sub-network)', async () => {
+    await app.ctx.db.update(locations).set({ status: 'operating' }).where(eq(locations.organizationId, orgId));
+    const names = async (q: string, token = owner.token) => {
+      const r = await call(app, 'GET', `/v1/orgs/${orgId}/league-table?${q}`, { token });
+      expect(r.status).toBe(200);
+      return (r.body.rows as Array<{ name: string }>).map((x) => x.name).sort();
+    };
+    expect(await names(`portfolioId=${portfolio}`)).toEqual(['Dublin', 'West End']);
+    expect(await names(`territoryId=${ireland}`)).toEqual(['Dublin', 'Galway']);
+    expect(await names(`territoryId=${ireland}&portfolioId=${portfolio}`)).toEqual(['Dublin']);
+    // A field consultant ranks their portfolio without revenue (owner finances).
+    const fc = await call(app, 'GET', `/v1/orgs/${orgId}/league-table`, { token: consultant.token });
+    expect(fc.status).toBe(200);
+    expect(fc.body.rows.map((r: any) => r.name).sort()).toEqual(['Dublin', 'West End']);
+    expect(fc.body.rows.every((r: any) => r.revenueMinor === null)).toBe(true);
+  });
+
   it('brand scope covers the brand’s locations (single-brand today: every location)', async () => {
     const scopes = await call(app, 'GET', `/v1/orgs/${orgId}/access/scopes`, { token: owner.token });
     expect(scopes.status).toBe(200);
@@ -210,7 +227,7 @@ describe.skipIf(!hasDb)('team templates and scopes (DB)', () => {
     expect(pv.body.hidden).toEqual(expect.arrayContaining(['finance.payments', 'sales.customers', 'legal.agreements']));
     expect(pv.body.actions['network.locations']).toEqual(['view']);
     const denied = await call(app, 'POST', `/v1/orgs/${orgId}/access/preview`, { token: owner.token, body: { role: 'franchise_owner', scopeKind: 'owner_group', deniedClasses: ['finance'] } });
-    expect(denied.body.sensitive).toEqual(['personal_data']);
+    expect(denied.body.sensitive).toEqual(['legal', 'personal_data']);
   });
 
   it('team shape: a small team gets combined roles; changing it later never removes anything', async () => {
@@ -278,7 +295,7 @@ describe.skipIf(!hasDb)('team templates and scopes (DB)', () => {
     const [a2] = await app.ctx.db.insert(roleAssignments).values({ organizationId: orgId, userId: v.userId, role: 'vp_franchise', scopeKind: 'organization', scopeId: orgId }).returning();
     // Before the data migration runs, legacy keys still resolve to their nearest template.
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/access/me`, { token: v.token })).body.capabilities).toContain('sales.franchise_pipeline:publish');
-    const file = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../drizzle/0023_migrate_legacy_roles.sql');
+    const file = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../drizzle/0026_migrate_legacy_roles.sql');
     // The migrator runs a file on one connection in one transaction; do the same.
     await app.ctx.db.transaction(async (tx) => {
       for (const stmt of readFileSync(file, 'utf8').split('--> statement-breakpoint')) if (stmt.trim()) await tx.execute(sql.raw(stmt));

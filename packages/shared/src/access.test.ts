@@ -94,7 +94,7 @@ test('support roles never include a sensitive data class; ownership roles do', (
   const fc = caps('field_consultant', 'portfolio');
   assert.ok(fc.has('network.locations:view') && fc.has('operations.classes:view') && fc.has('community.discussions:edit') && fc.has('community.help_desk:edit'));
   assert.ok(!fc.has('finance.payments:view') && !fc.has('finance.invoices:view') && !fc.has('sales.customers:view') && !fc.has('operations.classes:edit'));
-  assert.deepEqual([...sensitiveClassesIn(caps('franchise_owner', 'owner_group'), 'studios')].sort(), ['finance', 'personal_data']);
+  assert.deepEqual([...sensitiveClassesIn(caps('franchise_owner', 'owner_group'), 'studios')].sort(), ['finance', 'legal', 'personal_data']); // legal: their own compliance documents
   // A support role only gets finance through an explicit grant.
   assert.ok(effectiveCapabilities({ role: 'area_representative', scopeKind: 'territory', grants: ['finance.invoices:view'] }, 'studios').has('finance.invoices:view'));
 });

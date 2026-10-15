@@ -1866,7 +1866,10 @@
     "metaTitle": "Precios",
     "kicker": "Precios",
     "headline": "Precios sencillos por sede.",
-    "intro": "Elige cómo gestionas tu web y paga por cada sede que autorices. Los precios se muestran en tu moneda local.",
+    "intro": "Elige cómo gestionas tu web y paga por local. Las redes añaden una cuota de plataforma para la central. Los precios se muestran en tu moneda local.",
+    "trialLine": "Pruébalo {days} días por {price}.",
+    "trialLineSub": "Después tu plan empieza automáticamente salvo que canceles. Sin plan gratuito ni penalizaciones por cancelar.",
+    "trialHow": "Cómo funciona la prueba",
     "billingLabel": "Facturación",
     "monthly": "Mensual",
     "annual": "Anual · 2 meses incluidos",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / mes por {count, plural, one {# sede} other {# sedes}}",
     "totalAnnual": "{amount} / mes por {count, plural, one {# sede} other {# sedes}}, con facturación anual",
     "listPriceNote": "Los precios de lista se fijan para cada mercado y se ajustan al poder adquisitivo local. No son conversiones con el tipo de cambio del día.",
-    "taxNote": "Según tu país pueden aplicarse impuestos como el IVA, el GST o el sales tax; se muestran antes de pagar.",
+    "taxNote": "Precios sin impuestos. El IVA o GST se añade al pagar según tu país de facturación.",
+    "taxNoteUs": "Precios sin sales tax, que se añade al pagar cuando corresponde.",
     "proposedNote": "Revisamos los precios periódicamente. Las suscripciones existentes reciben aviso de cualquier cambio con antelación.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Red",
         "for": "Franquicias y grupos",
-        "tag": "Presupuesto disponible",
+        "tag": "Usuarios ilimitados",
         "features": [
-          "Regiones y grupos de franquiciados",
+          "Desarrollo de franquicias, Legal, Finanzas, Formación y Comunidad",
+          "Regiones y grupos de propietarios",
           "Plantillas bloqueadas / editables / con aprobación",
-          "Publicación en grupo con vuelta atrás",
-          "Puesta en marcha acompañada"
+          "Publicación en grupo con reversión"
         ],
-        "cta": "Pedir presupuesto"
+        "cta": "Empezar mi plan"
       }
     },
-    "ctaNote": "El alta es en autoservicio para todos los sectores. Los planes Red empiezan con un presupuesto para planificar la puesta en marcha contigo.",
+    "platformFee": "/ mes · cuota de plataforma de la central",
+    "networkIncludes": "Incluye {count} locales. Después, {price} / local / mes.",
+    "quoteLink": "¿Prefieres un presupuesto y una puesta en marcha guiada? Habla con nosotros",
+    "ctaNote": "El registro es autoservicio para todos los sectores y planes, empezando por la prueba de pago.",
     "faqTitle": "Preguntas sobre precios",
     "faqs": [
+      {
+        "q": "¿Cómo funciona la prueba de pago?",
+        "a": "Pagas una pequeña cuota de prueba (indicada arriba en tu moneda) por 14 días del plan elegido. El día 15 el plan empieza automáticamente salvo que canceles antes, y te escribimos 3 días y 1 día antes. No hay plan gratuito ni prueba gratuita; la demo es de libre acceso. Una prueba por negocio."
+      },
+      {
+        "q": "¿Puedo cancelar en cualquier momento?",
+        "a": "Sí, en Ajustes → Facturación, sin penalización. Si cancelas durante la prueba, no se cobra nada más. En un plan de pago, sigue activo hasta el final del periodo ya pagado."
+      },
       {
         "q": "¿Por qué varían los precios según el país?",
         "a": "Cada mercado tiene su propio precio de lista, ajustado al poder adquisitivo local. No convertimos con el tipo de cambio del día. Pagas el precio de tu país de facturación, en su moneda, más los impuestos aplicables."
@@ -1941,12 +1956,16 @@
         "a": "No. Según tu país y los datos de tu negocio pueden aplicarse IVA, GST, sales tax u otros similares. Los impuestos aplicables se muestran antes de confirmar."
       },
       {
+        "q": "¿Por qué mi tarjeta debe coincidir con mi país de facturación?",
+        "a": "Los precios se fijan por país. Al pagar indicas tu país de facturación; recalculamos el precio y lo fijamos. La tarjeta debe estar emitida en ese país, o puedes añadir un identificador fiscal de empresa de ese país, como un número de IVA. Cambiar de país de facturación más adelante requiere una tarjeta que coincida y se aplica desde el siguiente periodo."
+      },
+      {
         "q": "¿Pueden las sedes pagar en monedas distintas?",
-        "a": "Las redes pueden facturarse por sede o de forma centralizada. Cada factura usa una sola moneda; nunca sumamos importes en monedas distintas."
+        "a": "Sí, cuando la central traslada las cuotas de los locales a los franquiciados: cada franquiciado paga en la moneda de su propio país de facturación. Cada factura usa una sola moneda; nunca sumamos importes en monedas distintas."
       },
       {
         "q": "¿Están incluidas las comisiones de procesamiento de pagos?",
-        "a": "No. Los pagos pasan por un proveedor conectado como Stripe, que cobra sus propias comisiones en tu país."
+        "a": "No. Los pagos online de clientes llevan nuestra comisión de aplicación (indicada arriba) más la comisión de procesamiento del proveedor de pagos, que varía según el país."
       },
       {
         "q": "¿Qué pasa si abro una segunda sede?",
@@ -1955,6 +1974,10 @@
       {
         "q": "¿Puedo pagar en otra moneda?",
         "a": "No. La moneda depende de tu país de facturación, y el pago la verifica con tu dirección de facturación y tu tarjeta. Si tu negocio se factura desde otro país, se aplica el precio de ese país."
+      },
+      {
+        "q": "¿Puedo llevarme mis datos?",
+        "a": "Sí. El propietario puede exportar gratis los datos del negocio en cualquier momento desde Ajustes → Exportar tus datos. Te enviamos por correo un enlace a un ZIP con archivos CSV: locales, personas, clientes, reservas, pedidos, facturas, leads y más. El enlace funciona 7 días."
       }
     ],
     "perMonthOneLocation": "/ mes · una sede",
@@ -1963,7 +1986,62 @@
     "geoNote": "Precios en {currency} para {country}. Se te factura en la moneda de tu país de facturación.",
     "geoNoteUnknown": "Precios en {currency}. Se te factura en la moneda de tu país de facturación.",
     "demoTitle": "¿Aún no quieres darte de alta?",
-    "demoBody": "Explora un negocio de ejemplo en la demo o reserva una llamada y repasaremos tus sedes contigo."
+    "demoBody": "Explora un negocio de ejemplo en la demo o reserva una llamada y repasaremos tus sedes contigo.",
+    "trialTitle": "Cómo funciona la prueba de {days} días",
+    "trialIntro": "No hay plan gratuito ni prueba gratuita: la demo es de libre acceso. Cuando quieras, una pequeña cuota de prueba te da el producto real con tus propios datos.",
+    "trialSteps": {
+      "pay": {
+        "title": "Paga {price} hoy",
+        "body": "Elige tu plan y añade una tarjeta emitida en tu país de facturación. La cuota de prueba se cobra una sola vez."
+      },
+      "use": {
+        "title": "Úsalo durante {days} días",
+        "body": "Todo lo incluido en el plan elegido, con tus propios datos y usuarios ilimitados."
+      },
+      "remind": {
+        "title": "Dos recordatorios",
+        "body": "Te escribimos 3 días y 1 día antes de que termine la prueba, con el precio de tu plan."
+      },
+      "start": {
+        "title": "Tu plan empieza el día {day}",
+        "body": "Salvo que canceles antes en Ajustes → Facturación. Cancelar es gratis."
+      }
+    },
+    "whoPays": {
+      "title": "¿Quién paga cada local?",
+      "intro": "En Red, la central paga una cuota de plataforma de {platform} al mes. Incluye {count} locales y los espacios de Desarrollo de franquicias, Legal, Finanzas, Formación y Comunidad. Cada local adicional cuesta {price} al mes, y la central decide quién lo paga, por local o por grupo de propietarios. Puedes cambiarlo cuando quieras en Ajustes → Facturación.",
+      "hq": {
+        "title": "La central",
+        "body": "La central paga la cuota del local en su propia factura."
+      },
+      "franchisee": {
+        "title": "El franquiciado",
+        "body": "El franquiciado paga desde su propia cuenta de facturación, en la moneda de su país de facturación."
+      },
+      "split": {
+        "title": "Un reparto",
+        "body": "La central y el franquiciado pagan cada uno la parte que elijas, por ejemplo 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Otras comisiones, con total transparencia",
+      "collection": {
+        "title": "Cobro de royalties y fondo de marketing",
+        "body": "{fee} por cobro, con un máximo de {cap} por local y mes. Una tarifa fija, nunca un porcentaje de tus royalties."
+      },
+      "payments": {
+        "title": "Pagos online de clientes",
+        "body": "Una comisión de aplicación del {percent} sobre los pagos online de tus clientes, más la comisión de procesamiento del proveedor de pagos. Ambas aparecen en cada liquidación."
+      }
+    },
+    "terms": {
+      "title": "Condiciones justas",
+      "monthly": "Facturación mensual por defecto. Cancela cuando quieras.",
+      "annual": "La facturación anual incluye 2 meses gratis.",
+      "noFee": "Sin penalizaciones por cancelar ni permanencias largas.",
+      "export": "Exporta todos tus datos gratis, en cualquier momento.",
+      "lock": "Tu precio queda fijado a tu país de facturación y confirmado por tu tarjeta."
+    }
   },
   "demo": {
     "metaTitle": "Solicitar una demo",

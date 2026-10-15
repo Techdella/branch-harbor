@@ -1,0 +1,31 @@
+{
+  "reviewPage": {
+    "invalidTitle": "Dieser Bewertungslink ist ungültig",
+    "invalidBody": "Öffnen Sie den Link aus Ihrer Nachricht erneut oder kontaktieren Sie den Standort.",
+    "title": "Wie war es bei {location}?",
+    "thanksTitle": "Vielen Dank!",
+    "askNamed": "{name}, wie bewerten Sie Ihren Besuch?",
+    "ask": "Wie bewerten Sie Ihren Besuch?",
+    "ratingLabel": "Ihre Bewertung",
+    "starLabel": "{n} von 5 Sternen",
+    "scale": {
+      "1": "Sehr schlecht",
+      "2": "Schlecht",
+      "3": "In Ordnung",
+      "4": "Gut",
+      "5": "Ausgezeichnet"
+    },
+    "commentLabel": "Möchten Sie dem Team etwas sagen? (optional)",
+    "privateNote": "Ihre Bewertung und Ihr Kommentar gehen privat an das Team von {location}.",
+    "send": "Senden",
+    "chooseRating": "Wählen Sie 1 bis 5 Sterne.",
+    "thanksBody": "Ihr Feedback wurde an das Team von {location} gesendet.",
+    "publicBefore": "Lieber eine öffentliche Bewertung schreiben?",
+    "publicAfter": "Möchten Sie auch eine öffentliche Bewertung teilen?",
+    "publicBody": "Das hilft anderen, uns zu finden. Jede Bewertung ist willkommen, egal wie sie ausfällt.",
+    "reviewOn": "Auf {site} bewerten",
+    "otherSite": "einer anderen Website",
+    "optOut": "Keine Bewertungsanfragen mehr",
+    "optedOut": "Erledigt. Sie werden nicht mehr um Bewertungen gebeten."
+  }
+}

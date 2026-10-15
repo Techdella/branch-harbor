@@ -1,0 +1,209 @@
+{
+  "billing": {
+    "title": "Plan & billing",
+    "description": "Your BranchHarbor plan, trial, invoices and who pays for each location. Separate from customer payments.",
+    "separate": "Separate from customer payments",
+    "status": {
+      "checkout_required": "Not started",
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Payment due",
+      "canceled": "Ended"
+    },
+    "plans": {
+      "solo": "Solo",
+      "connector": "Connector",
+      "hosted": "Hosted",
+      "network": "Network"
+    },
+    "planFor": {
+      "solo": "One location, flat monthly price",
+      "connector": "Keep your WordPress site · per location",
+      "hosted": "BranchHarbor-hosted site · per location",
+      "network": "HQ platform fee + per location · unlimited users"
+    },
+    "interval": {
+      "month": "Monthly",
+      "year": "Annual · 2 months included"
+    },
+    "per": {
+      "month": "/ month",
+      "year": "/ year"
+    },
+    "common": {
+      "cancel": "Cancel"
+    },
+    "link": {
+      "trial": "Trial until {date}. Manage your plan, invoices and who pays each location.",
+      "start": "Start your {days}-day trial for {fee}.",
+      "manage": "Manage your plan, invoices and who pays each location."
+    },
+    "checkout": {
+      "title": "Start your {days}-day trial",
+      "restartTitle": "Restart your plan",
+      "intro": "There is no free plan or free trial. Pay {fee} today, use everything for {days} days, and your plan then starts automatically unless you cancel.",
+      "plan": "Plan",
+      "interval": "Billing",
+      "country": "Billing country",
+      "countryHint": "Your price, currency and tax follow your billing country. The card must be issued there, or add a business tax ID from it.",
+      "locations": "Locations",
+      "today": "Due today",
+      "todayTrial": "One-off fee for the {days}-day trial.",
+      "noTrial": "A trial was already used for this business, card or email domain, so your plan starts today.",
+      "from": "From {date}",
+      "then": "Then",
+      "taxExclusive": "Prices exclude tax. VAT or GST is added according to your billing country.",
+      "taxUs": "Prices exclude sales tax, which is added where it applies.",
+      "terms": {
+        "autoStart": "Your {plan} plan starts automatically on {date} unless you cancel before then.",
+        "reminders": "We email you 3 days and 1 day before the trial ends.",
+        "cancel": "Cancel any time in Settings → Billing. No cancellation fee.",
+        "export": "Export all your data for free, at any time.",
+        "lock": "Your price is locked to your billing country and confirmed by your card."
+      },
+      "taxId": "Business tax ID",
+      "taxIdHint": "Only needed if your card is issued in another country, e.g. a VAT number.",
+      "agree": "I agree to pay {fee} today for a {days}-day trial. On {date} my {plan} plan starts at {amount} plus tax, unless I cancel before then.",
+      "agreeNoTrial": "I agree to pay {amount} plus tax from today, until I cancel.",
+      "agreeRequired": "Tick the box to accept the trial terms.",
+      "continue": "Continue to card",
+      "payTrial": "Pay {fee} and start trial",
+      "payPlan": "Pay {amount} and start plan",
+      "linePlatform": "Platform fee (includes {count} locations)",
+      "linePlan": "Solo, one location",
+      "lineLocations": "{count, plural, one {# location} other {# locations}} × {price}"
+    },
+    "card": {
+      "title": "Card",
+      "sandbox": "Test mode",
+      "sandboxNote": "No real charge: the API runs without Stripe keys. Choose the country the simulated card was issued in.",
+      "issuedIn": "Card issued in",
+      "unavailable": "Card entry is unavailable right now. Try again later.",
+      "failed": "The card could not be confirmed. Try another card."
+    },
+    "current": {
+      "title": "Your plan",
+      "canceling": "Cancelled",
+      "platformFee": "Platform fee {amount}, includes {count} locations",
+      "taxNote": "Before tax",
+      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+      "trialCanceled": "Your trial ends on {date}. Nothing more will be charged.",
+      "startsOn": "Your {plan} plan starts on {date} at {amount}.",
+      "endsOn": "Your plan ends on {date}. Nothing more will be charged.",
+      "nextCharge": "Next charge on {date}: {amount}.",
+      "pastDue": "We couldn't take the last payment. Update your card to keep your plan.",
+      "country": "Billing country",
+      "evidence": {
+        "card": "confirmed by card",
+        "tax_id": "confirmed by tax ID"
+      },
+      "card": "Card",
+      "cardValue": "{brand} •••• {last4}, issued in {country}",
+      "resume": "Don't cancel",
+      "cancelTitle": "Cancel your plan?",
+      "cancelTrialBody": "Your trial ends on {date} and nothing more is charged. No cancellation fee.",
+      "cancelPlanBody": "Your plan stays active until {date}. No cancellation fee.",
+      "confirmCancel": "Yes, cancel",
+      "keep": "Keep my plan",
+      "cancelTrial": "Cancel trial",
+      "cancelPlan": "Cancel plan"
+    },
+    "country": {
+      "title": "Billing country",
+      "body": "Moving your business to another country? The new billing country needs a card issued there (or a business tax ID from it) and applies from your next billing period.",
+      "pending": "Changing to {country} ({currency}) on {date}.",
+      "keepCurrent": "Keep current country",
+      "change": "Change billing country",
+      "newCountry": "New billing country",
+      "continue": "Continue",
+      "newPrice": "New price: {amount}",
+      "confirm": "Confirm change"
+    },
+    "payers": {
+      "title": "Who pays each location",
+      "intro": "Your platform fee covers your first {count} locations. For each further location, choose who pays its {price} monthly fee: HQ, the franchisee or a split.",
+      "included": "Included in the platform fee",
+      "hqPays": "HQ pays {amount}",
+      "franchiseePays": "Franchisee pays {amount} ({pct}%)",
+      "fromGroup": "from owner group",
+      "payerFor": "Who pays for {name}",
+      "ownerGroups": "Owner groups",
+      "ownerGroupHint": "Applies to the group's locations unless a location has its own setting.",
+      "totals": "HQ pays {hq} · franchisees pay {franchisee} a month in total",
+      "inherit": "Default",
+      "hq": "HQ",
+      "franchisee": "Franchisee",
+      "split": "Split",
+      "share": "Franchisee share (%)",
+      "save": "Save"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "empty": "No invoices yet.",
+      "kinds": {
+        "trial_fee": "14-day trial",
+        "subscription": "Plan",
+        "franchisee_fee": "Location fees"
+      },
+      "statuses": {
+        "paid": "Paid",
+        "open": "Open",
+        "void": "Void",
+        "uncollectible": "Unpaid"
+      },
+      "view": "View"
+    },
+    "fees": {
+      "title": "Other fees",
+      "collection": "Royalty and marketing-fund collection: {fee} per collection, capped at {cap} per location per month. Never a percentage of royalties.",
+      "payments": "Online customer payments: {percent} application fee plus the payment provider's own fee.",
+      "terms": "Monthly terms, annual billing with 2 months included, no cancellation fees, free data export."
+    },
+    "banner": {
+      "trial": "Trial: {count, plural, one {# day left} other {# days left}}. Your {plan} plan starts on {date}.",
+      "trialCanceled": "Your trial ends on {date}. Nothing more will be charged.",
+      "required": "Start your {days}-day trial for {fee} to make changes and go live.",
+      "canceled": "Your plan has ended. Restart it to make changes; you can still export your data.",
+      "pastDue": "We couldn't take the last payment for your plan.",
+      "start": "Start trial",
+      "manage": "Manage billing"
+    },
+    "export": {
+      "title": "Export your data",
+      "body": "Download a ZIP of CSV files with your business's core data: locations, people, customers, bookings, orders, invoices, leads and more. Free, at any time. We also email you the link, which works for 7 days.",
+      "requested": "We're preparing your export. We'll email you when it's ready.",
+      "request": "Export your data",
+      "files": "{count, plural, one {# file} other {# files}}",
+      "expires": "available until {date}",
+      "status": {
+        "queued": "Preparing",
+        "running": "Preparing",
+        "ready": "Ready",
+        "failed": "Failed",
+        "expired": "Expired"
+      },
+      "download": "Download"
+    },
+    "franchisee": {
+      "title": "Location fees",
+      "description": "The BranchHarbor fees headquarters passes on to you for your locations.",
+      "locations": "Your locations",
+      "intro": "Headquarters passes on all or part of the fee for these locations. You pay from your own billing account, in the currency of your billing country.",
+      "none": "Headquarters pays the fees for your locations. You have nothing to pay.",
+      "included": "Included in headquarters' platform fee",
+      "hqPays": "Paid by headquarters",
+      "share": "your share {pct}%",
+      "perMonth": "/ month",
+      "ownerGroupAccount": "Billing account",
+      "locationAccount": "Billing account for this location",
+      "active": "Active",
+      "needsCard": "Card needed",
+      "cardOnFile": "{brand} •••• {last4} · billed in {currency}",
+      "setup": "Set up billing",
+      "saveCard": "Save card"
+    }
+  },
+  "shell": {
+    "locationFees": "Location fees"
+  }
+}

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
 import {
-  externalSalesReports, financeBalanceTransactions, financeDocuments, financeInvoices, financePaymentMethods, financePayouts, financeSettings, 
+  externalSalesReports, financeBalanceTransactions, financeDocuments, financeInvoices, financePaymentMethods, financePayouts, financeSettings, franchiseeStatements,
   marketingFundEntries, organizations, ownerGroups, royaltyDisputes, royaltyPeriods, royaltyStatements, royaltyTerms,
 } from '../db/schema/index.ts';
 import { isPeriodStart, periodContaining, type PeriodFrequency } from '../domain/royalty.ts';
@@ -15,9 +15,10 @@ import { methodTypesFor } from '../integrations/finance-collection.ts';
 import { buildExport, toCsv, major } from '../services/finance/exports.ts';
 import { consumePendingSpendEvents, fundBalances, fundCampaignNames, fundCampaigns, recordSpend, serializeEntry, transparencyReport } from '../services/finance/fund.ts';
 import {
-  collectInvoice, collectionAccount, collectionAdapter, confirmSandboxMethod, invoiceHistory, issueInvoice, orgTimeZone, recordManualPayment, refreshMethod, revokeMethod, runDunning,
+  collectInvoice, collectionAccount, collectionAdapter, collectionCountry, confirmSandboxMethod, invoiceHistory, issueInvoice, mandateText, orgTimeZone, recordManualPayment, refreshMethod, revokeMethod, runDunning,
   serializeInvoice, serializeMethod, settleSandboxCollection, startPaymentMethodSetup, today,
 } from '../services/finance/invoices.ts';
+import { franchiseeStatementPdf, issueFranchiseeStatements, serializeFranchiseeStatement } from '../services/finance/franchisee-statements.ts';
 import { invoicePdf } from '../services/finance/invoice-pdf.ts';
 import { reconciliation, serializePayout, syncPayouts } from '../services/finance/payouts.ts';
 import { financeReports } from '../services/finance/reports.ts';
@@ -457,14 +458,15 @@ export const financeRoutes: FastifyPluginAsyncZod = async (app) => {
     const { orgId } = req.params;
     await requireMember(req, db, orgId);
     const groups = await groupsInScope(req, orgId, 'view');
-    const rows = await db.select().from(financePaymentMethods).where(and(eq(financePaymentMethods.organizationId, orgId), inArray(financePaymentMethods.status, ['pending', 'active', 'failed']))).orderBy(desc(financePaymentMethods.createdAt));
+    const rows = await db.select().from(financePaymentMethods).where(and(eq(financePaymentMethods.organizationId, orgId), inArray(financePaymentMethods.status, ['pending', 'verifying', 'active', 'failed']))).orderBy(desc(financePaymentMethods.createdAt));
     const dir = await directory(db, orgId);
+    const country = await collectionCountry(s, orgId);
     const groupList = groups === 'all' ? [...dir.groups.values()] : [...groups].map((g) => dir.groups.get(g)!).filter(Boolean);
     const currenciesByGroup = new Map<string, Set<string>>();
     for (const l of dir.locations.values()) if (l.ownerGroupId) currenciesByGroup.set(l.ownerGroupId, (currenciesByGroup.get(l.ownerGroupId) ?? new Set()).add(l.currency));
     return {
-      mode: collectionAdapter(s).mode,
-      ownerGroups: groupList.map((g) => ({ id: g.id, name: g.name, currencies: [...(currenciesByGroup.get(g.id) ?? [])].sort().map((c) => ({ currency: c, methodTypes: methodTypesFor(c) })) })),
+      mode: collectionAdapter(s).mode, collectionCountry: country,
+      ownerGroups: groupList.map((g) => ({ id: g.id, name: g.name, currencies: [...(currenciesByGroup.get(g.id) ?? [])].sort().map((c) => ({ currency: c, methodTypes: methodTypesFor(c, country) })) })),
       items: rows.filter((r) => groups === 'all' || groups.has(r.ownerGroupId)).map(serializeMethod),
     };
   });
@@ -477,8 +479,23 @@ export const financeRoutes: FastifyPluginAsyncZod = async (app) => {
     return pm;
   };
 
+  const methodTypeSchema = z.enum(['card', 'us_bank_account', 'acss_debit', 'bacs_debit', 'sepa_debit', 'au_becs_debit']);
+
+  app.get('/orgs/:orgId/finance/payment-methods/mandate', {
+    schema: { tags: ['finance'], security: secured, params: orgParams, querystring: z.object({ ownerGroupId: z.uuid(), currency, methodType: methodTypeSchema }), summary: 'The exact authorisation text the franchisee is about to accept (shown before accepting; stored verbatim)' },
+  }, async (req) => {
+    const { orgId } = req.params;
+    await requireCapability(req, db, 'finance.invoices', 'view', { organizationId: orgId, kind: 'owner_group', id: req.query.ownerGroupId });
+    const [o] = await db.select().from(organizations).where(eq(organizations.id, orgId));
+    const [g] = await db.select().from(ownerGroups).where(and(eq(ownerGroups.id, req.query.ownerGroupId), eq(ownerGroups.organizationId, orgId)));
+    if (!g) throw notFound('Owner group');
+    const offered = methodTypesFor(req.query.currency, await collectionCountry(s, orgId));
+    if (!offered.includes(req.query.methodType)) throw validationError(`${req.query.methodType} is not available for ${req.query.currency}`, { methodType: `Use one of ${offered.join(', ')}` });
+    return { methodType: req.query.methodType, currency: req.query.currency, mandateText: mandateText(o!.name, g.legalName ?? g.name, req.query.methodType, req.query.currency), methodTypes: offered };
+  });
+
   app.post('/orgs/:orgId/finance/payment-methods/setup', {
-    schema: { tags: ['finance'], security: secured, params: orgParams, body: z.object({ ownerGroupId: z.uuid(), currency, methodType: z.enum(['card', 'us_bank_account', 'acss_debit', 'bacs_debit', 'sepa_debit', 'au_becs_debit']), acceptMandate: z.boolean() }), summary: 'Start saving a debit method: accepts the mandate and returns a SetupIntent for the collection account' },
+    schema: { tags: ['finance'], security: secured, params: orgParams, body: z.object({ ownerGroupId: z.uuid(), currency, methodType: methodTypeSchema, acceptMandate: z.boolean(), mandateText: z.string().max(4000).optional(), locale: z.string().max(10).optional() }), summary: 'Start saving a debit method: accepts the mandate (the text shown is checked and stored) and returns a SetupIntent for the collection account' },
   }, async (req, reply) => {
     const { orgId } = req.params;
     await requireCapability(req, db, 'finance.invoices', 'edit', { organizationId: orgId, kind: 'owner_group', id: req.body.ownerGroupId });
@@ -499,6 +516,42 @@ export const financeRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post('/orgs/:orgId/finance/payment-methods/:id/revoke', { schema: { tags: ['finance'], security: secured, params: idParams } }, async (req) => {
     const pm = await methodInScope(req, req.params.orgId, req.params.id);
     return serializeMethod(await revokeMethod(s, req.params.orgId, pm.id, req.user!.id));
+  });
+
+  /* ---------------- Monthly statements per franchisee ---------------- */
+
+  app.post('/orgs/:orgId/finance/periods/:id/franchisee-statements', { schema: { tags: ['finance'], security: secured, params: idParams, summary: 'Issue (or refresh) the monthly statement of every franchisee for the period, and email new ones to the franchise owners' } }, async (req) => {
+    await hq(req, req.params.orgId, 'finance.royalties', 'publish');
+    const r = await issueFranchiseeStatements(s, req.params.orgId, req.params.id, req.user!.id);
+    return { items: await Promise.all(r.items.map((x) => serializeFranchiseeStatement(db, x))), emailed: r.emailed };
+  });
+
+  const statementGroups = async (req: FastifyRequest, orgId: string) => {
+    await requireMember(req, db, orgId);
+    return groupsInScope(req, orgId, 'view');
+  };
+
+  app.get('/orgs/:orgId/finance/franchisee-statements', { schema: { tags: ['finance'], security: secured, params: orgParams, querystring: z.object({ periodId: z.uuid().optional(), ownerGroupId: z.uuid().optional() }), summary: 'Monthly franchisee statements in scope (franchise owners see only their own)' } }, async (req) => {
+    const { orgId } = req.params;
+    const groups = await statementGroups(req, orgId);
+    const rows = (await db.select().from(franchiseeStatements).where(and(eq(franchiseeStatements.organizationId, orgId), req.query.periodId ? eq(franchiseeStatements.periodId, req.query.periodId) : undefined, req.query.ownerGroupId ? eq(franchiseeStatements.ownerGroupId, req.query.ownerGroupId) : undefined)).orderBy(desc(franchiseeStatements.issuedAt)))
+      .filter((r) => groups === 'all' || groups.has(r.ownerGroupId));
+    return { items: await Promise.all(rows.map((x) => serializeFranchiseeStatement(db, x))) };
+  });
+
+  const loadFranchiseeStatement = async (req: FastifyRequest, orgId: string, id: string) => {
+    const groups = await statementGroups(req, orgId);
+    const [row] = await db.select().from(franchiseeStatements).where(and(eq(franchiseeStatements.id, id), eq(franchiseeStatements.organizationId, orgId)));
+    if (!row || (groups !== 'all' && !groups.has(row.ownerGroupId))) throw notFound('Statement');
+    return row;
+  };
+
+  app.get('/orgs/:orgId/finance/franchisee-statements/:id', { schema: { tags: ['finance'], security: secured, params: idParams } }, async (req) =>
+    serializeFranchiseeStatement(db, await loadFranchiseeStatement(req, req.params.orgId, req.params.id)));
+
+  app.get('/orgs/:orgId/finance/franchisee-statements/:id/pdf', { schema: { tags: ['finance'], security: secured, params: idParams, summary: 'Monthly statement PDF' } }, async (req, reply) => {
+    const row = await loadFranchiseeStatement(req, req.params.orgId, req.params.id);
+    return reply.header('Content-Disposition', `inline; filename="${row.number}.pdf"`).type('application/pdf').send(await franchiseeStatementPdf(db, row));
   });
 
   /* ---------------- Marketing fund ---------------- */

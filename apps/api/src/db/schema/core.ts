@@ -225,8 +225,13 @@ export const auditEvents = pgTable('audit_events', {
 export const subscriptions = pgTable('subscriptions', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }).unique(),
+  /** solo | connector | hosted | network (legacy: trial). The plan that starts when the paid trial ends. */
   plan: text('plan').notNull().default('trial'),
-  status: text('status').notNull().default('trialing'),
+  /**
+   * checkout_required (no paid trial or plan yet) → trialing (14-day trial fee paid) → active; past_due; canceled.
+   * Legacy rows created before the paid trial may still read `trialing` with no `trialEndsAt`.
+   */
+  status: text('status').notNull().default('checkout_required'),
   billedLocationCount: integer('billed_location_count').notNull().default(0),
   currency: currencyCol().notNull(),
   /** BranchHarbor plan price per billed location per interval, minor units in `currency`. null = not priced (trial). */
@@ -235,6 +240,31 @@ export const subscriptions = pgTable('subscriptions', {
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
   currentPeriodEnd: ts('current_period_end'),
+  /** Billing country locked at checkout (ISO alpha-2); decides the currency and price list. */
+  billingCountry: char('billing_country', { length: 2 }),
+  /** Price list key from @bh/shared (USD, EUR@C, …) and the price-book version used at checkout. */
+  priceList: text('price_list'),
+  priceBookVersion: text('price_book_version'),
+  /** Network HQ platform fee per interval (minor units) and the locations it includes. */
+  platformFeeMinor: bigint('platform_fee_minor', { mode: 'number' }),
+  includedLocations: integer('included_locations').notNull().default(0),
+  trialEndsAt: ts('trial_ends_at'),
+  trialFeeMinor: bigint('trial_fee_minor', { mode: 'number' }),
+  /** Day counts (3, 1) whose trial reminder email was sent. */
+  trialRemindersSent: jsonb('trial_reminders_sent').$type<number[]>().notNull().default([]),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+  canceledAt: ts('canceled_at'),
+  stripePaymentMethodId: text('stripe_payment_method_id'),
+  /** Card on file: brand, last4, issuing country (never the number). */
+  card: jsonb('card').$type<{ brand: string | null; last4: string | null; country: string | null; expMonth: number | null; expYear: number | null } | null>(),
+  taxId: text('tax_id'),
+  taxIdCountry: char('tax_id_country', { length: 2 }),
+  /** Evidence that locked the billing country: card | tax_id. */
+  countryEvidence: text('country_evidence'),
+  /** Open checkout (quote locked from the billing country, setup intent). Cleared when confirmed. */
+  checkout: jsonb('checkout').$type<Record<string, unknown> | null>(),
+  /** Billing-country change waiting for the next cycle. */
+  pendingChange: jsonb('pending_change').$type<Record<string, unknown> | null>(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });

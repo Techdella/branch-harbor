@@ -8,7 +8,7 @@
  *   signed webhook path (payments.ts) settles it idempotently through the payment-target extension registered below.
  * - Dunning: reminders, retries, late fees (per agreement terms) and a final notice, each recorded once.
  */
-import { and, asc, desc, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import type { Services } from '../../context.ts';
 import type { Exec, Tx } from '../../db/client.ts';
 import {
@@ -18,6 +18,7 @@ import {
 import type { LateFeeTerms } from '../../db/schema/finance.ts';
 import { daysBetween, formatInvoiceNumber, invoiceLinesFromStatement, invoiceTaxes, lateFeeFor } from '../../domain/royalty.ts';
 import { createCollectionAdapter, methodTypesFor, type CollectionAdapter, type DebitMethodType } from '../../integrations/finance-collection.ts';
+import { quoteCollectionFee } from '@bh/shared';
 import { localDateParts, addDays } from '../../lib/tz.ts';
 import { AppError, conflict, notFound, validationError } from '../../lib/errors.ts';
 import { audit } from '../audit.ts';
@@ -101,16 +102,42 @@ export async function activeMethod(db: Exec, ownerGroupId: string, currency: str
   return m ?? null;
 }
 
-/** The mandate text the franchisee accepts; stored verbatim with who, when and from where. */
+/**
+ * The mandate text the franchisee accepts; stored verbatim with who, when and from where. Bank debits carry the
+ * scheme's own wording (ACH authorisation, Canadian business PAD agreement, Bacs Direct Debit Guarantee summary, SEPA
+ * mandate, BECS Direct Debit Request); Stripe's Payment Element additionally shows the scheme mandate it collects.
+ */
 export function mandateText(orgName: string, groupName: string, methodType: DebitMethodType, currency: string) {
-  const what = methodType === 'card' ? 'charge this card' : 'debit this bank account';
-  return `${groupName} authorises ${orgName} to ${what} for royalty, marketing fund and fee invoices in ${currency} issued under the franchise agreement, on or after each invoice due date, until this authorisation is revoked in writing. Each invoice is available in BranchHarbor before it is collected.`;
+  const scope = `for royalty, marketing fund and fee invoices in ${currency} issued under the franchise agreement, on or after each invoice due date`;
+  const notice = 'Each invoice is available in BranchHarbor before it is collected.';
+  switch (methodType) {
+    case 'card':
+      return `${groupName} authorises ${orgName} to charge this card ${scope}, until this authorisation is revoked in writing. ${notice}`;
+    case 'us_bank_account':
+      return `${groupName} authorises ${orgName} to electronically debit the bank account provided through the ACH network ${scope}, and, if necessary, to credit the account to correct an erroneous debit. This authorisation stays in effect until ${groupName} notifies ${orgName} in writing at least 3 business days before the next debit. Debits that are returned may be retried. ${notice}`;
+    case 'acss_debit':
+      return `Business Pre-Authorized Debit (PAD) Agreement. ${groupName} authorises ${orgName} and its payment service provider to debit the bank account provided, on a sporadic basis, ${scope}. ${orgName} will make each invoice available at least 10 days before it is debited. ${groupName} may cancel this agreement at any time with 30 days' notice; it has certain recourse rights if a debit does not comply with this agreement (for example, a refund of an unauthorised debit). More about PAD rights: www.payments.ca. ${notice}`;
+    case 'bacs_debit':
+      return `Bacs Direct Debit Instruction. ${groupName} instructs its bank or building society to pay ${orgName} by Direct Debit from the account provided ${scope}, subject to the safeguards of the Direct Debit Guarantee: advance notice of each amount and date; a full and immediate refund of any error; and the right to cancel at any time by contacting the bank. Payments are processed by Stripe on behalf of ${orgName}. ${notice}`;
+    case 'sepa_debit':
+      return `SEPA Direct Debit mandate. By providing the account details and confirming, ${groupName} authorises (A) ${orgName} and Stripe, its payment service provider, to send instructions to its bank to debit the account and (B) its bank to debit the account in accordance with those instructions, ${scope}. As part of its rights, the account holder is entitled to a refund from its bank under the terms and conditions of its agreement with its bank; a refund must be claimed within 8 weeks starting from the date on which the account was debited. ${notice}`;
+    case 'au_becs_debit':
+      return `BECS Direct Debit Request. ${groupName} requests and authorises Stripe Payments Australia Pty Ltd ACN 160 180 343 (Direct Debit User ID 507156) to debit the account provided through the Bulk Electronic Clearing System on behalf of ${orgName}, ${scope}, in accordance with this request and the Direct Debit Request service agreement. ${notice}`;
+  }
 }
 
-export async function startPaymentMethodSetup(s: Services, organizationId: string, input: { ownerGroupId: string; currency: string; methodType: DebitMethodType; acceptMandate: boolean }, actor: { userId: string; ip: string | null }) {
+/** The collection account's country (live: from Stripe). Unknown in sandbox, where bank debits follow the currency. */
+export async function collectionCountry(s: Services, organizationId: string): Promise<string | null> {
+  const adapter = collectionAdapter(s);
+  if (adapter.mode === 'sandbox') return null;
+  return adapter.accountCountry(await collectionAccount(s.db, organizationId)).catch(() => null);
+}
+
+export async function startPaymentMethodSetup(s: Services, organizationId: string, input: { ownerGroupId: string; currency: string; methodType: DebitMethodType; acceptMandate: boolean; mandateText?: string; locale?: string }, actor: { userId: string; ip: string | null }) {
   if (!input.acceptMandate) throw validationError('The franchisee must accept the debit authorisation', { acceptMandate: 'Required' });
   const currency = input.currency.toUpperCase();
-  if (!methodTypesFor(currency).includes(input.methodType)) throw validationError(`${input.methodType} is not available for ${currency}`, { methodType: `Use one of ${methodTypesFor(currency).join(', ')}` });
+  const offered = methodTypesFor(currency, await collectionCountry(s, organizationId));
+  if (!offered.includes(input.methodType)) throw validationError(`${input.methodType} is not available for ${currency}`, { methodType: `Use one of ${offered.join(', ')}` });
   const [org] = await s.db.select().from(organizations).where(eq(organizations.id, organizationId));
   const [group] = await s.db.select().from(ownerGroups).where(and(eq(ownerGroups.id, input.ownerGroupId), eq(ownerGroups.organizationId, organizationId)));
   if (!group) throw notFound('Owner group');
@@ -120,9 +147,11 @@ export async function startPaymentMethodSetup(s: Services, organizationId: strin
   const [existing] = await s.db.select().from(financePaymentMethods).where(and(eq(financePaymentMethods.ownerGroupId, group.id), eq(financePaymentMethods.currency, currency))).orderBy(desc(financePaymentMethods.createdAt)).limit(1);
   const customerId = existing?.stripeCustomerId ?? (await adapter.ensureCustomer({ accountId: account, name: group.legalName ?? group.name, email: null, metadata: { bh_org: organizationId, bh_owner_group: group.id }, idempotencyKey: `fin_cus:${group.id}:${currency}:${account ?? 'sandbox'}` })).id;
   const text = mandateText(org!.name, group.legalName ?? group.name, input.methodType, currency);
+  // The text shown is the text stored: refuse when the client accepted a different (outdated) version.
+  if (input.mandateText !== undefined && input.mandateText.trim() !== text) throw conflict('mandate_text_changed', 'The authorisation text changed. Review it again before accepting.', { mandateText: text });
   const [pm] = await s.db.insert(financePaymentMethods).values({
     organizationId, ownerGroupId: group.id, currency, collectionAccountId: account, stripeCustomerId: customerId, methodType: input.methodType, mandateText: text,
-    mandateAcceptedAt: new Date(), mandateAcceptedBy: actor.userId, mandateIp: actor.ip, status: 'pending', sandbox: adapter.mode === 'sandbox',
+    mandateAcceptedAt: new Date(), mandateAcceptedBy: actor.userId, mandateIp: actor.ip, mandateLocale: input.locale ?? 'en', status: 'pending', sandbox: adapter.mode === 'sandbox',
   }).returning();
   const si = await adapter.createSetupIntent({ accountId: account, customerId, methodType: input.methodType, currency, metadata: { bh_org: organizationId, bh_owner_group: group.id, bh_finance_method: pm!.id }, idempotencyKey: `fin_seti:${pm!.id}` });
   await s.db.update(financePaymentMethods).set({ setupIntentId: si.id, updatedAt: new Date() }).where(eq(financePaymentMethods.id, pm!.id));
@@ -130,12 +159,12 @@ export async function startPaymentMethodSetup(s: Services, organizationId: strin
   return { id: pm!.id, clientSecret: si.clientSecret, setupIntentId: si.id, connectedAccountId: account, publishableKey: s.payments.publishableKey, mode: adapter.mode, mandateText: text };
 }
 
-async function activate(db: Exec, pmId: string, paymentMethodId: string, display: Record<string, string | null | undefined>) {
+async function activate(db: Exec, pmId: string, paymentMethodId: string, display: Record<string, string | null | undefined>, mandateId: string | null = null) {
   const [pm] = await db.select().from(financePaymentMethods).where(eq(financePaymentMethods.id, pmId));
   if (!pm) return null;
   // One active method per owner group and currency: the new one replaces the old.
   await db.update(financePaymentMethods).set({ status: 'revoked', updatedAt: new Date() }).where(and(eq(financePaymentMethods.ownerGroupId, pm.ownerGroupId), eq(financePaymentMethods.currency, pm.currency), eq(financePaymentMethods.status, 'active'), ne(financePaymentMethods.id, pm.id)));
-  const [row] = await db.update(financePaymentMethods).set({ status: 'active', paymentMethodId, display, updatedAt: new Date() }).where(eq(financePaymentMethods.id, pm.id)).returning();
+  const [row] = await db.update(financePaymentMethods).set({ status: 'active', paymentMethodId, display, mandateId: mandateId ?? pm.mandateId, verificationUrl: null, failureReason: null, updatedAt: new Date() }).where(eq(financePaymentMethods.id, pm.id)).returning();
   return row!;
 }
 
@@ -144,8 +173,8 @@ export async function confirmSandboxMethod(s: Services, organizationId: string, 
   if (collectionAdapter(s).mode !== 'sandbox') throw notFound('Route');
   const [pm] = await s.db.select().from(financePaymentMethods).where(and(eq(financePaymentMethods.id, id), eq(financePaymentMethods.organizationId, organizationId)));
   if (!pm) throw notFound('Payment method');
-  if (pm.status !== 'pending') throw conflict('method_not_pending', 'This payment method is not waiting for confirmation');
-  const row = await activate(s.db, pm.id, `pm_sandbox_${pm.methodType}_${outcome}_${pm.id.slice(0, 8)}`, { brand: pm.methodType === 'card' ? 'visa' : null, last4: outcome === 'ok' ? '4242' : '0002', bankName: pm.methodType === 'card' ? null : 'Sandbox Bank' });
+  if (pm.status !== 'pending' && pm.status !== 'verifying') throw conflict('method_not_pending', 'This payment method is not waiting for confirmation');
+  const row = await activate(s.db, pm.id, `pm_sandbox_${pm.methodType}_${outcome}_${pm.id.slice(0, 8)}`, { brand: pm.methodType === 'card' ? 'visa' : null, last4: outcome === 'ok' ? '4242' : '0002', bankName: pm.methodType === 'card' ? null : 'Sandbox Bank' }, pm.methodType === 'card' ? null : `mandate_sandbox_${pm.id.slice(0, 8)}`);
   await audit(s.db, { organizationId, actorUserId, action: 'finance.mandate_active', scopeKind: 'owner_group', scopeId: pm.ownerGroupId, targetType: 'finance_payment_method', targetId: pm.id, metadata: { sandbox: true } });
   return row!;
 }
@@ -154,9 +183,13 @@ export async function confirmSandboxMethod(s: Services, organizationId: string, 
 export async function refreshMethod(s: Services, organizationId: string, id: string) {
   const [pm] = await s.db.select().from(financePaymentMethods).where(and(eq(financePaymentMethods.id, id), eq(financePaymentMethods.organizationId, organizationId)));
   if (!pm) throw notFound('Payment method');
-  if (pm.status !== 'pending' || !pm.setupIntentId) return pm;
+  if ((pm.status !== 'pending' && pm.status !== 'verifying') || !pm.setupIntentId) return pm;
   const si = await collectionAdapter(s).retrieveSetupIntent({ accountId: pm.collectionAccountId, id: pm.setupIntentId });
-  if (si.status === 'succeeded' && si.paymentMethodId) return (await activate(s.db, pm.id, si.paymentMethodId, si.display))!;
+  if (si.status === 'succeeded' && si.paymentMethodId) return (await activate(s.db, pm.id, si.paymentMethodId, si.display, si.mandateId ?? null))!;
+  if (si.verificationUrl) {
+    const [row] = await s.db.update(financePaymentMethods).set({ status: 'verifying', verificationUrl: si.verificationUrl, updatedAt: new Date() }).where(eq(financePaymentMethods.id, pm.id)).returning();
+    return row!;
+  }
   return pm;
 }
 
@@ -170,7 +203,7 @@ export async function revokeMethod(s: Services, organizationId: string, id: stri
 export function serializeMethod(pm: typeof financePaymentMethods.$inferSelect) {
   return {
     id: pm.id, ownerGroupId: pm.ownerGroupId, currency: pm.currency, methodType: pm.methodType, status: pm.status, display: pm.display, mandateText: pm.mandateText,
-    mandateAcceptedAt: pm.mandateAcceptedAt.toISOString(), sandbox: pm.sandbox, createdAt: pm.createdAt.toISOString(),
+    mandateAcceptedAt: pm.mandateAcceptedAt.toISOString(), mandateId: pm.mandateId, verificationUrl: pm.verificationUrl, failureReason: pm.failureReason, sandbox: pm.sandbox, createdAt: pm.createdAt.toISOString(),
   };
 }
 
@@ -193,19 +226,25 @@ export async function collectInvoice(s: Services, organizationId: string, invoic
   const attemptNo = (await s.db.select({ n: sql<number>`count(*)::int` }).from(financeCollectionAttempts).where(eq(financeCollectionAttempts.invoiceId, inv.id)))[0]!.n + 1;
   const idempotencyKey = `fin_inv:${inv.id}:${attemptNo}`;
   const adapter = collectionAdapter(s);
+  // BranchHarbor's flat collection fee (paid by the franchisor as the platform fee), capped per location per month.
+  const feeMonth = today(await orgTimeZone(s.db, organizationId)).slice(0, 7);
+  const charged = (await s.db.select({ n: sql<number>`count(*)::int` }).from(financeCollectionAttempts).innerJoin(financeInvoices, eq(financeInvoices.id, financeCollectionAttempts.invoiceId))
+    .where(and(eq(financeInvoices.locationId, inv.locationId), eq(financeCollectionAttempts.feeMonth, feeMonth), sql`${financeCollectionAttempts.platformFeeMinor} > 0`)))[0]!.n;
+  const fee = Math.min(quoteCollectionFee(inv.currency, charged).amountMinor, Math.floor(amount / 2));
   const result = await adapter.debit({
     accountId: method.collectionAccountId, customerId: method.stripeCustomerId, paymentMethodId: method.paymentMethodId, methodType: method.methodType as DebitMethodType,
-    amountMinor: amount, currency: inv.currency, idempotencyKey, description: `Invoice ${inv.number}`,
+    amountMinor: amount, currency: inv.currency, idempotencyKey, description: `Invoice ${inv.number}`, applicationFeeMinor: fee,
     metadata: { bh_org: organizationId, bh_target_type: 'royalty_invoice', bh_target_id: inv.id, bh_invoice_number: inv.number },
   });
   const [p] = await s.db.insert(paymentReferences).values({
     organizationId, locationId: null, provider: 'stripe', externalId: result.id, connectedAccountId: method.collectionAccountId, amountMinor: amount, currency: inv.currency,
-    state: 'processing', targetType: 'royalty_invoice', targetId: inv.id, sandbox: adapter.mode === 'sandbox' ? 1 : 0,
+    state: 'processing', targetType: 'royalty_invoice', targetId: inv.id, sandbox: adapter.mode === 'sandbox' ? 1 : 0, applicationFeeMinor: fee,
   }).onConflictDoUpdate({ target: [paymentReferences.provider, paymentReferences.externalId], set: { updatedAt: new Date() } }).returning();
   const status = result.status;
   const [attempt] = await s.db.insert(financeCollectionAttempts).values({
     organizationId, invoiceId: inv.id, attempt: attemptNo, method: 'debit', idempotencyKey, paymentId: p!.id, paymentIntentId: result.id, amountMinor: amount, currency: inv.currency,
-    status, failureCode: result.failureCode ?? null, failureMessage: result.failureMessage ?? null, createdBy: opts.actorUserId,
+    status, methodType: method.methodType, platformFeeMinor: status === 'failed' ? 0 : fee, feeMonth, settledAt: status === 'succeeded' || status === 'failed' ? new Date() : null,
+    failureCode: result.failureCode ?? null, failureMessage: result.failureMessage ?? null, createdBy: opts.actorUserId,
   }).returning();
   if (status === 'processing' || status === 'requires_action') await s.db.update(financeInvoices).set({ status: 'processing', updatedAt: new Date() }).where(eq(financeInvoices.id, inv.id));
   await audit(s.db, { organizationId, actorUserId: opts.actorUserId, action: 'finance.collection_attempted', scopeKind: 'location', scopeId: inv.locationId, targetType: 'finance_invoice', targetId: inv.id, metadata: { attempt: attemptNo, status, amountMinor: amount, currency: inv.currency, trigger: opts.trigger } });
@@ -262,7 +301,7 @@ paymentTargetExtensions.royalty_invoice = {
   async fulfil(tx: Tx, p: PaymentRow) {
     const [inv] = await tx.select().from(financeInvoices).where(eq(financeInvoices.id, p.targetId!)).for('update');
     if (!inv) return { fulfilled: false, note: 'Royalty invoice missing' };
-    await tx.update(financeCollectionAttempts).set({ status: 'succeeded', updatedAt: new Date() }).where(eq(financeCollectionAttempts.paymentId, p.id));
+    await tx.update(financeCollectionAttempts).set({ status: 'succeeded', settledAt: new Date(), updatedAt: new Date() }).where(eq(financeCollectionAttempts.paymentId, p.id));
     if (inv.status === 'paid') return { fulfilled: true, note: 'Invoice already paid' };
     if (p.currency !== inv.currency) return { fulfilled: false, note: `Payment in ${p.currency} for a ${inv.currency} invoice` };
     await applyPayment(tx, inv, p.providerAmountMinor ?? p.amountMinor);
@@ -277,8 +316,29 @@ paymentTargetExtensions.royalty_invoice = {
 paymentFailureHooks.push(async (tx, p) => {
   if (p.targetType !== 'royalty_invoice' || !p.targetId) return;
   const [att] = await tx.select().from(financeCollectionAttempts).where(eq(financeCollectionAttempts.paymentId, p.id));
-  await tx.update(financeCollectionAttempts).set({ status: 'failed', failureCode: att?.failureCode ?? 'payment_failed', updatedAt: new Date() }).where(eq(financeCollectionAttempts.paymentId, p.id));
+  // A bank debit that fails days later: no collection fee for it, and the invoice reopens for dunning retries.
+  await tx.update(financeCollectionAttempts).set({ status: 'failed', failureCode: att?.failureCode ?? 'payment_failed', platformFeeMinor: 0, settledAt: new Date(), updatedAt: new Date() }).where(eq(financeCollectionAttempts.paymentId, p.id));
   await tx.update(financeInvoices).set({ status: 'open', updatedAt: new Date() }).where(and(eq(financeInvoices.id, p.targetId), eq(financeInvoices.status, 'processing')));
+});
+
+/* Live mode: ACH micro-deposits (verification pending) and mandates Stripe reports inactive (revoked by the bank). */
+stripeEventExtensions.push(async (tx, event) => {
+  if (event.type === 'setup_intent.requires_action') {
+    const si = event.data.object as { metadata?: Record<string, string>; next_action?: { type?: string; verify_with_microdeposits?: { hosted_verification_url?: string } } | null };
+    const pmId = si.metadata?.bh_finance_method;
+    const url = si.next_action?.type === 'verify_with_microdeposits' ? si.next_action.verify_with_microdeposits?.hosted_verification_url ?? null : null;
+    if (!pmId || !url) return null;
+    await tx.update(financePaymentMethods).set({ status: 'verifying', verificationUrl: url, updatedAt: new Date() }).where(and(eq(financePaymentMethods.id, pmId), inArray(financePaymentMethods.status, ['pending', 'verifying'])));
+    return { note: 'Royalty mandate awaiting micro-deposit verification', organizationId: si.metadata?.bh_org ?? null };
+  }
+  if (event.type === 'mandate.updated') {
+    const m = event.data.object as { id: string; status: string };
+    if (m.status !== 'inactive') return null;
+    const rows = await tx.update(financePaymentMethods).set({ status: 'revoked', failureReason: 'mandate_inactive', updatedAt: new Date() }).where(and(eq(financePaymentMethods.mandateId, m.id), eq(financePaymentMethods.status, 'active'))).returning();
+    if (!rows.length) return null;
+    return { note: 'Royalty mandate inactive: method revoked', organizationId: rows[0]!.organizationId };
+  }
+  return null;
 });
 
 /* Live mode: activate a mandate when Stripe confirms the SetupIntent on the collection account. */
@@ -288,14 +348,16 @@ stripeEventExtensions.push(async (tx, event, s) => {
   const pmId = si.metadata?.bh_finance_method;
   if (!pmId) return null;
   if (event.type === 'setup_intent.setup_failed') {
-    await tx.update(financePaymentMethods).set({ status: 'failed', updatedAt: new Date() }).where(eq(financePaymentMethods.id, pmId));
+    const err = (event.data.object as { last_setup_error?: { code?: string } | null }).last_setup_error;
+    await tx.update(financePaymentMethods).set({ status: 'failed', failureReason: err?.code ?? 'setup_failed', updatedAt: new Date() }).where(eq(financePaymentMethods.id, pmId));
     return { note: 'Royalty mandate setup failed', organizationId: si.metadata?.bh_org ?? null };
   }
   const methodId = typeof si.payment_method === 'string' ? si.payment_method : si.payment_method?.id;
   if (!methodId) return { note: 'Setup intent without payment method', organizationId: si.metadata?.bh_org ?? null };
   const [pm] = await tx.select().from(financePaymentMethods).where(eq(financePaymentMethods.id, pmId));
   const info = pm ? await collectionAdapter(s).retrieveSetupIntent({ accountId: pm.collectionAccountId, id: si.id }).catch(() => null) : null;
-  await activate(tx, pmId, methodId, info?.display ?? {});
+  const siMandate = (si as { mandate?: string | { id: string } | null }).mandate;
+  await activate(tx, pmId, methodId, info?.display ?? {}, info?.mandateId ?? (typeof siMandate === 'string' ? siMandate : siMandate?.id ?? null));
   return { note: 'Royalty mandate active', organizationId: si.metadata?.bh_org ?? null };
 });
 
@@ -326,9 +388,21 @@ export async function runDunning(s: Services, organizationId: string, todayLocal
   const day = todayLocal ?? today(await orgTimeZone(s.db, organizationId));
   const policy = settings.dunning;
   const open = await s.db.select().from(financeInvoices).where(and(eq(financeInvoices.organizationId, organizationId), inArray(financeInvoices.status, ['open', 'processing'])));
-  const summary = { checked: open.length, reminders: 0, lateFees: 0, retries: 0, retriesFailed: 0, finalNotices: 0 };
+  const summary = { checked: open.length, reminders: 0, lateFees: 0, retries: 0, retriesFailed: 0, finalNotices: 0, failureNotices: 0 };
   for (let inv of open) {
     if (outstanding(inv) <= 0) continue;
+    // A debit that failed (card decline now, or a bank debit returned days later): tell the franchisee once per
+    // attempt, with the next automatic retry from the dunning policy.
+    if (inv.status === 'open') {
+      // Claimed atomically on the attempt (failure_notified_at), so a repeated run never emails twice.
+      const failed = await s.db.update(financeCollectionAttempts).set({ failureNotifiedAt: new Date() })
+        .where(and(eq(financeCollectionAttempts.invoiceId, inv.id), eq(financeCollectionAttempts.method, 'debit'), eq(financeCollectionAttempts.status, 'failed'), isNull(financeCollectionAttempts.failureNotifiedAt))).returning();
+      for (const a of failed) {
+        summary.failureNotices++;
+        const next = policy.retryDays.map((d) => addDays(inv.dueDate, d)).filter((d) => d > day).sort()[0];
+        await notifyFranchisee(s, inv, `Payment for invoice ${inv.number} failed`, `The ${a.methodType ? a.methodType.replace(/_/g, ' ') : 'debit'} payment of ${fmt(a.amountMinor, a.currency)} for invoice ${inv.number} failed (${a.failureCode ?? 'payment_failed'}).${next ? ` It will be retried automatically on ${next}.` : ''} You can update the payment method or pay now in BranchHarbor under Finance → Statements & invoices.`);
+      }
+    }
     const toDue = daysBetween(day, inv.dueDate);
     if (policy.reminderDaysBefore > 0 && toDue > 0 && toDue <= policy.reminderDaysBefore && inv.status === 'open') {
       if (await recordStep(s.db, inv, 'reminder', -policy.reminderDaysBefore, `Due ${inv.dueDate}`)) {

@@ -1,0 +1,31 @@
+{
+  "reviewPage": {
+    "invalidTitle": "Deze reviewlink is niet geldig",
+    "invalidBody": "Open de link in je bericht opnieuw of neem contact op met de vestiging.",
+    "title": "Hoe was het bij {location}?",
+    "thanksTitle": "Bedankt!",
+    "askNamed": "{name}, hoe beoordeel je je bezoek?",
+    "ask": "Hoe beoordeel je je bezoek?",
+    "ratingLabel": "Jouw beoordeling",
+    "starLabel": "{n} van de 5 sterren",
+    "scale": {
+      "1": "Zeer slecht",
+      "2": "Slecht",
+      "3": "Redelijk",
+      "4": "Goed",
+      "5": "Uitstekend"
+    },
+    "commentLabel": "Wil je het team iets laten weten? (optioneel)",
+    "privateNote": "Je beoordeling en opmerking gaan privé naar het team van {location}.",
+    "send": "Versturen",
+    "chooseRating": "Kies 1 tot 5 sterren.",
+    "thanksBody": "Je feedback is naar het team van {location} gestuurd.",
+    "publicBefore": "Liever een openbare review plaatsen?",
+    "publicAfter": "Wil je ook een openbare review delen?",
+    "publicBody": "Zo vinden anderen ons. Elke review is welkom, wat je beoordeling ook is.",
+    "reviewOn": "Review ons op {site}",
+    "otherSite": "een andere site",
+    "optOut": "Geen reviewverzoeken meer",
+    "optedOut": "Klaar. We vragen je niet meer om reviews."
+  }
+}

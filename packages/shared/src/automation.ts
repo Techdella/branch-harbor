@@ -9,15 +9,17 @@ import { z } from 'zod';
 export const AUTOMATION_TRIGGERS = [
   'lead.created', 'form.submitted', 'booking.created', 'booking.cancelled', 'class.missed', 'order.completed',
   'membership.expiring', 'location.opening_soon', 'tag.added', 'customer.birthday',
+  // Reviews: a review arrived (private feedback on the hosted review page or a Google review); `event.rating` is 1–5.
+  'review.received',
 ] as const;
 export type AutomationTrigger = (typeof AUTOMATION_TRIGGERS)[number];
 
-export const AUTOMATION_ACTIONS = ['send_email', 'send_sms', 'send_whatsapp', 'add_tag', 'remove_tag', 'create_task', 'notify_staff', 'webhook'] as const;
+export const AUTOMATION_ACTIONS = ['send_email', 'send_sms', 'send_whatsapp', 'add_tag', 'remove_tag', 'create_task', 'notify_staff', 'webhook', 'send_review_request'] as const;
 export type AutomationAction = (typeof AUTOMATION_ACTIONS)[number];
 
 export const CONDITION_KINDS = ['field', 'segment', 'location', 'consent', 'tag'] as const;
 export const FIELD_OPS = ['eq', 'neq', 'contains', 'exists', 'not_exists', 'gt', 'lt'] as const;
-export const CONDITION_FIELDS = ['contact.email', 'contact.phone', 'contact.locale', 'contact.name', 'event.source', 'event.formId', 'event.tag', 'event.total', 'event.status'] as const;
+export const CONDITION_FIELDS = ['contact.email', 'contact.phone', 'contact.locale', 'contact.name', 'event.source', 'event.formId', 'event.tag', 'event.total', 'event.status', 'event.rating'] as const;
 export const CONSENT_PURPOSES = ['marketing_email', 'marketing_sms', 'marketing_whatsapp'] as const;
 
 const tag = z.string().trim().min(1).max(40).regex(/^[\p{L}\p{N} _.-]+$/u);
@@ -51,6 +53,8 @@ export const actionConfigSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('create_task'), title: z.string().min(1).max(200), dueInDays: z.number().int().min(0).max(90).default(1) }),
   z.object({ action: z.literal('notify_staff'), message: z.string().min(1).max(500) }),
   z.object({ action: z.literal('webhook'), url: https }),
+  /** Reviews: ask the contact for a review with the location's review-request settings (frequency cap, quiet hours, consent). */
+  z.object({ action: z.literal('send_review_request'), channel: z.enum(['default', 'email', 'sms', 'whatsapp']).default('default') }),
 ]);
 export type ActionConfig = z.infer<typeof actionConfigSchema>;
 export type ConditionConfig = z.infer<typeof conditionConfigSchema>;
@@ -160,7 +164,8 @@ export function automationTemplate(kind: AutomationTemplate, copy: { sms: string
       return { nodes: [
         { ...n('t', 0, 0), type: 'trigger', config: { event: 'order.completed' } },
         { ...n('d1', 0, 120), type: 'delay', config: { amount: 1, unit: 'days' } },
-        { ...n('a1', 0, 240), type: 'action', config: { action: 'send_email' } },
+        // Uses the location's review-request settings (channel, template, frequency cap, quiet hours, consent).
+        { ...n('a1', 0, 240), type: 'action', config: { action: 'send_review_request', channel: 'default' } },
       ], edges: line('t', 'd1', 'a1') };
     case 'coming_soon_launch':
       return { nodes: [

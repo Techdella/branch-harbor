@@ -85,6 +85,11 @@ export interface ModuleDef {
   sensitive?: SensitiveClass;
   /** Operations modules: the industry screens (dashboard route keys) the module covers. */
   screens?: readonly string[];
+  /**
+   * Only granted by name: area wildcards (`operations.*`) and the legacy `operations.read/write` permissions never
+   * include it (e.g. audits are not part of every Operations role).
+   */
+  explicitGrant?: boolean;
 }
 
 const V = ['view'] as const;
@@ -92,6 +97,36 @@ const VE = ['view', 'edit'] as const;
 const VEP = ['view', 'edit', 'publish'] as const;
 const VEX = ['view', 'edit', 'export'] as const;
 const ALL = ['view', 'edit', 'publish', 'export'] as const;
+
+/* ------------------------------------------------------------------ */
+/* Field audits, compliance documents and the league table             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Network quality modules (one block, appended after the other Operations, Legal & compliance and Network modules):
+ * - `operations.audits`: checklist templates, scheduled audits, scoring, corrective actions and re-audits. Granted by
+ *   name only (never through `operations.*`), so staff and read-only Operations roles don't get it.
+ * - `legal.compliance_documents`: certificates of insurance, licences, permits and health certificates per location or
+ *   owner group, HQ requirements, the compliance matrix and expiry reminders. Franchisees upload their own.
+ * - `network.league_table`: locations ranked by revenue (per currency), growth, activity, audit score and royalty
+ *   status. Franchise owners see their own locations against anonymised network quartiles.
+ */
+export const QUALITY_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'operations.audits', area: 'operations', name: 'Audits', description: 'Field visits and audits: checklist templates, scheduled audits with photos and scores, corrective actions and re-audits for the locations in scope.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { view: 'See audit reports for the locations in scope.', edit: 'Conduct audits assigned to you and complete corrective actions.', publish: 'Manage checklist templates, schedule audits and verify corrective actions.', export: 'Download audit results.' },
+    networkOnly: true, status: 'available', explicitGrant: true,
+  },
+  {
+    key: 'legal.compliance_documents', area: 'legal', name: 'Compliance documents', description: 'Certificates of insurance, licences, permits and health certificates per location or owner group, with expiry reminders.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { edit: 'Upload documents for the locations in scope.', publish: 'Set requirements and approve or reject uploads.', export: 'Download the compliance matrix.' },
+    networkOnly: true, status: 'available', sensitive: 'legal',
+  },
+  {
+    key: 'network.league_table', area: 'network', name: 'League table', description: 'Locations in scope ranked by revenue, growth, bookings or orders, audit score and royalty status. Franchise owners see their own locations against anonymised network quartiles.',
+    actions: ['view', 'publish', 'export'], actionNotes: { publish: 'Decide whether franchise owners see network quartiles.' }, networkOnly: true, status: 'available',
+  },
+];
 
 /** Modules every business account has, whatever its industry. */
 export const CORE_MODULES: readonly ModuleDef[] = [
@@ -120,6 +155,12 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'marketing.ads', area: 'marketing', name: 'Ads', description: 'Paid ad campaigns and budgets.', actions: ALL, status: 'available' },
   { key: 'marketing.network_campaigns', area: 'marketing', name: 'Network campaigns', description: 'Campaigns HQ runs for all locations, including coming-soon locations.', actions: ALL, status: 'available', hqOnly: true },
   { key: 'marketing.brand_assets', area: 'marketing', name: 'Brand assets', description: 'Logos, photos, files and brand guidelines used by websites and emails.', actions: VEP, actionNotes: { edit: 'Upload and organise assets.' }, status: 'available' },
+  // Marketing → Reviews (review requests, Google review monitoring and replies, rating dashboard).
+  {
+    key: 'marketing.reviews', area: 'marketing', name: 'Reviews',
+    description: 'Review requests after visits and orders, private feedback, Google reviews with replies, and ratings per location.',
+    actions: VEP, actionNotes: { edit: 'Reply to reviews (with AI suggestions) and send review requests.', publish: 'Configure review requests, review links, Google connections and reply approval.' }, status: 'available',
+  },
   // Finance
   { key: 'finance.payments', area: 'finance', name: 'Payments', description: 'Transactions, refunds, reconciliation and payment accounts (financial data).', actions: VEX, actionNotes: { edit: 'Issue refunds and fix reconciliation items.' }, status: 'available', sensitive: 'finance' },
   { key: 'finance.royalties', area: 'finance', name: 'Royalties', description: 'Royalty terms, period close, statements, disputes, approval, invoicing and collection across the network.', actions: ALL, actionNotes: { edit: 'Set terms, close periods, adjust statements, resolve disputes and run collection.', publish: 'Approve statements and issue invoices.' }, status: 'available', hqOnly: true, sensitive: 'finance' },
@@ -144,6 +185,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'settings.billing', area: 'settings', name: 'Billing', description: 'Your BranchHarbor plan and invoices.', actions: VE, status: 'available', hqOnly: true, sensitive: 'finance' },
   { key: 'settings.audit', area: 'settings', name: 'Audit log', description: 'Who changed what, and when.', actions: V, status: 'available' },
   { key: 'settings.ai', area: 'settings', name: 'AI assistant', description: 'Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes.', actions: V, status: 'available' },
+  // Field audits, compliance documents and the league table (see QUALITY_MODULES).
+  ...QUALITY_MODULES,
 ];
 
 const ops = (key: string, name: string, description: string, screens: readonly string[], status: ModuleDef['status'] = 'available'): ModuleDef => ({
@@ -232,7 +275,7 @@ export function expandGrants(spec: GrantSpec, industry: Industry | string): Set<
   const mods = modulesFor(industry);
   const out = new Set<Capability>();
   for (const [key, actions] of Object.entries(spec)) {
-    const targets = key === '*' ? mods : key.endsWith('.*') ? mods.filter((m) => m.area === key.slice(0, -2)) : mods.filter((m) => m.key === key);
+    const targets = key === '*' ? mods : key.endsWith('.*') ? mods.filter((m) => m.area === key.slice(0, -2) && !m.explicitGrant) : mods.filter((m) => m.key === key);
     for (const m of targets) {
       const acts = key === '*' ? m.actions : actions.filter((a) => m.actions.includes(a));
       for (const a of acts) out.add(capability(m.key, a));
@@ -328,11 +371,14 @@ export const PERMISSION_CAPABILITIES: Record<Permission, readonly string[]> = {
   'assets.manage': ['marketing.brand_assets:edit'],
 };
 
+/** Modules only granted by name: never matched by `area.*` wildcards. */
+const EXPLICIT_GRANT_MODULES = new Set(CORE_MODULES.filter((m) => m.explicitGrant).map((m) => m.key));
+
 function holds(caps: ReadonlySet<string>, pattern: string): boolean {
   if (!pattern.includes('*')) return caps.has(pattern);
   const [mod, action] = pattern.split(':') as [string, string];
   const prefix = mod.slice(0, -1); // "operations."
-  for (const c of caps) if (c.startsWith(prefix) && c.endsWith(`:${action}`)) return true;
+  for (const c of caps) if (c.startsWith(prefix) && c.endsWith(`:${action}`) && !EXPLICIT_GRANT_MODULES.has(c.slice(0, -action.length - 1))) return true;
   return false;
 }
 
@@ -403,14 +449,17 @@ const each = (keys: readonly string[], actions: readonly AccessAction[]): GrantS
 /** Franchise owners: the full dashboard for their own locations (also the base of area developers and multi-unit operators). */
 const ownerGrants: GrantSpec = {
   'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
-  'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP,
+  'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP, 'marketing.reviews': VEP,
   'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX, 'finance.invoices': VEX, 'finance.marketing_fund': V,
   'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
+  // Field audits, compliance documents and the league table (own locations; network quartiles, never other franchisees).
+  [AUDITS_MODULE]: VEX, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'],
 };
 
 /** Support roles: see and support locations, coach, run audits. Never finance, legal or customers' personal data. */
 const supportGrants: GrantSpec = {
-  'network.locations': V, 'network.onboarding': V, 'network.approvals': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: VE,
+  // Audits are granted by name (`operations.*` never includes them).
+  'network.locations': V, 'network.onboarding': V, 'network.approvals': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: VE, 'network.league_table': V,
   ...everyone, 'community.help_desk': VE, 'training.assignments': VE, 'settings.ai': V,
 };
 
@@ -426,6 +475,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {
       'network.locations': VE, 'network.franchisees': VE, 'network.onboarding': VE, 'network.templates': VEP, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'],
       'marketing.*': ALL, 'operations.*': V, 'settings.team': VE, 'settings.connections': VE, 'settings.audit': V, 'settings.ai': V, 'training.*': ALL, 'community.*': ALL,
+      // Field audits, compliance documents and the league table.
+      'operations.audits': ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'publish', 'export'],
     },
   },
   // ── Franchise development ──
@@ -478,22 +529,24 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'marketing', defaultScope: 'organization',
     grants: {
       'marketing.website_builder': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.network_campaigns': ALL, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.inbox': VE,
-      'marketing.forms': VEP, 'marketing.brand_assets': V,
+      'marketing.forms': VEP, 'marketing.brand_assets': V, 'marketing.reviews': VEP,
       'marketing.campaigns': VEP, 'network.locations': V, 'network.reports': V, ...everyone, 'settings.ai': V,
     },
   },
   content_social: {
     key: 'content_social', name: 'Content & social', team: 'marketing', description: 'Drafts posts, emails, website pages and campaigns; publishing needs someone with publish rights.',
     primaryWorkspace: 'marketing', defaultScope: 'organization',
-    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, 'marketing.forms': VE, 'marketing.brand_assets': VE, ...everyone, 'settings.ai': V },
+    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, 'marketing.forms': VE, 'marketing.brand_assets': VE, 'marketing.reviews': VE, ...everyone, 'settings.ai': V },
   },
   // ── Operations ──
   operations_lead: {
     key: 'operations_lead', name: 'Operations lead', team: 'operations', description: 'Day-to-day operations across the network: locations, approvals, new locations, audits, support and the help desk. No finance.',
     primaryWorkspace: 'operations', defaultScope: 'organization',
     grants: {
-      'operations.*': VE, [AUDITS_MODULE]: VE, 'network.locations': VE, 'network.onboarding': VE, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'sales.customers': V,
+      'operations.*': VE, 'network.locations': VE, 'network.onboarding': VE, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'sales.customers': V,
       ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'community.help_desk': VE, 'community.library': VE, 'training.assignments': VE, 'settings.connections': VE, 'settings.ai': V,
+      // Field audits, compliance documents and the league table.
+      [AUDITS_MODULE]: ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'export'],
     },
   },
   field_consultant: {
@@ -537,7 +590,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {
       'network.locations': VE, 'network.onboarding': VE, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'network.franchisees': VE, 'sales.franchise_pipeline': ALL,
       'sales.customers': V, 'sales.customer_pipeline': V, 'marketing.campaigns': VEP, 'marketing.website_builder': VEP, 'marketing.email': VEP, 'marketing.social': VEP, 'marketing.brand_assets': V,
-      'operations.*': V, [AUDITS_MODULE]: VE, 'finance.payments': ['view', 'export'], 'finance.invoices': VEX, 'finance.marketing_fund': V,
+      'operations.*': V, [AUDITS_MODULE]: VEP, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'], 'marketing.reviews': VEP, 'finance.payments': ['view', 'export'], 'finance.invoices': VEX, 'finance.marketing_fund': V,
       ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'community.library': VE, 'community.help_desk': VE, 'training.academy': VE, 'training.assignments': VE,
       'settings.team': VE, 'settings.ai': V,
     },
@@ -568,8 +621,10 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'location',
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE, 'marketing.inbox': VE, 'marketing.social': VE,
-      'marketing.email': VE, 'marketing.forms': VE, 'marketing.brand_assets': VE,
+      'marketing.email': VE, 'marketing.forms': VE, 'marketing.brand_assets': VE, 'marketing.reviews': VE,
       'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
+      // Field audits, compliance documents and the league table.
+      'operations.audits': VE, 'legal.compliance_documents': VE, 'network.league_table': V,
     },
   },
   staff: {
@@ -581,7 +636,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   auditor: {
     key: 'auditor', name: 'Auditor', team: 'other', description: 'Read-only view of locations and operations, and runs audits. No finance, legal files or customer data.',
     primaryWorkspace: 'network', defaultScope: 'organization', support: true,
-    grants: { 'network.locations': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: VE, 'settings.audit': V, ...everyone },
+    grants: { 'network.locations': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: ['view', 'edit', 'export'], 'network.league_table': V, 'settings.audit': V, ...everyone },
   },
   customer: {
     key: 'customer', name: 'Customer', team: 'other', description: 'Their own bookings, orders and preferences in the customer app.', primaryWorkspace: 'operations', defaultScope: 'location', hidden: true,

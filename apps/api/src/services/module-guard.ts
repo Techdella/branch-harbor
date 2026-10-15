@@ -42,11 +42,12 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   tags: ['sales.customers', 'marketing.*'],
   inbox: ['marketing.inbox'],
   social: ['marketing.social'],
+  reviews: ['marketing.reviews'],
   'ad-campaigns': ['marketing.ads', 'marketing.network_campaigns', 'finance.royalties'],
   // Franchise development (Sales), new locations (Network) and Legal. Franchise owners reach their own onboarding
   // projects and agreement through New locations; each route checks the module it needs.
-  franchise: ['sales.franchise_pipeline', 'legal.*', 'network.onboarding'],
-  legal: ['legal.*', 'network.onboarding'],
+  franchise: ['sales.franchise_pipeline', 'legal.agreements', 'legal.disclosure', 'network.onboarding'],
+  legal: ['legal.agreements', 'legal.disclosure', 'network.onboarding'],
   // Community (announcements, discussions, events, coaching), resource library, Training academy (+ course leads), help desk.
   community: ['community.*'],
   resources: ['community.library'],
@@ -59,6 +60,10 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   finance: ['finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts', 'finance.payments'],
   // Network
   reports: ['network.reports'],
+  // Field audits (Operations), compliance documents (Legal & compliance) and the league table (Network).
+  audits: ['operations.audits'],
+  compliance: ['legal.compliance_documents'],
+  'league-table': ['network.league_table'],
   // The inbox holds refunds (finance), local ad spend (marketing), shift swaps and website changes; each decision is
   // checked per kind.
   approvals: ['network.approvals', 'finance.payments', 'marketing.campaigns'],

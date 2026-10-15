@@ -298,8 +298,15 @@ export const financePaymentMethods = pgTable('finance_payment_methods', {
   mandateAcceptedAt: ts('mandate_accepted_at').notNull(),
   mandateAcceptedBy: uuid('mandate_accepted_by').notNull(),
   mandateIp: text('mandate_ip'),
-  /** pending | active | failed | revoked */
+  /** pending | verifying (ACH micro-deposits) | active | failed | revoked (also when Stripe reports the mandate inactive) */
   status: text('status').notNull().default('pending'),
+  /** Stripe Mandate id for bank debits (`mandate.updated` → inactive revokes the method). */
+  mandateId: text('mandate_id'),
+  /** ACH micro-deposit verification page (Stripe-hosted) while the method is `verifying`. */
+  verificationUrl: text('verification_url'),
+  /** Language the mandate text was shown in. */
+  mandateLocale: text('mandate_locale'),
+  failureReason: text('failure_reason'),
   sandbox: boolean('sandbox').notNull().default(false),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -320,6 +327,15 @@ export const financeCollectionAttempts = pgTable('finance_collection_attempts', 
   currency: currencyCol().notNull(),
   /** processing | succeeded | failed | requires_action */
   status: text('status').notNull(),
+  /** Method used (card or the bank-debit scheme) and the BranchHarbor collection fee taken on this attempt. */
+  methodType: text('method_type'),
+  platformFeeMinor: minor('platform_fee_minor').notNull().default(0),
+  /** Location month (YYYY-MM) the fee counts against (cap per location per month). */
+  feeMonth: text('fee_month'),
+  /** When Stripe reported the final outcome (bank debits settle days after the attempt). */
+  settledAt: ts('settled_at'),
+  /** When the franchisee was told this debit failed (dunning run; once per attempt). */
+  failureNotifiedAt: ts('failure_notified_at'),
   failureCode: text('failure_code'),
   failureMessage: text('failure_message'),
   reference: text('reference'),
@@ -408,3 +424,66 @@ export const financeBalanceTransactions = pgTable('finance_balance_transactions'
   netMinor: minor('net_minor').notNull(),
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('finance_balance_txn_uq').on(t.payoutId, t.externalId), index('finance_balance_txn_payment_idx').on(t.paymentId)]);
+
+export interface FranchiseeStatementLine {
+  locationId: string;
+  locationName: string;
+  /** Where gross sales came from: BranchHarbor payments, an external POS report, or both. */
+  salesSource: 'branchharbor' | 'external_pos' | 'mixed' | 'none';
+  grossSalesMinor: number;
+  basisMinor: number;
+  royaltyRateBps: number | null;
+  royaltyMinor: number;
+  marketingFundRateBps: number | null;
+  marketingFundMinor: number;
+  technologyFeeMinor: number;
+  adjustmentsMinor: number;
+  taxMinor: number;
+  lateFeeMinor: number;
+  totalMinor: number;
+  invoiceId: string | null;
+  invoiceNumber: string | null;
+  invoiceStatus: string | null;
+  dueDate: string | null;
+  /** Collection: method, last attempt status and date, and the BranchHarbor collection fee (paid by HQ). */
+  collectionMethod: string | null;
+  collectionStatus: string | null;
+  collectionDate: string | null;
+  collectedMinor: number;
+  collectionFeeMinor: number;
+}
+
+/**
+ * Monthly royalty statement per franchisee (owner group) and currency: one document that rolls up the period's
+ * location statements and invoices, with collection details. Issued (and emailed) once per period; re-issuing
+ * refreshes the figures and keeps the same row.
+ */
+export const franchiseeStatements = pgTable('franchisee_statements', {
+  id: pk(),
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  periodId: uuid('period_id').notNull().references(() => royaltyPeriods.id, { onDelete: 'cascade' }),
+  ownerGroupId: uuid('owner_group_id').notNull().references(() => ownerGroups.id, { onDelete: 'cascade' }),
+  currency: currencyCol().notNull(),
+  number: text('number').notNull(),
+  lines: jsonb('lines').$type<FranchiseeStatementLine[]>().notNull().default([]),
+  grossSalesMinor: minor('gross_sales_minor').notNull().default(0),
+  royaltyMinor: minor('royalty_minor').notNull().default(0),
+  marketingFundMinor: minor('marketing_fund_minor').notNull().default(0),
+  adjustmentsMinor: minor('adjustments_minor').notNull().default(0),
+  feesMinor: minor('fees_minor').notNull().default(0),
+  taxMinor: minor('tax_minor').notNull().default(0),
+  totalMinor: minor('total_minor').notNull().default(0),
+  collectedMinor: minor('collected_minor').notNull().default(0),
+  collectionFeeMinor: minor('collection_fee_minor').notNull().default(0),
+  /** The franchisee's active method when issued (display only). */
+  paymentMethod: jsonb('payment_method').$type<{ methodType: string; last4?: string | null; bankName?: string | null } | null>(),
+  issuedAt: ts('issued_at').notNull().defaultNow(),
+  issuedBy: uuid('issued_by'),
+  emailedAt: ts('emailed_at'),
+  emailedTo: jsonb('emailed_to').$type<string[]>().notNull().default([]),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (t) => [
+  uniqueIndex('franchisee_statements_uq').on(t.periodId, t.ownerGroupId, t.currency),
+  index('franchisee_statements_group_idx').on(t.organizationId, t.ownerGroupId),
+]);

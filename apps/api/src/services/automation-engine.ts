@@ -167,6 +167,20 @@ async function executeAction(s: Services, run: RunRow, node: AutomationNode & { 
       await notify(s, { userIds, organizationId: run.organizationId, category: 'approval_request', title: org!.name, body: personalise(cfg.message, values), data: { automationId: run.automationId, runId: run.id } });
       return { status: 'done', result: { notified: userIds.length } };
     }
+    case 'send_review_request': {
+      // Reviews: the location's review-request settings apply (frequency cap, opt-outs, consent, quiet hours).
+      if (!run.locationId) return { status: 'skipped', result: { reason: 'no_location' } };
+      if (run.test) return { status: 'skipped', result: { reason: 'test_run' } };
+      if (!contact.customer) return { status: 'skipped', result: { reason: 'no_contact' } };
+      const { queueReviewRequest, deliverRequest } = await import('./reviews.ts');
+      const req = await queueReviewRequest(s, {
+        organizationId: run.organizationId, locationId: run.locationId, customerId: contact.customer.id, source: 'automation', triggerKey: `automation:${run.id}:${node.id}`, sendAt: new Date(),
+        channel: cfg.channel === 'default' ? null : cfg.channel, automationRunId: run.id,
+      });
+      if (!req) return { status: 'skipped', result: { reason: 'already_sent' } };
+      const o = await deliverRequest(s, req.id);
+      return { status: o.status === 'skipped' ? 'skipped' : o.status === 'failed' ? 'failed' : 'done', result: { requestId: req.id, outcome: o.status, reason: o.reason ?? null } };
+    }
     case 'webhook': {
       const body = JSON.stringify({ type: 'automation.step', automationId: run.automationId, runId: run.id, test: run.test, event: run.context.eventType ?? null, contact: contact.customer ? { id: contact.customer.id, name: contact.customer.name, email: contact.customer.email } : null, sentAt: new Date().toISOString() });
       try {

@@ -1,0 +1,209 @@
+{
+  "billing": {
+    "title": "Plano e cobrança",
+    "description": "Seu plano BranchHarbor, o teste, as faturas e quem paga cada unidade. Separado dos pagamentos de clientes.",
+    "separate": "Separado dos pagamentos de clientes",
+    "status": {
+      "checkout_required": "Não iniciado",
+      "trialing": "Teste",
+      "active": "Ativo",
+      "past_due": "Pagamento pendente",
+      "canceled": "Encerrado"
+    },
+    "plans": {
+      "solo": "Solo",
+      "connector": "Conector",
+      "hosted": "Hospedado",
+      "network": "Rede"
+    },
+    "planFor": {
+      "solo": "Uma unidade, preço mensal fixo",
+      "connector": "Mantenha seu site WordPress · por unidade",
+      "hosted": "Site hospedado pela BranchHarbor · por unidade",
+      "network": "Taxa de plataforma da matriz + por unidade · usuários ilimitados"
+    },
+    "interval": {
+      "month": "Mensal",
+      "year": "Anual · 2 meses inclusos"
+    },
+    "per": {
+      "month": "/ mês",
+      "year": "/ ano"
+    },
+    "common": {
+      "cancel": "Cancelar"
+    },
+    "link": {
+      "trial": "Teste até {date}. Gerencie seu plano, suas faturas e quem paga cada unidade.",
+      "start": "Comece seu teste de {days} dias por {fee}.",
+      "manage": "Gerencie seu plano, suas faturas e quem paga cada unidade."
+    },
+    "checkout": {
+      "title": "Comece seu teste de {days} dias",
+      "restartTitle": "Reative seu plano",
+      "intro": "Não há plano gratuito nem teste grátis. Pague {fee} hoje, use tudo por {days} dias e depois seu plano começa automaticamente, a menos que você cancele.",
+      "plan": "Plano",
+      "interval": "Cobrança",
+      "country": "País de cobrança",
+      "countryHint": "Seu preço, moeda e impostos seguem o país de cobrança. O cartão deve ser emitido nele, ou informe um identificador fiscal da empresa desse país.",
+      "locations": "Unidades",
+      "today": "A pagar hoje",
+      "todayTrial": "Taxa única pelo teste de {days} dias.",
+      "noTrial": "Um teste já foi usado para esta empresa, cartão ou domínio de e-mail, então seu plano começa hoje.",
+      "from": "A partir de {date}",
+      "then": "Depois",
+      "taxExclusive": "Preços sem impostos. IVA ou GST é adicionado conforme o país de cobrança.",
+      "taxUs": "Preços sem sales tax, adicionada quando aplicável.",
+      "terms": {
+        "autoStart": "Seu plano {plan} começa automaticamente em {date}, a menos que você cancele antes.",
+        "reminders": "Enviamos e-mails 3 dias e 1 dia antes do fim do teste.",
+        "cancel": "Cancele quando quiser em Configurações → Cobrança. Sem multa.",
+        "export": "Exporte todos os seus dados de graça, a qualquer momento.",
+        "lock": "Seu preço fica vinculado ao país de cobrança e é confirmado pelo seu cartão."
+      },
+      "taxId": "Identificador fiscal da empresa",
+      "taxIdHint": "Só é necessário se o cartão for emitido em outro país, por exemplo CNPJ ou número de IVA.",
+      "agree": "Concordo em pagar {fee} hoje por um teste de {days} dias. Em {date}, meu plano {plan} começa a {amount} mais impostos, a menos que eu cancele antes.",
+      "agreeNoTrial": "Concordo em pagar {amount} mais impostos a partir de hoje, até eu cancelar.",
+      "agreeRequired": "Marque a caixa para aceitar as condições do teste.",
+      "continue": "Continuar para o cartão",
+      "payTrial": "Pagar {fee} e começar o teste",
+      "payPlan": "Pagar {amount} e começar o plano",
+      "linePlatform": "Taxa de plataforma (inclui {count} unidades)",
+      "linePlan": "Solo, uma unidade",
+      "lineLocations": "{count, plural, one {# unidade} other {# unidades}} × {price}"
+    },
+    "card": {
+      "title": "Cartão",
+      "sandbox": "Modo de teste",
+      "sandboxNote": "Sem cobrança real: a API funciona sem chaves do Stripe. Escolha o país de emissão do cartão simulado.",
+      "issuedIn": "Cartão emitido em",
+      "unavailable": "A inclusão de cartões está indisponível no momento. Tente novamente mais tarde.",
+      "failed": "Não foi possível confirmar o cartão. Tente outro cartão."
+    },
+    "current": {
+      "title": "Seu plano",
+      "canceling": "Cancelado",
+      "platformFee": "Taxa de plataforma {amount}, inclui {count} unidades",
+      "taxNote": "Sem impostos",
+      "daysLeft": "{count, plural, one {Falta # dia} other {Faltam # dias}}",
+      "trialCanceled": "Seu teste termina em {date}. Nada mais será cobrado.",
+      "startsOn": "Seu plano {plan} começa em {date} a {amount}.",
+      "endsOn": "Seu plano termina em {date}. Nada mais será cobrado.",
+      "nextCharge": "Próxima cobrança em {date}: {amount}.",
+      "pastDue": "Não conseguimos cobrar o último pagamento. Atualize seu cartão para manter seu plano.",
+      "country": "País de cobrança",
+      "evidence": {
+        "card": "confirmado pelo cartão",
+        "tax_id": "confirmado pelo identificador fiscal"
+      },
+      "card": "Cartão",
+      "cardValue": "{brand} •••• {last4}, emitido em {country}",
+      "resume": "Não cancelar",
+      "cancelTitle": "Cancelar seu plano?",
+      "cancelTrialBody": "Seu teste termina em {date} e nada mais é cobrado. Sem multa.",
+      "cancelPlanBody": "Seu plano continua ativo até {date}. Sem multa.",
+      "confirmCancel": "Sim, cancelar",
+      "keep": "Manter meu plano",
+      "cancelTrial": "Cancelar o teste",
+      "cancelPlan": "Cancelar o plano"
+    },
+    "country": {
+      "title": "País de cobrança",
+      "body": "Sua empresa vai mudar de país? O novo país de cobrança exige um cartão emitido nele (ou um identificador fiscal da empresa desse país) e vale a partir do próximo período de cobrança.",
+      "pending": "Mudança para {country} ({currency}) em {date}.",
+      "keepCurrent": "Manter o país atual",
+      "change": "Mudar o país de cobrança",
+      "newCountry": "Novo país de cobrança",
+      "continue": "Continuar",
+      "newPrice": "Novo preço: {amount}",
+      "confirm": "Confirmar a mudança"
+    },
+    "payers": {
+      "title": "Quem paga cada unidade",
+      "intro": "Sua taxa de plataforma cobre suas primeiras {count} unidades. Para cada unidade adicional, escolha quem paga a taxa mensal de {price}: a matriz, o franqueado ou uma divisão.",
+      "included": "Incluída na taxa de plataforma",
+      "hqPays": "A matriz paga {amount}",
+      "franchiseePays": "O franqueado paga {amount} ({pct}%)",
+      "fromGroup": "conforme o grupo de franqueados",
+      "payerFor": "Quem paga {name}",
+      "ownerGroups": "Grupos de franqueados",
+      "ownerGroupHint": "Vale para as unidades do grupo, a menos que uma unidade tenha configuração própria.",
+      "totals": "A matriz paga {hq} · os franqueados pagam {franchisee} por mês no total",
+      "inherit": "Padrão",
+      "hq": "Matriz",
+      "franchisee": "Franqueado",
+      "split": "Divisão",
+      "share": "Parte do franqueado (%)",
+      "save": "Salvar"
+    },
+    "invoices": {
+      "title": "Faturas",
+      "empty": "Nenhuma fatura ainda.",
+      "kinds": {
+        "trial_fee": "Teste de 14 dias",
+        "subscription": "Plano",
+        "franchisee_fee": "Taxas das unidades"
+      },
+      "statuses": {
+        "paid": "Paga",
+        "open": "Em aberto",
+        "void": "Anulada",
+        "uncollectible": "Não paga"
+      },
+      "view": "Ver"
+    },
+    "fees": {
+      "title": "Outras taxas",
+      "collection": "Cobrança de royalties e fundo de marketing: {fee} por cobrança, limitado a {cap} por unidade por mês. Nunca uma porcentagem dos royalties.",
+      "payments": "Pagamentos on-line de clientes: taxa de aplicação de {percent} mais a taxa do provedor de pagamento.",
+      "terms": "Contrato mensal, cobrança anual com 2 meses inclusos, sem multa de cancelamento, exportação de dados grátis."
+    },
+    "banner": {
+      "trial": "Teste: {count, plural, one {falta # dia} other {faltam # dias}}. Seu plano {plan} começa em {date}.",
+      "trialCanceled": "Seu teste termina em {date}. Nada mais será cobrado.",
+      "required": "Comece seu teste de {days} dias por {fee} para fazer alterações e entrar no ar.",
+      "canceled": "Seu plano terminou. Reative-o para fazer alterações; você ainda pode exportar seus dados.",
+      "pastDue": "Não conseguimos cobrar o último pagamento do seu plano.",
+      "start": "Começar o teste",
+      "manage": "Gerenciar cobrança"
+    },
+    "export": {
+      "title": "Exportar seus dados",
+      "body": "Baixe um ZIP com arquivos CSV dos dados principais da sua empresa: unidades, pessoas, clientes, reservas, pedidos, faturas, leads e mais. Grátis, a qualquer momento. Também enviamos o link por e-mail; ele vale por 7 dias.",
+      "requested": "Estamos preparando sua exportação. Enviaremos um e-mail quando estiver pronta.",
+      "request": "Exportar seus dados",
+      "files": "{count, plural, one {# arquivo} other {# arquivos}}",
+      "expires": "disponível até {date}",
+      "status": {
+        "queued": "Preparando",
+        "running": "Preparando",
+        "ready": "Pronta",
+        "failed": "Falhou",
+        "expired": "Expirada"
+      },
+      "download": "Baixar"
+    },
+    "franchisee": {
+      "title": "Taxas das unidades",
+      "description": "As taxas da BranchHarbor que a matriz repassa a você pelas suas unidades.",
+      "locations": "Suas unidades",
+      "intro": "A matriz repassa toda ou parte da taxa destas unidades. Você paga pela sua própria conta de cobrança, na moeda do seu país de cobrança.",
+      "none": "A matriz paga as taxas das suas unidades. Você não tem nada a pagar.",
+      "included": "Incluída na taxa de plataforma da matriz",
+      "hqPays": "Paga pela matriz",
+      "share": "sua parte {pct}%",
+      "perMonth": "/ mês",
+      "ownerGroupAccount": "Conta de cobrança",
+      "locationAccount": "Conta de cobrança desta unidade",
+      "active": "Ativa",
+      "needsCard": "Cartão necessário",
+      "cardOnFile": "{brand} •••• {last4} · cobrado em {currency}",
+      "setup": "Configurar a cobrança",
+      "saveCard": "Salvar cartão"
+    }
+  },
+  "shell": {
+    "locationFees": "Taxas das unidades"
+  }
+}

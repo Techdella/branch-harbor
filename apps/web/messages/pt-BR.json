@@ -1866,7 +1866,10 @@
     "metaTitle": "Preços",
     "kicker": "Preços",
     "headline": "Preço simples por unidade.",
-    "intro": "Escolha como você mantém seu site e pague por cada unidade que autorizar. Os preços aparecem na sua moeda local.",
+    "intro": "Escolha como você gerencia seu site e pague por unidade. Redes adicionam uma taxa de plataforma para a matriz. Os preços aparecem na sua moeda local.",
+    "trialLine": "Experimente por {days} dias por {price}.",
+    "trialLineSub": "Depois, seu plano começa automaticamente, a menos que você cancele. Sem plano gratuito, sem multa de cancelamento.",
+    "trialHow": "Como funciona o teste",
     "billingLabel": "Cobrança",
     "monthly": "Mensal",
     "annual": "Anual · 2 meses incluídos",
@@ -1877,7 +1880,8 @@
     "total": "{amount} / mês para {count, plural, one {# unidade} other {# unidades}}",
     "totalAnnual": "{amount} / mês para {count, plural, one {# unidade} other {# unidades}}, com cobrança anual",
     "listPriceNote": "Os preços de tabela são definidos para cada mercado e ajustados ao poder de compra local. Não são conversões pelo câmbio do dia.",
-    "taxNote": "Dependendo do país, podem incidir impostos como VAT, GST ou sales tax; eles aparecem antes do pagamento.",
+    "taxNote": "Preços sem impostos. IVA ou GST é adicionado no pagamento conforme o seu país de cobrança.",
+    "taxNoteUs": "Preços sem sales tax, adicionada no pagamento quando aplicável.",
     "proposedNote": "Revisamos os preços periodicamente. Assinaturas existentes são avisadas com antecedência sobre qualquer mudança.",
     "plans": {
       "solo": {
@@ -1919,19 +1923,30 @@
       "network": {
         "name": "Rede",
         "for": "Franquias e grupos",
-        "tag": "Sob proposta",
+        "tag": "Usuários ilimitados",
         "features": [
-          "Regionais e grupos de franqueados",
+          "Expansão de franquias, Jurídico, Financeiro, Treinamento e Comunidade",
+          "Regiões e grupos de franqueados",
           "Modelos bloqueados / editáveis / com aprovação",
-          "Publicação em grupo com reversão",
-          "Implantação assistida"
+          "Publicação em grupo com reversão"
         ],
-        "cta": "Solicitar proposta"
+        "cta": "Começar meu plano"
       }
     },
-    "ctaNote": "O cadastro é self-service para todos os segmentos. Os planos Rede começam com uma proposta para planejarmos a implantação com você.",
+    "platformFee": "/ mês · taxa de plataforma da matriz",
+    "networkIncludes": "Inclui {count} unidades. Depois, {price} / unidade / mês.",
+    "quoteLink": "Prefere um orçamento e implantação acompanhada? Fale conosco",
+    "ctaNote": "O cadastro é self-service para todos os segmentos e planos, começando pelo teste pago.",
     "faqTitle": "Perguntas sobre preços",
     "faqs": [
+      {
+        "q": "Como funciona o teste pago?",
+        "a": "Você paga uma pequena taxa de teste (mostrada acima na sua moeda) por 14 dias do plano escolhido. No 15º dia o plano começa automaticamente, a menos que você cancele antes, e enviamos e-mails 3 dias e 1 dia antes. Não há plano gratuito nem teste grátis; a demonstração é livre para explorar. Um teste por empresa."
+      },
+      {
+        "q": "Posso cancelar a qualquer momento?",
+        "a": "Sim, em Configurações → Cobrança, sem multa. Se cancelar durante o teste, nada mais é cobrado. Em um plano pago, ele segue até o fim do período já pago."
+      },
       {
         "q": "Por que os preços variam entre países?",
         "a": "Cada mercado tem seu próprio preço de tabela, ajustado ao poder de compra local. Não convertemos pelo câmbio do dia. Você paga o preço do seu país de faturamento, na moeda dele, mais os impostos aplicáveis."
@@ -1941,12 +1956,16 @@
         "a": "Não. Dependendo do país e dos dados da empresa, podem incidir VAT, GST, sales tax ou tributos similares. Os impostos aplicáveis aparecem antes da confirmação."
       },
       {
+        "q": "Por que meu cartão precisa corresponder ao meu país de cobrança?",
+        "a": "Os preços são definidos por país. No pagamento, você informa seu país de cobrança; recalculamos o preço e o fixamos. O cartão deve ser emitido nesse país, ou você pode informar um identificador fiscal da empresa desse país, como CNPJ ou número de IVA. Mudar o país de cobrança depois exige um cartão correspondente e vale a partir do próximo período."
+      },
+      {
         "q": "Unidades diferentes podem pagar em moedas diferentes?",
-        "a": "Redes podem ser cobradas por unidade ou de forma centralizada. Cada fatura usa uma única moeda; nunca somamos valores em moedas diferentes."
+        "a": "Sim, quando a matriz repassa as taxas das unidades aos franqueados: cada franqueado paga na moeda do seu próprio país de cobrança. Cada fatura usa uma única moeda; nunca somamos valores em moedas diferentes."
       },
       {
         "q": "As taxas de processamento de pagamento estão incluídas?",
-        "a": "Não. Os pagamentos passam por um provedor conectado, como a Stripe, que cobra as próprias taxas no seu país."
+        "a": "Não. Os pagamentos on-line de clientes têm a nossa taxa de aplicação (mostrada acima) mais a taxa de processamento do provedor de pagamento, que varia por país."
       },
       {
         "q": "O que acontece se eu abrir uma segunda unidade?",
@@ -1955,6 +1974,10 @@
       {
         "q": "Posso pagar em outra moeda?",
         "a": "Não. A moeda acompanha seu país de faturamento, e o pagamento a confirma com seu endereço de cobrança e seu cartão. Se sua empresa é faturada a partir de outro país, vale o preço desse país."
+      },
+      {
+        "q": "Posso levar meus dados?",
+        "a": "Sim. O proprietário pode exportar os dados da empresa de graça a qualquer momento em Configurações → Exportar seus dados. Enviamos por e-mail um link para um ZIP com arquivos CSV: unidades, pessoas, clientes, reservas, pedidos, faturas, leads e mais. O link vale por 7 dias."
       }
     ],
     "perMonthOneLocation": "/ mês · uma unidade",
@@ -1963,7 +1986,62 @@
     "geoNote": "Preços em {currency} para {country}. A cobrança é feita na moeda do seu país de faturamento.",
     "geoNoteUnknown": "Preços em {currency}. A cobrança é feita na moeda do seu país de faturamento.",
     "demoTitle": "Ainda não quer se cadastrar?",
-    "demoBody": "Explore uma empresa de exemplo na demo ou agende uma conversa para revisarmos suas unidades com você."
+    "demoBody": "Explore uma empresa de exemplo na demo ou agende uma conversa para revisarmos suas unidades com você.",
+    "trialTitle": "Como funciona o teste de {days} dias",
+    "trialIntro": "Não há plano gratuito nem teste grátis: a demonstração é livre para explorar. Quando quiser, uma pequena taxa de teste dá acesso ao produto real com seus próprios dados.",
+    "trialSteps": {
+      "pay": {
+        "title": "Pague {price} hoje",
+        "body": "Escolha seu plano e adicione um cartão emitido no seu país de cobrança. A taxa de teste é cobrada uma única vez."
+      },
+      "use": {
+        "title": "Use por {days} dias",
+        "body": "Tudo o que o plano escolhido inclui, com seus próprios dados e usuários ilimitados."
+      },
+      "remind": {
+        "title": "Dois lembretes",
+        "body": "Enviamos um e-mail 3 dias e 1 dia antes do fim do teste, com o preço do seu plano."
+      },
+      "start": {
+        "title": "Seu plano começa no dia {day}",
+        "body": "A menos que você cancele antes em Configurações → Cobrança. Cancelar é grátis."
+      }
+    },
+    "whoPays": {
+      "title": "Quem paga cada unidade?",
+      "intro": "No plano Rede, a matriz paga uma taxa de plataforma de {platform} por mês. Ela inclui {count} unidades e os espaços de Expansão de franquias, Jurídico, Financeiro, Treinamento e Comunidade. Cada unidade adicional custa {price} por mês, e a matriz escolhe quem paga, por unidade ou por grupo de franqueados. Altere quando quiser em Configurações → Cobrança.",
+      "hq": {
+        "title": "A matriz",
+        "body": "A matriz paga a taxa da unidade na própria fatura."
+      },
+      "franchisee": {
+        "title": "O franqueado",
+        "body": "O franqueado paga pela própria conta de cobrança, na moeda do seu país de cobrança."
+      },
+      "split": {
+        "title": "Uma divisão",
+        "body": "Matriz e franqueado pagam cada um a parte que você escolher, por exemplo 60 / 40."
+      }
+    },
+    "fees": {
+      "title": "Outras taxas, com total transparência",
+      "collection": {
+        "title": "Cobrança de royalties e fundo de marketing",
+        "body": "{fee} por cobrança, limitado a {cap} por unidade por mês. Um valor fixo, nunca uma porcentagem dos seus royalties."
+      },
+      "payments": {
+        "title": "Pagamentos on-line de clientes",
+        "body": "Uma taxa de aplicação de {percent} sobre os pagamentos on-line dos seus clientes, mais a taxa de processamento do provedor de pagamento. As duas aparecem em cada repasse."
+      }
+    },
+    "terms": {
+      "title": "Condições justas",
+      "monthly": "Cobrança mensal por padrão. Cancele quando quiser.",
+      "annual": "A cobrança anual inclui 2 meses grátis.",
+      "noFee": "Sem multa de cancelamento e sem contratos longos.",
+      "export": "Exporte todos os seus dados de graça, a qualquer momento.",
+      "lock": "Seu preço fica vinculado ao seu país de cobrança e é confirmado pelo seu cartão."
+    }
   },
   "demo": {
     "metaTitle": "Solicitar uma demonstração",

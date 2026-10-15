@@ -573,13 +573,16 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     const [p] = proj.prospectId ? await s.db.select({ name: franchiseProspects.name }).from(franchiseProspects).where(eq(franchiseProspects.id, proj.prospectId)) : [];
     const gates = tasks.filter((t) => t.gate);
     const names = withTasks ? await userNames(s.db, tasks.map((t) => t.ownerUserId)) : new Map<string, string>();
+    const preOpening = await (await import('../services/audits.ts')).preOpeningState(s.db, proj);
     return {
       id: proj.id, name: proj.name, status: proj.status, prospectId: proj.prospectId, prospectName: p?.name ?? null, ownerGroupId: proj.ownerGroupId, ownerEmail: proj.ownerEmail, ownerInvitationId: proj.ownerInvitationId,
       location: loc ? { id: loc.id, name: loc.name, status: loc.status, publiclyVisible: loc.publiclyVisible, slug: loc.slug } : null,
       targetOpenDate: proj.targetOpenDate, startedAt: proj.startedAt.toISOString(), openedAt: iso(proj.openedAt), approvalId: proj.approvalId,
       progress: { done: tasks.filter((t) => t.status === 'done').length, total: tasks.length, overdue: tasks.filter((t) => t.status === 'open' && t.dueAt && t.dueAt < new Date()).length },
       gates: { done: gates.filter((g) => g.status === 'done').length, total: gates.length },
-      canRequestGoLive: proj.status === 'active' && !!proj.locationId && gates.every((g) => g.status === 'done'),
+      // Pre-opening checks can use an audit checklist (Operations → Audits): an audit with it must have passed.
+      preOpening,
+      canRequestGoLive: proj.status === 'active' && !!proj.locationId && gates.every((g) => g.status === 'done') && (!preOpening || preOpening.passed),
       ...(withTasks ? { tasks: tasks.map((t) => serializeTask(t, names.get(t.ownerUserId ?? ''))) } : {}),
     };
   };

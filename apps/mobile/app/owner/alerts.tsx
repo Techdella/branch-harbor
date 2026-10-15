@@ -2,6 +2,7 @@ import { Badge, Card, DataStatus, Screen, ScreenHeader, SkeletonCard, Text, type
 import { router } from 'expo-router';
 import { useI18n } from '@/i18n';
 import { NetworkEntry } from '@/features/network/NetworkEntry';
+import { QualityEntry } from '@/features/quality/QualityEntry';
 import { api } from '@/lib/api';
 import { relativeAgo } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
@@ -20,6 +21,7 @@ export default function Alerts() {
     <Screen onRefresh={q.refresh} refreshing={q.refreshing}>
       <ScreenHeader title={t('owner.notificationsTitle')} />
       <NetworkEntry onPress={() => router.push('/network')} />
+      <QualityEntry onPress={() => router.push('/quality')} />
       <DataStatus q={q} />
       {q.loading ? <SkeletonCard /> : null}
       {(q.data ?? []).map((n) => {
