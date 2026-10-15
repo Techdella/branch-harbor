@@ -14,3 +14,4 @@ export * from './foods-ext.ts';
 export * from './partners.ts';
 export * from './payments-ext.ts';
 export * from './access.ts';
+export * from './comms.ts';

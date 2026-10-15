@@ -85,7 +85,7 @@ export async function buildApp(opts: BuildOptions = {}): Promise<FastifyInstance
       info: { title: 'BranchHarbor API', version: '0.1.0', description: 'Multi-location platform API. Errors use { error: { code, message, fields? } }. Money is integer minor units + ISO 4217 currency; timestamps are UTC ISO 8601.' },
       servers: [{ url: cfg.PUBLIC_API_URL }],
       components: { securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } } },
-      tags: ['public', 'auth', 'me', 'orgs', 'locations', 'members', 'websites', 'domains', 'connections', 'payments', 'webhooks', 'reports', 'studios', 'sports', 'wellness', 'commerce', 'foods', 'ai', 'audit'].map((name) => ({ name })),
+      tags: ['public', 'auth', 'me', 'orgs', 'locations', 'members', 'websites', 'domains', 'connections', 'payments', 'webhooks', 'reports', 'studios', 'sports', 'wellness', 'commerce', 'foods', 'ai', 'audit', 'inbox', 'sales', 'social', 'marketing'].map((name) => ({ name })),
     },
     transform: jsonSchemaTransform,
   });

@@ -98,17 +98,18 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'operations.schedule', area: 'operations', name: 'Staff schedule', description: 'Shifts, clock-in and shift swaps.', actions: VE, status: 'available' },
   // Sales
   { key: 'sales.customers', area: 'sales', name: 'Customers', description: 'Customer records with contact details and history (personal data).', actions: VEX, status: 'available', sensitive: 'personal_data' },
-  { key: 'sales.customer_pipeline', area: 'sales', name: 'Leads & enquiries', description: 'New enquiries and trial customers to follow up.', actions: ALL, status: 'planned', sensitive: 'personal_data' },
+  { key: 'sales.customer_pipeline', area: 'sales', name: 'Leads & enquiries', description: 'New enquiries, the customer sales pipeline (deals, tasks, activities) and lead routing.', actions: ALL, actionNotes: { publish: 'Change lead routing rules and pipeline stages.' }, status: 'available', sensitive: 'personal_data' },
   { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification and new-location deals.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'personal_data' },
-  { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and courses.', actions: VEX, status: 'planned', sensitive: 'personal_data' },
+  { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and courses, routed to instructors.', actions: VEX, status: 'available', sensitive: 'personal_data' },
   // Marketing
   { key: 'marketing.website_builder', area: 'marketing', name: 'Websites', description: 'Location websites: pages, approvals, publishing and domains.', actions: VEP, status: 'available' },
   { key: 'marketing.campaigns', area: 'marketing', name: 'Campaigns', description: 'Marketing campaigns and offers for the locations in scope.', actions: VEP, status: 'available' },
+  { key: 'marketing.inbox', area: 'marketing', name: 'Inbox', description: 'One inbox per location for email, SMS, WhatsApp, Instagram and Messenger: replies, notes, assignment and contact segments.', actions: VEX, actionNotes: { edit: 'Reply, assign, add notes and manage segments.' }, status: 'available', sensitive: 'personal_data' },
   { key: 'marketing.email', area: 'marketing', name: 'Email', description: 'Email campaigns and newsletters.', actions: VEP, status: 'planned' },
   { key: 'marketing.automations', area: 'marketing', name: 'Automations', description: 'Automatic journeys: trigger, conditions and actions.', actions: VEP, status: 'planned' },
-  { key: 'marketing.social', area: 'marketing', name: 'Social', description: 'Social posts and scheduling on brand accounts.', actions: VEP, status: 'planned' },
-  { key: 'marketing.ads', area: 'marketing', name: 'Ads', description: 'Paid ad campaigns and budgets.', actions: ALL, status: 'planned' },
-  { key: 'marketing.network_campaigns', area: 'marketing', name: 'Network campaigns', description: 'Campaigns HQ runs for all locations, including coming-soon locations.', actions: ALL, status: 'planned' },
+  { key: 'marketing.social', area: 'marketing', name: 'Social', description: 'Social posts and scheduling on brand accounts.', actions: VEP, actionNotes: { publish: 'Approve local posts, connect accounts and hand over posting rights.' }, status: 'available' },
+  { key: 'marketing.ads', area: 'marketing', name: 'Ads', description: 'Paid ad campaigns and budgets.', actions: ALL, status: 'available' },
+  { key: 'marketing.network_campaigns', area: 'marketing', name: 'Network campaigns', description: 'Campaigns HQ runs for all locations, including coming-soon locations.', actions: ALL, status: 'available', hqOnly: true },
   { key: 'marketing.brand_assets', area: 'marketing', name: 'Brand assets', description: 'Logos, photos and brand guidelines.', actions: VEP, status: 'planned' },
   // Finance
   { key: 'finance.payments', area: 'finance', name: 'Payments', description: 'Transactions, refunds, reconciliation and payment accounts (financial data).', actions: VEX, actionNotes: { edit: 'Issue refunds and fix reconciliation items.' }, status: 'available', sensitive: 'finance' },
@@ -358,7 +359,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'digital_marketer', name: 'Digital marketer', description: 'Websites, social, ads, email and network campaigns. No operations, customers or finance.',
     primaryWorkspace: 'marketing', defaultScope: 'organization',
     grants: {
-      'marketing.website_builder': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.network_campaigns': ALL, 'marketing.email': VE, 'marketing.automations': VE,
+      'marketing.website_builder': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.network_campaigns': ALL, 'marketing.email': VE, 'marketing.automations': VE, 'marketing.inbox': VE,
       'marketing.campaigns': VEP, 'network.locations': V, 'network.reports': V, ...everyone, 'settings.ai': V,
     },
   },
@@ -398,7 +399,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'owner_group', networkOnly: true,
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': ['view', 'export'],
-      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': V,
+      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': V, 'marketing.inbox': VEX,
       'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX,
       'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone,
     },
@@ -407,7 +408,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'location_manager', name: 'Location manager', description: 'Runs a location day to day: operations, customers, the local website and campaign drafts.',
     primaryWorkspace: 'operations', defaultScope: 'location',
     grants: {
-      'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE,
+      'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE, 'marketing.inbox': VE, 'marketing.social': VE,
       'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone,
     },
   },
@@ -419,7 +420,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   marketing_contributor: {
     key: 'marketing_contributor', name: 'Marketing contributor', description: 'Drafts website and campaign changes; publishing needs someone with publish rights.',
     primaryWorkspace: 'marketing', defaultScope: 'location',
-    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'settings.ai': V },
+    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, 'settings.ai': V },
   },
   customer: {
     key: 'customer', name: 'Customer', description: 'Their own bookings, orders and preferences in the customer app.', primaryWorkspace: 'operations', defaultScope: 'location', hidden: true,

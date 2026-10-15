@@ -57,9 +57,10 @@ test('workspaces only appear for available modules and industry modules follow t
   const marketer = expandGrants(ROLE_TEMPLATES.digital_marketer.grants, 'studios');
   assert.deepEqual(workspacesFor(marketer, 'studios').map((w) => w.key), ['network', 'marketing']);
   const trainer = expandGrants(ROLE_TEMPLATES.instructor_trainer.grants, 'studios');
-  // Training is not built yet, so the trainer lands in Operations rather than an empty Training workspace.
+  // Training is not built yet, so the trainer lands in Operations rather than an empty Training workspace; course
+  // leads (Sales) are built and appear.
   const ws = workspacesFor(trainer, 'studios').map((w) => w.key);
-  assert.deepEqual(ws, ['operations']);
+  assert.deepEqual(ws, ['operations', 'sales']);
   assert.equal(primaryWorkspace([{ role: 'instructor_trainer' }], ws), 'operations');
   const foodsStaff = expandGrants(ROLE_TEMPLATES.staff.grants, 'foods');
   assert.ok(foodsStaff.has('operations.menu:edit'));

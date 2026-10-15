@@ -1,0 +1,427 @@
+{
+  "nav": {
+    "inbox": "Caixa de entrada",
+    "social": "Redes sociais",
+    "campaigns": "Campanhas de anúncios",
+    "leads": "Leads e funil"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "inbox": {
+          "name": "Caixa de entrada",
+          "description": "Uma caixa de entrada por unidade para e-mail, SMS, WhatsApp, Instagram e Messenger: respostas, notas, atribuição e segmentos."
+        },
+        "social": {
+          "name": "Redes sociais",
+          "description": "Posts, agendamento e aprovações nas contas da marca, com direitos de publicação cedidos às unidades."
+        },
+        "ads": {
+          "name": "Anúncios",
+          "description": "Campanhas pagas locais, orçamentos e resultados."
+        },
+        "network_campaigns": {
+          "name": "Campanhas da rede",
+          "description": "Campanhas que a sede faz para todas as unidades, inclusive as que vão inaugurar."
+        }
+      },
+      "sales": {
+        "customer_pipeline": {
+          "name": "Leads e funil",
+          "description": "Novos contatos, funil de vendas (negócios, tarefas, atividades) e roteamento de leads."
+        },
+        "course_leads": {
+          "name": "Leads de cursos",
+          "description": "Pessoas interessadas na formação de professores, encaminhadas aos instrutores."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "whatsapp_template_required": "Mais de 24 horas desde a última mensagem do contato: envie um modelo de WhatsApp aprovado.",
+    "template_not_approved": "Só é possível enviar modelos aprovados pelo WhatsApp.",
+    "contact_opted_out": "Este contato cancelou as mensagens neste canal.",
+    "consent_required": "Este contato não aceitou receber mensagens neste canal.",
+    "messaging_window_closed": "A janela de 24 horas foi encerrada. Aguarde o contato escrever novamente.",
+    "campaign_not_running": "Os resultados podem ser lançados depois que a campanha começar.",
+    "awaiting_approval": "Esta campanha aguarda aprovação do orçamento.",
+    "channel_in_use": "Este endereço já está conectado a uma caixa de entrada.",
+    "oauth_not_configured": "Conectar contas exige as credenciais do app. Use contas de teste enquanto isso.",
+    "account_disconnected": "Esta conta está desconectada.",
+    "not_hq_account": "Só contas da sede podem ser cedidas.",
+    "not_scheduled": "Este post não está agendado.",
+    "not_cancellable": "Este post não pode mais ser cancelado.",
+    "campaign_closed": "Esta campanha está encerrada.",
+    "not_customer_lead": "Leads de cursos são acompanhados pelos instrutores, não viram negócios."
+  },
+  "comms": {
+    "common": {
+      "hq": "Sede",
+      "unknownLocation": "Outra unidade"
+    },
+    "meta": {
+      "inbox": "Caixa de entrada",
+      "social": "Redes sociais",
+      "campaigns": "Campanhas de anúncios",
+      "leads": "Leads e funil"
+    },
+    "inbox": {
+      "title": "Caixa de entrada",
+      "description": "E-mail, SMS, WhatsApp, Instagram e Messenger em um só lugar, para as unidades selecionadas.",
+      "denied": "A caixa de entrada não faz parte do seu acesso.",
+      "status": {
+        "open": "Abertas",
+        "pending": "Pendentes",
+        "closed": "Fechadas",
+        "all": "Todas"
+      },
+      "channel": {
+        "email": "E-mail",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "messenger": "Messenger"
+      },
+      "channelFilter": "Canal",
+      "allChannels": "Todos os canais",
+      "hqOnly": "Só a sede",
+      "noChannels": {
+        "title": "Nenhum canal conectado ainda",
+        "body": "Conecte um número, WhatsApp, página ou e-mail para começar a receber mensagens."
+      },
+      "listLabel": "Conversas",
+      "empty": "Nenhuma conversa",
+      "pick": "Escolha uma conversa para ler e responder.",
+      "unread": "Não lida",
+      "overdue": "Resposta atrasada",
+      "threadLabel": "Conversa",
+      "back": "Voltar às conversas",
+      "linkedCustomer": "Cliente: {name}",
+      "linkedLead": "Lead · {status}",
+      "leadStatus": {
+        "new": "Novo",
+        "contacted": "Contatado",
+        "qualified": "Qualificado",
+        "converted": "Convertido",
+        "lost": "Perdido"
+      },
+      "windowOpen": "Respostas livres até {time}",
+      "windowClosed": "Janela de 24 h encerrada",
+      "optedOut": "Descadastrado",
+      "messagesLabel": "Mensagens",
+      "note": "Nota interna",
+      "msgStatus": {
+        "sent": "Enviada",
+        "sandboxed": "Simulada (teste)",
+        "failed": "Falhou",
+        "blocked": "Bloqueada",
+        "received": "Recebida",
+        "note": "Nota"
+      },
+      "readOnly": "Você pode ler esta conversa, mas não responder.",
+      "statusLabel": "Status",
+      "assignLabel": "Atribuída a",
+      "unassigned": "Sem responsável",
+      "reply": "Responder",
+      "addNote": "Nota interna",
+      "canned": "Respostas salvas",
+      "blocked": {
+        "contact_opted_out": {
+          "title": "Este contato se descadastrou",
+          "body": "Respondeu STOP neste canal. Pode escrever START para voltar a receber mensagens."
+        },
+        "consent_required": {
+          "title": "Sem consentimento para este canal",
+          "body": "Este contato nunca escreveu aqui e não aceitou mensagens neste canal."
+        },
+        "messaging_window_closed": {
+          "title": "Janela de mensagens encerrada",
+          "body": "Instagram e Messenger permitem respostas até 24 horas após a última mensagem do contato."
+        }
+      },
+      "template": {
+        "title": "Use um modelo aprovado",
+        "body": "O contato escreveu há mais de 24 horas. O WhatsApp só permite modelos aprovados até ele escrever de novo.",
+        "pick": "Modelo",
+        "choose": "Escolha um modelo"
+      },
+      "noteLabel": "Nota para a equipe",
+      "replyLabel": "Sua resposta",
+      "notePlaceholder": "Só a sua equipe vê",
+      "replyPlaceholder": "Escreva uma resposta…",
+      "saveNote": "Salvar nota",
+      "sendTemplate": "Enviar modelo",
+      "send": "Enviar",
+      "sandboxNote": "Canais de teste registram as respostas sem enviá-las.",
+      "simulate": {
+        "open": "Simular mensagem",
+        "title": "Simular mensagem recebida",
+        "kicker": "Teste",
+        "body": "Canais de teste ainda não têm provedor. A mensagem é assinada e entregue pelo mesmo webhook de uma real.",
+        "channel": "Canal",
+        "from": "De",
+        "name": "Nome do contato",
+        "message": "Mensagem",
+        "submit": "Receber mensagem",
+        "placeholder": {
+          "email": "nome@exemplo.com",
+          "meta": "ID do remetente",
+          "phone": "+55 11 91234 5678"
+        }
+      }
+    },
+    "social": {
+      "title": "Redes sociais",
+      "description": "Planeje, aprove e publique nas contas da marca e nas cedidas às unidades.",
+      "denied": "Redes sociais não fazem parte do seu acesso.",
+      "compose": "Novo post",
+      "tab": {
+        "calendar": "Calendário",
+        "approvals": "Aprovações",
+        "accounts": "Contas"
+      },
+      "status": {
+        "draft": "Rascunho",
+        "pending_approval": "Aguardando aprovação",
+        "scheduled": "Agendado",
+        "publishing": "Publicando",
+        "published": "Publicado",
+        "sandboxed": "Simulado (teste)",
+        "partially_published": "Publicado em parte",
+        "failed": "Falhou",
+        "rejected": "Ajustes solicitados",
+        "cancelled": "Cancelado"
+      },
+      "result": {
+        "published": "publicado",
+        "sandboxed": "simulado",
+        "failed": "falhou",
+        "cancelled": "cancelado"
+      },
+      "unknownAccount": "Conta removida",
+      "cancelPost": "Cancelar post",
+      "approvals": {
+        "empty": "Nada aguardando aprovação",
+        "comment": "Comentário para o autor",
+        "approve": "Aprovar",
+        "reject": "Pedir ajustes"
+      },
+      "calendar": {
+        "empty": "Nenhum post planejado",
+        "emptyBody": "Escreva um post e agende para uma ou mais contas.",
+        "unscheduled": "Sem agendamento"
+      },
+      "composer": {
+        "title": "Novo post",
+        "kicker": "Redes sociais",
+        "postAs": "Publicar para",
+        "hq": "Sede (marca)",
+        "accounts": "Contas",
+        "noAccounts": "Nenhuma conta disponível. A sede pode ceder direitos de publicação.",
+        "text": "Texto",
+        "image": "Link da imagem",
+        "imageHint": "Da biblioteca da marca ou qualquer link público.",
+        "when": "Publicar em",
+        "whenHint": "Deixe vazio para publicar assim que for aprovado.",
+        "approvalNote": "A sede aprova este post antes de publicar.",
+        "previews": "Prévias",
+        "chars": "{n} / {max}",
+        "submitApproval": "Enviar para aprovação",
+        "schedule": "Agendar",
+        "publishNow": "Publicar agora",
+        "saveDraft": "Salvar rascunho"
+      },
+      "issue": {
+        "too_long": "Longo demais para esta rede",
+        "media_required": "Precisa de uma imagem",
+        "too_many_media": "Imagens demais",
+        "empty": "Escreva algo primeiro"
+      },
+      "network": {
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "google_business": "Perfil da Empresa no Google"
+      },
+      "ownerHq": "Da sede",
+      "ownerLocation": "Da própria unidade",
+      "ownedBy": "De {location}",
+      "sandbox": "Teste",
+      "live": "Conectada",
+      "access": {
+        "post": "Publicar",
+        "post_insights": "Publicar + métricas",
+        "view": "Só visualizar"
+      },
+      "accounts": {
+        "ownershipTitle": "A sede continua dona",
+        "ownershipBody": "As unidades recebem direitos de publicação; as senhas ficam com a sede e os direitos podem ser revogados.",
+        "empty": "Nenhuma conta ainda",
+        "rights": "Direitos de publicação",
+        "noRights": "Nenhuma unidade pode publicar.",
+        "revoke": "Revogar",
+        "grant": "Conceder",
+        "location": "Unidade",
+        "chooseLocation": "Escolha uma unidade",
+        "accessLabel": "Acesso",
+        "addTitle": "Adicionar conta",
+        "addBody": "As contas entram em teste; conecte pelo Meta para publicar de verdade.",
+        "network": "Rede",
+        "handle": "Nome ou usuário",
+        "add": "Adicionar conta",
+        "terminateTitle": "Unidade saindo da rede",
+        "terminateBody": "Revogue todos os direitos da unidade nas contas da sede e cancele os posts planejados.",
+        "terminate": "Revogar todos os direitos",
+        "terminated": "{grants} direitos revogados, {posts} posts cancelados."
+      }
+    },
+    "campaigns": {
+      "title": "Campanhas de anúncios",
+      "description": "Campanhas da rede, de inauguração, de cursos e locais: orçamentos por unidade e moeda, resultados e leads atribuídos.",
+      "denied": "Campanhas de anúncios não fazem parte do seu acesso.",
+      "filter": "Tipo de campanha",
+      "kind": {
+        "all": "Todas",
+        "network": "Rede",
+        "coming_soon": "Em breve",
+        "course": "Curso",
+        "local": "Local"
+      },
+      "status": {
+        "draft": "Rascunho",
+        "pending_approval": "Orçamento aguardando aprovação",
+        "scheduled": "Agendada",
+        "active": "Ativa",
+        "paused": "Pausada",
+        "completed": "Concluída",
+        "rejected": "Recusada",
+        "archived": "Arquivada"
+      },
+      "new": {
+        "network": "Nova campanha da rede",
+        "coming_soon": "Campanha de inauguração",
+        "course": "Campanha de curso",
+        "local": "Campanha local",
+        "kicker": "Campanha de anúncios",
+        "create": "Criar campanha",
+        "noOnboarding": "Nenhuma unidade está em implantação agora.",
+        "localNote": "O orçamento vai para aprovação da sede; a campanha é agendada após aprovação.",
+        "requestBudget": "Solicitar orçamento"
+      },
+      "empty": "Nenhuma campanha ainda",
+      "emptyBody": "Crie uma campanha para todas ou algumas unidades.",
+      "openingOn": "Inaugura em {date}",
+      "totals": "Orçamento {budget} · gasto {spend} · {leads, plural, one {# lead} other {# leads}}",
+      "locationsCount": "{count, plural, one {# unidade} other {# unidades}}",
+      "open": "Detalhes",
+      "platform": {
+        "meta": "Meta (Facebook e Instagram)",
+        "google": "Google Ads",
+        "linkedin": "LinkedIn Ads"
+      },
+      "field": {
+        "name": "Nome da campanha",
+        "locations": "Unidades",
+        "onboardingLocations": "Unidades em implantação",
+        "allLocations": "Todas",
+        "platforms": "Plataformas",
+        "startsOn": "Início",
+        "endsOn": "Fim",
+        "budget": "Orçamento",
+        "budgetHint": "Um total por moeda, dividido igualmente entre as unidades.",
+        "budgetIn": "Orçamento total ({currency})",
+        "split": "Orçamento por unidade",
+        "radius": "Raio em torno de cada unidade (km)",
+        "radiusHint": "Os anúncios atingem pessoas perto de cada unidade.",
+        "headline": "Título",
+        "copy": "Texto do anúncio",
+        "image": "Link da imagem",
+        "imageHint": "Da biblioteca da marca.",
+        "openingDate": "Data de inauguração",
+        "presale": "Oferta de pré-venda",
+        "location": "Unidade",
+        "days": "Dias"
+      },
+      "detail": {
+        "title": "Campanha",
+        "leadForm": "Endpoint do formulário:",
+        "awaitingApproval": "O orçamento está na caixa de aprovações.",
+        "launch": "Lançar",
+        "pause": "Pausar",
+        "complete": "Marcar como concluída",
+        "byLocation": "Por unidade",
+        "enterResults": "Lançar resultados",
+        "row": "Gasto {spend} · {clicks} cliques · {leads} leads · {radius} km",
+        "cpl": "Custo por lead {cpl}"
+      },
+      "results": {
+        "hint": "As plataformas ainda não estão conectadas: lance os resultados diários manualmente. O gasto do fundo de marketing vai para o livro do fundo.",
+        "day": "Dia",
+        "spend": "Gasto ({currency})",
+        "impressions": "Impressões",
+        "clicks": "Cliques",
+        "save": "Salvar resultados",
+        "saved": "Resultados salvos."
+      }
+    },
+    "leads": {
+      "title": "Leads e funil",
+      "description": "Acompanhe contatos, leads de cursos e negócios. Regras de roteamento definem quem recebe cada lead.",
+      "denied": "Leads não fazem parte do seu acesso.",
+      "tab": {
+        "customer": "Leads de clientes",
+        "course": "Leads de cursos",
+        "pipeline": "Funil",
+        "routing": "Roteamento"
+      },
+      "status": {
+        "open": "Abertos",
+        "new": "Novo",
+        "contacted": "Contatado",
+        "qualified": "Qualificado",
+        "converted": "Convertido",
+        "lost": "Perdido",
+        "all": "Todos"
+      },
+      "source": {
+        "website": "Site",
+        "manual": "Adicionado manualmente",
+        "email": "E-mail",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "messenger": "Messenger",
+        "ad_campaign": "Campanha de anúncios",
+        "coming_soon": "Campanha de inauguração",
+        "course_campaign": "Campanha de curso"
+      },
+      "statusFilter": "Status",
+      "setStatus": "Alterar status",
+      "mine": "Atribuídos a mim",
+      "empty": "Nenhum lead",
+      "assignedTo": "Atribuído a {name}",
+      "unassigned": "Ainda sem responsável",
+      "convert": "Converter em negócio",
+      "openTasks": "{count, plural, one {# tarefa aberta} other {# tarefas abertas}}",
+      "moveTo": "Mover para a etapa",
+      "routing": {
+        "title": "Regras de roteamento",
+        "body": "Verificadas em ordem. A primeira que corresponder vale.",
+        "empty": "Sem regras: os leads ficam na unidade.",
+        "off": "Desativada",
+        "postal": "CEP {list}",
+        "sources": "Origem {list}",
+        "countries": "País {list}",
+        "anyLead": "Qualquer lead",
+        "people": "{count, plural, one {# pessoa} other {# pessoas em rodízio}}",
+        "team": "Equipe de {location}, em rodízio",
+        "testTitle": "Testar um lead",
+        "postalLabel": "CEP",
+        "sourceLabel": "Origem",
+        "test": "Para onde iria?",
+        "result": "Regra “{rule}” → {target}",
+        "noMatch": "Nenhuma regra corresponde: o lead fica onde entrou."
+      }
+    }
+  }
+}

@@ -10,3 +10,4 @@ export * from './business-mode.ts';
 export * from './sports.ts';
 export * from './realty.ts';
 export * from './foods.ts';
+export * from './comms.ts';

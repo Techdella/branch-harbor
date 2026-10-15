@@ -31,6 +31,12 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'sales.customers': [{ key: 'customers', href: '/customers', icon: 'users' }],
   'marketing.website_builder': [{ key: 'websites', href: '/websites', icon: 'globe' }],
   'marketing.campaigns': [{ key: 'marketing', href: '/marketing', icon: 'megaphone' }],
+  'marketing.inbox': [{ key: 'inbox', href: '/marketing/inbox', icon: 'message' }],
+  'marketing.social': [{ key: 'social', href: '/marketing/social', icon: 'share' }],
+  'marketing.ads': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
+  'marketing.network_campaigns': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
+  'sales.customer_pipeline': [{ key: 'leads', href: '/sales/leads', icon: 'trending' }],
+  'sales.course_leads': [{ key: 'leads', href: '/sales/leads', icon: 'trending' }],
   'finance.payments': [{ key: 'payments', href: '/payments', icon: 'card' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
@@ -91,7 +97,12 @@ export function routeModules(pathname: string, industry: IndustryKey): string[] 
     return m ? [m.key] : [];
   }
   if (first === 'community') return [];
-  const matches = Object.entries(MODULE_LINKS).filter(([, links]) => links.some((l) => l.href === `/${first}`)).map(([k]) => k);
+  // The longest link that is the path or a prefix of it decides (`/marketing/inbox` before `/marketing`).
+  const path = `/${seg.join('/')}`;
+  const hrefs = Object.values(MODULE_LINKS).flat().map((l) => l.href).filter((h) => path === h || path.startsWith(`${h}/`));
+  const best = hrefs.sort((a, b) => b.length - a.length)[0];
+  if (!best) return seg.length > 1 && Object.values(MODULE_LINKS).flat().some((l) => l.href.startsWith(`/${first}/`)) ? [] : null;
+  const matches = Object.entries(MODULE_LINKS).filter(([, links]) => links.some((l) => l.href === best)).map(([k]) => k);
   return matches.length ? matches : null;
 }
 

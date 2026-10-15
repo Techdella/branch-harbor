@@ -18,7 +18,10 @@ import { requireMember } from './authz.ts';
 export const ROUTE_MODULES: Record<string, readonly string[]> = {
   // Sales
   customers: ['sales.customers'],
-  leads: ['sales.customers', 'sales.customer_pipeline'],
+  leads: ['sales.customers', 'sales.customer_pipeline', 'sales.course_leads'],
+  sales: ['sales.customer_pipeline', 'sales.course_leads'],
+  contacts: ['sales.customers', 'marketing.inbox'],
+  segments: ['marketing.inbox', 'marketing.campaigns', 'sales.customer_pipeline', 'sales.customers'],
   // Marketing
   websites: ['marketing.website_builder', 'network.templates'],
   pages: ['marketing.website_builder', 'network.templates'],
@@ -28,6 +31,9 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   sites: ['marketing.website_builder'],
   campaigns: ['marketing.campaigns', 'marketing.*'],
   'ad-spend-requests': ['marketing.campaigns', 'marketing.ads'],
+  inbox: ['marketing.inbox'],
+  social: ['marketing.social'],
+  'ad-campaigns': ['marketing.ads', 'marketing.network_campaigns', 'finance.royalties'],
   // Finance
   payments: ['finance.payments'],
   'refund-requests': ['finance.payments'],

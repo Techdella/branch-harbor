@@ -67,4 +67,10 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./commerce-ext.ts')).commerceExtRoutes);
   await app.register((await import('./foods-ext.ts')).foodsExtRoutes);
   await app.register((await import('./payments-customer.ts')).paymentCustomerRoutes);
+  // Marketing & sales communications: inbox webhooks (raw bodies), inbox, sales pipeline, social, ad campaigns.
+  await app.register((await import('./comms-webhooks.ts')).commsWebhookRoutes);
+  await app.register((await import('./inbox.ts')).inboxRoutes);
+  await app.register((await import('./sales-pipeline.ts')).salesPipelineRoutes);
+  await app.register((await import('./social.ts')).socialRoutes);
+  await app.register((await import('./ad-campaigns.ts')).adCampaignRoutes);
 };
