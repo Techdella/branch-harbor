@@ -60,6 +60,9 @@ function Editor({ orgId, automation, templates, forms, segments, locations, t }:
   const [version, setVersion] = useState(automation.version);
   const [status, setStatus] = useState(automation.status);
   const [sel, setSel] = useState<string | null>(null);
+  // React Flow measures each node after it renders; in controlled mode the measured size must be fed back on the
+  // nodes or they stay hidden. Only the position lives in the saved graph, so the sizes are kept here.
+  const [measured, setMeasured] = useState<Record<string, { width?: number; height?: number }>>({});
   const [tab, setTab] = useState<'flow' | 'runs'>('flow');
   const [test, setTest] = useState<{ status: string; steps: AutomationRun['steps'] } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -89,7 +92,7 @@ function Editor({ orgId, automation, templates, forms, segments, locations, t }:
     }
   }, [forms, segments, templates, tr]);
 
-  const nodes: FlowNode[] = graph.nodes.map((n) => ({ id: n.id, type: 'box', position: n.position, selected: n.id === sel, data: { node: n, summary: summary(n), title: tr(`auto.node.${n.type}`), issue: issues.some((i) => i.nodeId === n.id) } }));
+  const nodes: FlowNode[] = graph.nodes.map((n) => ({ id: n.id, type: 'box', position: n.position, measured: measured[n.id], selected: n.id === sel, data: { node: n, summary: summary(n), title: tr(`auto.node.${n.type}`), issue: issues.some((i) => i.nodeId === n.id) } }));
   const edges: Edge[] = graph.edges.map((e) => ({ id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle ?? undefined, label: e.sourceHandle ? tr(`auto.branch.${e.sourceHandle}`) : undefined }));
 
   const onNodesChange = (all: NodeChange<FlowNode>[]) => {
@@ -98,6 +101,9 @@ function Editor({ orgId, automation, templates, forms, segments, locations, t }:
     const next = applyNodeChanges(changes, nodes);
     const sc = changes.find((c) => c.type === 'select' && c.selected);
     if (sc && 'id' in sc) setSel(sc.id);
+    const dims = changes.filter((c) => c.type === 'dimensions' && c.dimensions);
+    if (dims.length) setMeasured((m) => { const out = { ...m }; for (const c of dims) if (c.type === 'dimensions' && c.dimensions) out[c.id] = c.dimensions; return out; });
+    if (!changes.some((c) => c.type === 'position' || c.type === 'remove')) return;
     setGraph((g) => ({
       nodes: next.filter((x) => g.nodes.some((n) => n.id === x.id)).map((x) => ({ ...g.nodes.find((n) => n.id === x.id)!, position: x.position })),
       edges: g.edges.filter((e) => next.some((x) => x.id === e.source) && next.some((x) => x.id === e.target)),

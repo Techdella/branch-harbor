@@ -129,10 +129,16 @@ function Toolbar({ orgId, mode, reload }: { orgId: string; mode: Mode; reload: (
   // Autosave 1.2 s after the last change.
   useEffect(() => {
     const json = JSON.stringify(fromPuck(data, { master }));
-    if (json === last.current) return;
+    // Back to the saved content (e.g. undo then redo): nothing to save.
+    if (json === last.current) { if (!inflight.current) setState((s) => (s === 'dirty' ? 'saved' : s)); return; }
     setState((s) => (s === 'conflict' ? s : 'dirty'));
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => { if (!inflight.current) inflight.current = save().finally(() => { inflight.current = null; }); }, 1200);
+    timer.current = setTimeout(() => {
+      // Saves never overlap: wait for the one in flight, then save the latest content.
+      const run = async () => { if (inflight.current) await inflight.current; await save(); };
+      const p = run().finally(() => { if (inflight.current === p) inflight.current = null; });
+      inflight.current = p;
+    }, 1200);
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [data, master, save]);
 

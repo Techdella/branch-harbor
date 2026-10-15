@@ -186,7 +186,8 @@ export function CampaignScreen({ id }: { id: string }) {
   const a = useAction();
   const [msg, setMsg] = useState<string | null>(null);
   const recipients = useLoad(res.data && res.data.c.status !== 'draft' ? orgId : null, (o) => mkt.recipients(o, id), [res.data?.c.status]);
-  useEffect(() => { if (res.data?.c.content) setDraft({ name: res.data.c.name, subject: res.data.c.content.subject, preheader: res.data.c.content.preheader, document: res.data.c.content.document, segmentId: res.data.c.segmentId }); }, [res.data]);
+  // Seed the editor once; later reloads (new audience, send status) must not overwrite what is being edited.
+  useEffect(() => { const c = res.data?.c; if (c?.content) setDraft((d) => d ?? { name: c.name, subject: c.content!.subject, preheader: c.content!.preheader, document: c.content!.document, segmentId: c.segmentId }); }, [res.data]);
   const scopeName = useMemo(() => (res.data ? (res.data.c.scope.kind === 'organization' ? t('email.wholeNetwork') : locations.find((l) => l.id === res.data!.c.scope.id)?.name ?? '') : ''), [res.data, locations, t]);
   if (res.status === 'error') return <ErrorState error={res.error} onRetry={res.reload} />;
   if (!res.data || !draft || !orgId) return <LoadingBlock variant="detail" />;

@@ -144,7 +144,8 @@ export function buildConfig(i: ConfigInput): Config {
   return {
     categories: Object.fromEntries(Object.entries(CATEGORIES).map(([k, list]) => [k, { title: t(`cat.${k}`), components: list as string[], defaultExpanded: true }])) as Config['categories'],
     components: Object.fromEntries(order.map((k) => [k, components[k]!])),
-    root: { render: ({ children }: { children: React.ReactNode }) => <SiteThemeRoot theme={i.theme}>{children}</SiteThemeRoot> },
+    // No page-level fields: title and SEO live in Page settings.
+    root: { fields: {}, render: ({ children }: { children: React.ReactNode }) => <SiteThemeRoot theme={i.theme}>{children}</SiteThemeRoot> },
   } as Config;
 }
 

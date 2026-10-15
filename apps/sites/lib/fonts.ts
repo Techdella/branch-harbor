@@ -9,24 +9,23 @@ import type { SiteFont } from '@bh/shared';
  * use the same list). Fonts are self-hosted by next/font; only the families a page actually uses are downloaded by
  * the browser (preload off). Each exposes a CSS variable.
  */
-const opts = { subsets: ['latin', 'latin-ext'] as ('latin' | 'latin-ext')[], display: 'swap' as const, preload: false };
-const jakarta = Plus_Jakarta_Sans({ ...opts, variable: '--f-jakarta' });
-const inter = Inter({ ...opts, variable: '--f-inter' });
-const work = Work_Sans({ ...opts, variable: '--f-work' });
-const sourceSerif = Source_Serif_4({ ...opts, variable: '--f-source-serif' });
-const lora = Lora({ ...opts, variable: '--f-lora' });
-const merriweather = Merriweather({ ...opts, weight: ['400', '700'], variable: '--f-merriweather' });
-const fraunces = Fraunces({ ...opts, variable: '--f-fraunces' });
-const manrope = Manrope({ ...opts, variable: '--f-manrope' });
-const archivo = Archivo({ ...opts, variable: '--f-archivo' });
-const cormorant = Cormorant_Garamond({ ...opts, weight: ['500', '600', '700'], variable: '--f-cormorant' });
-const playfair = Playfair_Display({ ...opts, variable: '--f-playfair' });
-const spaceGrotesk = Space_Grotesk({ ...opts, variable: '--f-space-grotesk' });
-const dmSans = DM_Sans({ ...opts, variable: '--f-dm-sans' });
-const dmSerif = DM_Serif_Display({ ...opts, weight: '400', variable: '--f-dm-serif' });
-const nunito = Nunito({ ...opts, variable: '--f-nunito' });
-const oswald = Oswald({ ...opts, variable: '--f-oswald' });
-const karla = Karla({ ...opts, variable: '--f-karla' });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-jakarta' });
+const inter = Inter({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-inter' });
+const work = Work_Sans({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-work' });
+const sourceSerif = Source_Serif_4({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-source-serif' });
+const lora = Lora({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-lora' });
+const merriweather = Merriweather({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, weight: ['400', '700'], variable: '--f-merriweather' });
+const fraunces = Fraunces({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-fraunces' });
+const manrope = Manrope({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-manrope' });
+const archivo = Archivo({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-archivo' });
+const cormorant = Cormorant_Garamond({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, weight: ['500', '600', '700'], variable: '--f-cormorant' });
+const playfair = Playfair_Display({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-playfair' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-space-grotesk' });
+const dmSans = DM_Sans({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-dm-sans' });
+const dmSerif = DM_Serif_Display({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, weight: '400', variable: '--f-dm-serif' });
+const nunito = Nunito({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-nunito' });
+const oswald = Oswald({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-oswald' });
+const karla = Karla({ subsets: ['latin', 'latin-ext'], display: 'swap', preload: false, variable: '--f-karla' });
 
 export const fontVariables = [jakarta, inter, work, sourceSerif, lora, merriweather, fraunces, manrope, archivo, cormorant, playfair, spaceGrotesk, dmSans, dmSerif, nunito, oswald, karla].map((f) => f.variable).join(' ');
 
