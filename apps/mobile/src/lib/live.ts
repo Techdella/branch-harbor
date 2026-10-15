@@ -126,8 +126,8 @@ const caps = (org: RawOrg) => new Set(org.access?.capabilities ?? []);
 const holdsView = (org: RawOrg, prefix: string) => [...caps(org)].some((c) => c.startsWith(prefix) && c.endsWith(':view'));
 const has = (org: RawOrg, p: Permission) =>
   org.access ? permissionsFromCapabilities(caps(org)).has(p) : org.roles.some((r) => (ROLE_PERMISSIONS[r.role as Role] ?? []).includes(p));
-/** Staff experience: any Operations module (industry screens, staff schedule). */
-const isStaff = (o: RawOrg) => (o.access ? holdsView(o, 'operations.') : has(o, 'operations.read'));
+/** Staff experience: any Operations module (industry screens, staff schedule). Audits alone open the audits screens. */
+const isStaff = (o: RawOrg) => (o.access ? [...caps(o)].some((c) => c.startsWith('operations.') && !c.startsWith('operations.audits:') && c.endsWith(':view')) : has(o, 'operations.read'));
 /** Owner / HQ experience: reports or approvals. */
 const isOwner = (o: RawOrg) => (o.access ? holdsView(o, 'network.reports:') || holdsView(o, 'network.approvals:') : has(o, 'reports.read') || has(o, 'website.approve'));
 const isTeam = (o: RawOrg) => o.roles.some((r) => r.role !== 'customer');
