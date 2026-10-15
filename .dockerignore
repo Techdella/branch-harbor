@@ -1,0 +1,13 @@
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/.expo
+.git
+.claude
+design
+apps/mobile
+apps/wordpress-plugin
+tools
+**/.env
+**/.env.local

@@ -1,0 +1,35 @@
+# Render Blueprint for the BranchHarbor API (alternative to Fly.io).
+# New > Blueprint > pick this repository. Fill the env vars marked sync: false in the dashboard.
+services:
+  - type: web
+    name: branchharbor-api
+    runtime: docker
+    dockerfilePath: ./deploy/api.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: WEB_URL
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: SITES_BASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: COOKIE_DOMAIN
+        sync: false
