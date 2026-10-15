@@ -1,4 +1,6 @@
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull } from 'drizzle-orm';
+import { ASSISTANT_NAME } from '@bh/shared';
+import { actionCard, transcript } from '../ai/engine.ts';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { aiConversations, aiMessages, aiProposedActions } from '../db/schema/index.ts';
@@ -20,6 +22,7 @@ export const aiRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/ai/status', { schema: { tags: ['ai'], security: secured, params: orgParams } }, async () => ({
     available: s.ai.enabled, model: s.ai.enabled ? s.ai.model : null, proposableActions: Object.keys(PROPOSABLE_ACTIONS),
+    assistant: { name: ASSISTANT_NAME, mode: s.marina.mode },
     message: s.ai.enabled ? null : 'BranchHarbor AI is unavailable. Manual bookings, orders and publishing are unaffected.',
   }));
 
@@ -34,14 +37,15 @@ export const aiRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/ai/conversations', { schema: { tags: ['ai'], security: secured, params: orgParams } }, async (req) => {
     const me = requireUser(req);
-    return { items: await s.db.select().from(aiConversations).where(and(eq(aiConversations.organizationId, req.params.orgId), eq(aiConversations.userId, me.id))).orderBy(desc(aiConversations.updatedAt)) };
+    return { items: await s.db.select().from(aiConversations).where(and(eq(aiConversations.organizationId, req.params.orgId), eq(aiConversations.userId, me.id), isNull(aiConversations.archivedAt))).orderBy(desc(aiConversations.updatedAt)).limit(100) };
   });
 
   app.get('/orgs/:orgId/ai/conversations/:id', { schema: { tags: ['ai'], security: secured, params: idParams } }, async (req) => {
     const c = await load(req.params.orgId, req.params.id, requireUser(req).id);
     const msgs = await s.db.select().from(aiMessages).where(eq(aiMessages.conversationId, c.id)).orderBy(asc(aiMessages.createdAt));
     const actions = await s.db.select().from(aiProposedActions).where(eq(aiProposedActions.conversationId, c.id)).orderBy(desc(aiProposedActions.createdAt));
-    return { ...c, messages: msgs, proposedActions: actions };
+    // `turns` is the display transcript (questions, answers, tables, citations); `actions` are the action cards.
+    return { ...c, messages: msgs, proposedActions: actions, turns: transcript(msgs), actions: actions.map(actionCard) };
   });
 
   app.post('/orgs/:orgId/ai/conversations/:id/messages', {

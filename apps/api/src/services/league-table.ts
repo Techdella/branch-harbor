@@ -61,7 +61,7 @@ export interface LeagueQuery { from: string; to: string; regionId?: string; owne
 const DAY = 86_400_000;
 const dayStart = (ymd: string) => new Date(`${ymd}T00:00:00Z`);
 
-async function activityCounts(db: Exec, industry: string, ids: string[], from: Date, to: Date): Promise<{ activity: Map<string, number>; occupancy: Map<string, number | null> }> {
+export async function activityCounts(db: Exec, industry: string, ids: string[], from: Date, to: Date): Promise<{ activity: Map<string, number>; occupancy: Map<string, number | null> }> {
   const activity = new Map<string, number>();
   const occupancy = new Map<string, number | null>();
   if (!ids.length) return { activity, occupancy };
@@ -109,7 +109,7 @@ async function activityCounts(db: Exec, industry: string, ids: string[], from: D
   return { activity, occupancy };
 }
 
-async function revenueByLocation(db: Exec, organizationId: string, locs: Array<{ id: string; currency: string }>, from: Date, to: Date) {
+export async function revenueByLocation(db: Exec, organizationId: string, locs: Array<{ id: string; currency: string }>, from: Date, to: Date) {
   const out = new Map<string, number>();
   if (!locs.length) return out;
   const rows = await db.select({ id: paymentReferences.locationId, currency: paymentReferences.currency, gross: sql<string>`coalesce(sum(${paymentReferences.amountMinor}),0)`, refunded: sql<string>`coalesce(sum(${paymentReferences.refundedMinor}),0)` })

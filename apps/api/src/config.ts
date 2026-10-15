@@ -131,9 +131,26 @@ const envSchema = z.object({
 
   // AI
   ANTHROPIC_API_KEY: optional,
-  ANTHROPIC_MODEL: z.string().default('claude-sonnet-5-5'),
+  /** Main model: the assistant's agent loop, vision and long-form generation. */
+  ANTHROPIC_MODEL: z.string().default('claude-opus-5-5'),
+  /** Small, fast model for classification, summaries and briefings. */
+  ANTHROPIC_FAST_MODEL: z.string().default('claude-haiku-5-5'),
+  /** Effort for the main model (low | medium | high | xhigh | max). */
+  ANTHROPIC_EFFORT: z.enum(['low', 'medium', 'high', 'xhigh', 'max']).default('medium'),
   ANTHROPIC_MAX_TOKENS: z.coerce.number().int().default(4096),
   ANTHROPIC_REFUSAL_FALLBACK: bool(true),
+  /** Max output tokens per assistant turn (streamed). */
+  MARINA_MAX_TOKENS: z.coerce.number().int().min(1024).default(16000),
+  /**
+   * Run the assistant on the deterministic sandbox engine even when ANTHROPIC_API_KEY is set (tests, demo site). Without
+   * a key the sandbox is always used: it answers only from real tool results and never invents business facts.
+   */
+  MARINA_SANDBOX: bool(false),
+  /** Fair-use ceiling as a multiple of the plan's monthly AI credits. */
+  MARINA_FAIR_USE_MULTIPLIER: z.coerce.number().min(1).default(2),
+  /** Optional embeddings for the knowledge base (Voyage AI). Used only when the Postgres `vector` extension exists. */
+  VOYAGE_API_KEY: optional,
+  VOYAGE_MODEL: z.string().default('voyage-3.5'),
 
   // Domains
   CLOUDFLARE_API_TOKEN: optional,
@@ -231,6 +248,8 @@ export function integrationStatus(cfg: Config) {
     billingEnforcement: billingEnforced(cfg) ? 'on' : 'off',
     stripeCardEntry: cfg.STRIPE_SECRET_KEY && cfg.STRIPE_PUBLISHABLE_KEY ? 'live' : 'sandbox (simulated payments)',
     ai: mode(!!cfg.ANTHROPIC_API_KEY),
+    assistant: cfg.ANTHROPIC_API_KEY && !cfg.MARINA_SANDBOX ? 'live' : 'sandbox (scripted, answers from real data only)',
+    embeddings: cfg.VOYAGE_API_KEY ? 'voyage (when pgvector is available)' : 'off (full-text search)',
     push: mode(!!cfg.EXPO_ACCESS_TOKEN || cfg.ENABLE_EXPO_PUSH, 'sandbox'),
     domains: mode(!!(cfg.CLOUDFLARE_API_TOKEN && cfg.CLOUDFLARE_ZONE_ID), 'sandbox'),
     maps: mode(!!cfg.GOOGLE_MAPS_API_KEY),

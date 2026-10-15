@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
 import { organizations } from './core.ts';
 
@@ -121,9 +121,14 @@ export const aiConversations = pgTable('ai_conversations', {
   scopeKind: text('scope_kind').notNull(),
   scopeId: uuid('scope_id').notNull(),
   title: text('title'),
+  /** web | mobile | api | seed */
+  channel: text('channel').notNull().default('web'),
+  /** The screen the conversation started on (path and record), for suggested prompts and history. */
+  context: jsonb('context').$type<Record<string, unknown>>().notNull().default({}),
+  archivedAt: ts('archived_at'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
-});
+}, (t) => [index('ai_conversations_user_idx').on(t.organizationId, t.userId, t.updatedAt)]);
 
 export const aiMessages = pgTable('ai_messages', {
   id: pk(),
@@ -134,23 +139,46 @@ export const aiMessages = pgTable('ai_messages', {
   content: jsonb('content').$type<unknown>().notNull(),
   inputTokens: integer('input_tokens'),
   outputTokens: integer('output_tokens'),
+  cacheReadTokens: integer('cache_read_tokens'),
+  cacheWriteTokens: integer('cache_write_tokens'),
   model: text('model'),
+  /** Tables and charts built from tool results during the turn (never generated numbers). */
+  blocks: jsonb('blocks').$type<unknown[]>().notNull().default([]),
+  citations: jsonb('citations').$type<unknown[]>().notNull().default([]),
+  /** Notices (not legal advice, sandbox), action ids and navigation of the turn. */
+  meta: jsonb('meta').$type<Record<string, unknown>>().notNull().default({}),
   createdAt: createdAt(),
 }, (t) => [index('ai_messages_conv_idx').on(t.conversationId, t.createdAt)]);
 
 export const aiProposedActions = pgTable('ai_proposed_actions', {
   id: pk(),
   organizationId: orgId(),
-  conversationId: uuid('conversation_id').notNull().references(() => aiConversations.id, { onDelete: 'cascade' }),
+  /** Null for actions proposed outside a conversation (insights, setup assistant, course builder). */
+  conversationId: uuid('conversation_id').references(() => aiConversations.id, { onDelete: 'cascade' }),
   userId: uuid('user_id').notNull(),
+  /** The tool (or legacy action kind) that executes the action once confirmed. */
   kind: text('kind').notNull(),
+  title: text('title'),
   summary: text('summary').notNull(),
+  details: jsonb('details').$type<Array<{ label: string; value: string }>>().notNull().default([]),
+  /** Inputs the person may change on the card before confirming. */
+  editable: jsonb('editable').$type<Array<{ key: string; label: string; kind: string }>>().notNull().default([]),
+  /** change | bulk | outbound | publish | money | delete */
+  risk: text('risk').notNull().default('change'),
+  /** Proposed after the conversation read untrusted content (reviews, messages, documents). */
+  fromUntrusted: boolean('from_untrusted').notNull().default(false),
+  /** chat | insight | setup | course_builder | content | helpdesk | document */
+  source: text('source').notNull().default('chat'),
+  link: text('link'),
   payload: jsonb('payload').$type<Record<string, unknown>>().notNull(),
   scopeKind: text('scope_kind').notNull(),
   scopeId: uuid('scope_id').notNull(),
-  status: text('status').notNull().default('proposed'), // proposed | executed | rejected | failed
+  status: text('status').notNull().default('proposed'), // proposed | pending_approval | executed | rejected | failed | cancelled
   result: jsonb('result').$type<Record<string, unknown>>(),
+  /** The person confirmed the card (then it executes, or waits for an HQ approver). */
+  confirmedAt: ts('confirmed_at'),
+  approvedBy: uuid('approved_by'),
   decidedBy: uuid('decided_by'),
   decidedAt: ts('decided_at'),
   createdAt: createdAt(),
-});
+}, (t) => [index('ai_proposed_actions_org_idx').on(t.organizationId, t.status)]);

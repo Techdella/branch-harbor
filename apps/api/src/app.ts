@@ -78,7 +78,9 @@ export async function buildApp(opts: BuildOptions = {}): Promise<FastifyInstance
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
   await app.register(cookie);
-  await app.register(rateLimit, { global: false, max: 300, timeWindow: '1 minute' });
+  // The assistant's in-process calls (same person's token, see src/ai/context.ts) carry a per-process secret and are
+  // not counted against the shared loopback address.
+  await app.register(rateLimit, { global: false, max: 300, timeWindow: '1 minute', allowList: (req) => req.headers['x-bh-internal'] === services.internalKey });
 
   await app.register(swagger, {
     openapi: {
@@ -137,6 +139,7 @@ export async function buildApp(opts: BuildOptions = {}): Promise<FastifyInstance
   });
 
   await app.register(registerRoutes, { prefix: '/v1' });
+  services.inject = (o) => app.inject(o);
 
   app.log.info({ integrations: integrationStatus(cfg) }, 'BranchHarbor API configured');
   return app;

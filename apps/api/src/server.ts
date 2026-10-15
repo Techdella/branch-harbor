@@ -42,6 +42,11 @@ const billingSweep = setInterval(() => void (async () => {
   await (await import('./services/data-export.ts')).purgeExpiredExports(app.ctx);
 })().catch((err) => app.log.warn({ err }, 'billing sweep failed')), cfg.BILLING_SWEEP_MINUTES * 60_000);
 
+// The AI assistant: due reminders and briefings every 5 minutes; insights, knowledge re-index and retention hourly
+// (each step is idempotent, so a repeated run is harmless).
+const marinaTick = setInterval(() => void app.ctx.jobs.enqueue('marina.tick', {}, { jobId: `marina-tick-${Math.floor(Date.now() / 300_000)}` }).catch(() => {}), 5 * 60_000);
+const marinaDaily = setInterval(() => void app.ctx.jobs.enqueue('marina.daily', {}, { jobId: `marina-daily-${Math.floor(Date.now() / 3600_000)}` }).catch(() => {}), 3600_000);
+
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
   clearInterval(sweep);
@@ -54,6 +59,8 @@ const shutdown = async (signal: string) => {
   clearInterval(dunningSweep);
   clearInterval(billingSweep);
   clearInterval(qualitySweep);
+  clearInterval(marinaTick);
+  clearInterval(marinaDaily);
   await app.close();
   process.exit(0);
 };

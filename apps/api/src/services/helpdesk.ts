@@ -110,6 +110,8 @@ export async function createTicket(s: Services, input: NewTicket) {
   });
   const to = assigneeId ? [assigneeId] : await agentIds(s.db, input.organizationId);
   await networkNotify(s, { organizationId: input.organizationId, userIds: to, exclude: input.requesterId ? [input.requesterId] : [], kind: assigneeId ? 'ticket_assigned' : 'ticket', title: `#${t.number} ${t.subject}`, body: input.body.slice(0, 160), link: `/help?ticket=${t.id}`, data: { ticketId: t.id, priority: t.priority } });
+  // AI assistant: optional knowledge-base auto-answer (only when HQ opted in; see src/ai/skills/helpdesk.ts).
+  await s.jobs.enqueue('marina.ticket_created', { ticketId: t.id }).catch(() => {});
   return t;
 }
 

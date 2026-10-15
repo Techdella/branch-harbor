@@ -434,3 +434,25 @@ export function taxIdCountry(value: string, claimedCountry: string): string | nu
   if (fmt) return fmt.test(v) ? claimed : null;
   return EU_VAT.has(claimed) ? null : /^[A-Z\d]{5,20}$/.test(v) ? claimed : null;
 }
+
+/* ------------------------------------------------------------------ */
+/* AI assistant allowance                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * AI credits included each month (1 credit = US$0.01 of model usage, see `creditsFor` in ai.ts). `base` is per
+ * organisation, `perLocation` per billable location. Usage above the allowance continues up to the fair-use ceiling
+ * (`AI_FAIR_USE_MULTIPLIER` × allowance), then the assistant pauses until the next month. Same in every currency.
+ */
+export const AI_CREDIT_ALLOWANCE: Readonly<Record<PlanPriceKey, { base: number; perLocation: number }>> = {
+  solo: { base: 500, perLocation: 0 },
+  connector: { base: 200, perLocation: 150 },
+  hosted: { base: 300, perLocation: 300 },
+  network: { base: 2000, perLocation: 400 },
+};
+
+/** Monthly AI credits for a plan and number of billable locations. */
+export function aiMonthlyAllowance(plan: PlanPriceKey, locations: number): number {
+  const a = AI_CREDIT_ALLOWANCE[plan];
+  return a.base + a.perLocation * Math.max(0, locations);
+}

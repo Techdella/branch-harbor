@@ -6,9 +6,13 @@ import { demoRequestCopy } from '../lib/demoRequestCopy.ts';
 import { runConnectionSync } from '../services/connections.ts';
 import { expireHolds } from '../services/studios.ts';
 import { deliverPush, type NotifyInput } from '../services/notifications.ts';
+import { registerAssistantJobs } from '../ai/jobs.ts';
 
 /** Background job handlers. Run via BullMQ when REDIS_URL is set, inline otherwise. */
 export function registerJobHandlers(s: Services) {
+  // The AI assistant: reminders, briefings, insights, knowledge re-index, retention and help desk auto-answer.
+  registerAssistantJobs(s);
+
   s.jobs.register('email.send', async (msg: EmailMessage) => {
     await s.mailer.send(msg);
   });
