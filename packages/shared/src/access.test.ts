@@ -106,5 +106,5 @@ test('finance workspace: franchise owners see their statements and the fund repo
   const fin = effectiveCapabilities({ role: 'finance', scopeKind: 'organization' }, 'studios');
   for (const m of ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts']) assert.ok(fin.has(`${m}:view`), m);
   assert.ok(fin.has('finance.royalties:publish'));
-  assert.deepEqual(workspacesFor(fin, 'studios').find((w) => w.key === 'finance')?.modules, ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts']);
+  assert.deepEqual(workspacesFor(fin, 'studios').find((w) => w.key === 'finance')?.modules, ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts', 'finance.royalty_splits']);
 });

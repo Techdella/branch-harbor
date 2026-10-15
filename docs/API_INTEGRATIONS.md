@@ -375,6 +375,31 @@ Replies can be drafted with BranchHarbor AI (`ANTHROPIC_API_KEY`; drafts only) a
 (none / negative reviews / all). `getLocationRatingSummary(db, orgId, locationIds, period)` exposes per-location
 ratings for the network league table.
 
+## Franchise development: territory maps, demographics and master payouts
+
+### Territory basemap (`MAP_TILES_URL`)
+The territory map (Sales → Territories) and the public "Available territories" map on brand sites use MapLibre GL.
+- `MAP_TILES_URL`: a MapLibre **style JSON** URL (for example MapTiler `https://api.maptiler.com/maps/streets-v2/style.json?key=YOUR_KEY`, restrict the key to your app and sites domains) or a **raster XYZ template** containing `{z}/{x}/{y}` (any OSM-compatible tile provider whose terms allow it). `MAP_ATTRIBUTION` overrides the attribution text.
+- A no-key option is OpenFreeMap (`https://tiles.openfreemap.org/styles/positron`); check its terms before production use.
+- **Unset:** maps draw territories and locations on a plain styled background with a latitude/longitude graticule. No third-party tiles are requested and nothing breaks; it simply has no streets.
+- The API returns the basemap config with the territory list (`map`) and the public map, so changing it needs no app rebuild.
+
+### Demographics provider (territory scoring)
+`integrations/demographics.ts` defines a provider interface (population, households, median household income per postcode area):
+| Country | Provider | Status |
+|---|---|---|
+| United States | US Census Bureau **ACS 5-year** by ZIP Code Tabulation Area (`B01003_001E`, `B11001_001E`, `B19013_001E`), free key from api.census.gov/data/key_signup.html | **Live** when `CENSUS_API_KEY` is set (postcode territories) |
+| United Kingdom | ONS / Nomis Census 2021 by postcode district (free) | Planned; sandbox until built |
+| Canada | Statistics Canada Census Profile by FSA | Planned |
+| Others, and drawn-only polygons | A commercial partner with polygon enrichment (e.g. Esri GeoEnrichment) | Phase 3 |
+Without a live provider the sandbox returns stable sample figures flagged `sandbox: true`; screens label them "sample figures" and Item 12 exports say they are not for disclosure. Income across several areas is the household-weighted mean of the medians (an approximation).
+
+### Master franchise payouts (Stripe Connect transfers)
+Split statements pay the master franchisee's share of **collected** royalties and fund contributions.
+- `stripe_transfer`: `transfers.create` from the **platform balance** to the master's connected account (idempotency key per statement). Royalties are collected on the franchisor's own connected account, so the platform balance must hold funds in that currency first; transfers are same-currency only and limited to regions where Stripe supports cross-border transfers from the platform's country. The master's account needs the `transfers` capability.
+- `manual`: HQ pays by bank transfer and records the reference. Use this whenever transfers are not supported.
+- Without `STRIPE_SECRET_KEY` (sandbox) transfers get a `tr_sandbox_…` id and move no money.
+
 ## What to set up first (shortest path to a Studios pilot)
 
 1. Stripe account (platform) → enable Connect + Billing + Tax

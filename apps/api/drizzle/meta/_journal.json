@@ -176,6 +176,13 @@
       "when": 1792099144124,
       "tag": "0024_audits_compliance",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792100925419,
+      "tag": "0025_franchise_dev",
+      "breakpoints": true
     }
   ]
 }

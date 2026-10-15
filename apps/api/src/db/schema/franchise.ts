@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
-import type { JurisdictionRule } from '@bh/shared';
+import type { Demographics, JurisdictionRule, ScorePart, TerritoryGeometry } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
 import { locations, organizations, ownerGroups } from './core.ts';
 
@@ -57,6 +57,24 @@ export const franchiseTerritories = pgTable('franchise_territories', {
   ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'set null' }),
   /** Public on the brand site's "Own a franchise" form. */
   showOnSite: boolean('show_on_site').notNull().default(true),
+  // Territory map (franchise-dev): drawn area and/or postcode list, exclusivity, demographics and score.
+  /** GeoJSON Polygon / MultiPolygon (WGS84 lng/lat). */
+  geometry: jsonb('geometry').$type<TerritoryGeometry>(),
+  /** Postcodes / ZIP codes (normalised: upper case, no spaces). */
+  postcodes: text('postcodes').array().notNull().default(sql`'{}'::text[]`),
+  /** exclusive | protected | non_exclusive */
+  exclusivity: text('exclusivity').notNull().default('exclusive'),
+  centroid: jsonb('centroid').$type<{ lat: number; lng: number }>(),
+  demographics: jsonb('demographics').$type<Demographics>(),
+  score: integer('score'),
+  scoreParts: jsonb('score_parts').$type<ScorePart[]>(),
+  /** The agreement that holds the territory (set when signed). */
+  agreementId: uuid('agreement_id'),
+  /** Master franchise agreement whose master develops this territory. */
+  masterAgreementId: uuid('master_agreement_id'),
+  /** Link to the access-model territory scope (sub-network) once it exists; not an access scope itself. */
+  scopeTerritoryId: uuid('scope_territory_id'),
+  statusChangedAt: ts('status_changed_at'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [index('franchise_territories_org_idx').on(t.organizationId)]);
@@ -89,6 +107,8 @@ export const franchiseProspects = pgTable('franchise_prospects', {
   /** Set when the agreement is signed. */
   ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'set null' }),
   locale: text('locale').notNull().default('en'),
+  /** Set when the prospect belongs to a master franchisee's pipeline (master_agreements). */
+  masterAgreementId: uuid('master_agreement_id'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [index('franchise_prospects_org_stage_idx').on(t.organizationId, t.stage)]);

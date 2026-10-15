@@ -7,7 +7,9 @@ import { notify } from './notifications.ts';
 
 export type NetworkNotificationKind =
   | 'announcement' | 'required_read_reminder' | 'mention' | 'reply' | 'answer_accepted' | 'coaching' | 'event'
-  | 'course_assigned' | 'course_approval' | 'course_reviewed' | 'course_lead' | 'certificate_expiring' | 'ticket' | 'ticket_reply' | 'ticket_assigned' | 'sla';
+  | 'course_assigned' | 'course_approval' | 'course_reviewed' | 'course_lead' | 'certificate_expiring' | 'ticket' | 'ticket_reply' | 'ticket_assigned' | 'sla'
+  // Franchise development: survey rounds, validation calls and agreement notices.
+  | 'survey' | 'validation_call' | 'agreement_notice';
 
 /** Kinds a person cannot switch off: compliance reminders and SLA breaches. */
 const ALWAYS: NetworkNotificationKind[] = ['required_read_reminder', 'sla'];
