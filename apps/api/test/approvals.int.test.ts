@@ -53,6 +53,10 @@ describe.skipIf(!hasDb)('approvals inbox: refunds over the org threshold, local 
     const r = await call(app, 'POST', `/v1/orgs/${orgId}/refund-requests`, { token: manager.token, body: { paymentId: pay, amountMinor: 2500, currency: 'CAD', reason: 'Studio heating failed' } });
     expect(r.status).toBe(202);
     expect(r.body.approval).toMatchObject({ kind: 'refund', status: 'pending', amount: { amount: 2500, currency: 'CAD' }, location: { name: 'Queen West' }, canDecide: false });
+    // Structured title next to the English one, so apps can phrase it in the viewer's language.
+    expect(r.body.approval.title).toMatch(/^Refund for payment /);
+    expect(r.body.approval).toMatchObject({ titleCode: 'refund_payment', titleParams: { amountMinor: 2500, currency: 'CAD' } });
+    expect(r.body.approval.titleParams.ref).toEqual(expect.any(String));
     const id = r.body.approval.id;
     expect(await refunded(pay)).toBe(0); // nothing executed yet
     expect((await call(app, 'POST', `/v1/orgs/${orgId}/refund-requests`, { token: manager.token, body: { paymentId: pay, amountMinor: 100, currency: 'CAD', reason: 'again' } })).body.error.code).toBe('request_pending');

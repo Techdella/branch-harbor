@@ -12,6 +12,7 @@ import { useApp } from '../shell/AppContext';
 import { useBusinessMode } from '@/lib/useBusinessMode';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
+import { useDataText } from '../ui/useDataText';
 
 const ROLE_OPTIONS = ['hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance'] as const;
 /** Independent businesses: owner, manager, staff, marketing contributor, finance — no HQ, regional or franchise roles. */
@@ -51,6 +52,9 @@ function MembersTab() {
   // Independent: no scope to pick — org-wide roles cover the business, the others its one location.
   const independentScope = ORG_WIDE_ROLES.includes(role) || !mode.location ? 'all' : `loc:${mode.location.id}`;
   const roleLabel = (r: string) => (mode.isIndependent ? ts(`role.${r}`) : t(`role.${r}`));
+  const dt = useDataText();
+  /** Assignment role: independent businesses use their own role names; otherwise data `role.*`, else the API label. */
+  const assignmentRole = (a: Member['assignments'][number]) => (a.roleKey && mode.isIndependent && ts.has(`role.${a.roleKey}`) ? ts(`role.${a.roleKey}`) : dt(a.roleKey ? `role.${a.roleKey}` : undefined, undefined, a.role));
   const invite = useMutation((api) =>
     mode.isIndependent
       ? api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId: independentScope, scopeLabel: mode.businessName })
@@ -126,8 +130,8 @@ function MembersTab() {
               rowKey={(m) => m.id}
               columns={[
                 { key: 'person', header: t('col.person'), render: (m) => <span className="flex items-center gap-2.5"><Avatar name={m.name} size={32} pastel={m.status === 'support' ? '#F7EDA8' : '#E2F5A6'} /><span><strong>{m.name}</strong><span className="block text-xs text-stone">{m.email}</span></span></span> },
-                { key: 'roles', header: t('col.assignments'), render: (m) => <ul className="flex flex-col gap-0.5">{m.assignments.map((a, i) => <li key={i}><strong>{a.role}</strong> <span className="text-stone">· {a.scopeLabel}</span></li>)}</ul> },
-                { key: 'last', header: t('col.lastActive'), render: (m) => m.lastActive },
+                { key: 'roles', header: t('col.assignments'), render: (m) => <ul className="flex flex-col gap-0.5">{m.assignments.map((a, i) => <li key={i}><strong>{assignmentRole(a)}</strong> <span className="text-stone">· {dt(a.scopeKey, a.scopeParams, a.scopeLabel)}</span></li>)}</ul> },
+                { key: 'last', header: t('col.lastActive'), render: (m) => dt(m.lastActiveKey, m.lastActiveParams, m.lastActive) },
                 { key: 'status', header: t('col.status'), render: (m) => <Badge tone={m.status === 'active' ? 'success' : m.status === 'invited' ? 'info' : 'warning'} icon={m.status === 'support' ? 'shield' : undefined}>{t(`status.${m.status}`)}</Badge> },
               ]}
             />

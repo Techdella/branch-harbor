@@ -16,9 +16,12 @@ export interface Entitlements {
   credits: { available: number };
   fees: Array<{ id: string; kind: string; amount: Money }>;
 }
+/** Facts behind the API's English `access` / `terms` lines (phrased in the app's language by lib `studioText`). */
+export interface AccessDetail { policy: 'any_location' | 'same_currency' | 'listed' | 'home_only'; currency: string; locationCount: number; locationName: string }
+export interface TermsDetail { billingCurrency: string; noticeDays: number; maxPauseDays: number | null; classesPerPeriod: number | null }
 export interface Pricing {
-  packs: Array<{ id: string; name: string; credits: number; validityDays: number; price: Money; access: string }>;
-  memberships: Array<{ id: string; name: string; classesPerPeriod: number | null; price: Money; access: string; terms: string[] }>;
+  packs: Array<{ id: string; name: string; credits: number; validityDays: number; price: Money; access: string; accessDetail?: AccessDetail }>;
+  memberships: Array<{ id: string; name: string; classesPerPeriod: number | null; price: Money; access: string; accessDetail?: AccessDetail; terms: string[]; termsDetail?: TermsDetail }>;
   offers: Array<{ id: string; name: string; credits: number | null; validDays: number; price: Money; newCustomersOnly: boolean }>;
   policy: CustomerPolicy;
   location: { paymentsEnabled: boolean };
@@ -29,7 +32,7 @@ export interface BookingOptions {
   memberships: Array<{ id: string; name: string; usable: boolean; reason: string | null; usage: { used: number; limit: number | null } | null }>;
 }
 export type PayWith = { kind: 'credit'; packId: string } | { kind: 'membership'; membershipId: string };
-export interface OnlineClass { id: string; kind: 'livestream' | 'on_demand'; title: string; instructorName: string | null; startsAt: string | null; durationMinutes: number | null; rules: string[]; access?: { access: boolean; registered: boolean; needsRegistration: boolean; canJoin: boolean; reasons: string[]; purchasable: Money | null } }
+export interface OnlineClass { id: string; kind: 'livestream' | 'on_demand'; title: string; instructorName: string | null; startsAt: string | null; durationMinutes: number | null; rules: string[]; ruleCodes?: string[]; access?: { access: boolean; registered: boolean; needsRegistration: boolean; canJoin: boolean; reasons: string[]; reasonCodes?: string[]; purchasable: Money | null } }
 export interface OccupancyRow { locationId: string; locationName: string; classes: number; occupancyPct: number | null }
 
 /** `${locationId}~${occurrenceId}` (see src/lib/live.ts). */
@@ -61,15 +64,15 @@ const ent: Entitlements = {
   memberships: [], packs: [{ id: 'pk1', name: '5-class pack', creditsRemaining: 3, creditsTotal: 5, expiresAt: new Date(Date.now() + 40 * 86400_000).toISOString(), status: 'active' }], credits: { available: 3 }, fees: [],
 };
 const onlineMock: OnlineClass[] = [
-  { id: 'on1', kind: 'livestream', title: 'Morning Vinyasa — live', instructorName: 'Maya Rao', startsAt: new Date(Date.now() + 86400_000).toISOString(), durationMinutes: 60, rules: ['Included with a membership', 'Included for class pack holders'], access: { access: true, registered: false, needsRegistration: true, canJoin: false, reasons: [], purchasable: null } },
-  { id: 'on2', kind: 'on_demand', title: 'Hip Mobility for Desk Days', instructorName: 'Priya Shah', startsAt: null, durationMinutes: 30, rules: ['Included with a membership', 'Available to buy'], access: { access: false, registered: false, needsRegistration: false, canJoin: false, reasons: ['Members only'], purchasable: { amount: 900, currency: 'CAD' } } },
+  { id: 'on1', kind: 'livestream', title: 'Morning Vinyasa — live', instructorName: 'Maya Rao', startsAt: new Date(Date.now() + 86400_000).toISOString(), durationMinutes: 60, rules: ['Included with a membership', 'Included for class pack holders'], ruleCodes: ['members', 'pack_holders'], access: { access: true, registered: false, needsRegistration: true, canJoin: false, reasons: [], reasonCodes: [], purchasable: null } },
+  { id: 'on2', kind: 'on_demand', title: 'Hip Mobility for Desk Days', instructorName: 'Priya Shah', startsAt: null, durationMinutes: 30, rules: ['Included with a membership', 'Available to buy'], ruleCodes: ['members', 'buy'], access: { access: false, registered: false, needsRegistration: false, canJoin: false, reasons: ['Members only'], reasonCodes: ['members_only'], purchasable: { amount: 900, currency: 'CAD' } } },
 ];
 const mock: typeof live = {
   entitlements: async () => wait({ ...ent, customer: null }),
   pricing: async (l) => wait<Pricing>({
     location: { paymentsEnabled: true }, policy: { lines: ['Cancel at least 12 hours before the class starts to avoid a late cancellation.', 'Late cancellations with a class pack use the credit.'] },
-    packs: [{ id: 'pp5', name: '5-class pack', credits: 5, validityDays: 90, price: { amount: 12500, currency: cur(l) }, access: 'Valid at every location in your currency' }, { id: 'pp10', name: '10-class pack', credits: 10, validityDays: 180, price: { amount: 23000, currency: cur(l) }, access: 'Valid at every location' }],
-    memberships: [{ id: 'mpu', name: 'Unlimited', classesPerPeriod: null, price: { amount: 18900, currency: cur(l) }, access: 'Valid at every location in your currency', terms: ['Billed monthly until cancelled.', "Cancel with 30 days' notice."] }],
+    packs: [{ id: 'pp5', name: '5-class pack', credits: 5, validityDays: 90, price: { amount: 12500, currency: cur(l) }, access: 'Valid at every location in your currency', accessDetail: { policy: 'same_currency', currency: cur(l), locationCount: 0, locationName: '' } }, { id: 'pp10', name: '10-class pack', credits: 10, validityDays: 180, price: { amount: 23000, currency: cur(l) }, access: 'Valid at every location', accessDetail: { policy: 'any_location', currency: cur(l), locationCount: 0, locationName: '' } }],
+    memberships: [{ id: 'mpu', name: 'Unlimited', classesPerPeriod: null, price: { amount: 18900, currency: cur(l) }, access: 'Valid at every location in your currency', accessDetail: { policy: 'same_currency', currency: cur(l), locationCount: 0, locationName: '' }, terms: ['Billed monthly until cancelled.', "Cancel with 30 days' notice."], termsDetail: { billingCurrency: cur(l), noticeDays: 30, maxPauseDays: null, classesPerPeriod: null } }],
     offers: [{ id: 'of1', name: 'Intro week — 3 classes', credits: 3, validDays: 7, price: { amount: 2500, currency: cur(l) }, newCustomersOnly: true }],
   }),
   options: async () => wait<BookingOptions>({ signedIn: true, price: { amount: 2800, currency: 'CAD' }, outstandingFees: 0, policy: { lines: ['Cancel at least 12 hours before the class starts to avoid a late cancellation.'] }, memberships: [], credits: ent.packs.map((p) => ({ id: p.id, name: p.name, creditsRemaining: p.creditsRemaining, creditsNeeded: 1, usable: p.creditsRemaining > 0, reason: p.creditsRemaining > 0 ? null : 'No credits left' })) }),

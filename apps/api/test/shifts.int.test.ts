@@ -59,6 +59,7 @@ describe.skipIf(!hasDb)('staff shifts, swap requests with manager approval, and 
     const req = await call(app, 'POST', `/v1/orgs/${orgId}/shifts/${mine.id}/swap-requests`, { token: sam.token, body: { toUserId: jordan.userId, toShiftId: theirs.id, reason: 'Exam that morning' } });
     expect(req.status).toBe(201);
     expect(req.body.approval).toMatchObject({ kind: 'shift_swap', status: 'pending', canDecide: false, requester: { name: 'Sam Tran' } });
+    expect(req.body.approval).toMatchObject({ titleCode: 'shift_swap', titleParams: { role: mine.role, startsAt: new Date(mine.startsAt).toISOString(), timeZone: expect.any(String) } });
     const approvalId = req.body.approval.id;
     expect((await call(app, 'POST', `/v1/orgs/${orgId}/shifts/${mine.id}/swap-requests`, { token: sam.token, body: { toUserId: jordan.userId } })).body.error.code).toBe('swap_pending');
 

@@ -124,6 +124,23 @@ Customer websites serve Arabic (`ar`) with `dir="rtl"` on `<html>`:
 
 ## Text that comes from the API
 
-Sentences the API composes (studio cancellation policy, membership terms, error messages) are English. Where the API
-also returns the facts behind them — e.g. the studio policy's `terms` — sites and mobile phrase them from the
-catalogue (`studio.terms.*`) and only fall back to the English lines for older responses.
+Sentences the API composes are English. Next to each one the API returns a stable code or the facts behind it, and
+the clients phrase the text from their catalogues, falling back to the English line only for codes they don't know
+or older responses. New API text that reaches a screen should follow the same pattern (additive fields, never a
+changed `message`).
+
+| API text | Structured field(s) | Phrased from |
+| --- | --- | --- |
+| Error `message` | `code` (+ `details`, e.g. `days`, `freeCancelHours`) | sites `messages/fallback/*.json` → `apiError.*` (applied in `lib/client.ts`, `portal.ts`, `shop.ts`); mobile `apiError.*` (`lib/errors.ts` `localizedApiMessage`) |
+| Studio cancellation policy `lines` | `terms` | sites / mobile `studio.terms.*` |
+| Pack / membership `access` | `accessDetail` (`policy`, `currency`, `locationCount`, `locationName`) | `studio.access.*` |
+| Membership `terms` | `termsDetail` (`billingCurrency`, `noticeDays`, `maxPauseDays`, `classesPerPeriod`) | `studio.membershipTerms.*` |
+| Online class `rules` / access `reasons` | `ruleCodes` / `reasonCodes` (same order) | `studio.onlineRule.*` / `studio.onlineReason.*` |
+| Approval `title` | `titleCode` + `titleParams` (null for titles people typed) | app `data` → `approval.title.*`; mobile `owner.approvalTitle.*` |
+| Report metric `unavailableReason`, `freshness.source` | `unavailableCode` + `unavailableParams`, `freshness.sourceCode` | app `data` → `metricReason.*`, `source.api.*` |
+
+In the business app, text the data layer builds itself (metric names, roles, history and timeline entries, connection
+status, approval details) travels in the view models as keys plus arguments (`labelKey`, `roleKey`,
+`titleKey`/`titleParams`, `textKey`/`textParams`, …) and is translated in the components from the `data` namespace
+(`messages/data/*.json`, see `src/lib/msg.ts`). Names, places and other business data are passed as arguments and
+never translated.

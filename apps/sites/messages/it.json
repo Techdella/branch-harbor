@@ -944,6 +944,35 @@
       "noShowFee": "Penale per mancata presenza: {amount}.",
       "noShowFeeMembers": "Penale per mancata presenza: {amount} (non addebitata agli abbonati).",
       "noNoShowFee": "Nessuna penale per mancata presenza."
+    },
+    "access": {
+      "any_location": "Valido in tutte le sedi",
+      "same_currency": "Valido in tutte le sedi in {currency}",
+      "listed": "{count, plural, one {Valido in # sede selezionata} other {Valido in # sedi selezionate}}",
+      "home_only": "Valido solo a {location}"
+    },
+    "membershipTerms": {
+      "billed": "Addebito mensile in {currency} fino alla disdetta.",
+      "notice": "{days, plural, one {Disdetta con # giorno di preavviso.} other {Disdetta con # giorni di preavviso.}}",
+      "pause": "Sospensione fino a {days} giorni alla volta.",
+      "noPause": "Sospensione non disponibile.",
+      "classes": "{count} lezioni al mese; le lezioni non usate non si accumulano.",
+      "unlimited": "Lezioni illimitate."
+    },
+    "onlineReason": {
+      "sign_in": "Accedi per seguire le lezioni online",
+      "membership_excludes": "Il tuo abbonamento non include questa lezione al momento",
+      "members_only": "Solo per iscritti",
+      "pack_holders_only": "Solo con carnet di lezioni",
+      "buy_to_watch": "Acquista questa lezione per guardarla",
+      "livestream_ended": "Questa diretta è terminata"
+    },
+    "onlineRule": {
+      "free_with_registration": "Gratis con iscrizione",
+      "members": "Incluso nell’abbonamento",
+      "pack_holders": "Incluso con carnet di lezioni",
+      "buy": "Disponibile all’acquisto",
+      "not_available": "Non ancora disponibile"
     }
   },
   "storefront": {

@@ -10,12 +10,14 @@ import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, LoadingBlock, SectionCard } from '../ui/States';
 import { MetricCard } from './MetricCard';
+import { useDataText } from '../ui/useDataText';
 
 export function OverviewScreen() {
   const t = useTranslations('overview');
   const locale = useLocale();
   const app = useApp();
   const scopeLabel = useScopeLabel();
+  const dt = useDataText();
   const res = useApi((api) => api.overview(app.ctx), [app.industry, app.role, app.scopeId]);
   const kindTone = { action: 'bg-butter', integration: 'bg-blush', info: 'bg-canvas' } as const;
 
@@ -31,7 +33,7 @@ export function OverviewScreen() {
               ))}
             </section>
             <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))]">
-              <SectionCard title={ov.upcomingTitle} aside={<span className="text-xs text-stone">{t('localTimes')}</span>}>
+              <SectionCard title={dt(ov.upcomingTitleKey, undefined, ov.upcomingTitle)} aside={<span className="text-xs text-stone">{t('localTimes')}</span>}>
                 {ov.upcoming.length === 0 ? (
                   <p className="rounded-md bg-canvas p-4 text-sm text-stone">{t('nothingUpcoming')}</p>
                 ) : (
@@ -43,10 +45,10 @@ export function OverviewScreen() {
                           <span className="block text-[10px] font-semibold text-stone">{zoneLabel(u.timeZone, locale, new Date(u.at))}</span>
                         </span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm font-bold sm:truncate">{u.title}</div>
-                          <div className="truncate text-xs text-stone">{u.detail}</div>
+                          <div className="text-sm font-bold sm:truncate">{dt(u.titleKey, u.titleParams, u.title)}</div>
+                          <div className="truncate text-xs text-stone">{dt(u.detailKey, u.detailParams, u.detail)}</div>
                         </div>
-                        <Badge tone={u.status.tone}>{u.status.label}</Badge>
+                        <Badge tone={u.status.tone}>{dt(u.status.labelKey, u.status.labelParams, u.status.label)}</Badge>
                       </li>
                     ))}
                   </ul>
@@ -67,8 +69,8 @@ export function OverviewScreen() {
                             <Icon name={a.icon} size={18} />
                             <div className="min-w-0 flex-1">
                               <div className="text-[11px] font-bold uppercase tracking-[0.05em] text-graphite">{t(`kind.${a.kind}`)}</div>
-                              <div className="text-sm font-bold">{a.title}</div>
-                              <div className="text-xs text-graphite">{a.detail}</div>
+                              <div className="text-sm font-bold">{dt(a.titleKey, a.titleParams, a.title)}</div>
+                              <div className="text-xs text-graphite">{dt(a.detailKey, a.detailParams, a.detail)}</div>
                             </div>
                             <Icon name="chevron-right" size={16} />
                           </Link>
@@ -82,7 +84,7 @@ export function OverviewScreen() {
                     <Icon name="sparkles" size={20} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[15px] font-bold">{ov.aiPrompt}</div>
+                    <div className="text-[15px] font-bold">{dt(ov.aiPromptKey, undefined, ov.aiPrompt)}</div>
                     <div className="text-xs text-[#B9B9B3]">{t('aiNote', { scope: scopeLabel })}</div>
                   </div>
                   <Button variant="secondary" size="sm" onClick={() => app.setAiOpen(true)} className="border-0">

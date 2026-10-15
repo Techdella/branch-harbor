@@ -3,6 +3,7 @@ import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
 import type { AttentionItem, Cell, IndustryKey, Metric, MetricValue, TableData } from '../types';
 import { FIXTURES, PASTEL as P, at, loc } from './orgs';
+import { moneyArg, type MsgParams } from '../msg';
 
 /* ------------------------------------------------------------------ */
 /* Overview                                                            */
@@ -25,7 +26,7 @@ interface MetricDef {
   note?: string;
 }
 
-const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: string; upcoming: [locId: string, hhmm: string, title: string, detail: string, status: string, tone: Tone][]; attention: (AttentionItem & { locId?: string })[]; aiPrompt: string }> = {
+const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: string; upcoming: [locId: string, hhmm: string, title: string, detail: string, status: string, tone: Tone, detailMsg?: [key: string, params: MsgParams]][]; attention: (AttentionItem & { locId?: string })[]; aiPrompt: string }> = {
   studios: {
     metrics: [
       { key: 'enquiries', label: 'Enquiries', definition: 'Website enquiry and trial forms submitted', range: 'Last 7 days', source: 'Website forms', icon: 'mail', pastel: P.lime, perLoc: [12, 9, 7, 8, 6, 0, 5], agg: 'sum', kind: 'count' },
@@ -36,17 +37,17 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
     ],
     upcomingTitle: 'Upcoming classes',
     upcoming: [
-      ['qw', '07:00', 'Morning Vinyasa · Maya Rao', 'Queen West · 16/20', 'Cover requested', 'warning'],
-      ['qw', '09:00', 'Slow Flow · Sam Tran', 'Queen West · 20/20 · 3 waitlisted', 'Full', 'info'],
-      ['ls', '12:15', 'Lunchtime Pilates · Ana Silva', 'Leslieville · 11/20', 'Open', 'success'],
-      ['sh', '18:30', 'Yin & Restore · Priya Shah', 'Shoreditch · 19/20', '1 spot', 'neutral'],
-      ['sy', '06:30', 'Sunrise Flow · Ella Wright', 'Surry Hills · 14/18', 'Open', 'success'],
+      ['qw', '07:00', 'Morning Vinyasa · Maya Rao', 'Queen West · 16/20', 'Cover requested', 'warning', ['upcoming.detail.class', { place: 'Queen West', booked: 16, capacity: 20, waitlist: 0 }]],
+      ['qw', '09:00', 'Slow Flow · Sam Tran', 'Queen West · 20/20 · 3 waitlisted', 'Full', 'info', ['upcoming.detail.class', { place: 'Queen West', booked: 20, capacity: 20, waitlist: 3 }]],
+      ['ls', '12:15', 'Lunchtime Pilates · Ana Silva', 'Leslieville · 11/20', 'Open', 'success', ['upcoming.detail.class', { place: 'Leslieville', booked: 11, capacity: 20, waitlist: 0 }]],
+      ['sh', '18:30', 'Yin & Restore · Priya Shah', 'Shoreditch · 19/20', '1 spot', 'neutral', ['upcoming.detail.class', { place: 'Shoreditch', booked: 19, capacity: 20, waitlist: 0 }]],
+      ['sy', '06:30', 'Sunrise Flow · Ella Wright', 'Surry Hills · 14/18', 'Open', 'success', ['upcoming.detail.class', { place: 'Surry Hills', booked: 14, capacity: 18, waitlist: 0 }]],
     ],
     attention: [
-      { id: 'a1', icon: 'alert', title: 'Kitsilano booking sync degraded', detail: 'Last successful sync 2 h ago · occupancy unavailable', href: '/connections', kind: 'integration', locId: 'kt' },
-      { id: 'a2', icon: 'users', title: '1 open cover request', detail: 'Morning Vinyasa, Queen West', href: '/ops/cover', kind: 'action', locId: 'qw' },
-      { id: 'a3', icon: 'shield', title: '1 page change awaiting approval', detail: 'Leslieville · Home hero', href: '/websites?tab=approvals', kind: 'action', locId: 'ls' },
-      { id: 'a4', icon: 'card', title: 'Payment without booking record', detail: 'Reconciliation queue · 1 item', href: '/payments?tab=reconciliation', kind: 'action' },
+      { id: 'a1', icon: 'alert', title: 'Kitsilano booking sync degraded', detail: 'Last successful sync 2 h ago · occupancy unavailable', titleKey: 'attention.bookingSyncDegraded', titleParams: { place: 'Kitsilano' }, detailKey: 'attention.lastSyncOccupancy', detailParams: { hours: 2 }, href: '/connections', kind: 'integration', locId: 'kt' },
+      { id: 'a2', icon: 'users', title: '1 open cover request', detail: 'Morning Vinyasa, Queen West', titleKey: 'attention.openCover', titleParams: { count: 1 }, href: '/ops/cover', kind: 'action', locId: 'qw' },
+      { id: 'a3', icon: 'shield', title: '1 page change awaiting approval', detail: 'Leslieville · Home hero', titleKey: 'attention.pageChanges', titleParams: { count: 1 }, href: '/websites?tab=approvals', kind: 'action', locId: 'ls' },
+      { id: 'a4', icon: 'card', title: 'Payment without booking record', detail: 'Reconciliation queue · 1 item', titleKey: 'attention.paymentWithoutBooking', detailKey: 'attention.reconQueue', detailParams: { count: 1 }, href: '/payments?tab=reconciliation', kind: 'action' },
     ],
     aiPrompt: 'Summarise attendance changes this month',
   },
@@ -65,9 +66,9 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
       ['mc', '18:00', 'U14 Development · Coach Hale', 'Didsbury · Main pitch', 'Scheduled', 'neutral'],
     ],
     attention: [
-      { id: 'a1', icon: 'alert', title: 'Pitch 2 double-booked at 17:00', detail: 'U10 Blue and U12 Camp · Riverside Park', href: '/ops/schedule', kind: 'action', locId: 'rp' },
-      { id: 'a2', icon: 'file', title: '9 registrations awaiting review', detail: 'Autumn U10 and U12', href: '/ops/registrations', kind: 'action' },
-      { id: 'a3', icon: 'wifi-off', title: 'Dublin payments not set up', detail: 'Registration stays closed until the account is enabled', href: '/payments?tab=setup', kind: 'integration', locId: 'dn' },
+      { id: 'a1', icon: 'alert', title: 'Pitch 2 double-booked at 17:00', detail: 'U10 Blue and U12 Camp · Riverside Park', titleKey: 'attention.doubleBooked', titleParams: { venue: 'Pitch 2', time: '17:00' }, detailKey: 'attention.twoGroupsAt', detailParams: { a: 'U10 Blue', b: 'U12 Camp', place: 'Riverside Park' }, href: '/ops/schedule', kind: 'action', locId: 'rp' },
+      { id: 'a2', icon: 'file', title: '9 registrations awaiting review', detail: 'Autumn U10 and U12', titleKey: 'attention.registrationsReview', titleParams: { count: 9 }, detailKey: 'attention.twoNames', detailParams: { a: 'Autumn U10', b: 'U12' }, href: '/ops/registrations', kind: 'action' },
+      { id: 'a3', icon: 'wifi-off', title: 'Dublin payments not set up', detail: 'Registration stays closed until the account is enabled', titleKey: 'attention.paymentsNotSetUp', titleParams: { place: 'Dublin' }, detailKey: 'attention.registrationClosedUntil', href: '/payments?tab=setup', kind: 'integration', locId: 'dn' },
     ],
     aiPrompt: 'Suggest a fix for the Pitch 2 clash',
   },
@@ -86,9 +87,9 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
       ['hf', '14:00', 'Facial · Tom B.', 'Room C', 'Cancelled', 'danger'],
     ],
     attention: [
-      { id: 'a1', icon: 'refresh', title: 'Reschedule request', detail: 'Jordan P. wants the 10:00 deep tissue moved', href: '/ops/calendar', kind: 'action', locId: 'hf' },
-      { id: 'a2', icon: 'user', title: 'Ana L. absent Friday', detail: '4 appointments need reassigning', href: '/ops/practitioners', kind: 'action', locId: 'yv' },
-      { id: 'a3', icon: 'alert', title: 'Fitzroy calendar sync degraded', detail: 'Utilisation unavailable for Melbourne', href: '/connections', kind: 'integration', locId: 'fz' },
+      { id: 'a1', icon: 'refresh', title: 'Reschedule request', detail: 'Jordan P. wants the 10:00 deep tissue moved', titleKey: 'attention.rescheduleRequest', detailKey: 'attention.wantsMoved', detailParams: { name: 'Jordan P.', time: '10:00', service: 'Deep tissue' }, href: '/ops/calendar', kind: 'action', locId: 'hf' },
+      { id: 'a2', icon: 'user', title: 'Ana L. absent Friday', detail: '4 appointments need reassigning', titleKey: 'attention.absentFriday', titleParams: { name: 'Ana L.' }, detailKey: 'attention.appointmentsReassign', detailParams: { count: 4 }, href: '/ops/practitioners', kind: 'action', locId: 'yv' },
+      { id: 'a3', icon: 'alert', title: 'Fitzroy calendar sync degraded', detail: 'Utilisation unavailable for Melbourne', titleKey: 'attention.calendarSyncDegraded', titleParams: { place: 'Fitzroy' }, detailKey: 'attention.utilisationUnavailable', detailParams: { place: 'Melbourne' }, href: '/connections', kind: 'integration', locId: 'fz' },
     ],
     aiPrompt: 'Draft a reply using our cancellation policy',
   },
@@ -101,15 +102,15 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
     ],
     upcomingTitle: 'To fulfil today',
     upcoming: [
-      ['pd', '10:20', '#5521 · Linen overshirt ×2', 'Portland · ship', 'To fulfil', 'info'],
-      ['sf', '11:05', '#5524 · Merino crew', 'Hayes Valley · pickup', 'To fulfil', 'info'],
-      ['am', '14:10', '#5526 · Field notebook set', 'De Pijp · pickup', 'To fulfil', 'info'],
+      ['pd', '10:20', '#5521 · Linen overshirt ×2', 'Portland · ship', 'To fulfil', 'info', ['upcoming.detail.ship', { place: 'Portland' }]],
+      ['sf', '11:05', '#5524 · Merino crew', 'Hayes Valley · pickup', 'To fulfil', 'info', ['upcoming.detail.pickup', { place: 'Hayes Valley' }]],
+      ['am', '14:10', '#5526 · Field notebook set', 'De Pijp · pickup', 'To fulfil', 'info', ['upcoming.detail.pickup', { place: 'De Pijp' }]],
       ['pd', '11:40', '#5517 · Canvas tote', 'Portland', 'Payment failed', 'danger'],
     ],
     attention: [
-      { id: 'a1', icon: 'alert', title: 'Merino crew failed to sync to 2 stores', detail: 'Variant mismatch on size XS', href: '/ops/catalogue', kind: 'integration' },
-      { id: 'a2', icon: 'box', title: 'Linen overshirt L low at Portland', detail: '1 on hand', href: '/ops/inventory', kind: 'action', locId: 'pd' },
-      { id: 'a3', icon: 'wifi-off', title: 'Austin store disconnected', detail: 'Orders there are not imported until it reconnects', href: '/connections', kind: 'integration', locId: 'au' },
+      { id: 'a1', icon: 'alert', title: 'Merino crew failed to sync to 2 stores', detail: 'Variant mismatch on size XS', titleKey: 'attention.productSyncFailed', titleParams: { product: 'Merino crew', count: 2 }, detailKey: 'attention.variantMismatch', detailParams: { size: 'XS' }, href: '/ops/catalogue', kind: 'integration' },
+      { id: 'a2', icon: 'box', title: 'Linen overshirt L low at Portland', detail: '1 on hand', titleKey: 'attention.lowStock', titleParams: { item: 'Linen overshirt L', place: 'Portland' }, detailKey: 'attention.onHand', detailParams: { count: 1 }, href: '/ops/inventory', kind: 'action', locId: 'pd' },
+      { id: 'a3', icon: 'wifi-off', title: 'Austin store disconnected', detail: 'Orders there are not imported until it reconnects', titleKey: 'attention.storeDisconnected', titleParams: { place: 'Austin' }, detailKey: 'attention.ordersNotImported', href: '/connections', kind: 'integration', locId: 'au' },
     ],
     aiPrompt: 'Explain this week’s stock trend',
   },
@@ -128,9 +129,9 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
       ['bo', '19:30', '#2207 · Oliver', 'Borough', 'Accepted', 'neutral'],
     ],
     attention: [
-      { id: 'a1', icon: 'alert', title: 'Order #1041 overdue 6 min', detail: 'Ballard kitchen', href: '/ops/kitchen', kind: 'action', locId: 'bl' },
-      { id: 'a2', icon: 'card', title: 'Payment without order', detail: 'Lena W. · $34.65 USD · recovery queue', href: '/payments?tab=reconciliation', kind: 'action', locId: 'bl' },
-      { id: 'a3', icon: 'wifi-off', title: 'Fremont kitchen screen offline', detail: 'Orders still arrive by email', href: '/connections', kind: 'integration', locId: 'fr' },
+      { id: 'a1', icon: 'alert', title: 'Order #1041 overdue 6 min', detail: 'Ballard kitchen', titleKey: 'attention.orderOverdue', titleParams: { ref: '#1041', minutes: 6 }, detailKey: 'attention.kitchenOf', detailParams: { place: 'Ballard' }, href: '/ops/kitchen', kind: 'action', locId: 'bl' },
+      { id: 'a2', icon: 'card', title: 'Payment without order', detail: 'Lena W. · $34.65 USD · recovery queue', titleKey: 'attention.paymentWithoutOrder', detailKey: 'attention.recoveryQueue', detailParams: { name: 'Lena W.', amount: moneyArg(3465, 'USD') }, href: '/payments?tab=reconciliation', kind: 'action', locId: 'bl' },
+      { id: 'a3', icon: 'wifi-off', title: 'Fremont kitchen screen offline', detail: 'Orders still arrive by email', titleKey: 'attention.kitchenScreenOffline', titleParams: { place: 'Fremont' }, detailKey: 'attention.ordersByEmail', href: '/connections', kind: 'integration', locId: 'fr' },
     ],
     aiPrompt: 'Summarise today’s production by item',
   },
@@ -149,12 +150,32 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
       ['mad', '12:00', 'Piso exterior, Salamanca · Lucía Romero', 'Madrid Salamanca · Carmen D.', 'Confirmed', 'success'],
     ],
     attention: [
-      { id: 'a1', icon: 'shield', title: '1 listing awaiting HQ approval', detail: 'Townhouse with rooftop terrace · Toronto Midtown', href: '/ops/listings', kind: 'action', locId: 'tor' },
-      { id: 'a2', icon: 'mail', title: '1 enquiry in the office pool', detail: 'Valuation request · Toronto Midtown', href: '/ops/enquiries', kind: 'action', locId: 'tor' },
-      { id: 'a3', icon: 'receipt', title: 'Offer countered — awaiting buyer', detail: '42 Birchmount Cres · expires in 2 days', href: '/ops/offers', kind: 'action', locId: 'tor' },
+      { id: 'a1', icon: 'shield', title: '1 listing awaiting HQ approval', detail: 'Townhouse with rooftop terrace · Toronto Midtown', titleKey: 'attention.listingsAwaitingHq', titleParams: { count: 1 }, href: '/ops/listings', kind: 'action', locId: 'tor' },
+      { id: 'a2', icon: 'mail', title: '1 enquiry in the office pool', detail: 'Valuation request · Toronto Midtown', titleKey: 'attention.enquiriesInPool', titleParams: { count: 1 }, detailKey: 'attention.valuationRequestAt', detailParams: { place: 'Toronto Midtown' }, href: '/ops/enquiries', kind: 'action', locId: 'tor' },
+      { id: 'a3', icon: 'receipt', title: 'Offer countered — awaiting buyer', detail: '42 Birchmount Cres · expires in 2 days', titleKey: 'attention.offerCountered', detailKey: 'attention.expiresInDays', detailParams: { place: '42 Birchmount Cres', days: 2 }, href: '/ops/offers', kind: 'action', locId: 'tor' },
     ],
     aiPrompt: 'Summarise viewing feedback for 42 Birchmount Cres',
   },
+};
+
+/** Catalogue keys (namespace "data") for the English range/source/title strings above. Provider names have none. */
+const RANGE_KEYS: Record<string, string> = {
+  'Last 7 days': 'range.last7Days', 'Last 30 days': 'range.last30Days', Today: 'range.today', 'This week': 'range.thisWeek', Now: 'range.now', 'Next hour': 'range.nextHour', 'Autumn season': 'range.autumnSeason',
+};
+const SOURCE_KEYS: Record<string, string> = {
+  'Website forms': 'source.websiteForms', 'Booking connection': 'source.bookingConnection', 'Membership system': 'source.membershipSystem', Registrations: 'source.registrations', Schedule: 'source.schedule',
+  Calendar: 'source.calendar', 'Practitioner calendars': 'source.practitionerCalendars', Inventory: 'source.inventory', Connections: 'source.connections', 'Pickup ordering': 'source.pickupOrdering',
+  'Slot settings': 'source.slotSettings', 'Location menus': 'source.locationMenus', 'BranchHarbor listings': 'source.bhListings', 'Enquiries inbox': 'source.enquiriesInbox', 'Viewings calendar': 'source.viewingsCalendar', Offers: 'source.offers',
+};
+const UPCOMING_TITLE_KEYS: Record<string, string> = {
+  'Upcoming classes': 'upcoming.title.classes', 'Today’s sessions': 'upcoming.title.sessionsToday', 'Next appointments': 'upcoming.title.nextAppointments', 'To fulfil today': 'upcoming.title.toFulfilToday',
+  'Next pickups': 'upcoming.title.nextPickups', 'Upcoming viewings': 'upcoming.title.viewings',
+};
+/** Status label → data key `upcoming.status.*` (+ arguments). */
+const UPCOMING_STATUS: Record<string, [string, MsgParams?]> = {
+  'Cover requested': ['cover_requested'], Full: ['full'], Open: ['open'], '1 spot': ['spots_left', { count: 1 }], Scheduled: ['scheduled'], 'Venue clash': ['venue_clash'], Confirmed: ['confirmed'],
+  'Deposit paid': ['deposit_paid'], Cancelled: ['cancelled'], 'To fulfil': ['to_fulfil'], 'Payment failed': ['payment_failed'], Ready: ['ready'], Preparing: ['preparing'],
+  'Awaiting acceptance': ['awaiting_acceptance'], Accepted: ['accepted'], 'Awaiting confirmation': ['awaiting_confirmation'],
 };
 
 export function buildOverview(ind: IndustryKey, locIds: string[]) {
@@ -162,34 +183,42 @@ export function buildOverview(ind: IndustryKey, locIds: string[]) {
   const cfg = OVERVIEW[ind];
   const idx = f.locations.map((l, i) => [l, i] as const).filter(([l]) => locIds.includes(l.id));
   const metrics: Metric[] = cfg.metrics.map((m) => {
-    const base = { key: m.key, label: m.label, definition: m.definition, range: m.range, source: m.source, icon: m.icon, pastel: m.pastel };
-    if (m.notConnected) return { ...base, state: 'not_connected', value: null, note: m.note };
+    const base = {
+      key: m.key, label: m.label, labelKey: `metric.${ind}.${m.key}.label`, definition: m.definition, definitionKey: `metric.${ind}.${m.key}.definition`,
+      range: m.range, rangeKey: RANGE_KEYS[m.range], source: m.source, sourceKey: SOURCE_KEYS[m.source], icon: m.icon, pastel: m.pastel,
+    };
+    if (m.notConnected) return { ...base, state: 'not_connected', value: null, note: m.note, noteKey: 'note.noMembershipSystem' };
     if (m.revenue) {
       const avail = idx.filter(([l]) => l.revenue7d.amount > 0);
       const missing = idx.filter(([l]) => l.revenue7d.amount === 0 && l.sync === 'attention' && l.site === 'live').map(([l]) => l.name);
-      if (!avail.length) return { ...base, state: 'unavailable', value: null, note: missing.length ? `Sync unavailable at ${missing.join(', ')}` : 'No payments yet in this scope' };
+      if (!avail.length) return { ...base, state: 'unavailable', value: null, ...(missing.length ? { note: `Sync unavailable at ${missing.join(', ')}`, noteKey: 'note.syncUnavailableAt', noteParams: { list: missing } } : { note: 'No payments yet in this scope', noteKey: 'note.noPayments' }) };
       const map = new Map<Currency, number>();
       for (const [l] of avail) map.set(l.currency, (map.get(l.currency) ?? 0) + l.revenue7d.amount);
       const values: Money[] = [...map.entries()].map(([currency, amount]) => ({ currency, amount }));
-      return { ...base, state: 'ok', value: { kind: 'money', values }, note: missing.length ? `Excludes ${missing.join(', ')} (sync degraded)` : values.length > 1 ? 'Shown per currency · not combined' : undefined };
+      const note = missing.length ? { note: `Excludes ${missing.join(', ')} (sync degraded)`, noteKey: 'note.excludesDegraded', noteParams: { list: missing } } : values.length > 1 ? { note: 'Shown per currency · not combined', noteKey: 'note.perCurrency' } : {};
+      return { ...base, state: 'ok', value: { kind: 'money', values }, ...note };
     }
     const vals = idx.map(([l, i]) => [l, m.perLoc?.[i] ?? null] as const);
     const ok = vals.filter(([, v]) => v != null) as (readonly [(typeof f.locations)[number], number])[];
     const missing = vals.filter(([l, v]) => v == null && l.site === 'live').map(([l]) => l.name.split(' – ').pop());
-    if (!ok.length) return { ...base, state: 'unavailable', value: null, note: missing.length ? `Not available for ${missing.join(', ')}` : undefined };
+    if (!ok.length) return { ...base, state: 'unavailable', value: null, ...(missing.length ? { note: `Not available for ${missing.join(', ')}`, noteKey: 'note.notAvailableFor', noteParams: { list: missing as string[] } } : {}) };
     const total = ok.reduce((s, [, v]) => s + v, 0);
     const value: MetricValue = m.kind === 'percent' ? { kind: 'percent', value: total / ok.length } : m.key === 'sync' ? { kind: 'ratio', value: total, of: idx.length } : { kind: 'count', value: total };
-    return { ...base, state: 'ok', value, note: missing.length ? `Excludes ${missing.join(', ')}` : undefined };
+    return { ...base, state: 'ok', value, ...(missing.length ? { note: `Excludes ${missing.join(', ')}`, noteKey: 'note.excludes', noteParams: { list: missing as string[] } } : {}) };
   });
   const upcoming = cfg.upcoming
     .filter(([lid]) => locIds.includes(lid))
-    .map(([lid, hhmm, title, detail, label, tone], i) => {
+    .map(([lid, hhmm, title, detail, label, tone, detailMsg], i) => {
       const l = loc(ind, lid);
-      return { id: `u${i}`, at: at(l.timeZone, hhmm), timeZone: l.timeZone, title, detail, status: { label, tone } };
+      const st = UPCOMING_STATUS[label] ?? [label.toLowerCase().replace(/[^a-z]+/g, '_')];
+      return {
+        id: `u${i}`, at: at(l.timeZone, hhmm), timeZone: l.timeZone, title, detail, ...(detailMsg ? { detailKey: detailMsg[0], detailParams: detailMsg[1] } : {}),
+        status: { label, labelKey: `upcoming.status.${st[0]}`, ...(st[1] ? { labelParams: st[1] } : {}), tone },
+      };
     })
     .sort((a, b) => a.at.localeCompare(b.at));
   const attention = cfg.attention.filter((a) => !a.locId || locIds.includes(a.locId)).map(({ locId: _l, ...a }) => a);
-  return { metrics, upcomingTitle: cfg.upcomingTitle, upcoming, attention, aiPrompt: cfg.aiPrompt };
+  return { metrics, upcomingTitle: cfg.upcomingTitle, upcomingTitleKey: UPCOMING_TITLE_KEYS[cfg.upcomingTitle], upcoming, attention, aiPrompt: cfg.aiPrompt, aiPromptKey: `ai.prompt.${ind}` };
 }
 
 /* ------------------------------------------------------------------ */

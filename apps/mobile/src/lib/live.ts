@@ -51,9 +51,18 @@ interface RawMyBooking {
 interface RawOccurrence { id: string; locationId: string; startsAt: string; endsAt: string; classTypeName: string; room: string | null; booked: number; instructorUserId: string | null }
 interface RawCover { id: string; locationId: string; occurrenceId: string; requestedBy: string; status: string; substituteName: string | null; reason: string | null; createdAt: string }
 interface RawApproval { id: string; locationId: string | null; targetType: string; payload: Record<string, unknown>; status: string; requestedBy: string; requestComment: string | null; createdAt: string }
+/** Title in the app's language from the API's structured title (`titleCode` + `titleParams`); otherwise the API's title. */
+function approvalTitle(a: RawApprovalFull): string {
+  const params: Record<string, unknown> = { ...(a.titleParams ?? {}) };
+  if (!a.titleCode) return a.title;
+  if (typeof params.startsAt === 'string') params.when = new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: typeof params.timeZone === 'string' ? params.timeZone : 'UTC' }).format(new Date(params.startsAt));
+  if (typeof params.fieldKey === 'string') params.field = params.fieldKey.replace(/_/g, ' ');
+  return tNow(`owner.approvalTitle.${a.titleCode}`, a.title, params);
+}
 interface RawApprovalFull {
   id: string; kind: 'refund' | 'ad_spend' | 'shift_swap' | 'field' | 'page'; title: string; locationId: string | null; location: { name: string } | null; amount: Money | null;
   payload: Record<string, unknown> | null; requester: { id: string; name: string | null }; requestComment: string | null; createdAt: string; canDecide: boolean;
+  titleCode?: string | null; titleParams?: Record<string, string | number> | null;
 }
 interface RawShift {
   id: string; organizationId: string; locationId: string; location: { id: string; name: string; timeZone: string } | null; role: string; startsAt: string; endsAt: string;
@@ -796,9 +805,9 @@ export const liveApi = {
     const m = await rawMe();
     const perOrg = await Promise.all(ownerOrgs(m).map(async (o) => {
       const names = await memberNames(o.id);
-      const who = (id: string) => (id === m!.user.id ? 'You' : names.get(id) ?? 'Location team');
+      const who = (id: string) => (id === m!.user.id ? tNow('owner.you', 'You') : names.get(id) ?? tNow('owner.locationTeam', 'Location team'));
       const { index } = await loadCatalog();
-      const locName = (id: string | null) => (id ? index.get(id)?.loc.name ?? '' : 'All locations');
+      const locName = (id: string | null) => (id ? index.get(id)?.loc.name ?? '' : tNow('owner.allLocationsShort', 'All locations'));
       // One inbox: refunds over the threshold, local ad spend, shift swaps and website changes (GET /approvals),
       // plus studio cover substitutions waiting for a manager.
       const [requests, covers] = await Promise.all([
@@ -808,22 +817,23 @@ export const liveApi = {
       const out: Approval[] = requests.map((a) => {
         const p = a.payload ?? {};
         const base = { id: `${o.id}~approval~${a.id}`, locationId: a.locationId ?? '', locationName: a.location?.name ?? locName(a.locationId), requestedBy: a.requester.name ?? who(a.requester.id), requestedAt: a.createdAt, reason: a.requestComment ?? undefined, status: 'pending' as const };
-        if (a.kind === 'refund') return { ...base, kind: 'refund' as const, title: a.title, amount: a.amount ?? undefined };
-        if (a.kind === 'ad_spend') return { ...base, kind: 'ad_spend' as const, title: a.title, amount: a.amount ?? undefined, channel: CHANNEL[String(p.channel)] ?? String(p.channel ?? ''), days: Number(p.durationDays ?? 0) };
+        if (a.kind === 'refund') return { ...base, kind: 'refund' as const, title: approvalTitle(a), amount: a.amount ?? undefined };
+        if (a.kind === 'ad_spend') return { ...base, kind: 'ad_spend' as const, title: a.title, amount: a.amount ?? undefined, channel: CHANNEL[String(p.channel)] ? tNow(`owner.channel.${String(p.channel)}`, CHANNEL[String(p.channel)]!) : String(p.channel ?? ''), days: Number(p.durationDays ?? 0) };
         if (a.kind === 'shift_swap') {
           const sh = p.shift as { startsAt?: string; timeZone?: string; role?: string } | undefined;
           const when = sh?.startsAt ? new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: sh.timeZone ?? 'UTC' }).format(new Date(sh.startsAt)) : '';
-          return { ...base, kind: 'shift_swap' as const, title: a.title, swap: { a: String((p.from as { name?: string })?.name ?? '—'), b: String((p.to as { name?: string })?.name ?? '—'), session: `${sh?.role ?? 'Shift'} · ${when}` } };
+          return { ...base, kind: 'shift_swap' as const, title: approvalTitle(a), swap: { a: String((p.from as { name?: string })?.name ?? '—'), b: String((p.to as { name?: string })?.name ?? '—'), session: `${sh?.role ?? tNow('owner.shift', 'Shift')} · ${when}` } };
         }
-        return { ...base, kind: 'website' as const, title: a.kind === 'field' ? `Website · ${String(p.fieldKey ?? 'field').replace(/_/g, ' ')}: “${String(p.value ?? '')}”` : 'Website page ready to publish' };
+        const field = String(p.fieldKey ?? 'field').replace(/_/g, ' ');
+        return { ...base, kind: 'website' as const, title: a.kind === 'field' ? tNow('owner.websiteField', `Website · ${field}: “${String(p.value ?? '')}”`, { field, value: String(p.value ?? '') }) : tNow('owner.websitePage', 'Website page ready to publish') };
       });
       const occs = covers.length ? await occurrencesFor(o.id, new Date(Date.now() - 86400_000).toISOString(), new Date(Date.now() + 60 * 86400_000).toISOString()) : [];
       for (const c of covers) {
         const occ = occs.find((x) => x.id === c.occurrenceId);
         out.push({
-          id: `${o.id}~cover~${c.id}`, kind: 'shift_swap', locationId: c.locationId, locationName: locName(c.locationId), title: occ?.classTypeName ?? 'Class cover',
+          id: `${o.id}~cover~${c.id}`, kind: 'shift_swap', locationId: c.locationId, locationName: locName(c.locationId), title: occ?.classTypeName ?? tNow('owner.classCover', 'Class cover'),
           requestedBy: who(c.requestedBy), requestedAt: c.createdAt, reason: c.reason ?? undefined, status: 'pending',
-          swap: { a: who(c.requestedBy), b: c.substituteName ?? '—', session: occ ? `${occ.classTypeName} · ${new Date(occ.startsAt).toUTCString().slice(0, 22)} UTC` : '' },
+          swap: { a: who(c.requestedBy), b: c.substituteName ?? '—', session: occ ? `${occ.classTypeName} · ${new Intl.DateTimeFormat(currentLocale(), { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' }).format(new Date(occ.startsAt))}` : '' },
         });
       }
       return out;
@@ -838,7 +848,7 @@ export const liveApi = {
       await http('POST', `/orgs/${orgId}/studios/cover-requests/${targetId}/decision`, { decision: decision === 'approved' ? 'approve' : 'decline', note: reason || undefined });
     } else {
       // Website rejections need a reason on the server; give a neutral default when none was typed.
-      const comment = reason || (decision === 'rejected' && current.kind === 'website' ? 'Rejected from the mobile app' : undefined);
+      const comment = reason || (decision === 'rejected' && current.kind === 'website' ? tNow('owner.rejectedFromApp', 'Rejected from the mobile app') : undefined);
       await http('POST', `/orgs/${orgId}/approvals/${targetId}/decision`, { decision: decision === 'approved' ? 'approve' : 'reject', comment });
     }
     return { ...current, status: decision };
@@ -850,14 +860,14 @@ export const liveApi = {
       const ov = await http<RawOverview>('GET', `/orgs/${o.id}/reports/overview`);
       for (const c of ov.connections.filter((x) => x.state !== 'connected')) {
         out.push({
-          id: `${o.id}~conn~${c.id}`, kind: 'integration', title: `${c.provider} connection ${c.state.replace(/_/g, ' ')}`,
-          body: `${o.name}: figures that depend on ${c.provider} are unavailable until it reconnects.`, at: c.lastSuccessAt ?? new Date().toISOString(),
+          id: `${o.id}~conn~${c.id}`, kind: 'integration', title: tNow('owner.connIssue', `${c.provider} connection ${c.state.replace(/_/g, ' ')}`, { provider: c.provider }),
+          body: tNow('owner.connIssueBody', `${o.name}: figures that depend on ${c.provider} are unavailable until it reconnects.`, { org: o.name, provider: c.provider }), at: c.lastSuccessAt ?? new Date().toISOString(),
         });
       }
     }));
     const pending = await liveApi.approvals().catch(() => []);
     if (pending.length) {
-      out.push({ id: 'approvals', kind: 'action', title: `${pending.length} ${pending.length === 1 ? 'approval' : 'approvals'} waiting`, body: 'Open Approvals to review and decide.', at: pending[0]!.requestedAt });
+      out.push({ id: 'approvals', kind: 'action', title: tNow('owner.approvalsWaiting', `${pending.length} ${pending.length === 1 ? 'approval' : 'approvals'} waiting`, { count: pending.length }), body: tNow('owner.approvalsWaitingBody', 'Open Approvals to review and decide.'), at: pending[0]!.requestedAt });
     }
     return out.sort((a, b) => b.at.localeCompare(a.at));
   },

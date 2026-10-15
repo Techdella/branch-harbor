@@ -11,6 +11,7 @@ import { fmtDay, fmtMoney } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 import type { Money } from '@bh/shared';
 import { pastel } from '@/theme';
+import { accessLine, membershipTermLines } from '@/features/studios/text';
 
 /** Packs & membership: my credits and membership, and what this studio sells (in its own currency). */
 export default function Pass() {
@@ -67,7 +68,7 @@ export default function Pass() {
         <Card key={p.id}>
           <Text variant="h3">{p.name}</Text>
           <Text>{m(p.price)} / {t('studio.month')} · {p.classesPerPeriod ? t('studio.perMonth', { n: p.classesPerPeriod }) : t('studio.unlimited')}</Text>
-          <Text variant="small" tone="muted">{[p.access, ...p.terms].join(' · ')}</Text>
+          <Text variant="small" tone="muted">{[accessLine(p.access, p.accessDetail, t), ...membershipTermLines(p.terms, p.termsDetail, t)].join(' · ')}</Text>
           {!guest ? <BuyButton locationId={location.id} kind="membership" id={p.id} label={t('studio.join')} onDone={refresh} /> : null}
         </Card>
       ))}
@@ -76,7 +77,7 @@ export default function Pass() {
         <Card key={p.id}>
           <Text variant="h3">{p.name}</Text>
           <Text>{m(p.price)} · {t('studio.creditsValid', { n: p.credits, days: p.validityDays })}</Text>
-          <Text variant="small" tone="muted">{p.access}</Text>
+          <Text variant="small" tone="muted">{accessLine(p.access, p.accessDetail, t)}</Text>
           {!guest ? <BuyButton locationId={location.id} kind="pack" id={p.id} label={t('studio.buy')} onDone={refresh} /> : null}
         </Card>
       ))}

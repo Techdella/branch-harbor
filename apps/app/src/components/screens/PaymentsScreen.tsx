@@ -13,6 +13,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { Timeline } from './Timeline';
+import { useDataText } from '../ui/useDataText';
 
 type Tab = 'transactions' | 'reconciliation' | 'automatic' | 'setup';
 const payTone: Record<PaymentState, Tone> = { created: 'neutral', requires_action: 'warning', processing: 'info', succeeded: 'success', failed: 'danger', cancelled: 'neutral' };
@@ -63,6 +64,7 @@ function useLocLookup() {
 
 function Transactions() {
   const t = useTranslations('payments');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const scopeLabel = useScopeLabel();
@@ -106,7 +108,7 @@ function Transactions() {
                 onRowClick={(x) => setOpen(x.id)}
                 columns={[
                   { key: 'ref', header: t('col.ref'), render: (x) => <span><strong className="font-mono text-[13px]">{x.externalRef}</strong><span className="block text-xs text-stone">{fmtDateTime(x.createdAt, loc(x.locationId).timeZone, locale)}</span></span> },
-                  { key: 'what', header: t('col.what'), render: (x) => <span>{x.description}{app.org.model !== 'independent' && <span className="block text-xs text-stone">{loc(x.locationId).name}</span>}</span> },
+                  { key: 'what', header: t('col.what'), render: (x) => <span>{dt(x.descriptionKey, x.descriptionParams, x.description)}{app.org.model !== 'independent' && <span className="block text-xs text-stone">{loc(x.locationId).name}</span>}</span> },
                   { key: 'amt', header: t('col.amount'), align: 'right', render: (x) => <strong>{moneyWithCode(x.amount, locale)}</strong> },
                   { key: 'pay', header: t('col.payment'), render: (x) => <Badge tone={payTone[x.payment]}>{t(`payState.${x.payment}`)}</Badge> },
                   { key: 'ref2', header: t('col.refund'), render: (x) => <Badge tone={refTone[x.refund]} icon={x.refund === 'none' ? 'minus' : undefined}>{t(`refundState.${x.refund}`)}</Badge> },
@@ -119,10 +121,10 @@ function Transactions() {
                 <div className="flex flex-col gap-3">
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     {[
-                      [t('col.what'), open.description],
+                      [t('col.what'), dt(open.descriptionKey, open.descriptionParams, open.description)],
                       [t('location'), loc(open.locationId).name],
-                      [t('provider'), open.provider],
-                      [t('linked'), open.linkedRecord ?? t('missing')],
+                      [t('provider'), dt(open.providerKey, open.providerParams, open.provider)],
+                      [t('linked'), open.linkedRecord ? dt(open.linkedRecordKey, open.linkedRecordParams, open.linkedRecord) : t('missing')],
                       [t('col.payment'), t(`payState.${open.payment}`)],
                       [t('col.refund'), t(`refundState.${open.refund}`)],
                     ].map(([k, v]) => (
@@ -150,6 +152,7 @@ function Transactions() {
 
 function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationItem[]>> }) {
   const t = useTranslations('payments');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const [selId, setSelId] = useState<string | null>(null);
@@ -207,7 +210,7 @@ function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationI
                   [t('location'), l.name],
                   [t('customer'), sel.customer],
                   [t('col.payment'), sel.type === 'unpaid_confirmed' ? t('payState.created') : t('payState.succeeded')],
-                  [t('recordState'), sel.orderState],
+                  [t('recordState'), dt(sel.orderStateKey, sel.orderStateParams, sel.orderState)],
                 ].map(([k, v]) => (
                   <div key={k} className="rounded-[14px] bg-canvas p-2.5">
                     <div className="text-stone">{k}</div>
@@ -260,7 +263,7 @@ function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationI
                 </Banner>
               )}
               {(recreate.error || refund.error) && <Banner tone="danger" live="assertive">{(recreate.error ?? refund.error)!.message}</Banner>}
-              {sel.status === 'resolved' && sel.resolution && <Banner tone="success" live="polite">{t('resolved', { resolution: sel.resolution })}</Banner>}
+              {sel.status === 'resolved' && sel.resolution && <Banner tone="success" live="polite">{t('resolved', { resolution: dt(sel.resolutionKey, sel.resolutionParams, sel.resolution) })}</Banner>}
             </section>
           </div>
         );
@@ -271,6 +274,7 @@ function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationI
 
 function Setup() {
   const t = useTranslations('payments');
+  const dt = useDataText();
   const ts = useTranslations('single.payments');
   const app = useApp();
   // Independent businesses have one payment account — no per-location account mapping.
@@ -298,9 +302,9 @@ function Setup() {
                     <Badge tone="neutral" icon={null}>{l.currency}</Badge>
                   </div>
                   <p className="text-xs text-stone">
-                    {a.provider} · {independent ? ts('accountDetail', { name: app.org.name }) : a.arrangement === 'own' ? t('ownDetail') : t('sharedDetail')}
+                    {dt(a.providerKey, a.providerParams, a.provider)} · {independent ? ts('accountDetail', { name: app.org.name }) : a.arrangement === 'own' ? t('ownDetail') : t('sharedDetail')}
                   </p>
-                  {a.capabilities.length > 0 && <p className="text-xs">{a.capabilities.join(' · ')}</p>}
+                  {a.capabilities.length > 0 && <p className="text-xs">{a.capabilities.map((c, i) => dt(a.capabilityKeys?.[i] ? `payment.capability.${a.capabilityKeys[i]}` : undefined, undefined, c)).join(' · ')}</p>}
                   {a.status !== 'enabled' && <p className="text-xs font-semibold text-warning">{t('notPurchasable')}</p>}
                 </div>
               );

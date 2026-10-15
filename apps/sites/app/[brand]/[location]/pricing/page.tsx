@@ -3,15 +3,15 @@ import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { BuyButton } from '@/components/studios/Commerce';
 import { apiGet } from '@/lib/api';
-import { policyLines, type CustomerPolicy } from '@/lib/policy';
+import { accessLine, membershipTermLines, policyLines, type AccessDetail, type CustomerPolicy, type TermsDetail } from '@/lib/policy';
 import { money } from '@/lib/format';
 import { getRouting, loadLocation, makeLinks } from '@/lib/site';
 
 type Money = { amount: number; currency: string };
 interface Pricing {
   location: { id: string; name: string; currency: string; paymentsEnabled: boolean };
-  packs: Array<{ id: string; name: string; description: string | null; credits: number; validityDays: number; price: Money; perClass: Money; access: string }>;
-  memberships: Array<{ id: string; name: string; description: string | null; classesPerPeriod: number | null; price: Money & { interval: string }; access: string; terms: string[] }>;
+  packs: Array<{ id: string; name: string; description: string | null; credits: number; validityDays: number; price: Money; perClass: Money; access: string; accessDetail?: AccessDetail }>;
+  memberships: Array<{ id: string; name: string; description: string | null; classesPerPeriod: number | null; price: Money & { interval: string }; access: string; accessDetail?: AccessDetail; terms: string[]; termsDetail?: TermsDetail }>;
   offers: Array<{ id: string; name: string; description: string | null; kind: string; credits: number | null; validDays: number; price: Money; newCustomersOnly: boolean }>;
   policy: CustomerPolicy;
 }
@@ -31,6 +31,7 @@ export default async function PricingPage({ params }: Props) {
   if (data.module.kind !== 'studios' || data.module.mode !== 'native') notFound();
   const t = await getTranslations('studio');
   const locale = await getLocale();
+  const st = (k: string, v?: Record<string, string | number>) => t(k as never, v as never);
   const links = makeLinks(await getRouting(), brand, { brandPrimaryHost: data.site.brandPrimaryHost });
   const p = await apiGet<Pricing>(`/v1/public/studios/${data.location.id}/pricing`);
   const account = links.location(location, '/account');
@@ -66,7 +67,7 @@ export default async function PricingPage({ params }: Props) {
         <h2 id="mem-h" className="text-xl font-extrabold">{t('memberships')}</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {p.memberships.map((m) => (
-            <Card key={m.id} title={m.name} price={`${money(m.price, locale)} / ${t('month')}`} lines={[m.description, m.access, ...m.terms]}>
+            <Card key={m.id} title={m.name} price={`${money(m.price, locale)} / ${t('month')}`} lines={[m.description, accessLine(m.access, m.accessDetail, st), ...membershipTermLines(m.terms, m.termsDetail, st)]}>
               <BuyButton brand={brand} locationId={data.location.id} kind="membership" productId={m.id} label={t('join')} accountPath={account} disabled={!sellable} />
             </Card>
           ))}
@@ -77,7 +78,7 @@ export default async function PricingPage({ params }: Props) {
         <h2 id="packs-h" className="text-xl font-extrabold">{t('packs')}</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {p.packs.map((k) => (
-            <Card key={k.id} title={k.name} price={money(k.price, locale)} lines={[k.description, t('creditsValid', { n: k.credits, days: k.validityDays }), t('perClass', { amount: money(k.perClass, locale) }), k.access]}>
+            <Card key={k.id} title={k.name} price={money(k.price, locale)} lines={[k.description, t('creditsValid', { n: k.credits, days: k.validityDays }), t('perClass', { amount: money(k.perClass, locale) }), accessLine(k.access, k.accessDetail, st)]}>
               <BuyButton brand={brand} locationId={data.location.id} kind="pack" productId={k.id} label={t('buy')} accountPath={account} disabled={!sellable} />
             </Card>
           ))}

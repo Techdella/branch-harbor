@@ -197,6 +197,7 @@ export const shiftRoutes: FastifyPluginAsyncZod = async (app) => {
       const [sw] = await tx.insert(shiftSwapRequests).values({ organizationId: sh.organizationId, locationId: sh.locationId, shiftId: sh.id, requestedBy: me.id, toUserId: req.body.toUserId, toShiftId: req.body.toShiftId ?? null, reason: req.body.reason ?? null }).returning();
       const ap = await insertApproval(tx, {
         organizationId: sh.organizationId, locationId: sh.locationId, kind: 'shift_swap', targetId: sw!.id, title: `${sh.role} · ${when}`,
+        titleI18n: { code: 'shift_swap', params: { role: sh.role, startsAt: sh.startsAt.toISOString(), timeZone: loc?.timeZone ?? 'UTC' } },
         payload: { shiftId: sh.id, toShiftId: req.body.toShiftId ?? null, from: { id: me.id, name: meRow?.name ?? 'Team member' }, to: { id: req.body.toUserId, name: toUser?.name ?? 'Colleague' }, shift: { role: sh.role, startsAt: sh.startsAt.toISOString(), endsAt: sh.endsAt.toISOString(), timeZone: loc?.timeZone ?? 'UTC' } },
         requestedBy: me.id, comment: req.body.reason ?? null,
       }, req.ip);

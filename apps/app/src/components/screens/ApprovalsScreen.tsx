@@ -10,6 +10,7 @@ import { moneyWithCode, relativeTime } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
+import { useDataText } from '../ui/useDataText';
 
 const KIND_UI: Record<ApprovalKind, { icon: IconName; bg: string }> = {
   refund: { icon: 'undo', bg: 'bg-blush' },
@@ -70,13 +71,15 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
   const [comment, setComment] = useState('');
   const [done, setDone] = useState<string | null>(null);
   const decide = useMutation((api, id: string, d: 'approve' | 'reject', c?: string) => api.approvals.decide(id, d, c));
+  const dt = useDataText();
+  const title = dt(a.titleKey, a.titleParams, a.title);
   const ui = KIND_UI[a.kind];
   const amount = a.amount ? moneyWithCode(a.amount, locale) : '';
   const consequence = deciding === 'reject'
     ? t('consequence.reject')
     : a.kind === 'refund' ? t('consequence.refund', { amount, location: a.locationName })
     : a.kind === 'ad_spend' ? t('consequence.ad_spend', { amount, location: a.locationName })
-    : a.kind === 'shift_swap' ? t('consequence.shift_swap', { from: a.details.find((d) => d.label === 'From')?.value ?? '', to: a.details.find((d) => d.label === 'To')?.value ?? '' })
+    : a.kind === 'shift_swap' ? t('consequence.shift_swap', { from: a.details.find((d) => (d.key ?? d.label) === 'from' || d.label === 'From')?.value ?? '', to: a.details.find((d) => (d.key ?? d.label) === 'to' || d.label === 'To')?.value ?? '' })
     : t('consequence.website', { location: a.locationName });
   const needsComment = deciding === 'reject' && (a.kind === 'field' || a.kind === 'page');
 
@@ -90,7 +93,7 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
         <span className="ml-auto text-xs text-stone">{relativeTime(a.requestedAt, locale)}</span>
       </div>
       <div>
-        <h2 id={`ap-${a.id}`} className="text-base font-bold">{a.title}</h2>
+        <h2 id={`ap-${a.id}`} className="text-base font-bold">{title}</h2>
         <p className="text-[13px] text-stone">{t('requested', { location: a.locationName, name: a.requestedBy })}</p>
       </div>
       {a.amount && (
@@ -102,9 +105,9 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
       {a.details.length > 0 && (
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
           {a.details.map((d) => (
-            <div key={d.label} className="contents">
-              <dt className="text-stone">{d.label}</dt>
-              <dd className="font-semibold">{d.value}</dd>
+            <div key={d.key ?? d.label} className="contents">
+              <dt className="text-stone">{dt(d.key ? `approval.detail.${d.key}` : undefined, undefined, d.label)}</dt>
+              <dd className="font-semibold">{dt(d.valueKey, d.valueParams, d.value)}</dd>
             </div>
           ))}
         </dl>
@@ -128,7 +131,7 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
                   onClick={async () => {
                     const u = await decide.run(a.id, deciding, comment.trim() || undefined);
                     if (u) {
-                      setDone(u.status === 'approved' ? t('approvedDone', { result: u.result ?? '' }) : t('rejectedDone'));
+                      setDone(u.status === 'approved' ? t('approvedDone', { result: dt(u.resultKey, u.resultParams, u.result ?? '') }) : t('rejectedDone'));
                       setDeciding(null);
                       onDecided(u);
                     }
@@ -141,8 +144,8 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
             </div>
           ) : (
             <div className="flex gap-2">
-              <Button variant="secondary" icon="x" onClick={() => setDeciding('reject')} aria-label={`${t('reject')}: ${a.title}`}>{t('reject')}</Button>
-              <Button icon="check" onClick={() => setDeciding('approve')} aria-label={`${t('approve')}: ${a.title}`}>{t('approve')}</Button>
+              <Button variant="secondary" icon="x" onClick={() => setDeciding('reject')} aria-label={`${t('reject')}: ${title}`}>{t('reject')}</Button>
+              <Button icon="check" onClick={() => setDeciding('approve')} aria-label={`${t('approve')}: ${title}`}>{t('approve')}</Button>
             </div>
           )
         ) : (
@@ -153,7 +156,7 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
           <Badge tone={a.status === 'approved' ? 'success' : 'neutral'} icon={a.status === 'approved' ? 'check-circle' : 'x'}>
             {t(`status.${a.status}`, { name: a.decidedBy ?? '—' })}
           </Badge>
-          {a.result && <span className="text-xs text-stone">{a.result}</span>}
+          {a.result && <span className="text-xs text-stone">{dt(a.resultKey, a.resultParams, a.result)}</span>}
           {a.decisionComment && <span className="text-xs text-stone">“{a.decisionComment}”</span>}
         </div>
       )}

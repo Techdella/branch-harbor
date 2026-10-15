@@ -944,6 +944,35 @@
       "noShowFee": "No-show fee: {amount}.",
       "noShowFeeMembers": "No-show fee: {amount} (not charged to members).",
       "noNoShowFee": "No no-show fee."
+    },
+    "access": {
+      "any_location": "Valid at every location",
+      "same_currency": "Valid at every {currency} location",
+      "listed": "{count, plural, one {Valid at # selected location} other {Valid at # selected locations}}",
+      "home_only": "Valid at {location} only"
+    },
+    "membershipTerms": {
+      "billed": "Billed monthly in {currency} until canceled.",
+      "notice": "{days, plural, one {Cancel with # day’s notice.} other {Cancel with # days’ notice.}}",
+      "pause": "Pause for up to {days} days at a time.",
+      "noPause": "Pausing isn’t available.",
+      "classes": "{count} classes per month; unused classes don’t roll over.",
+      "unlimited": "Unlimited classes."
+    },
+    "onlineReason": {
+      "sign_in": "Sign in to access online classes",
+      "membership_excludes": "Your membership doesn’t include this class right now",
+      "members_only": "Members only",
+      "pack_holders_only": "Class pack holders only",
+      "buy_to_watch": "Buy this class to watch",
+      "livestream_ended": "This livestream has ended"
+    },
+    "onlineRule": {
+      "free_with_registration": "Free with registration",
+      "members": "Included with a membership",
+      "pack_holders": "Included for class pack holders",
+      "buy": "Available to buy",
+      "not_available": "Not available yet"
     }
   },
   "storefront": {

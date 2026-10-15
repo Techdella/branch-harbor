@@ -41,9 +41,9 @@ function st(ind: IndustryKey): BizState {
       approvals: 'off',
       site: { address: `https://sites.branchharbor.com/${f.org.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`, exists: true, published: true, publishedAt: new Date(Date.now() - 3 * 86400_000).toISOString(), version: 4, visible: true },
       team: [
-        { id: 'mem_owner', name: f.owner, email: 'owner@…', assignments: [{ role: 'Owner', scopeLabel: f.org.name }], lastActive: 'Now', status: 'active' },
-        { id: 'mem_staff', name: FIXTURES_STAFF[ind], email: 'staff@…', assignments: [{ role: 'Staff', scopeLabel: f.org.name }], lastActive: 'Yesterday', status: 'active' },
-        { id: 'mem_inv', name: 'new.hire@…', email: 'new.hire@…', assignments: [{ role: 'Manager', scopeLabel: f.org.name }], lastActive: 'Invitation sent 2 days ago', status: 'invited' },
+        { id: 'mem_owner', name: f.owner, email: 'owner@…', assignments: [{ role: 'Owner', roleKey: 'org_owner', scopeLabel: f.org.name }], lastActive: 'Now', lastActiveKey: 'member.now', status: 'active' },
+        { id: 'mem_staff', name: FIXTURES_STAFF[ind], email: 'staff@…', assignments: [{ role: 'Staff', roleKey: 'staff', scopeLabel: f.org.name }], lastActive: 'Yesterday', lastActiveKey: 'member.yesterday', status: 'active' },
+        { id: 'mem_inv', name: 'new.hire@…', email: 'new.hire@…', assignments: [{ role: 'Manager', roleKey: 'location_manager', scopeLabel: f.org.name }], lastActive: 'Invitation sent 2 days ago', lastActiveKey: 'member.invitedDaysAgo', lastActiveParams: { count: 2 }, status: 'invited' },
       ],
     };
     state.set(ind, s);

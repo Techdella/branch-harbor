@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from './Icon';
+import { useUiLabels } from '../labels';
 
 export interface ScopeOption {
   id: string;
@@ -10,10 +11,11 @@ export interface ScopeOption {
 
 /** Always-visible scope selector: "All authorised locations", a region, an owner group or a location. */
 export function ScopeSelector({ options, value, onChange }: { options: ScopeOption[]; value: string; onChange: (id: string) => void }) {
+  const ui = useUiLabels();
   return (
     <label className="relative inline-flex h-11 max-w-full items-center gap-2 rounded-full border border-line bg-surface pl-3 pr-8 text-[13px] font-bold">
       <Icon name="pin" size={16} />
-      <span className="sr-only">Scope</span>
+      <span className="sr-only">{ui.scope}</span>
       <select value={value} onChange={(e) => onChange(e.target.value)} className="min-w-0 max-w-full appearance-none truncate bg-transparent pr-1 focus:outline-none">
         {options.map((o) => (
           <option key={o.id} value={o.id}>

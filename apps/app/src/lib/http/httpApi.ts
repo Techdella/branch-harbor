@@ -16,6 +16,7 @@ import { ApiError } from '../errors';
 import { addDays, fmtDay, fmtTime, moneyWithCode, zoneLabel, zonedToUtc } from '../format';
 import type { AiAnswer, ApprovalItem, ApprovalRequest, AttentionItem, Cell, ClassOccurrence, Connection, ConnectionState, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, IndustryKey, Location, Member, MenuItem, Metric, OnboardingProgress, OnboardingStep, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, PaymentState, ReconciliationItem, RefundState, Report, RequestContext, ShiftView, TableData, TimelineEvent, Transaction, UpcomingItem, WebsiteField, WebsitePage } from '../types';
 import { ONBOARDING_STEPS } from '../types';
+import { dateArg, moneyArg, ref, type MsgParam, type MsgParams } from '../msg';
 import { httpBusiness } from './business';
 import { http, login, logout, resendVerification, signup, verifyEmail } from './client';
 import {
@@ -76,6 +77,17 @@ const ROLE_LABEL: Record<string, string> = {
   location_manager: 'Location manager', staff: 'Staff', marketing_contributor: 'Marketing contributor', finance: 'Finance user', customer: 'Customer',
 };
 
+/** Scope label plus its catalogue key (data `scope.*`); location scopes are just the location name. */
+function scopeMsg(scope: { kind: string; id: string; name?: string | null }): { scopeLabel: string; scopeKey?: string; scopeParams?: MsgParams } {
+  const w = workspace();
+  const label = scopeLabel(scope);
+  if (scope.kind === 'organization') return { scopeLabel: label, scopeKey: 'scope.organization' };
+  if (scope.kind === 'region') return { scopeLabel: label, scopeKey: 'scope.region', scopeParams: { name: scope.name ?? w?.regions.find((r) => r.id === scope.id)?.name ?? '—' } };
+  if (scope.kind === 'owner_group') return { scopeLabel: label, scopeKey: 'scope.ownerGroup', scopeParams: { name: scope.name ?? w?.ownerGroups.find((g) => g.id === scope.id)?.name ?? '—' } };
+  return { scopeLabel: label };
+}
+const roleOf = (role: string) => ({ role: ROLE_LABEL[role] ?? humanise(role), roleKey: role });
+
 function scopeLabel(scope: { kind: string; id: string; name?: string | null }): string {
   const w = workspace();
   if (scope.kind === 'organization') return 'Organisation';
@@ -111,8 +123,11 @@ async function personName(userId: string | null | undefined): Promise<string> {
 interface ApiMetric<T> {
   value: T | null;
   unavailableReason: string | null;
+  /** Stable reason code + arguments (newer APIs); translated via data `metricReason.*`. */
+  unavailableCode?: string | null;
+  unavailableParams?: Record<string, string | number> | null;
   definition: string;
-  freshness: { asOf: string; source: string; lastSyncAt: string | null; complete: boolean };
+  freshness: { asOf: string; source: string; sourceCode?: string; lastSyncAt: string | null; complete: boolean };
 }
 interface ApiRevenueRow {
   currency: Currency;
@@ -148,13 +163,21 @@ function freshnessText(f: ApiMetric<unknown>['freshness']): string {
   return f.source;
 }
 
+/** Freshness line as data `source.*` key: known BranchHarbor sources are translated, provider names stay as they are. */
+function freshnessMsg(f: ApiMetric<unknown>['freshness']): { sourceKey: string; sourceParams: MsgParams } {
+  const name: MsgParam = f.sourceCode && f.sourceCode !== 'provider' ? ref(`source.api.${f.sourceCode}`, undefined, f.source) : f.source;
+  return f.lastSyncAt ? { sourceKey: 'source.withSync', sourceParams: { source: name, at: dateArg(f.lastSyncAt, 'UTC', 'dateTime') } } : { sourceKey: 'source.plain', sourceParams: { source: name } };
+}
+
 function metricOf<T>(key: string, label: string, icon: IconName, pastel: string, api: ApiMetric<T>, value: (v: T) => Metric['value'], notConnected = /no .*connected/i): Metric {
-  const base = { key, label, definition: api.definition, range: 'Last 30 days', source: freshnessText(api.freshness), icon, pastel };
+  const base = { key, label, labelKey: `metric.live.${key}.label`, definition: api.definition, definitionKey: `metric.live.${key}.definition`, range: 'Last 30 days', rangeKey: 'range.last30Days', source: freshnessText(api.freshness), ...freshnessMsg(api.freshness), icon, pastel };
   if (api.value === null || api.value === undefined) {
     const reason = api.unavailableReason ?? undefined;
-    return { ...base, state: reason && notConnected.test(reason) ? 'not_connected' : 'unavailable', value: null, note: reason };
+    const code = api.unavailableCode ?? undefined;
+    const state = code ? (code === 'no_payment_account' ? 'not_connected' : 'unavailable') : reason && notConnected.test(reason) ? 'not_connected' : 'unavailable';
+    return { ...base, state, value: null, note: reason, ...(code ? { noteKey: `metricReason.${code}`, noteParams: { ...(api.unavailableParams ?? {}) } } : {}) };
   }
-  return { ...base, state: 'ok', value: value(api.value), note: api.freshness.complete ? undefined : 'Partial data — some sources are behind' };
+  return { ...base, state: 'ok', value: value(api.value), ...(api.freshness.complete ? {} : { note: 'Partial data — some sources are behind', noteKey: 'note.partial' }) };
 }
 
 const sumRecord = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0);
@@ -162,7 +185,7 @@ const sumRecord = (r: Record<string, number>) => Object.values(r).reduce((a, b) 
 function overviewMetrics(ind: IndustryKey, r: ApiReport): Metric[] {
   const M = r.metrics;
   const revenue = metricOf('revenue', 'Revenue', 'wallet', P.butter, M.revenue, (rows) => ({ kind: 'money', values: rows.map((x) => m(x.netMinor, x.currency)) }));
-  if (revenue.value?.kind === 'money' && revenue.value.values.length > 1) revenue.note = 'Shown per currency · not combined';
+  if (revenue.value?.kind === 'money' && revenue.value.values.length > 1) Object.assign(revenue, { note: 'Shown per currency · not combined', noteKey: 'note.perCurrency' });
   const leads = metricOf('enquiries', 'Enquiries', 'mail', P.lime, M.leads, (v) => ({ kind: 'count', value: v }));
   const byInd: Record<IndustryKey, Metric[]> = {
     studios: [
@@ -180,8 +203,8 @@ function overviewMetrics(ind: IndustryKey, r: ApiReport): Metric[] {
   };
   const conns = r.connections;
   const sync: Metric = conns.length
-    ? { key: 'sync', label: 'Connections healthy', definition: 'Connected systems currently syncing without errors', range: 'Now', source: 'Connections', icon: 'plug', pastel: P.grey, state: 'ok', value: { kind: 'ratio', value: conns.filter((c) => c.state === 'connected').length, of: conns.length } }
-    : { key: 'sync', label: 'Connections', definition: 'Connected booking, commerce or POS systems', range: 'Now', source: 'Connections', icon: 'plug', pastel: P.grey, state: 'not_connected', value: null, note: 'No systems connected yet' };
+    ? { key: 'sync', label: 'Connections healthy', labelKey: 'metric.live.syncHealthy.label', definition: 'Connected systems currently syncing without errors', definitionKey: 'metric.live.syncHealthy.definition', range: 'Now', rangeKey: 'range.now', source: 'Connections', sourceKey: 'source.connections', icon: 'plug', pastel: P.grey, state: 'ok', value: { kind: 'ratio', value: conns.filter((c) => c.state === 'connected').length, of: conns.length } }
+    : { key: 'sync', label: 'Connections', labelKey: 'metric.live.syncNone.label', definition: 'Connected booking, commerce or POS systems', definitionKey: 'metric.live.syncNone.definition', range: 'Now', rangeKey: 'range.now', source: 'Connections', sourceKey: 'source.connections', icon: 'plug', pastel: P.grey, state: 'not_connected', value: null, note: 'No systems connected yet', noteKey: 'note.noSystems' };
   return [leads, ...byInd[ind], revenue, sync];
 }
 
@@ -199,20 +222,33 @@ async function attentionItems(ctx: RequestContext): Promise<(AttentionItem & { a
     w.orgView?.industry === 'studios' ? maybe(http.get<{ items: ApiCover[] }>(o('/studios/cover-requests'), { status: 'open' }).then(items), [] as ApiCover[]) : [],
   ]);
   for (const c of conns.filter((x) => x.state !== 'connected' && inS(x.locationId)))
-    out.push({ id: `conn-${c.id}`, icon: 'alert', kind: 'integration', title: `${providerName(c.provider)} ${humanise(c.state).toLowerCase()}`, detail: `${nameOfLoc(c.locationId)} · ${c.lastError ?? 'Check the connection'}`, href: '/connections', at: c.lastErrorAt ?? now() });
+    out.push({
+      id: `conn-${c.id}`, icon: 'alert', kind: 'integration', title: `${providerName(c.provider)} ${humanise(c.state).toLowerCase()}`, titleKey: 'attention.connState', titleParams: { provider: providerName(c.provider), state: c.state },
+      detail: `${nameOfLoc(c.locationId)} · ${c.lastError ?? 'Check the connection'}`, detailKey: c.lastError ? 'attention.placeDetail' : 'attention.checkConnection', detailParams: { place: nameOfLoc(c.locationId), detail: c.lastError ?? '' },
+      href: '/connections', at: c.lastErrorAt ?? now(),
+    });
   const recItems = (recon?.items ?? []).filter((x) => inS(x.locationId));
   if (recItems.length)
-    out.push({ id: 'recon', icon: 'card', kind: 'action', title: `${recItems.length} payment${recItems.length > 1 ? 's need' : ' needs'} reconciliation`, detail: recItems.map((x) => humanise(x.kind)).filter((v, i, a) => a.indexOf(v) === i).join(' · '), href: '/payments?tab=reconciliation', at: recon?.generatedAt ?? now() });
+    out.push({
+      id: 'recon', icon: 'card', kind: 'action', title: `${recItems.length} payment${recItems.length > 1 ? 's need' : ' needs'} reconciliation`, titleKey: 'attention.reconciliation', titleParams: { count: recItems.length },
+      detail: recItems.map((x) => humanise(x.kind)).filter((v, i, a) => a.indexOf(v) === i).join(' · '), detailKey: 'attention.list', detailParams: { list: [...new Set(recItems.map((x) => x.kind))].map((k) => ref(`payment.reconKind.${k}`, undefined, humanise(k))) },
+      href: '/payments?tab=reconciliation', at: recon?.generatedAt ?? now(),
+    });
   const aps = approvals.filter((a) => inS(a.locationId));
-  if (aps.length) out.push({ id: 'approvals', icon: 'shield', kind: 'action', title: `${aps.length} request${aps.length > 1 ? 's' : ''} awaiting approval`, detail: [...new Set(aps.map((a) => humanise(a.targetType)))].join(', ') + ' · ' + [...new Set(aps.map((a) => nameOfLoc(a.locationId)))].join(', '), href: '/approvals', at: aps[0]!.createdAt });
+  if (aps.length) out.push({
+    id: 'approvals', icon: 'shield', kind: 'action', title: `${aps.length} request${aps.length > 1 ? 's' : ''} awaiting approval`, titleKey: 'attention.approvals', titleParams: { count: aps.length },
+    detail: [...new Set(aps.map((a) => humanise(a.targetType)))].join(', ') + ' · ' + [...new Set(aps.map((a) => nameOfLoc(a.locationId)))].join(', '),
+    detailKey: 'attention.kindsAt', detailParams: { kinds: [...new Set(aps.map((a) => a.targetType))].map((k) => ref(`approval.kind.${k}`, undefined, humanise(k))), places: [...new Set(aps.map((a) => nameOfLoc(a.locationId)))] },
+    href: '/approvals', at: aps[0]!.createdAt,
+  });
   const fo = foods.filter((x) => inS(x.locationId));
-  if (fo.length) out.push({ id: 'food-accept', icon: 'receipt', kind: 'action', title: `${fo.length} order${fo.length > 1 ? 's' : ''} awaiting acceptance`, detail: [...new Set(fo.map((x) => nameOfLoc(x.locationId)))].join(', '), href: '/ops/orders', at: fo[0]!.createdAt });
+  if (fo.length) out.push({ id: 'food-accept', icon: 'receipt', kind: 'action', title: `${fo.length} order${fo.length > 1 ? 's' : ''} awaiting acceptance`, titleKey: 'attention.ordersAwaiting', titleParams: { count: fo.length }, detail: [...new Set(fo.map((x) => nameOfLoc(x.locationId)))].join(', '), href: '/ops/orders', at: fo[0]!.createdAt });
   const cv = cover.filter((x) => inS(x.locationId));
-  if (cv.length) out.push({ id: 'cover', icon: 'users', kind: 'action', title: `${cv.length} open cover request${cv.length > 1 ? 's' : ''}`, detail: [...new Set(cv.map((x) => nameOfLoc(x.locationId)))].join(', '), href: '/ops/cover', at: cv[0]!.createdAt });
+  if (cv.length) out.push({ id: 'cover', icon: 'users', kind: 'action', title: `${cv.length} open cover request${cv.length > 1 ? 's' : ''}`, titleKey: 'attention.openCover', titleParams: { count: cv.length }, detail: [...new Set(cv.map((x) => nameOfLoc(x.locationId)))].join(', '), href: '/ops/cover', at: cv[0]!.createdAt });
   return out;
 }
 
-async function upcoming(ctx: RequestContext): Promise<{ title: string; items: UpcomingItem[] }> {
+async function upcoming(ctx: RequestContext): Promise<{ title: string; titleKey: string; items: UpcomingItem[] }> {
   const ind = ws().orgView?.industry;
   const scope = inScope(ctx);
   if (ind === 'studios') {
@@ -220,9 +256,15 @@ async function upcoming(ctx: RequestContext): Promise<{ title: string; items: Up
     const occ = await maybe(http.get<{ items: ApiOccurrence[] }>(o('/studios/occurrences'), { from: from.toISOString(), to: new Date(from.getTime() + 86400_000).toISOString() }).then(items), [] as ApiOccurrence[]);
     return {
       title: 'Upcoming classes',
+      titleKey: 'upcoming.title.classes',
       items: occ.filter((x) => scope.has(x.locationId) && x.status === 'scheduled').slice(0, 8).map((x) => {
         const full = x.booked >= x.capacity;
-        return { id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: `${x.classTypeName ?? 'Class'}${x.instructorName ? ` · ${x.instructorName}` : ''}`, detail: `${nameOfLoc(x.locationId)} · ${x.booked}/${x.capacity}${x.waitlist ? ` · ${x.waitlist} waitlisted` : ''}`, status: full ? { label: 'Full', tone: 'info' as Tone } : { label: 'Open', tone: 'success' as Tone } };
+        return {
+          id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: `${x.classTypeName ?? 'Class'}${x.instructorName ? ` · ${x.instructorName}` : ''}`,
+          ...(x.classTypeName ? {} : { titleKey: x.instructorName ? 'upcoming.item.classWith' : 'upcoming.item.class', titleParams: { name: x.instructorName ?? '' } }),
+          detail: `${nameOfLoc(x.locationId)} · ${x.booked}/${x.capacity}${x.waitlist ? ` · ${x.waitlist} waitlisted` : ''}`, detailKey: 'upcoming.detail.class', detailParams: { place: nameOfLoc(x.locationId), booked: x.booked, capacity: x.capacity, waitlist: x.waitlist },
+          status: full ? { label: 'Full', labelKey: 'upcoming.status.full', tone: 'info' as Tone } : { label: 'Open', labelKey: 'upcoming.status.open', tone: 'success' as Tone },
+        };
       }),
     };
   }
@@ -230,7 +272,12 @@ async function upcoming(ctx: RequestContext): Promise<{ title: string; items: Up
     const fo = await maybe(http.get<{ items: ApiFoodOrder[] }>(o('/foods/orders'), { active: true }).then(items), [] as ApiFoodOrder[]);
     return {
       title: 'Upcoming pickups',
-      items: fo.filter((x) => scope.has(x.locationId)).sort((a, b) => a.promisedAt.localeCompare(b.promisedAt)).slice(0, 8).map((x) => ({ id: x.id, at: x.promisedAt, timeZone: tzOf(x.locationId), title: `#${x.orderNumber} · ${x.contact?.name ?? 'Guest'}`, detail: `${nameOfLoc(x.locationId)} · ${x.lines.reduce((a, l) => a + l.quantity, 0)} items`, status: { label: humanise(x.status), tone: (x.status === 'awaiting_acceptance' ? 'warning' : x.status === 'ready' ? 'success' : 'info') as Tone } })),
+      titleKey: 'upcoming.title.pickups',
+      items: fo.filter((x) => scope.has(x.locationId)).sort((a, b) => a.promisedAt.localeCompare(b.promisedAt)).slice(0, 8).map((x) => ({
+        id: x.id, at: x.promisedAt, timeZone: tzOf(x.locationId), title: `#${x.orderNumber} · ${x.contact?.name ?? 'Guest'}`, ...(x.contact?.name ? {} : { titleKey: 'upcoming.item.guestOrder', titleParams: { ref: `#${x.orderNumber}` } }),
+        detail: `${nameOfLoc(x.locationId)} · ${x.lines.reduce((a, l) => a + l.quantity, 0)} items`, detailKey: 'upcoming.detail.items', detailParams: { place: nameOfLoc(x.locationId), count: x.lines.reduce((a, l) => a + l.quantity, 0) },
+        status: { label: humanise(x.status), labelKey: `upcoming.status.${x.status}`, tone: (x.status === 'awaiting_acceptance' ? 'warning' : x.status === 'ready' ? 'success' : 'info') as Tone },
+      })),
     };
   }
   if (ind === 'realty') {
@@ -238,14 +285,23 @@ async function upcoming(ctx: RequestContext): Promise<{ title: string; items: Up
     const vs = await maybe(http.get<{ items: RV[] }>(o('/realty/viewings'), { from: now(), to: new Date(Date.now() + 2 * 86400_000).toISOString(), status: 'requested,confirmed' }).then(items), [] as RV[]);
     return {
       title: 'Upcoming viewings',
-      items: vs.filter((x) => scope.has(x.locationId)).slice(0, 8).map((x) => ({ id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: x.listing?.title ?? 'Viewing', detail: `${nameOfLoc(x.locationId)} · ${x.agentName ?? 'Agent'}`, status: x.status === 'confirmed' ? { label: 'Confirmed', tone: 'success' as Tone } : { label: 'Awaiting confirmation', tone: 'warning' as Tone } })),
+      titleKey: 'upcoming.title.viewings',
+      items: vs.filter((x) => scope.has(x.locationId)).slice(0, 8).map((x) => ({
+        id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: x.listing?.title ?? 'Viewing', ...(x.listing?.title ? {} : { titleKey: 'upcoming.item.viewing' }),
+        detail: `${nameOfLoc(x.locationId)} · ${x.agentName ?? 'Agent'}`, ...(x.agentName ? {} : { detailKey: 'upcoming.detail.noAgent', detailParams: { place: nameOfLoc(x.locationId) } }),
+        status: x.status === 'confirmed' ? { label: 'Confirmed', labelKey: 'upcoming.status.confirmed', tone: 'success' as Tone } : { label: 'Awaiting confirmation', labelKey: 'upcoming.status.awaiting_confirmation', tone: 'warning' as Tone },
+      })),
     };
   }
   if (ind === 'wellness') {
     const ap = await maybe(http.get<{ items: ApiAppointment[] }>(o('/wellness/appointments'), { from: now(), to: new Date(Date.now() + 86400_000).toISOString() }).then(items), [] as ApiAppointment[]);
-    return { title: 'Upcoming appointments', items: ap.filter((x) => scope.has(x.locationId) && x.status === 'confirmed').slice(0, 8).map((x) => ({ id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: 'Appointment', detail: nameOfLoc(x.locationId), status: { label: 'Confirmed', tone: 'success' as Tone } })) };
+    return {
+      title: 'Upcoming appointments',
+      titleKey: 'upcoming.title.appointments',
+      items: ap.filter((x) => scope.has(x.locationId) && x.status === 'confirmed').slice(0, 8).map((x) => ({ id: x.id, at: x.startsAt, timeZone: tzOf(x.locationId), title: 'Appointment', titleKey: 'upcoming.item.appointment', detail: nameOfLoc(x.locationId), status: { label: 'Confirmed', labelKey: 'upcoming.status.confirmed', tone: 'success' as Tone } })),
+    };
   }
-  return { title: 'Upcoming', items: [] };
+  return { title: 'Upcoming', titleKey: 'upcoming.title.generic', items: [] };
 }
 
 const AI_SUGGESTIONS: Record<IndustryKey, string[]> = {
@@ -293,7 +349,11 @@ async function coverView(cr: ApiCover): Promise<CoverRequest> {
   const occ = await maybe(http.get<ApiOccurrence & { bookings?: unknown[] }>(o(`/studios/occurrences/${cr.occurrenceId}`)), null);
   const occurrence = (occ && 'occurrence' in (occ as object) ? (occ as unknown as { occurrence: ApiOccurrence }).occurrence : occ) as ApiOccurrence | null;
   const status: CoverRequest['status'] = cr.status === 'approved' ? 'confirmed' : cr.status === 'accepted' ? 'accepted' : 'open';
-  const history = await Promise.all(cr.history.map(async (h) => ({ at: h.at, text: `${await personName(h.by)} · ${humanise(h.action)}${h.note ? ` — ${h.note}` : ''}` })));
+  const history = await Promise.all(cr.history.map(async (h) => {
+    const name = await personName(h.by);
+    const action = ref(`cover.action.${h.action}`, undefined, humanise(h.action));
+    return { at: h.at, text: `${name} · ${humanise(h.action)}${h.note ? ` — ${h.note}` : ''}`, textKey: h.note ? 'cover.historyNote' : 'cover.history', textParams: { name, action, note: h.note ?? '' } };
+  }));
   return {
     id: cr.id,
     classId: cr.occurrenceId,
@@ -305,8 +365,8 @@ async function coverView(cr: ApiCover): Promise<CoverRequest> {
     reason: cr.reason ?? '—',
     bookedCustomers: occurrence?.booked ?? 0,
     status,
-    candidates: cr.substituteName ? [{ id: cr.substituteUserId ?? 'sub', name: cr.substituteName, note: status === 'confirmed' ? 'Assigned' : 'Accepted the cover', available: true, state: status === 'confirmed' ? 'assigned' : 'accepted' }] : [],
-    history: history.length ? history : [{ at: cr.createdAt, text: 'Cover requested' }],
+    candidates: cr.substituteName ? [{ id: cr.substituteUserId ?? 'sub', name: cr.substituteName, note: status === 'confirmed' ? 'Assigned' : 'Accepted the cover', noteKey: status === 'confirmed' ? 'cover.candidate.assigned' : 'cover.candidate.accepted', available: true, state: status === 'confirmed' ? 'assigned' : 'accepted' }] : [],
+    history: history.length ? history : [{ at: cr.createdAt, text: 'Cover requested', textKey: 'cover.requested' }],
   };
 }
 
@@ -382,7 +442,9 @@ interface ApiShift {
   clockedInAt: string | null; clockedOutAt: string | null; pendingSwap: { id: string; approvalId: string | null; toUser: { id: string; name: string } } | null;
 }
 interface ApiApprovalFull {
-  id: string; kind: ApprovalRequest['kind']; title: string; status: ApprovalRequest['status']; locationId: string | null; amount: Money | null; location: { name: string } | null;
+  id: string; kind: ApprovalRequest['kind']; title: string;
+  /** Structured title (newer APIs): translated via data `approval.title.<code>`; `title` stays the English fallback. */
+  titleCode?: string | null; titleParams?: Record<string, string | number> | null; status: ApprovalRequest['status']; locationId: string | null; amount: Money | null; location: { name: string } | null;
   requester: { id: string; name: string | null }; decider: { id: string; name: string | null } | null; requestComment: string | null; decisionComment: string | null;
   createdAt: string; canDecide: boolean; payload: Record<string, unknown> | null; executionResult: Record<string, unknown> | null;
 }
@@ -391,23 +453,46 @@ function approvalView(a: ApiApprovalFull): ApprovalRequest {
   const p = a.payload ?? {};
   const details: ApprovalRequest['details'] = [];
   if (a.kind === 'ad_spend') {
-    details.push({ label: 'Channel', value: CHANNEL_LABEL[String(p.channel)] ?? humanise(String(p.channel ?? 'other')) }, { label: 'Duration', value: `${p.durationDays ?? '?'} days` });
-    if (p.startsOn) details.push({ label: 'Starts', value: String(p.startsOn) });
+    const channel = String(p.channel ?? 'other');
+    details.push(
+      { key: 'channel', label: 'Channel', value: CHANNEL_LABEL[channel] ?? humanise(channel), valueKey: `approval.channel.${channel}` },
+      { key: 'duration', label: 'Duration', value: `${p.durationDays ?? '?'} days`, ...(typeof p.durationDays === 'number' ? { valueKey: 'approval.value.days', valueParams: { count: p.durationDays } } : {}) },
+    );
+    if (p.startsOn) details.push({ key: 'starts', label: 'Starts', value: String(p.startsOn), valueKey: 'approval.value.date', valueParams: { date: dateArg(`${String(p.startsOn)}T12:00:00Z`) } });
   } else if (a.kind === 'shift_swap') {
     const sh = p.shift as { startsAt?: string; endsAt?: string; timeZone?: string } | undefined;
-    details.push({ label: 'From', value: String((p.from as { name?: string })?.name ?? '—') }, { label: 'To', value: String((p.to as { name?: string })?.name ?? '—') });
-    if (sh?.startsAt && sh.timeZone) details.push({ label: 'Shift', value: `${fmtDay(sh.startsAt, sh.timeZone, 'en')} ${fmtTime(sh.startsAt, sh.timeZone, 'en')}–${fmtTime(sh.endsAt ?? sh.startsAt, sh.timeZone, 'en')} ${zoneLabel(sh.timeZone, 'en')}` });
+    details.push({ key: 'from', label: 'From', value: String((p.from as { name?: string })?.name ?? '—') }, { key: 'to', label: 'To', value: String((p.to as { name?: string })?.name ?? '—') });
+    if (sh?.startsAt && sh.timeZone)
+      details.push({
+        key: 'shift', label: 'Shift', value: `${fmtDay(sh.startsAt, sh.timeZone, 'en')} ${fmtTime(sh.startsAt, sh.timeZone, 'en')}–${fmtTime(sh.endsAt ?? sh.startsAt, sh.timeZone, 'en')} ${zoneLabel(sh.timeZone, 'en')}`,
+        valueKey: 'approval.value.shift', valueParams: { start: dateArg(sh.startsAt, sh.timeZone, 'dayTime'), end: dateArg(sh.endsAt ?? sh.startsAt, sh.timeZone, 'dayTime') },
+      });
   } else if (a.kind === 'refund') {
-    details.push({ label: 'Refund of', value: p.orderId ? 'Commerce order' : 'Online payment' });
+    details.push({ key: 'refundOf', label: 'Refund of', value: p.orderId ? 'Commerce order' : 'Online payment', valueKey: p.orderId ? 'approval.value.commerceOrder' : 'approval.value.onlinePayment' });
   } else if (a.kind === 'field') {
-    details.push({ label: 'Field', value: humanise(String(p.fieldKey ?? 'field')) }, { label: 'New value', value: str(p.value) });
+    details.push({ key: 'field', label: 'Field', value: humanise(String(p.fieldKey ?? 'field')) }, { key: 'newValue', label: 'New value', value: str(p.value) });
   }
   const r = a.executionResult ?? {};
-  const result = a.status !== 'approved' ? null : a.kind === 'refund' ? `Refund ${String(r.refundState ?? 'processed').replace(/_/g, ' ')}` : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : 'Change applied';
+  const refundState = String(r.refundState ?? 'processed');
+  const result = a.status !== 'approved' ? null : a.kind === 'refund' ? `Refund ${refundState.replace(/_/g, ' ')}` : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : 'Change applied';
+  const resultKey = a.status !== 'approved' ? undefined : a.kind === 'refund' ? 'approval.result.refund' : a.kind === 'ad_spend' ? 'approval.result.campaignScheduled' : a.kind === 'shift_swap' ? 'approval.result.shiftReassigned' : 'approval.result.changeApplied';
+  const title = approvalTitle(a);
   return {
-    id: a.id, kind: a.kind, title: a.title, status: a.status, locationName: a.location?.name ?? nameOfLoc(a.locationId), amount: a.amount, requestedBy: a.requester.name ?? 'Someone', requestedAt: a.createdAt,
+    id: a.id, kind: a.kind, title: a.title, ...title, status: a.status, locationName: a.location?.name ?? nameOfLoc(a.locationId), amount: a.amount, requestedBy: a.requester.name ?? 'Someone', requestedAt: a.createdAt,
     reason: a.requestComment, details, canDecide: a.canDecide, decidedBy: a.decider?.name ?? null, decisionComment: a.decisionComment, result,
+    ...(resultKey ? { resultKey, resultParams: { state: ref(`approval.refundState.${refundState}`, undefined, refundState.replace(/_/g, ' ')) } } : {}),
   };
+}
+
+/** Title key from the API's structured title; shift dates are formatted in the viewer's locale and the location's zone. */
+function approvalTitle(a: ApiApprovalFull): { titleKey?: string; titleParams?: MsgParams } {
+  if (!a.titleCode) return {};
+  const raw = a.titleParams ?? {};
+  const params: MsgParams = { ...raw };
+  if (typeof raw.startsAt === 'string') params.when = dateArg(raw.startsAt, typeof raw.timeZone === 'string' ? raw.timeZone : undefined, 'dayTime');
+  if (typeof raw.amountMinor === 'number' && typeof raw.currency === 'string') params.amount = moneyArg(raw.amountMinor, raw.currency);
+  if (typeof raw.fieldKey === 'string') params.field = humanise(raw.fieldKey);
+  return { titleKey: `approval.title.${a.titleCode}`, titleParams: params };
 }
 
 interface ApiService {
@@ -596,8 +681,12 @@ async function pageView(locationId: string, page?: ApiPage): Promise<WebsitePage
     }),
   );
   const activity = [
-    ...versions.map((v, i) => ({ at: v.createdAt, text: `Version ${v.version ?? versions.length - i} published` })),
-    ...(await Promise.all(approvals.filter((a) => a.payload?.pageId === p.id).map(async (a) => ({ at: a.createdAt, text: `${await personName(a.requestedBy)} requested a change to ${p.fields.find((f) => f.key === a.payload?.fieldKey)?.label ?? a.payload?.fieldKey}` })))),
+    ...versions.map((v, i) => ({ at: v.createdAt, text: `Version ${v.version ?? versions.length - i} published`, textKey: 'website.versionPublished', textParams: { version: v.version ?? versions.length - i } })),
+    ...(await Promise.all(approvals.filter((a) => a.payload?.pageId === p.id).map(async (a) => {
+      const name = await personName(a.requestedBy);
+      const field = p.fields.find((f) => f.key === a.payload?.fieldKey)?.label ?? a.payload?.fieldKey ?? '';
+      return { at: a.createdAt, text: `${name} requested a change to ${field}`, textKey: 'website.changeRequested', textParams: { name, field } };
+    }))),
   ].sort((a, b) => b.at.localeCompare(a.at));
   return { locationId, locationName: nameOfLoc(locationId), page: p.title || 'Home', version: versions.length, fields, activity };
 }
@@ -646,24 +735,29 @@ interface ApiRecon {
 }
 
 const TARGET_LABEL: Record<string, string> = { class_booking: 'Class booking', food_order: 'Pickup order', order: 'Order', appointment: 'Appointment', registration: 'Registration' };
+/** data `payment.target.*` for a payment's linked record type (unknown types fall back to "Record"). */
+const targetRef = (type: string | null | undefined, fallback = 'Record') => ref(`payment.target.${type && TARGET_LABEL[type] ? type : 'record'}`, undefined, TARGET_LABEL[type ?? ''] ?? fallback);
 
 function txView(p: ApiPayment): Transaction {
   const refund: RefundState = (p.refundState as RefundState | null) ?? 'none';
-  const timeline: TimelineEvent[] = [{ at: p.createdAt, text: `Payment created (${p.externalId})`, tone: 'neutral', icon: 'card' }];
-  if (p.succeededAt) timeline.push({ at: p.succeededAt, text: 'payment_intent.succeeded · signed event', tone: 'success', icon: 'check' });
-  if (p.state === 'failed') timeline.push({ at: p.updatedAt, text: 'Payment failed', tone: 'danger', icon: 'x' });
-  if (p.refunded.amount > 0) timeline.push({ at: p.updatedAt, text: `Refunded ${(p.refunded.amount / 100).toFixed(2)} ${p.refunded.currency}`, tone: 'info', icon: 'undo' });
+  const timeline: TimelineEvent[] = [{ at: p.createdAt, text: `Payment created (${p.externalId})`, textKey: 'payment.event.created', textParams: { ref: p.externalId }, tone: 'neutral', icon: 'card' }];
+  if (p.succeededAt) timeline.push({ at: p.succeededAt, text: 'payment_intent.succeeded · signed event', textKey: 'payment.event.signed', textParams: { event: 'payment_intent.succeeded' }, tone: 'success', icon: 'check' });
+  if (p.state === 'failed') timeline.push({ at: p.updatedAt, text: 'Payment failed', textKey: 'payment.event.failed', tone: 'danger', icon: 'x' });
+  if (p.refunded.amount > 0) timeline.push({ at: p.updatedAt, text: `Refunded ${(p.refunded.amount / 100).toFixed(2)} ${p.refunded.currency}`, textKey: 'payment.event.refunded', textParams: { amount: moneyArg(p.refunded.amount, p.refunded.currency) }, tone: 'info', icon: 'undo' });
   return {
     id: p.id,
     externalRef: p.externalId,
     createdAt: p.createdAt,
     description: TARGET_LABEL[p.targetType ?? ''] ?? 'Payment',
+    descriptionKey: `payment.target.${p.targetType && TARGET_LABEL[p.targetType] ? p.targetType : 'payment'}`,
     locationId: p.locationId ?? '',
     amount: p.amount,
     payment: p.state,
     refund,
     provider: `${humanise(p.provider)}${p.sandbox ? ' (sandbox)' : ''}`,
+    ...(p.sandbox ? { providerKey: 'payment.provider.sandbox', providerParams: { name: humanise(p.provider) } } : {}),
     linkedRecord: p.targetId ? `${TARGET_LABEL[p.targetType ?? ''] ?? 'Record'} ${p.targetId.slice(0, 8)}` : undefined,
+    ...(p.targetId ? { linkedRecordKey: 'payment.linked', linkedRecordParams: { what: targetRef(p.targetType), ref: p.targetId.slice(0, 8) } } : {}),
     timeline,
   };
 }
@@ -678,17 +772,20 @@ async function reconciliationView(ctx: RequestContext): Promise<ReconciliationIt
       const type: ReconciliationItem['type'] = x.kind === 'unpaid_confirmed_record' ? 'unpaid_confirmed' : (x.kind as ReconciliationItem['type']);
       const amount = x.actual ?? x.expected ?? m(0, locationById(x.locationId)?.currency ?? 'USD');
       const timeline: TimelineEvent[] = [];
-      if (pay) timeline.push({ at: pay.succeededAt ?? pay.createdAt, text: `${humanise(pay.provider)} payment ${pay.state} · ${amount.currency}`, tone: pay.state === 'succeeded' ? 'success' : 'neutral', icon: 'card' });
-      timeline.push({ at: rec.generatedAt, text: x.detail, tone: 'danger', icon: 'x' });
+      if (pay) timeline.push({ at: pay.succeededAt ?? pay.createdAt, text: `${humanise(pay.provider)} payment ${pay.state} · ${amount.currency}`, textKey: 'payment.event.providerState', textParams: { provider: humanise(pay.provider), state: ref(`payment.state.${pay.state}`, undefined, pay.state), currency: amount.currency }, tone: pay.state === 'succeeded' ? 'success' : 'neutral', icon: 'card' });
+      timeline.push({ at: rec.generatedAt, text: x.detail, textKey: `payment.reconDetail.${x.kind}`, tone: 'danger', icon: 'x' });
       return {
         id: x.paymentId ?? `${x.kind}:${x.targetId}`,
         type,
         summary: `${TARGET_LABEL[x.targetType ?? ''] ?? 'Record'} · ${nameOfLoc(x.locationId)}`,
+        summaryKey: 'payment.recon.summary',
+        summaryParams: { what: targetRef(x.targetType), place: nameOfLoc(x.locationId) },
         transactionRef: pay?.externalId ?? '—',
         amount,
         locationId: x.locationId ?? '',
         customer: '—',
         orderState: type === 'paid_without_record' ? 'Missing' : type === 'unpaid_confirmed' ? 'Confirmed' : `Expected ${x.expected ? (x.expected.amount / 100).toFixed(2) : '—'}`,
+        ...(type === 'paid_without_record' ? { orderStateKey: 'payment.recon.missing' } : type === 'unpaid_confirmed' ? { orderStateKey: 'payment.recon.confirmed' } : x.expected ? { orderStateKey: 'payment.recon.expected', orderStateParams: { amount: moneyArg(x.expected.amount, x.expected.currency) } } : {}),
         status: x.recoverable ? 'needs_action' : 'reviewing',
         timeline,
       };
@@ -712,14 +809,19 @@ function connectionView(c: ApiConnection): Connection {
     name: c.locationId ? `${name} (${nameOfLoc(c.locationId)})` : name,
     monogram: name.slice(0, 2),
     role: KIND_ROLE[c.kind] ?? humanise(c.kind),
+    roleKey: `connection.role.${c.kind}`,
     state,
     lastSync: c.lastSuccessAt,
     direction: c.direction,
     authoritative: c.authoritative === 'external' ? `${name} is the source of truth` : 'BranchHarbor is the source of truth; the connection receives copies',
+    ...(c.authoritative === 'external' ? { authoritativeKey: 'connection.authoritative.external', authoritativeParams: { name } } : { authoritativeKey: 'connection.authoritative.branchharbor' }),
     locations: c.locationId ? [nameOfLoc(c.locationId)] : (workspace()?.locations.map((l) => l.name) ?? []),
     issue: state === 'connected' || state === 'initial_sync' ? undefined : (c.lastError ?? `Connection is ${humanise(state).toLowerCase()}.`),
+    ...(state === 'connected' || state === 'initial_sync' || c.lastError ? {} : { issueKey: 'connection.issue.state', issueParams: { state } }),
     affected: c.mappingErrors ? `${c.mappingErrors} record${c.mappingErrors > 1 ? 's' : ''} need mapping` : undefined,
+    ...(c.mappingErrors ? { affectedKey: 'connection.affected.mapping', affectedParams: { count: c.mappingErrors } } : {}),
     fixAction: state === 'degraded' ? 'Retry sync' : state === 'connected' || state === 'initial_sync' ? undefined : 'Test connection',
+    ...(state === 'degraded' ? { fixActionKey: 'connection.fix.retrySync' } : state === 'connected' || state === 'initial_sync' ? {} : { fixActionKey: 'connection.fix.test' }),
   };
 }
 
@@ -1095,7 +1197,7 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     const ind = ws().orgView?.industry ?? ctx.industry;
     // Roles without reports.read (e.g. staff) still get their upcoming work and alerts, just no metrics.
     const [r, up, attention] = await Promise.all([allowedFor(ctx, 'reports.read') ? report(ctx) : null, upcoming(ctx), attentionItems(ctx)]);
-    return { metrics: r ? overviewMetrics(ind, r) : [], upcomingTitle: up.title, upcoming: up.items, attention: attention.map(({ at: _at, ...a }) => a), aiPrompt: AI_SUGGESTIONS[ind][0]! } satisfies Overview;
+    return { metrics: r ? overviewMetrics(ind, r) : [], upcomingTitle: up.title, upcomingTitleKey: up.titleKey, upcoming: up.items, attention: attention.map(({ at: _at, ...a }) => a), aiPrompt: AI_SUGGESTIONS[ind][0]!, aiPromptKey: `ai.live.${ind}` } satisfies Overview;
   },
   table: (ctx, key) => liveTable(ctx, key),
   search: async (ctx, q) => {
@@ -1109,7 +1211,7 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     if (people.length) groups.push({ type: 'Team', items: people.map((p) => ({ id: p.user.id, label: p.user.name, sub: p.assignments.map((a) => ROLE_LABEL[a.role] ?? a.role).join(', '), href: '/team' })) });
     return groups;
   },
-  notifications: async (ctx) => (await attentionItems(ctx)).map((a) => ({ id: a.id, kind: a.kind, title: a.title, at: a.at, href: a.href })),
+  notifications: async (ctx) => (await attentionItems(ctx)).map((a) => ({ id: a.id, kind: a.kind, title: a.title, titleKey: a.titleKey, titleParams: a.titleParams, at: a.at, href: a.href })),
 
   studios: {
     classes: async (ctx, weekStartYmd) => {
@@ -1280,14 +1382,17 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
       const before = (await reconciliationView({ industry: 'studios', role: role(), scopeId: 'all' })).find((x) => x.id === itemId);
       const r = await http.post<{ fulfilled: boolean; note?: string; targetId?: string }>(o(`/payments/${itemId}/recreate-record`), {});
       const base = before ?? ({ id: itemId, type: 'paid_without_record', summary: '', transactionRef: '—', amount: m(0, 'USD'), locationId: '', customer: '—', orderState: '', status: 'needs_action', timeline: [] } as ReconciliationItem);
-      return { ...base, status: 'resolved', orderState: 'Record recreated', resolution: r.note ?? 'Record recreated and linked to the payment.', timeline: [...base.timeline, { at: now(), text: r.note ?? 'Record recreated from the payment snapshot', tone: 'success', icon: 'check' }] };
+      return {
+        ...base, status: 'resolved', orderState: 'Record recreated', orderStateKey: 'payment.recon.recreated', resolution: r.note ?? 'Record recreated and linked to the payment.', ...(r.note ? {} : { resolutionKey: 'payment.recon.recreatedLinked' }),
+        timeline: [...base.timeline, { at: now(), text: r.note ?? 'Record recreated from the payment snapshot', ...(r.note ? {} : { textKey: 'payment.event.recreatedSnapshot' }), tone: 'success', icon: 'check' }],
+      };
     },
     refund: async (itemId, confirm) => {
       const before = (await reconciliationView({ industry: 'studios', role: role(), scopeId: 'all' })).find((x) => x.id === itemId);
       if (before && (before.amount.amount !== confirm.amount || before.amount.currency !== confirm.currency)) throw new ApiError('confirmation_mismatch', 'The confirmed amount doesn’t match. Nothing was refunded.', 409);
       await http.post(o(`/payments/${itemId}/refunds`), { amountMinor: confirm.amount, confirmCurrency: confirm.currency, reason: 'Reconciliation: paid without a record' });
       const base = before!;
-      return { ...base, status: 'resolved', resolution: 'Payment refunded in full.', timeline: [...base.timeline, { at: now(), text: 'Refund requested', tone: 'warning', icon: 'undo' }] };
+      return { ...base, status: 'resolved', resolution: 'Payment refunded in full.', resolutionKey: 'payment.recon.refundedInFull', timeline: [...base.timeline, { at: now(), text: 'Refund requested', textKey: 'payment.event.refundRequested', tone: 'warning', icon: 'undo' }] };
     },
     accounts: async (ctx) => {
       const scope = inScope(ctx);
@@ -1295,9 +1400,11 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
       return r.locations.filter((l) => scope.has(l.id)).map((l): PaymentAccount => ({
         locationId: l.id,
         provider: `Stripe Connect${r.providerMode === 'sandbox' ? ' (sandbox)' : ''}`,
+        ...(r.providerMode === 'sandbox' ? { providerKey: 'payment.provider.sandbox', providerParams: { name: 'Stripe Connect' } } : {}),
         arrangement: r.mode === 'per_location' ? 'own' : 'shared',
         status: l.paymentsEnabled ? 'enabled' : l.accountId ? 'pending_verification' : 'not_set_up',
         capabilities: l.paymentsEnabled ? ['Card payments', 'Refunds'] : [],
+        capabilityKeys: l.paymentsEnabled ? ['cardPayments', 'refunds'] : [],
       }));
     },
     automation: async (ctx) => {
@@ -1334,13 +1441,14 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
       const [list, invites] = await Promise.all([members(), maybe(http.get<{ items: { id: string; email: string; role: string; scope?: { kind: string; id: string }; scopeKind?: string; scopeId?: string; createdAt: string; expiresAt?: string; status?: string }[] }>(o('/invitations')).then(items), [])]);
       const out: Member[] = list.map((x) => ({
         id: x.user.id, name: x.user.name, email: x.user.email,
-        assignments: x.assignments.map((a) => ({ role: ROLE_LABEL[a.role] ?? humanise(a.role), scopeLabel: scopeLabel(a.scope) })),
+        assignments: x.assignments.map((a) => ({ ...roleOf(a.role), ...scopeMsg(a.scope) })),
         lastActive: `Member since ${fmtDate(x.assignments[0]?.createdAt)}`,
+        ...(x.assignments[0]?.createdAt ? { lastActiveKey: 'member.since', lastActiveParams: { date: dateArg(x.assignments[0].createdAt) } } : {}),
         status: 'active',
       }));
       for (const i of invites.filter((v) => !v.status || v.status === 'pending')) {
         const sc = i.scope ?? { kind: i.scopeKind ?? 'organization', id: i.scopeId ?? '' };
-        out.push({ id: i.id, name: i.email, email: i.email, assignments: [{ role: ROLE_LABEL[i.role] ?? humanise(i.role), scopeLabel: scopeLabel(sc) }], lastActive: `Invitation sent ${fmtDate(i.createdAt)}`, status: 'invited' });
+        out.push({ id: i.id, name: i.email, email: i.email, assignments: [{ ...roleOf(i.role), ...scopeMsg(sc) }], lastActive: `Invitation sent ${fmtDate(i.createdAt)}`, lastActiveKey: 'member.invitedOn', lastActiveParams: { date: dateArg(i.createdAt) }, status: 'invited' });
       }
       return out;
     },
@@ -1357,7 +1465,7 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     invite: async (input) => {
       const s = input.scopeId === 'all' ? { kind: 'organization', id: orgId() } : apiScope(input.scopeId);
       await http.post(o('/invitations'), { email: input.email, role: (input.roleKey ?? 'staff') as Role, scope: s });
-      return { id: `inv_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', status: 'invited' };
+      return { id: `inv_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, roleKey: input.roleKey, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', lastActiveKey: 'member.invitedJustNow', status: 'invited' };
     },
   },
 

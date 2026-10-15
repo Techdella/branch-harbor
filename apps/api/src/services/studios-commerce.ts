@@ -30,6 +30,9 @@ export function serializePack(p: Pack, now = new Date()) {
   };
 }
 
+/** Where a pack or membership can be used: every location, every location in the same currency, listed locations, or the home location only. */
+export type AccessPolicyCode = 'any_location' | 'same_currency' | 'listed' | 'home_only';
+
 export function serializeMembership(m: Membership, now = new Date()) {
   return {
     id: m.id, name: m.plan, planId: m.planId, locationId: m.locationId, status: m.status, state: membershipState(m, now), recurring: m.recurring, classesPerPeriod: m.classesPerPeriod,
@@ -50,15 +53,19 @@ export async function pricingFor(db: Exec, loc: Loc) {
     db.select().from(studioOffers).where(and(eq(studioOffers.organizationId, loc.organizationId), eq(studioOffers.status, 'active'), or(isNull(studioOffers.locationId), eq(studioOffers.locationId, loc.id)))),
   ]);
   const accessText = (policy: string, n: number) => policy === 'any_location' ? 'Valid at every location' : policy === 'same_currency' ? `Valid at every ${loc.currency} location` : policy === 'listed' ? `Valid at ${n} selected location${n === 1 ? '' : 's'}` : `Valid at ${loc.name} only`;
+  /** The facts behind `access`, so apps can phrase it in the customer's language (`access` stays as the English line). */
+  const accessDetail = (policy: string, n: number) => ({ policy: (['any_location', 'same_currency', 'listed'].includes(policy) ? policy : 'home_only') as AccessPolicyCode, currency: loc.currency, locationCount: n, locationName: loc.name });
   return {
     packs: pp.filter((p) => priceIn(p.prices, loc.currency) !== undefined).map((p) => ({
       id: p.id, name: p.name, description: p.description, credits: p.credits, validityDays: p.validityDays, price: { amount: priceIn(p.prices, loc.currency)!, currency: loc.currency },
-      perClass: { amount: Math.round(priceIn(p.prices, loc.currency)! / p.credits), currency: loc.currency }, transferPolicy: p.transferPolicy, access: accessText(p.transferPolicy, p.allowedLocationIds.length), scope: p.locationId ? 'location' : 'network',
+      perClass: { amount: Math.round(priceIn(p.prices, loc.currency)! / p.credits), currency: loc.currency }, transferPolicy: p.transferPolicy, access: accessText(p.transferPolicy, p.allowedLocationIds.length), accessDetail: accessDetail(p.transferPolicy, p.allowedLocationIds.length), scope: p.locationId ? 'location' : 'network',
     })).sort((a, b) => a.credits - b.credits),
     memberships: mp.filter((p) => priceIn(p.prices, loc.currency) !== undefined).map((p) => ({
       id: p.id, name: p.name, description: p.description, classesPerPeriod: p.classesPerPeriod, price: { amount: priceIn(p.prices, loc.currency)!, currency: loc.currency, interval: 'month' as const },
-      accessPolicy: p.accessPolicy, access: accessText(p.accessPolicy, p.allowedLocationIds.length), noticeDays: p.noticeDays, maxPauseDays: p.maxPauseDays, graceDays: p.graceDays, scope: p.locationId ? 'location' : 'network',
+      accessPolicy: p.accessPolicy, access: accessText(p.accessPolicy, p.allowedLocationIds.length), accessDetail: accessDetail(p.accessPolicy, p.allowedLocationIds.length), noticeDays: p.noticeDays, maxPauseDays: p.maxPauseDays, graceDays: p.graceDays, scope: p.locationId ? 'location' : 'network',
       terms: [`Billed monthly in ${loc.currency} until cancelled.`, `Cancel with ${p.noticeDays} days' notice.`, p.maxPauseDays ? `Pause for up to ${p.maxPauseDays} days at a time.` : 'Pausing is not available.', p.classesPerPeriod ? `${p.classesPerPeriod} classes per month; unused classes do not roll over.` : 'Unlimited classes.'],
+      /** The facts behind `terms` (same order), for apps that phrase them in the customer's language. */
+      termsDetail: { billingCurrency: loc.currency, interval: 'month' as const, noticeDays: p.noticeDays, maxPauseDays: p.maxPauseDays || null, classesPerPeriod: p.classesPerPeriod ?? null },
     })).sort((a, b) => a.price.amount - b.price.amount),
     offers: offers.filter((o) => priceIn(o.prices, loc.currency) !== undefined && (!o.startsAt || o.startsAt <= new Date()) && (!o.endsAt || o.endsAt > new Date()) && (!o.locationId || o.locationId === loc.id) && (!o.eligibility.locationIds?.length || o.eligibility.locationIds.includes(loc.id))).map((o) => ({
       id: o.id, name: o.name, description: o.description, kind: o.kind, credits: o.credits, validDays: o.validDays, price: { amount: priceIn(o.prices, loc.currency)!, currency: loc.currency }, newCustomersOnly: !!o.eligibility.newCustomersOnly,

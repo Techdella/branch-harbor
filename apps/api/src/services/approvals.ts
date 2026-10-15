@@ -58,12 +58,18 @@ export async function assertRefundWithinThreshold(req: FastifyRequest, db: Exec,
   }
 }
 
+/** Structured title: a stable code plus arguments, so apps can phrase it in the viewer's language. */
+export interface ApprovalTitle { code: ApprovalTitleCode; params: Record<string, string | number> }
+export type ApprovalTitleCode = 'refund_payment' | 'refund_order' | 'refund_pickup_order' | 'refund_return' | 'shift_swap' | 'website_change' | 'page_submitted';
+
 export interface NewApproval {
   organizationId: string;
   locationId: string | null;
   kind: Exclude<ApprovalKind, 'page' | 'field'>;
   targetId: string;
   title: string;
+  /** Stored in the payload as `titleI18n` and returned as `titleCode` / `titleParams` (titles typed by people have none). */
+  titleI18n?: ApprovalTitle;
   payload: Record<string, unknown>;
   amountMinor?: number | null;
   currency?: string | null;
@@ -74,7 +80,7 @@ export interface NewApproval {
 /** Insert a pending approval request (call inside the transaction that creates the underlying request). */
 export async function insertApproval(tx: Exec, a: NewApproval, ip?: string) {
   const [row] = await tx.insert(approvals).values({
-    organizationId: a.organizationId, locationId: a.locationId, targetType: a.kind, targetId: a.targetId, title: a.title, payload: a.payload,
+    organizationId: a.organizationId, locationId: a.locationId, targetType: a.kind, targetId: a.targetId, title: a.title, payload: a.titleI18n ? { ...a.payload, titleI18n: a.titleI18n } : a.payload,
     amountMinor: a.amountMinor ?? null, currency: a.currency ?? null, requestedBy: a.requestedBy, requestComment: a.comment ?? null,
   }).returning();
   await audit(tx, { organizationId: a.organizationId, actorUserId: a.requestedBy, action: 'approval.requested', scopeKind: a.locationId ? 'location' : 'organization', scopeId: a.locationId ?? a.organizationId, targetType: a.kind, targetId: a.targetId, metadata: { approvalId: row!.id, amountMinor: a.amountMinor ?? null, currency: a.currency ?? null }, ip: ip ?? null });
@@ -218,6 +224,19 @@ async function executeShiftSwap(s: Services, swapId: string, approverId: string)
   });
 }
 
+/**
+ * Structured title for an approval row: the code stored at creation, or one derived for website changes (which have
+ * no stored title). Requests titled by a person (local ad spend) return null and keep their own `title`.
+ */
+export function approvalTitleOf(r: Pick<ApprovalRow, 'title' | 'targetType' | 'payload'>): ApprovalTitle | null {
+  const p = (r.payload ?? {}) as { titleI18n?: ApprovalTitle; fieldKey?: string };
+  if (p.titleI18n?.code) return p.titleI18n;
+  if (r.title) return null;
+  if (r.targetType === 'page') return { code: 'page_submitted', params: {} };
+  if (r.targetType === 'field') return { code: 'website_change', params: { fieldKey: String(p.fieldKey ?? 'field') } };
+  return null;
+}
+
 /** View model for the approvals inbox: kind, title, money, location, people and whether the viewer can decide. */
 export async function serializeApprovals(req: FastifyRequest, db: Exec, rows: ApprovalRow[]) {
   const userIds = [...new Set(rows.flatMap((r) => [r.requestedBy, r.decidedBy].filter((x): x is string => !!x)))];
@@ -229,6 +248,8 @@ export async function serializeApprovals(req: FastifyRequest, db: Exec, rows: Ap
     ...r,
     kind: kindOf(r),
     kindLabel: DECIDER[kindOf(r)].label,
+    titleCode: approvalTitleOf(r)?.code ?? null,
+    titleParams: approvalTitleOf(r)?.params ?? null,
     title: r.title ?? (r.targetType === 'page' ? 'Page submitted for approval' : r.targetType === 'field' ? `Website change: ${String((r.payload as { fieldKey?: string }).fieldKey ?? 'field')}` : DECIDER[kindOf(r)].label),
     amount: r.amountMinor != null && r.currency ? { amount: r.amountMinor, currency: r.currency } : null,
     location: locs.find((l) => l.id === r.locationId) ?? null,

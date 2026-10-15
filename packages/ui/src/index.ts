@@ -1,4 +1,5 @@
 export * from './cx';
+export * from './labels';
 export * from './components/Icon';
 export * from './components/Logo';
 export * from './components/Button';

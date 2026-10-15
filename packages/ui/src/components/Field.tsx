@@ -2,6 +2,7 @@
 
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { cx } from '../cx';
+import { useUiLabels } from '../labels';
 
 const control =
   'w-full rounded-xs border border-line bg-surface px-3.5 text-sm font-medium text-ink placeholder:text-mute transition focus:border-ink focus-visible:outline-offset-0 aria-[invalid=true]:border-danger';
@@ -17,13 +18,14 @@ interface FieldWrapProps {
 /** Label + control + hint + inline error. Errors keep the entered value intact. */
 export function Field({ label, hint, error, optional, children }: FieldWrapProps) {
   const id = useId();
+  const ui = useUiLabels();
   const hintId = hint ? `${id}-hint` : undefined;
   const errId = error ? `${id}-err` : undefined;
   const describedBy = [hintId, errId].filter(Boolean).join(' ') || undefined;
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-[13px] font-bold text-ink">
-        {label} {optional && <span className="font-medium text-stone">(optional)</span>}
+        {label} {optional && <span className="font-medium text-stone">({ui.optional})</span>}
       </label>
       {children({ id, describedBy, invalid: !!error })}
       {hint && !error && <p id={hintId} className="text-xs text-stone">{hint}</p>}

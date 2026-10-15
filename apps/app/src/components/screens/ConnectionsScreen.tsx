@@ -11,6 +11,7 @@ import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { PartnerIntegrationsPanel } from './PartnerIntegrations';
+import { useDataText } from '../ui/useDataText';
 
 const STATE: Record<ConnectionState, [Tone, IconName]> = {
   connected: ['success', 'check-circle'],
@@ -29,6 +30,7 @@ export function ConnectionsScreen() {
   const fix = useMutation((api, id: string) => api.connections.fix(id));
   const [fixing, setFixing] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const dt = useDataText();
   if (!app.can('locations.read')) return <DeniedState permission="locations.read" detail={t('denied')} />;
   const canManage = app.can('connections.manage');
 
@@ -50,8 +52,8 @@ export function ConnectionsScreen() {
                       {c.monogram}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <h2 className="truncate text-[15px] font-bold">{c.name}</h2>
-                      <div className="truncate text-xs text-stone">{c.role}</div>
+                      <h2 className="truncate text-[15px] font-bold">{dt(c.nameKey, c.nameParams, c.name)}</h2>
+                      <div className="truncate text-xs text-stone">{dt(c.roleKey, undefined, c.role)}</div>
                     </div>
                     <Badge tone={tone} icon={icon}>
                       {t(`state.${c.state}`)}
@@ -77,14 +79,14 @@ export function ConnectionsScreen() {
                   )}
                   <p className="text-xs text-stone">
                     <Icon name="shield" size={11} className="mr-1 inline" />
-                    {c.authoritative}
+                    {dt(c.authoritativeKey, c.authoritativeParams, c.authoritative)}
                   </p>
                   <p className="text-xs text-stone">{t('locations', { list: c.locations.join(', ') || '—' })}</p>
                   {c.issue && (
                     <>
                       <div className="rounded-[14px] bg-warning-bg px-3 py-2.5 text-xs leading-normal text-warning">
-                        {c.issue}
-                        {c.affected && <div className="mt-1 font-bold">{t('affected', { what: c.affected })}</div>}
+                        {dt(c.issueKey, c.issueParams, c.issue)}
+                        {c.affected && <div className="mt-1 font-bold">{t('affected', { what: dt(c.affectedKey, c.affectedParams, c.affected) })}</div>}
                       </div>
                       <Button
                         size="sm"
@@ -97,11 +99,11 @@ export function ConnectionsScreen() {
                           setFixing(null);
                           if (r && res.status === 'ready') {
                             res.setData(res.data.map((x) => (x.id === r.id ? r : x)));
-                            setDone(r.name);
+                            setDone(dt(r.nameKey, r.nameParams, r.name));
                           }
                         }}
                       >
-                        {c.fixAction}
+                        {dt(c.fixActionKey, undefined, c.fixAction ?? '')}
                       </Button>
                     </>
                   )}

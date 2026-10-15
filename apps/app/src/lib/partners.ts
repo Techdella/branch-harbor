@@ -16,10 +16,14 @@ export interface PartnerLocation { id: string; name: string; country: string; cu
 export interface PartnerResult { at: string; action: string; status: string; message: string | null }
 export interface PartnerConnection {
   id: string; provider: string; name: string; kind: string; locationId: string; enabled: boolean; mode: 'sandbox' | 'live'; status: PartnerStatus; statusReason: string;
+  /** Stable code for `statusReason` (translated via `partners.reason.*`); `missingKeys` are the field keys behind `missing`. */
+  statusReasonCode?: string; missingKeys?: string[];
   config: Record<string, unknown>; credentials: Record<string, { set: boolean; masked: string | null }>; missing: string[];
   state: string; lastSuccessAt: string | null; lastError: string | null; lastFetchedAt: string | null; busy: { paused: boolean; until?: string | null } | null;
   feedUrl: string | null; webhookUrl: string | null; canManage?: boolean; lastResult?: PartnerResult | null;
 }
+/** `code` + `params` (newer APIs) let the panel phrase the outcome in the user's language; `message` is the English line. */
+export interface PartnerTestResult { ok: boolean; sandbox: boolean; message: string; code?: string; params?: Record<string, string | number | string[]> }
 export interface PartnerOverview { catalog: PartnerCatalogEntry[]; locations: PartnerLocation[]; items: PartnerConnection[] }
 export type Settings = Record<string, string | boolean | null>;
 
@@ -27,7 +31,7 @@ export interface PartnersApi {
   overview(industry: 'foods' | 'realty'): Promise<PartnerOverview>;
   create(provider: string, locationId: string, settings: Settings): Promise<PartnerConnection>;
   update(id: string, body: { settings?: Settings; enabled?: boolean; mode?: 'sandbox' | 'live' }): Promise<PartnerConnection>;
-  test(id: string): Promise<{ result: { ok: boolean; sandbox: boolean; message: string }; connection: PartnerConnection }>;
+  test(id: string): Promise<{ result: PartnerTestResult; connection: PartnerConnection }>;
   rotateFeed(id: string): Promise<PartnerConnection>;
   disconnect(id: string): Promise<PartnerConnection>;
   menuPush(locationId: string): Promise<{ status: string; message: string; products: number; soldOut: number; unmappedAllergens: Array<{ plu: string; allergen: string }> }>;
@@ -70,10 +74,12 @@ const mk = (provider: string, locationId: string, settings: Settings): PartnerCo
     if (f.secret) credentials[f.key] = { set: !!v, masked: v ? '••••' : null };
     else if (v !== undefined) config[f.key] = v;
   }
-  const missing = entry.fields.filter((f) => f.required && !(f.secret ? credentials[f.key]?.set : config[f.key])).map((f) => f.label);
+  const missingDefs = entry.fields.filter((f) => f.required && !(f.secret ? credentials[f.key]?.set : config[f.key]));
+  const missing = missingDefs.map((f) => f.label);
   return {
     id: `mock-${provider}-${locationId}`, provider, name: entry.name, kind: entry.kind, locationId, enabled: true, mode: 'sandbox', status: 'sandbox',
-    statusReason: missing.length ? `Sandbox — missing ${missing.join(', ')}` : 'Sandbox (sample data — never connected)', config, credentials, missing, state: 'disconnected',
+    statusReason: missing.length ? `Sandbox — missing ${missing.join(', ')}` : 'Sandbox (sample data — never connected)', statusReasonCode: missing.length ? 'missing_credentials' : 'sample', missingKeys: missingDefs.map((f) => f.key),
+    config, credentials, missing, state: 'disconnected',
     lastSuccessAt: null, lastError: null, lastFetchedAt: null, busy: null, feedUrl: entry.delivery === 'pull' ? 'https://api.example.com/v1/feeds/realty/sample/•••.xml' : null,
     webhookUrl: entry.kind !== 'portal' ? `https://api.example.com/v1/webhooks/${provider === 'uber_direct' ? 'uber-direct' : 'deliverect'}` : null, canManage: true, lastResult: null,
   };
@@ -93,12 +99,12 @@ const mock: PartnersApi = {
     const c = find(id);
     if (body.mode === 'live') throw new ApiError('test_required', 'Sample data: connections can’t go live.', 409);
     Object.assign(c, mk(c.provider, c.locationId, { ...(c.config as Settings), ...(body.settings ?? {}) }), { enabled: body.enabled ?? c.enabled, id: c.id });
-    if (!c.enabled) { c.status = 'disabled'; c.statusReason = 'Switched off'; }
+    if (!c.enabled) Object.assign(c, { status: 'disabled', statusReason: 'Switched off', statusReasonCode: 'disabled' });
     return c;
   },
-  async test(id) { await delay(); const c = find(id); const r = { ok: false, sandbox: true, message: 'Sample data: no partner is contacted. Connect the API to test real credentials.' }; c.lastResult = { at: new Date().toISOString(), action: 'test', status: 'sandbox', message: r.message }; return { result: r, connection: c }; },
+  async test(id) { await delay(); const c = find(id); const r: PartnerTestResult = { ok: false, sandbox: true, message: 'Sample data: no partner is contacted. Connect the API to test real credentials.', code: 'sample' }; c.lastResult = { at: new Date().toISOString(), action: 'test', status: 'sandbox', message: r.message }; return { result: r, connection: c }; },
   async rotateFeed(id) { await delay(); return find(id); },
-  async disconnect(id) { await delay(); const c = find(id); c.enabled = false; c.status = 'disabled'; c.statusReason = 'Switched off'; return c; },
+  async disconnect(id) { await delay(); const c = find(id); Object.assign(c, { enabled: false, status: 'disabled', statusReason: 'Switched off', statusReasonCode: 'disabled' }); return c; },
   async menuPush() { await delay(); return { status: 'sandbox', message: 'Sandbox: menu snapshot built, nothing sent to Deliverect', products: 12, soldOut: 1, unmappedAllergens: [] }; },
   async busy(_l, paused) { await delay(); return { status: 'sandbox', message: paused ? 'Sandbox: busy mode recorded, marketplaces not paused' : 'Sandbox: busy mode cleared', paused }; },
 };

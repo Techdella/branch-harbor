@@ -8,10 +8,12 @@ import { cityOfZone, fmtDay, fmtTime, relativeTime } from '@/lib/format';
 import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, Empty, LoadingBlock } from '../../ui/States';
+import { useDataText } from '../../ui/useDataText';
 
 export function CoverScreen() {
   const t = useTranslations('cover');
   const tOps = useTranslations('ops.studios.cover');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const res = useApi((api) => api.studios.cover(app.ctx), [app.role]);
@@ -56,7 +58,7 @@ export function CoverScreen() {
                     <Avatar name={p.name} size={36} pastel={p.available ? '#E2F5A6' : '#EEEDE8'} />
                     <div className="min-w-0 flex-1">
                       <strong>{p.name}</strong>
-                      <div className="text-xs text-stone">{p.note}</div>
+                      <div className="text-xs text-stone">{dt(p.noteKey, p.noteParams, p.note)}</div>
                     </div>
                     <Badge tone={p.state === 'assigned' ? 'success' : p.state === 'accepted' ? 'info' : p.state === 'unavailable' ? 'neutral' : 'neutral'} icon={p.state === 'notified' ? 'bell' : p.state === 'unavailable' ? 'minus' : undefined}>
                       {t(`candidate.${p.state}`)}
@@ -107,7 +109,7 @@ export function CoverScreen() {
                   <li key={i} className="flex gap-2.5 text-[13px]">
                     <Icon name="clock" size={14} className="mt-0.5 shrink-0 text-stone" />
                     <div>
-                      <div>{h.text}</div>
+                      <div>{dt(h.textKey, h.textParams, h.text)}</div>
                       <div className="text-xs text-stone">{relativeTime(h.at, locale)}</div>
                     </div>
                   </li>

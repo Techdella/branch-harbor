@@ -4,6 +4,7 @@ import { network } from './network';
 import { mockRequest } from '@/mock/server';
 import { ApiError } from './errors';
 import { guestContact, liveApi, serverPaymentsSandbox, type GuestContact } from './live';
+import { tNow } from '@/i18n/current';
 import type {
   Approval, AppNotification, Booking, Brand, ClassOccurrence, CoverRequest, DataRequest, FoodOrder, FoodOrderStatus,
   KitchenOrder, Location, Me, MenuItem, Message, OrderLineInput, PaymentIntentParams, PickupSlot, Preferences, Pulse,
@@ -16,7 +17,7 @@ type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 /** Mock-mode transport: the in-process mock (src/mock/server.ts) with the original flat paths. */
 export async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
-  if (!network.isOnline()) throw new ApiError(0, 'network_error', 'You’re offline.');
+  if (!network.isOnline()) throw new ApiError(0, 'network_error', tNow('apiError.offline', 'You’re offline.'));
   return mockRequest<T>(method, path, body);
 }
 

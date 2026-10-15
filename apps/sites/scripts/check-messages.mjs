@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Verifies every customer-site locale against English for each catalogue set (messages/*.json and
- * messages/foods/*.json): every key present, no extra keys, no empty strings, ICU arguments preserved.
+ * Verifies every customer-site locale against English for each catalogue set (messages/*.json and the
+ * namespace folders foods/, fallback/ and payments/): every key present, no extra keys, no empty strings, ICU arguments preserved.
  * Customer pages serve all platform locales, so every locale in @bh/shared SUPPORTED_LOCALES must exist.
  * Rules are shared with the marketing site (scripts/i18n/catalog.mjs). Usage: node scripts/check-messages.mjs [--verbose]
  */
@@ -20,7 +20,7 @@ const LOCALES = JSON.parse(
     .exec(shared)[1]
     .replace(/'/g, '"'),
 );
-const SETS = ['', 'foods', 'fallback'];
+const SETS = ['', 'foods', 'fallback', 'payments'];
 
 const read = (dir, l) => {
   const f = path.join(root, dir, `${l}.json`);
@@ -37,7 +37,7 @@ const sets = SETS.map((dir) => ({
 const request = fs.readFileSync(path.join(here, '..', 'i18n', 'request.ts'), 'utf8');
 let ok = true;
 for (const l of LOCALES.filter((x) => x !== 'en')) {
-  if (!new RegExp(`['"]?${l}['"]?\s*:`).test(request)) {
+  if (!new RegExp(`['"]?${l}['"]?\\s*:`).test(request)) {
     console.error(`✗ i18n/request.ts does not load '${l}'`);
     ok = false;
   }

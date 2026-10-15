@@ -1,6 +1,12 @@
 import type { Currency, Money, Permission, RoleAssignment } from '@bh/shared';
 import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
+import type { MsgParams } from './msg';
+
+/**
+ * Translatable text in view models: `xKey` (+ `xParams`) is a catalogue key in the "data" namespace that components
+ * translate (see lib/msg.ts); the plain `x` string next to it is the English fallback. Mock and live fill both.
+ */
 
 /** The verticals demonstrated in the business app (realty: Real Estate, release "next"). */
 export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
@@ -95,14 +101,22 @@ export type MetricValue =
 export interface Metric {
   key: string;
   label: string;
+  labelKey?: string;
   definition: string;
+  definitionKey?: string;
   range: string;
+  rangeKey?: string;
   source: string;
+  /** Absent for provider names (Stripe, WooCommerce), which stay as they are. */
+  sourceKey?: string;
+  sourceParams?: MsgParams;
   icon: IconName;
   pastel: string;
   state: 'ok' | 'unavailable' | 'not_connected';
   value: MetricValue | null;
   note?: string;
+  noteKey?: string;
+  noteParams?: MsgParams;
 }
 
 export interface UpcomingItem {
@@ -110,15 +124,23 @@ export interface UpcomingItem {
   at: string; // ISO UTC
   timeZone: string;
   title: string;
+  titleKey?: string;
+  titleParams?: MsgParams;
   detail: string;
-  status: { label: string; tone: Tone };
+  detailKey?: string;
+  detailParams?: MsgParams;
+  status: { label: string; labelKey?: string; labelParams?: MsgParams; tone: Tone };
 }
 
 export interface AttentionItem {
   id: string;
   icon: IconName;
   title: string;
+  titleKey?: string;
+  titleParams?: MsgParams;
   detail: string;
+  detailKey?: string;
+  detailParams?: MsgParams;
   href: string;
   kind: 'action' | 'integration' | 'info';
 }
@@ -126,9 +148,19 @@ export interface AttentionItem {
 export interface Overview {
   metrics: Metric[];
   upcomingTitle: string;
+  upcomingTitleKey?: string;
   upcoming: UpcomingItem[];
   attention: AttentionItem[];
   aiPrompt: string;
+  aiPromptKey?: string;
+}
+
+/** A dated history line (cover requests, website activity). */
+export interface HistoryEntry {
+  at: string;
+  text: string;
+  textKey?: string;
+  textParams?: MsgParams;
 }
 
 /* ---------- Generic tables ---------- */
@@ -170,6 +202,8 @@ export interface CoverCandidate {
   id: string;
   name: string;
   note: string;
+  noteKey?: string;
+  noteParams?: MsgParams;
   available: boolean;
   state: 'notified' | 'accepted' | 'assigned' | 'unavailable';
 }
@@ -186,7 +220,7 @@ export interface CoverRequest {
   bookedCustomers: number;
   status: 'open' | 'accepted' | 'confirmed';
   candidates: CoverCandidate[];
-  history: { at: string; text: string }[];
+  history: HistoryEntry[];
 }
 
 /* ---------- Sports ---------- */
@@ -332,7 +366,7 @@ export interface WebsitePage {
   page: string;
   version: number;
   fields: WebsiteField[];
-  activity: { at: string; text: string }[];
+  activity: HistoryEntry[];
 }
 export interface ApprovalItem {
   id: string;
@@ -365,6 +399,8 @@ export type RefundState = 'none' | 'requested' | 'pending' | 'partial' | 'comple
 export interface TimelineEvent {
   at: string;
   text: string;
+  textKey?: string;
+  textParams?: MsgParams;
   tone: Tone;
   icon: IconName;
 }
@@ -373,25 +409,37 @@ export interface Transaction {
   externalRef: string;
   createdAt: string;
   description: string;
+  descriptionKey?: string;
+  descriptionParams?: MsgParams;
   locationId: string;
   amount: Money;
   payment: PaymentState;
   refund: RefundState;
   provider: string;
+  providerKey?: string;
+  providerParams?: MsgParams;
   linkedRecord?: string;
+  linkedRecordKey?: string;
+  linkedRecordParams?: MsgParams;
   timeline: TimelineEvent[];
 }
 export interface ReconciliationItem {
   id: string;
   type: 'paid_without_record' | 'unpaid_confirmed' | 'amount_mismatch';
   summary: string;
+  summaryKey?: string;
+  summaryParams?: MsgParams;
   transactionRef: string;
   amount: Money;
   locationId: string;
   customer: string;
   orderState: string;
+  orderStateKey?: string;
+  orderStateParams?: MsgParams;
   status: 'needs_action' | 'reviewing' | 'resolved';
   resolution?: string;
+  resolutionKey?: string;
+  resolutionParams?: MsgParams;
   timeline: TimelineEvent[];
 }
 /** Automatic (off-session) charging of fees and instalments to cards customers agreed to keep on file. */
@@ -404,9 +452,13 @@ export interface AutoChargeRow {
 export interface PaymentAccount {
   locationId: string;
   provider: string;
+  providerKey?: string;
+  providerParams?: MsgParams;
   arrangement: 'own' | 'shared';
   status: 'enabled' | 'pending_verification' | 'not_set_up';
   capabilities: string[];
+  /** Keys under data `payment.capability.*`, parallel to `capabilities`. */
+  capabilityKeys?: string[];
 }
 
 /* ---------- Connections ---------- */
@@ -414,17 +466,27 @@ export type ConnectionState = 'connected' | 'initial_sync' | 'degraded' | 'disco
 export interface Connection {
   id: string;
   name: string;
+  nameKey?: string;
+  nameParams?: MsgParams;
   monogram: string;
   role: string;
+  roleKey?: string;
   state: ConnectionState;
   lastSync: string | null;
   progress?: number;
   direction: 'import' | 'export' | 'bidirectional';
   authoritative: string;
+  authoritativeKey?: string;
+  authoritativeParams?: MsgParams;
   locations: string[];
   issue?: string;
+  issueKey?: string;
+  issueParams?: MsgParams;
   affected?: string;
+  affectedKey?: string;
+  affectedParams?: MsgParams;
   fixAction?: string;
+  fixActionKey?: string;
 }
 
 /* ---------- Team ---------- */
@@ -432,8 +494,11 @@ export interface Member {
   id: string;
   name: string;
   email: string;
-  assignments: { role: string; scopeLabel: string }[];
+  /** `roleKey` is the role code (org_owner, staff, …) translated via data `role.*`; `scopeKey` is a data key for scope labels that aren't names. */
+  assignments: { role: string; roleKey?: string; scopeLabel: string; scopeKey?: string; scopeParams?: MsgParams }[];
   lastActive: string;
+  lastActiveKey?: string;
+  lastActiveParams?: MsgParams;
   status: 'active' | 'invited' | 'support';
   note?: string;
 }
@@ -537,6 +602,8 @@ export interface ApprovalRequest {
   id: string;
   kind: ApprovalKind;
   title: string;
+  titleKey?: string;
+  titleParams?: MsgParams;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'executing';
   locationName: string;
   amount: Money | null;
@@ -544,10 +611,12 @@ export interface ApprovalRequest {
   requestedAt: string;
   reason: string | null;
   /** Kind-specific facts shown before deciding (channel, duration, who swaps with whom, field value…). */
-  details: { label: string; value: string }[];
+  details: { key?: string; label: string; value: string; valueKey?: string; valueParams?: MsgParams }[];
   canDecide: boolean;
   decidedBy: string | null;
   decisionComment: string | null;
   /** What ran on approval (e.g. "Refund complete"). */
   result: string | null;
+  resultKey?: string;
+  resultParams?: MsgParams;
 }

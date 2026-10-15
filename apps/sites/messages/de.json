@@ -944,6 +944,35 @@
       "noShowFee": "Gebühr bei Nichterscheinen: {amount}.",
       "noShowFeeMembers": "Gebühr bei Nichterscheinen: {amount} (nicht für Mitglieder).",
       "noNoShowFee": "Keine Gebühr bei Nichterscheinen."
+    },
+    "access": {
+      "any_location": "Gültig an allen Standorten",
+      "same_currency": "Gültig an allen Standorten mit {currency}",
+      "listed": "{count, plural, one {Gültig an # ausgewählten Standort} other {Gültig an # ausgewählten Standorten}}",
+      "home_only": "Nur gültig in {location}"
+    },
+    "membershipTerms": {
+      "billed": "Monatliche Abrechnung in {currency} bis zur Kündigung.",
+      "notice": "{days, plural, one {Kündigungsfrist: # Tag.} other {Kündigungsfrist: # Tage.}}",
+      "pause": "Pausieren für bis zu {days} Tage am Stück.",
+      "noPause": "Pausieren ist nicht möglich.",
+      "classes": "{count} Kurse pro Monat; nicht genutzte Kurse verfallen.",
+      "unlimited": "Unbegrenzt Kurse."
+    },
+    "onlineReason": {
+      "sign_in": "Melden Sie sich an, um Onlinekurse zu nutzen",
+      "membership_excludes": "Ihre Mitgliedschaft umfasst diesen Kurs derzeit nicht",
+      "members_only": "Nur für Mitglieder",
+      "pack_holders_only": "Nur mit Kurskarte",
+      "buy_to_watch": "Kaufen Sie diesen Kurs, um ihn anzusehen",
+      "livestream_ended": "Dieser Livestream ist beendet"
+    },
+    "onlineRule": {
+      "free_with_registration": "Kostenlos mit Anmeldung",
+      "members": "In der Mitgliedschaft enthalten",
+      "pack_holders": "Für Inhaber einer Kurskarte enthalten",
+      "buy": "Einzeln erhältlich",
+      "not_available": "Noch nicht verfügbar"
     }
   },
   "storefront": {

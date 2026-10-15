@@ -8,7 +8,8 @@
  * - Errors are normalised to ApiError from `{ error: { code, message, fields } }`.
  */
 import { env } from './env';
-import { ApiError } from './errors';
+import { ApiError, localizedApiMessage } from './errors';
+import { tNow } from '@/i18n/current';
 import { network } from './network';
 import { storage, tokenStore } from './storage';
 
@@ -46,7 +47,7 @@ export function refreshAccessToken(): Promise<string | null> {
       });
     } catch {
       // Offline: keep the stored session and let the caller surface a network error.
-      throw new ApiError(0, 'network_error', 'Can’t reach BranchHarbor. Check your connection.');
+      throw new ApiError(0, 'network_error', tNow('apiError.network_error', 'Can’t reach BranchHarbor. Check your connection.'));
     }
     if (!res.ok) {
       await Promise.all([tokenStore.clear(), refreshStore.clear()]);
@@ -80,7 +81,7 @@ async function send(method: Method, path: string, body: unknown, token: string |
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
-    throw new ApiError(0, 'network_error', 'Can’t reach BranchHarbor. Check your connection.');
+    throw new ApiError(0, 'network_error', tNow('apiError.network_error', 'Can’t reach BranchHarbor. Check your connection.'));
   }
 }
 
@@ -88,15 +89,16 @@ async function parse<T>(res: Response): Promise<T> {
   if (res.status === 204) return undefined as T;
   const json = (await res.json().catch(() => null)) as unknown;
   if (!res.ok) {
-    const e = (json as { error?: { code?: string; message?: string; fields?: Record<string, string> } } | null)?.error;
-    throw new ApiError(res.status, e?.code ?? `http_${res.status}`, e?.message ?? res.statusText, e?.fields);
+    const e = (json as { error?: { code?: string; message?: string; fields?: Record<string, string>; details?: Record<string, unknown> } } | null)?.error;
+    const code = e?.code ?? `http_${res.status}`;
+    throw new ApiError(res.status, code, localizedApiMessage(code, e?.message ?? res.statusText, e?.details), e?.fields);
   }
   return json as T;
 }
 
 /** Live /v1 request. `auth: false` skips the bearer token (public endpoints, login). */
 export async function http<T>(method: Method, path: string, body?: unknown, opts: { auth?: boolean } = {}): Promise<T> {
-  if (!network.isOnline()) throw new ApiError(0, 'network_error', 'You’re offline.');
+  if (!network.isOnline()) throw new ApiError(0, 'network_error', tNow('apiError.offline', 'You’re offline.'));
   const useAuth = opts.auth !== false;
   const token = useAuth ? await tokenStore.get() : null;
   let res = await send(method, path, body, token);

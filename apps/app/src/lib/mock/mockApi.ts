@@ -36,6 +36,7 @@ import { addDays, dateInZone, zonedToUtc } from '../format';
 import { AI, buildOverview, buildTable } from './content';
 import { FIXTURES, PASTEL as P, at, loc, minutesAgo, scopeLocationIds, scopeOptions, sessionFor, unsplash, visibleLocations } from './orgs';
 import { withIndependent } from './business';
+import { moneyArg, ref, type MsgParams } from '../msg';
 
 /* ---------------- helpers ---------------- */
 
@@ -108,11 +109,14 @@ function freshCover(): CoverRequest {
   return {
     id: 'cov_1', classId: `qw-${sat}-0`, className: 'Morning Vinyasa', start: zonedToUtc(sat, '07:00', l.timeZone), timeZone: l.timeZone, locationName: l.name, requestedBy: 'Maya Rao', reason: 'Unavailable — family commitment', bookedCustomers: 16, status: 'open',
     candidates: [
-      { id: 'st', name: 'Sam Tran', note: 'Available · teaches Vinyasa', available: true, state: 'notified' },
-      { id: 'as', name: 'Ana Silva', note: 'Available', available: true, state: 'notified' },
-      { id: 'jl', name: 'Jordan Lee', note: 'Teaching at Leslieville at that time', available: false, state: 'unavailable' },
+      { id: 'st', name: 'Sam Tran', note: 'Available · teaches Vinyasa', noteKey: 'cover.candidate.availableTeaches', noteParams: { style: 'Vinyasa' }, available: true, state: 'notified' },
+      { id: 'as', name: 'Ana Silva', note: 'Available', noteKey: 'cover.candidate.available', available: true, state: 'notified' },
+      { id: 'jl', name: 'Jordan Lee', note: 'Teaching at Leslieville at that time', noteKey: 'cover.candidate.teachingAt', noteParams: { place: 'Leslieville' }, available: false, state: 'unavailable' },
     ],
-    history: [{ at: minutesAgo(180), text: 'Maya Rao requested cover' }, { at: minutesAgo(179), text: '2 eligible instructors notified' }],
+    history: [
+      { at: minutesAgo(180), text: 'Maya Rao requested cover', textKey: 'cover.requestedBy', textParams: { name: 'Maya Rao' } },
+      { at: minutesAgo(179), text: '2 eligible instructors notified', textKey: 'cover.notified', textParams: { count: 2 } },
+    ],
   };
 }
 
@@ -133,9 +137,23 @@ function freshRegs(): { items: Registration[]; groups: SportsGroup[] } {
 
 /* ---------------- Commerce ---------------- */
 
+const ORDER_EVENT = (text: string): { textKey?: string; textParams?: MsgParams } => {
+  const fixed: Record<string, string> = {
+    'Order created in WooCommerce': 'order.event.createdWoo', 'Imported to BranchHarbor': 'order.event.imported', 'Retry received · same external ID, no duplicate created': 'order.event.retryDeduped',
+    'Payment failed · card declined': 'order.event.cardDeclined', 'Payment processing': 'order.event.paymentProcessing', 'Store disconnected — order seen in last partial sync only': 'order.event.storeDisconnected',
+  };
+  if (fixed[text]) return { textKey: fixed[text] };
+  let m = /^Imported to BranchHarbor \(event (.+)\)$/.exec(text);
+  if (m) return { textKey: 'order.event.importedEvent', textParams: { event: m[1]! } };
+  m = /^Marked fulfilled at (.+)$/.exec(text);
+  if (m) return { textKey: 'order.event.fulfilledAt', textParams: { place: m[1]! } };
+  return {};
+};
+
 function freshOrders(): CommerceOrder[] {
   const pd = loc('commerce', 'pd');
-  const tl = (minsAgo: number, text: string, tone: 'success' | 'info' | 'neutral' | 'warning' | 'danger', icon: 'check' | 'refresh' | 'undo' | 'alert' | 'x') => ({ at: minutesAgo(minsAgo), text, tone, icon });
+  /** Timeline entry; the English text maps to a data `order.event.*` key (see ORDER_EVENT). */
+  const tl = (minsAgo: number, text: string, tone: 'success' | 'info' | 'neutral' | 'warning' | 'danger', icon: 'check' | 'refresh' | 'undo' | 'alert' | 'x') => ({ at: minutesAgo(minsAgo), text, ...ORDER_EVENT(text), tone, icon });
   return [
     { id: 'o5521', number: '5521', customer: 'Riley A.', locationId: 'pd', source: 'WooCommerce #8841', placedAt: at(pd.timeZone, '10:14'), lines: [{ id: 'l1', name: 'Linen overshirt · M', qty: 1, unit: m(99, 'USD'), refunded: false }, { id: 'l2', name: 'Linen overshirt · L', qty: 1, unit: m(99, 'USD'), refunded: false }], total: m(198, 'USD'), tax: { label: 'Sales tax (Oregon): none configured', amount: null }, payment: 'succeeded', refund: 'none', fulfilment: 'to_fulfil',
       timeline: [tl(90, 'Order created in WooCommerce', 'success', 'check'), tl(90, 'Imported to BranchHarbor (event wc_8841_created)', 'info', 'refresh'), tl(89, 'Retry received · same external ID, no duplicate created', 'neutral', 'refresh')] },
@@ -194,7 +212,10 @@ function freshPage(ind: IndustryKey, locId: string): WebsitePage {
       { key: 'hours', label: 'Opening hours', policy: 'editable', value: hq.hours, hqValue: hq.hours },
       { key: 'phone', label: 'Phone number', policy: 'editable', value: locId === 'ls' ? '+1 416 555 0199' : hq.phone, hqValue: hq.phone },
     ],
-    activity: [{ at: minutesAgo(310), text: 'Version 15 published by headquarters' }, ...(pending ? [{ at: pending.at, text: 'Kim Lau requested a change to Hero headline' }] : [])],
+    activity: [
+      { at: minutesAgo(310), text: 'Version 15 published by headquarters', textKey: 'website.versionPublishedByHq', textParams: { version: 15 } },
+      ...(pending ? [{ at: pending.at, text: 'Kim Lau requested a change to Hero headline', textKey: 'website.changeRequested', textParams: { name: 'Kim Lau', field: 'Hero headline' } }] : []),
+    ],
   };
 }
 
@@ -218,21 +239,37 @@ function freshPayments(ind: IndustryKey) {
   const L = f.locations;
   const lp = loc(ind, f.localLocationId);
   const what: Record<IndustryKey, [string, string]> = { studios: ['Class booking', 'Monthly membership'], sports: ['Registration · U10 Autumn', 'Camp registration'], wellness: ['Deposit · Hot stone', 'Deep tissue 60 min'], commerce: ['Order #5521', 'Order #5519'], foods: ['Pickup order', 'Pickup order'], realty: ['Valuation fee', 'Marketing package'] };
-  const ev = (mins: number, text: string, tone: 'success' | 'info' | 'danger' | 'warning' | 'neutral', icon: 'card' | 'check' | 'x' | 'refresh' | 'undo' | 'alert') => ({ at: minutesAgo(mins), text, tone, icon });
+  /** data keys for the descriptions above; product and service names stay as published. */
+  const whatKey: Record<IndustryKey, [[string, MsgParams?] | null, [string, MsgParams?] | null]> = {
+    studios: [['payment.target.class_booking'], ['payment.what.monthlyMembership']], sports: [['payment.what.registrationFor', { name: 'U10 Autumn' }], ['payment.what.campRegistration']],
+    wellness: [['payment.what.depositFor', { name: 'Hot stone' }], null], commerce: [['payment.what.orderNo', { ref: '#5521' }], ['payment.what.orderNo', { ref: '#5519' }]],
+    foods: [['payment.target.food_order'], ['payment.target.food_order']], realty: [null, null],
+  };
+  const desc = (i: 0 | 1) => { const k = whatKey[ind][i]; return k ? { descriptionKey: k[0], ...(k[1] ? { descriptionParams: k[1] } : {}) } : {}; };
+  const whatRef = (i: 0 | 1) => { const k = whatKey[ind][i]; return k ? ref(k[0], k[1], what[ind][i]) : what[ind][i]; };
+  const ev = (mins: number, text: string, tone: 'success' | 'info' | 'danger' | 'warning' | 'neutral', icon: 'card' | 'check' | 'x' | 'refresh' | 'undo' | 'alert', key?: string, params?: MsgParams) => ({ at: minutesAgo(mins), text, ...(key ? { textKey: key } : {}), ...(params ? { textParams: params } : {}), tone, icon });
   const tx: Transaction[] = L.filter((l) => l.site === 'live').flatMap((l, i): Transaction[] => {
     const base = l.currency === 'GBP' ? 28 : l.currency === 'EUR' ? 32 : l.currency === 'AUD' ? 45 : l.currency === 'CAD' ? 39 : 34.65;
     return [
-      { id: `tx_${l.id}_1`, externalRef: `pi_3QX…${(9 + i).toString(36)}F${i}k`, createdAt: minutesAgo(20 + i * 37), description: what[ind][0], locationId: l.id, amount: m(base, l.currency), payment: 'succeeded', refund: 'none', provider: 'Stripe', linkedRecord: l.id === lp.id ? undefined : `${ind === 'foods' ? 'Order' : 'Booking'} ${l.code}-${3390 + i}`,
-        timeline: [ev(20 + i * 37, `payment_intent.succeeded · signed event`, 'success', 'card'), ev(19 + i * 37, l.id === lp.id ? 'Linked record could not be created' : 'Linked record created', l.id === lp.id ? 'danger' : 'success', l.id === lp.id ? 'x' : 'check')] },
-      { id: `tx_${l.id}_2`, externalRef: `pi_3QX…${(4 + i).toString(36)}E${i}f`, createdAt: minutesAgo(300 + i * 90), description: what[ind][1], locationId: l.id, amount: m(base * 4 + 13, l.currency), payment: i % 3 === 2 ? 'failed' : i % 4 === 1 ? 'processing' : 'succeeded', refund: i === 1 ? 'partial' : 'none', provider: ind === 'commerce' ? 'WooCommerce gateway' : 'Stripe', linkedRecord: `Record ${l.code}-${4100 + i}`,
-        timeline: [ev(300 + i * 90, 'payment_intent.created', 'neutral', 'card'), ev(299 + i * 90, i % 3 === 2 ? 'payment_intent.payment_failed · card declined' : 'payment_intent.succeeded', i % 3 === 2 ? 'danger' : 'success', i % 3 === 2 ? 'x' : 'check'), ...(i === 1 ? [ev(120, 'Partial refund complete', 'info' as const, 'undo' as const)] : [])] },
+      { id: `tx_${l.id}_1`, externalRef: `pi_3QX…${(9 + i).toString(36)}F${i}k`, createdAt: minutesAgo(20 + i * 37), description: what[ind][0], ...desc(0), locationId: l.id, amount: m(base, l.currency), payment: 'succeeded', refund: 'none', provider: 'Stripe',
+        ...(l.id === lp.id ? {} : { linkedRecord: `${ind === 'foods' ? 'Order' : 'Booking'} ${l.code}-${3390 + i}`, linkedRecordKey: 'payment.linked', linkedRecordParams: { what: ref(ind === 'foods' ? 'payment.target.order' : 'payment.target.booking', undefined, ind === 'foods' ? 'Order' : 'Booking'), ref: `${l.code}-${3390 + i}` } }),
+        timeline: [ev(20 + i * 37, `payment_intent.succeeded · signed event`, 'success', 'card', 'payment.event.signed', { event: 'payment_intent.succeeded' }), l.id === lp.id ? ev(19 + i * 37, 'Linked record could not be created', 'danger', 'x', 'payment.event.linkFailed') : ev(19 + i * 37, 'Linked record created', 'success', 'check', 'payment.event.linkCreated')] },
+      { id: `tx_${l.id}_2`, externalRef: `pi_3QX…${(4 + i).toString(36)}E${i}f`, createdAt: minutesAgo(300 + i * 90), description: what[ind][1], ...desc(1), locationId: l.id, amount: m(base * 4 + 13, l.currency), payment: i % 3 === 2 ? 'failed' : i % 4 === 1 ? 'processing' : 'succeeded', refund: i === 1 ? 'partial' : 'none',
+        provider: ind === 'commerce' ? 'WooCommerce gateway' : 'Stripe', ...(ind === 'commerce' ? { providerKey: 'payment.provider.gateway', providerParams: { name: 'WooCommerce' } } : {}),
+        linkedRecord: `Record ${l.code}-${4100 + i}`, linkedRecordKey: 'payment.linked', linkedRecordParams: { what: ref('payment.target.record', undefined, 'Record'), ref: `${l.code}-${4100 + i}` },
+        timeline: [ev(300 + i * 90, 'payment_intent.created', 'neutral', 'card'), i % 3 === 2 ? ev(299 + i * 90, 'payment_intent.payment_failed · card declined', 'danger', 'x', 'payment.event.cardDeclined', { event: 'payment_intent.payment_failed' }) : ev(299 + i * 90, 'payment_intent.succeeded', 'success', 'check'), ...(i === 1 ? [ev(120, 'Partial refund complete', 'info' as const, 'undo' as const, 'payment.event.partialRefund')] : [])] },
     ];
   });
   const rec: ReconciliationItem[] = [
-    { id: 'rec_1', type: 'paid_without_record', summary: `${what[ind][0]} · ${lp.name}`, transactionRef: 'pi_3QX…9Fk', amount: m(34.65, lp.currency), locationId: lp.id, customer: 'Lena W.', orderState: 'Missing', status: 'needs_action',
-      timeline: [ev(42, `Stripe payment_intent.succeeded · ${lp.currency} (signed event)`, 'success', 'card'), ev(42, ind === 'foods' ? 'Order creation failed: pickup slot full at confirm' : 'Record creation failed: capacity changed during checkout', 'danger', 'x')] },
-    { id: 'rec_2', type: 'unpaid_confirmed', summary: 'Confirmed record without payment', transactionRef: '—', amount: m(34, L[0]!.currency), locationId: L[0]!.id, customer: 'Jo M.', orderState: 'Confirmed', status: 'reviewing', timeline: [ev(600, 'Record confirmed by staff', 'neutral', 'check'), ev(599, 'No payment event received', 'warning', 'alert')] },
-    { id: 'rec_3', type: 'amount_mismatch', summary: 'Amount mismatch', transactionRef: 'pi_3QX…2Ab', amount: m(39, L[0]!.currency), locationId: L[0]!.id, customer: 'Noor H.', orderState: 'Booked at 35.00', status: 'resolved', resolution: 'Difference refunded', timeline: [ev(1600, 'Mismatch detected', 'warning', 'alert'), ev(1500, 'Resolved: difference refunded', 'success', 'check')] },
+    { id: 'rec_1', type: 'paid_without_record', summary: `${what[ind][0]} · ${lp.name}`, summaryKey: 'payment.recon.summary', summaryParams: { what: whatRef(0), place: lp.name }, transactionRef: 'pi_3QX…9Fk', amount: m(34.65, lp.currency), locationId: lp.id, customer: 'Lena W.', orderState: 'Missing', orderStateKey: 'payment.recon.missing', status: 'needs_action',
+      timeline: [
+        ev(42, `Stripe payment_intent.succeeded · ${lp.currency} (signed event)`, 'success', 'card', 'payment.event.signedCurrency', { provider: 'Stripe', event: 'payment_intent.succeeded', currency: lp.currency }),
+        ind === 'foods' ? ev(42, 'Order creation failed: pickup slot full at confirm', 'danger', 'x', 'payment.event.orderFailedSlotFull') : ev(42, 'Record creation failed: capacity changed during checkout', 'danger', 'x', 'payment.event.recordFailedCapacity'),
+      ] },
+    { id: 'rec_2', type: 'unpaid_confirmed', summary: 'Confirmed record without payment', summaryKey: 'payment.recon.confirmedWithoutPayment', transactionRef: '—', amount: m(34, L[0]!.currency), locationId: L[0]!.id, customer: 'Jo M.', orderState: 'Confirmed', orderStateKey: 'payment.recon.confirmed', status: 'reviewing',
+      timeline: [ev(600, 'Record confirmed by staff', 'neutral', 'check', 'payment.event.confirmedByStaff'), ev(599, 'No payment event received', 'warning', 'alert', 'payment.event.noPaymentEvent')] },
+    { id: 'rec_3', type: 'amount_mismatch', summary: 'Amount mismatch', summaryKey: 'payment.recon.amountMismatch', transactionRef: 'pi_3QX…2Ab', amount: m(39, L[0]!.currency), locationId: L[0]!.id, customer: 'Noor H.', orderState: 'Booked at 35.00', orderStateKey: 'payment.recon.bookedAt', orderStateParams: { amount: moneyArg(3500, L[0]!.currency) }, status: 'resolved', resolution: 'Difference refunded', resolutionKey: 'payment.recon.differenceRefunded',
+      timeline: [ev(1600, 'Mismatch detected', 'warning', 'alert', 'payment.event.mismatchDetected'), ev(1500, 'Resolved: difference refunded', 'success', 'check', 'payment.event.resolvedDifference')] },
   ];
   return { tx, rec };
 }
@@ -272,8 +309,30 @@ function freshConnections(ind: IndustryKey): Connection[] {
       { id: 'c_portal', name: 'Portal feeds (sandbox)', monogram: 'Pf', role: 'Listing syndication preview', state: 'initial_sync', lastSync: null, progress: 0, direction: 'export', authoritative: 'Sandbox only — nothing is sent to portals', locations: names },
     ],
   };
-  return C[ind];
+  return C[ind].map((c) => ({ ...c, ...CONNECTION_KEYS[`${ind}:${c.id}`] }));
 }
+
+/** data keys for the mock connections' role, source-of-truth, issue, affected and fix texts (provider names stay as they are). */
+const auth = (key: string, params?: MsgParams) => ({ authoritativeKey: `connection.authoritative.${key}`, ...(params ? { authoritativeParams: params } : {}) });
+const CONNECTION_KEYS: Record<string, Partial<Connection>> = {
+  'studios:c_momence': { nameKey: 'connection.name.booking', nameParams: { name: 'Momence' }, roleKey: 'connection.role.booking', ...auth('externalBookings', { name: 'Momence' }), issueKey: 'connection.issue.rateLimit', issueParams: { place: 'Kitsilano', count: 8 }, affectedKey: 'connection.affected.classes', affectedParams: { count: 8 }, fixActionKey: 'connection.fix.retrySync' },
+  'studios:c_stripe': { roleKey: 'connection.role.customerPayments', ...auth('stripe') },
+  'studios:c_gcal': { roleKey: 'connection.role.instructorSchedules', ...auth('bhSourceCalendars'), issueKey: 'connection.issue.calendarsStopped', issueParams: { days: 3 }, affectedKey: 'connection.affected.instructors', affectedParams: { count: 11 }, fixActionKey: 'connection.fix.reauthorize' },
+  'studios:c_mail': { roleKey: 'connection.role.consentedContacts', ...auth('consent') },
+  'studios:c_wp': { nameKey: 'connection.name.site', nameParams: { name: 'WordPress', place: 'London' }, roleKey: 'connection.role.websiteBlocks', ...auth('wordpress') },
+  'sports:c_stripe': { roleKey: 'connection.role.registrationPayments', ...auth('stripe') },
+  'sports:c_gcal': { roleKey: 'connection.role.coachSchedules', ...auth('bhSchedule') },
+  'sports:c_stripe_ie': { roleKey: 'connection.role.registrationPayments', ...auth('stripe'), issueKey: 'connection.issue.verificationIncomplete', affectedKey: 'connection.affected.programmes', affectedParams: { count: 1 }, fixActionKey: 'connection.fix.finishVerification' },
+  'wellness:c_stripe': { roleKey: 'connection.role.depositsPayments', ...auth('stripe') },
+  'wellness:c_gcal': { roleKey: 'connection.role.practitionerCalendars', ...auth('bhCalendar'), issueKey: 'connection.issue.eventsRejected', issueParams: { place: 'Fitzroy', count: 2, name: 'Tom B.' }, affectedKey: 'connection.affected.appointments', affectedParams: { count: 2 }, fixActionKey: 'connection.fix.viewAndRetry' },
+  'commerce:c_woo': { roleKey: 'connection.role.commerce', ...auth('externalOrders', { name: 'WooCommerce' }) },
+  'commerce:c_woo_aus': { roleKey: 'connection.role.commerce', ...auth('externalOrders', { name: 'WooCommerce' }), issueKey: 'connection.issue.siteUnreachable', affectedKey: 'connection.affected.ordersSince', affectedParams: { time: '18:02' }, fixActionKey: 'connection.fix.test' },
+  'foods:c_stripe': { roleKey: 'connection.role.pickupPayments', ...auth('stripe') },
+  'foods:c_kds_fr': { nameKey: 'connection.name.kitchenScreen', nameParams: { place: 'Fremont' }, roleKey: 'connection.role.kitchenDisplay', ...auth('ordersRemain'), issueKey: 'connection.issue.screenOffline', affectedKey: 'connection.affected.devices', affectedParams: { count: 1 }, fixActionKey: 'connection.fix.sendTestOrder' },
+  'foods:c_pos': { roleKey: 'connection.role.pos', ...auth('posNotAuthoritative') },
+  'realty:c_gcal': { roleKey: 'connection.role.agentCalendars', ...auth('bhViewings') },
+  'realty:c_portal': { nameKey: 'connection.name.portalFeedsSandbox', roleKey: 'connection.role.syndicationPreview', ...auth('sandboxOnly') },
+};
 
 /* ---------------- Team ---------------- */
 
@@ -281,14 +340,14 @@ function freshTeam(ind: IndustryKey): Member[] {
   const f = FIXTURES[ind];
   const L = f.locations;
   return [
-    { id: 'mem_hq', name: f.people.hq, email: 'jamie@…', assignments: [{ role: 'Organisation owner', scopeLabel: 'Organisation' }], lastActive: 'Now', status: 'active' },
-    { id: 'mem_rm', name: 'Priya Nair', email: 'priya@…', assignments: [{ role: 'Regional manager', scopeLabel: 'Region: North America' }], lastActive: '1 h ago', status: 'active' },
-    { id: 'mem_eu', name: 'Sophie Laurent', email: 'sophie@…', assignments: [{ role: 'Regional manager', scopeLabel: 'Region: Europe' }, { role: 'Marketing contributor', scopeLabel: 'Campaigns · Europe' }], lastActive: 'Today', status: 'active' },
-    { id: 'mem_lm', name: f.people.local, email: 'local@…', assignments: [{ role: 'Location manager', scopeLabel: loc(ind, f.localLocationId).name }], lastActive: 'Today', status: 'active' },
-    { id: 'mem_st', name: f.people.staff, email: 'staff@…', assignments: [{ role: 'Staff', scopeLabel: loc(ind, f.staffLocationId).name }, { role: 'Staff', scopeLabel: L[1]!.name }], lastActive: 'Yesterday', status: 'active' },
-    { id: 'mem_fin', name: 'Olu Adeyemi', email: 'finance@…', assignments: [{ role: 'Finance user', scopeLabel: 'All authorised locations' }], lastActive: '3 days ago', status: 'active' },
-    { id: 'mem_inv', name: 'new.manager@…', email: 'new.manager@…', assignments: [{ role: 'Location manager', scopeLabel: L[L.length - 1]!.name }], lastActive: 'Invitation sent 2 days ago', status: 'invited' },
-    { id: 'mem_sup', name: 'BranchHarbor Support', email: 'Time-limited', assignments: [{ role: 'Support access', scopeLabel: 'Read-only · organisation' }], lastActive: 'Expires in 2 h · every action logged', status: 'support', note: 'Granted by ' + f.people.hq },
+    { id: 'mem_hq', name: f.people.hq, email: 'jamie@…', assignments: [{ role: 'Organisation owner', roleKey: 'org_owner', scopeLabel: 'Organisation', scopeKey: 'scope.organization' }], lastActive: 'Now', lastActiveKey: 'member.now', status: 'active' },
+    { id: 'mem_rm', name: 'Priya Nair', email: 'priya@…', assignments: [{ role: 'Regional manager', roleKey: 'regional_manager', scopeLabel: 'Region: North America', scopeKey: 'scope.region', scopeParams: { name: 'North America' } }], lastActive: '1 h ago', lastActiveKey: 'member.hoursAgo', lastActiveParams: { count: 1 }, status: 'active' },
+    { id: 'mem_eu', name: 'Sophie Laurent', email: 'sophie@…', assignments: [{ role: 'Regional manager', roleKey: 'regional_manager', scopeLabel: 'Region: Europe', scopeKey: 'scope.region', scopeParams: { name: 'Europe' } }, { role: 'Marketing contributor', roleKey: 'marketing_contributor', scopeLabel: 'Campaigns · Europe', scopeKey: 'scope.campaigns', scopeParams: { name: 'Europe' } }], lastActive: 'Today', lastActiveKey: 'member.today', status: 'active' },
+    { id: 'mem_lm', name: f.people.local, email: 'local@…', assignments: [{ role: 'Location manager', roleKey: 'location_manager', scopeLabel: loc(ind, f.localLocationId).name }], lastActive: 'Today', lastActiveKey: 'member.today', status: 'active' },
+    { id: 'mem_st', name: f.people.staff, email: 'staff@…', assignments: [{ role: 'Staff', roleKey: 'staff', scopeLabel: loc(ind, f.staffLocationId).name }, { role: 'Staff', roleKey: 'staff', scopeLabel: L[1]!.name }], lastActive: 'Yesterday', lastActiveKey: 'member.yesterday', status: 'active' },
+    { id: 'mem_fin', name: 'Olu Adeyemi', email: 'finance@…', assignments: [{ role: 'Finance user', roleKey: 'finance', scopeLabel: 'All authorised locations', scopeKey: 'scope.allAuthorized' }], lastActive: '3 days ago', lastActiveKey: 'member.daysAgo', lastActiveParams: { count: 3 }, status: 'active' },
+    { id: 'mem_inv', name: 'new.manager@…', email: 'new.manager@…', assignments: [{ role: 'Location manager', roleKey: 'location_manager', scopeLabel: L[L.length - 1]!.name }], lastActive: 'Invitation sent 2 days ago', lastActiveKey: 'member.invitedDaysAgo', lastActiveParams: { count: 2 }, status: 'invited' },
+    { id: 'mem_sup', name: 'BranchHarbor Support', email: 'support@branchharbor.com', assignments: [{ role: 'Support access', roleKey: 'support', scopeLabel: 'Read-only · organisation', scopeKey: 'scope.readOnlyOrg' }], lastActive: 'Expires in 2 h · every action logged', lastActiveKey: 'member.supportExpires', lastActiveParams: { count: 2 }, status: 'support', note: 'Granted by ' + f.people.hq },
   ];
 }
 
@@ -387,11 +446,20 @@ function freshApprovals(ind: IndustryKey): ApprovalRequest[] {
   const a = L[0]!, b = L[1] ?? L[0]!, c = L[2] ?? L[0]!;
   const base = { status: 'pending' as const, canDecide: true, decidedBy: null, decisionComment: null, result: null };
   return [
-    { ...base, id: `ap_${ind}_refund`, kind: 'refund', title: `Refund for ${ind === 'foods' ? 'pickup order #1042' : ind === 'commerce' ? 'order #5521' : 'payment pi_…8f2c'}`, locationName: a.name, amount: m(ind === 'foods' ? 17.66 : 68, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(48), reason: ind === 'foods' ? 'Order arrived cold — customer asked for a refund' : 'Class cancelled after the heating failed', details: [{ label: 'Above threshold', value: `Refunds over ${a.currency} 50.00 need approval` }, { label: 'Refunded so far', value: `${a.currency} 0.00` }] },
-    { ...base, id: `ap_${ind}_ads`, kind: 'ad_spend', title: `${b.name.split(' – ').pop()} spring local ads`, locationName: b.name, amount: m(400, b.currency), requestedBy: f.people.local, requestedAt: minutesAgo(26 * 60), reason: 'Instagram + Facebook, 5 km radius, promoting the intro offer.', details: [{ label: 'Channel', value: 'Meta ads' }, { label: 'Duration', value: '14 days' }, { label: 'Starts', value: 'In 7 days' }] },
-    { ...base, id: `ap_${ind}_swap`, kind: 'shift_swap', title: `${SHIFT_PEOPLE[ind][0]![0]} · in 2 days`, locationName: a.name, amount: null, requestedBy: SHIFT_PEOPLE[ind][0]![1], requestedAt: minutesAgo(180), reason: 'Exam that morning', details: [{ label: 'From', value: SHIFT_PEOPLE[ind][0]![1] }, { label: 'To', value: SHIFT_PEOPLE[ind][1]![1] }] },
-    { ...base, id: `ap_${ind}_web`, kind: 'field', title: 'Website change: Intro offer', locationName: c.name, amount: null, requestedBy: f.people.local, requestedAt: minutesAgo(300), reason: 'Local launch promotion', details: [{ label: 'New value', value: 'First week unlimited for new members' }] },
-    { ...base, id: `ap_${ind}_done`, kind: 'ad_spend', title: 'Autumn open day', status: 'approved', locationName: a.name, amount: m(250, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(5 * 24 * 60), reason: null, details: [{ label: 'Channel', value: 'Google ads' }, { label: 'Duration', value: '7 days' }], canDecide: false, decidedBy: f.people.hq, decisionComment: 'Approved — keep it local', result: 'Campaign scheduled' },
+    { ...base, id: `ap_${ind}_refund`, kind: 'refund', title: `Refund for ${ind === 'foods' ? 'pickup order #1042' : ind === 'commerce' ? 'order #5521' : 'payment pi_…8f2c'}`,
+      titleKey: ind === 'foods' ? 'approval.title.refund_pickup_order' : ind === 'commerce' ? 'approval.title.refund_order' : 'approval.title.refund_payment', titleParams: { ref: ind === 'foods' ? '#1042' : ind === 'commerce' ? '#5521' : 'pi_…8f2c' },
+      locationName: a.name, amount: m(ind === 'foods' ? 17.66 : 68, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(48), reason: ind === 'foods' ? 'Order arrived cold — customer asked for a refund' : 'Class cancelled after the heating failed',
+      details: [
+        { key: 'threshold', label: 'Above threshold', value: `Refunds over ${a.currency} 50.00 need approval`, valueKey: 'approval.value.thresholdOver', valueParams: { amount: moneyArg(5000, a.currency) } },
+        { key: 'refundedSoFar', label: 'Refunded so far', value: `${a.currency} 0.00`, valueKey: 'approval.value.amount', valueParams: { amount: moneyArg(0, a.currency) } },
+      ] },
+    { ...base, id: `ap_${ind}_ads`, kind: 'ad_spend', title: `${b.name.split(' – ').pop()} spring local ads`, locationName: b.name, amount: m(400, b.currency), requestedBy: f.people.local, requestedAt: minutesAgo(26 * 60), reason: 'Instagram + Facebook, 5 km radius, promoting the intro offer.',
+      details: [{ key: 'channel', label: 'Channel', value: 'Meta ads', valueKey: 'approval.channel.meta_ads' }, { key: 'duration', label: 'Duration', value: '14 days', valueKey: 'approval.value.days', valueParams: { count: 14 } }, { key: 'starts', label: 'Starts', value: 'In 7 days', valueKey: 'approval.value.inDays', valueParams: { count: 7 } }] },
+    { ...base, id: `ap_${ind}_swap`, kind: 'shift_swap', title: `${SHIFT_PEOPLE[ind][0]![0]} · in 2 days`, titleKey: 'approval.title.shift_swap_in', titleParams: { role: SHIFT_PEOPLE[ind][0]![0], count: 2 }, locationName: a.name, amount: null, requestedBy: SHIFT_PEOPLE[ind][0]![1], requestedAt: minutesAgo(180), reason: 'Exam that morning',
+      details: [{ key: 'from', label: 'From', value: SHIFT_PEOPLE[ind][0]![1] }, { key: 'to', label: 'To', value: SHIFT_PEOPLE[ind][1]![1] }] },
+    { ...base, id: `ap_${ind}_web`, kind: 'field', title: 'Website change: Intro offer', titleKey: 'approval.title.website_change', titleParams: { field: 'Intro offer' }, locationName: c.name, amount: null, requestedBy: f.people.local, requestedAt: minutesAgo(300), reason: 'Local launch promotion', details: [{ key: 'newValue', label: 'New value', value: 'First week unlimited for new members' }] },
+    { ...base, id: `ap_${ind}_done`, kind: 'ad_spend', title: 'Autumn open day', status: 'approved', locationName: a.name, amount: m(250, a.currency), requestedBy: f.people.local, requestedAt: minutesAgo(5 * 24 * 60), reason: null,
+      details: [{ key: 'channel', label: 'Channel', value: 'Google ads', valueKey: 'approval.channel.google_ads' }, { key: 'duration', label: 'Duration', value: '7 days', valueKey: 'approval.value.days', valueParams: { count: 7 } }], canDecide: false, decidedBy: f.people.hq, decisionComment: 'Approved — keep it local', result: 'Campaign scheduled', resultKey: 'approval.result.campaignScheduled' },
   ];
 }
 const SCHEDULE: Partial<Record<IndustryKey, ShiftView[]>> = {};
@@ -479,7 +547,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       return groups;
     }, () => [], 180),
   notifications: (ctx) =>
-    read(() => buildOverview(ctx.industry, scopeIds(ctx)).attention.map((a, i) => ({ id: a.id, kind: a.kind, title: a.title, at: minutesAgo(12 + i * 40), href: a.href })), () => [], 150),
+    read(() => buildOverview(ctx.industry, scopeIds(ctx)).attention.map((a, i) => ({ id: a.id, kind: a.kind, title: a.title, titleKey: a.titleKey, titleParams: a.titleParams, at: minutesAgo(12 + i * 40), href: a.href })), () => [], 150),
 
   studios: {
     classes: (ctx, ws) => {
@@ -494,7 +562,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         const c = st('studios').cover;
         c.status = 'accepted';
         c.candidates = c.candidates.map((x) => (x.id === candidateId ? { ...x, state: 'accepted' } : x));
-        c.history.push({ at: now(), text: `${c.candidates.find((x) => x.id === candidateId)?.name} accepted the cover` });
+        c.history.push({ at: now(), text: `${c.candidates.find((x) => x.id === candidateId)?.name} accepted the cover`, textKey: 'cover.acceptedBy', textParams: { name: c.candidates.find((x) => x.id === candidateId)?.name ?? '' } });
         return c;
       }),
     approveCover: (_id) =>
@@ -503,7 +571,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         const c = st('studios').cover;
         c.status = 'confirmed';
         c.candidates = c.candidates.map((x) => (x.state === 'accepted' ? { ...x, state: 'assigned' } : x));
-        c.history.push({ at: now(), text: `Confirmed by ${sessionFor('studios', lastCtx.role).user.name}. Schedule, class page and ${c.bookedCustomers} customers updated together.` });
+        c.history.push({ at: now(), text: `Confirmed by ${sessionFor('studios', lastCtx.role).user.name}. Schedule, class page and ${c.bookedCustomers} customers updated together.`, textKey: 'cover.confirmedBy', textParams: { name: sessionFor('studios', lastCtx.role).user.name, count: c.bookedCustomers } });
         return c;
       }, 1000),
     resetCover: () => write(() => (st('studios').cover = freshCover()), 200),
@@ -552,7 +620,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         if (f.policy === 'locked' && lastCtx.role !== 'hq') throw new ApiError('forbidden', 'This field is locked by headquarters.', 403);
         if (f.policy === 'approval' && lastCtx.role !== 'hq') throw new ApiError('approval_required', 'This change needs headquarters approval.', 409);
         f.value = value;
-        p.activity.unshift({ at: now(), text: `${sessionFor(lastCtx.industry, lastCtx.role).user.name} edited ${f.label} (draft)` });
+        p.activity.unshift({ at: now(), text: `${sessionFor(lastCtx.industry, lastCtx.role).user.name} edited ${f.label} (draft)`, textKey: 'website.editedDraft', textParams: { name: sessionFor(lastCtx.industry, lastCtx.role).user.name, field: f.label } });
         return p;
       }, 500),
     requestChange: (locId, key, value, reason) =>
@@ -562,7 +630,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         if (!reason.trim()) throw new ApiError('validation_error', 'Add a reason for headquarters.', 422, { reason: 'Add a reason for headquarters.' });
         const who = sessionFor(lastCtx.industry, lastCtx.role).user.name;
         f.pending = { value, reason, requestedBy: who, at: now() };
-        p.activity.unshift({ at: now(), text: `${who} requested a change to ${f.label}` });
+        p.activity.unshift({ at: now(), text: `${who} requested a change to ${f.label}`, textKey: 'website.changeRequested', textParams: { name: who, field: f.label } });
         return p;
       }, 600),
     decide: (locId, key, decision, comment) =>
@@ -571,7 +639,10 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         const p = page(lastCtx.industry, locId);
         const f = p.fields.find((x) => x.key === key)!;
         if (decision === 'approve' && f.pending) f.value = f.pending.value;
-        p.activity.unshift({ at: now(), text: `${sessionFor(lastCtx.industry, 'hq').user.name} ${decision === 'approve' ? 'approved' : 'rejected'} ${f.label}${comment ? ` · “${comment}”` : ''}` });
+        p.activity.unshift({
+          at: now(), text: `${sessionFor(lastCtx.industry, 'hq').user.name} ${decision === 'approve' ? 'approved' : 'rejected'} ${f.label}${comment ? ` · “${comment}”` : ''}`,
+          textKey: decision === 'approve' ? (comment ? 'website.approvedComment' : 'website.approved') : comment ? 'website.rejectedComment' : 'website.rejected', textParams: { name: sessionFor(lastCtx.industry, 'hq').user.name, field: f.label, comment: comment ?? '' },
+        });
         f.pending = undefined;
         return p;
       }, 600),
@@ -580,7 +651,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         const p = page(lastCtx.industry, locId);
         const f = p.fields.find((x) => x.key === key)!;
         if (f.hqValue != null) f.value = f.hqValue;
-        p.activity.unshift({ at: now(), text: `${f.label} reset to the headquarters default` });
+        p.activity.unshift({ at: now(), text: `${f.label} reset to the headquarters default`, textKey: 'website.resetToHq', textParams: { field: f.label } });
         return p;
       }, 400),
     approvals: (ctx) =>
@@ -648,10 +719,12 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       await sleep(1300);
       const r = st(lastCtx.industry).payments.rec.find((x) => x.id === id)!;
       const who = sessionFor(lastCtx.industry, lastCtx.role).user.name;
-      r.timeline.push({ at: now(), text: `${who} recreated the record in the next available slot`, tone: 'info', icon: 'refresh' }, { at: now(), text: 'Record #1047 created and linked to the payment · customer notified', tone: 'success', icon: 'check' });
+      r.timeline.push(
+        { at: now(), text: `${who} recreated the record in the next available slot`, textKey: 'payment.event.recreatedBy', textParams: { name: who }, tone: 'info', icon: 'refresh' },
+        { at: now(), text: 'Record #1047 created and linked to the payment · customer notified', textKey: 'payment.event.recordCreatedNotified', textParams: { ref: '#1047' }, tone: 'success', icon: 'check' },
+      );
       r.status = 'resolved';
-      r.orderState = '#1047 created';
-      r.resolution = 'Record #1047 created and linked to the payment.';
+      Object.assign(r, { orderState: '#1047 created', orderStateKey: 'payment.recon.created', orderStateParams: { ref: '#1047' }, resolution: 'Record #1047 created and linked to the payment.', resolutionKey: 'payment.recon.createdLinked', resolutionParams: { ref: '#1047' } });
       return clone(r);
     },
     refund: async (id, confirm) => {
@@ -660,9 +733,12 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       await sleep(1300);
       const r = st(lastCtx.industry).payments.rec.find((x) => x.id === id)!;
       if (confirm.amount !== r.amount.amount || confirm.currency !== r.amount.currency) throw new ApiError('confirmation_mismatch', 'The confirmed amount doesn’t match. Nothing was refunded.', 409);
-      r.timeline.push({ at: now(), text: `Refund requested by ${s.user.name} (finance)`, tone: 'warning', icon: 'undo' }, { at: now(), text: 'Refund complete · customer emailed', tone: 'success', icon: 'check' });
+      r.timeline.push(
+        { at: now(), text: `Refund requested by ${s.user.name} (finance)`, textKey: 'payment.event.refundRequestedBy', textParams: { name: s.user.name }, tone: 'warning', icon: 'undo' },
+        { at: now(), text: 'Refund complete · customer emailed', textKey: 'payment.event.refundCompleteEmailed', tone: 'success', icon: 'check' },
+      );
       r.status = 'resolved';
-      r.resolution = 'Payment refunded in full.';
+      Object.assign(r, { resolution: 'Payment refunded in full.', resolutionKey: 'payment.recon.refundedInFull' });
       const t = st(lastCtx.industry).payments.tx.find((x) => x.externalRef === r.transactionRef);
       if (t) t.refund = 'complete';
       return clone(r);
@@ -670,7 +746,14 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
     accounts: (ctx) => {
       requirePerm(ctx, 'payments.read');
       return read(() =>
-        visibleLocations(ctx.industry, ctx.role).map((l) => ({ locationId: l.id, provider: ctx.industry === 'commerce' ? 'WooCommerce gateway' : 'Stripe Connect', arrangement: l.ownership === 'franchise' ? ('own' as const) : ('shared' as const), status: l.site === 'unpublished' ? ('pending_verification' as const) : l.sync === 'attention' && ctx.industry === 'sports' ? ('not_set_up' as const) : ('enabled' as const), capabilities: l.site === 'unpublished' ? [] : ['Card payments', 'Refunds', ...(l.currency === 'EUR' ? ['SEPA debit'] : []), ...(l.currency === 'GBP' ? ['Bacs debit'] : [])] })),
+        visibleLocations(ctx.industry, ctx.role).map((l) => {
+          const caps: [string, string][] = l.site === 'unpublished' ? [] : [['cardPayments', 'Card payments'], ['refunds', 'Refunds'], ...(l.currency === 'EUR' ? [['sepaDebit', 'SEPA debit'] as [string, string]] : []), ...(l.currency === 'GBP' ? [['bacsDebit', 'Bacs debit'] as [string, string]] : [])];
+          return {
+            locationId: l.id, provider: ctx.industry === 'commerce' ? 'WooCommerce gateway' : 'Stripe Connect', ...(ctx.industry === 'commerce' ? { providerKey: 'payment.provider.gateway', providerParams: { name: 'WooCommerce' } } : {}),
+            arrangement: l.ownership === 'franchise' ? ('own' as const) : ('shared' as const), status: l.site === 'unpublished' ? ('pending_verification' as const) : l.sync === 'attention' && ctx.industry === 'sports' ? ('not_set_up' as const) : ('enabled' as const),
+            capabilities: caps.map((c) => c[1]), capabilityKeys: caps.map((c) => c[0]),
+          };
+        }),
       );
     },
     automation: (ctx) => {
@@ -692,7 +775,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
       if (lastCtx.role !== 'hq') throw new ApiError('forbidden', 'Ask headquarters to manage connections.', 403);
       await sleep(1400);
       const c = st(lastCtx.industry).connections.find((x) => x.id === id)!;
-      Object.assign(c, { state: 'connected', lastSync: now(), issue: undefined, affected: undefined, fixAction: undefined });
+      Object.assign(c, { state: 'connected', lastSync: now(), issue: undefined, issueKey: undefined, issueParams: undefined, affected: undefined, affectedKey: undefined, affectedParams: undefined, fixAction: undefined, fixActionKey: undefined });
       return clone(c);
     },
   },
@@ -709,7 +792,7 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
     invite: (input) =>
       write(() => {
         if (!/^\S+@\S+\.\S+$/.test(input.email)) throw new ApiError('validation_error', 'Check the highlighted fields.', 422, { email: 'Enter a valid email.' });
-        const mem: Member = { id: `mem_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', status: 'invited' };
+        const mem: Member = { id: `mem_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, roleKey: input.roleKey, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', lastActiveKey: 'member.invitedJustNow', status: 'invited' };
         st(lastCtx.industry).team.push(mem);
         return mem;
       }),
@@ -733,6 +816,8 @@ const rawMockApi: Omit<BranchHarborApi, 'business'> = {
         a.decisionComment = comment ?? null;
         a.canDecide = false;
         a.result = decision === 'reject' ? null : a.kind === 'refund' ? 'Refund complete' : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : 'Change applied';
+        a.resultKey = decision === 'reject' ? undefined : a.kind === 'refund' ? 'approval.result.refund' : a.kind === 'ad_spend' ? 'approval.result.campaignScheduled' : a.kind === 'shift_swap' ? 'approval.result.shiftReassigned' : 'approval.result.changeApplied';
+        a.resultParams = a.kind === 'refund' && decision !== 'reject' ? { state: ref('approval.refundState.complete', undefined, 'complete') } : undefined;
         if (a.kind === 'shift_swap' && decision === 'approve') for (const sh of shiftsOf(lastCtx.industry)) if (sh.pendingSwap?.approvalId === a.id) Object.assign(sh, { person: sh.pendingSwap.to, pendingSwap: null });
         return a;
       }),

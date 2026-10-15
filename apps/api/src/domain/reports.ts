@@ -32,16 +32,30 @@ export function revenueByCurrency(rows: PaymentRow[]): CurrencyRevenue[] {
     .sort((a, b) => a.currency.localeCompare(b.currency));
 }
 
-export type Freshness = { asOf: string; source: string; lastSyncAt: string | null; complete: boolean };
+/** `sourceCode` names a BranchHarbor source (payments, bookings, …) or `provider` when `source` is a provider name. */
+export type Freshness = { asOf: string; source: string; sourceCode?: string; lastSyncAt: string | null; complete: boolean };
+
+/** Why a metric is unavailable, as a stable code plus arguments (apps translate it; `unavailableReason` is the English line). */
+export interface UnavailableReason { code: string; params?: Record<string, string | number> }
 
 /** A metric value that is honest about missing data: `value` is null (not 0) when unavailable. */
 export interface Metric<T> {
   value: T | null;
   unavailableReason: string | null;
+  unavailableCode: string | null;
+  unavailableParams: Record<string, string | number> | null;
   definition: string;
   freshness: Freshness;
 }
 
-export function metric<T>(value: T | null, definition: string, freshness: Freshness, unavailableReason: string | null = null): Metric<T> {
-  return { value, unavailableReason: value === null ? unavailableReason ?? 'Unavailable' : null, definition, freshness };
+export function metric<T>(value: T | null, definition: string, freshness: Freshness, unavailableReason: string | null = null, reason?: UnavailableReason): Metric<T> {
+  const missing = value === null;
+  return {
+    value,
+    unavailableReason: missing ? unavailableReason ?? 'Unavailable' : null,
+    unavailableCode: missing ? reason?.code ?? 'unavailable' : null,
+    unavailableParams: missing ? reason?.params ?? {} : null,
+    definition,
+    freshness,
+  };
 }

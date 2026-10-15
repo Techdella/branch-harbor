@@ -160,6 +160,8 @@ describe.skipIf(!hasDb)('studios full product (DB)', () => {
     const pricing = await call(app, 'GET', `/v1/public/studios/${loc.id}/pricing`);
     expect(pricing.body.packs.find((p: any) => p.id === product.body.id)).toMatchObject({ price: { amount: 11000, currency: 'CAD' }, credits: 5 });
     expect(pricing.body.policy.lines.join(' ')).toMatch(/Late cancellation fee/);
+    // Access line in English plus the facts behind it for translated apps.
+    expect(pricing.body.packs.find((p: any) => p.id === product.body.id)).toMatchObject({ access: `Valid at ${loc.name} only`, accessDetail: { policy: 'home_only', currency: 'CAD', locationCount: 0, locationName: loc.name } });
 
     const c = await portal(loc.id);
     const purchase = await buy(c.headers, { locationId: loc.id, kind: 'pack', productId: product.body.id });
@@ -222,6 +224,10 @@ describe.skipIf(!hasDb)('studios full product (DB)', () => {
     const plan = await call(app, 'POST', `/v1/orgs/${orgId}/studios/membership-plans`, { token, body: { locationId: loc.id, name: '8 classes / month', classesPerPeriod: 2, prices: { CAD: 9900 }, accessPolicy: 'home_only', noticeDays: 30 } });
     expect(plan.status, JSON.stringify(plan.body)).toBe(201);
     const wide = await call(app, 'POST', `/v1/orgs/${orgId}/studios/membership-plans`, { token, body: { name: 'Unlimited (CAD studios)', classesPerPeriod: null, prices: { CAD: 18900, USD: 16900 }, accessPolicy: 'same_currency' } });
+    // Memberships: English access/terms lines plus their structured facts.
+    const priced = (await call(app, 'GET', `/v1/public/studios/${loc.id}/pricing`)).body.memberships;
+    expect(priced.find((m: any) => m.id === wide.body.id)).toMatchObject({ access: 'Valid at every CAD location', accessDetail: { policy: 'same_currency', currency: 'CAD' }, termsDetail: { billingCurrency: 'CAD', interval: 'month', classesPerPeriod: null } });
+    expect(priced.find((m: any) => m.id === plan.body.id)).toMatchObject({ accessDetail: { policy: 'home_only', locationName: loc.name }, termsDetail: { noticeDays: 30, classesPerPeriod: 2 } });
     const c = await portal(loc.id);
     const m = await buy(c.headers, { locationId: loc.id, kind: 'membership', productId: plan.body.id });
     expect((await call(app, 'POST', '/v1/public/studios/account/purchases', { headers: c.headers, body: { locationId: loc.id, kind: 'membership', productId: plan.body.id } })).body.error.code).toBe('already_member');
@@ -345,6 +351,11 @@ describe.skipIf(!hasDb)('studios full product (DB)', () => {
     // On-demand sold individually: buy → watch.
     const list = await call(app, 'GET', `/v1/public/studios/account/online?locationId=${loc.id}`, { headers: guest.headers });
     expect(list.body.items.find((i: any) => i.id === vod.body.id).access).toMatchObject({ access: false, purchasable: { amount: 900, currency: 'CAD' } });
+    // Reasons come with stable codes (same order) so apps can translate them.
+    const vodAccess = list.body.items.find((i: any) => i.id === vod.body.id).access;
+    expect(vodAccess.reasonCodes).toHaveLength(vodAccess.reasons.length);
+    expect(vodAccess.reasonCodes).toContain('buy_to_watch');
+    expect(list.body.items.find((i: any) => i.id === vod.body.id).ruleCodes).toContain('buy');
     expect((await call(app, 'POST', `/v1/public/studios/account/online/${vod.body.id}/join`, { headers: guest.headers, body: { locationId: loc.id } })).status).toBe(403);
     await buy(guest.headers, { locationId: loc.id, kind: 'online', productId: vod.body.id });
     const watch = await call(app, 'POST', `/v1/public/studios/account/online/${vod.body.id}/join`, { headers: guest.headers, body: { locationId: loc.id } });

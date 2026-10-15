@@ -17,8 +17,8 @@
     "secure": "Card details go straight to Stripe. {business} never sees your full card number.",
     "wallets": "Apple Pay and Google Pay appear automatically when your device supports them.",
     "saveCard": "Save this card with {business} for future payments",
-    "consentRenewals": "I authorise {business} to save this card and charge it automatically for each renewal until I cancel.",
-    "consentInstalments": "I authorise {business} to save this card and charge the remaining instalments automatically on their due dates.",
+    "consentRenewals": "I authorize {business} to save this card and charge it automatically for each renewal until I cancel.",
+    "consentInstalments": "I authorize {business} to save this card and charge the remaining installments automatically on their due dates.",
     "consentFees": "Allow {business} to charge my saved card for a late-cancellation or no-show fee under the policy shown.",
     "consentRequired": "Please tick the box to agree before paying.",
     "feePolicyTitle": "Cancellation policy",
@@ -54,10 +54,10 @@
       "usedFor": "Used for: {purposes}",
       "purpose_save_card": "future payments",
       "purpose_renewals": "renewals",
-      "purpose_instalments": "instalments",
+      "purpose_instalments": "installments",
       "purpose_fees": "cancellation fees",
       "simulateSave": "Save a test card (simulated)",
-      "updateConsent": "I authorise {business} to keep this card and use it for my renewals, instalments and agreed fees until I remove it."
+      "updateConsent": "I authorize {business} to keep this card and use it for my renewals, installments and agreed fees until I remove it."
     },
     "complete": {
       "title": "Complete your payment",

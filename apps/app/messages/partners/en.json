@@ -73,7 +73,103 @@
       "sandbox_removed": "Removed (sandbox)",
       "error": "Portal error"
     },
-    "delivery": { "push": "Pushed per listing", "pull": "Portal fetches a feed URL" },
+    "delivery": {
+      "push": "Pushed per listing",
+      "pull": "Portal fetches a feed URL"
+    },
     "removedNote": "Withdrawn, sold and let listings are removed from portals automatically."
-  }
+  },
+  "reason": {
+    "not_configured": "Not configured",
+    "disabled": "Switched off",
+    "missing_credentials": "Sandbox — missing {list}",
+    "credentials_saved": "Sandbox — credentials saved; switch to live after a successful test",
+    "test_failed": "Last connection test failed — test again",
+    "awaiting_fetch": "Feed URL ready — waiting for the portal to fetch it",
+    "live": "Live",
+    "sample": "Sandbox (sample data — never connected)"
+  },
+  "requirements": {
+    "uber_direct": "Requires an Uber Direct business account (Uber Direct dashboard → Developer) with API access for your country.",
+    "deliverect": "Requires Deliverect partner credentials (staging first; production after Deliverect certification) and the customer’s Deliverect account and location.",
+    "rightmove": "Rightmove must set up a Real Time Datafeed network for BranchHarbor and issue the network ID and client certificate.",
+    "idealista": "idealista must enable feed import for your professional account and be given the feed URL below.",
+    "reso_xml": "The portal (for example Zillow Listing Feeds) must approve the feed for your brokerage and be given the feed URL below.",
+    "reaxml": "realestate.com.au / Domain must enable REAXML import for your agency and be given the feed URL below."
+  },
+  "fields": {
+    "clientId": "Client ID",
+    "clientSecret": "Client secret",
+    "customerId": "Customer ID",
+    "webhookSigningKey": "Webhook signing key",
+    "feeMode": "Delivery fee",
+    "externalStoreId": "Store ID",
+    "webhookSecret": "Webhook HMAC secret (production)",
+    "environment": "Environment",
+    "accountId": "Deliverect account ID",
+    "deliverectLocationId": "Deliverect location ID",
+    "channelName": "Channel name (POS injection)",
+    "channelLinkId": "Channel link ID (POS injection)",
+    "posInjection": "Send accepted BranchHarbor orders to the POS",
+    "marketplaceOrders": "Receive marketplace orders (Uber Eats, Deliveroo, DoorDash, Just Eat)",
+    "autoAccept": "Auto-accept marketplace orders",
+    "networkId": "Network ID",
+    "branchId": "Branch ID",
+    "baseUrl": "API base URL",
+    "certificatePfxBase64": "Client certificate (PKCS#12, base64)",
+    "certificatePassword": "Certificate password",
+    "customerCode": "idealista customer code",
+    "contactEmail": "Contact email for the account",
+    "contactPhone": "Contact phone",
+    "feedId": "Portal feed / account ID",
+    "brokerageName": "Brokerage name (as licensed)",
+    "brokerageEmail": "Brokerage email",
+    "agentId": "Portal agent / office ID"
+  },
+  "fieldHelp": {
+    "customerId": "Shown in the Uber Direct dashboard (Developer tab)",
+    "webhookSigningKey": "Uber Direct dashboard → Webhooks; the webhook URL is shown below",
+    "feeMode": "Absorb: customers pay your zone fee and you pay Uber. Pass on: customers pay the Uber quote.",
+    "webhookSecret": "In staging, Deliverect signs with the channel link ID",
+    "networkId": "Issued by the Rightmove Data Feed team for BranchHarbor as your feed provider",
+    "branchId": "Your branch ID on Rightmove",
+    "baseUrl": "Leave empty for production (https://adfapi.rightmove.co.uk); Rightmove issues separate test URLs",
+    "customerCode": "Your idealista professional account code (for example ilc…)",
+    "feedId": "The ID the portal gives your feed when it approves it (Zillow Listing Feed, syndicator, MLS)",
+    "agentId": "The agency ID issued by realestate.com.au or Domain"
+  },
+  "options": {
+    "absorb": "Absorb the Uber fee",
+    "pass_through": "Pass the Uber quote on",
+    "staging": "Staging",
+    "production": "Production"
+  },
+  "testResult": {
+    "missing_credentials": "Sandbox — add {list} to test against {provider}",
+    "accepted": "{provider} accepted the credentials",
+    "feed_ready": "Feed ready: {included} listings included, {excluded} need fixes. Give the feed URL to the portal.",
+    "sample": "Sample data: no partner is contacted. Connect the API to test real credentials."
+  },
+  "action": {
+    "test": "Connection test",
+    "busy_mode": "Busy mode",
+    "menu_push": "Menu push",
+    "create_delivery": "Delivery request",
+    "cancel_delivery": "Delivery cancellation",
+    "quote": "Delivery quote",
+    "pos_push": "Order sent to POS",
+    "pos_status": "POS status update",
+    "feed_fetch": "Feed fetched",
+    "send_property": "Listing sent",
+    "remove_property": "Listing removed"
+  },
+  "resultStatus": {
+    "ok": "OK",
+    "sandbox": "Sandbox",
+    "error": "Error",
+    "skipped": "Skipped"
+  },
+  "menuSandbox": "Sandbox: menu snapshot built, nothing sent to Deliverect",
+  "busySandboxOn": "Sandbox: busy mode recorded, marketplaces not paused",
+  "busySandboxOff": "Sandbox: busy mode cleared"
 }

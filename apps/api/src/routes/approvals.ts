@@ -7,7 +7,7 @@ import { AppError, conflict, forbidden, notFound, validationError } from '../lib
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { hasPerm, requireLocationPerm, requireMember } from '../services/authz.ts';
-import { APPROVAL_KINDS, canDecide, decideApproval, formatMinor, insertApproval, notifyApprovers, refundNeedsApproval, serializeApprovals } from '../services/approvals.ts';
+import { APPROVAL_KINDS, canDecide, decideApproval, formatMinor, insertApproval, notifyApprovers, refundNeedsApproval, serializeApprovals, type ApprovalTitle } from '../services/approvals.ts';
 import { refundCommerceOrder } from '../services/commerce.ts';
 import { refundPayment, serializePayment } from '../services/payments.ts';
 import { idParams, orgParams, secured } from './_common.ts';
@@ -89,6 +89,7 @@ export const approvalRoutes: FastifyPluginAsyncZod = async (app) => {
     let cur: string;
     let remaining: number;
     let label: string;
+    let titleI18n: ApprovalTitle;
     if (b.paymentId) {
       const [p] = await s.db.select().from(paymentReferences).where(and(eq(paymentReferences.id, b.paymentId), eq(paymentReferences.organizationId, orgId)));
       if (!p) throw notFound('Payment');
@@ -98,6 +99,7 @@ export const approvalRoutes: FastifyPluginAsyncZod = async (app) => {
       const pending = await s.db.select({ amt: refunds.amountMinor }).from(refunds).where(and(eq(refunds.paymentId, p.id), eq(refunds.state, 'pending')));
       remaining = p.amountMinor - p.refundedMinor - pending.reduce((a, r) => a + r.amt, 0);
       label = `Refund for payment ${p.externalId.slice(-8)}`;
+      titleI18n = { code: 'refund_payment', params: { ref: p.externalId.slice(-8), amountMinor: b.amountMinor, currency: p.currency } };
     } else {
       const [o] = await s.db.select().from(orders).where(and(eq(orders.id, b.orderId!), eq(orders.organizationId, orgId)));
       if (!o) throw notFound('Order');
@@ -105,6 +107,7 @@ export const approvalRoutes: FastifyPluginAsyncZod = async (app) => {
       cur = o.currency;
       remaining = o.totalMinor - o.refundedMinor;
       label = `Refund for order ${o.externalId ?? o.id.slice(0, 8)}`;
+      titleI18n = { code: 'refund_order', params: { ref: o.externalId ?? o.id.slice(0, 8), amountMinor: b.amountMinor, currency: o.currency } };
     }
     if (!locationId) throw validationError('This payment is not linked to a location', { paymentId: 'No location' });
     await requireLocationPerm(req, s.db, orgId, locationId, 'payments.read');
@@ -124,7 +127,7 @@ export const approvalRoutes: FastifyPluginAsyncZod = async (app) => {
     const [dupe] = await s.db.select({ id: approvals.id }).from(approvals).where(and(eq(approvals.organizationId, orgId), eq(approvals.targetType, 'refund'), eq(approvals.targetId, (b.paymentId ?? b.orderId)!), inArray(approvals.status, ['pending', 'executing'])));
     if (dupe) throw conflict('request_pending', 'A refund request for this is already waiting for approval', { approvalId: dupe.id });
     const ap = await s.db.transaction((tx) => insertApproval(tx, {
-      organizationId: orgId, locationId, kind: 'refund', targetId: (b.paymentId ?? b.orderId)!, title: `${label} · ${formatMinor(b.amountMinor, cur)}`,
+      organizationId: orgId, locationId, kind: 'refund', targetId: (b.paymentId ?? b.orderId)!, title: `${label} · ${formatMinor(b.amountMinor, cur)}`, titleI18n,
       payload: { paymentId: b.paymentId ?? null, orderId: b.orderId ?? null, amountMinor: b.amountMinor, currency: cur, reason: b.reason, restock: b.restock },
       amountMinor: b.amountMinor, currency: cur, requestedBy: me.id, comment: b.reason,
     }, req.ip));

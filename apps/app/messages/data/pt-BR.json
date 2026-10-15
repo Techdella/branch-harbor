@@ -1,0 +1,621 @@
+{
+  "role": {
+    "org_owner": "Proprietário da organização",
+    "hq_admin": "Administrador da matriz",
+    "regional_manager": "Gerente regional",
+    "franchise_owner": "Franqueado",
+    "location_manager": "Gerente da unidade",
+    "staff": "Equipe",
+    "marketing_contributor": "Colaborador de marketing",
+    "finance": "Usuário financeiro",
+    "customer": "Cliente",
+    "support": "Acesso do suporte"
+  },
+  "scope": {
+    "organization": "Organização",
+    "region": "Região: {name}",
+    "ownerGroup": "Grupo proprietário: {name}",
+    "allAuthorized": "Todas as unidades autorizadas",
+    "readOnlyOrg": "Somente leitura · organização",
+    "campaigns": "Campanhas · {name}"
+  },
+  "member": {
+    "now": "Agora",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "hoursAgo": "{count, plural, one {há # h} other {há # h}}",
+    "daysAgo": "{count, plural, one {há # dia} other {há # dias}}",
+    "since": "Membro desde {date}",
+    "invitedOn": "Convite enviado em {date}",
+    "invitedDaysAgo": "{count, plural, one {Convite enviado há # dia} other {Convite enviado há # dias}}",
+    "invitedJustNow": "Convite enviado agora",
+    "supportExpires": "Expira em {count} h · toda ação é registrada"
+  },
+  "metric": {
+    "studios": {
+      "enquiries": {
+        "label": "Contatos",
+        "definition": "Formulários de contato e de aula experimental enviados pelo site"
+      },
+      "classes": {
+        "label": "Aulas hoje",
+        "definition": "Sessões de aula agendadas para hoje, no fuso horário de cada unidade"
+      },
+      "occupancy": {
+        "label": "Ocupação",
+        "definition": "Vagas reservadas ÷ capacidade das aulas desta semana"
+      },
+      "revenue": {
+        "label": "Receita",
+        "definition": "Pagamentos de clientes aprovados, sem reembolsos, por moeda"
+      },
+      "membership": {
+        "label": "Atividade dos planos",
+        "definition": "Planos novos, pausados e cancelados"
+      }
+    },
+    "sports": {
+      "enrolled": {
+        "label": "Inscritos",
+        "definition": "Inscrições aceitas nesta temporada"
+      },
+      "review": {
+        "label": "Aguardando análise",
+        "definition": "Inscrições enviadas ainda não aceitas nem em lista de espera"
+      },
+      "sessions": {
+        "label": "Sessões hoje",
+        "definition": "Sessões de treino agendadas para hoje"
+      },
+      "revenue": {
+        "label": "Pagamentos de inscrição",
+        "definition": "Pagamentos aprovados, sem reembolsos, por moeda"
+      }
+    },
+    "wellness": {
+      "appts": {
+        "label": "Agendamentos hoje",
+        "definition": "Agendamentos confirmados para hoje"
+      },
+      "cancel": {
+        "label": "Cancelamentos",
+        "definition": "Agendamentos cancelados hoje"
+      },
+      "util": {
+        "label": "Utilização",
+        "definition": "Horas reservadas dos profissionais ÷ horas disponíveis"
+      },
+      "revenue": {
+        "label": "Receita",
+        "definition": "Pagamentos aprovados, incluindo sinais, sem reembolsos"
+      }
+    },
+    "commerce": {
+      "orders": {
+        "label": "Pedidos",
+        "definition": "Pedidos importados das lojas conectadas"
+      },
+      "stock": {
+        "label": "Alertas de estoque",
+        "definition": "Variações no ponto de reposição ou abaixo dele"
+      },
+      "revenue": {
+        "label": "Receita",
+        "definition": "Pagamentos de pedidos aprovados, sem reembolsos, por moeda"
+      },
+      "sync": {
+        "label": "Sincronização das lojas",
+        "definition": "Lojas sincronizadas com sucesso na última hora"
+      }
+    },
+    "foods": {
+      "open": {
+        "label": "Pedidos em aberto",
+        "definition": "Pedidos ainda não retirados, cancelados ou recusados"
+      },
+      "capacity": {
+        "label": "Capacidade de retirada usada",
+        "definition": "Horários de retirada reservados ÷ capacidade dos horários"
+      },
+      "soldout": {
+        "label": "Itens esgotados",
+        "definition": "Itens do cardápio marcados como esgotados na unidade"
+      },
+      "revenue": {
+        "label": "Receita",
+        "definition": "Pagamentos de retirada aprovados, sem reembolsos, por moeda"
+      }
+    },
+    "realty": {
+      "active": {
+        "label": "Anúncios ativos",
+        "definition": "Anúncios ativos ou com proposta em andamento"
+      },
+      "enquiries": {
+        "label": "Novos contatos",
+        "definition": "Contatos recebidos pelo site, portais e telefone"
+      },
+      "viewings": {
+        "label": "Visitas nesta semana",
+        "definition": "Visitas solicitadas e confirmadas, no fuso horário de cada escritório"
+      },
+      "offers": {
+        "label": "Propostas em negociação",
+        "definition": "Propostas enviadas ou com contraproposta"
+      }
+    },
+    "live": {
+      "enquiries": {
+        "label": "Contatos",
+        "definition": "Leads captados pelos formulários do BranchHarbor no período. Não inclui contatos recebidos por outros canais."
+      },
+      "bookings": {
+        "label": "Reservas de aulas",
+        "definition": "Reservas de aulas confirmadas no período"
+      },
+      "occupancy": {
+        "label": "Ocupação",
+        "definition": "Reservas confirmadas ÷ capacidade das aulas agendadas"
+      },
+      "registrations": {
+        "label": "Inscrições",
+        "definition": "Inscrições em programas criadas no período, por status"
+      },
+      "appointments": {
+        "label": "Agendamentos",
+        "definition": "Agendamentos confirmados que começam no período"
+      },
+      "orders": {
+        "label": "Pedidos para retirada",
+        "definition": "Pedidos para retirada no período, por status"
+      },
+      "revenue": {
+        "label": "Receita",
+        "definition": "Pagamentos on-line aprovados no período, sem reembolsos, agrupados por moeda. Não inclui pagamentos recebidos fora do BranchHarbor."
+      },
+      "syncHealthy": {
+        "label": "Conexões funcionando",
+        "definition": "Sistemas conectados sincronizando sem erros"
+      },
+      "syncNone": {
+        "label": "Conexões",
+        "definition": "Sistemas de reservas, comércio ou PDV conectados"
+      }
+    }
+  },
+  "metricReason": {
+    "no_payment_account": "Nenhuma conta de pagamento conectada para estas unidades",
+    "booking_sync": "{provider} está {state, select, degraded {instável} disconnected {desconectado} authorization_expired {sem autorização válida} initial_sync {ainda sincronizando} other {indisponível}} — não é possível medir as reservas",
+    "no_classes": "Nenhuma aula agendada no BranchHarbor neste período",
+    "no_capacity": "Nenhuma capacidade configurada",
+    "no_menu": "Nenhum cardápio configurado",
+    "not_combined": "Valores em moedas diferentes não são somados sem um método de conversão definido",
+    "unavailable": "Indisponível"
+  },
+  "range": {
+    "last7Days": "Últimos 7 dias",
+    "last30Days": "Últimos 30 dias",
+    "today": "Hoje",
+    "thisWeek": "Esta semana",
+    "now": "Agora",
+    "nextHour": "Próxima hora",
+    "autumnSeason": "Temporada de outono"
+  },
+  "source": {
+    "plain": "{source}",
+    "withSync": "{source} · última sincronização {at}",
+    "websiteForms": "Formulários do site",
+    "bookingConnection": "Conexão de reservas",
+    "membershipSystem": "Sistema de planos",
+    "registrations": "Inscrições",
+    "schedule": "Grade",
+    "calendar": "Agenda",
+    "practitionerCalendars": "Agendas dos profissionais",
+    "inventory": "Estoque",
+    "connections": "Conexões",
+    "pickupOrdering": "Pedidos para retirada",
+    "slotSettings": "Configuração dos horários",
+    "locationMenus": "Cardápios das unidades",
+    "bhListings": "Anúncios do BranchHarbor",
+    "enquiriesInbox": "Caixa de contatos",
+    "viewingsCalendar": "Agenda de visitas",
+    "offers": "Propostas",
+    "api": {
+      "payments": "Pagamentos BranchHarbor (Stripe)",
+      "bookings": "Reservas BranchHarbor",
+      "schedule": "Grade BranchHarbor",
+      "orders": "Pedidos BranchHarbor",
+      "appointments": "Agendamentos BranchHarbor",
+      "registrations": "Inscrições BranchHarbor",
+      "forms": "Formulários BranchHarbor",
+      "none": "Não calculado"
+    }
+  },
+  "note": {
+    "perCurrency": "Por moeda · sem somar",
+    "partial": "Dados parciais — algumas fontes estão atrasadas",
+    "noSystems": "Nenhum sistema conectado ainda",
+    "noMembershipSystem": "Nenhum sistema de planos conectado ainda",
+    "syncUnavailableAt": "Sincronização indisponível em {list}",
+    "noPayments": "Nenhum pagamento ainda neste escopo",
+    "excludesDegraded": "Sem {list} (sincronização instável)",
+    "notAvailableFor": "Indisponível para {list}",
+    "excludes": "Sem {list}"
+  },
+  "upcoming": {
+    "title": {
+      "classes": "Próximas aulas",
+      "sessionsToday": "Sessões de hoje",
+      "nextAppointments": "Próximos agendamentos",
+      "toFulfilToday": "Para atender hoje",
+      "nextPickups": "Próximas retiradas",
+      "viewings": "Próximas visitas",
+      "pickups": "Próximas retiradas",
+      "appointments": "Próximos agendamentos",
+      "generic": "Em breve"
+    },
+    "item": {
+      "class": "Aula",
+      "classWith": "Aula · {name}",
+      "guestOrder": "{ref} · Convidado",
+      "viewing": "Visita",
+      "appointment": "Agendamento"
+    },
+    "detail": {
+      "class": "{place} · {booked}/{capacity}{waitlist, plural, =0 {} other { · # na lista de espera}}",
+      "items": "{place} · {count, plural, one {# item} other {# itens}}",
+      "ship": "{place} · envio",
+      "pickup": "{place} · retirada",
+      "noAgent": "{place} · sem corretor atribuído"
+    },
+    "status": {
+      "cover_requested": "Substituição solicitada",
+      "full": "Lotada",
+      "open": "Com vagas",
+      "spots_left": "{count, plural, one {# vaga} other {# vagas}}",
+      "scheduled": "Agendada",
+      "venue_clash": "Conflito de local",
+      "confirmed": "Confirmado",
+      "deposit_paid": "Sinal pago",
+      "cancelled": "Cancelado",
+      "to_fulfil": "A atender",
+      "payment_failed": "Pagamento recusado",
+      "ready": "Pronto",
+      "preparing": "Em preparo",
+      "awaiting_acceptance": "Aguardando aceite",
+      "accepted": "Aceito",
+      "awaiting_confirmation": "Aguardando confirmação",
+      "collected": "Retirado",
+      "rejected": "Recusado"
+    }
+  },
+  "attention": {
+    "bookingSyncDegraded": "Sincronização de reservas instável em {place}",
+    "lastSyncOccupancy": "Última sincronização bem-sucedida há {hours} h · ocupação indisponível",
+    "openCover": "{count, plural, one {# pedido de substituição em aberto} other {# pedidos de substituição em aberto}}",
+    "pageChanges": "{count, plural, one {# alteração de página aguardando aprovação} other {# alterações de página aguardando aprovação}}",
+    "paymentWithoutBooking": "Pagamento sem registro de reserva",
+    "reconQueue": "Fila de conciliação · {count, plural, one {# item} other {# itens}}",
+    "doubleBooked": "{venue} reservado duas vezes às {time}",
+    "twoGroupsAt": "{a} e {b} · {place}",
+    "registrationsReview": "{count, plural, one {# inscrição aguardando análise} other {# inscrições aguardando análise}}",
+    "twoNames": "{a} e {b}",
+    "paymentsNotSetUp": "Pagamentos não configurados em {place}",
+    "registrationClosedUntil": "As inscrições ficam fechadas até a conta ser ativada",
+    "rescheduleRequest": "Pedido de remarcação",
+    "wantsMoved": "{name} quer remarcar o {service} das {time}",
+    "absentFriday": "{name} ausente na sexta-feira",
+    "appointmentsReassign": "{count, plural, one {# agendamento precisa ser reatribuído} other {# agendamentos precisam ser reatribuídos}}",
+    "calendarSyncDegraded": "Sincronização da agenda instável em {place}",
+    "utilisationUnavailable": "Utilização indisponível para {place}",
+    "productSyncFailed": "{product} não sincronizou com {count, plural, one {# loja} other {# lojas}}",
+    "variantMismatch": "Variação divergente no tamanho {size}",
+    "lowStock": "Estoque baixo de {item} em {place}",
+    "onHand": "{count} em estoque",
+    "storeDisconnected": "Loja de {place} desconectada",
+    "ordersNotImported": "Os pedidos dessa loja só são importados quando ela reconectar",
+    "orderOverdue": "Pedido {ref} atrasado {minutes} min",
+    "kitchenOf": "Cozinha de {place}",
+    "paymentWithoutOrder": "Pagamento sem pedido",
+    "recoveryQueue": "{name} · {amount} · fila de recuperação",
+    "kitchenScreenOffline": "Tela da cozinha de {place} off-line",
+    "ordersByEmail": "Os pedidos continuam chegando por e-mail",
+    "listingsAwaitingHq": "{count, plural, one {# anúncio aguardando aprovação da matriz} other {# anúncios aguardando aprovação da matriz}}",
+    "enquiriesInPool": "{count, plural, one {# contato na fila do escritório} other {# contatos na fila do escritório}}",
+    "valuationRequestAt": "Pedido de avaliação · {place}",
+    "offerCountered": "Contraproposta enviada — aguardando o comprador",
+    "expiresInDays": "{place} · expira em {days, plural, one {# dia} other {# dias}}",
+    "connState": "{provider}: {state, select, degraded {instável} disconnected {desconectado} authorization_expired {autorização expirada} initial_sync {sincronização inicial} other {requer atenção}}",
+    "placeDetail": "{place} · {detail}",
+    "checkConnection": "{place} · Verifique a conexão",
+    "reconciliation": "{count, plural, one {# pagamento precisa de conciliação} other {# pagamentos precisam de conciliação}}",
+    "list": "{list}",
+    "approvals": "{count, plural, one {# solicitação aguardando aprovação} other {# solicitações aguardando aprovação}}",
+    "kindsAt": "{kinds} · {places}",
+    "ordersAwaiting": "{count, plural, one {# pedido aguardando aceite} other {# pedidos aguardando aceite}}"
+  },
+  "ai": {
+    "prompt": {
+      "studios": "Resumir as mudanças de frequência neste mês",
+      "sports": "Sugerir uma solução para o conflito no campo 2",
+      "wellness": "Escrever uma resposta com a nossa política de cancelamento",
+      "commerce": "Explicar a tendência do estoque nesta semana",
+      "foods": "Resumir a produção de hoje por item",
+      "realty": "Resumir o feedback das visitas a 42 Birchmount Cres"
+    },
+    "live": {
+      "studios": "Resumir a ocupação das aulas neste mês",
+      "sports": "Resumir as inscrições aguardando análise",
+      "wellness": "Resumir os agendamentos desta semana",
+      "commerce": "Explicar a tendência dos pedidos nesta semana",
+      "foods": "Resumir os pedidos de hoje por unidade",
+      "realty": "Quais escritórios precisam de atenção?"
+    }
+  },
+  "cover": {
+    "requested": "Substituição solicitada",
+    "requestedBy": "{name} pediu substituição",
+    "notified": "{count, plural, one {# instrutor elegível avisado} other {# instrutores elegíveis avisados}}",
+    "acceptedBy": "{name} aceitou a substituição",
+    "confirmedBy": "Confirmado por {name}. Grade, página da aula e {count, plural, one {# cliente} other {# clientes}} atualizados juntos.",
+    "history": "{name} · {action}",
+    "historyNote": "{name} · {action} — {note}",
+    "action": {
+      "requested": "Substituição solicitada",
+      "accepted": "Aceita",
+      "declined": "Recusada",
+      "approved": "Aprovada",
+      "assigned": "Atribuída",
+      "cancelled": "Cancelada"
+    },
+    "candidate": {
+      "available": "Disponível",
+      "availableTeaches": "Disponível · dá aulas de {style}",
+      "teachingAt": "Dando aula em {place} nesse horário",
+      "assigned": "Atribuído",
+      "accepted": "Aceitou a substituição"
+    }
+  },
+  "approval": {
+    "title": {
+      "refund_payment": "Reembolso do pagamento {ref}",
+      "refund_order": "Reembolso do pedido {ref}",
+      "refund_pickup_order": "Reembolso do pedido para retirada {ref}",
+      "refund_return": "Devolução {rma} · pedido {order}",
+      "shift_swap": "{role} · {when}",
+      "shift_swap_in": "{role} · {count, plural, one {em # dia} other {em # dias}}",
+      "website_change": "Alteração no site: {field}",
+      "page_submitted": "Página enviada para aprovação"
+    },
+    "kind": {
+      "refund": "Reembolso",
+      "ad_spend": "Anúncios locais",
+      "shift_swap": "Troca de turno",
+      "field": "Alteração no site",
+      "page": "Página do site"
+    },
+    "detail": {
+      "threshold": "Acima do limite",
+      "refundedSoFar": "Reembolsado até agora",
+      "channel": "Canal",
+      "duration": "Duração",
+      "starts": "Início",
+      "from": "De",
+      "to": "Para",
+      "shift": "Turno",
+      "refundOf": "Reembolso de",
+      "field": "Campo",
+      "newValue": "Novo valor"
+    },
+    "channel": {
+      "google_ads": "Anúncios do Google",
+      "meta_ads": "Anúncios da Meta",
+      "local_print": "Material impresso local",
+      "other": "Outro"
+    },
+    "value": {
+      "thresholdOver": "Reembolsos acima de {amount} precisam de aprovação",
+      "amount": "{amount}",
+      "days": "{count, plural, one {# dia} other {# dias}}",
+      "inDays": "{count, plural, one {Em # dia} other {Em # dias}}",
+      "date": "{date}",
+      "shift": "{start} – {end}",
+      "commerceOrder": "Pedido da loja",
+      "onlinePayment": "Pagamento on-line"
+    },
+    "result": {
+      "refund": "Reembolso {state}",
+      "campaignScheduled": "Campanha agendada",
+      "shiftReassigned": "Turno reatribuído",
+      "changeApplied": "Alteração aplicada"
+    },
+    "refundState": {
+      "processed": "processado",
+      "complete": "concluído",
+      "pending": "pendente",
+      "partial": "parcialmente concluído",
+      "failed": "falhou",
+      "requested": "solicitado"
+    }
+  },
+  "website": {
+    "versionPublished": "Versão {version} publicada",
+    "versionPublishedByHq": "Versão {version} publicada pela matriz",
+    "changeRequested": "{name} pediu uma alteração em “{field}”",
+    "editedDraft": "{name} editou “{field}” (rascunho)",
+    "approved": "{name} aprovou “{field}”",
+    "approvedComment": "{name} aprovou “{field}” · “{comment}”",
+    "rejected": "{name} recusou “{field}”",
+    "rejectedComment": "{name} recusou “{field}” · “{comment}”",
+    "resetToHq": "“{field}” voltou ao padrão da matriz"
+  },
+  "order": {
+    "event": {
+      "createdWoo": "Pedido criado no WooCommerce",
+      "imported": "Importado para o BranchHarbor",
+      "importedEvent": "Importado para o BranchHarbor (evento {event})",
+      "retryDeduped": "Reenvio recebido · mesmo ID externo, nenhuma duplicata criada",
+      "fulfilledAt": "Marcado como atendido em {place}",
+      "cardDeclined": "Pagamento recusado · cartão recusado",
+      "paymentProcessing": "Pagamento em processamento",
+      "storeDisconnected": "Loja desconectada — pedido visto apenas na última sincronização parcial"
+    }
+  },
+  "payment": {
+    "target": {
+      "class_booking": "Reserva de aula",
+      "food_order": "Pedido para retirada",
+      "order": "Pedido",
+      "appointment": "Agendamento",
+      "registration": "Inscrição",
+      "booking": "Reserva",
+      "record": "Registro",
+      "payment": "Pagamento"
+    },
+    "what": {
+      "monthlyMembership": "Plano mensal",
+      "registrationFor": "Inscrição · {name}",
+      "campRegistration": "Inscrição no acampamento",
+      "depositFor": "Sinal · {name}",
+      "orderNo": "Pedido {ref}"
+    },
+    "linked": "{what} {ref}",
+    "provider": {
+      "sandbox": "{name} (sandbox)",
+      "gateway": "Gateway {name}"
+    },
+    "capability": {
+      "cardPayments": "Pagamentos com cartão",
+      "refunds": "Reembolsos",
+      "sepaDebit": "Débito SEPA",
+      "bacsDebit": "Débito Bacs"
+    },
+    "state": {
+      "created": "criado",
+      "requires_action": "requer ação",
+      "processing": "em processamento",
+      "succeeded": "aprovado",
+      "failed": "recusado",
+      "cancelled": "cancelado"
+    },
+    "reconKind": {
+      "paid_without_record": "Pago sem registro",
+      "unpaid_confirmed_record": "Confirmado sem pagamento",
+      "amount_mismatch": "Valor divergente",
+      "duplicate_payment": "Pagamento duplicado"
+    },
+    "reconDetail": {
+      "paid_without_record": "O pagamento foi aprovado, mas o registro vinculado está faltando ou não foi confirmado",
+      "amount_mismatch": "O valor ou a moeda cobrados diferem do total do registro"
+    },
+    "recon": {
+      "summary": "{what} · {place}",
+      "confirmedWithoutPayment": "Registro confirmado sem pagamento",
+      "amountMismatch": "Valor divergente",
+      "missing": "Faltando",
+      "confirmed": "Confirmado",
+      "expected": "Esperado: {amount}",
+      "bookedAt": "Reservado por {amount}",
+      "differenceRefunded": "Diferença reembolsada",
+      "recreated": "Registro recriado",
+      "recreatedLinked": "Registro recriado e vinculado ao pagamento.",
+      "created": "{ref} criado",
+      "createdLinked": "Registro {ref} criado e vinculado ao pagamento.",
+      "refundedInFull": "Pagamento reembolsado integralmente."
+    },
+    "event": {
+      "created": "Pagamento criado ({ref})",
+      "signed": "{event} · evento assinado",
+      "signedCurrency": "{provider} {event} · {currency} (evento assinado)",
+      "failed": "Pagamento recusado",
+      "refunded": "Reembolsado: {amount}",
+      "providerState": "Pagamento {provider} {state} · {currency}",
+      "linkCreated": "Registro vinculado criado",
+      "linkFailed": "Não foi possível criar o registro vinculado",
+      "cardDeclined": "{event} · cartão recusado",
+      "partialRefund": "Reembolso parcial concluído",
+      "orderFailedSlotFull": "Falha ao criar o pedido: horário de retirada lotado na confirmação",
+      "recordFailedCapacity": "Falha ao criar o registro: a capacidade mudou durante o pagamento",
+      "confirmedByStaff": "Registro confirmado pela equipe",
+      "noPaymentEvent": "Nenhum evento de pagamento recebido",
+      "mismatchDetected": "Divergência detectada",
+      "resolvedDifference": "Resolvido: diferença reembolsada",
+      "recreatedBy": "{name} recriou o registro no próximo horário disponível",
+      "recordCreatedNotified": "Registro {ref} criado e vinculado ao pagamento · cliente avisado",
+      "recreatedSnapshot": "Registro recriado a partir do snapshot do pagamento",
+      "refundRequested": "Reembolso solicitado",
+      "refundRequestedBy": "Reembolso solicitado por {name} (financeiro)",
+      "refundCompleteEmailed": "Reembolso concluído · cliente avisado por e-mail"
+    }
+  },
+  "connection": {
+    "name": {
+      "booking": "{name} (reservas)",
+      "site": "{name} (site de {place})",
+      "kitchenScreen": "Tela da cozinha de {place}",
+      "portalFeedsSandbox": "Feeds de portais (sandbox)"
+    },
+    "role": {
+      "booking": "Reservas e grade de aulas",
+      "commerce": "Pedidos, produtos e estoque",
+      "pos": "PDV",
+      "website": "Site existente",
+      "marketing": "Marketing",
+      "payments": "Pagamentos de clientes",
+      "customerPayments": "Pagamentos de clientes",
+      "instructorSchedules": "Agendas dos instrutores",
+      "consentedContacts": "Contatos com consentimento",
+      "websiteBlocks": "Site existente · blocos e formulários",
+      "registrationPayments": "Pagamentos de inscrição",
+      "coachSchedules": "Agendas dos técnicos",
+      "depositsPayments": "Sinais e pagamentos",
+      "practitionerCalendars": "Agendas dos profissionais",
+      "pickupPayments": "Pagamentos de retirada",
+      "kitchenDisplay": "Tela da cozinha",
+      "agentCalendars": "Agendas de visitas dos corretores",
+      "syndicationPreview": "Prévia da distribuição de anúncios"
+    },
+    "authoritative": {
+      "external": "{name} é a fonte oficial",
+      "branchharbor": "O BranchHarbor é a fonte oficial; a conexão recebe cópias",
+      "externalBookings": "{name} é a fonte oficial das reservas",
+      "externalOrders": "{name} é a fonte oficial dos pedidos",
+      "stripe": "A Stripe confirma o resultado dos pagamentos",
+      "bhSourceCalendars": "O BranchHarbor é a fonte; as agendas recebem cópias",
+      "consent": "Os consentimentos do BranchHarbor são a referência oficial",
+      "wordpress": "As páginas ficam no WordPress; os formulários enviados chegam ao BranchHarbor",
+      "bhSchedule": "A grade do BranchHarbor é a referência oficial",
+      "bhCalendar": "A agenda do BranchHarbor é a referência oficial",
+      "ordersRemain": "Os pedidos ficam no BranchHarbor",
+      "posNotAuthoritative": "O BranchHarbor envia os pedidos; o PDV não é a referência oficial",
+      "bhViewings": "As visitas do BranchHarbor são a referência oficial; as agendas recebem cópias",
+      "sandboxOnly": "Somente sandbox — nada é enviado aos portais"
+    },
+    "issue": {
+      "state": "A conexão está {state, select, degraded {instável} disconnected {desconectada} authorization_expired {sem autorização válida} other {indisponível}}.",
+      "rateLimit": "{place}: limite de chamadas da API atingido. {count, plural, one {# sessão de aula pode estar desatualizada} other {# sessões de aula podem estar desatualizadas}}.",
+      "calendarsStopped": "As agendas dos instrutores pararam de atualizar há {days, plural, one {# dia} other {# dias}}.",
+      "verificationIncomplete": "Verificação da conta incompleta. As inscrições ficam fechadas até os pagamentos serem ativados.",
+      "eventsRejected": "{place}: {count, plural, one {# evento recusado} other {# eventos recusados}} pela agenda de {name}.",
+      "siteUnreachable": "Site inacessível. Os pedidos feitos lá só são importados quando ele reconectar.",
+      "screenOffline": "Tela off-line. Os pedidos continuam chegando aqui e por e-mail."
+    },
+    "affected": {
+      "mapping": "{count, plural, one {# registro precisa de mapeamento} other {# registros precisam de mapeamento}}",
+      "classes": "{count, plural, one {# sessão de aula} other {# sessões de aula}}",
+      "instructors": "{count, plural, one {# instrutor} other {# instrutores}}",
+      "programmes": "{count, plural, one {# programa} other {# programas}}",
+      "appointments": "{count, plural, one {# agendamento} other {# agendamentos}}",
+      "ordersSince": "Pedidos desde ontem às {time}",
+      "devices": "{count, plural, one {# dispositivo} other {# dispositivos}}"
+    },
+    "fix": {
+      "retrySync": "Tentar sincronizar de novo",
+      "test": "Testar conexão",
+      "reauthorize": "Autorizar de novo",
+      "finishVerification": "Concluir verificação",
+      "viewAndRetry": "Ver afetados e tentar de novo",
+      "sendTestOrder": "Enviar pedido de teste"
+    }
+  }
+}

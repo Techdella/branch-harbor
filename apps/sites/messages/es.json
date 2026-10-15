@@ -944,6 +944,35 @@
       "noShowFee": "Cargo por no presentarse: {amount}.",
       "noShowFeeMembers": "Cargo por no presentarse: {amount} (no se cobra a los miembros).",
       "noNoShowFee": "Sin cargo por no presentarse."
+    },
+    "access": {
+      "any_location": "Válido en todas las sedes",
+      "same_currency": "Válido en todas las sedes en {currency}",
+      "listed": "{count, plural, one {Válido en # sede seleccionada} other {Válido en # sedes seleccionadas}}",
+      "home_only": "Válido solo en {location}"
+    },
+    "membershipTerms": {
+      "billed": "Se cobra cada mes en {currency} hasta que canceles.",
+      "notice": "{days, plural, one {Cancela con # día de preaviso.} other {Cancela con # días de preaviso.}}",
+      "pause": "Pausa de hasta {days} días cada vez.",
+      "noPause": "No se puede pausar.",
+      "classes": "{count} clases al mes; las clases no usadas no se acumulan.",
+      "unlimited": "Clases ilimitadas."
+    },
+    "onlineReason": {
+      "sign_in": "Inicia sesión para acceder a las clases en línea",
+      "membership_excludes": "Tu membresía no incluye esta clase ahora mismo",
+      "members_only": "Solo para miembros",
+      "pack_holders_only": "Solo con bono de clases",
+      "buy_to_watch": "Compra esta clase para verla",
+      "livestream_ended": "Esta clase en directo ha terminado"
+    },
+    "onlineRule": {
+      "free_with_registration": "Gratis con inscripción",
+      "members": "Incluida en la membresía",
+      "pack_holders": "Incluida con bono de clases",
+      "buy": "Disponible para comprar",
+      "not_available": "Aún no disponible"
     }
   },
   "storefront": {

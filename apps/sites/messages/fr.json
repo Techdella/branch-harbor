@@ -944,6 +944,35 @@
       "noShowFee": "Frais d’absence : {amount}.",
       "noShowFeeMembers": "Frais d’absence : {amount} (non facturés aux abonnés).",
       "noNoShowFee": "Pas de frais d’absence."
+    },
+    "access": {
+      "any_location": "Valable dans tous les établissements",
+      "same_currency": "Valable dans tous les établissements en {currency}",
+      "listed": "{count, plural, one {Valable dans # établissement sélectionné} other {Valable dans # établissements sélectionnés}}",
+      "home_only": "Valable uniquement à {location}"
+    },
+    "membershipTerms": {
+      "billed": "Facturé chaque mois en {currency} jusqu’à résiliation.",
+      "notice": "{days, plural, one {Résiliation avec # jour de préavis.} other {Résiliation avec # jours de préavis.}}",
+      "pause": "Suspension possible jusqu’à {days} jours à la fois.",
+      "noPause": "Suspension non disponible.",
+      "classes": "{count} cours par mois ; les cours non utilisés ne sont pas reportés.",
+      "unlimited": "Cours illimités."
+    },
+    "onlineReason": {
+      "sign_in": "Connectez-vous pour accéder aux cours en ligne",
+      "membership_excludes": "Votre abonnement n’inclut pas ce cours pour le moment",
+      "members_only": "Réservé aux membres",
+      "pack_holders_only": "Réservé aux détenteurs d’un carnet de cours",
+      "buy_to_watch": "Achetez ce cours pour le regarder",
+      "livestream_ended": "Ce direct est terminé"
+    },
+    "onlineRule": {
+      "free_with_registration": "Gratuit sur inscription",
+      "members": "Inclus dans l’abonnement",
+      "pack_holders": "Inclus pour les détenteurs d’un carnet de cours",
+      "buy": "Disponible à l’achat",
+      "not_available": "Pas encore disponible"
     }
   },
   "storefront": {

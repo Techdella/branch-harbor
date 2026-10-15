@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { UiLabels } from '@/components/ui/UiLabels';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin', 'latin-ext'], weight: ['400', '500', '600', '700', '800'], variable: '--font-jakarta', display: 'swap' });
@@ -30,7 +31,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} className={jakarta.variable} data-scroll-behavior="smooth">
       <body className="min-h-viewport bg-canvas font-sans text-ink antialiased">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <UiLabels>{children}</UiLabels>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

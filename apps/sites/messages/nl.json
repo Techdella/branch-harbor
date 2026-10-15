@@ -944,6 +944,35 @@
       "noShowFee": "Kosten bij niet verschijnen: {amount}.",
       "noShowFeeMembers": "Kosten bij niet verschijnen: {amount} (niet voor leden).",
       "noNoShowFee": "Geen kosten bij niet verschijnen."
+    },
+    "access": {
+      "any_location": "Geldig op alle vestigingen",
+      "same_currency": "Geldig op alle vestigingen in {currency}",
+      "listed": "{count, plural, one {Geldig op # geselecteerde vestiging} other {Geldig op # geselecteerde vestigingen}}",
+      "home_only": "Alleen geldig bij {location}"
+    },
+    "membershipTerms": {
+      "billed": "Maandelijks gefactureerd in {currency} tot je opzegt.",
+      "notice": "{days, plural, one {Opzeggen met # dag opzegtermijn.} other {Opzeggen met # dagen opzegtermijn.}}",
+      "pause": "Pauzeren tot {days} dagen per keer.",
+      "noPause": "Pauzeren is niet mogelijk.",
+      "classes": "{count} lessen per maand; ongebruikte lessen vervallen.",
+      "unlimited": "Onbeperkt lessen."
+    },
+    "onlineReason": {
+      "sign_in": "Log in voor toegang tot online lessen",
+      "membership_excludes": "Je lidmaatschap omvat deze les nu niet",
+      "members_only": "Alleen voor leden",
+      "pack_holders_only": "Alleen met een rittenkaart",
+      "buy_to_watch": "Koop deze les om te kijken",
+      "livestream_ended": "Deze livestream is afgelopen"
+    },
+    "onlineRule": {
+      "free_with_registration": "Gratis na inschrijving",
+      "members": "Inbegrepen bij een lidmaatschap",
+      "pack_holders": "Inbegrepen met een rittenkaart",
+      "buy": "Los te koop",
+      "not_available": "Nog niet beschikbaar"
     }
   },
   "storefront": {

@@ -184,7 +184,7 @@ export const wellnessPublicRoutes: FastifyPluginAsyncZod = async (app) => {
       const a = await mine(requireUser(req).id, req.params.id);
       const [svc] = await s.db.select().from(services).where(eq(services.id, a.serviceId));
       const policy = policyOf(svc!);
-      if ((a.startsAt.getTime() - Date.now()) / 3600_000 < policy.freeCancelHours) throw conflict('late_change_not_allowed', `Changes within ${policy.freeCancelHours} hours of the appointment need a call to the team`);
+      if ((a.startsAt.getTime() - Date.now()) / 3600_000 < policy.freeCancelHours) throw conflict('late_change_not_allowed', `Changes within ${policy.freeCancelHours} hours of the appointment need a call to the team`, { freeCancelHours: policy.freeCancelHours });
       const r = await rescheduleAppointment(s.db, a.id, { startsAt: new Date(req.body.startsAt), practitionerId: req.body.practitionerId, actorUserId: null });
       offerFreedTime(s, a).catch(() => {});
       return { appointment: serializeAppointment(r.appointment), previousAppointmentId: a.id, priceChange: r.priceChange };

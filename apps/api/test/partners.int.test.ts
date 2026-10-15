@@ -69,6 +69,8 @@ describe.skipIf(!hasDb)('partner integrations (DB, mocked HTTP)', () => {
     expect(created.status).toBe(201);
     ids.uberConn = created.body.id;
     expect(created.body).toMatchObject({ status: 'sandbox', mode: 'sandbox', config: { customerId: 'cust-1', feeMode: 'pass_through' }, credentials: { clientId: { set: true, masked: 'uber••••3456' }, clientSecret: { set: true, masked: 'uber••••cdef' } }, webhookUrl: expect.stringMatching(/\/v1\/webhooks\/uber-direct$/) });
+    // Status reason as a stable code next to the English line, so apps can translate it.
+    expect(created.body).toMatchObject({ statusReasonCode: 'credentials_saved', missingKeys: [] });
     expect(JSON.stringify(created.body)).not.toContain('uber_secret_abcdef');
     expect((await call(app, 'PATCH', org(`/partner-connections/${ids.uberConn}`), { token, body: { mode: 'live' } })).body.error.code).toBe('test_required');
     const t = await call(app, 'POST', org(`/partner-connections/${ids.uberConn}/test`), { token });
@@ -143,7 +145,10 @@ describe.skipIf(!hasDb)('partner integrations (DB, mocked HTTP)', () => {
 
   it('outside Uber Direct countries: own drivers with an honest notice; dispatch refused', async () => {
     const ae = await createLocation(app, token, orgId, { name: 'Dubai Marina', currency: 'AED', timeZone: 'Asia/Dubai', address: { line1: 'Marina Walk', city: 'Dubai', region: 'Dubai', postalCode: '00000', country: 'AE' } });
-    expect((await call(app, 'POST', org('/partner-connections'), { token, body: { provider: 'uber_direct', locationId: ae.id, settings: {} } })).status).toBe(201);
+    const empty = await call(app, 'POST', org('/partner-connections'), { token, body: { provider: 'uber_direct', locationId: ae.id, settings: {} } });
+    expect(empty.status).toBe(201);
+    expect(empty.body).toMatchObject({ status: 'sandbox', statusReasonCode: 'missing_credentials', statusReason: expect.stringMatching(/^Sandbox — missing Client ID/) });
+    expect(empty.body.missingKeys).toEqual(expect.arrayContaining(['clientId', 'clientSecret', 'customerId', 'webhookSigningKey']));
     const [loc] = await app.ctx.db.select().from(locations).where(eq(locations.id, ae.id));
     const cfg = await loadFoodConfig(app.ctx.db, ae.id);
     const r = await providerDeliveryQuote(app.ctx, loc!, { ...cfg, delivery: { ...cfg.delivery, provider: 'uber_direct' } }, { address: { line1: 'x', city: 'Dubai' }, deliverBy: null, dropoffDeadline: null, subtotalMinor: 5000, zoneFeeMinor: 1000 });

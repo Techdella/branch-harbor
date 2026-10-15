@@ -44,7 +44,7 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
 
     const [lastWebhook] = await s.db.select({ at: webhookEvents.processedAt }).from(webhookEvents).where(eq(webhookEvents.organizationId, orgId)).orderBy(desc(webhookEvents.processedAt)).limit(1);
     const conns = await s.db.select().from(connections).where(eq(connections.organizationId, orgId));
-    const fresh = (source: string, lastSyncAt: Date | null = null, complete = true): Freshness => ({ asOf: now, source, lastSyncAt: lastSyncAt?.toISOString() ?? null, complete });
+    const fresh = (source: string, sourceCode: string, lastSyncAt: Date | null = null, complete = true): Freshness => ({ asOf: now, source, sourceCode, lastSyncAt: lastSyncAt?.toISOString() ?? null, complete });
 
     // Revenue
     const paymentsConnected = scoped.some((l) => l.paymentsEnabled);
@@ -55,8 +55,9 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
     const revenue = metric(
       paymentsConnected || payRows.length ? revenueByCurrency(payRows) : null,
       'Succeeded online payments in the period, gross and net of refunds, grouped by currency. Excludes payments taken outside BranchHarbor.',
-      fresh('BranchHarbor payments (Stripe)', lastWebhook?.at ?? null, true),
+      fresh('BranchHarbor payments (Stripe)', 'payments', lastWebhook?.at ?? null, true),
       'No payment account connected for these locations',
+      { code: 'no_payment_account' },
     );
     const revenueByLocation = scoped.map((l) => ({ locationId: l.id, name: l.name, currency: l.currency, revenue: revenueByCurrency(payRows.filter((p) => p.locationId === l.id)) }));
 
@@ -68,22 +69,23 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
     let occupancy;
     if (bookingProvider && bookingProvider.state !== 'connected') {
       const reason = `${bookingProvider.provider} is ${bookingProvider.state.replace('_', ' ')} — bookings cannot be measured`;
-      bookingsMetric = metric<number>(null, 'Confirmed class bookings in the period', fresh(bookingProvider.provider, bookingProvider.lastSuccessAt, false), reason);
-      occupancy = metric<number>(null, 'Confirmed bookings ÷ capacity for scheduled classes', fresh(bookingProvider.provider, bookingProvider.lastSuccessAt, false), reason);
+      const code = { code: 'booking_sync', params: { provider: bookingProvider.provider, state: bookingProvider.state } };
+      bookingsMetric = metric<number>(null, 'Confirmed class bookings in the period', fresh(bookingProvider.provider, 'provider', bookingProvider.lastSuccessAt, false), reason, code);
+      occupancy = metric<number>(null, 'Confirmed bookings ÷ capacity for scheduled classes', fresh(bookingProvider.provider, 'provider', bookingProvider.lastSuccessAt, false), reason, code);
     } else if (!occRows.length) {
-      bookingsMetric = metric<number>(null, 'Confirmed class bookings in the period', fresh('BranchHarbor schedule'), 'No classes scheduled in BranchHarbor for this period');
-      occupancy = metric<number>(null, 'Confirmed bookings ÷ capacity for scheduled classes', fresh('BranchHarbor schedule'), 'No classes scheduled in BranchHarbor for this period');
+      bookingsMetric = metric<number>(null, 'Confirmed class bookings in the period', fresh('BranchHarbor schedule', 'schedule'), 'No classes scheduled in BranchHarbor for this period', { code: 'no_classes' });
+      occupancy = metric<number>(null, 'Confirmed bookings ÷ capacity for scheduled classes', fresh('BranchHarbor schedule', 'schedule'), 'No classes scheduled in BranchHarbor for this period', { code: 'no_classes' });
     } else {
       const [b] = await s.db.select({ c: count() }).from(classBookings).where(and(inArray(classBookings.occurrenceId, occRows.map((o) => o.id)), inArray(classBookings.status, ['confirmed', 'attended', 'no_show'])));
       const cap = occRows.reduce((a, o) => a + o.capacity, 0);
-      bookingsMetric = metric(b?.c ?? 0, 'Confirmed class bookings in the period', fresh('BranchHarbor bookings'));
-      occupancy = metric(cap ? Math.round(((b?.c ?? 0) / cap) * 1000) / 1000 : null, 'Confirmed bookings ÷ capacity for scheduled classes', fresh('BranchHarbor bookings'), 'No capacity configured');
+      bookingsMetric = metric(b?.c ?? 0, 'Confirmed class bookings in the period', fresh('BranchHarbor bookings', 'bookings'));
+      occupancy = metric(cap ? Math.round(((b?.c ?? 0) / cap) * 1000) / 1000 : null, 'Confirmed bookings ÷ capacity for scheduled classes', fresh('BranchHarbor bookings', 'bookings'), 'No capacity configured', { code: 'no_capacity' });
     }
 
     // Foods
     const hasMenu = (await s.db.select({ c: count() }).from(menus).where(eq(menus.organizationId, orgId)))[0]?.c ?? 0;
     const foodRows = hasMenu && locIds.length ? await s.db.select({ status: foodOrders.status, c: count() }).from(foodOrders).where(and(inLocs(foodOrders.locationId), gte(foodOrders.createdAt, from), lt(foodOrders.createdAt, to))).groupBy(foodOrders.status) : [];
-    const foodMetric = metric(hasMenu ? Object.fromEntries(foodRows.map((r) => [r.status, r.c])) : null, 'Pickup orders by status in the period', fresh('BranchHarbor orders'), 'No menu configured');
+    const foodMetric = metric(hasMenu ? Object.fromEntries(foodRows.map((r) => [r.status, r.c])) : null, 'Pickup orders by status in the period', fresh('BranchHarbor orders', 'orders'), 'No menu configured', { code: 'no_menu' });
 
     // Wellness / Sports / Leads
     const appts = locIds.length ? (await s.db.select({ c: count() }).from(appointments).where(and(inLocs(appointments.locationId), eq(appointments.status, 'confirmed'), gte(appointments.startsAt, from), lt(appointments.startsAt, to))))[0]?.c ?? 0 : 0;
@@ -95,13 +97,13 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
       period: { from: from.toISOString(), to: to.toISOString() },
       metrics: {
         revenue,
-        combinedRevenue: { value: null, unavailableReason: 'Amounts in different currencies are not combined without a defined conversion method', definition: 'Not computed', freshness: fresh('n/a') },
+        combinedRevenue: metric<null>(null, 'Not computed', fresh('n/a', 'none'), 'Amounts in different currencies are not combined without a defined conversion method', { code: 'not_combined' }),
         classBookings: bookingsMetric,
         occupancy,
         foodOrders: foodMetric,
-        appointments: metric(appts, 'Confirmed appointments starting in the period', fresh('BranchHarbor appointments')),
-        registrations: metric(Object.fromEntries(regs.map((r) => [r.status, r.c])), 'Programme registrations created in the period, by status', fresh('BranchHarbor registrations')),
-        leads: metric(leadCount, 'Leads captured by BranchHarbor forms in the period. Excludes enquiries received elsewhere.', fresh('BranchHarbor forms')),
+        appointments: metric(appts, 'Confirmed appointments starting in the period', fresh('BranchHarbor appointments', 'appointments')),
+        registrations: metric(Object.fromEntries(regs.map((r) => [r.status, r.c])), 'Programme registrations created in the period, by status', fresh('BranchHarbor registrations', 'registrations')),
+        leads: metric(leadCount, 'Leads captured by BranchHarbor forms in the period. Excludes enquiries received elsewhere.', fresh('BranchHarbor forms', 'forms')),
       },
       // Independent businesses have one location: no per-location breakdown.
       revenueByLocation: independent ? [] : revenueByLocation,

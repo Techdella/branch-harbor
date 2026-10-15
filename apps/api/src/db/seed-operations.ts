@@ -90,7 +90,7 @@ export async function seedOperations(c: SeedCtx) {
 
   // Refund request (Maya → owner) for a Queen West class payment, and a local ad spend request.
   const [qwPay] = await db.select().from(t.paymentReferences).where(and(eq(t.paymentReferences.locationId, qw.id), eq(t.paymentReferences.state, 'succeeded'), eq(t.paymentReferences.targetType, 'class_booking'))).limit(1);
-  if (qwPay) await refundApproval(db, c.swId, qw, { paymentId: qwPay.id }, qwPay.amountMinor, 'CAD', c.maya, 'Class cancelled after the heating failed — full refund for the member', `Refund for payment ${qwPay.externalId.slice(-8)}`);
+  if (qwPay) await refundApproval(db, c.swId, qw, { paymentId: qwPay.id }, qwPay.amountMinor, 'CAD', c.maya, 'Class cancelled after the heating failed — full refund for the member', `Refund for payment ${qwPay.externalId.slice(-8)}`, { code: 'refund_payment', params: { ref: qwPay.externalId.slice(-8) } });
   await adSpendApproval(db, c.swId, qw, c.maya, { amountMinor: 40000, channel: 'meta_ads', durationDays: 14, title: 'Queen West spring intro offer', description: 'Instagram + Facebook, 5 km radius, targeting the intro week offer.' }, today);
 
   // ───────────── Maple & Ember: pickup settings, shifts, approvals ─────────────
@@ -115,7 +115,7 @@ export async function seedOperations(c: SeedCtx) {
   const carlosFuture = meShifts.find((s) => s.userId === c.carlos.id && s.startsAt > new Date(Date.now() + hours(30)));
   if (carlosFuture) await swapRequest(db, c.meId, ballard, carlosFuture, c.carlos, ren, 'Family event — Ren can take the kitchen');
   const [foodPay] = await db.select().from(t.paymentReferences).where(and(eq(t.paymentReferences.locationId, ballard.id), eq(t.paymentReferences.targetType, 'food_order'))).limit(1);
-  if (foodPay) await refundApproval(db, c.meId, ballard, { paymentId: foodPay.id }, foodPay.amountMinor, 'USD', ren, 'Order arrived cold — customer asked for a refund', `Refund for pickup order ${foodPay.externalId.slice(-8)}`);
+  if (foodPay) await refundApproval(db, c.meId, ballard, { paymentId: foodPay.id }, foodPay.amountMinor, 'USD', ren, 'Order arrived cold — customer asked for a refund', `Refund for pickup order ${foodPay.externalId.slice(-8)}`, { code: 'refund_pickup_order', params: { ref: foodPay.externalId.slice(-8) } });
 
   // ───────────── North Shore Football Academy (sports) ─────────────
   const coachKim = await user('kim', 'kim.osei@demo.branchharbor.com', 'Kim Osei');
@@ -333,7 +333,7 @@ export async function seedOperations(c: SeedCtx) {
   await db.insert(t.connections).values({ organizationId: fgId, locationId: pdx.id, provider: 'shopify', kind: 'commerce', direction: 'import', authoritative: 'external', state: 'connected', config: { shop: 'fieldnote-demo.myshopify.com' }, lastSuccessAt: new Date(Date.now() - hours(1)) });
   // Large refund for a Portland order (above the USD 100 threshold) requested by the store manager.
   const [bigOrder] = await db.select().from(t.orders).where(and(eq(t.orders.locationId, pdx.id), eq(t.orders.status, 'paid'), sql`${t.orders.paymentId} is not null`)).limit(1);
-  if (bigOrder?.paymentId) await refundApproval(db, fgId, pdx, { paymentId: bigOrder.paymentId }, Math.min(bigOrder.totalMinor, 12500), 'USD', olivia, 'Pen nib arrived damaged — customer returned the item', `Refund for order ${bigOrder.id.slice(0, 8)}`);
+  if (bigOrder?.paymentId) await refundApproval(db, fgId, pdx, { paymentId: bigOrder.paymentId }, Math.min(bigOrder.totalMinor, 12500), 'USD', olivia, 'Pen nib arrived damaged — customer returned the item', `Refund for order ${bigOrder.id.slice(0, 8)}`, { code: 'refund_order', params: { ref: bigOrder.id.slice(0, 8) } });
   await adSpendApproval(db, fgId, ams, sanne, { amountMinor: 45000, channel: 'meta_ads', durationDays: 14, title: 'Amsterdam back-to-school notebooks', description: 'Instagram carousel for students within 3 km.' }, today);
   await scheduleWeek(db, fgId, pdx, today, [{ user: olivia, role: 'Store manager', start: '09:30', end: '17:30', days: [1, 2, 3, 4, 5] }]);
   await scheduleWeek(db, fgId, yul, today, [{ user: luc, role: 'Vendeur', start: '10:00', end: '18:00', days: [0, 3, 4, 5, 6] }]);
@@ -365,15 +365,15 @@ async function swapRequest(db: Db, orgId: string, loc: Loc, shift: typeof t.shif
   const when = new Intl.DateTimeFormat('en', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: loc.timeZone }).format(shift.startsAt);
   const [ap] = await db.insert(t.approvals).values({
     organizationId: orgId, locationId: loc.id, targetType: 'shift_swap', targetId: sw!.id, title: `${shift.role} · ${when}`, requestedBy: from.id, requestComment: reason, createdAt: new Date(Date.now() - hours(3)),
-    payload: { shiftId: shift.id, toShiftId: null, from: { id: from.id, name: from.name }, to: { id: to.id, name: to.name }, shift: { role: shift.role, startsAt: shift.startsAt.toISOString(), endsAt: shift.endsAt.toISOString(), timeZone: loc.timeZone } },
+    payload: { shiftId: shift.id, toShiftId: null, from: { id: from.id, name: from.name }, to: { id: to.id, name: to.name }, shift: { role: shift.role, startsAt: shift.startsAt.toISOString(), endsAt: shift.endsAt.toISOString(), timeZone: loc.timeZone }, titleI18n: { code: 'shift_swap', params: { role: shift.role, startsAt: shift.startsAt.toISOString(), timeZone: loc.timeZone } } },
   }).returning();
   await db.update(t.shiftSwapRequests).set({ approvalId: ap!.id }).where(eq(t.shiftSwapRequests.id, sw!.id));
 }
 
-async function refundApproval(db: Db, orgId: string, loc: Loc, target: { paymentId: string }, amountMinor: number, currency: string, by: User, reason: string, title: string) {
+async function refundApproval(db: Db, orgId: string, loc: Loc, target: { paymentId: string }, amountMinor: number, currency: string, by: User, reason: string, title: string, titleI18n?: { code: string; params: Record<string, string | number> }) {
   await db.insert(t.approvals).values({
     organizationId: orgId, locationId: loc.id, targetType: 'refund', targetId: target.paymentId, title, amountMinor, currency, requestedBy: by.id, requestComment: reason, createdAt: new Date(Date.now() - hours(5)),
-    payload: { paymentId: target.paymentId, orderId: null, amountMinor, currency, reason, restock: [] },
+    payload: { paymentId: target.paymentId, orderId: null, amountMinor, currency, reason, restock: [], ...(titleI18n ? { titleI18n } : {}) },
   });
 }
 

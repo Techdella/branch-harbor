@@ -14,6 +14,7 @@ import { USE_MOCKS, markOfflineSession } from './http/client';
 import { httpApi } from './http/httpApi';
 import type { BusinessApi } from './business';
 import type { AiAnswer, ApprovalItem, ApprovalRequest, ClassOccurrence, Connection, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, KitchenFeed, Location, Member, MenuItem, OnboardingProgress, Organization, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, ReconciliationItem, Report, RequestContext, ScopeOptionT, Session, ShiftView, TableData, Transaction, WebsitePage } from './types';
+import type { MsgParams } from './msg';
 
 export { ApiError } from './errors';
 export { API_URL, USE_MOCKS, setAccessToken as setAuthToken } from './http/client';
@@ -46,7 +47,7 @@ export interface BranchHarborApi {
   overview(ctx: RequestContext): Promise<Overview>;
   table(ctx: RequestContext, key: string): Promise<TableData>;
   search(ctx: RequestContext, q: string): Promise<{ type: string; items: { id: string; label: string; sub: string; href: string }[] }[]>;
-  notifications(ctx: RequestContext): Promise<{ id: string; kind: 'info' | 'action' | 'integration'; title: string; at: string; href: string }[]>;
+  notifications(ctx: RequestContext): Promise<{ id: string; kind: 'info' | 'action' | 'integration'; title: string; titleKey?: string; titleParams?: MsgParams; at: string; href: string }[]>;
 
   studios: {
     classes(ctx: RequestContext, weekStart: string): Promise<{ timeZone: string; occurrences: ClassOccurrence[] }>;

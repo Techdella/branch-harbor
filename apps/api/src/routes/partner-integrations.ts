@@ -17,7 +17,7 @@ import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requireLocationPerm } from '../services/authz.ts';
 import { deliverectMenuSnapshot, pushMenuToDeliverect, setDeliverectBusyMode } from '../services/foods-partners.ts';
 import {
-  catalogEntry, encryptCredentials, errInfo, isPartnerProvider, lastSyncs, logSync, missingFields, PARTNER_CATALOG, PARTNER_PROVIDERS, partnerCredentials,
+  catalogEntry, encryptCredentials, errInfo, isPartnerProvider, lastSyncs, logSync, missingFields, missingFieldKeys, PARTNER_CATALOG, PARTNER_PROVIDERS, partnerCredentials,
   serializePartnerConnection, type PartnerProvider,
 } from '../services/partner-connections.ts';
 import { officeFeed } from '../services/realty-portals.ts';
@@ -130,24 +130,25 @@ export const partnerIntegrationRoutes: FastifyPluginAsyncZod = async (app) => {
     const provider = c.provider as PartnerProvider;
     const creds = partnerCredentials(s, c);
     const missing = missingFields(provider, c.config, creds);
-    let result: { ok: boolean; sandbox: boolean; message: string };
+    // `code` + `params` (additive) let apps phrase the outcome in the user's language; `message` stays the English line.
+    let result: { ok: boolean; sandbox: boolean; message: string; code?: 'missing_credentials' | 'accepted' | 'feed_ready'; params?: Record<string, string | number | string[]> };
     if (missing.length) {
-      result = { ok: false, sandbox: true, message: `Sandbox — add ${missing.join(', ')} to test against ${catalogEntry(provider).name}` };
+      result = { ok: false, sandbox: true, message: `Sandbox — add ${missing.join(', ')} to test against ${catalogEntry(provider).name}`, code: 'missing_credentials', params: { provider: catalogEntry(provider).name, missingKeys: missingFieldKeys(provider, c.config, creds) } };
     } else {
       try {
         if (provider === 'uber_direct') {
           await createUberDirectClient({ creds: { clientId: creds.clientId!, clientSecret: creds.clientSecret!, customerId: String(c.config.customerId) }, fetch: s.partnerFetch, authUrl: s.cfg.UBER_DIRECT_AUTH_URL, apiUrl: s.cfg.UBER_DIRECT_API_URL }).test();
-          result = { ok: true, sandbox: false, message: 'Uber Direct accepted the credentials' };
+          result = { ok: true, sandbox: false, message: 'Uber Direct accepted the credentials', code: 'accepted', params: { provider: 'Uber Direct' } };
         } else if (provider === 'deliverect') {
           await createDeliverectClient({ creds: { clientId: creds.clientId!, clientSecret: creds.clientSecret! }, config: c.config, fetch: s.partnerFetch, baseUrl: s.cfg.DELIVERECT_API_URL }).test();
-          result = { ok: true, sandbox: false, message: `Deliverect ${String(c.config.environment ?? 'staging')} accepted the credentials` };
+          result = { ok: true, sandbox: false, message: `Deliverect ${String(c.config.environment ?? 'staging')} accepted the credentials`, code: 'accepted', params: { provider: `Deliverect ${String(c.config.environment ?? 'staging')}` } };
         } else if (provider === 'rightmove') {
           const r = await createRightmoveClient({ fetch: s.rightmoveFetch(creds.certificatePfxBase64!, creds.certificatePassword), baseUrl: (c.config.baseUrl as string) || undefined }).branchPropertyList(Number(c.config.networkId), Number(c.config.branchId));
-          result = r.ok ? { ok: true, sandbox: false, message: 'Rightmove accepted the certificate and branch' } : { ok: false, sandbox: false, message: r.errors.join('; ') || r.message || 'Rightmove rejected the request' };
+          result = r.ok ? { ok: true, sandbox: false, message: 'Rightmove accepted the certificate and branch', code: 'accepted', params: { provider: 'Rightmove' } } : { ok: false, sandbox: false, message: r.errors.join('; ') || r.message || 'Rightmove rejected the request' };
         } else {
           const portal = normalizePortalId(provider)!;
           const f = await officeFeed(s, c.organizationId, portal, c.locationId, { sandbox: false, config: c.config });
-          result = { ok: true, sandbox: false, message: `Feed ready: ${f.included.length} listing(s) included, ${f.excluded.length} need fixes. Give the feed URL to the portal.` };
+          result = { ok: true, sandbox: false, message: `Feed ready: ${f.included.length} listing(s) included, ${f.excluded.length} need fixes. Give the feed URL to the portal.`, code: 'feed_ready', params: { included: f.included.length, excluded: f.excluded.length } };
         }
       } catch (err) {
         result = { ok: false, sandbox: false, message: errInfo(err).message };

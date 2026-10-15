@@ -5,11 +5,14 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Icon, cx } from '@bh/ui';
 import type { Metric } from '@/lib/types';
 import { fmtNumber, moneyWithCode } from '@/lib/format';
+import { useDataText } from '../ui/useDataText';
 
 /** Metric card: value, time range, data source and definition. Missing data is never shown as zero. */
 export function MetricCard({ m }: { m: Metric }) {
   const t = useTranslations('overview');
   const locale = useLocale();
+  const dt = useDataText();
+  const label = dt(m.labelKey, undefined, m.label);
   const [showDef, setShowDef] = useState(false);
   const v = m.value;
   let body: React.ReactNode;
@@ -33,20 +36,20 @@ export function MetricCard({ m }: { m: Metric }) {
         <span className="flex h-[38px] w-[38px] items-center justify-center rounded-sm bg-surface">
           <Icon name={m.icon} size={18} />
         </span>
-        <span className="text-[11px] font-semibold text-graphite">{m.range}</span>
+        <span className="text-[11px] font-semibold text-graphite">{dt(m.rangeKey, undefined, m.range)}</span>
       </div>
       <div className="flex items-center gap-1.5">
-        <h3 className="text-[13px] font-semibold">{m.label}</h3>
-        <button type="button" onClick={() => setShowDef((s) => !s)} aria-expanded={showDef} aria-label={t('definitionOf', { label: m.label })} className="rounded-full p-0.5 text-graphite hover:bg-surface/60">
+        <h3 className="text-[13px] font-semibold">{label}</h3>
+        <button type="button" onClick={() => setShowDef((s) => !s)} aria-expanded={showDef} aria-label={t('definitionOf', { label })} className="rounded-full p-0.5 text-graphite hover:bg-surface/60">
           <Icon name="help" size={13} />
         </button>
       </div>
-      {showDef && <p className="rounded-sm bg-surface/70 px-2.5 py-1.5 text-xs leading-snug">{m.definition}</p>}
+      {showDef && <p className="rounded-sm bg-surface/70 px-2.5 py-1.5 text-xs leading-snug">{dt(m.definitionKey, undefined, m.definition)}</p>}
       <div className="tabular text-[30px] font-extrabold leading-tight tracking-[-0.02em]">{body}</div>
-      {m.note && <div className="text-[11px] font-semibold text-graphite">{m.note}</div>}
+      {(m.note || m.noteKey) && <div className="text-[11px] font-semibold text-graphite">{dt(m.noteKey, m.noteParams, m.note ?? '')}</div>}
       <div className="mt-auto flex items-center gap-1 text-[11px] text-graphite">
         <Icon name="info" size={11} />
-        {t('source', { source: m.source })}
+        {t('source', { source: dt(m.sourceKey, m.sourceParams, m.source) })}
       </div>
     </div>
   );

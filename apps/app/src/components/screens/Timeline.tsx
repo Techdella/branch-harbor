@@ -4,11 +4,13 @@ import { useLocale } from 'next-intl';
 import { Icon, cx } from '@bh/ui';
 import type { TimelineEvent } from '@/lib/types';
 import { fmtTime } from '@/lib/format';
+import { useDataText } from '../ui/useDataText';
 
 const toneBg = { success: 'bg-lime-soft', info: 'bg-aqua', warning: 'bg-butter', danger: 'bg-blush', neutral: 'bg-canvas', signal: 'bg-lime' } as const;
 
 export function Timeline({ events, tz }: { events: TimelineEvent[]; tz: string }) {
   const locale = useLocale();
+  const dt = useDataText();
   return (
     <ol className="flex flex-col">
       {events.map((e, i) => (
@@ -17,7 +19,7 @@ export function Timeline({ events, tz }: { events: TimelineEvent[]; tz: string }
             <Icon name={e.icon} size={12} />
           </span>
           <span className="tabular w-16 shrink-0 pt-0.5 text-xs text-stone">{fmtTime(e.at, tz, locale)}</span>
-          <span className="flex-1 pt-0.5">{e.text}</span>
+          <span className="flex-1 pt-0.5">{dt(e.textKey, e.textParams, e.text)}</span>
         </li>
       ))}
     </ol>

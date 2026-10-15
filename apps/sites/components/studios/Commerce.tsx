@@ -9,6 +9,7 @@ import { dateTime, money } from '@/lib/format';
 import { policyLines, type CustomerPolicy } from '@/lib/policy';
 import { getSession, pcall } from '@/lib/portal';
 import { SignIn, useStudioSession } from './Account';
+import { codedLines } from '@/lib/policy';
 
 type Money = { amount: number; currency: string };
 type Payment = { id: string; sandbox: boolean; amount: number; currency: string };
@@ -113,7 +114,7 @@ export function MemberBooking({ brand, occurrenceId, locationId, full, accountPa
   );
 }
 
-interface OnlineItem { id: string; kind: 'livestream' | 'on_demand'; title: string; description: string | null; instructorName: string | null; startsAt: string | null; durationMinutes: number | null; provider: string; rules: string[]; price: Money | null; access?: { access: boolean; registered: boolean; needsRegistration: boolean; canJoin: boolean; reasons: string[]; purchasable: Money | null } }
+interface OnlineItem { id: string; kind: 'livestream' | 'on_demand'; title: string; description: string | null; instructorName: string | null; startsAt: string | null; durationMinutes: number | null; provider: string; rules: string[]; ruleCodes?: string[]; price: Money | null; access?: { access: boolean; registered: boolean; needsRegistration: boolean; canJoin: boolean; reasons: string[]; reasonCodes?: string[]; purchasable: Money | null } }
 
 /** Online library: anyone can browse; join links are fetched only on demand for entitled (and registered) customers. */
 export function OnlineLibrary({ brand, locationId, timeZone, accountPath, publicItems }: { brand: string; locationId: string; timeZone: string; accountPath: string; publicItems: OnlineItem[] }) {
@@ -137,7 +138,7 @@ export function OnlineLibrary({ brand, locationId, timeZone, accountPath, public
           </div>
           <p className="text-sm text-graphite">{[c.instructorName, c.startsAt ? dateTime(c.startsAt, timeZone, locale) : null, c.durationMinutes ? t('minutes', { n: c.durationMinutes }) : null].filter(Boolean).join(' · ')}</p>
           {c.description && <p className="text-sm">{c.description}</p>}
-          <p className="text-xs text-graphite">{c.rules.join(' · ')}{c.price ? ` · ${money(c.price, locale)}` : ''}</p>
+          <p className="text-xs text-graphite">{codedLines(c.rules, c.ruleCodes, 'onlineRule', t).join(' · ')}{c.price ? ` · ${money(c.price, locale)}` : ''}</p>
           {session && c.access && (
             <div className="flex flex-wrap items-center gap-2">
               {c.access.access ? (
@@ -148,7 +149,7 @@ export function OnlineLibrary({ brand, locationId, timeZone, accountPath, public
                 )
               ) : c.access.purchasable ? (
                 <BuyButton brand={brand} locationId={locationId} kind="online" productId={c.id} label={t('buyFor', { amount: money(c.access.purchasable, locale) })} accountPath={accountPath} />
-              ) : <p className="text-sm text-graphite">{c.access.reasons.join(' · ')}</p>}
+              ) : <p className="text-sm text-graphite">{codedLines(c.access.reasons, c.access.reasonCodes, 'onlineReason', t).join(' · ')}</p>}
               {c.access.registered && <span className="text-xs font-bold text-success">✓ {t('registered')}</span>}
             </div>
           )}

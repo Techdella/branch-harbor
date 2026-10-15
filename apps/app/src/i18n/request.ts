@@ -6,6 +6,7 @@ import singleEn from '../../messages/single/en.json';
 import foodsEn from '../../messages/foods/en.json';
 import partnersEn from '../../messages/partners/en.json';
 import paymentsEn from '../../messages/payments/en.json';
+import dataEn from '../../messages/data/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -29,15 +30,18 @@ export default getRequestConfig(async () => {
   const locale = resolveAppLocale(raw);
   // Independent-business strings live in messages/single/*.json (namespace "single") and foods strings in
   // messages/foods/*.json so they merge cleanly.
-  // Partner integrations (delivery partners, POS, property portals): namespace "partners", English only for now (falls back per key).
-  let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages, partners: partnersEn as Messages }, foodsEn as Messages);
+  // Partner integrations (delivery partners, POS, property portals): namespace "partners" in messages/partners/*.json.
+  // Text the data layer builds (metrics, history entries, roles…) is referenced by key: namespace "data" in messages/data/*.json.
+  let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages, partners: partnersEn as Messages, data: dataEn as Messages }, foodsEn as Messages);
   messages = merge(messages, paymentsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
-    messages = merge(messages, { ...translated, single });
+    const partners = (await import(`../../messages/partners/${locale}.json`)).default as Messages;
+    const data = (await import(`../../messages/data/${locale}.json`)).default as Messages;
+    messages = merge(messages, { ...translated, single, partners, data });
     messages = merge(messages, (await import(`../../messages/foods/${locale}.json`)).default as Messages);
-    messages = merge(messages, (await import(`../../messages/payments/${locale}.json`).catch(() => ({ default: {} }))).default as Messages);
+    messages = merge(messages, (await import(`../../messages/payments/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

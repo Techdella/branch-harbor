@@ -944,6 +944,35 @@
       "noShowFee": "Taxa de não comparecimento: {amount}.",
       "noShowFeeMembers": "Taxa de não comparecimento: {amount} (não cobrada de assinantes).",
       "noNoShowFee": "Sem taxa de não comparecimento."
+    },
+    "access": {
+      "any_location": "Válido em todas as unidades",
+      "same_currency": "Válido em todas as unidades em {currency}",
+      "listed": "{count, plural, one {Válido em # unidade selecionada} other {Válido em # unidades selecionadas}}",
+      "home_only": "Válido somente em {location}"
+    },
+    "membershipTerms": {
+      "billed": "Cobrado mensalmente em {currency} até o cancelamento.",
+      "notice": "{days, plural, one {Cancele com # dia de aviso prévio.} other {Cancele com # dias de aviso prévio.}}",
+      "pause": "Pausa de até {days} dias por vez.",
+      "noPause": "Não é possível pausar.",
+      "classes": "{count} aulas por mês; aulas não usadas não acumulam.",
+      "unlimited": "Aulas ilimitadas."
+    },
+    "onlineReason": {
+      "sign_in": "Entre na sua conta para acessar as aulas on-line",
+      "membership_excludes": "Seu plano não inclui esta aula no momento",
+      "members_only": "Somente para alunos com plano",
+      "pack_holders_only": "Somente com pacote de aulas",
+      "buy_to_watch": "Compre esta aula para assistir",
+      "livestream_ended": "Esta transmissão ao vivo terminou"
+    },
+    "onlineRule": {
+      "free_with_registration": "Grátis com inscrição",
+      "members": "Incluída no plano",
+      "pack_holders": "Incluída para quem tem pacote de aulas",
+      "buy": "Disponível para compra",
+      "not_available": "Ainda não disponível"
     }
   },
   "storefront": {

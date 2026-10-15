@@ -14,6 +14,7 @@ import { APP_LOCALES, APP_LOCALE_LABELS, LOCALE_COOKIE } from '@/i18n/config';
 import { Popover } from '../ui/Popover';
 import { useApp } from './AppContext';
 import { ScopePicker } from './ScopePicker';
+import { useDataText } from '../ui/useDataText';
 
 export function setLocaleCookie(locale: string) {
   document.cookie = `${LOCALE_COOKIE}=${encodeURIComponent(locale)}; path=/; max-age=31536000; samesite=lax`;
@@ -107,6 +108,7 @@ function Search({ onDone }: { onDone?: () => void }) {
 
 function Notifications() {
   const t = useTranslations('shell');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const res = useApi((api) => api.notifications(app.ctx), [app.ctx.industry, app.ctx.role, app.ctx.scopeId]);
@@ -136,7 +138,7 @@ function Notifications() {
                   </span>
                   <span className="min-w-0">
                     <span className="block text-[11px] font-bold uppercase tracking-[0.05em] text-stone">{t(`notificationKind.${n.kind}`)}</span>
-                    <span className="block text-sm font-bold">{n.title}</span>
+                    <span className="block text-sm font-bold">{dt(n.titleKey, n.titleParams, n.title)}</span>
                     <span className="block text-xs text-stone">{relativeTime(n.at, locale)}</span>
                   </span>
                 </Link>

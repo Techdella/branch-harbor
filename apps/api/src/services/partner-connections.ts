@@ -73,23 +73,32 @@ export function partnerCredentials(s: Pick<Services, 'cfg'>, c: Connection): Rec
 }
 export const encryptCredentials = (s: Pick<Services, 'cfg'>, creds: Record<string, string>) => (Object.keys(creds).length ? encrypt(JSON.stringify(creds), s.cfg.ENCRYPTION_KEY) : null);
 
+const missingFieldDefs = (provider: PartnerProvider, config: Record<string, unknown>, creds: Record<string, string>) =>
+  catalogEntry(provider).fields.filter((f) => f.required && !(f.secret ? creds[f.key] : config[f.key] !== undefined && config[f.key] !== ''));
 export function missingFields(provider: PartnerProvider, config: Record<string, unknown>, creds: Record<string, string>) {
-  return catalogEntry(provider).fields.filter((f) => f.required && !(f.secret ? creds[f.key] : config[f.key] !== undefined && config[f.key] !== '')).map((f) => f.label);
+  return missingFieldDefs(provider, config, creds).map((f) => f.label);
+}
+/** Field keys of the missing required settings (same order as `missingFields`), for apps that translate the labels. */
+export function missingFieldKeys(provider: PartnerProvider, config: Record<string, unknown>, creds: Record<string, string>) {
+  return missingFieldDefs(provider, config, creds).map((f) => f.key);
 }
 
 export type PartnerStatus = 'not_configured' | 'disabled' | 'sandbox' | 'awaiting_portal' | 'live' | 'error';
 
-export function partnerStatus(c: Connection | undefined, creds: Record<string, string>): { status: PartnerStatus; reason: string } {
-  if (!c) return { status: 'not_configured', reason: 'Not configured' };
+/** Why a connection has its status, as a stable code (apps translate it; `reason` is the English line). */
+export type PartnerReasonCode = 'not_configured' | 'disabled' | 'missing_credentials' | 'credentials_saved' | 'last_error' | 'test_failed' | 'awaiting_fetch' | 'live';
+
+export function partnerStatus(c: Connection | undefined, creds: Record<string, string>): { status: PartnerStatus; reason: string; code: PartnerReasonCode } {
+  if (!c) return { status: 'not_configured', reason: 'Not configured', code: 'not_configured' };
   const provider = c.provider as PartnerProvider;
   const cfg = c.config;
-  if (cfg.enabled === false) return { status: 'disabled', reason: 'Switched off' };
+  if (cfg.enabled === false) return { status: 'disabled', reason: 'Switched off', code: 'disabled' };
   const missing = missingFields(provider, cfg, creds);
-  if (missing.length) return { status: 'sandbox', reason: `Sandbox — missing ${missing.join(', ')}` };
-  if (cfg.mode !== 'live') return { status: 'sandbox', reason: 'Sandbox — credentials saved; switch to live after a successful test' };
-  if (c.state !== 'connected') return { status: 'error', reason: c.lastError ?? 'Last connection test failed — test again' };
-  if (catalogEntry(provider).delivery === 'pull' && !cfg.lastFetchedAt) return { status: 'awaiting_portal', reason: 'Feed URL ready — waiting for the portal to fetch it' };
-  return { status: 'live', reason: 'Live' };
+  if (missing.length) return { status: 'sandbox', reason: `Sandbox — missing ${missing.join(', ')}`, code: 'missing_credentials' };
+  if (cfg.mode !== 'live') return { status: 'sandbox', reason: 'Sandbox — credentials saved; switch to live after a successful test', code: 'credentials_saved' };
+  if (c.state !== 'connected') return c.lastError ? { status: 'error', reason: c.lastError, code: 'last_error' } : { status: 'error', reason: 'Last connection test failed — test again', code: 'test_failed' };
+  if (catalogEntry(provider).delivery === 'pull' && !cfg.lastFetchedAt) return { status: 'awaiting_portal', reason: 'Feed URL ready — waiting for the portal to fetch it', code: 'awaiting_fetch' };
+  return { status: 'live', reason: 'Live', code: 'live' };
 }
 export const isLive = (c: Connection | undefined, creds: Record<string, string>) => partnerStatus(c, creds).status === 'live';
 /** Live for outbound calls: pull feeds count as live once configured (the portal fetching is what confirms them). */
@@ -130,9 +139,10 @@ export function serializePartnerConnection(s: Pick<Services, 'cfg'>, c: Connecti
   const { lastFetchedAt, feedTokenVersion, busy, ...config } = c.config as Record<string, unknown>;
   return {
     id: c.id, provider: c.provider, name: entry.name, kind: entry.kind, locationId: c.locationId,
-    enabled: c.config.enabled !== false, mode: c.config.mode === 'live' ? 'live' : 'sandbox', status: st.status, statusReason: st.reason,
+    enabled: c.config.enabled !== false, mode: c.config.mode === 'live' ? 'live' : 'sandbox', status: st.status, statusReason: st.reason, statusReasonCode: st.code,
     config, credentials: Object.fromEntries(entry.fields.filter((f) => f.secret).map((f) => [f.key, { set: !!creds[f.key], masked: maskSecret(creds[f.key]) }])),
     missing: missingFields(c.provider as PartnerProvider, c.config, creds),
+    missingKeys: missingFieldKeys(c.provider as PartnerProvider, c.config, creds),
     state: c.state, lastSuccessAt: c.lastSuccessAt?.toISOString() ?? null, lastErrorAt: c.lastErrorAt?.toISOString() ?? null, lastError: c.lastError,
     lastFetchedAt: (lastFetchedAt as string) ?? null, busy: busy ?? null,
     feedUrl: entry.delivery === 'pull' ? feedUrl(s, c) : null,

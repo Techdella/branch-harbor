@@ -198,6 +198,7 @@ export async function resolveReturn(s: Services, req: FastifyRequest, returnId: 
     const ap = await s.db.transaction(async (tx) => {
       const a = await insertApproval(tx, {
         organizationId: o.organizationId, locationId: o.locationId, kind: 'refund', targetId: o.id, title: `Return ${r.rmaNumber} · order ${o.orderNumber ?? o.id.slice(0, 8)}`,
+        titleI18n: { code: 'refund_return', params: { rma: r.rmaNumber ?? r.id.slice(0, 8), order: o.orderNumber ?? o.id.slice(0, 8) } },
         payload: { orderId: o.id, returnId: r.id, amountMinor: amount, currency: o.currency, reason: input.reason ?? `Return ${r.rmaNumber}`, restock: [] },
         amountMinor: amount, currency: o.currency, requestedBy: by, comment: input.reason ?? null,
       }, req.ip);

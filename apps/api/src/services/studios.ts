@@ -43,7 +43,7 @@ export async function bookClass(s: Services, input: BookInput): Promise<BookResu
   if (occPeek.priceMinor > 0 && payWith.kind === 'pay') await assertPaymentsEnabled(s.db, input.organizationId, occPeek.locationId);
   const [locRow] = await s.db.select().from(locations).where(eq(locations.id, occPeek.locationId));
   const policy = await effectivePolicy(s.db, occPeek.organizationId, occPeek.locationId);
-  if (occPeek.startsAt.getTime() > Date.now() + policy.bookingWindowDays * 86400_000) throw conflict('outside_booking_window', `Booking opens ${policy.bookingWindowDays} days before the class`);
+  if (occPeek.startsAt.getTime() > Date.now() + policy.bookingWindowDays * 86400_000) throw conflict('outside_booking_window', `Booking opens ${policy.bookingWindowDays} days before the class`, { days: policy.bookingWindowDays });
 
   const manageToken = randomToken();
   const res = await s.db.transaction(async (tx) => {

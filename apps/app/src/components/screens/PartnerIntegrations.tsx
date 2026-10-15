@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, Drawer, Field, Input, Select, Toggle, type Tone } from '@bh/ui';
 import { relativeTime } from '@/lib/format';
-import { usePartners, usePartnersMutation, type PartnerCatalogEntry, type PartnerConnection, type PartnerLocation, type PartnerStatus, type Settings } from '@/lib/partners';
+import { usePartners, usePartnersMutation, type PartnerCatalogEntry, type PartnerConnection, type PartnerField, type PartnerLocation, type PartnerStatus, type PartnerTestResult, type Settings } from '@/lib/partners';
 import { useApp } from '../shell/AppContext';
 import { Banner, LoadingBlock } from '../ui/States';
 
@@ -12,11 +12,35 @@ type NoteTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 const TONE: Record<PartnerStatus, Tone> = { not_configured: 'neutral', disabled: 'neutral', sandbox: 'warning', awaiting_portal: 'info', live: 'success', error: 'danger' };
 
 /**
+ * The partner catalogue, status reasons and test results come from the API in English; they're phrased here from
+ * `partners.*` by field key, provider and reason code, falling back to the API text for anything not in the catalogue.
+ */
+function usePartnerText() {
+  const t = useTranslations('partners');
+  const has = (k: string) => t.has(k as never);
+  const tx = (k: string, fallback: string, v?: Record<string, string | number>) => (has(k) ? t(k as never, v as never) : fallback);
+  const field = (f: Pick<PartnerField, 'key' | 'label'>) => tx(`fields.${f.key}`, f.label);
+  const help = (f: PartnerField) => (f.help ? tx(`fieldHelp.${f.key}`, f.help) : undefined);
+  const option = (o: string) => tx(`options.${o}`, o);
+  const requirements = (e: PartnerCatalogEntry) => tx(`requirements.${e.provider}`, e.approvals);
+  const fieldList = (e: PartnerCatalogEntry, keys: string[] | undefined) => (keys ?? []).map((k) => field(e.fields.find((f) => f.key === k) ?? { key: k, label: k })).join(', ');
+  const reason = (e: PartnerCatalogEntry, c: PartnerConnection) => (c.statusReasonCode ? tx(`reason.${c.statusReasonCode}`, c.statusReason, { list: fieldList(e, c.missingKeys) }) : c.statusReason);
+  const testResult = (e: PartnerCatalogEntry, r: PartnerTestResult) => {
+    if (!r.code) return r.message;
+    const p = r.params ?? {};
+    return tx(`testResult.${r.code}`, r.message, { provider: String(p.provider ?? e.name), list: fieldList(e, p.missingKeys as string[] | undefined), included: Number(p.included ?? 0), excluded: Number(p.excluded ?? 0) });
+  };
+  const lastResult = (r: NonNullable<PartnerConnection['lastResult']>) => `${tx(`action.${r.action}`, r.action)} · ${tx(`resultStatus.${r.status}`, r.status)}`;
+  return { field, help, option, requirements, reason, testResult, lastResult };
+}
+
+/**
  * Partner integrations per location/office: credentials (masked, write-only), connection test, last result,
  * enable/disable and sandbox ↔ live. Sandbox is always labelled; "Live" only appears after a passing test.
  */
 export function PartnerIntegrationsPanel({ industry }: { industry: 'foods' | 'realty' }) {
   const t = useTranslations('partners');
+  const pt = usePartnerText();
   const locale = useLocale();
   const app = useApp();
   const res = usePartners((a) => a.overview(industry), [industry, app.apiMode]);
@@ -24,12 +48,16 @@ export function PartnerIntegrationsPanel({ industry }: { industry: 'foods' | 're
   const [note, setNote] = useState<{ tone: NoteTone; text: string } | null>(null);
   const act = usePartnersMutation(async (a, kind: 'test' | 'enable' | 'disable' | 'live' | 'sandbox' | 'rotate' | 'menu' | 'busyOn' | 'busyOff', c: PartnerConnection) => {
     switch (kind) {
-      case 'test': { const r = await a.test(c.id); return { tone: (r.result.ok ? 'success' : r.result.sandbox ? 'warning' : 'danger') as NoteTone, text: t('tested', { name: c.name, message: r.result.message }) }; }
+      case 'test': {
+        const r = await a.test(c.id);
+        const entry = res.data?.catalog.find((e) => e.provider === c.provider);
+        return { tone: (r.result.ok ? 'success' : r.result.sandbox ? 'warning' : 'danger') as NoteTone, text: t('tested', { name: c.name, message: entry ? pt.testResult(entry, r.result) : r.result.message }) };
+      }
       case 'enable': case 'disable': await a.update(c.id, { enabled: kind === 'enable' }); return null;
       case 'live': case 'sandbox': await a.update(c.id, { mode: kind }); return null;
       case 'rotate': await a.rotateFeed(c.id); return null;
-      case 'menu': { const r = await a.menuPush(c.locationId); return { tone: (r.status === 'error' ? 'danger' : r.status === 'ok' ? 'success' : 'warning') as NoteTone, text: `${t('menuPushed', { message: r.message, products: r.products, soldOut: r.soldOut })}${r.unmappedAllergens.length ? ` ${t('unmappedAllergens', { list: [...new Set(r.unmappedAllergens.map((x) => x.allergen))].join(', ') })}` : ''}` }; }
-      case 'busyOn': case 'busyOff': { const r = await a.busy(c.locationId, kind === 'busyOn', kind === 'busyOn' ? 30 : undefined); return { tone: (r.status === 'error' ? 'danger' : 'info') as NoteTone, text: r.message }; }
+      case 'menu': { const r = await a.menuPush(c.locationId); return { tone: (r.status === 'error' ? 'danger' : r.status === 'ok' ? 'success' : 'warning') as NoteTone, text: `${t('menuPushed', { message: r.status === 'sandbox' ? t('menuSandbox') : r.message, products: r.products, soldOut: r.soldOut })}${r.unmappedAllergens.length ? ` ${t('unmappedAllergens', { list: [...new Set(r.unmappedAllergens.map((x) => x.allergen))].join(', ') })}` : ''}` }; }
+      case 'busyOn': case 'busyOff': { const r = await a.busy(c.locationId, kind === 'busyOn', kind === 'busyOn' ? 30 : undefined); return { tone: (r.status === 'error' ? 'danger' : 'info') as NoteTone, text: r.status === 'sandbox' ? t(kind === 'busyOn' ? 'busySandboxOn' : 'busySandboxOff') : r.message }; }
     }
   });
   const run = async (kind: Parameters<typeof act.run>[0], c: PartnerConnection) => {
@@ -70,16 +98,16 @@ export function PartnerIntegrationsPanel({ industry }: { industry: 'foods' | 're
                           <Badge tone={TONE[status]} icon={status === 'live' ? 'check-circle' : status === 'sandbox' ? 'lock' : undefined}>{t(`status.${status}`)}</Badge>
                           {c?.mode === 'sandbox' && status !== 'sandbox' && status !== 'disabled' && <Badge tone="warning" icon="lock">{t('status.sandbox')}</Badge>}
                         </div>
-                        <p className="text-xs text-stone">{c?.statusReason ?? entry.approvals}</p>
+                        <p className="text-xs text-stone">{c ? pt.reason(entry, c) : pt.requirements(entry)}</p>
                         {entry.provider === 'uber_direct' && !loc.uberDirectAvailable && <p className="text-xs text-warning">{t('uberUnavailable', { country: loc.country })}</p>}
                         {c && (
                           <>
                             <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
                               {Object.entries(c.credentials).map(([k, v]) => (
-                                <div key={k} className="contents"><dt className="text-stone">{entry.fields.find((f) => f.key === k)?.label ?? k}</dt><dd className="font-mono">{v.set ? v.masked : t('secretUnset')}</dd></div>
+                                <div key={k} className="contents"><dt className="text-stone">{pt.field(entry.fields.find((f) => f.key === k) ?? { key: k, label: k })}</dt><dd className="font-mono">{v.set ? v.masked : t('secretUnset')}</dd></div>
                               ))}
                               <dt className="text-stone">{t('lastResult')}</dt>
-                              <dd>{c.lastResult ? `${c.lastResult.action} · ${c.lastResult.status} · ${relativeTime(c.lastResult.at, locale)}${c.lastResult.message ? ` — ${c.lastResult.message}` : ''}` : t('never')}</dd>
+                              <dd>{c.lastResult ? `${pt.lastResult(c.lastResult)} · ${relativeTime(c.lastResult.at, locale)}${c.lastResult.message ? ` — ${c.lastResult.status === 'sandbox' && c.lastResult.action === 'test' && c.statusReasonCode === 'sample' ? t('testResult.sample') : c.lastResult.message}` : ''}` : t('never')}</dd>
                             </dl>
                             {c.busy?.paused && <Badge tone="warning" icon="clock">{t('busyState')}</Badge>}
                             {c.feedUrl && (
@@ -126,6 +154,7 @@ export function PartnerIntegrationsPanel({ industry }: { industry: 'foods' | 're
 
 function ConfigureDrawer({ entry, loc, conn, onClose, onSaved }: { entry: PartnerCatalogEntry; loc: PartnerLocation; conn: PartnerConnection | null; onClose: () => void; onSaved: () => void }) {
   const t = useTranslations('partners');
+  const pt = usePartnerText();
   const [values, setValues] = useState<Settings>(() => Object.fromEntries(entry.fields.filter((f) => !f.secret).map((f) => [f.key, (conn?.config[f.key] as string | boolean | null | undefined) ?? (f.type === 'boolean' ? false : f.type === 'select' ? f.options![0]! : '')])));
   const save = usePartnersMutation(async (a) => {
     // Secrets are write-only: only fields the user typed are sent; empty means "keep".
@@ -136,14 +165,14 @@ function ConfigureDrawer({ entry, loc, conn, onClose, onSaved }: { entry: Partne
     <Drawer open onClose={onClose} title={`${entry.name} · ${loc.name}`} kicker={t('credentials')}
       footer={<div className="flex gap-2"><Button loading={save.pending} onClick={async () => { if (await save.run()) onSaved(); }}>{t('save')}</Button><Button variant="ghost" onClick={onClose}>{t('cancel')}</Button></div>}>
       <form className="flex flex-col gap-3" onSubmit={async (e) => { e.preventDefault(); if (await save.run()) onSaved(); }}>
-        <Banner tone="info" icon="lock">{entry.approvals}</Banner>
+        <Banner tone="info" icon="lock">{pt.requirements(entry)}</Banner>
         {save.error && <Banner tone="danger" live="assertive">{save.error.message}</Banner>}
         {entry.fields.map((f) => (
-          <Field key={f.key} label={f.label} hint={f.secret ? (conn?.credentials[f.key]?.set ? t('secretSet', { masked: conn.credentials[f.key]!.masked ?? '••••' }) : f.help) : f.help} optional={!f.required}>
+          <Field key={f.key} label={pt.field(f)} hint={f.secret && conn?.credentials[f.key]?.set ? t('secretSet', { masked: conn.credentials[f.key]!.masked ?? '••••' }) : pt.help(f)} optional={!f.required}>
             {({ id, describedBy }) => f.type === 'boolean'
               ? <Select id={id} aria-describedby={describedBy} value={values[f.key] ? 'true' : 'false'} onChange={(e) => setValues({ ...values, [f.key]: e.target.value === 'true' })}><option value="true">{t('yes')}</option><option value="false">{t('no')}</option></Select>
               : f.type === 'select'
-                ? <Select id={id} aria-describedby={describedBy} value={String(values[f.key] ?? '')} onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}>{f.options!.map((o) => <option key={o} value={o}>{o}</option>)}</Select>
+                ? <Select id={id} aria-describedby={describedBy} value={String(values[f.key] ?? '')} onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}>{f.options!.map((o) => <option key={o} value={o}>{pt.option(o)}</option>)}</Select>
                 : <Input id={id} aria-describedby={describedBy} type={f.secret ? 'password' : 'text'} autoComplete="off" value={String(values[f.key] ?? '')} placeholder={f.secret && conn?.credentials[f.key]?.set ? '••••••••' : ''} onChange={(e) => setValues({ ...values, [f.key]: e.target.value })} />}
           </Field>
         ))}

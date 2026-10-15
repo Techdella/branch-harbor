@@ -14,6 +14,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { IndependentWebsite } from './independent/IndependentWebsite';
+import { useDataText } from '../ui/useDataText';
 
 type Tab = 'editor' | 'approvals' | 'publish' | 'domains';
 
@@ -46,6 +47,7 @@ export function WebsitesScreen() {
 
 function Editor() {
   const t = useTranslations('websites');
+  const dt = useDataText();
   const locale = useLocale();
   const app = useApp();
   const locs = app.locations.filter((l) => app.scope.locationIds.includes(l.id));
@@ -230,7 +232,7 @@ function Editor() {
                   {page.activity.slice(0, 8).map((a, i) => (
                     <li key={i} className="flex gap-2.5 text-[13px] leading-relaxed">
                       <span className="w-20 shrink-0 text-stone">{relativeTime(a.at, locale)}</span>
-                      <span>{a.text}</span>
+                      <span>{dt(a.textKey, a.textParams, a.text)}</span>
                     </li>
                   ))}
                 </ol>

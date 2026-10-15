@@ -1,7 +1,7 @@
 'use client';
 
 import type { ApiResult } from './client';
-import { fallbackText } from './fallback-messages';
+import { fallbackText, localizeApiError } from './fallback-messages';
 
 /**
  * Studio customer portal session (magic-link sign-in). Kept in this browser only; the API stores it hashed
@@ -27,7 +27,7 @@ export async function pcall<T>(brand: string, method: 'GET' | 'POST', path: stri
     });
     const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
     if (res.status === 401) setSession(brand, null);
-    if (!res.ok) return { ok: false, status: res.status, error: (json.error as { code: string; message: string }) ?? { code: 'http_error', message: fallbackText('requestFailed', { status: res.status }) } };
+    if (!res.ok) return { ok: false, status: res.status, error: json.error ? localizeApiError(json.error as { code: string; message: string; details?: Record<string, unknown> }) : { code: 'http_error', message: fallbackText('requestFailed', { status: res.status }) } };
     return { ok: true, data: json as T };
   } catch {
     return { ok: false, status: 0, error: { code: 'network', message: fallbackText('network') } };
