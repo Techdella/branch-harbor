@@ -44,8 +44,8 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   'ad-campaigns': ['marketing.ads', 'marketing.network_campaigns', 'finance.royalties'],
   // Franchise development (Sales), new locations (Network) and Legal. Franchise owners reach their own onboarding
   // projects and agreement through New locations; each route checks the module it needs.
-  franchise: ['sales.franchise_pipeline', 'legal.*', 'network.onboarding'],
-  legal: ['legal.*', 'network.onboarding'],
+  franchise: ['sales.franchise_pipeline', 'legal.agreements', 'legal.disclosure', 'network.onboarding'],
+  legal: ['legal.agreements', 'legal.disclosure', 'network.onboarding'],
   // Community (announcements, discussions, events, coaching), resource library, Training academy (+ course leads), help desk.
   community: ['community.*'],
   resources: ['community.library'],

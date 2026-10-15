@@ -156,7 +156,10 @@ export async function leagueTable(req: FastifyRequest, db: Exec, organizationId:
   const from = dayStart(q.from);
   const to = new Date(dayStart(q.to).getTime() + DAY);
   const span = to.getTime() - from.getTime();
-  const prevFrom = new Date(from.getTime() - span);
+  // Whole calendar months compare with the same number of months before; other periods with the same number of days.
+  const wholeMonths = from.getUTCDate() === 1 && to.getUTCDate() === 1;
+  const months = (to.getUTCFullYear() - from.getUTCFullYear()) * 12 + to.getUTCMonth() - from.getUTCMonth();
+  const prevFrom = wholeMonths ? new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth() - months, 1)) : new Date(from.getTime() - span);
 
   let territoryGroup: string | null | undefined;
   if (q.territoryId) {
