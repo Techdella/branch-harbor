@@ -81,10 +81,16 @@ async function computeInto(db: Exec, stmt: StatementRow, loc: LocationRow, frequ
   const terms = await resolveTerms(db, { organizationId: stmt.organizationId, ownerGroupId: loc.ownerGroupId, locationId: loc.id, currency: loc.currency, onDate: startDate });
   const agg = await salesAggregate(db, loc, stmt.periodStartAt, stmt.periodEndAt);
   const [ext] = await db.select().from(externalSalesReports).where(and(eq(externalSalesReports.locationId, loc.id), eq(externalSalesReports.frequency, frequency), eq(externalSalesReports.periodStart, startDate)));
-  const sales: SalesAggregate = { currency: loc.currency, streams: agg.streams, external: ext?.status === 'accepted' && ext.currency === loc.currency ? { grossMinor: ext.grossMinor, refundsMinor: ext.refundsMinor, taxMinor: ext.taxMinor } : null };
+  let sales: SalesAggregate = { currency: loc.currency, streams: agg.streams, external: ext?.status === 'accepted' && ext.currency === loc.currency ? { grossMinor: ext.grossMinor, refundsMinor: ext.refundsMinor, taxMinor: ext.taxMinor } : null };
   const manual = await db.select().from(royaltyStatementLines).where(and(eq(royaltyStatementLines.statementId, stmt.id), eq(royaltyStatementLines.manual, true)));
   const warnings: string[] = [];
-  if (ext?.status === 'submitted') warnings.push('external_sales_pending_review');
+  // One gross-sales source per location (Network → Connections): a connector, a self-reported figure or BranchHarbor
+  // payments only. Without an explicit source: BranchHarbor payments plus the accepted external report (below).
+  const source = await (await import('../sales-sources.ts')).statementSales(db, loc, frequency, startDate, agg);
+  if (source) {
+    sales = { currency: loc.currency, streams: source.streams, external: source.external };
+    warnings.push(`sales_source:${source.kind}`, ...source.warnings);
+  } else if (ext?.status === 'submitted') warnings.push('external_sales_pending_review');
   for (const [cur, amt] of Object.entries(agg.foreignByCurrency)) warnings.push(`foreign_currency_payments:${cur}:${amt}`);
   if (!terms) warnings.push('no_terms');
   const computed = terms ? computeStatement(terms, sales, manual.map((m) => m.amountMinor)) : null;

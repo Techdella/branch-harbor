@@ -123,6 +123,42 @@ export const QUALITY_MODULES: readonly ModuleDef[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Network data platform: sales connectors, import, launch, benchmarks */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Data platform modules (one block, appended after the quality modules):
+ * - `network.sales_connectors`: POS and booking sales connectors (Square, Toast, Mindbody, Shopify, Lightspeed, Clover)
+ *   per location, the gross-sales source of each location and the reconciliation view. Edit connects and resyncs the
+ *   locations in scope; publish (HQ) decides each location's gross-sales source.
+ * - `network.bulk_launch`: create many locations at once from the brand template with sites, listings data and staff
+ *   invitations, and follow the progress board. HQ-private.
+ * - `network.benchmarks`: opt-in, anonymised cross-network benchmarks ("you vs similar networks"). Publish decides
+ *   whether the organisation takes part. HQ-private.
+ * - `settings.import`: the import wizard (locations, staff, customers, memberships, products, rooms or listings, leads)
+ *   with mapping, preview, dry run and a 24-hour undo. Each record type also needs edit rights on what it creates.
+ */
+export const DATA_PLATFORM_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'network.sales_connectors', area: 'network', name: 'Sales connectors', description: 'POS and booking connections that bring in daily sales for royalties, each location’s gross-sales source and the reconciliation view.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { edit: 'Connect, re-authorise and resync the locations in scope.', publish: 'Choose each location’s gross-sales source and review variances.', export: 'Download the reconciliation.' },
+    networkOnly: true, status: 'available', sensitive: 'finance',
+  },
+  {
+    key: 'network.bulk_launch', area: 'network', name: 'Bulk launch', description: 'Launch many locations at once from the brand template: sites, listings data and staff invitations, with a progress board.',
+    actions: ['view', 'edit', 'publish'], actionNotes: { edit: 'Start launches with sites saved as drafts.', publish: 'Start launches that publish the sites.' }, networkOnly: true, hqOnly: true, status: 'available',
+  },
+  {
+    key: 'network.benchmarks', area: 'network', name: 'Network benchmarks', description: 'Anonymised comparisons with similar networks (opt-in): revenue per location, bookings, occupancy, reviews, audits and royalties paid on time.',
+    actions: ['view', 'publish'], actionNotes: { publish: 'Decide whether the business takes part in benchmarks.' }, networkOnly: true, hqOnly: true, status: 'available',
+  },
+  {
+    key: 'settings.import', area: 'settings', name: 'Import', description: 'Import locations, staff, customers, memberships, products, rooms or listings and leads from CSV or Excel files, with a preview and undo.',
+    actions: ['view', 'edit'], actionNotes: { edit: 'Run imports (each record type also needs edit rights on it).' }, status: 'available',
+  },
+];
+
 /** Modules every business account has, whatever its industry. */
 export const CORE_MODULES: readonly ModuleDef[] = [
   // Network (HQ)
@@ -182,6 +218,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'settings.ai', area: 'settings', name: 'AI assistant', description: 'Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes.', actions: V, status: 'available' },
   // Field audits, compliance documents and the league table (see QUALITY_MODULES).
   ...QUALITY_MODULES,
+  // Sales connectors, bulk launch, benchmarks and the import wizard (see DATA_PLATFORM_MODULES).
+  ...DATA_PLATFORM_MODULES,
 ];
 
 const ops = (key: string, name: string, description: string, screens: readonly string[], status: ModuleDef['status'] = 'available'): ModuleDef => ({
@@ -523,6 +561,22 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {},
   },
 };
+
+/**
+ * Data platform grants per role template (one block, merged into the templates here). Owners already hold everything
+ * through `*`.
+ */
+export const DATA_PLATFORM_ROLE_GRANTS: Partial<Record<Role, GrantSpec>> = {
+  hq_admin: { 'network.sales_connectors': ALL, 'network.bulk_launch': VEP, 'network.benchmarks': ['view', 'publish'], 'settings.import': VE },
+  vp_franchise: { 'network.bulk_launch': VEP, 'settings.import': VE },
+  operations_manager: { 'network.sales_connectors': VEX, 'network.benchmarks': V, 'settings.import': VE },
+  finance: { 'network.sales_connectors': ALL, 'network.benchmarks': V },
+  cmo: { 'network.benchmarks': V },
+  regional_manager: { 'network.sales_connectors': V },
+  franchise_owner: { 'network.sales_connectors': VEX, 'settings.import': VE },
+  location_manager: { 'network.sales_connectors': V },
+};
+for (const [role, spec] of Object.entries(DATA_PLATFORM_ROLE_GRANTS) as Array<[Role, GrantSpec]>) Object.assign(ROLE_TEMPLATES[role].grants, spec);
 
 /** System roles offered when inviting, in display order. */
 export const TEAM_ROLE_ORDER: readonly Role[] = [
