@@ -1,0 +1,398 @@
+{
+  "nav": {
+    "reviews": "Avis"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "reviews": {
+          "name": "Avis",
+          "description": "Demandes d’avis après les visites et commandes, retours privés, avis Google avec réponses et notes par établissement."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "already_reviewed": "Un avis a déjà été reçu pour cette demande.",
+    "reply_in_inbox": "Les retours privés se traitent depuis la conversation de la messagerie.",
+    "awaiting_approval": "Cette réponse attend l’approbation du siège.",
+    "not_pending": "Cette réponse n’attend pas d’approbation.",
+    "google_not_configured": "La connexion Google n’est pas encore configurée. Ajoutez une connexion sandbox en attendant.",
+    "mandate_text_changed": "Le texte de l’autorisation a changé. Relisez-le avant d’accepter.",
+    "no_reply": "Rédigez d’abord une réponse."
+  },
+  "mkt": {
+    "auto": {
+      "trigger": {
+        "review": {
+          "received": "Avis reçu"
+        }
+      },
+      "action": {
+        "send_review_request": "Envoyer une demande d’avis"
+      },
+      "field": {
+        "event": {
+          "rating": "Note (1–5)"
+        }
+      },
+      "reason": {
+        "no_location": "aucun établissement",
+        "test_run": "non envoyé en test",
+        "opted_out": "désinscrit",
+        "frequency_cap": "sollicité récemment",
+        "reviews_disabled": "demandes d’avis désactivées",
+        "location_unavailable": "établissement indisponible",
+        "not_scheduled": "déjà traité"
+      }
+    }
+  },
+  "reviews": {
+    "stars": "{n} étoiles sur 5",
+    "title": "Avis",
+    "description": "Demandez des avis après une visite, lisez les retours privés et les avis Google, et répondez.",
+    "tab": {
+      "overview": "Vue d’ensemble",
+      "reviews": "Avis",
+      "requests": "Demandes",
+      "settings": "Paramètres",
+      "connections": "Google"
+    },
+    "filter": {
+      "location": "Établissement",
+      "allLocations": "Tous les établissements visibles",
+      "bucket": "Regrouper par",
+      "month": "Mois",
+      "week": "Semaine",
+      "source": "Source",
+      "allSources": "Toutes les sources",
+      "show": "Afficher",
+      "all": "Tous les avis",
+      "negative": "Négatifs (2★ ou moins)",
+      "unanswered": "Google, sans réponse",
+      "pending": "Réponses en attente d’approbation",
+      "search": "Rechercher"
+    },
+    "hours": "{n} h",
+    "days": "{n} jours",
+    "kpi": {
+      "average": "Note moyenne",
+      "averageSub": "sur {n} avis",
+      "volume": "Avis",
+      "volumeSub": "{public} publics · {negative} négatifs",
+      "responseRate": "Taux de réponse",
+      "responseRateSub": "Réponses Google et messagerie",
+      "pendingApproval": "{n} en attente d’approbation du siège",
+      "responseTime": "Délai de réponse moyen",
+      "responseTimeSub": "de l’avis à la première réponse",
+      "requests": "Demandes envoyées",
+      "requestsSub": "{completed} répondues ({rate})"
+    },
+    "chart": {
+      "rating": "Note moyenne dans le temps",
+      "volume": "Avis par période",
+      "empty": "Aucun avis sur cette période.",
+      "ratingCaption": "Histogramme de la note moyenne par période, de 0 à 5.",
+      "volumeCaption": "Histogramme du nombre d’avis par période."
+    },
+    "byLocation": "Par établissement",
+    "col": {
+      "location": "Établissement",
+      "average": "Moyenne",
+      "reviews": "Avis",
+      "responseRate": "Taux de réponse",
+      "responseTime": "Délai de réponse",
+      "customer": "Client",
+      "source": "Après",
+      "channel": "Canal",
+      "when": "Quand",
+      "status": "Statut"
+    },
+    "source": {
+      "google": "Google",
+      "branchharbor": "Retour privé"
+    },
+    "anonymous": "Anonyme",
+    "noComment": "Pas de commentaire, note seulement.",
+    "replyStatus": {
+      "none": "Sans réponse",
+      "draft": "Brouillon de réponse",
+      "pending_approval": "En attente d’approbation",
+      "published": "Réponse publiée",
+      "rejected": "Réponse refusée",
+      "failed": "Réponse non publiée"
+    },
+    "sandboxReply": "Sandbox : non publiée",
+    "sandboxReplyLong": "Enregistrée dans BranchHarbor. Cette connexion est en sandbox : rien n’a été publié sur Google.",
+    "empty": "Pas encore d’avis",
+    "emptyBody": "Activez les demandes d’avis ou connectez Google Business Profile pour voir les avis ici.",
+    "drawer": {
+      "title": "Avis",
+      "privateHint": "Les retours privés arrivent dans la messagerie de l’établissement. Répondez au client depuis cette conversation.",
+      "pendingTitle": "En attente d’approbation du siège",
+      "pendingBody": "Envoyée par {name}. Elle sera publiée après approbation du siège.",
+      "rejectedTitle": "Le siège a refusé cette réponse",
+      "publishedTitle": "Réponse publiée",
+      "externalReply": "Réponse faite directement sur Google.",
+      "publishedBody": "Publiée sur Google.",
+      "reply": "Votre réponse",
+      "suggest": "Suggérer une réponse",
+      "aiNote": "Suggérée par l’IA de BranchHarbor. Relisez-la avant de publier.",
+      "replyLabel": "Réponse publique",
+      "replyHint": "Visible par tous sur Google. Ni promesse de remboursement ni données personnelles.",
+      "needsApproval": "Le siège approuve les réponses à cet avis avant publication.",
+      "sentForApproval": "Envoyée au siège pour approbation.",
+      "published": "Réponse publiée.",
+      "submit": "Envoyer pour approbation",
+      "publish": "Publier la réponse",
+      "saved": "Brouillon enregistré.",
+      "saveDraft": "Enregistrer le brouillon",
+      "decisionNote": "Note pour l’auteur",
+      "approve": "Approuver et publier",
+      "reject": "Refuser",
+      "rejected": "Réponse refusée."
+    },
+    "send": {
+      "title": "Envoyer une demande d’avis",
+      "hint": "Les demandes partent aussi automatiquement après chaque visite terminée si l’option est active. Désinscriptions, consentement, limite de fréquence et heures calmes s’appliquent toujours.",
+      "run": "Lancer maintenant",
+      "ran": "{n} nouvelles demandes planifiées.",
+      "search": "Trouver un client",
+      "customer": "Client",
+      "choose": "Choisir…",
+      "button": "Envoyer la demande"
+    },
+    "outcome": {
+      "sent": "Demande envoyée.",
+      "sandboxed": "Demande enregistrée (sandbox : aucun message envoyé).",
+      "skipped": "Non envoyée : {reason}.",
+      "failed": "Échec de l’envoi : {reason}.",
+      "deferred": "Planifiée pour la fin des heures calmes."
+    },
+    "skip": {
+      "not_scheduled": "déjà traitée",
+      "location_unavailable": "établissement indisponible",
+      "reviews_disabled": "demandes désactivées",
+      "no_contact": "aucune coordonnée",
+      "no_email": "pas d’adresse e-mail",
+      "no_phone": "pas de numéro de téléphone",
+      "opted_out": "désinscrit",
+      "no_consent": "pas de consentement marketing",
+      "frequency_cap": "déjà sollicité récemment (limite de fréquence)",
+      "quiet_hours": "heures calmes",
+      "send_failed": "le fournisseur a refusé le message"
+    },
+    "requests": {
+      "empty": "Aucune demande d’avis",
+      "emptyBody": "Activez les demandes dans les paramètres, ou envoyez-en une à un client."
+    },
+    "trigger": {
+      "class_visit": "Cours suivi",
+      "booking": "Rendez-vous terminé",
+      "order": "Commande terminée",
+      "hotel_checkout": "Départ de l’hôtel",
+      "property_viewing": "Visite de bien",
+      "manual": "Envoyée par l’équipe",
+      "automation": "Automatisation"
+    },
+    "channel": {
+      "email": "E-mail",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "requestStatus": {
+      "scheduled": "Planifiée",
+      "sending": "Envoi en cours",
+      "sent": "Envoyée",
+      "sandboxed": "Sandbox",
+      "opened": "Ouverte",
+      "completed": "Avis laissé",
+      "skipped": "Non envoyée",
+      "failed": "Échec"
+    },
+    "settings": {
+      "scope": "Paramètres pour",
+      "scopeHint": "Les valeurs du siège s’appliquent partout ; un établissement peut les remplacer.",
+      "hqDefaults": "Valeurs du siège (tous les établissements)",
+      "requests": "Demandes d’avis",
+      "enabled": "Envoyer automatiquement",
+      "after": "Envoyer après",
+      "delay": "Délai (heures)",
+      "delayHint": "Temps après la fin de la visite.",
+      "channel": "Canal",
+      "cap": "Au plus une demande tous les (jours)",
+      "capHint": "Par client, tous établissements confondus.",
+      "quietStart": "Début des heures calmes",
+      "quietHint": "Les SMS et WhatsApp attendent la fin des heures calmes (heure locale).",
+      "quietEnd": "Fin des heures calmes",
+      "consent": "Qui peut être sollicité",
+      "consentHint": {
+        "marketing": "Uniquement les clients ayant accepté le marketing sur ce canal.",
+        "service": "Un suivi ponctuel de la visite, si la loi locale le permet. Les désinscriptions sont toujours respectées."
+      },
+      "consentMode": {
+        "marketing": "Clients avec consentement marketing",
+        "service": "Suivi de service"
+      },
+      "template": "Message",
+      "templateHint": "Laissez vide pour utiliser le texte par défaut dans chaque langue. Utilisez '{name}', '{location}', '{business}' et '{link}'.",
+      "language": "Langue",
+      "subject": "Objet de l’e-mail",
+      "body": "Texte",
+      "bodyHint": "Doit contenir '{link}'. Les SMS ajoutent automatiquement la mention de désinscription.",
+      "links": "Liens d’avis publics",
+      "noGating": "Chaque client voit ces liens après sa note, quelle qu’elle soit. Les réserver aux clients satisfaits (« review gating ») enfreint la politique d’avis de Google.",
+      "linkKind": "Site",
+      "linkLabel": "Libellé",
+      "linkUrl": "Lien",
+      "remove": "Supprimer",
+      "addLink": "Ajouter un lien",
+      "approval": "Approbation des réponses",
+      "approvalLabel": "Le siège approuve les réponses des établissements",
+      "approvalHint": "Le marketing du siège peut toujours publier directement.",
+      "approvalMode": {
+        "none": "Jamais (les établissements publient)",
+        "negative": "Pour les avis négatifs (2★ ou moins)",
+        "all": "Pour chaque réponse"
+      },
+      "saved": "Paramètres enregistrés.",
+      "save": "Enregistrer"
+    },
+    "linkKind": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "tripadvisor": "Tripadvisor",
+      "yelp": "Yelp",
+      "trustpilot": "Trustpilot",
+      "other": "Autre"
+    },
+    "connections": {
+      "connected": "Compte Google connecté. Associez ses établissements ci-dessous.",
+      "title": "Google Business Profile",
+      "intro": "Connectez un compte Google qui gère plusieurs établissements (siège), ou laissez un établissement connecter le sien. Les avis sont récupérés toutes les 30 minutes.",
+      "owner": "Géré par",
+      "hq": "Siège (plusieurs établissements)",
+      "location": "Un établissement",
+      "connectGoogle": "Se connecter avec Google",
+      "sandboxAdded": "Connexion sandbox ajoutée.",
+      "addSandbox": "Ajouter une connexion sandbox",
+      "notConfigured": "La connexion Google n’est pas encore configurée sur cette plateforme. Une connexion sandbox fonctionne en attendant : elle ne récupère aucun avis et n’en invente jamais.",
+      "empty": "Aucune connexion Google",
+      "hqAccount": "Compte Google du siège",
+      "locationAccount": "Compte Google de {name}",
+      "mode": {
+        "live": "Actif",
+        "sandbox": "Sandbox"
+      },
+      "status": {
+        "connected": "Connecté",
+        "error": "À vérifier",
+        "disconnected": "Déconnecté"
+      },
+      "sandboxNote": "Sandbox : rien n’est récupéré de Google et les réponses restent dans BranchHarbor.",
+      "lastFetched": "Dernière récupération {at}",
+      "neverFetched": "Pas encore récupéré",
+      "syncedSandbox": "Sandbox : rien à récupérer.",
+      "synced": "{n} nouveaux avis.",
+      "sync": "Récupérer",
+      "googleLocation": "Établissement Google",
+      "googleLocationId": "ID d’établissement Google",
+      "googleLocationIdHint": "Depuis le gestionnaire de fiches d’établissement.",
+      "placeholder": "locations/1234567890",
+      "linked": "Établissement associé.",
+      "link": "Associer"
+    },
+    "nav": {
+      "reviews": "Avis"
+    }
+  },
+  "royaltyDebit": {
+    "noGroups": "Aucune société franchisée à configurer.",
+    "intro": "Le siège prélève les factures de redevances, de fonds marketing et de frais sur ce compte après leur émission. Un prélèvement bancaire coûte bien moins cher qu’une carte.",
+    "active": "Autorisé",
+    "none": "Non configuré",
+    "type": {
+      "card": "Carte",
+      "us_bank_account": "Prélèvement ACH",
+      "acss_debit": "Débit préautorisé (DPA)",
+      "bacs_debit": "Prélèvement Bacs",
+      "sepa_debit": "Prélèvement SEPA",
+      "au_becs_debit": "Prélèvement BECS",
+      "manual": "Virement (enregistré)"
+    },
+    "ending": "se terminant par {last4}",
+    "revoked": "Autorisation révoquée.",
+    "revoke": "Révoquer",
+    "pendingTitle": "{method} : en attente de confirmation",
+    "verifyingTitle": "{method} : vérifiez votre compte",
+    "pendingBody": "Terminez la saisie des coordonnées. Le prélèvement s’active dès que la banque confirme le mandat.",
+    "verifyingBody": "Deux petits dépôts arriveront sur le compte sous 1 à 2 jours ouvrés. Saisissez-les sur la page de vérification pour activer le prélèvement.",
+    "verifyLink": "Ouvrir la page de vérification",
+    "mandateAccepted": "Autorisation acceptée",
+    "confirmed": "Moyen de paiement mis à jour.",
+    "sandboxConfirm": "Confirmer (sandbox)",
+    "sandboxDecline": "Simuler un compte en échec",
+    "checked": "Statut vérifié.",
+    "check": "Vérifier le statut",
+    "choose": "Comment le siège doit-il prélever ?",
+    "recommended": "Frais réduits",
+    "about": {
+      "card": "Débitée à l’échéance. Frais de carte plus élevés pour le siège ; fonctionne partout.",
+      "us_bank_account": "Prélevé sur un compte bancaire américain via ACH. Règlement en 4 jours ouvrés environ.",
+      "acss_debit": "Débit préautorisé d’entreprise depuis un compte canadien. Règlement en 5 jours ouvrés environ.",
+      "bacs_debit": "Prélèvement sur un compte britannique, protégé par la Direct Debit Guarantee. Règlement en 3 jours ouvrés environ.",
+      "sepa_debit": "Prélèvement sur un compte en euros (IBAN). Règlement en 5 jours ouvrés environ ; remboursement possible sous 8 semaines.",
+      "au_becs_debit": "Prélèvement sur un compte australien (BSB). Règlement en 3 jours ouvrés environ."
+    },
+    "noBankDebit": "Le prélèvement en {currency} n’est pas disponible sur le compte d’encaissement du siège ; seule la carte est possible.",
+    "mandateTitle": "Autorisation que vous allez accepter",
+    "accept": "Je suis habilité à signer pour {group} et j’accepte cette autorisation. Le texte exact, mon nom, l’heure et mon adresse IP sont enregistrés.",
+    "started": "Autorisation enregistrée. Confirmez le compte pour l’activer.",
+    "replace": "Remplacer par ce moyen",
+    "authorise": "Autoriser",
+    "settleNote": "Les prélèvements restent « en cours » quelques jours. En cas d’échec, vous êtes prévenu par e-mail et le siège relance aux dates de sa politique de recouvrement.",
+    "statements": {
+      "tab": "Relevés mensuels",
+      "issued": "{n} relevés émis, {emailed} envoyés par e-mail.",
+      "period": "Période",
+      "issue": "Émettre les relevés",
+      "issueHint": "Un relevé par franchisé et par devise. Les nouveaux relevés sont envoyés aux franchisés ; une nouvelle émission met les chiffres à jour.",
+      "empty": "Aucun relevé mensuel",
+      "emptyBody": "Le siège les émet après la clôture d’une période.",
+      "franchisee": "Franchisé",
+      "gross": "Ventes brutes",
+      "total": "Total",
+      "collected": "Encaissé",
+      "paid": "Payé",
+      "outstanding": "À payer",
+      "pdf": "Télécharger le PDF",
+      "source": {
+        "branchharbor": "Ventes issues des paiements BranchHarbor",
+        "external_pos": "Ventes déclarées depuis une caisse externe",
+        "mixed": "Paiements BranchHarbor et caisse externe",
+        "none": "Aucune vente"
+      },
+      "royaltyAt": "Redevance ({rate})",
+      "fundAt": "Fonds marketing ({rate})",
+      "adjustments": "Ajustements",
+      "feesTax": "Frais et taxes",
+      "amount": "Montant",
+      "collection": "Prélèvement",
+      "status": {
+        "processing": "en cours",
+        "succeeded": "encaissé",
+        "failed": "échoué",
+        "requires_action": "action requise"
+      },
+      "notCollected": "Pas encore prélevé",
+      "collectionFee": "Frais de prélèvement BranchHarbor (payés par le siège)",
+      "invoice": "Facture {number}, échéance {due}",
+      "royalty": "Redevance",
+      "fund": "Fonds marketing",
+      "feeNote": "Les frais fixes de prélèvement BranchHarbor pour cette période s’élèvent à {fee}. Le siège les paie ; ils ne s’ajoutent jamais à votre montant dû.",
+      "method": "Prélevé par {method} se terminant par {last4}.",
+      "emailed": "Envoyé par e-mail à {n, plural, one {# personne} other {# personnes}} le {at}.",
+      "notEmailed": "Non envoyé (aucun franchisé enregistré)."
+    }
+  }
+}

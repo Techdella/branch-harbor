@@ -86,4 +86,6 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./marketing.ts')).marketingRoutes);
   await app.register((await import('./marketing-public.ts')).marketingPublicRoutes);
   await app.register((await import('./finance.ts')).financeRoutes);
+  // Marketing → Reviews (requests, hosted review page, Google Business Profile, replies, dashboard).
+  await app.register((await import('./reviews.ts')).reviewRoutes);
 };

@@ -1,0 +1,31 @@
+{
+  "reviewPage": {
+    "invalidTitle": "Este enlace de reseña no es válido",
+    "invalidBody": "Abre de nuevo el enlace de tu mensaje o contacta con el local.",
+    "title": "¿Qué tal en {location}?",
+    "thanksTitle": "¡Gracias!",
+    "askNamed": "{name}, ¿cómo valorarías tu visita?",
+    "ask": "¿Cómo valorarías tu visita?",
+    "ratingLabel": "Tu valoración",
+    "starLabel": "{n} de 5 estrellas",
+    "scale": {
+      "1": "Muy malo",
+      "2": "Malo",
+      "3": "Regular",
+      "4": "Bueno",
+      "5": "Excelente"
+    },
+    "commentLabel": "¿Algo que quieras decirle al equipo? (opcional)",
+    "privateNote": "Tu valoración y comentario llegan en privado al equipo de {location}.",
+    "send": "Enviar",
+    "chooseRating": "Elige de 1 a 5 estrellas.",
+    "thanksBody": "Tu opinión se ha enviado al equipo de {location}.",
+    "publicBefore": "¿Prefieres publicar una reseña pública?",
+    "publicAfter": "¿Quieres compartir también una reseña pública?",
+    "publicBody": "Ayuda a que otras personas nos encuentren. Todas las reseñas son bienvenidas, sea cual sea tu valoración.",
+    "reviewOn": "Escribe una reseña en {site}",
+    "otherSite": "otro sitio",
+    "optOut": "No volver a pedirme reseñas",
+    "optedOut": "Hecho. No volveremos a pedirte reseñas."
+  }
+}

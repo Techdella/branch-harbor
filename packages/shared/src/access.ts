@@ -115,6 +115,12 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'marketing.ads', area: 'marketing', name: 'Ads', description: 'Paid ad campaigns and budgets.', actions: ALL, status: 'available' },
   { key: 'marketing.network_campaigns', area: 'marketing', name: 'Network campaigns', description: 'Campaigns HQ runs for all locations, including coming-soon locations.', actions: ALL, status: 'available', hqOnly: true },
   { key: 'marketing.brand_assets', area: 'marketing', name: 'Brand assets', description: 'Logos, photos, files and brand guidelines used by websites and emails.', actions: VEP, actionNotes: { edit: 'Upload and organise assets.' }, status: 'available' },
+  // Marketing → Reviews (review requests, Google review monitoring and replies, rating dashboard).
+  {
+    key: 'marketing.reviews', area: 'marketing', name: 'Reviews',
+    description: 'Review requests after visits and orders, private feedback, Google reviews with replies, and ratings per location.',
+    actions: VEP, actionNotes: { edit: 'Reply to reviews (with AI suggestions) and send review requests.', publish: 'Configure review requests, review links, Google connections and reply approval.' }, status: 'available',
+  },
   // Finance
   { key: 'finance.payments', area: 'finance', name: 'Payments', description: 'Transactions, refunds, reconciliation and payment accounts (financial data).', actions: VEX, actionNotes: { edit: 'Issue refunds and fix reconciliation items.' }, status: 'available', sensitive: 'finance' },
   { key: 'finance.royalties', area: 'finance', name: 'Royalties', description: 'Royalty terms, period close, statements, disputes, approval, invoicing and collection across the network.', actions: ALL, actionNotes: { edit: 'Set terms, close periods, adjust statements, resolve disputes and run collection.', publish: 'Approve statements and issue invoices.' }, status: 'available', hqOnly: true, sensitive: 'finance' },
@@ -440,7 +446,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'owner_group', networkOnly: true,
     grants: {
       'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
-      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP,
+      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP, 'marketing.reviews': VEP,
       'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX, 'finance.invoices': VEX, 'finance.marketing_fund': V,
       'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
     },
@@ -450,7 +456,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'location',
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE, 'marketing.inbox': VE, 'marketing.social': VE,
-      'marketing.email': VE, 'marketing.forms': VE, 'marketing.brand_assets': VE,
+      'marketing.email': VE, 'marketing.forms': VE, 'marketing.brand_assets': VE, 'marketing.reviews': VE,
       'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
     },
   },

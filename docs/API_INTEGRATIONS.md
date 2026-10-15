@@ -40,7 +40,7 @@ Env var names match `apps/api/.env.example`, `apps/app/.env.example` and `apps/m
 | # | Service | What it's for | Recommended | Alternatives | Env vars |
 |---|---|---|---|---|---|
 | 18 | **Maps, geocoding and address autocomplete** | Location finder, address entry for any country, timezone lookup from coordinates | **Google Maps Platform** (Places Autocomplete, Geocoding, Time Zone API) | Mapbox + Mapbox Search, HERE | `GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` |
-| 19 | **Google Business Profile** | Sync hours, posts and reviews per location | **Google Business Profile APIs** (requires Google approval) | — | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
+| 19 | **Google Business Profile** | Review monitoring and replies per location (live, see [Reviews](#reviews-requests-and-google-business-profile)); hours and posts later | **Google Business Profile APIs** (requires Google approval) | — | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
 | 20 | **Calendar sync** | Staff schedules and appointments to Google/Outlook calendars | **Google Calendar API**, **Microsoft Graph** | Nylas (one API for both) | `GOOGLE_OAUTH_*`, `MS_GRAPH_CLIENT_ID/SECRET` |
 
 ## 4. Industry connectors: "existing-system connection" model (P1, pick per pilot)
@@ -258,8 +258,8 @@ Code: `apps/api/src/services/finance/*`, `apps/api/src/integrations/finance-coll
   SEPA Direct Debit (EUR) or BECS (AUD). Stripe collects the scheme mandate in the Payment Element (confirm the
   SetupIntent client-side with `stripeAccount` = the collection account), then `setup_intent.succeeded` on the Connect
   webhook (or `POST …/payment-methods/:id/refresh`) activates it.
-- Invoices are collected with an **off-session PaymentIntent created on the collection account** (direct charge, no
-  application fee), one idempotency key per attempt (`fin_inv:<invoice>:<attempt>`). Each attempt is a
+- Invoices are collected with an **off-session PaymentIntent created on the collection account** (direct charge; the only
+  application fee is BranchHarbor's flat collection fee, see below), one idempotency key per attempt (`fin_inv:<invoice>:<attempt>`). Each attempt is a
   `payment_references` row with target `royalty_invoice`, so the existing signed-webhook processor settles it
   idempotently (`payment_intent.succeeded` / `payment_intent.payment_failed`); bank debits stay `processing` for days
   until Stripe reports the outcome.
@@ -275,6 +275,36 @@ Code: `apps/api/src/services/finance/*`, `apps/api/src/integrations/finance-coll
   Element for live SetupIntent confirmation yet (sandbox confirms in place); see gaps in the finance hand-off.
 - Without `STRIPE_SECRET_KEY` (sandbox): methods carry their outcome (`…_decline` fails), cards settle immediately,
   bank debits stay `processing` until `POST …/finance/invoices/:id/sandbox-settle`. Nothing leaves the server.
+
+**Bank debit by scheme and HQ's account country:** the franchisee chooses card or the local bank debit when
+authorising (Finance → Statements & invoices → Debit authorisation). The bank debit offered depends on the franchisee's
+currency AND the collection account's country (read from Stripe, `accounts.retrieve`): ACH `us_bank_account` (USD, US
+accounts; Financial Connections with micro-deposit fallback), Canadian PAD `acss_debit` (CAD, Canadian accounts;
+business, sporadic), Bacs `bacs_debit` (GBP, UK accounts), SEPA `sepa_debit` (EUR, EEA/CH/UK accounts) and BECS
+`au_becs_debit` (AUD, Australian accounts). In sandbox the country is unknown, so methods follow the currency.
+- **Mandate text:** `GET …/finance/payment-methods/mandate?ownerGroupId&currency&methodType` returns the exact scheme
+  wording (ACH authorisation, business PAD agreement, Bacs Direct Debit Guarantee summary, SEPA mandate with the 8-week
+  refund right, BECS Direct Debit Request). The app shows it before the franchisee accepts; `POST …/payment-methods/setup`
+  receives the text that was shown and refuses (`409 mandate_text_changed`) when it no longer matches, so the stored
+  text (`finance_payment_methods.mandate_text`, with user, time, IP and language) is exactly what was accepted.
+- **Delayed outcomes:** bank debits stay `processing` until Stripe reports `payment_intent.succeeded` /
+  `payment_intent.payment_failed` days later (attempt `settled_at` is set). A failure reopens the invoice; the next
+  dunning run emails the franchise owners once per failed attempt (`failure_notified_at`) with the next automatic retry
+  date, and retries follow the dunning policy. `setup_intent.requires_action` with `verify_with_microdeposits` moves the
+  method to `verifying` (with Stripe's hosted verification link); `mandate.updated` with `status: inactive` revokes it.
+  Add `setup_intent.requires_action` and `mandate.updated` to the Connect webhook endpoint's events.
+- **Collection fee:** a flat BranchHarbor fee per collection attempt that is not failed — USD 1.00, at most 5 per
+  location per calendar month, in the price-book currency (`royaltyCollectionFee` in `packages/shared/src/fees.ts`,
+  scaled by the price book's market ratio; currencies outside the price book: no fee). It is NOT a percentage of
+  royalties. It is taken as `application_fee_amount` on the direct charge on the franchisor's collection account (HQ
+  pays it), recorded on the attempt (`platform_fee_minor`) and shown on statements for transparency; a debit that later
+  fails has its fee reset to 0.
+- **Monthly statements per franchisee:** `POST …/finance/periods/:id/franchisee-statements` (HQ, Royalties publish)
+  builds one statement per owner group and currency from the period's location statements and invoices: gross sales and
+  their source (BranchHarbor payments / external POS), royalty and fund rates and amounts, adjustments, fees, tax,
+  amount, collection method, status and date, collected amount and the collection fee. New statements are emailed to
+  the franchise owners; re-issuing refreshes the figures without emailing again. `GET …/franchisee-statements[/:id[/pdf]]`
+  (franchise owners see only their own).
 
 **Dunning:** `POST …/finance/dunning/run` (and the `finance.dunning` job, `{ organizationId }`, to schedule daily):
 reminder N days before the due date, late fee once after the agreement's grace days (flat or % of the overdue amount,
@@ -304,6 +334,46 @@ A live Xero / QuickBooks Online API sync (OAuth apps, contact and item mapping) 
 **Franchise agreements:** the royalty engine reads rates through `registerAgreementTermsProvider` (services/finance/terms.ts):
 an agreement's royalty / marketing-fund basis points override owner-group terms, which override the organisation
 default; anything the agreement doesn't set (tiers, minimum, technology fee, revenue basis, late fee) falls back.
+
+## Reviews: requests and Google Business Profile
+
+Code: `apps/api/src/services/reviews.ts`, `apps/api/src/integrations/google-business.ts`, routes `/v1/orgs/:orgId/reviews/...`
+(module `marketing.reviews`), hosted page `apps/sites/app/[brand]/[location]/review`.
+
+**Review requests (no third party beyond the existing comms adapters):** after a completed class visit (studios,
+sports), completed appointment (wellness), collected/delivered/served or fulfilled order (foods, commerce), hotel
+checkout (hospitality) or completed property viewing (realty), one request per interaction is scheduled after the
+location's delay and sent by email (Postmark/Resend), SMS (Twilio) or WhatsApp (Cloud API). Settings per location
+(overriding HQ defaults): channel, delay, copy per site locale (default copy in all 9 locales), frequency cap per
+customer, quiet hours for texts, consent mode (marketing consent, or a service follow-up where local law allows it) and
+public review links. Opt-outs are always respected: STOP replies and unsubscribes on the channel, plus "Stop review
+requests" on the hosted page. Without provider credentials messages are recorded as `sandboxed` (never claimed as
+delivered). WhatsApp outside the 24-hour window needs an approved template on Meta's side before going live.
+
+**No review gating:** the hosted page offers the location's public review links (and the linked Google listing's
+"write a review" link) to every customer, before and after rating, whatever the rating. Private feedback (rating and
+comment) goes to the location's inbox as a conversation. Negative reviews (≤ 2★, private or Google) alert the
+location's managers and HQ marketing (push + email).
+
+**Google Business Profile (P1):** env `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` (same OAuth client as
+other Google sign-ins is fine). Steps:
+1. Google Cloud project → enable the **My Business Account Management API**, **My Business Business Information API**
+   and the **Google My Business API** (v4, reviews and replies). These are not available by default: request access
+   with the [Business Profile API access form](https://developers.google.com/my-business/content/prereqs) (approval
+   typically takes days to weeks; the project must belong to a verified business, and quota starts at 0 until approved).
+2. OAuth consent screen: external, scope `https://www.googleapis.com/auth/business.manage` (plus `openid email` to
+   show who connected). The scope is sensitive, so Google verification of the app is required before public use.
+3. OAuth client (web): authorised redirect URI `https://api.<domain>/v1/oauth/reviews/google/callback`
+   (`PUBLIC_API_URL` + that path).
+4. In BranchHarbor: Marketing → Reviews → Google → Connect with Google (HQ for many locations, or one location), then
+   link each Google location to a BranchHarbor location. Reviews are fetched every 30 minutes (and on "Fetch now");
+   replies are posted with `PUT …/reviews/{id}/reply`. The refresh token is stored encrypted (`ENCRYPTION_KEY`).
+
+Without the OAuth client, connections can only be added in **sandbox**: nothing is fetched (no reviews are ever
+invented; demo reviews exist only in `seed-demo.ts`) and replies stay in BranchHarbor, labelled as not posted.
+Replies can be drafted with BranchHarbor AI (`ANTHROPIC_API_KEY`; drafts only) and, by HQ policy, need HQ approval
+(none / negative reviews / all). `getLocationRatingSummary(db, orgId, locationIds, period)` exposes per-location
+ratings for the network league table.
 
 ## What to set up first (shortest path to a Studios pilot)
 

@@ -48,6 +48,7 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'marketing.brand_assets': [{ key: 'assets', href: '/marketing/assets', icon: 'image', msg: 'mkt.nav.assets' }],
   'marketing.inbox': [{ key: 'inbox', href: '/marketing/inbox', icon: 'message' }],
   'marketing.social': [{ key: 'social', href: '/marketing/social', icon: 'share' }],
+  'marketing.reviews': [{ key: 'reviews', href: '/marketing/reviews', icon: 'star', msg: 'reviews.nav.reviews' }],
   'marketing.ads': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
   'marketing.network_campaigns': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],
   'sales.customer_pipeline': [{ key: 'leads', href: '/sales/leads', icon: 'trending' }],

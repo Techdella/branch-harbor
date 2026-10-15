@@ -1,0 +1,398 @@
+{
+  "nav": {
+    "reviews": "Avaliações"
+  },
+  "access": {
+    "modules": {
+      "marketing": {
+        "reviews": {
+          "name": "Avaliações",
+          "description": "Pedidos de avaliação após visitas e pedidos, comentários privados, avaliações do Google com respostas e notas por unidade."
+        }
+      }
+    }
+  },
+  "apiError": {
+    "already_reviewed": "Já recebemos um comentário para este pedido.",
+    "reply_in_inbox": "Comentários privados são respondidos na conversa da caixa de entrada.",
+    "awaiting_approval": "Esta resposta aguarda aprovação da matriz.",
+    "not_pending": "Esta resposta não aguarda aprovação.",
+    "google_not_configured": "O login com Google ainda não está configurado. Adicione uma conexão sandbox enquanto isso.",
+    "mandate_text_changed": "O texto da autorização mudou. Leia novamente antes de aceitar.",
+    "no_reply": "Escreva uma resposta primeiro."
+  },
+  "mkt": {
+    "auto": {
+      "trigger": {
+        "review": {
+          "received": "Avaliação recebida"
+        }
+      },
+      "action": {
+        "send_review_request": "Enviar pedido de avaliação"
+      },
+      "field": {
+        "event": {
+          "rating": "Nota (1–5)"
+        }
+      },
+      "reason": {
+        "no_location": "sem unidade",
+        "test_run": "não enviado em teste",
+        "opted_out": "descadastrado",
+        "frequency_cap": "pedido recentemente",
+        "reviews_disabled": "pedidos de avaliação desativados",
+        "location_unavailable": "unidade indisponível",
+        "not_scheduled": "já tratado"
+      }
+    }
+  },
+  "reviews": {
+    "stars": "{n} de 5 estrelas",
+    "title": "Avaliações",
+    "description": "Peça avaliações após cada visita, leia comentários privados e avaliações do Google e responda.",
+    "tab": {
+      "overview": "Visão geral",
+      "reviews": "Avaliações",
+      "requests": "Pedidos",
+      "settings": "Configurações",
+      "connections": "Google"
+    },
+    "filter": {
+      "location": "Unidade",
+      "allLocations": "Todas as unidades visíveis",
+      "bucket": "Agrupar por",
+      "month": "Mês",
+      "week": "Semana",
+      "source": "Origem",
+      "allSources": "Todas as origens",
+      "show": "Mostrar",
+      "all": "Todas as avaliações",
+      "negative": "Negativas (2★ ou menos)",
+      "unanswered": "Google, sem resposta",
+      "pending": "Respostas aguardando aprovação",
+      "search": "Pesquisar"
+    },
+    "hours": "{n} h",
+    "days": "{n} dias",
+    "kpi": {
+      "average": "Nota média",
+      "averageSub": "de {n} avaliações",
+      "volume": "Avaliações",
+      "volumeSub": "{public} públicas · {negative} negativas",
+      "responseRate": "Taxa de resposta",
+      "responseRateSub": "Respostas no Google e na caixa de entrada",
+      "pendingApproval": "{n} aguardando aprovação da matriz",
+      "responseTime": "Tempo médio de resposta",
+      "responseTimeSub": "da avaliação até a primeira resposta",
+      "requests": "Pedidos enviados",
+      "requestsSub": "{completed} respondidos ({rate})"
+    },
+    "chart": {
+      "rating": "Nota média ao longo do tempo",
+      "volume": "Avaliações por período",
+      "empty": "Ainda não há avaliações neste período.",
+      "ratingCaption": "Gráfico de barras da nota média por período, de 0 a 5.",
+      "volumeCaption": "Gráfico de barras do número de avaliações por período."
+    },
+    "byLocation": "Por unidade",
+    "col": {
+      "location": "Unidade",
+      "average": "Média",
+      "reviews": "Avaliações",
+      "responseRate": "Taxa de resposta",
+      "responseTime": "Tempo de resposta",
+      "customer": "Cliente",
+      "source": "Após",
+      "channel": "Canal",
+      "when": "Quando",
+      "status": "Status"
+    },
+    "source": {
+      "google": "Google",
+      "branchharbor": "Comentário privado"
+    },
+    "anonymous": "Anônimo",
+    "noComment": "Sem comentário, apenas a nota.",
+    "replyStatus": {
+      "none": "Sem resposta",
+      "draft": "Rascunho de resposta",
+      "pending_approval": "Aguardando aprovação",
+      "published": "Respondida",
+      "rejected": "Resposta rejeitada",
+      "failed": "Resposta não publicada"
+    },
+    "sandboxReply": "Sandbox: não publicada",
+    "sandboxReplyLong": "Salva no BranchHarbor. Esta conexão está em sandbox, então nada foi publicado no Google.",
+    "empty": "Ainda não há avaliações",
+    "emptyBody": "Ative os pedidos de avaliação ou conecte o Google Business Profile para ver avaliações aqui.",
+    "drawer": {
+      "title": "Avaliação",
+      "privateHint": "Os comentários privados chegam à caixa de entrada da unidade. Responda ao cliente nessa conversa.",
+      "pendingTitle": "Aguardando aprovação da matriz",
+      "pendingBody": "Enviada por {name}. Será publicada quando a matriz aprovar.",
+      "rejectedTitle": "A matriz rejeitou esta resposta",
+      "publishedTitle": "Resposta publicada",
+      "externalReply": "Respondida diretamente no Google.",
+      "publishedBody": "Publicada no Google.",
+      "reply": "Sua resposta",
+      "suggest": "Sugerir resposta",
+      "aiNote": "Sugerida pela IA do BranchHarbor. Revise antes de publicar.",
+      "replyLabel": "Resposta pública",
+      "replyHint": "Todos podem ler no Google. Sem promessas de reembolso nem dados pessoais.",
+      "needsApproval": "A matriz aprova as respostas a esta avaliação antes da publicação.",
+      "sentForApproval": "Enviada à matriz para aprovação.",
+      "published": "Resposta publicada.",
+      "submit": "Enviar para aprovação",
+      "publish": "Publicar resposta",
+      "saved": "Rascunho salvo.",
+      "saveDraft": "Salvar rascunho",
+      "decisionNote": "Nota para o autor",
+      "approve": "Aprovar e publicar",
+      "reject": "Rejeitar",
+      "rejected": "Resposta rejeitada."
+    },
+    "send": {
+      "title": "Enviar um pedido de avaliação",
+      "hint": "Os pedidos também são enviados automaticamente após cada visita concluída, se ativados. Descadastros, consentimento, limite de frequência e horário de silêncio sempre se aplicam.",
+      "run": "Executar agora",
+      "ran": "{n} novos pedidos agendados.",
+      "search": "Encontrar um cliente",
+      "customer": "Cliente",
+      "choose": "Escolher…",
+      "button": "Enviar pedido"
+    },
+    "outcome": {
+      "sent": "Pedido enviado.",
+      "sandboxed": "Pedido registrado (sandbox: nenhuma mensagem foi entregue).",
+      "skipped": "Não enviado: {reason}.",
+      "failed": "Falha no envio: {reason}.",
+      "deferred": "Agendado para o fim do horário de silêncio."
+    },
+    "skip": {
+      "not_scheduled": "já tratado",
+      "location_unavailable": "unidade indisponível",
+      "reviews_disabled": "pedidos desativados",
+      "no_contact": "sem dados de contato",
+      "no_email": "sem e-mail",
+      "no_phone": "sem telefone",
+      "opted_out": "descadastrado",
+      "no_consent": "sem consentimento de marketing",
+      "frequency_cap": "pedido recentemente (limite de frequência)",
+      "quiet_hours": "horário de silêncio",
+      "send_failed": "o provedor recusou a mensagem"
+    },
+    "requests": {
+      "empty": "Ainda não há pedidos de avaliação",
+      "emptyBody": "Ative os pedidos em Configurações ou envie um para um cliente."
+    },
+    "trigger": {
+      "class_visit": "Aula frequentada",
+      "booking": "Atendimento concluído",
+      "order": "Pedido concluído",
+      "hotel_checkout": "Check-out do hotel",
+      "property_viewing": "Visita ao imóvel",
+      "manual": "Enviado pela equipe",
+      "automation": "Automação"
+    },
+    "channel": {
+      "email": "E-mail",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "requestStatus": {
+      "scheduled": "Agendado",
+      "sending": "Enviando",
+      "sent": "Enviado",
+      "sandboxed": "Sandbox",
+      "opened": "Aberto",
+      "completed": "Avaliado",
+      "skipped": "Não enviado",
+      "failed": "Falhou"
+    },
+    "settings": {
+      "scope": "Configurações para",
+      "scopeHint": "Os padrões da matriz valem para todos; uma unidade pode substituí-los.",
+      "hqDefaults": "Padrões da matriz (todas as unidades)",
+      "requests": "Pedidos de avaliação",
+      "enabled": "Enviar automaticamente",
+      "after": "Enviar após",
+      "delay": "Atraso (horas)",
+      "delayHint": "Tempo após o fim da visita.",
+      "channel": "Canal",
+      "cap": "No máximo um pedido a cada (dias)",
+      "capHint": "Por cliente, em todas as unidades.",
+      "quietStart": "Início do horário de silêncio",
+      "quietHint": "SMS e WhatsApp aguardam o fim do horário de silêncio (hora local).",
+      "quietEnd": "Fim do horário de silêncio",
+      "consent": "Quem pode ser solicitado",
+      "consentHint": {
+        "marketing": "Apenas clientes que aceitaram marketing neste canal.",
+        "service": "Um acompanhamento único da visita, onde a lei local permitir. Descadastros são sempre respeitados."
+      },
+      "consentMode": {
+        "marketing": "Clientes com consentimento de marketing",
+        "service": "Acompanhamento do serviço"
+      },
+      "template": "Mensagem",
+      "templateHint": "Deixe vazio para usar o texto padrão em cada idioma. Use '{name}', '{location}', '{business}' e '{link}'.",
+      "language": "Idioma",
+      "subject": "Assunto do e-mail",
+      "body": "Texto",
+      "bodyHint": "Deve incluir '{link}'. SMS recebem automaticamente a linha de descadastro.",
+      "links": "Links de avaliação pública",
+      "noGating": "Todo cliente vê estes links após avaliar, qualquer que seja a nota. Mostrá-los só a clientes satisfeitos (“review gating”) viola a política de avaliações do Google.",
+      "linkKind": "Site",
+      "linkLabel": "Rótulo",
+      "linkUrl": "Link",
+      "remove": "Remover",
+      "addLink": "Adicionar link",
+      "approval": "Aprovação de respostas",
+      "approvalLabel": "A matriz aprova as respostas das unidades",
+      "approvalHint": "O marketing da matriz sempre pode publicar diretamente.",
+      "approvalMode": {
+        "none": "Nunca (as unidades publicam)",
+        "negative": "Para avaliações negativas (2★ ou menos)",
+        "all": "Para cada resposta"
+      },
+      "saved": "Configurações salvas.",
+      "save": "Salvar configurações"
+    },
+    "linkKind": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "tripadvisor": "Tripadvisor",
+      "yelp": "Yelp",
+      "trustpilot": "Trustpilot",
+      "other": "Outro"
+    },
+    "connections": {
+      "connected": "Conta do Google conectada. Vincule as unidades abaixo.",
+      "title": "Google Business Profile",
+      "intro": "Conecte uma conta do Google que gerencia várias unidades (matriz) ou deixe uma unidade conectar a sua. As avaliações são buscadas a cada 30 minutos.",
+      "owner": "Gerenciada por",
+      "hq": "Matriz (várias unidades)",
+      "location": "Uma unidade",
+      "connectGoogle": "Conectar com o Google",
+      "sandboxAdded": "Conexão sandbox adicionada.",
+      "addSandbox": "Adicionar conexão sandbox",
+      "notConfigured": "O login com Google ainda não está configurado nesta plataforma. Enquanto isso, uma conexão sandbox funciona: ela não busca avaliações e nunca as inventa.",
+      "empty": "Ainda não há conexão com o Google",
+      "hqAccount": "Conta do Google da matriz",
+      "locationAccount": "Conta do Google de {name}",
+      "mode": {
+        "live": "Ativa",
+        "sandbox": "Sandbox"
+      },
+      "status": {
+        "connected": "Conectada",
+        "error": "Requer atenção",
+        "disconnected": "Desconectada"
+      },
+      "sandboxNote": "Sandbox: nada é buscado no Google e as respostas ficam no BranchHarbor.",
+      "lastFetched": "Última busca {at}",
+      "neverFetched": "Ainda não buscado",
+      "syncedSandbox": "Sandbox: nada para buscar.",
+      "synced": "{n} novas avaliações.",
+      "sync": "Buscar agora",
+      "googleLocation": "Unidade do Google",
+      "googleLocationId": "ID da unidade no Google",
+      "googleLocationIdHint": "Do gerenciador do Perfil da Empresa.",
+      "placeholder": "locations/1234567890",
+      "linked": "Unidade vinculada.",
+      "link": "Vincular"
+    },
+    "nav": {
+      "reviews": "Avaliações"
+    }
+  },
+  "royaltyDebit": {
+    "noGroups": "Ainda não há empresa franqueada para configurar.",
+    "intro": "A matriz cobra as faturas de royalties, fundo de marketing e taxas desta conta após a emissão. O débito em conta custa bem menos que o cartão.",
+    "active": "Autorizado",
+    "none": "Não configurado",
+    "type": {
+      "card": "Cartão",
+      "us_bank_account": "Débito bancário ACH",
+      "acss_debit": "Débito pré-autorizado (PAD)",
+      "bacs_debit": "Débito direto Bacs",
+      "sepa_debit": "Débito direto SEPA",
+      "au_becs_debit": "Débito direto BECS",
+      "manual": "Transferência (registrada)"
+    },
+    "ending": "final {last4}",
+    "revoked": "Autorização revogada.",
+    "revoke": "Revogar",
+    "pendingTitle": "{method}: aguardando confirmação",
+    "verifyingTitle": "{method}: verifique sua conta",
+    "pendingBody": "Conclua os dados da conta. O débito é ativado quando o banco confirmar o mandato.",
+    "verifyingBody": "Dois pequenos depósitos chegarão à conta em 1–2 dias úteis. Informe-os na página de verificação para ativar o débito.",
+    "verifyLink": "Abrir a página de verificação",
+    "mandateAccepted": "Autorização aceita",
+    "confirmed": "Forma de pagamento atualizada.",
+    "sandboxConfirm": "Confirmar (sandbox)",
+    "sandboxDecline": "Simular conta com falha",
+    "checked": "Status verificado.",
+    "check": "Verificar status",
+    "choose": "Como a matriz deve cobrar?",
+    "recommended": "Taxas menores",
+    "about": {
+      "card": "Cobrado no vencimento. Taxas de cartão maiores para a matriz; funciona em qualquer país.",
+      "us_bank_account": "Debitado de uma conta bancária dos EUA via ACH. Liquida em cerca de 4 dias úteis.",
+      "acss_debit": "Débito pré-autorizado empresarial de conta canadense. Liquida em cerca de 5 dias úteis.",
+      "bacs_debit": "Débito direto de conta do Reino Unido, protegido pela Direct Debit Guarantee. Liquida em cerca de 3 dias úteis.",
+      "sepa_debit": "Débito de conta em euros (IBAN). Liquida em cerca de 5 dias úteis; reembolso pode ser pedido em até 8 semanas.",
+      "au_becs_debit": "Débito direto de conta australiana (BSB). Liquida em cerca de 3 dias úteis."
+    },
+    "noBankDebit": "O débito em {currency} não está disponível na conta de cobrança da matriz, então só o cartão pode ser usado.",
+    "mandateTitle": "Autorização que você vai aceitar",
+    "accept": "Estou autorizado a assinar por {group} e aceito esta autorização. O texto exato, meu nome, o horário e meu endereço IP são registrados.",
+    "started": "Autorização registrada. Confirme a conta para ativá-la.",
+    "replace": "Substituir por esta forma",
+    "authorise": "Autorizar",
+    "settleNote": "Débitos aparecem em processamento por alguns dias. Se um falhar, você recebe um e-mail e a matriz tenta de novo nas datas da sua política de cobrança.",
+    "statements": {
+      "tab": "Extratos mensais",
+      "issued": "{n} extratos emitidos, {emailed} enviados por e-mail.",
+      "period": "Período",
+      "issue": "Emitir extratos",
+      "issueHint": "Um extrato por franqueado e moeda. Os novos são enviados por e-mail aos franqueados; emitir de novo atualiza os valores.",
+      "empty": "Ainda não há extratos mensais",
+      "emptyBody": "A matriz os emite após fechar um período.",
+      "franchisee": "Franqueado",
+      "gross": "Vendas brutas",
+      "total": "Total",
+      "collected": "Cobrado",
+      "paid": "Pago",
+      "outstanding": "Em aberto",
+      "pdf": "Baixar PDF",
+      "source": {
+        "branchharbor": "Vendas de pagamentos BranchHarbor",
+        "external_pos": "Vendas informadas de um PDV externo",
+        "mixed": "Pagamentos BranchHarbor e PDV externo",
+        "none": "Sem vendas"
+      },
+      "royaltyAt": "Royalty ({rate})",
+      "fundAt": "Fundo de marketing ({rate})",
+      "adjustments": "Ajustes",
+      "feesTax": "Taxas e impostos",
+      "amount": "Valor",
+      "collection": "Cobrança",
+      "status": {
+        "processing": "em processamento",
+        "succeeded": "cobrado",
+        "failed": "falhou",
+        "requires_action": "requer ação"
+      },
+      "notCollected": "Ainda não cobrado",
+      "collectionFee": "Taxa de cobrança BranchHarbor (paga pela matriz)",
+      "invoice": "Fatura {number}, vencimento {due}",
+      "royalty": "Royalties",
+      "fund": "Fundo de marketing",
+      "feeNote": "A taxa fixa de cobrança da BranchHarbor neste período foi {fee}. A matriz paga; ela nunca é somada ao que você deve.",
+      "method": "Cobrado por {method} final {last4}.",
+      "emailed": "Enviado por e-mail a {n, plural, one {# pessoa} other {# pessoas}} em {at}.",
+      "notEmailed": "Não enviado (nenhum franqueado cadastrado)."
+    }
+  }
+}

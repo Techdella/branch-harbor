@@ -1,0 +1,31 @@
+{
+  "reviewPage": {
+    "invalidTitle": "Ce lien d’avis n’est pas valide",
+    "invalidBody": "Rouvrez le lien depuis votre message ou contactez l’établissement.",
+    "title": "Comment s’est passée votre visite chez {location} ?",
+    "thanksTitle": "Merci !",
+    "askNamed": "{name}, quelle note donneriez-vous à votre visite ?",
+    "ask": "Quelle note donneriez-vous à votre visite ?",
+    "ratingLabel": "Votre note",
+    "starLabel": "{n} étoiles sur 5",
+    "scale": {
+      "1": "Très mauvais",
+      "2": "Mauvais",
+      "3": "Correct",
+      "4": "Bien",
+      "5": "Excellent"
+    },
+    "commentLabel": "Un message pour l’équipe ? (facultatif)",
+    "privateNote": "Votre note et votre commentaire sont transmis en privé à l’équipe de {location}.",
+    "send": "Envoyer",
+    "chooseRating": "Choisissez de 1 à 5 étoiles.",
+    "thanksBody": "Votre avis a été transmis à l’équipe de {location}.",
+    "publicBefore": "Vous préférez publier un avis public ?",
+    "publicAfter": "Voulez-vous aussi publier un avis public ?",
+    "publicBody": "Cela aide d’autres personnes à nous trouver. Tous les avis sont les bienvenus, quelle que soit votre note.",
+    "reviewOn": "Donner un avis sur {site}",
+    "otherSite": "un autre site",
+    "optOut": "Ne plus me demander d’avis",
+    "optedOut": "C’est noté. Nous ne vous demanderons plus d’avis."
+  }
+}
