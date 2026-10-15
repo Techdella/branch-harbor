@@ -271,6 +271,8 @@ async function main() {
     await consumePendingSpendEvents(db, northlight.orgId);
   }
   console.log(` Finance:       closed royalty periods, a disputed statement, an overdue invoice and fund spend with receipts (sandbox). Finance lead: ${financeSeed.logins.join(', ')}`);
+  const quality = await (await import('./seed-quality.ts')).seedQuality({ db, today, upsertUser });
+  console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }
