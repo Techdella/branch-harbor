@@ -80,6 +80,17 @@ export const OPS: Record<IndustryKey, OpsDef[]> = {
     { key: 'agents', icon: 'users', kind: 'screen' },
     { key: 'portals', icon: 'plug', kind: 'screen' },
   ],
+  hospitality: [
+    { key: 'pulse', icon: 'grid', kind: 'screen' },
+    { key: 'grid', icon: 'calendar', kind: 'screen' },
+    { key: 'reservations', icon: 'list', kind: 'screen' },
+    { key: 'rates', icon: 'sliders', kind: 'screen' },
+    { key: 'housekeeping', icon: 'check-circle', kind: 'screen' },
+    { key: 'outlet', icon: 'utensils', kind: 'screen' },
+    { key: 'hotelreports', icon: 'chart', kind: 'screen' },
+    { key: 'setup', icon: 'settings', kind: 'screen' },
+    { key: 'channels', icon: 'plug', kind: 'screen' },
+  ],
 };
 
 export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }> = {
@@ -89,6 +100,7 @@ export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }
   commerce: { icon: 'bag', pastel: '#F7EDA8' },
   foods: { icon: 'utensils', pastel: '#F8D6D8' },
   realty: { icon: 'house', pastel: '#CDEEEE' },
+  hospitality: { icon: 'bed', pastel: '#E4DDF7' },
 };
 
 export interface NavItem {

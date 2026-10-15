@@ -349,7 +349,8 @@
       "wellness": "Summarize appointments this week",
       "commerce": "Explain this week’s order trend",
       "foods": "Summarize today’s orders by location",
-      "realty": "Which offices need attention?"
+      "realty": "Which offices need attention?",
+      "hospitality": "Which properties have the most arrivals today?"
     },
     "withScope": "{text} Scope: {scope}.",
     "scopeOnly": "Scope: {scope}.",
@@ -390,6 +391,11 @@
         "s0": "Which offices need attention?",
         "s1": "Draft a campaign for new listings",
         "s2": "Summarize inquiries this week"
+      },
+      "hospitality": {
+        "s0": "Which properties have the most arrivals today?",
+        "s1": "Draft a pre-arrival message",
+        "s2": "Summarize occupancy this week"
       }
     },
     "mock": {

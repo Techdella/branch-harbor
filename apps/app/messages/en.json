@@ -81,6 +81,10 @@
     "realty": {
       "name": "Real Estate",
       "customers": "Clients"
+    },
+    "hospitality": {
+      "name": "Hospitality",
+      "customers": "Guests"
     }
   },
   "shell": {
@@ -399,6 +403,44 @@
       "portals": {
         "title": "Portal feeds",
         "description": "Preview listing feeds for property portals. Sandbox only — nothing is sent."
+      }
+    },
+    "hospitality": {
+      "pulse": {
+        "title": "Pulse",
+        "description": "Tonight at each property: occupancy, ADR and RevPAR in its own currency, arrivals, departures and rooms to clean."
+      },
+      "grid": {
+        "title": "Room grid",
+        "description": "Rooms by night: who stays where, stays still needing a room and out-of-order blocks."
+      },
+      "reservations": {
+        "title": "Reservations",
+        "description": "Arrivals, in-house guests and departures, with the folio, check-in and check-out."
+      },
+      "rates": {
+        "title": "Rates & availability",
+        "description": "Prices per night in the property currency, seasons, minimum stays and closures per rate plan."
+      },
+      "housekeeping": {
+        "title": "Housekeeping",
+        "description": "Today’s cleans and inspections by status, room status and maintenance."
+      },
+      "outlet": {
+        "title": "Restaurant outlet",
+        "description": "Sell food and drink with the Foods engine and charge orders to the guest’s room."
+      },
+      "hotelreports": {
+        "title": "Reports",
+        "description": "Occupancy, ADR and RevPAR per property and per currency, pickup and cancellations."
+      },
+      "setup": {
+        "title": "Setup",
+        "description": "Check-in times, room types and rooms, taxes your property charges and cancellation policies."
+      },
+      "channels": {
+        "title": "Channel managers",
+        "description": "SiteMinder, Cloudbeds and Channex connections — sandbox previews only, nothing is sent."
       }
     }
   },
@@ -1896,6 +1938,13 @@
         "itemsTitle": "Add menu items",
         "itemSingular": "Menu item",
         "itemPh": "e.g. Ember chicken bowl"
+      },
+      "hospitality": {
+        "name": "Hospitality",
+        "workflow": "Dates → room & rate → deposit → stay",
+        "itemsTitle": "Add your room types",
+        "itemSingular": "Room type",
+        "itemPh": "e.g. River View Double · 2 guests"
       }
     },
     "modelLegend": "Business type",
@@ -2011,7 +2060,8 @@
         "wellness": "Appointment system",
         "commerce": "Store and checkout",
         "foods": "Ordering",
-        "realty": "Listings and inquiries"
+        "realty": "Listings and inquiries",
+        "hospitality": "Rooms and reservations"
       },
       "status": {
         "available": "Available",
@@ -2082,6 +2132,16 @@
           "keep": {
             "title": "Listing service connection",
             "body": "Import listings from your listing service."
+          }
+        },
+        "hospitality": {
+          "native": {
+            "title": "BranchHarbor booking engine",
+            "body": "Rooms, rates, reservations, folios and housekeeping."
+          },
+          "keep": {
+            "title": "Channel manager connection",
+            "body": "Sync availability with SiteMinder, Cloudbeds or Channex (later)."
           }
         }
       },
@@ -4545,6 +4605,359 @@
       "past": "The new time is in the past.",
       "practitioner_busy": "The practitioner is already booked (buffers included).",
       "room_busy": "The room is already reserved (buffers included)."
+    },
+    "sold_out": "Those dates just sold out for this room type. Choose other dates or rooms.",
+    "would_overbook": "This change would leave more stays than rooms on some nights. Move or cancel those stays first.",
+    "room_taken": "That room is already given to another stay on some of these nights.",
+    "room_not_ready": "The room is not ready for check-in yet.",
+    "room_not_assigned": "Assign a room to every guest room before check-in.",
+    "balance_due": "Settle the folio before check-out.",
+    "not_arrival_day": "Check-in is only possible from the arrival date.",
+    "not_in_house": "Only guests who are checked in can charge to their room.",
+    "room_out_of_order": "That room is out of order on some of these nights.",
+    "room_assigned": "The room is assigned to a stay in that period. Move that stay first.",
+    "room_type_mismatch": "Choose a room of the booked room type.",
+    "not_modifiable": "This reservation can no longer be changed.",
+    "not_cancellable": "This reservation can no longer be canceled.",
+    "outlet_disabled": "This property has no restaurant outlet enabled.",
+    "not_yet_arrival": "A no-show can only be recorded from the arrival date.",
+    "folio_closed": "This folio is closed.",
+    "rate_min_stay": "This rate needs a longer stay.",
+    "rate_closed_to_arrival": "Arrivals are not possible on this date for this rate.",
+    "property_not_accepting_bookings": "This property is not taking bookings right now."
+  },
+  "hosp": {
+    "common": {
+      "property": "Property",
+      "refresh": "Refresh",
+      "close": "Close",
+      "notAvailable": "Not available",
+      "noPropertiesTitle": "No properties yet",
+      "noPropertiesBody": "Add a location to start selling rooms. Each location is a property with its own currency and time zone.",
+      "liveOnlyTitle": "Hospitality needs a connection to your account",
+      "liveOnlyBody": "Rooms, rates and reservations are always read from your live account. There is no sample data for this industry."
+    },
+    "status": {
+      "hold": "On hold",
+      "confirmed": "Confirmed",
+      "checked_in": "In house",
+      "checked_out": "Departed",
+      "cancelled": "Canceled",
+      "no_show": "No-show",
+      "expired": "Expired"
+    },
+    "hk": {
+      "clean": "Clean",
+      "dirty": "Dirty",
+      "inspected": "Inspected",
+      "out_of_order": "Out of order"
+    },
+    "source": {
+      "website": "website",
+      "mobile": "app",
+      "front_desk": "front desk",
+      "phone": "phone",
+      "email": "email",
+      "channel": "channel manager"
+    },
+    "pulse": {
+      "occupancy": "Occupancy",
+      "adr": "ADR",
+      "revpar": "RevPAR",
+      "roomsSold": "{sold} of {available} rooms tonight",
+      "arrivals": "Arrivals",
+      "departures": "Departures",
+      "inHouse": "In house",
+      "checkedIn": "{count} checked in",
+      "checkedOut": "{count} checked out",
+      "dirty": "{count, plural, one {# room to clean} other {# rooms to clean}}",
+      "outOfOrder": "{count} out of order",
+      "openTasks": "{count, plural, one {# open task} other {# open tasks}}",
+      "note": "ADR and RevPAR exclude taxes and are shown in each property’s own currency. Amounts in different currencies are never added together."
+    },
+    "reports": {
+      "from": "From",
+      "to": "To",
+      "byCurrency": "Per currency",
+      "byProperty": "Per property",
+      "currency": "Currency",
+      "available": "Room nights available",
+      "sold": "Room nights sold",
+      "revenue": "Room revenue",
+      "beds": "Dorm beds",
+      "neverCombined": "Each currency is reported on its own row. BranchHarbor never converts or combines currencies in these figures.",
+      "pickup": "Pickup",
+      "noPickup": "No new bookings for this period in the last 14 days.",
+      "bookedOn": "Booked on",
+      "bookings": "Bookings",
+      "roomNights": "Room nights",
+      "cancellations": "Cancellations and no-shows",
+      "noCancellations": "No cancellations for stays in this period.",
+      "cancelled": "Canceled",
+      "noShows": "No-shows",
+      "nightsLost": "Nights lost",
+      "feesRetained": "Fees kept",
+      "definitions": "Occupancy = room nights sold ÷ available (out-of-order rooms excluded). ADR = room revenue ÷ room nights sold. RevPAR = room revenue ÷ room nights available.",
+      "generated": "Updated {when}"
+    },
+    "grid": {
+      "prev": "Previous",
+      "next": "Next",
+      "today": "Today",
+      "nights": "Nights shown",
+      "room": "Room",
+      "beds": "{count} beds",
+      "availTitle": "{available} of {total} free",
+      "unassigned": "{count, plural, one {# stay needs a room} other {# stays need a room}}",
+      "noRoomsTitle": "No rooms yet",
+      "noRoomsBody": "Add room types and rooms in Setup to see the grid."
+    },
+    "list": {
+      "arrivals": "Arrivals",
+      "in_house": "In house",
+      "departures": "Departures",
+      "upcoming": "Upcoming",
+      "all": "All",
+      "search": "Search code, guest or group",
+      "code": "Booking",
+      "guest": "Guest",
+      "stay": "Stay",
+      "status": "Status",
+      "nights": "{count, plural, one {# night} other {# nights}}",
+      "emptyTitle": "Nothing here",
+      "emptyBody": "No reservations match this view."
+    },
+    "res": {
+      "title": "Reservation",
+      "source": "Booked via {source}",
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "guests": "Guests",
+      "guestCount": "{adults} adults · {children} children",
+      "total": "Total",
+      "deposit": "Deposit paid",
+      "contact": "Contact",
+      "arrivalTime": "Expected arrival",
+      "holdUntil": "Held until {when} while the guest pays the deposit.",
+      "rooms": "Rooms",
+      "breakfast": "breakfast included",
+      "roomNo": "Room {number}",
+      "bed": "bed {label}",
+      "unassigned": "No room yet",
+      "room": "Room",
+      "bedLabel": "Bed",
+      "timeline": "History"
+    },
+    "timeline": {
+      "held": "Held",
+      "confirmed": "Confirmed",
+      "deposit_paid": "Deposit paid",
+      "modified": "Dates changed",
+      "room_assigned": "Room assigned",
+      "checked_in": "Checked in",
+      "checked_out": "Checked out",
+      "cancelled": "Canceled",
+      "expired": "Hold expired",
+      "no_show": "No-show"
+    },
+    "folio": {
+      "title": "Folio",
+      "balance": "Balance",
+      "notPosted": "Room nights post at check-in. Expected balance:",
+      "empty": "No folio lines yet.",
+      "description": "Description",
+      "amount": "Amount ({currency})",
+      "methodLabel": "Paid by",
+      "post": "Post to folio",
+      "defaultCharge": "Extra",
+      "defaultPayment": "Payment",
+      "kind": {
+        "room": "Room night",
+        "tax": "Tax",
+        "extra": "Extra",
+        "outlet": "Restaurant",
+        "fee": "Fee",
+        "payment": "Payment",
+        "refund": "Refund",
+        "adjustment": "Adjustment"
+      },
+      "method": {
+        "card_online": "card, online",
+        "card_terminal": "card terminal",
+        "cash": "cash",
+        "bank_transfer": "bank transfer",
+        "other": "other"
+      }
+    },
+    "reg": {
+      "title": "Guest registration",
+      "checkInTitle": "Check in",
+      "none": "This property asks for no registration details.",
+      "why": "Only the details your property is legally required to collect. They are deleted after the retention period you set."
+    },
+    "actions": {
+      "checkIn": "Check in",
+      "confirmCheckIn": "Confirm check-in",
+      "checkOut": "Check out",
+      "addCharge": "Add charge",
+      "addPayment": "Take payment",
+      "modify": "Change dates",
+      "cancel": "Cancel",
+      "noShow": "No-show",
+      "assign": "Assign",
+      "move": "Move"
+    },
+    "modify": {
+      "title": "Change dates",
+      "note": "The new nights are secured first. If they are not available, the reservation stays exactly as it is.",
+      "submit": "Change dates"
+    },
+    "cancel": {
+      "title": "Cancel reservation",
+      "free": "Free cancellation applies.",
+      "late": "The free cancellation period has ended; the policy fee applies.",
+      "nonRefundable": "This rate is non-refundable.",
+      "fee": "Fee",
+      "refund": "Refund",
+      "outstanding": "Still due",
+      "confirm": "Cancel reservation"
+    },
+    "book": {
+      "new": "New reservation",
+      "adults": "Adults",
+      "rooms": "Rooms",
+      "search": "Check availability",
+      "left": "{count} left",
+      "guestName": "Guest name",
+      "email": "Email",
+      "phone": "Phone",
+      "groupName": "Group name",
+      "create": "Create reservation",
+      "depositNote": "Front-desk bookings are confirmed straight away; collect any deposit on the folio."
+    },
+    "rates": {
+      "roomAndPlan": "Room type and rate",
+      "left": "{count} left",
+      "derived": "derived",
+      "minShort": "min {count}",
+      "cta": "no arrival",
+      "ctd": "no departure",
+      "closed": "closed",
+      "legend": "Nightly prices in {currency} for the base occupancy, before taxes. Derived rates follow their parent rate.",
+      "bulkTitle": "Change dates in bulk",
+      "plan": "Rate plan",
+      "roomTypes": "Room types",
+      "weekdays": "Only these weekdays",
+      "price": "Price per night ({currency})",
+      "priceHint": "Leave empty to keep the season or base price",
+      "minStay": "Minimum stay (nights)",
+      "flag": {
+        "closed": "Closed",
+        "closedToArrival": "Closed to arrival",
+        "closedToDeparture": "Closed to departure"
+      },
+      "apply": "Apply",
+      "updated": "{count} nights updated",
+      "baseTitle": "Base prices",
+      "baseNote": "Price per night in {currency}. Weekend prices and seasons are kept.",
+      "current": "Now {amount}",
+      "noPrice": "No price — not sellable on this rate",
+      "derivedNote": "Derived rates:",
+      "saveBase": "Save prices"
+    },
+    "task": {
+      "status": {
+        "todo": "To do",
+        "in_progress": "In progress",
+        "done": "Done"
+      },
+      "kind": {
+        "departure_clean": "Departure clean",
+        "stayover": "Stayover",
+        "inspection": "Inspection",
+        "maintenance": "Maintenance",
+        "turndown": "Turndown"
+      }
+    },
+    "hkb": {
+      "date": "Date",
+      "assignee": "Assigned to",
+      "unassigned": "Unassigned",
+      "start": "Start",
+      "done": "Done",
+      "reopen": "Reopen",
+      "rooms": "Rooms",
+      "markClean": "Mark clean",
+      "markInspected": "Mark inspected",
+      "markDirty": "Mark dirty",
+      "outOfOrder": "Out of order",
+      "backInService": "Back in service",
+      "reason": "Reason",
+      "until": "Back in service on"
+    },
+    "occ": {
+      "vacant": "Vacant",
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "stayover": "Stayover"
+    },
+    "outlet": {
+      "offTitle": "No restaurant outlet",
+      "offBody": "Turn on the restaurant outlet in Setup to sell food and drink with the Foods engine and charge it to rooms.",
+      "noMenu": "No published menu for this property yet. Publish one under Foods → Menu.",
+      "qty": "Quantity of {item}",
+      "guest": "Charge to",
+      "pickGuest": "Choose an in-house guest",
+      "note": "The order goes to the kitchen display and onto the guest’s folio. Rejected or canceled orders come off the folio automatically.",
+      "charge": "Charge to room",
+      "charged": "Order {order} charged to the room."
+    },
+    "setup": {
+      "property": "Property settings",
+      "checkIn": "Check-in from",
+      "checkOut": "Check-out by",
+      "preArrival": "Pre-arrival message (days before)",
+      "requireInspected": "Rooms must be inspected before check-in",
+      "outlet": "Restaurant outlet",
+      "saved": "Saved",
+      "save": "Save settings",
+      "roomTypes": "Room types",
+      "rooms": "Rooms",
+      "noRooms": "No rooms yet",
+      "roomType": "Room type",
+      "number": "Number",
+      "beds": "Beds",
+      "addRoom": "Add room",
+      "occupancy": "{base}–{max} guests",
+      "kind": {
+        "room": "room",
+        "apartment": "apartment",
+        "dorm": "dorm beds"
+      },
+      "taxes": "Taxes",
+      "taxNote": "Enter the taxes your property must charge (for example city or occupancy tax). BranchHarbor never supplies tax amounts.",
+      "noTaxes": "No taxes configured",
+      "taxName": "Name",
+      "taxKind": "Charged",
+      "taxRate": "Rate (%)",
+      "taxAmount": "Amount ({currency})",
+      "addTax": "Add tax",
+      "policies": "Cancellation policies"
+    },
+    "tax": {
+      "percent": "% of room price",
+      "per_night": "per room per night",
+      "per_person_per_night": "per person per night",
+      "per_stay": "per stay",
+      "inclusive": "included in price"
+    },
+    "channels": {
+      "sandboxTitle": "Sandbox only",
+      "sandboxBody": "Preview the availability and rates each channel manager would receive. Nothing is sent and no sync is live.",
+      "sandbox": "Sandbox",
+      "preview": "Preview next 7 nights",
+      "exports": "{count, plural, one {# sandbox export} other {# sandbox exports}}",
+      "previewTitle": "{provider} payload · {count} rows"
     }
   }
 }

@@ -1834,7 +1834,8 @@
       "consent": "Senden Sie mir gelegentlich Produktneuigkeiten per E-Mail. Abmeldung jederzeit möglich.",
       "submit": "Demo anfragen",
       "sending": "Wird gesendet …",
-      "securityCheck": "Sicherheitsprüfung"
+      "securityCheck": "Sicherheitsprüfung",
+      "hospitalityOption": "Gastgewerbe (Hotels, Pensionen, Hostels)"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Dieses Formular enthält # Problem} other {Dieses Formular enthält # Probleme}}",

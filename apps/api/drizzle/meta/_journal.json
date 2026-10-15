@@ -92,6 +92,13 @@
       "when": 1792017847568,
       "tag": "0012_payments_saved_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792066938564,
+      "tag": "0013_hospitality",
+      "breakpoints": true
     }
   ]
 }

@@ -105,8 +105,7 @@ export const FIXTURES: Record<IndustryKey, IndustryFixture> = {
       ['syd', 'SYD', 'Sydney Paddington', '312 Oxford St', 'Paddington', 'NSW', 'AU', 'apac', 'og_company', 'company', 'AUD', 'Australia/Sydney', 'en-AU', '+61 2 5550 0312', 'Mon–Sat 09:00–17:30', 'live', 'ok', P.blush, 0],
     ] as L[]).map(mk('Office · v3')),
     localLocationId: 'tor', staffLocationId: 'tor', people: { hq: 'Elena Vargas', local: 'Marcus Lee', staff: 'Nadia Hassan' },
-  },
-};
+  }, /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return FIXTURES.realty; } };
 
 export function fixture(ind: IndustryKey): IndustryFixture {
   return FIXTURES[ind];

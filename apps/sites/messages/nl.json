@@ -89,7 +89,9 @@
     "commerce": "Shop in deze winkel",
     "commerceCta": "Producten bekijken",
     "realty": "Woningen",
-    "realtyCta": "Woningen zoeken"
+    "realtyCta": "Woningen zoeken",
+    "hospitality": "Verblijf boeken",
+    "hospitalityCta": "Beschikbaarheid bekijken"
   },
   "schedule": {
     "title": "Lesrooster",
@@ -1131,6 +1133,131 @@
       "awaiting_transfer": "Onderweg naar de winkel",
       "stock_conflict": "De winkel neemt contact met je op",
       "cancelled": "Geannuleerd"
+    }
+  },
+  "stay": {
+    "title": "Boek je verblijf bij {name}",
+    "times": "Inchecken vanaf {checkIn} · uitchecken voor {checkOut}",
+    "restaurant": "Restaurant ter plaatse",
+    "taxesTitle": "Belastingen die de accommodatie rekent",
+    "included": "inbegrepen in de prijs",
+    "houseRules": "Huisregels:",
+    "search": {
+      "label": "Kamer zoeken",
+      "arrival": "Aankomst",
+      "departure": "Vertrek",
+      "adults": "Volwassenen",
+      "children": "Kinderen",
+      "rooms": "Kamers",
+      "cta": "Beschikbaarheid bekijken"
+    },
+    "results": {
+      "title": "{nights, plural, one {# nacht} other {# nachten}} · {from} → {to}",
+      "none": "Er is niets beschikbaar op deze data. Probeer andere data of minder kamers.",
+      "dormBed": "Bed in een gedeelde slaapzaal",
+      "sleeps": "Voor {count} personen",
+      "size": "{size} m²",
+      "soldOut": "uitverkocht",
+      "left": "nog {count}",
+      "breakfast": "Ontbijt inbegrepen",
+      "deposit": "Aanbetaling vandaag: {amount}",
+      "noDeposit": "Vandaag niets te betalen",
+      "inclTaxes": "totaal incl. belastingen",
+      "taxIncluded": "belastingen inbegrepen",
+      "noTaxes": "totaal voor je verblijf",
+      "select": "Kiezen",
+      "selectAria": "{room}, {rate} kiezen"
+    },
+    "reason": {
+      "invalid_dates": "Kies een vertrek na de aankomst",
+      "too_many_guests": "Te veel gasten voor deze kamer",
+      "no_price": "Niet beschikbaar op deze data",
+      "closed": "Niet beschikbaar op een van deze nachten",
+      "closed_to_arrival": "Geen aankomst op deze datum",
+      "closed_to_departure": "Geen vertrek op deze datum",
+      "min_stay": "Langer verblijf nodig",
+      "max_stay": "Alleen voor kortere verblijven"
+    },
+    "policy": {
+      "nonRefundable": "Niet-restitueerbaar",
+      "noFreeWindow": "Annuleringskosten zijn altijd van toepassing",
+      "freeUntil": "Gratis annuleren tot {hours} uur voor aankomst, daarna {fee}",
+      "feeFirstNight": "wordt de eerste nacht gerekend",
+      "feeFull": "wordt het hele verblijf gerekend",
+      "feePercent": "wordt {percent}% van het verblijf gerekend",
+      "feeNone": "zonder kosten",
+      "feeFixed": "geldt een vast bedrag"
+    },
+    "guest": {
+      "title": "Je gegevens",
+      "party": "{adults} volwassenen, {children} kinderen",
+      "nightly": "Vanaf {from} per nacht",
+      "total": "Totaal {amount}",
+      "depositNow": "Nu {amount} aanbetaling, de rest ter plaatse",
+      "payAtProperty": "Betalen ter plaatse",
+      "checkIn": "inchecken vanaf {time}",
+      "name": "Volledige naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "arrivalTime": "Verwachte aankomsttijd",
+      "requests": "Verzoeken voor de accommodatie",
+      "consentEmail": "Stuur me vóór mijn verblijf aankomstinformatie per e-mail",
+      "consentSms": "Stuur me op de dag incheckinformatie per sms",
+      "terms": "Ik ga akkoord met de tarief-, betalings- en annuleringsvoorwaarden van {business}",
+      "privacy": "We vragen alleen wat de accommodatie nodig heeft voor je boeking.",
+      "holdCta": "Door naar betalen",
+      "bookCta": "Boeking bevestigen"
+    },
+    "errors": {
+      "dates": "Kies een vertrek na de aankomst.",
+      "name": "Vul je naam in",
+      "email": "Vul een geldig e-mailadres in",
+      "terms": "Ga akkoord met de voorwaarden om verder te gaan",
+      "check": "Controleer je gegevens"
+    },
+    "pay": {
+      "title": "Betaal je aanbetaling",
+      "held": "Je kamer wordt vastgehouden terwijl je betaalt (boeking {code}).",
+      "depositToday": "Aanbetaling vandaag {amount} van {total}",
+      "cta": "Betaal {amount}",
+      "failed": "De betaling is niet gelukt. Je kamer blijft een paar minuten vastgehouden — probeer het opnieuw."
+    },
+    "status": {
+      "hold": "Wacht op aanbetaling",
+      "confirmed": "Bevestigd",
+      "checked_in": "Ingecheckt",
+      "checked_out": "Afgerond",
+      "cancelled": "Geannuleerd",
+      "no_show": "Niet verschenen",
+      "expired": "Verlopen"
+    },
+    "manage": {
+      "title": "Je verblijf",
+      "greeting": "Hallo {name}",
+      "code": "Boeking {code}",
+      "nights": "{count, plural, one {# nacht} other {# nachten}}",
+      "checkOut": "uitchecken voor {time}",
+      "total": "Totaal",
+      "depositPaid": "Betaald",
+      "dueAtProperty": "Te betalen ter plaatse",
+      "changeTitle": "Data wijzigen",
+      "changeNote": "We leggen eerst de nieuwe nachten vast. Zijn die niet beschikbaar, dan blijft je boeking ongewijzigd.",
+      "changeCta": "Wijzigen",
+      "changed": "Data gewijzigd. De nieuwe prijs is {difference} {direction, select, more {hoger} other {lager}}.",
+      "changedSame": "Data gewijzigd. De prijs blijft gelijk.",
+      "cancelTitle": "Boeking annuleren",
+      "cancelFree": "Nu annuleren is gratis. Je krijgt {refund} terug.",
+      "cancelFee": "Nu annuleren kost {fee}. Je krijgt {refund} terug.",
+      "cancelOutstanding": "{amount} van de kosten valt niet onder je aanbetaling; de accommodatie neemt contact op.",
+      "cancelCta": "Annuleren",
+      "cancelConfirm": "Ja, annuleer mijn boeking",
+      "cancelled": "Je boeking is geannuleerd."
+    },
+    "reg": {
+      "title": "Registratiegegevens",
+      "why": "De accommodatie moet deze gegevens wettelijk vastleggen. Vul ze nu in om sneller in te checken.",
+      "save": "Opslaan",
+      "saved": "Gegevens opgeslagen."
     }
   }
 }

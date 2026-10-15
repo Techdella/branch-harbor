@@ -1834,7 +1834,8 @@
       "consent": "Envoyez-moi occasionnellement des nouveautés produit par e-mail. Vous pouvez vous désabonner à tout moment.",
       "submit": "Demander la démo",
       "sending": "Envoi…",
-      "securityCheck": "Vérification de sécurité"
+      "securityCheck": "Vérification de sécurité",
+      "hospitalityOption": "Hôtellerie (hôtels, chambres d’hôtes, auberges)"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {Ce formulaire contient # problème} other {Ce formulaire contient # problèmes}}",

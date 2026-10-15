@@ -1,4 +1,4 @@
-export const INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
+export const INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'] as const;
 export type Industry = (typeof INDUSTRIES)[number];
 
 export interface IndustryMeta {
@@ -19,4 +19,5 @@ export const INDUSTRY_META: Record<Industry, IndustryMeta> = {
   commerce: { key: 'commerce', name: 'Commerce', customerNoun: 'Customers', staffNoun: 'Store associate', primaryCta: 'Shop now', workflow: 'Discovery → order → fulfilment', release: 'next' },
   foods: { key: 'foods', name: 'Foods', customerNoun: 'Guests', staffNoun: 'Kitchen lead', primaryCta: 'Order pickup', workflow: 'Location → menu → order → pickup', release: 'next' },
   realty: { key: 'realty', name: 'Real Estate', customerNoun: 'Buyers & sellers', staffNoun: 'Agent', primaryCta: 'Book a viewing', workflow: 'Listing → enquiry → viewing → offer', release: 'next' },
+  hospitality: { key: 'hospitality', name: 'Hospitality', customerNoun: 'Guests', staffNoun: 'Front desk', primaryCta: 'Book a stay', workflow: 'Dates → room & rate → deposit → stay', release: 'next' },
 };

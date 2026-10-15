@@ -81,6 +81,10 @@
     "realty": {
       "name": "Imobiliário",
       "customers": "Clientes"
+    },
+    "hospitality": {
+      "name": "Hotelaria",
+      "customers": "Hóspedes"
     }
   },
   "shell": {
@@ -399,6 +403,44 @@
       "portals": {
         "title": "Feeds de portais",
         "description": "Prévia dos feeds de anúncios para portais imobiliários. Apenas sandbox — nada é enviado."
+      }
+    },
+    "hospitality": {
+      "pulse": {
+        "title": "Pulso",
+        "description": "Hoje em cada propriedade: ocupação, diária média e RevPAR na própria moeda, chegadas, saídas e quartos para limpar."
+      },
+      "grid": {
+        "title": "Mapa de quartos",
+        "description": "Quartos por noite: quem fica onde, estadias sem quarto e bloqueios fora de serviço."
+      },
+      "reservations": {
+        "title": "Reservas",
+        "description": "Chegadas, hóspedes e saídas, com fólio, check-in e check-out."
+      },
+      "rates": {
+        "title": "Tarifas e disponibilidade",
+        "description": "Preços por noite na moeda da propriedade, temporadas, estadias mínimas e fechamentos por tarifa."
+      },
+      "housekeeping": {
+        "title": "Governança",
+        "description": "Limpezas e inspeções do dia por status, status dos quartos e manutenção."
+      },
+      "outlet": {
+        "title": "Restaurante",
+        "description": "Venda com o módulo de alimentação e lance pedidos no quarto."
+      },
+      "hotelreports": {
+        "title": "Relatórios",
+        "description": "Ocupação, diária média e RevPAR por propriedade e moeda, pickup e cancelamentos."
+      },
+      "setup": {
+        "title": "Configuração",
+        "description": "Horários, tipos de quarto e quartos, impostos e políticas de cancelamento."
+      },
+      "channels": {
+        "title": "Gerenciadores de canais",
+        "description": "Conexões SiteMinder, Cloudbeds e Channex — apenas prévias de teste, nada é enviado."
       }
     }
   },
@@ -1896,6 +1938,13 @@
         "itemsTitle": "Adicione itens do cardápio",
         "itemSingular": "Item do cardápio",
         "itemPh": "ex.: Bowl de frango na brasa"
+      },
+      "hospitality": {
+        "name": "Hotelaria",
+        "workflow": "Datas → quarto e tarifa → depósito → estadia",
+        "itemsTitle": "Adicione seus tipos de quarto",
+        "itemSingular": "Tipo de quarto",
+        "itemPh": "ex. Duplo vista rio · 2 hóspedes"
       }
     },
     "modelLegend": "Tipo de empresa",
@@ -2011,7 +2060,8 @@
         "wellness": "Sistema de agendamentos",
         "commerce": "Loja e checkout",
         "foods": "Pedidos",
-        "realty": "Anúncios e contatos"
+        "realty": "Anúncios e contatos",
+        "hospitality": "Quartos e reservas"
       },
       "status": {
         "available": "Disponível",
@@ -2082,6 +2132,16 @@
           "keep": {
             "title": "Conexão com serviço de anúncios",
             "body": "Importe anúncios do seu serviço de anúncios."
+          }
+        },
+        "hospitality": {
+          "native": {
+            "title": "Motor de reservas BranchHarbor",
+            "body": "Quartos, tarifas, reservas, fólios e governança."
+          },
+          "keep": {
+            "title": "Conexão com gerenciador de canais",
+            "body": "Sincronizar disponibilidade com SiteMinder, Cloudbeds ou Channex (depois)."
           }
         }
       },
@@ -4545,6 +4605,359 @@
       "past": "O novo horário já passou.",
       "practitioner_busy": "O profissional já tem um agendamento (intervalos incluídos).",
       "room_busy": "A sala já está reservada (intervalos incluídos)."
+    },
+    "sold_out": "Essas datas acabaram de esgotar para este tipo de quarto. Escolha outras datas ou quartos.",
+    "would_overbook": "Esta alteração deixaria mais estadias do que quartos em algumas noites. Mova ou cancele essas estadias primeiro.",
+    "room_taken": "Esse quarto já está atribuído a outra estadia em algumas dessas noites.",
+    "room_not_ready": "O quarto ainda não está pronto.",
+    "room_not_assigned": "Atribua um quarto a cada quarto reservado antes do check-in.",
+    "balance_due": "Quite o fólio antes do check-out.",
+    "not_arrival_day": "O check-in só é possível a partir da data de chegada.",
+    "not_in_house": "Somente hóspedes com check-in podem lançar no quarto.",
+    "room_out_of_order": "Esse quarto está fora de serviço em algumas dessas noites.",
+    "room_assigned": "O quarto está atribuído a uma estadia nesse período. Mova-a primeiro.",
+    "room_type_mismatch": "Escolha um quarto do tipo reservado.",
+    "not_modifiable": "Esta reserva não pode mais ser alterada.",
+    "not_cancellable": "Esta reserva não pode mais ser cancelada.",
+    "outlet_disabled": "Esta propriedade não tem restaurante ativado.",
+    "not_yet_arrival": "O não comparecimento só pode ser registrado a partir da chegada.",
+    "folio_closed": "Este fólio está fechado.",
+    "rate_min_stay": "Esta tarifa exige uma estadia maior.",
+    "rate_closed_to_arrival": "Não há chegada nesta data para esta tarifa.",
+    "property_not_accepting_bookings": "Esta propriedade não está aceitando reservas no momento."
+  },
+  "hosp": {
+    "common": {
+      "property": "Propriedade",
+      "refresh": "Atualizar",
+      "close": "Fechar",
+      "notAvailable": "Indisponível",
+      "noPropertiesTitle": "Nenhuma propriedade ainda",
+      "noPropertiesBody": "Adicione um local para começar a vender quartos. Cada local é uma propriedade com moeda e fuso horário próprios.",
+      "liveOnlyTitle": "Hotelaria precisa de conexão com sua conta",
+      "liveOnlyBody": "Quartos, tarifas e reservas são sempre lidos da sua conta real. Não há dados de exemplo para este setor."
+    },
+    "status": {
+      "hold": "Em espera",
+      "confirmed": "Confirmada",
+      "checked_in": "Hospedado",
+      "checked_out": "Saiu",
+      "cancelled": "Cancelada",
+      "no_show": "Não compareceu",
+      "expired": "Expirada"
+    },
+    "hk": {
+      "clean": "Limpo",
+      "dirty": "Sujo",
+      "inspected": "Inspecionado",
+      "out_of_order": "Fora de serviço"
+    },
+    "source": {
+      "website": "site",
+      "mobile": "app",
+      "front_desk": "recepção",
+      "phone": "telefone",
+      "email": "e-mail",
+      "channel": "gerenciador de canais"
+    },
+    "pulse": {
+      "occupancy": "Ocupação",
+      "adr": "Diária média",
+      "revpar": "RevPAR",
+      "roomsSold": "{sold} de {available} quartos hoje",
+      "arrivals": "Chegadas",
+      "departures": "Saídas",
+      "inHouse": "Hospedados",
+      "checkedIn": "{count} com check-in",
+      "checkedOut": "{count} com check-out",
+      "dirty": "{count, plural, one {# quarto para limpar} other {# quartos para limpar}}",
+      "outOfOrder": "{count} fora de serviço",
+      "openTasks": "{count, plural, one {# tarefa aberta} other {# tarefas abertas}}",
+      "note": "A diária média e o RevPAR excluem impostos e aparecem na moeda de cada propriedade. Valores em moedas diferentes nunca são somados."
+    },
+    "reports": {
+      "from": "De",
+      "to": "Até",
+      "byCurrency": "Por moeda",
+      "byProperty": "Por propriedade",
+      "currency": "Moeda",
+      "available": "Diárias disponíveis",
+      "sold": "Diárias vendidas",
+      "revenue": "Receita de quartos",
+      "beds": "Camas em dormitório",
+      "neverCombined": "Cada moeda tem sua própria linha. A BranchHarbor nunca converte nem combina moedas nesses números.",
+      "pickup": "Pickup",
+      "noPickup": "Nenhuma reserva nova para este período nos últimos 14 dias.",
+      "bookedOn": "Reservado em",
+      "bookings": "Reservas",
+      "roomNights": "Diárias",
+      "cancellations": "Cancelamentos e não comparecimentos",
+      "noCancellations": "Nenhum cancelamento para estadias neste período.",
+      "cancelled": "Canceladas",
+      "noShows": "Não compareceram",
+      "nightsLost": "Diárias perdidas",
+      "feesRetained": "Taxas retidas",
+      "definitions": "Ocupação = diárias vendidas ÷ disponíveis (sem quartos fora de serviço). Diária média = receita ÷ diárias vendidas. RevPAR = receita ÷ diárias disponíveis.",
+      "generated": "Atualizado {when}"
+    },
+    "grid": {
+      "prev": "Anterior",
+      "next": "Próximo",
+      "today": "Hoje",
+      "nights": "Noites exibidas",
+      "room": "Quarto",
+      "beds": "{count} camas",
+      "availTitle": "{available} de {total} livres",
+      "unassigned": "{count, plural, one {# estadia sem quarto} other {# estadias sem quarto}}",
+      "noRoomsTitle": "Ainda não há quartos",
+      "noRoomsBody": "Adicione tipos de quarto e quartos em Configuração para ver a grade."
+    },
+    "list": {
+      "arrivals": "Chegadas",
+      "in_house": "Hospedados",
+      "departures": "Saídas",
+      "upcoming": "Próximas",
+      "all": "Todas",
+      "search": "Buscar código, hóspede ou grupo",
+      "code": "Reserva",
+      "guest": "Hóspede",
+      "stay": "Estadia",
+      "status": "Status",
+      "nights": "{count, plural, one {# noite} other {# noites}}",
+      "emptyTitle": "Nada aqui",
+      "emptyBody": "Nenhuma reserva corresponde a esta visualização."
+    },
+    "res": {
+      "title": "Reserva",
+      "source": "Reservada via {source}",
+      "arrival": "Chegada",
+      "departure": "Saída",
+      "guests": "Hóspedes",
+      "guestCount": "{adults} adultos · {children} crianças",
+      "total": "Total",
+      "deposit": "Depósito pago",
+      "contact": "Contato",
+      "arrivalTime": "Chegada prevista",
+      "holdUntil": "Retida até {when} enquanto o hóspede paga o depósito.",
+      "rooms": "Quartos",
+      "breakfast": "café da manhã incluído",
+      "roomNo": "Quarto {number}",
+      "bed": "cama {label}",
+      "unassigned": "Sem quarto",
+      "room": "Quarto",
+      "bedLabel": "Cama",
+      "timeline": "Histórico"
+    },
+    "timeline": {
+      "held": "Retida",
+      "confirmed": "Confirmada",
+      "deposit_paid": "Depósito pago",
+      "modified": "Datas alteradas",
+      "room_assigned": "Quarto atribuído",
+      "checked_in": "Check-in",
+      "checked_out": "Check-out",
+      "cancelled": "Cancelada",
+      "expired": "Retenção expirada",
+      "no_show": "Não compareceu"
+    },
+    "folio": {
+      "title": "Fólio",
+      "balance": "Saldo",
+      "notPosted": "As diárias são lançadas no check-in. Saldo previsto:",
+      "empty": "Nenhum lançamento ainda.",
+      "description": "Descrição",
+      "amount": "Valor ({currency})",
+      "methodLabel": "Pago com",
+      "post": "Lançar no fólio",
+      "defaultCharge": "Extra",
+      "defaultPayment": "Pagamento",
+      "kind": {
+        "room": "Diária",
+        "tax": "Imposto",
+        "extra": "Extra",
+        "outlet": "Restaurante",
+        "fee": "Taxa",
+        "payment": "Pagamento",
+        "refund": "Reembolso",
+        "adjustment": "Ajuste"
+      },
+      "method": {
+        "card_online": "cartão, online",
+        "card_terminal": "maquininha",
+        "cash": "dinheiro",
+        "bank_transfer": "transferência",
+        "other": "outro"
+      }
+    },
+    "reg": {
+      "title": "Registro do hóspede",
+      "checkInTitle": "Fazer check-in",
+      "none": "Esta propriedade não pede dados de registro.",
+      "why": "Somente os dados que sua propriedade é obrigada a coletar por lei. Eles são apagados após o prazo de retenção definido."
+    },
+    "actions": {
+      "checkIn": "Check-in",
+      "confirmCheckIn": "Confirmar check-in",
+      "checkOut": "Check-out",
+      "addCharge": "Adicionar cobrança",
+      "addPayment": "Receber pagamento",
+      "modify": "Alterar datas",
+      "cancel": "Cancelar",
+      "noShow": "Não compareceu",
+      "assign": "Atribuir",
+      "move": "Mover"
+    },
+    "modify": {
+      "title": "Alterar datas",
+      "note": "As novas noites são garantidas primeiro. Se não houver disponibilidade, a reserva fica exatamente como está.",
+      "submit": "Alterar"
+    },
+    "cancel": {
+      "title": "Cancelar reserva",
+      "free": "O cancelamento é gratuito.",
+      "late": "O prazo de cancelamento gratuito terminou; aplica-se a taxa da política.",
+      "nonRefundable": "Esta tarifa não é reembolsável.",
+      "fee": "Taxa",
+      "refund": "Reembolso",
+      "outstanding": "Ainda devido",
+      "confirm": "Cancelar reserva"
+    },
+    "book": {
+      "new": "Nova reserva",
+      "adults": "Adultos",
+      "rooms": "Quartos",
+      "search": "Ver disponibilidade",
+      "left": "Restam {count}",
+      "guestName": "Nome do hóspede",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "groupName": "Nome do grupo",
+      "create": "Criar reserva",
+      "depositNote": "Reservas da recepção são confirmadas na hora; receba o depósito pelo fólio."
+    },
+    "rates": {
+      "roomAndPlan": "Tipo de quarto e tarifa",
+      "left": "Restam {count}",
+      "derived": "derivada",
+      "minShort": "mín {count}",
+      "cta": "sem chegada",
+      "ctd": "sem saída",
+      "closed": "fechado",
+      "legend": "Preços por noite em {currency} para a ocupação base, sem impostos. Tarifas derivadas seguem a tarifa principal.",
+      "bulkTitle": "Alterar um período",
+      "plan": "Plano tarifário",
+      "roomTypes": "Tipos de quarto",
+      "weekdays": "Somente nestes dias",
+      "price": "Preço por noite ({currency})",
+      "priceHint": "Deixe vazio para manter o preço de temporada ou base",
+      "minStay": "Estadia mínima (noites)",
+      "flag": {
+        "closed": "Fechado",
+        "closedToArrival": "Fechado para chegada",
+        "closedToDeparture": "Fechado para saída"
+      },
+      "apply": "Aplicar",
+      "updated": "{count} noites atualizadas",
+      "baseTitle": "Preços base",
+      "baseNote": "Preço por noite em {currency}. Preços de fim de semana e temporadas são mantidos.",
+      "current": "Atual {amount}",
+      "noPrice": "Sem preço — não vendável nesta tarifa",
+      "derivedNote": "Tarifas derivadas:",
+      "saveBase": "Salvar preços"
+    },
+    "task": {
+      "status": {
+        "todo": "A fazer",
+        "in_progress": "Em andamento",
+        "done": "Concluído"
+      },
+      "kind": {
+        "departure_clean": "Limpeza de saída",
+        "stayover": "Arrumação diária",
+        "inspection": "Inspeção",
+        "maintenance": "Manutenção",
+        "turndown": "Arrumação noturna"
+      }
+    },
+    "hkb": {
+      "date": "Data",
+      "assignee": "Atribuída a",
+      "unassigned": "Sem responsável",
+      "start": "Iniciar",
+      "done": "Concluído",
+      "reopen": "Reabrir",
+      "rooms": "Quartos",
+      "markClean": "Marcar limpo",
+      "markInspected": "Marcar inspecionado",
+      "markDirty": "Marcar sujo",
+      "outOfOrder": "Fora de serviço",
+      "backInService": "Voltar ao serviço",
+      "reason": "Motivo",
+      "until": "Volta ao serviço em"
+    },
+    "occ": {
+      "vacant": "Livre",
+      "arrival": "Chegada",
+      "departure": "Saída",
+      "stayover": "Permanece"
+    },
+    "outlet": {
+      "offTitle": "Sem restaurante",
+      "offBody": "Ative o restaurante em Configuração para vender com o módulo de alimentação e lançar no quarto.",
+      "noMenu": "Ainda não há cardápio publicado. Publique um em Alimentação → Cardápio.",
+      "qty": "Quantidade de {item}",
+      "guest": "Lançar para",
+      "pickGuest": "Escolha um hóspede",
+      "note": "O pedido vai para a tela da cozinha e para o fólio do hóspede. Pedidos recusados ou cancelados saem do fólio automaticamente.",
+      "charge": "Lançar no quarto",
+      "charged": "Pedido {order} lançado no quarto."
+    },
+    "setup": {
+      "property": "Configurações da propriedade",
+      "checkIn": "Check-in a partir de",
+      "checkOut": "Check-out até",
+      "preArrival": "Mensagem pré-chegada (dias antes)",
+      "requireInspected": "Inspecionar quartos antes do check-in",
+      "outlet": "Restaurante",
+      "saved": "Salvo",
+      "save": "Salvar configurações",
+      "roomTypes": "Tipos de quarto",
+      "rooms": "Quartos",
+      "noRooms": "Ainda não há quartos",
+      "roomType": "Tipo de quarto",
+      "number": "Número",
+      "beds": "Camas",
+      "addRoom": "Adicionar",
+      "occupancy": "{base}–{max} hóspedes",
+      "kind": {
+        "room": "quarto",
+        "apartment": "apartamento",
+        "dorm": "camas em dormitório"
+      },
+      "taxes": "Impostos",
+      "taxNote": "Informe os impostos que sua propriedade deve cobrar (por exemplo, taxa de turismo). A BranchHarbor nunca sugere valores.",
+      "noTaxes": "Nenhum imposto configurado",
+      "taxName": "Nome",
+      "taxKind": "Cobrança",
+      "taxRate": "Alíquota (%)",
+      "taxAmount": "Valor ({currency})",
+      "addTax": "Adicionar",
+      "policies": "Políticas de cancelamento"
+    },
+    "tax": {
+      "percent": "% do preço",
+      "per_night": "por quarto por noite",
+      "per_person_per_night": "por pessoa por noite",
+      "per_stay": "por estadia",
+      "inclusive": "incluído no preço"
+    },
+    "channels": {
+      "sandboxTitle": "Somente sandbox",
+      "sandboxBody": "Veja a disponibilidade e as tarifas que cada gerenciador de canais receberia. Nada é enviado e nenhuma sincronização está ativa.",
+      "sandbox": "Sandbox",
+      "preview": "Prévia das próximas 7 noites",
+      "exports": "{count, plural, one {# exportação de teste} other {# exportações de teste}}",
+      "previewTitle": "Dados {provider} · {count} linhas"
     }
   }
 }

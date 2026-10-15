@@ -2,6 +2,7 @@ import { Image, View } from 'react-native';
 import { router } from 'expo-router';
 import { Avatar, Card, Icon, MoneyText, Screen, ScopeChipView, SectionHeader, SkeletonCard, Tag, Text, DataStatus, type IconName } from '@/components';
 import { RealtyEntry } from '@/features/realty/RealtyEntry';
+import { HospitalityEntry } from '@/features/hospitality/HospitalityEntry';
 import { useCatalog } from '@/features/customer/catalog';
 import { useLocationScope } from '@/features/customer/useLocationScope';
 import { useI18n } from '@/i18n';
@@ -146,6 +147,7 @@ export default function Home() {
         </>
       ) : null}
       <RealtyEntry kind="buyer" />
+      <HospitalityEntry kind="guest" />
     </Screen>
   );
 }

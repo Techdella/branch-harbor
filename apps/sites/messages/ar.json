@@ -89,7 +89,9 @@
     "commerce": "تسوّق من هذا المتجر",
     "commerceCta": "تصفح المنتجات",
     "realty": "العقارات",
-    "realtyCta": "ابحث عن منزل"
+    "realtyCta": "ابحث عن منزل",
+    "hospitality": "احجز إقامة",
+    "hospitalityCta": "تحقق من التوفر"
   },
   "schedule": {
     "title": "جدول الحصص",
@@ -1131,6 +1133,131 @@
       "awaiting_transfer": "في الطريق إلى المتجر",
       "stock_conflict": "سيتواصل معك المتجر",
       "cancelled": "ملغى"
+    }
+  },
+  "stay": {
+    "title": "احجز إقامتك في {name}",
+    "times": "تسجيل الوصول من {checkIn} · المغادرة حتى {checkOut}",
+    "restaurant": "مطعم في المكان",
+    "taxesTitle": "الضرائب التي تفرضها المنشأة",
+    "included": "مشمولة في السعر",
+    "houseRules": "قواعد المنشأة:",
+    "search": {
+      "label": "ابحث عن غرفة",
+      "arrival": "الوصول",
+      "departure": "المغادرة",
+      "adults": "البالغون",
+      "children": "الأطفال",
+      "rooms": "الغرف",
+      "cta": "تحقق من التوفر"
+    },
+    "results": {
+      "title": "{nights, plural, zero {# ليلة} one {ليلة واحدة} two {ليلتان} few {# ليالٍ} many {# ليلة} other {# ليلة}} · {from} → {to}",
+      "none": "لا يوجد توفر في هذه التواريخ. جرّب تواريخ أخرى أو عددًا أقل من الغرف.",
+      "dormBed": "سرير في مهجع مشترك",
+      "sleeps": "تتسع لـ {count}",
+      "size": "{size} م²",
+      "soldOut": "محجوز بالكامل",
+      "left": "متبقٍ {count}",
+      "breakfast": "الإفطار مشمول",
+      "deposit": "العربون اليوم: {amount}",
+      "noDeposit": "لا شيء للدفع اليوم",
+      "inclTaxes": "الإجمالي شامل الضرائب",
+      "taxIncluded": "الضرائب مشمولة",
+      "noTaxes": "إجمالي إقامتك",
+      "select": "اختر",
+      "selectAria": "اختر {room}، {rate}"
+    },
+    "reason": {
+      "invalid_dates": "اختر تاريخ مغادرة بعد الوصول",
+      "too_many_guests": "عدد الضيوف أكبر من سعة الغرفة",
+      "no_price": "غير متاح في هذه التواريخ",
+      "closed": "غير متاح في إحدى هذه الليالي",
+      "closed_to_arrival": "لا وصول في هذا التاريخ",
+      "closed_to_departure": "لا مغادرة في هذا التاريخ",
+      "min_stay": "يتطلب إقامة أطول",
+      "max_stay": "للإقامات الأقصر فقط"
+    },
+    "policy": {
+      "nonRefundable": "غير قابل للاسترداد",
+      "noFreeWindow": "تُطبّق رسوم الإلغاء في أي وقت",
+      "freeUntil": "إلغاء مجاني حتى {hours} ساعة قبل الوصول، ثم {fee}",
+      "feeFirstNight": "تُحتسب الليلة الأولى",
+      "feeFull": "تُحتسب الإقامة كاملة",
+      "feePercent": "تُحتسب نسبة {percent}% من الإقامة",
+      "feeNone": "دون رسوم",
+      "feeFixed": "تُفرض رسوم ثابتة"
+    },
+    "guest": {
+      "title": "بياناتك",
+      "party": "البالغون: {adults}، الأطفال: {children}",
+      "nightly": "من {from} لليلة",
+      "total": "الإجمالي {amount}",
+      "depositNow": "عربون {amount} الآن والباقي في المنشأة",
+      "payAtProperty": "الدفع في المنشأة",
+      "checkIn": "تسجيل الوصول من {time}",
+      "name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "arrivalTime": "وقت الوصول المتوقع",
+      "requests": "طلبات للمنشأة",
+      "consentEmail": "أرسل لي معلومات الوصول بالبريد الإلكتروني قبل إقامتي",
+      "consentSms": "أرسل لي معلومات تسجيل الوصول برسالة نصية في اليوم نفسه",
+      "terms": "أوافق على شروط السعر والدفع والإلغاء لدى {business}",
+      "privacy": "نطلب فقط ما تحتاجه المنشأة لإدارة حجزك.",
+      "holdCta": "المتابعة إلى الدفع",
+      "bookCta": "تأكيد الحجز"
+    },
+    "errors": {
+      "dates": "اختر تاريخ مغادرة بعد الوصول.",
+      "name": "أدخل اسمك",
+      "email": "أدخل بريدًا إلكترونيًا صالحًا",
+      "terms": "وافق على الشروط للمتابعة",
+      "check": "تحقق من بياناتك"
+    },
+    "pay": {
+      "title": "ادفع العربون",
+      "held": "غرفتك محجوزة أثناء الدفع (الحجز {code}).",
+      "depositToday": "العربون اليوم {amount} من {total}",
+      "cta": "ادفع {amount}",
+      "failed": "لم تكتمل عملية الدفع. تبقى الغرفة محجوزة لبضع دقائق — يرجى المحاولة مرة أخرى."
+    },
+    "status": {
+      "hold": "بانتظار العربون",
+      "confirmed": "مؤكد",
+      "checked_in": "تم تسجيل الوصول",
+      "checked_out": "مكتمل",
+      "cancelled": "ملغى",
+      "no_show": "لم يحضر",
+      "expired": "منتهي"
+    },
+    "manage": {
+      "title": "إقامتك",
+      "greeting": "مرحبًا {name}",
+      "code": "الحجز {code}",
+      "nights": "{count, plural, zero {# ليلة} one {ليلة واحدة} two {ليلتان} few {# ليالٍ} many {# ليلة} other {# ليلة}}",
+      "checkOut": "المغادرة حتى {time}",
+      "total": "الإجمالي",
+      "depositPaid": "المدفوع",
+      "dueAtProperty": "المستحق في المنشأة",
+      "changeTitle": "تغيير التواريخ",
+      "changeNote": "نحجز الليالي الجديدة أولًا. إن لم تكن متاحة يبقى حجزك كما هو تمامًا.",
+      "changeCta": "تغيير",
+      "changed": "تم تغيير التواريخ. السعر الجديد {direction, select, more {أعلى} other {أقل}} بمقدار {difference}.",
+      "changedSame": "تم تغيير التواريخ. السعر لم يتغير.",
+      "cancelTitle": "إلغاء الحجز",
+      "cancelFree": "الإلغاء الآن مجاني. ستسترد {refund}.",
+      "cancelFee": "الإلغاء الآن يكلّف {fee}. ستسترد {refund}.",
+      "cancelOutstanding": "لا يغطي العربون {amount} من الرسوم؛ ستتواصل معك المنشأة.",
+      "cancelCta": "إلغاء",
+      "cancelConfirm": "نعم، ألغِ حجزي",
+      "cancelled": "تم إلغاء حجزك."
+    },
+    "reg": {
+      "title": "بيانات التسجيل",
+      "why": "تلتزم المنشأة قانونًا بتسجيل هذه البيانات. أضفها الآن لتسريع تسجيل الوصول.",
+      "save": "حفظ",
+      "saved": "تم حفظ البيانات."
     }
   }
 }

@@ -8,11 +8,18 @@ const app = await buildApp();
 const sweep = setInterval(() => void app.ctx.jobs.enqueue('studios.expire-holds', {}).catch(() => {}), 60_000);
 // Real Estate: viewing reminders and consented saved-search alerts.
 const realtySweep = setInterval(() => void import('./services/realty-jobs.ts').then((m) => m.runRealtyHousekeeping(app.ctx)), 5 * 60_000);
+// Hospitality: expire unpaid holds and send consented pre-arrival / check-in messages.
+const hospitalitySweep = setInterval(() => void (async () => {
+  const m = await import('./services/hospitality.ts');
+  await m.expireHolds(app.ctx);
+  await (await import('./services/hospitality-ops.ts')).runGuestMessages(app.ctx);
+})().catch((err) => app.log.warn({ err }, 'hospitality sweep failed')), 5 * 60_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
   clearInterval(sweep);
   clearInterval(realtySweep);
+  clearInterval(hospitalitySweep);
   await app.close();
   process.exit(0);
 };

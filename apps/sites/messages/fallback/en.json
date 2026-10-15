@@ -72,6 +72,12 @@
     "link_invalid": "This sign-in link has expired or was already used. Ask for a new one.",
     "portal_session_expired": "Your session has ended. Ask for a new sign-in link.",
     "invalid_credentials": "Email or password is incorrect.",
-    "email_taken": "An account with this email already exists."
+    "email_taken": "An account with this email already exists.",
+    "sold_out": "Those dates just sold out. Please choose other dates or rooms.",
+    "rate_min_stay": "This rate needs a longer stay.",
+    "rate_closed_to_arrival": "Arrivals are not possible on this date for this rate.",
+    "not_modifiable": "This booking can no longer be changed online.",
+    "not_cancellable": "This booking can no longer be canceled.",
+    "property_not_accepting_bookings": "This property is not taking bookings right now."
   }
 }

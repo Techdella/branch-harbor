@@ -36,8 +36,7 @@ export const INDEPENDENT: Record<IndustryKey, IndependentFixture> = {
   foods: make('foods', 'bl', { id: 'org_ballard_corner', name: 'Ballard Corner Café', defaultCurrency: 'USD', defaultTimeZone: 'America/Los_Angeles', defaultLocale: 'en', dataRegion: 'us' },
     {}, 'Carlos Ortega'),
   realty: make('realty', 'tor', { id: 'org_annex_homes', name: 'Annex Homes Realty', defaultCurrency: 'CAD', defaultTimeZone: 'America/Toronto', defaultLocale: 'en', dataRegion: 'us' },
-    {}, 'Priya Shah'),
-};
+    {}, 'Priya Shah'), /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return INDEPENDENT.realty; } };
 
 export function independentSession(ind: IndustryKey): Session {
   const f = INDEPENDENT[ind];

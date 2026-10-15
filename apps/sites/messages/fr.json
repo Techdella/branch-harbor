@@ -89,7 +89,9 @@
     "commerce": "Acheter dans ce magasin",
     "commerceCta": "Voir les produits",
     "realty": "Biens",
-    "realtyCta": "Voir les biens"
+    "realtyCta": "Voir les biens",
+    "hospitality": "Réserver un séjour",
+    "hospitalityCta": "Voir les disponibilités"
   },
   "schedule": {
     "title": "Planning des cours",
@@ -1131,6 +1133,131 @@
       "awaiting_transfer": "En route vers la boutique",
       "stock_conflict": "La boutique vous contactera",
       "cancelled": "Annulée"
+    }
+  },
+  "stay": {
+    "title": "Réservez votre séjour à {name}",
+    "times": "Arrivée dès {checkIn} · départ avant {checkOut}",
+    "restaurant": "Restaurant sur place",
+    "taxesTitle": "Taxes perçues par l’établissement",
+    "included": "incluse dans le prix",
+    "houseRules": "Règlement intérieur :",
+    "search": {
+      "label": "Trouver une chambre",
+      "arrival": "Arrivée",
+      "departure": "Départ",
+      "adults": "Adultes",
+      "children": "Enfants",
+      "rooms": "Chambres",
+      "cta": "Voir les disponibilités"
+    },
+    "results": {
+      "title": "{nights, plural, one {# nuit} other {# nuits}} · {from} → {to}",
+      "none": "Rien n’est disponible à ces dates. Essayez d’autres dates ou moins de chambres.",
+      "dormBed": "Lit en dortoir partagé",
+      "sleeps": "Pour {count} personnes",
+      "size": "{size} m²",
+      "soldOut": "complet",
+      "left": "plus que {count}",
+      "breakfast": "Petit-déjeuner inclus",
+      "deposit": "Acompte aujourd’hui : {amount}",
+      "noDeposit": "Rien à payer aujourd’hui",
+      "inclTaxes": "total taxes comprises",
+      "taxIncluded": "taxes incluses",
+      "noTaxes": "total du séjour",
+      "select": "Choisir",
+      "selectAria": "Choisir {room}, {rate}"
+    },
+    "reason": {
+      "invalid_dates": "Choisissez un départ après l’arrivée",
+      "too_many_guests": "Trop de personnes pour cette chambre",
+      "no_price": "Indisponible à ces dates",
+      "closed": "Indisponible l’une de ces nuits",
+      "closed_to_arrival": "Pas d’arrivée à cette date",
+      "closed_to_departure": "Pas de départ à cette date",
+      "min_stay": "Séjour plus long requis",
+      "max_stay": "Uniquement pour des séjours plus courts"
+    },
+    "policy": {
+      "nonRefundable": "Non remboursable",
+      "noFreeWindow": "Des frais d’annulation s’appliquent à tout moment",
+      "freeUntil": "Annulation gratuite jusqu’à {hours} h avant l’arrivée, puis {fee}",
+      "feeFirstNight": "la première nuit est due",
+      "feeFull": "le séjour entier est dû",
+      "feePercent": "{percent} % du séjour est dû",
+      "feeNone": "sans frais",
+      "feeFixed": "des frais fixes s’appliquent"
+    },
+    "guest": {
+      "title": "Vos coordonnées",
+      "party": "{adults} adultes, {children} enfants",
+      "nightly": "À partir de {from} la nuit",
+      "total": "Total {amount}",
+      "depositNow": "Acompte de {amount} maintenant, le reste sur place",
+      "payAtProperty": "Paiement sur place",
+      "checkIn": "arrivée dès {time}",
+      "name": "Nom complet",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "arrivalTime": "Heure d’arrivée prévue",
+      "requests": "Demandes pour l’établissement",
+      "consentEmail": "M’envoyer par e-mail les informations d’arrivée avant mon séjour",
+      "consentSms": "M’envoyer par SMS les informations d’arrivée le jour J",
+      "terms": "J’accepte les conditions tarifaires, de paiement et d’annulation de {business}",
+      "privacy": "Nous ne demandons que ce dont l’établissement a besoin pour gérer votre réservation.",
+      "holdCta": "Continuer vers le paiement",
+      "bookCta": "Confirmer la réservation"
+    },
+    "errors": {
+      "dates": "Choisissez un départ après l’arrivée.",
+      "name": "Saisissez votre nom",
+      "email": "Saisissez un e-mail valide",
+      "terms": "Acceptez les conditions pour continuer",
+      "check": "Vérifiez vos informations"
+    },
+    "pay": {
+      "title": "Payer l’acompte",
+      "held": "Votre chambre est bloquée pendant le paiement (réservation {code}).",
+      "depositToday": "Acompte aujourd’hui {amount} sur {total}",
+      "cta": "Payer {amount}",
+      "failed": "Le paiement n’a pas abouti. La chambre reste bloquée quelques minutes — réessayez."
+    },
+    "status": {
+      "hold": "Acompte en attente",
+      "confirmed": "Confirmée",
+      "checked_in": "Arrivé",
+      "checked_out": "Terminé",
+      "cancelled": "Annulée",
+      "no_show": "Non présenté",
+      "expired": "Expirée"
+    },
+    "manage": {
+      "title": "Votre séjour",
+      "greeting": "Bonjour {name}",
+      "code": "Réservation {code}",
+      "nights": "{count, plural, one {# nuit} other {# nuits}}",
+      "checkOut": "départ avant {time}",
+      "total": "Total",
+      "depositPaid": "Payé",
+      "dueAtProperty": "À régler sur place",
+      "changeTitle": "Modifier les dates",
+      "changeNote": "Nous réservons d’abord les nouvelles nuits. Si elles ne sont pas disponibles, votre réservation reste inchangée.",
+      "changeCta": "Modifier",
+      "changed": "Dates modifiées. Le nouveau prix est {difference} {direction, select, more {plus cher} other {moins cher}}.",
+      "changedSame": "Dates modifiées. Le prix est identique.",
+      "cancelTitle": "Annuler la réservation",
+      "cancelFree": "Annuler maintenant est gratuit. Vous récupérez {refund}.",
+      "cancelFee": "Annuler maintenant coûte {fee}. Vous récupérez {refund}.",
+      "cancelOutstanding": "{amount} de frais ne sont pas couverts par l’acompte ; l’établissement vous contactera.",
+      "cancelCta": "Annuler",
+      "cancelConfirm": "Oui, annuler ma réservation",
+      "cancelled": "Votre réservation est annulée."
+    },
+    "reg": {
+      "title": "Fiche d’enregistrement",
+      "why": "L’établissement doit légalement enregistrer ces données. Ajoutez-les maintenant pour gagner du temps à l’arrivée.",
+      "save": "Enregistrer",
+      "saved": "Informations enregistrées."
     }
   }
 }

@@ -1834,7 +1834,8 @@
       "consent": "Inviatemi ogni tanto aggiornamenti sul prodotto via email. Posso annullare l’iscrizione in qualsiasi momento.",
       "submit": "Richiedi la demo",
       "sending": "Invio in corso…",
-      "securityCheck": "Verifica di sicurezza"
+      "securityCheck": "Verifica di sicurezza",
+      "hospitalityOption": "Ospitalità (hotel, B&B, ostelli)"
     },
     "errors": {
       "summaryTitle": "{count, plural, one {C’è # problema in questo modulo} other {Ci sono # problemi in questo modulo}}",

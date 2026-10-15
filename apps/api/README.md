@@ -2,7 +2,7 @@
 
 Fastify 5 + Zod 4 (fastify-type-provider-zod) + Drizzle ORM on Postgres 16. Multi-tenant API for
 multi-location businesses and franchise networks (HQ → regions → owner groups → locations) across
-Studios, Sports, Wellness, Commerce and Foods, built for an international market (multi-currency,
+Studios, Sports, Wellness, Commerce, Foods, Real Estate and Hospitality, built for an international market (multi-currency,
 IANA timezones, locales, data-residency region per organisation, GDPR-style consent/export/delete).
 
 OpenAPI: **`/docs`** (UI) and **`/docs/json`**. Health + integration status: **`/health`**.
@@ -67,7 +67,7 @@ permissions, refund thresholds), leaving a waitlist (guest token and `/me`), spo
 conflicts and coach scoping, sports full product (age boundaries, capacity/approval across payment retries, instalments + reminders,
 guardian authorisation/invitations/disputes, transfers, coach-scoped care data, notification scoping, AI context exclusion), offer eligibility rules, intake form validation/consent versions/AI exclusion, pickup
 settings → slot generation (pure planner incl. DST), inventory history with reservations, push sandbox/preferences/
-Expo adapter, org policies and per-location billing.
+Expo adapter, org policies and per-location billing, hospitality (no overbooking under concurrent bookings, modification secures new nights before releasing old ones, season/weekday/derived-plan rates with taxes and min stay, cancellation and no-show fees per policy, folio balance and check-out, outlet charge-to-room with reversal, housekeeping and out-of-order rules, consented pre-arrival messages, currency-separated reports).
 
 ## Environment
 
@@ -582,6 +582,19 @@ Full foods product (routes/foods-ext.ts: foods-public, foods-menu-admin, foods-o
 - Syndication (portals `rightmove` · `idealista` · `reso_xml` · `reaxml`; legacy `*_style` ids accepted): `GET /realty/syndication/portals` (status per office + last push) · `GET /realty/syndication/listings` (fresh validation errors + last result per opted-in listing) · `PUT /realty/listings/{id}/syndication/{portal}` (opt-out removes it from the portal) · `PUT /realty/listings/{id}/portal-fields` (price qualifier, tenure, council tax band, energy rating, available from — supplied by the business) · `GET /realty/syndication/{portal}/feed?locationId=` · `POST /realty/syndication/{portal}/export` (live push or sandbox record; withdrawn/sold/let are removed). Listing status changes queue `realty.portal_sync` (re-send / remove).
 - AI (proposals only, fair-housing guardrails): `POST /realty/listings/{id}/ai/description` · `POST /realty/listings/{id}/ai/feedback-summary` · `POST /realty/ai/follow-ups` · `GET /realty/ai/proposals` · `POST /realty/ai/proposals/{id}/decision`
 - `POST /realty/jobs/run` `{ job: viewing_reminders | saved_search_alerts }` (also every 5 minutes from `server.ts`)
+
+**hospitality** (hotels, guesthouses/B&Bs, serviced apartments, hostels — see [docs/verticals/hospitality.md](../../docs/verticals/hospitality.md); schema `src/db/schema/hospitality-ext.ts`, migration `0013_hospitality`; Tidewater Stays demo (`seed-hospitality.ts`): Lisbon EUR hotel + restaurant outlet, Vancouver CAD apartments, London GBP B&B, Sydney AUD hostel with dorm beds; `ines.costa@` Lisbon manager, `rui.matos@` Lisbon housekeeping, `chloe.martin@` London staff, same password)
+
+- Inventory: one `hosp_inventory` row per room type × night with `CHECK (sold >= 0 AND sold <= total)`; every hold/booking/modification/cancellation/no-show changes the counter in its transaction, rows locked in (room type, date) order — concurrent bookings cannot oversell (409 `sold_out`). `total` = active rooms (or dorm beds) minus out-of-order blocks; taking a sold room out of order is refused (409 `would_overbook`). Room-night assignments (`hosp_assignments`) have partial unique indexes per room/bed and night.
+- Rates: plans (BAR, non-refundable derived with an adjustment, packages incl. breakfast) priced in the property currency; base / season / weekday prices, daily overrides; min/max stay (plan, season, arrival day — strictest), closed, closed to arrival/departure; taxes only as configured by the business (percent inclusive/added, per night, per person per night with max nights and child exemption, per stay). Pure maths in `@bh/shared` `hospitality.ts` (`quoteStay`, `cancellationFee`, `hkTransition`, `hotelKpis`).
+- Public: `GET /v1/public/hospitality/{brandSlug}` · `GET /v1/public/hospitality/properties/{locationId}` · `GET …/properties/{locationId}/availability?arrival&departure&adults&children&rooms` · `POST …/properties/{locationId}/reservations` (hold + deposit PaymentIntent, target `hosp_deposit`; no deposit → confirmed; returns `manageToken`) · `GET /v1/public/hospitality/reservations/{id}?token` · `POST …/reservations/{id}/modify` (new nights secured before old ones are released; on failure nothing changes) · `GET …/reservations/{id}/cancellation-quote?token` · `POST …/reservations/{id}/cancel` (fee per snapshotted policy; deposit minus fee refunded) · `POST …/reservations/{id}/registration` (only the configured fields) · Guest: `GET /v1/me/hospitality/reservations`
+- Staff (`/v1/orgs/{orgId}/hospitality`): `GET /me` · `GET /properties` · `PUT /properties/{locationId}` · `GET|POST /room-types` · `PATCH /room-types/{id}` · `GET|POST /rooms` · `PATCH /rooms/{id}` · `POST /rooms/{id}/status` (clean/dirty/inspected/out_of_order) · `GET|POST /policies` · `PATCH /policies/{id}` · `GET|POST /taxes` · `PATCH /taxes/{id}` · `GET|POST /rate-plans` · `PATCH /rate-plans/{id}` · `PUT /rate-plans/{id}/prices` · `POST|PATCH|DELETE /seasons` · `PUT /daily-rates` (bulk range + weekdays) · `GET /rates-grid`
+- Front desk: `GET /availability` · `GET|POST /reservations` (views arrivals/in_house/departures/upcoming in each property's local date; group bookings = several rooms + `groupName`) · `GET /reservations/{id}` (rooms, folio, registration, timeline) · `POST /reservations/{id}/modify|cancel|no-show|check-in|check-out` · `GET /reservations/{id}/cancellation-quote` · `PUT /reservations/{id}/registration` · `POST /reservations/{id}/folio` (extra, adjustment, payment, refund) · `POST /reservation-rooms/{id}/assign` · `GET /grid?locationId&from&nights`
+- Housekeeping: `GET /housekeeping?locationId&date` (generates departure cleans and stayovers) · `POST /housekeeping/tasks` · `PATCH /housekeeping/tasks/{id}` (done → room clean / inspected) · `GET /housekeeping/my-tasks`
+- Outlet (Foods engine on the property location): `GET /outlet/{locationId}` · `POST /outlet/{locationId}/room-charges` (food order on the room tab + folio line in one transaction; reject/cancel posts a reversal via `foodOrderTransitionHooks`)
+- `GET /reports?from&to&locationId` (occupancy, ADR, RevPAR per property and per currency, `combinedRevenue: null`, pickup, cancellations) · `GET /pulse`
+- Channel managers (sandbox only, nothing is sent): `GET /channels` · `POST /channels/{siteminder|cloudbeds|channex}/preview` (ARI payload; `record: true` stores a sandbox export)
+- Every 5 minutes (`server.ts`): expire unpaid holds; consented pre-arrival / check-in messages (email/SMS adapters, logged once per reservation × kind × channel).
 
 ## Stubbed / not yet implemented
 

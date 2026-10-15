@@ -9,8 +9,13 @@ import type { MsgParams, MsgRef } from './msg';
  */
 
 /** The verticals demonstrated in the business app (realty: Real Estate, release "next"). */
-export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
+export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'] as const;
 export type IndustryKey = (typeof APP_INDUSTRIES)[number];
+/** Industries with sample-data fixtures (hospitality is live-API only). */
+export type MockIndustryKey = Exclude<IndustryKey, 'hospitality'>;
+export const MOCK_INDUSTRIES = APP_INDUSTRIES.filter((k): k is MockIndustryKey => k !== 'hospitality');
+/** Sample-data fixtures exist for every industry except the live-only ones; those fall back to studios in sample mode. */
+export const mockIndustry = (k: IndustryKey): MockIndustryKey => (k === 'hospitality' ? 'studios' : k);
 
 /** "Viewing as" personas used to demonstrate permission states. */
 export const VIEW_ROLES = ['hq', 'local', 'staff'] as const;

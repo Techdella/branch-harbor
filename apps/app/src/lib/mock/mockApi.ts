@@ -240,13 +240,12 @@ function freshPayments(ind: IndustryKey) {
   const f = FIXTURES[ind];
   const L = f.locations;
   const lp = loc(ind, f.localLocationId);
-  const what: Record<IndustryKey, [string, string]> = { studios: ['Class booking', 'Monthly membership'], sports: ['Registration · U10 Autumn', 'Camp registration'], wellness: ['Deposit · Hot stone', 'Deep tissue 60 min'], commerce: ['Order #5521', 'Order #5519'], foods: ['Pickup order', 'Pickup order'], realty: ['Valuation fee', 'Marketing package'] };
+  const what: Record<IndustryKey, [string, string]> = { studios: ['Class booking', 'Monthly membership'], sports: ['Registration · U10 Autumn', 'Camp registration'], wellness: ['Deposit · Hot stone', 'Deep tissue 60 min'], commerce: ['Order #5521', 'Order #5519'], foods: ['Pickup order', 'Pickup order'], realty: ['Valuation fee', 'Marketing package'], /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return what.realty; } };
   /** data keys for the descriptions above; product and service names stay as published. */
   const whatKey: Record<IndustryKey, [[string, MsgParams?] | null, [string, MsgParams?] | null]> = {
     studios: [['payment.target.class_booking'], ['payment.what.monthlyMembership']], sports: [['payment.what.registrationFor', { name: 'U10 Autumn' }], ['payment.what.campRegistration']],
     wellness: [['payment.what.depositFor', { name: 'Hot stone' }], null], commerce: [['payment.what.orderNo', { ref: '#5521' }], ['payment.what.orderNo', { ref: '#5519' }]],
-    foods: [['payment.target.food_order'], ['payment.target.food_order']], realty: [null, null],
-  };
+    foods: [['payment.target.food_order'], ['payment.target.food_order']], realty: [null, null], /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return whatKey.realty; } };
   const desc = (i: 0 | 1) => { const k = whatKey[ind][i]; return k ? { descriptionKey: k[0], ...(k[1] ? { descriptionParams: k[1] } : {}) } : {}; };
   const whatRef = (i: 0 | 1) => { const k = whatKey[ind][i]; return k ? ref(k[0], k[1], what[ind][i]) : what[ind][i]; };
   const ev = (mins: number, text: string, tone: 'success' | 'info' | 'danger' | 'warning' | 'neutral', icon: 'card' | 'check' | 'x' | 'refresh' | 'undo' | 'alert', key?: string, params?: MsgParams) => ({ at: minutesAgo(mins), text, ...(key ? { textKey: key } : {}), ...(params ? { textParams: params } : {}), tone, icon });
@@ -309,8 +308,7 @@ function freshConnections(ind: IndustryKey): Connection[] {
     realty: [
       { id: 'c_gcal', name: 'Google Calendar', monogram: 'Gc', role: 'Agent viewing calendars', state: 'connected', lastSync: minutesAgo(9), direction: 'export', authoritative: 'BranchHarbor viewings are authoritative; calendars receive copies', locations: names },
       { id: 'c_portal', name: 'Portal feeds (sandbox)', monogram: 'Pf', role: 'Listing syndication preview', state: 'initial_sync', lastSync: null, progress: 0, direction: 'export', authoritative: 'Sandbox only — nothing is sent to portals', locations: names },
-    ],
-  };
+    ], /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return C.realty; } };
   return C[ind].map((c) => ({ ...c, ...CONNECTION_KEYS[`${ind}:${c.id}`] }));
 }
 
@@ -414,8 +412,7 @@ const SHIFT_PEOPLE: Record<IndustryKey, [string, string][]> = {
   wellness: [['Reception', 'Tom Becker'], ['Clinic manager', 'Rina Kapoor'], ['Reception', 'Ana Lima']],
   commerce: [['Sales associate', 'Kim Lau'], ['Store manager', 'Leah Park'], ['Sales associate', 'Sanne Visser']],
   foods: [['Kitchen lead', 'Mei Lin'], ['Shift manager', 'Carlos Ortega'], ['Line cook', 'Ren Ito']],
-  realty: [['Office duty agent', 'Nadia Hassan'], ['Office manager', 'Marcus Lee'], ['Office duty agent', 'Daniel Okafor']],
-};
+  realty: [['Office duty agent', 'Nadia Hassan'], ['Office manager', 'Marcus Lee'], ['Office duty agent', 'Daniel Okafor']], /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return SHIFT_PEOPLE.realty; } };
 const SHIFT_TIMES: [string, string][] = [['07:00', '15:00'], ['14:00', '22:00'], ['09:00', '17:00']];
 
 function freshShifts(ind: IndustryKey): ShiftView[] {

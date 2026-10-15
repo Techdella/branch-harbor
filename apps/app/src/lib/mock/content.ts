@@ -155,8 +155,7 @@ const OVERVIEW: Record<IndustryKey, { metrics: MetricDef[]; upcomingTitle: strin
       { id: 'a3', icon: 'receipt', title: 'Offer countered — awaiting buyer', detail: '42 Birchmount Cres · expires in 2 days', titleKey: 'attention.offerCountered', detailKey: 'attention.expiresInDays', detailParams: { place: '42 Birchmount Cres', days: 2 }, href: '/ops/offers', kind: 'action', locId: 'tor' },
     ],
     aiPrompt: 'Summarise viewing feedback for 42 Birchmount Cres',
-  },
-};
+  }, /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return OVERVIEW.realty; } };
 
 /** Catalogue keys (namespace "data") for the English range/source/title strings above. Provider names have none. */
 const RANGE_KEYS: Record<string, string> = {
@@ -406,7 +405,7 @@ const tables = (): Record<string, TableSpec> => ({
     ] },
 });
 
-const CUSTOMER_TABLE: Record<IndustryKey, string> = { studios: 'members', sports: 'participants', wellness: 'clients', commerce: 'shoppers', foods: 'guests', realty: 'realtyClients' };
+const CUSTOMER_TABLE: Record<IndustryKey, string> = { studios: 'members', sports: 'participants', wellness: 'clients', commerce: 'shoppers', foods: 'guests', realty: 'realtyClients', /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return CUSTOMER_TABLE.realty; } };
 
 export function buildTable(ind: IndustryKey, key: string, locIds: string[]): TableData | null {
   const k = key === 'customers' ? CUSTOMER_TABLE[ind] : key;
@@ -509,5 +508,4 @@ export const AI: Record<IndustryKey, MockAi> = {
     assumptions: ai('realty', 'assumptions', 'Feedback from completed viewings in the last 14 days, Toronto time. No-shows are excluded.'),
     sources: [[ai('realty', 'src0', 'Viewings · feedback'), updated(6)]],
     action: { title: ai('realty', 'actionTitle', 'Draft follow-up emails for 2 interested buyers'), kind: 'draft', affected: [ai('realty', 'affected0', 'Toronto Midtown · 2 buyers')], excluded: [ai('realty', 'excluded0', 'Buyers without email consent')] },
-  },
-};
+  }, /** Live-API only: no sample data; mirrors realty so sample mode stays type-complete. */ get hospitality() { return AI.realty; } };

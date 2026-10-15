@@ -214,6 +214,7 @@ async function main() {
   console.log('Studios:', await (await import('./seed-studios.ts')).seedStudios({ db, today, swId, demo, maya }));
   await (await import('./seed-commerce.ts')).seedCommerce({ db, orgId: ops.orgs.fieldnote, demo, upsertUser });
   const foods = await seedFoods({ db, today, meId, demo, carlos, upsertUser });
+  const hospitality = await (await import('./seed-hospitality.ts')).seedHospitality({ db, upsertUser, demo });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
@@ -230,6 +231,7 @@ async function main() {
   console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Real Estate:   Keystone Realty Network (${realty.orgId}) — Toronto/Vancouver CAD, London GBP, Madrid EUR, Dubai AED, Sydney AUD; ${realty.listings} listings · ${realty.users.join(', ')}`);
+  console.log(` Hospitality:   Tidewater Stays (${hospitality.orgId}) — Lisbon EUR (hotel + outlet), Vancouver CAD, London GBP, Sydney AUD (hostel); ${hospitality.rooms} rooms · ${hospitality.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
   await seedIndependent({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   console.log('─────────────────────────────────────────────────\n');
