@@ -1,4 +1,5 @@
 import { index, integer, jsonb, pgTable, text, uniqueIndex, uuid, boolean } from 'drizzle-orm/pg-core';
+import type { PageDocument } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
 import { locations, organizations } from './core.ts';
 
@@ -12,6 +13,10 @@ export const templates = pgTable('templates', {
   name: text('name').notNull(),
   industry: text('industry'),
   fields: jsonb('fields').$type<TemplateField[]>().notNull().default([]),
+  /** Website builder master page (HQ): sections carry lock modes (locked / editable / approval). */
+  document: jsonb('document').$type<PageDocument>(),
+  /** Page slug the master applies to on location sites (builder templates). */
+  pageSlug: text('page_slug'),
   version: integer('version').notNull().default(1),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -28,6 +33,8 @@ export const websites = pgTable('websites', {
   primaryDomainId: uuid('primary_domain_id'),
   connectionId: uuid('connection_id'),
   status: text('status').notNull().default('draft'), // draft | live | paused
+  /** Extra navigation links (website builder navigation editor); pages appear by their nav settings. */
+  navLinks: jsonb('nav_links').$type<Array<{ label: string; href: string }>>().notNull().default([]),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [index('websites_org_idx').on(t.organizationId)]);
@@ -42,7 +49,16 @@ export const pages = pgTable('pages', {
   title: text('title').notNull(),
   /** draft | pending_approval | approved | published | archived */
   status: text('status').notNull().default('draft'),
-  seo: jsonb('seo').$type<{ title?: string; description?: string; canonicalOwner?: 'branchharbor' | 'external' }>().notNull().default({}),
+  seo: jsonb('seo').$type<{ title?: string; description?: string; canonicalOwner?: 'branchharbor' | 'external'; socialImage?: string; noindex?: boolean }>().notNull().default({}),
+  /** Website builder draft (sections). null = classic field page that was never migrated. */
+  document: jsonb('document').$type<PageDocument>(),
+  /** Increments on every draft save (optimistic concurrency for autosave). */
+  revision: integer('revision').notNull().default(0),
+  navLabel: text('nav_label'),
+  showInNav: boolean('show_in_nav').notNull().default(true),
+  navOrder: integer('nav_order').notNull().default(0),
+  scheduledPublishAt: ts('scheduled_publish_at'),
+  scheduledBy: uuid('scheduled_by'),
   publishedVersionId: uuid('published_version_id'),
   publishedAt: ts('published_at'),
   archivedAt: ts('archived_at'),
@@ -56,6 +72,8 @@ export const pageVersions = pgTable('page_versions', {
   pageId: uuid('page_id').notNull().references(() => pages.id, { onDelete: 'cascade' }),
   version: integer('version').notNull(),
   content: jsonb('content').$type<Record<string, unknown>>().notNull(),
+  /** Published page document (website builder). Sites render it when present, else the classic fields. */
+  document: jsonb('document').$type<PageDocument>(),
   createdBy: uuid('created_by'),
   publishJobId: uuid('publish_job_id'),
   createdAt: createdAt(),

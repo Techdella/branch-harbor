@@ -48,6 +48,20 @@ export function registerJobHandlers(s: Services) {
     await (await import('../services/realty-portals.ts')).syncListingPortals(s, listingId);
   });
 
+  // Marketing workspace: event inbox → automation runs, run advancement, campaign delivery, housekeeping tick.
+  s.jobs.register('marketing.event', async ({ eventId }: { eventId: string }) => {
+    await (await import('../services/automation-engine.ts')).processMarketingEvent(s, eventId);
+  });
+  s.jobs.register('automation.advance', async ({ runId }: { runId: string }) => {
+    await (await import('../services/automation-engine.ts')).advanceRun(s, runId);
+  });
+  s.jobs.register('marketing.campaign', async ({ campaignId }: { campaignId: string }) => {
+    await (await import('../services/marketing.ts')).deliverCampaign(s, campaignId);
+  });
+  s.jobs.register('marketing.tick', async () => {
+    await (await import('../services/automation-engine.ts')).marketingTick(s);
+  });
+
   s.jobs.register('studios.expire-holds', async () => {
     await expireHolds(s);
     await (await import('../services/studios-commerce.ts')).runStudioLifecycle(s);
