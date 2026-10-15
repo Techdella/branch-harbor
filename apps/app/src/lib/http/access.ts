@@ -14,6 +14,11 @@ import { orgId } from './workspace';
 export interface RoleTemplateVM {
   key: string;
   name: string;
+  /** The business's own name for the role (renamed), if any. */
+  label: string | null;
+  team: string;
+  support: boolean;
+  sensitive: string[];
   description: string;
   primaryWorkspace: WorkspaceKey;
   defaultScope: ScopeKind;
@@ -34,6 +39,8 @@ export interface RolesVM {
   industry: string;
   templates: RoleTemplateVM[];
   custom: CustomRoleVM[];
+  teams: string[];
+  scopeKinds: ScopeKind[];
 }
 export interface AssignmentAccessVM {
   id: string;
@@ -41,6 +48,8 @@ export interface AssignmentAccessVM {
   roleName: string;
   customRoleId: string | null;
   scope: { kind: ScopeKind; id: string; name: string | null };
+  /** Location names the scope reaches ('all' for the whole business). */
+  locations: 'all' | string[];
   grants: string[];
   revokes: string[];
   capabilities: string[];
@@ -49,11 +58,15 @@ export interface AssignmentAccessVM {
 export interface MemberAccessVM {
   user: { id: string; name: string; email: string };
   industry: string;
+  jobTitle: string | null;
+  deniedClasses: string[];
   assignments: AssignmentAccessVM[];
   summary: AccessSummary;
 }
 export interface MyAccessVM extends AccessSummary {
   industry: string;
+  jobTitle: string | null;
+  roleLabels: Record<string, string>;
   assignments: { id: string; role: string; customRoleId: string | null; scope: { kind: ScopeKind; id: string }; capabilities: string[] }[];
 }
 export interface RoleInput {
@@ -62,6 +75,41 @@ export interface RoleInput {
   baseRole?: string;
   primaryWorkspace?: WorkspaceKey;
   capabilities: string[];
+}
+
+export interface PreviewVM {
+  capabilities: string[];
+  locations: { all: boolean; names: string[] };
+  workspaces: { key: WorkspaceKey; modules: string[] }[];
+  settings: string[];
+  actions: Record<string, string[]>;
+  hidden: string[];
+  sensitive: string[];
+}
+export interface CoverageVM {
+  items: { key: string; capability: string; suggestedRole: string; covered: boolean; holders: { id: string; name: string }[] }[];
+  uncovered: string[];
+}
+export interface TeamShapeVM {
+  shape: string | null;
+  shapes: { key: string; templates: string[]; combined: string[] }[];
+  combined: { key: string; name: string; description: string; from: string[]; roleId: string | null; roleName: string | null }[];
+}
+export interface ScopesVM {
+  brands: { id: string; name: string; isDefault: boolean }[];
+  territories: { id: string; name: string; kind: string; country: string | null; brandId: string | null; locationIds: string[] }[];
+  regions: { id: string; name: string }[];
+  portfolios: { id: string; name: string; description: string | null; locationIds: string[] }[];
+  ownerGroups: { id: string; name: string }[];
+  locations: { id: string; name: string; regionId: string | null; ownerGroupId: string | null; territoryId: string | null }[];
+}
+export interface PreviewInput {
+  role: string;
+  customRoleId?: string | null;
+  scopeKind: ScopeKind;
+  scopeId?: string;
+  capabilities?: string[];
+  deniedClasses?: string[];
 }
 
 const o = (p: string) => `/orgs/${orgId()}${p}`;
@@ -75,6 +123,21 @@ export const accessApi = {
   member: (userId: string) => http.get<MemberAccessVM>(o(`/members/${userId}/access`)),
   setAssignment: (id: string, body: { role: string; customRoleId: string | null; grants: string[]; revokes: string[] }) =>
     http.put<{ capabilities: string[]; changes: { added: string[]; removed: string[] } }>(o(`/role-assignments/${id}/access`), body),
+  addAssignment: (body: { userId: string; role: string; customRoleId?: string; scope: { kind: ScopeKind; id: string }; grants: string[]; revokes: string[] }) =>
+    http.post<{ id: string }>(o('/role-assignments'), body),
+  removeAssignment: (id: string) => http.del<{ revoked: true }>(o(`/role-assignments/${id}`)),
+  preview: (body: PreviewInput) => http.post<PreviewVM>(o('/access/preview'), { grants: [], revokes: [], ...body }),
+  setProfile: (userId: string, body: { jobTitle?: string | null; deniedClasses?: string[] }) => http.put<{ jobTitle: string | null; deniedClasses: string[] }>(o(`/members/${userId}/profile`), body),
+  renameRole: (role: string, name: string | null) => http.put<{ role: string; label: string | null }>(o(`/access/role-labels/${role}`), { name }),
+  coverage: () => http.get<CoverageVM>(o('/access/coverage')),
+  assignArea: (area: string, userId: string) => http.post<CoverageVM>(o(`/access/coverage/${area}/assign`), { userId }),
+  teamShape: () => http.get<TeamShapeVM>(o('/access/team-shape')),
+  setTeamShape: (shape: string, names?: Record<string, string>, descriptions?: Record<string, string>) => http.put<TeamShapeVM>(o('/access/team-shape'), { shape, names, descriptions }),
+  scopes: () => http.get<ScopesVM>(o('/access/scopes')),
+  createPortfolio: (body: { name: string; description?: string | null; locationIds: string[] }) => http.post<{ id: string }>(o('/access/portfolios'), body),
+  updatePortfolio: (id: string, body: { name?: string; locationIds?: string[] }) => http.patch<{ id: string }>(o(`/access/portfolios/${id}`), body),
+  createTerritory: (body: { name: string; kind: string; country?: string | null; locationIds: string[] }) => http.post<{ id: string }>(o('/access/territories'), body),
+  updateTerritory: (id: string, body: { name?: string; locationIds?: string[] }) => http.patch<{ id: string }>(o(`/access/territories/${id}`), body),
 };
 
 type Res<T> = { status: 'loading'; data?: T; error?: undefined } | { status: 'ready'; data: T; error?: undefined } | { status: 'error'; data?: T; error: ApiError };

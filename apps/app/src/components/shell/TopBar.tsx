@@ -170,7 +170,7 @@ function useRoleNames() {
   const t = useTranslations('access.roles');
   const app = useApp();
   const roles = workspace()?.orgs.find((o) => o.id === app.org.id)?.roles ?? [];
-  const names = [...new Set(roles.map((r) => (r.role === 'custom' ? (r.name ?? t('custom')) : t.has(`${r.role}.name`) ? t(`${r.role}.name`) : r.role)))];
+  const names = [...new Set(roles.map((r) => (r.role === 'custom' ? (r.name ?? t('custom')) : r.label ? r.label : t.has(`${r.role}.name`) ? t(`${r.role}.name`) : r.role)))];
   return names.join(', ');
 }
 

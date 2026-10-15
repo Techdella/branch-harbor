@@ -70,7 +70,7 @@ export const UPGRADE_CONSEQUENCES = [
   'Your existing location, customers, website, team and payment history stay exactly as they are.',
   'The scope selector, Locations directory, regions and owner groups become available.',
   'Website templates can lock fields or require approval, and pages can be published to several locations at once.',
-  'Headquarters, regional manager and franchise owner roles can be invited.',
+  'Headquarters, field consultant, franchise partner and franchise owner roles can be invited.',
   'Billing moves from the Solo plan to per-location pricing once a second location is operating.',
   'Your customer website gets a location finder; your current address keeps working and redirects to your location.',
 ] as const;

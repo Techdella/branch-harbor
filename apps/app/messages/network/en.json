@@ -19,13 +19,16 @@
     },
     "roles": {
       "franchise_owner": "Franchise owners",
+      "multi_unit_operator": "Multi-unit operators",
+      "master_franchisee": "Master franchisees",
+      "area_developer": "Area developers",
       "location_manager": "Location managers",
       "staff": "Staff",
-      "regional_manager": "Regional managers",
-      "instructor_trainer": "Instructor-trainers",
+      "field_consultant": "Field consultants",
+      "trainer": "Trainers",
       "hq_admin": "HQ team",
-      "marketing_contributor": "Marketing",
-      "finance": "Finance"
+      "content_social": "Marketing",
+      "finance_lead": "Finance"
     },
     "audience": {
       "label": "Audience",

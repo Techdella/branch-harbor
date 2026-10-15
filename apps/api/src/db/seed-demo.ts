@@ -40,7 +40,8 @@ async function upsertUser(email: string, name: string, locale = 'en') {
 
 /**
  * Stillwater: a small team where people cover several areas (team shape "small"). The combined roles are the
- * business's own roles built from the templates; Owen Reid holds two roles (access is the union).
+ * business's own roles built from the templates; Owen Reid holds two roles (access is the union). Nobody approves
+ * disclosure yet, so Team & access shows it as an uncovered area (it goes to the owner meanwhile).
  */
 async function seedSmallTeam(swId: string, ownerId: string, luciaId: string) {
   const { COMBINED_ROLES, combinedRoleCapabilities } = await import('@bh/shared');
@@ -62,14 +63,14 @@ async function seedSmallTeam(swId: string, ownerId: string, luciaId: string) {
   await asCustom(luciaId, 'development_training');
   await db.insert(t.roleAssignments).values([
     { organizationId: swId, userId: owen.id, role: 'custom', customRoleId: created.operations_finance!, scopeKind: 'organization', scopeId: swId, createdBy: ownerId },
-    { organizationId: swId, userId: owen.id, role: 'legal_lead', scopeKind: 'organization', scopeId: swId, createdBy: ownerId },
+    { organizationId: swId, userId: owen.id, role: 'trainer', scopeKind: 'organization', scopeId: swId, createdBy: ownerId },
   ]);
   // Lena teaches and follows up course leads at Queen West (a trainer with one extra module).
   const [lenaA] = await db.select().from(t.roleAssignments).where(sql`${t.roleAssignments.organizationId} = ${swId} and ${t.roleAssignments.userId} = ${lena.id}`);
   if (lenaA) await db.insert(t.memberAccessOverrides).values(['sales.course_leads:view', 'sales.course_leads:edit'].map((capability) => ({ organizationId: swId, assignmentId: lenaA.id, capability, effect: 'grant', createdBy: ownerId })));
   await db.insert(t.memberProfiles).values([
     { organizationId: swId, userId: elena.id, jobTitle: 'Head of growth' },
-    { organizationId: swId, userId: owen.id, jobTitle: 'Operations, finance & compliance' },
+    { organizationId: swId, userId: owen.id, jobTitle: 'Operations, finance & teacher training' },
     { organizationId: swId, userId: luciaId, jobTitle: 'Franchise development & teacher training' },
   ]);
   return { combined: Object.keys(created), owen: owen.email };
@@ -275,7 +276,7 @@ async function main() {
   console.log(` Password:      ${password}`);
   console.log(` Also:          maya.rao@demo.branchharbor.com (location manager, Queen West)`);
   console.log(`                priya.anand@demo.branchharbor.com (field consultant, Europe)`);
-  console.log(`                ${smallTeam.owen} (Stillwater small team: Operations & finance + Legal lead) — combined roles: ${smallTeam.combined.join(', ')}`);
+  console.log(`                ${smallTeam.owen} (Stillwater small team: Operations & finance + Trainer) — combined roles: ${smallTeam.combined.join(', ')}`);
   console.log(`                carlos.ortega@demo.branchharbor.com (staff, Ballard) — same password`);
   console.log(` Organisations: Stillwater Yoga Collective (${swId}) — Toronto CAD, Seattle USD, London GBP, Berlin EUR, Sydney AUD`);
   console.log(`                Maple & Ember Restaurants (${meId}) — Seattle USD, Vancouver CAD, London GBP, Lisbon EUR`);

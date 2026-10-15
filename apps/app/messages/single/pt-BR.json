@@ -61,7 +61,7 @@
       "Sua unidade, clientes, site, equipe e histórico de pagamentos continuam como estão.",
       "O seletor de escopo, o diretório de unidades, as regiões e os grupos de proprietários ficam disponíveis.",
       "Os modelos de site podem bloquear campos ou exigir aprovação, e as páginas podem ser publicadas em várias unidades de uma vez.",
-      "Os papéis de matriz, gerente regional e franqueado podem ser convidados.",
+      "Funções de sede, consultor de campo, parceiro da franquia e franqueado podem ser convidadas.",
       "A cobrança passa do plano Solo para o preço por unidade quando uma segunda unidade estiver em operação.",
       "Seu site para clientes ganha um localizador de unidades no endereço atual, e cada unidade tem sua própria página."
     ],
@@ -137,15 +137,19 @@
       "org_owner": "Proprietário",
       "location_manager": "Gerente",
       "staff": "Equipe / instrutor / treinador",
-      "marketing_contributor": "Colaborador de marketing",
-      "finance": "Financeiro"
+      "content_social": "Conteúdo e redes sociais",
+      "finance_lead": "Finanças",
+      "accountant": "Contador",
+      "sales_rep": "Vendas"
     },
     "roleHelp": {
-      "org_owner": "Acesso total, incluindo cobrança, equipe e configurações do negócio.",
-      "location_manager": "Cuida do dia a dia: agendas, clientes, pedidos e publicação do site.",
-      "staff": "Apenas a própria agenda, presença ou pedidos.",
-      "marketing_contributor": "Redige conteúdos do site e de marketing; publica só se você permitir.",
-      "finance": "Pagamentos, conciliação e reembolsos permitidos."
+      "org_owner": "Acesso total, inclusive faturamento, equipe e configurações do negócio.",
+      "location_manager": "Comanda o dia: agendas, clientes, pedidos e publicação do site.",
+      "staff": "Somente a própria agenda, presenças ou pedidos.",
+      "content_social": "Rascunha conteúdo do site e de marketing; publica só se você permitir.",
+      "finance_lead": "Pagamentos, conciliação e reembolsos permitidos.",
+      "accountant": "Consulta e exporta pagamentos para a contabilidade.",
+      "sales_rep": "Leads, clientes e planos."
     }
   },
   "payments": {
