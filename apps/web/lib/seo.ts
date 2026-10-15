@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { DEFAULT_LOCALE, type Locale } from '@bh/shared';
 import { routing } from '@/i18n/routing';
 import { INDUSTRY_KEYS, type IndustryKey } from '@/content/industries';
+import { getArticle, type ArticleKind } from '@/lib/articles';
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
 
@@ -41,6 +42,8 @@ export const PAGES = {
   integrations: { path: '/integrations', title: 'integrations.metaTitle', description: 'integrations.intro', headline: 'integrations.headline', priority: 0.8 },
   pricing: { path: '/pricing', title: 'pricing.metaTitle', description: 'pricing.intro', headline: 'pricing.headline', priority: 0.9 },
   demo: { path: '/demo', title: 'demo.metaTitle', description: 'demo.intro', headline: 'demo.headline', priority: 0.9 },
+  blog: { path: '/blog', title: 'articles.blog.metaTitle', description: 'articles.blog.intro', headline: 'articles.blog.headline', priority: 0.7 },
+  guides: { path: '/guides', title: 'articles.guides.metaTitle', description: 'articles.guides.intro', headline: 'articles.guides.headline', priority: 0.7 },
   resources: { path: '/resources', title: 'resources.metaTitle', description: 'resources.intro', headline: 'resources.headline', priority: 0.6 },
   docs: { path: '/docs', title: 'docs.metaTitle', description: 'docs.intro', headline: 'docs.headline', priority: 0.6 },
   support: { path: '/support', title: 'support.metaTitle', description: 'support.intro', headline: 'support.headline', priority: 0.6 },
@@ -111,5 +114,44 @@ export async function buildMetadata(locale: string, id: PageId): Promise<Metadat
     },
     twitter: { card: 'summary_large_image', title: copy.fullTitle, description: copy.description, images: [image] },
     ...(p.noindex ? { robots: { index: false, follow: true } } : {}),
+  };
+}
+
+/**
+ * Article metadata. Articles are written in English, so every locale's page points its canonical URL at the English
+ * article (the translated chrome around it is not a separate document) and only English is listed as an alternate.
+ */
+export async function articleMetadata(locale: string, kind: ArticleKind, slug: string): Promise<Metadata> {
+  const a = getArticle(kind, slug);
+  if (!a) return {};
+  const t = await getTranslations({ locale });
+  const path = `/${kind}/${slug}`;
+  const canonical = localizedPath('en', path);
+  const fullTitle = t('meta.titleTemplate').replace('%s', a.title);
+  const image = { url: `/api/og/article/${kind}/${slug}`, width: 1200, height: 630, alt: a.title };
+  return {
+    title: a.title,
+    description: a.description,
+    authors: [{ name: a.author }],
+    keywords: a.tags,
+    alternates: {
+      canonical,
+      languages: { en: canonical, 'x-default': canonical },
+      types: kind === 'blog' ? { 'application/rss+xml': [{ url: '/blog/rss.xml', title: 'BranchHarbor blog' }] } : undefined,
+    },
+    openGraph: {
+      type: 'article',
+      siteName: 'BranchHarbor',
+      title: fullTitle,
+      description: a.description,
+      url: localizedPath(locale, path),
+      locale: 'en_US',
+      publishedTime: a.date,
+      modifiedTime: a.updated ?? a.date,
+      authors: [a.author],
+      tags: a.tags,
+      images: [image],
+    },
+    twitter: { card: 'summary_large_image', title: fullTitle, description: a.description, images: [image] },
   };
 }

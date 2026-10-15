@@ -7,13 +7,71 @@
   --font-sans: var(--font-jakarta), 'Plus Jakarta Sans', var(--font-arabic), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
+/*
+ * Full-bleed layout. Bands (panels, header, footer, card rows) span the viewport with a modest edge inset
+ * (--edge); the content inside a band sits on a centred rail no wider than --rail. Text blocks keep their own
+ * max-widths. Cards rows that are bands of their own grow with the viewport up to --rail-wide.
+ */
+@utility band {
+  padding-inline: max(var(--band-pad), calc((100% - var(--rail)) / 2));
+}
+@utility rail {
+  width: min(100% - 2 * var(--band-pad), var(--rail));
+  margin-inline: auto;
+}
+@utility rail-wide {
+  width: min(100%, var(--rail-wide));
+  margin-inline: auto;
+}
+@utility edge {
+  padding: var(--edge);
+}
+
 @layer base {
   /* The marketing site is designed light-only (see docs/DESIGN_SYSTEM.md → Dark mode). */
   :root {
     color-scheme: light;
+    --edge: clamp(8px, 0.75vw, 20px);
+    --band-pad: 20px;
+    --rail: 1440px;
+    --rail-wide: 2200px;
+    --header-h: 68px;
+  }
+  @media (min-width: 640px) {
+    :root {
+      --band-pad: 32px;
+    }
+  }
+  @media (min-width: 768px) {
+    :root {
+      --band-pad: 48px;
+      --header-h: 76px;
+    }
+  }
+  @media (min-width: 1920px) {
+    :root {
+      --band-pad: 64px;
+      --rail: 1520px;
+    }
+  }
+  /* Native selects get one consistent custom chevron at the inline end (mirrors in RTL). */
+  select.bh-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B6B66' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: right 12px center;
+    padding-inline-end: 36px;
+  }
+  [dir='rtl'] select.bh-select {
+    background-position: left 12px center;
+  }
+  select.bh-select.bh-select-dark {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B9B9B3' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   }
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 2 * var(--edge) + 12px);
   }
   @media (prefers-reduced-motion: reduce) {
     html {

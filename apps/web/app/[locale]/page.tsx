@@ -10,6 +10,7 @@ import { ProductPreview } from '@/components/home/ProductPreview';
 import { FaqList, H2, Kicker, Lead, Panel, PastelIcon, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
 import { buildMetadata } from '@/lib/seo';
+import { DEMO_URL, otherIndustryMailto, signUpUrl } from '@/lib/links';
 
 export const generateMetadata = async ({ params }: { params: Promise<{ locale: string }> }) => buildMetadata((await params).locale, 'home');
 
@@ -41,6 +42,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const tc = await getTranslations('common');
   const tm = await getTranslations('industryMeta');
   const ti = await getTranslations('integrations');
+  const tn = await getTranslations('nav');
 
   const steps = t.raw('steps.items') as { title: string; desc: string }[];
   const caps = t.raw('capabilities.items') as { name: string; desc: string }[];
@@ -59,32 +61,45 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </h1>
         <Lead className="max-w-[620px]">{t('hero.body')}</Lead>
         <div className="flex flex-wrap justify-center gap-2.5">
-          <a href="#industries" className="inline-flex h-[54px] items-center gap-2.5 rounded-full bg-ink ps-6 pe-1.5 text-[15px] font-bold text-white transition hover:bg-ink-2">
-            {t('hero.primary')}
-            <span className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-lime text-ink">
-              <Icon name="arrow-down" size={18} />
-            </span>
-          </a>
-          <a href="#how" className="inline-flex h-[54px] items-center gap-2 rounded-full border-[1.5px] border-ink bg-surface px-6 text-[15px] font-bold transition hover:bg-canvas-raised">
-            <Icon name="play" size={14} />
-            {t('hero.secondary')}
-          </a>
+          <LinkButton href={DEMO_URL} external size="lg" signal="arrow-up-right">
+            {tc('tryDemo')}
+          </LinkButton>
+          <LinkButton href={signUpUrl()} external size="lg" variant="secondary">
+            {tc('startPlan')}
+          </LinkButton>
         </div>
+        <p className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-bold">
+          <a href="#industries" className="inline-flex items-center gap-1.5 rounded-full underline-offset-4 hover:underline">
+            {t('hero.primary')}
+            <Icon name="arrow-down" size={16} />
+          </a>
+          <Link href="/demo" className="inline-flex items-center gap-1.5 rounded-full underline-offset-4 hover:underline">
+            <Icon name="phone" size={16} />
+            {tc('requestDemo')}
+          </Link>
+        </p>
       </Panel>
 
       {/* 3. Product visual */}
       <ProductPreview />
 
       {/* 4. Industry selector */}
-      <section id="industries" aria-labelledby="industries-title" className="grid scroll-mt-4 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="flex min-h-[300px] flex-col justify-between gap-6 rounded-[28px] bg-sage p-7 text-white md:rounded-2xl md:p-9">
+      <section id="industries" aria-labelledby="industries-title" className="grid gap-[var(--edge)] sm:grid-cols-2 lg:grid-cols-3 min-[1800px]:grid-cols-4">
+        <div className="flex min-h-[300px] flex-col justify-between gap-6 rounded-[28px] bg-sage p-7 text-white md:rounded-2xl md:p-9 lg:col-span-2 min-[1800px]:col-span-1 min-[1920px]:p-12">
           <H2 id="industries-title">{t('industries.title')}</H2>
           <div className="flex flex-col gap-4">
             <p className="text-[15px] leading-relaxed text-white">{t('industries.body')}</p>
             <Link href="/solutions/independent-businesses" className="inline-flex items-center gap-2 text-sm font-bold text-white underline-offset-4 hover:underline">
               {t('industries.independent')}
-              <Icon name="arrow-right" size={15} className="rtl:-scale-x-100" />
+              <Icon name="arrow-right" size={16} className="rtl:-scale-x-100" />
             </Link>
+            <p className="rounded-[18px] bg-white/10 p-4 text-sm leading-relaxed text-white">
+              <span className="font-bold">{tc('otherIndustry')}</span> {tc('otherIndustryBody')}{' '}
+              <a href={otherIndustryMailto(tn('otherIndustrySubject'))} className="inline-flex items-center gap-1 font-bold underline underline-offset-4">
+                {tc('otherIndustryCta')}
+                <Icon name="arrow-right" size={14} className="rtl:-scale-x-100" />
+              </a>
+            </p>
           </div>
         </div>
         {INDUSTRY_KEYS.map((k) => {
@@ -93,19 +108,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Link
               key={k}
               href={`/industries/${k}`}
-              className="group relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[28px] md:rounded-2xl"
+              className="group relative flex min-h-[380px] flex-col justify-end overflow-hidden rounded-[28px] focus-visible:outline-3 focus-visible:outline-offset-2 md:rounded-2xl min-[1920px]:min-h-[460px]"
               style={{ background: ind.pastel }}
             >
-              <Image src={ind.image} alt="" fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.03]" />
-              <span className="absolute start-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold backdrop-blur">
-                <Icon name={ind.icon} size={13} />
-                {tc(`availability.${ind.availability}`)}
+              <Image src={ind.image} alt="" fill sizes="(min-width: 1800px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.03]" />
+              <span className="absolute start-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur" aria-hidden="true">
+                <Icon name={ind.icon} size={18} />
               </span>
               <span className="relative m-3 flex flex-col gap-1.5 rounded-[22px] bg-white/95 p-4 backdrop-blur">
                 <span className="flex items-center justify-between gap-2">
                   <span className="text-xl font-extrabold tracking-[-0.02em]">{tm(`${k}.name`)}</span>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-white">
-                    <Icon name="arrow-up-right" size={15} className="rtl:-scale-x-100" />
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-white transition group-hover:bg-ink-2">
+                    <Icon name="arrow-up-right" size={16} className="rtl:-scale-x-100" />
                   </span>
                 </span>
                 <span className="text-[13px] leading-snug text-graphite">{tm(`${k}.who`)}</span>
@@ -117,7 +131,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* 5. Headquarters and locations */}
-      <section aria-labelledby="hqlocal-title" className="grid gap-3 md:grid-cols-2">
+      <section aria-labelledby="hqlocal-title" className="grid gap-[var(--edge)] md:grid-cols-2">
         <h2 id="hqlocal-title" className="sr-only">
           {t('hqLocal.title')}
         </h2>
@@ -201,7 +215,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </Panel>
 
       {/* 8. Hosted vs WordPress */}
-      <section aria-labelledby="delivery-title" className="grid gap-3 md:grid-cols-2">
+      <section aria-labelledby="delivery-title" className="grid gap-[var(--edge)] md:grid-cols-2">
         <h2 id="delivery-title" className="sr-only">
           {t('delivery.title')}
         </h2>
@@ -255,7 +269,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </Panel>
 
       {/* 10. Evidence + 11. Pricing preview */}
-      <section aria-label={`${t('evidence.eyebrow')} · ${t('pricing.eyebrow')}`} className="grid gap-3 md:grid-cols-2">
+      <section aria-label={`${t('evidence.eyebrow')} · ${t('pricing.eyebrow')}`} className="grid gap-[var(--edge)] md:grid-cols-2">
         <div className="flex flex-col items-start gap-4 rounded-[28px] bg-surface p-7 md:rounded-2xl md:p-10">
           <span className="text-label font-extrabold text-stone uppercase">{t('evidence.eyebrow')}</span>
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-0.03em]">{t('evidence.title')}</h2>
@@ -293,13 +307,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </H2>
         <p className="max-w-xl text-base leading-relaxed text-white md:text-lg">{t('closing.body')}</p>
         <div className="flex flex-wrap justify-center gap-2.5">
-          <LinkButton href="/demo" size="lg" variant="light" iconRight="arrow-up-right">
-            {t('closing.primary')}
+          <LinkButton href={DEMO_URL} external size="lg" variant="light" iconRight="arrow-up-right">
+            {tc('tryDemo')}
           </LinkButton>
-          <LinkButton href="/pricing" size="lg" variant="onDark">
-            {t('closing.secondary')}
+          <LinkButton href={signUpUrl()} external size="lg" variant="onDark">
+            {tc('startPlan')}
           </LinkButton>
         </div>
+        <p className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-bold">
+          <Link href="/demo" className="underline-offset-4 hover:underline">
+            {t('closing.primary')}
+          </Link>
+          <Link href="/pricing" className="underline-offset-4 hover:underline">
+            {t('closing.secondary')}
+          </Link>
+        </p>
       </Panel>
     </>
   );

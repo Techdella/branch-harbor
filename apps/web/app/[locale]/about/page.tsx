@@ -50,7 +50,7 @@ export default async function AboutPage({ params }: Props) {
           ))}
         </ul>
       </Panel>
-      <section aria-label={`${t('companyTitle')} · ${t('contactTitle')}`} className="grid gap-3 md:grid-cols-2">
+      <section aria-label={`${t('companyTitle')} · ${t('contactTitle')}`} className="grid gap-[var(--edge)] md:grid-cols-2">
         <div className="flex flex-col gap-3 rounded-[28px] bg-surface p-7 md:rounded-2xl md:p-10">
           <h2 className="text-[26px] font-extrabold tracking-[-0.03em]">{t('companyTitle')}</h2>
           <p className="text-[15px] leading-relaxed text-stone">{t('company')}</p>

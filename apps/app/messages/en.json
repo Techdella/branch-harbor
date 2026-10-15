@@ -1851,8 +1851,6 @@
     },
     "industryLegend": "Industry",
     "selfServe": "Self-service setup",
-    "pilotOnly": "Pilot by request",
-    "pilotOnlyBody": "{industry} is available through our pilot program. You can explore setup, but publishing needs a pilot agreement — we'll be in touch.",
     "industry": {
       "studios": {
         "name": "Studios",
@@ -1895,6 +1893,13 @@
         "itemsTitle": "Add your room types",
         "itemSingular": "Room type",
         "itemPh": "e.g. River View Double · 2 guests"
+      },
+      "realty": {
+        "name": "Real Estate",
+        "workflow": "Listing → inquiry → viewing → offer",
+        "itemsTitle": "Add your first listings",
+        "itemSingular": "Listing",
+        "itemPh": "e.g. 42 Birchmount Cres · 3 bed"
       }
     },
     "modelLegend": "Business type",
@@ -2144,7 +2149,9 @@
         "sports": "Register",
         "wellness": "Book",
         "commerce": "Buy",
-        "foods": "Order"
+        "foods": "Order",
+        "realty": "Book a viewing",
+        "hospitality": "Book a stay"
       },
       "publishedTitle": "Published",
       "publishedBody": "Your site is live at {address}.",
@@ -2167,8 +2174,7 @@
     "blockers": {
       "location": "Save your first location",
       "website": "Choose a website and address",
-      "items": "Add at least one item",
-      "industry": "{industry} publishing needs a pilot agreement"
+      "items": "Add at least one item"
     }
   },
   "approvals": {

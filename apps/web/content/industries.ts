@@ -1,15 +1,12 @@
 import type { IconName } from '@bh/icons';
 import { IMG, PASTEL, type PastelKey } from './images';
 
-export const INDUSTRY_KEYS = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
+export const INDUSTRY_KEYS = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'] as const;
 export type IndustryKey = (typeof INDUSTRY_KEYS)[number];
 
 export function isIndustryKey(v: string): v is IndustryKey {
   return (INDUSTRY_KEYS as readonly string[]).includes(v);
 }
-
-/** Release labels shown on the site. Planned verticals are never presented as working features. */
-export type Availability = 'pilot' | 'next' | 'planned';
 
 export interface SampleLocation {
   name: string;
@@ -30,7 +27,6 @@ export interface IndustryDef {
   icon: IconName;
   pastel: string;
   accent: string;
-  availability: Availability;
   image: string;
   image2: string;
   problemIcons: IconName[];
@@ -48,7 +44,6 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
     icon: 'lotus',
     pastel: PASTEL.lilac,
     accent: '#7460A8',
-    availability: 'pilot',
     image: IMG.yogaGroup,
     image2: IMG.yogaMeditate,
     problemIcons: ['globe', 'mail', 'users'],
@@ -71,7 +66,6 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
     icon: 'trophy',
     pastel: PASTEL.lime,
     accent: '#2867AA',
-    availability: 'planned',
     image: IMG.sportKids,
     image2: IMG.sportCones,
     problemIcons: ['file', 'calendar', 'user'],
@@ -94,7 +88,6 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
     icon: 'leaf',
     pastel: PASTEL.sage,
     accent: '#56836C',
-    availability: 'planned',
     image: IMG.spaProne,
     image2: IMG.spaDiffuser,
     problemIcons: ['room', 'refresh', 'lock'],
@@ -117,7 +110,6 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
     icon: 'bag',
     pastel: PASTEL.butter,
     accent: '#A66C26',
-    availability: 'planned',
     image: IMG.shopInterior,
     image2: IMG.shopPay,
     problemIcons: ['box', 'tag', 'receipt'],
@@ -140,7 +132,6 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
     icon: 'utensils',
     pastel: PASTEL.blush,
     accent: '#B9543D',
-    availability: 'next',
     image: IMG.foodChef,
     image2: IMG.foodPizza,
     problemIcons: ['list', 'clock', 'wifi-off'],
@@ -163,7 +154,6 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
     icon: 'house',
     pastel: PASTEL.aqua,
     accent: '#2C7A7B',
-    availability: 'next',
     image: IMG.realtyHouse,
     image2: IMG.realtyLiving,
     problemIcons: ['shield', 'mail', 'chart'],
@@ -179,6 +169,28 @@ export const INDUSTRIES: Record<IndustryKey, IndustryDef> = {
       { name: 'London – Hampstead', country: 'GB', currency: 'GBP', timeZone: 'Europe/London', status: 'operating' },
       { name: 'Madrid – Salamanca', country: 'ES', currency: 'EUR', timeZone: 'Europe/Madrid', status: 'operating' },
       { name: 'Dubai – Marina', country: 'AE', currency: 'AED', timeZone: 'Asia/Dubai', status: 'openingSoon' },
+    ],
+  },
+  hospitality: {
+    key: 'hospitality',
+    icon: 'bed',
+    pastel: PASTEL.sand,
+    accent: '#8A5A3C',
+    image: IMG.hotelRoom,
+    image2: IMG.hotelSuite,
+    problemIcons: ['tag', 'calendar', 'refresh'],
+    workflow: [
+      { icon: 'calendar', rows: [r('bed', 'signal'), r('bed', 'butter'), r('bed')] },
+      { icon: 'card', rows: [r('user', 'signal'), r('user', 'aqua'), r('user', 'blush')] },
+      { icon: 'key', rows: [r('key', 'signal'), r('key', 'butter'), r('alert', 'blush')] },
+      { icon: 'receipt', rows: [r('receipt', 'butter'), r('receipt', 'signal')] },
+    ],
+    connected: ['stripe', 'twilio', 'mailchimp', 'ga4'],
+    sampleLocations: [
+      { name: 'Lisbon – Alfama', country: 'PT', currency: 'EUR', timeZone: 'Europe/Lisbon', status: 'operating' },
+      { name: 'Edinburgh – Old Town', country: 'GB', currency: 'GBP', timeZone: 'Europe/London', status: 'operating' },
+      { name: 'Cape Town – Bo-Kaap', country: 'ZA', currency: 'ZAR', timeZone: 'Africa/Johannesburg', status: 'operating' },
+      { name: 'Queenstown – Lakefront', country: 'NZ', currency: 'NZD', timeZone: 'Pacific/Auckland', status: 'openingSoon' },
     ],
   },
 };

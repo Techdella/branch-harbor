@@ -29,8 +29,8 @@ const stepsFor = (model: 'independent' | 'network'): readonly OnboardingStep[] =
 
 const STEP_ICON: Record<OnboardingStep, IconName> = { account: 'user', industry: 'grid', business: 'building', location: 'pin', website: 'globe', data: 'list', connect: 'plug', team: 'users', publish: 'eye' };
 const OPTIONAL: OnboardingStep[] = ['connect', 'team'];
-const INDUSTRIES: IndustryKey[] = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'hospitality'];
-const SELF_SERVE: Record<IndustryKey, boolean> = { studios: true, sports: false, wellness: false, commerce: false, foods: false, realty: false, hospitality: false };
+/** Every industry is available for self-service sign-up (all industries launch together). */
+const INDUSTRIES: IndustryKey[] = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'];
 
 const SAMPLE_CSV = `name,code,country,timezone,currency
 London – Shoreditch,LDN-SH,GB,Europe/London,GBP
@@ -188,7 +188,6 @@ export function Onboarding() {
     !done.includes('location') && (independent ? { label: ts('blockerBusiness'), step: 'business' as const } : { label: t('blockers.location'), step: 'location' as const }),
     !done.includes('website') && { label: t('blockers.website'), step: 'website' as const },
     data.items.length === 0 && { label: t('blockers.items'), step: 'data' as const },
-    !SELF_SERVE[data.industry] && { label: t('blockers.industry', { industry: t(`industry.${data.industry}.name`) }), step: 'industry' as const },
   ].filter(Boolean) as { label: string; step: OnboardingStep }[];
 
   if (!loaded) return <div className="p-10 text-center text-sm text-stone">{t('loading')}</div>;
@@ -339,11 +338,10 @@ function IndustryStep({ data, set }: StepProps) {
             body={t(`industry.${k}.workflow`)}
             icon={INDUSTRY_UI[k].icon}
             pastel={INDUSTRY_UI[k].pastel}
-            badge={SELF_SERVE[k] ? <Badge tone="success">{t('selfServe')}</Badge> : <Badge tone="neutral" icon="clock">{t('pilotOnly')}</Badge>}
+            badge={<Badge tone="success">{t('selfServe')}</Badge>}
           />
         ))}
       </fieldset>
-      {!SELF_SERVE[data.industry] && <Banner tone="info">{t('pilotOnlyBody', { industry: t(`industry.${data.industry}.name`) })}</Banner>}
       <fieldset className="grid gap-2.5 md:grid-cols-2">
         <legend className="mb-2 text-sm font-bold">{t('modelLegend')}</legend>
         <Choice name="model" checked={data.model === 'independent'} onChange={() => set('model', 'independent')} title={t('model.independent')} body={t('model.independentBody')} icon="store" />

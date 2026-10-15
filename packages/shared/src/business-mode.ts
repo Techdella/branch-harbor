@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { Currency } from './money.ts';
 import { addressSchema, currency, timeZone } from './schemas.ts';
 import type { Industry } from './industries.ts';
 import type { Role } from './permissions.ts';
@@ -71,41 +70,10 @@ export const UPGRADE_CONSEQUENCES = [
 export const BILLING_PLANS = ['trial', 'solo', 'hosted', 'connector', 'network'] as const;
 export type BillingPlan = (typeof BILLING_PLANS)[number];
 
-/** Currencies with published list prices (set per currency, not exchange-rate conversions). */
-export const PRICED_CURRENCIES = ['USD', 'CAD', 'GBP', 'EUR', 'AUD'] as const satisfies readonly Currency[];
-export type PricedCurrency = (typeof PRICED_CURRENCIES)[number];
+/** List prices, the Solo plan and country → currency rules live in ./pricing.ts (the price book). */
 
-/**
- * Solo: one location, hosted site and dashboard, monthly list price in minor units per currency.
- * Kept here so the API subscription and the marketing pricing page show the same numbers.
- */
-export const SOLO_PLAN = {
-  key: 'solo' as const,
-  maxLocations: 1,
-  interval: 'month' as const,
-  priceMinor: { USD: 3900, CAD: 5200, GBP: 3100, EUR: 3600, AUD: 5900 } satisfies Record<PricedCurrency, number>,
-};
-
-/**
- * Per-location monthly list prices (minor units) for the multi-location plans. The marketing pricing page and
- * the API subscription both read these, so the numbers can never drift apart.
- */
-export const LIST_PRICES_MINOR: Record<PricedCurrency, { connector: number; hosted: number; network: number; solo: number }> = {
-  USD: { connector: 2900, hosted: 5900, network: 8900, solo: SOLO_PLAN.priceMinor.USD },
-  CAD: { connector: 3900, hosted: 7900, network: 11900, solo: SOLO_PLAN.priceMinor.CAD },
-  GBP: { connector: 2300, hosted: 4700, network: 7100, solo: SOLO_PLAN.priceMinor.GBP },
-  EUR: { connector: 2700, hosted: 5500, network: 8300, solo: SOLO_PLAN.priceMinor.EUR },
-  AUD: { connector: 4500, hosted: 8900, network: 13500, solo: SOLO_PLAN.priceMinor.AUD },
-};
-
-/** Solo list price for a currency, or null when the currency has no list price (quote). */
-export function soloPrice(currency: string): { amount: number; currency: PricedCurrency; interval: 'month' } | null {
-  const c = (PRICED_CURRENCIES as readonly string[]).includes(currency) ? (currency as PricedCurrency) : null;
-  return c ? { amount: SOLO_PLAN.priceMinor[c], currency: c, interval: 'month' } : null;
-}
-
-/** Verticals that support self-service signup today (others stay on demo/pilot enquiry — spec §4). */
-export const SELF_SERVE_INDUSTRIES = ['studios'] as const satisfies readonly Industry[];
+/** Every industry supports self-service sign-up (all industries launch together). */
+export const SELF_SERVE_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'] as const satisfies readonly Industry[];
 export function supportsSelfServe(industry: string): boolean {
   return (SELF_SERVE_INDUSTRIES as readonly string[]).includes(industry);
 }

@@ -1,15 +1,12 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import type { IconName } from '@bh/icons';
 import { Icon, cx } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
-import { PLAN_KEYS, PRICE_CURRENCIES, currencySymbol, defaultCurrencyFor, formatPrice, perLocationPrice, type PlanKey, type PriceCurrency } from '@/content/pricing';
-
-const STORAGE_KEY = 'bh.pricing.currency';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001';
+import { PLAN_KEYS, countryName, currencyName, formatPrice, perLocationPrice, type PlanKey, type PriceCurrency } from '@/content/pricing';
+import { signUpUrl } from '@/lib/links';
 
 const STYLE: Record<PlanKey, { icon: IconName; card: string; iconBg: string; tag: string; line: string; btn: string }> = {
   solo: { icon: 'store', card: 'bg-butter text-ink', iconBg: 'bg-surface', tag: 'bg-surface', line: 'border-black/10', btn: 'bg-ink text-white hover:bg-ink-2' },
@@ -18,50 +15,30 @@ const STYLE: Record<PlanKey, { icon: IconName; card: string; iconBg: string; tag
   network: { icon: 'building', card: 'bg-lilac text-ink', iconBg: 'bg-surface', tag: 'bg-surface', line: 'border-black/10', btn: 'bg-ink text-white hover:bg-ink-2' },
 };
 
-export function PricingPlans() {
+/**
+ * Plans in the visitor's local currency. The currency is chosen on the server from the visitor's location
+ * (lib/geo.ts) — there is no currency picker: checkout charges the billing country's currency (docs/PRICING.md).
+ */
+export function PricingPlans({ currency, country }: { currency: PriceCurrency; country: string | null }) {
   const t = useTranslations('pricing');
   const locale = useLocale();
-  const [currency, setCurrency] = useState<PriceCurrency>(defaultCurrencyFor(locale));
   const [annual, setAnnual] = useState(false);
   const [count, setCount] = useState(3);
-  const currencyId = useId();
   const countId = useId();
-
-  // Remember the visitor's currency choice on this device (convenience only).
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved && (PRICE_CURRENCIES as readonly string[]).includes(saved)) setCurrency(saved as PriceCurrency);
-    } catch {
-      /* storage unavailable */
-    }
-  }, []);
-  const chooseCurrency = (c: PriceCurrency) => {
-    setCurrency(c);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, c);
-    } catch {
-      /* storage unavailable */
-    }
-  };
 
   const fmt = (n: number) => formatPrice(n, currency, locale);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-[24px] bg-canvas p-4 md:flex-row md:flex-wrap md:items-end md:justify-between md:p-5">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor={currencyId} className="text-[13px] font-bold">
-            {t('currencyLabel')}
-          </label>
-          <select id={currencyId} value={currency} onChange={(e) => chooseCurrency(e.target.value as PriceCurrency)} className="h-11 rounded-full border border-line bg-surface px-4 text-sm font-bold">
-            {PRICE_CURRENCIES.map((c) => (
-              <option key={c} value={c}>
-                {c} · {currencySymbol(c, locale)}
-              </option>
-            ))}
-          </select>
-        </div>
+        <p className="flex max-w-xl items-start gap-2.5 self-center text-sm leading-relaxed text-graphite" data-testid="geo-note" data-currency={currency} data-country={country ?? ''}>
+          <Icon name="globe" size={18} className="mt-0.5 shrink-0" />
+          <span>
+            {country
+              ? t('geoNote', { currency: currencyName(currency, locale), country: countryName(country, locale) })
+              : t('geoNoteUnknown', { currency: currencyName(currency, locale) })}
+          </span>
+        </p>
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1.5 text-[13px] font-bold">{t('billingLabel')}</legend>
           <div className="inline-flex flex-wrap gap-1 rounded-full bg-surface p-1">
@@ -101,7 +78,7 @@ export function PricingPlans() {
         </div>
       </div>
 
-      <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <ul className="grid gap-[var(--edge)] md:grid-cols-2 xl:grid-cols-4">
         {PLAN_KEYS.map((k) => {
           const s = STYLE[k];
           const price = perLocationPrice(currency, k, annual);
@@ -120,7 +97,7 @@ export function PricingPlans() {
               </div>
               <div aria-live="polite">
                 <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="tabular text-[44px] leading-none font-extrabold tracking-[-0.04em]">{fmt(price)}</span>
+                  <span className={cx('tabular leading-none font-extrabold tracking-[-0.04em]', priceSize(fmt(price)))}>{fmt(price)}</span>
                   <span className={cx('text-sm font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>{k === 'solo' ? t('perMonthOneLocation') : t('perLocation')}</span>
                 </p>
                 <p className={cx('tabular mt-2 text-xs font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>
@@ -135,10 +112,10 @@ export function PricingPlans() {
                   </li>
                 ))}
               </ul>
-              {k === 'solo' ? (
-                // Self-service sign-up for single-location businesses (industries that support it); others start with a demo.
-                <a href={`${APP_URL}/sign-up?model=independent&industry=studios`} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
-                  {t('plans.solo.cta')}
+              {k !== 'network' ? (
+                // Self-service sign-up for every industry; Network starts with a quote.
+                <a href={signUpUrl({ plan: k, model: k === 'solo' ? 'independent' : 'network' })} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
+                  {t(`plans.${k}.cta`)}
                 </a>
               ) : (
                 <Link href={`/demo?plan=${k}`} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
@@ -151,4 +128,10 @@ export function PricingPlans() {
       </ul>
     </div>
   );
+}
+
+/** Long amounts (₦41,500, IDR 579,000) step down so they never overflow a narrow card. */
+function priceSize(formatted: string): string {
+  const n = formatted.replace(/[⁦-⁩\s]/g, '').length;
+  return n <= 6 ? 'text-[44px]' : n <= 8 ? 'text-[38px]' : n <= 10 ? 'text-[32px]' : 'text-[28px]';
 }

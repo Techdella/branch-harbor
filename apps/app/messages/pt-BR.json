@@ -1851,8 +1851,6 @@
     },
     "industryLegend": "Segmento",
     "selfServe": "Configuração por conta própria",
-    "pilotOnly": "Piloto sob solicitação",
-    "pilotOnlyBody": "{industry} está disponível pelo nosso programa piloto. Você pode explorar a configuração, mas para publicar é preciso um acordo de piloto — entraremos em contato.",
     "industry": {
       "studios": {
         "name": "Estúdios",
@@ -1895,6 +1893,13 @@
         "itemsTitle": "Adicione seus tipos de quarto",
         "itemSingular": "Tipo de quarto",
         "itemPh": "ex. Duplo vista rio · 2 hóspedes"
+      },
+      "realty": {
+        "name": "Imóveis",
+        "workflow": "Anúncio → contato → visita → proposta",
+        "itemsTitle": "Adicione seus primeiros anúncios",
+        "itemSingular": "Anúncio",
+        "itemPh": "ex. Rua das Flores, 42 · 3 quartos"
       }
     },
     "modelLegend": "Tipo de empresa",
@@ -2144,7 +2149,9 @@
         "sports": "Inscrever-se",
         "wellness": "Agendar",
         "commerce": "Comprar",
-        "foods": "Pedir"
+        "foods": "Pedir",
+        "realty": "Agendar visita",
+        "hospitality": "Reservar estadia"
       },
       "publishedTitle": "Publicado",
       "publishedBody": "Seu site está no ar em {address}.",
@@ -2167,8 +2174,7 @@
     "blockers": {
       "location": "Salve sua primeira unidade",
       "website": "Escolha um site e um endereço",
-      "items": "Adicione pelo menos um item",
-      "industry": "Publicar em {industry} exige um acordo de piloto"
+      "items": "Adicione pelo menos um item"
     }
   },
   "approvals": {
