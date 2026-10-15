@@ -2176,7 +2176,8 @@
       "ad_spend": "Local ad spend",
       "shift_swap": "Shift swap",
       "field": "Website change",
-      "page": "Website page"
+      "page": "Website page",
+      "section": "Website section change"
     },
     "requested": "{location} · requested by {name}",
     "waiting": "Waiting for someone else to decide",

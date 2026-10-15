@@ -2176,7 +2176,8 @@
       "ad_spend": "Publicidad local",
       "shift_swap": "Cambio de turno",
       "field": "Cambio en la web",
-      "page": "Página web"
+      "page": "Página web",
+      "section": "Cambio de sección web"
     },
     "requested": "{location} · solicitado por {name}",
     "waiting": "Esperando la decisión de otra persona",

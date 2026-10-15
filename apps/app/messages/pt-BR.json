@@ -2176,7 +2176,8 @@
       "ad_spend": "Anúncios locais",
       "shift_swap": "Troca de turno",
       "field": "Alteração no site",
-      "page": "Página do site"
+      "page": "Página do site",
+      "section": "Alteração de seção do site"
     },
     "requested": "{location} · solicitado por {name}",
     "waiting": "Aguardando a decisão de outra pessoa",

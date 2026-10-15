@@ -494,14 +494,16 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {em # dia} other {em # dias}}",
       "website_change": "Alteração no site: {field}",
-      "page_submitted": "Página enviada para aprovação"
+      "page_submitted": "Página enviada para aprovação",
+      "website_section_change": "Alteração no site: {page}"
     },
     "kind": {
       "refund": "Reembolso",
       "ad_spend": "Anúncios locais",
       "shift_swap": "Troca de turno",
       "field": "Alteração no site",
-      "page": "Página do site"
+      "page": "Página do site",
+      "section": "Alteração de seção do site"
     },
     "detail": {
       "threshold": "Acima do limite",

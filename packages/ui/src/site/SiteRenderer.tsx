@@ -306,14 +306,23 @@ export function SectionView({ section, ctx, labels, live, renderForm, renderNews
   }
 }
 
+/** Stable short key for a resolved theme, so several themed roots (theme gallery) never share CSS variables. */
+function themeKey(theme: ResolvedTheme): string {
+  const str = JSON.stringify(theme);
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
 /** Full page: theme CSS scoped to the root, then every visible section. */
 export function SiteDocument(props: SiteRenderProps) {
   const { document, theme, scheme } = props;
   const visible = document.sections.filter((x) => !x.hidden);
   const firstHero = visible.findIndex((x) => x.type.startsWith('hero'));
+  const key = themeKey(theme);
   return (
-    <div className="bhs-root" data-theme-id={theme.id} data-hero={theme.layout.hero} data-cards={theme.layout.cards} data-divider={theme.layout.divider} data-deco={theme.decoration} data-scheme={scheme} style={{} as CSSProperties}>
-      <style dangerouslySetInnerHTML={{ __html: themeCss(theme, '.bhs-root', props.fontVar) }} />
+    <div className="bhs-root" data-bhs={key} data-theme-id={theme.id} data-hero={theme.layout.hero} data-cards={theme.layout.cards} data-divider={theme.layout.divider} data-deco={theme.decoration} data-scheme={scheme} style={{} as CSSProperties}>
+      <style dangerouslySetInnerHTML={{ __html: themeCss(theme, `.bhs-root[data-bhs="${key}"]`, props.fontVar) }} />
       {visible.map((section, i) => <SectionView key={section.id} {...props} section={section} first={i === firstHero} />)}
     </div>
   );
@@ -321,9 +330,10 @@ export function SiteDocument(props: SiteRenderProps) {
 
 /** Theme root without content (the builder renders sections itself inside it). */
 export function SiteThemeRoot({ theme, children, fontVar, scheme }: { theme: ResolvedTheme; children: ReactNode; fontVar?: (f: SiteFont) => string | null; scheme?: 'light' | 'dark' }) {
+  const key = themeKey(theme);
   return (
-    <div className="bhs-root" data-theme-id={theme.id} data-hero={theme.layout.hero} data-cards={theme.layout.cards} data-divider={theme.layout.divider} data-deco={theme.decoration} data-scheme={scheme}>
-      <style dangerouslySetInnerHTML={{ __html: themeCss(theme, '.bhs-root', fontVar) }} />
+    <div className="bhs-root" data-bhs={key} data-theme-id={theme.id} data-hero={theme.layout.hero} data-cards={theme.layout.cards} data-divider={theme.layout.divider} data-deco={theme.decoration} data-scheme={scheme}>
+      <style dangerouslySetInnerHTML={{ __html: themeCss(theme, `.bhs-root[data-bhs="${key}"]`, fontVar) }} />
       {children}
     </div>
   );

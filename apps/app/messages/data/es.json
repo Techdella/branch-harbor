@@ -494,14 +494,16 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {dentro de # día} other {dentro de # días}}",
       "website_change": "Cambio en la web: {field}",
-      "page_submitted": "Página enviada para aprobación"
+      "page_submitted": "Página enviada para aprobación",
+      "website_section_change": "Cambio en la web: {page}"
     },
     "kind": {
       "refund": "Reembolso",
       "ad_spend": "Publicidad local",
       "shift_swap": "Cambio de turno",
       "field": "Cambio en la web",
-      "page": "Página web"
+      "page": "Página web",
+      "section": "Cambio de sección web"
     },
     "detail": {
       "threshold": "Supera el límite",

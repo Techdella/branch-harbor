@@ -494,14 +494,16 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {in # day} other {in # days}}",
       "website_change": "Website change: {field}",
-      "page_submitted": "Page submitted for approval"
+      "page_submitted": "Page submitted for approval",
+      "website_section_change": "Website change: {page}"
     },
     "kind": {
       "refund": "Refund",
       "ad_spend": "Local ad spend",
       "shift_swap": "Shift swap",
       "field": "Website change",
-      "page": "Website page"
+      "page": "Website page",
+      "section": "Website section change"
     },
     "detail": {
       "threshold": "Above threshold",

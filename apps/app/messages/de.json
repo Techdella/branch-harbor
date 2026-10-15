@@ -2176,7 +2176,8 @@
       "ad_spend": "Lokale Werbeausgaben",
       "shift_swap": "Schichttausch",
       "field": "Website-Änderung",
-      "page": "Website-Seite"
+      "page": "Website-Seite",
+      "section": "Änderung eines Website-Abschnitts"
     },
     "requested": "{location} · angefragt von {name}",
     "waiting": "Wartet auf die Entscheidung einer anderen Person",

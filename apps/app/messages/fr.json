@@ -2176,7 +2176,8 @@
       "ad_spend": "Publicité locale",
       "shift_swap": "Échange de service",
       "field": "Modification du site",
-      "page": "Page du site"
+      "page": "Page du site",
+      "section": "Modification de section du site"
     },
     "requested": "{location} · demandé par {name}",
     "waiting": "En attente de la décision d’une autre personne",

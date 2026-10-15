@@ -494,14 +494,16 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {dans # jour} other {dans # jours}}",
       "website_change": "Modification du site : {field}",
-      "page_submitted": "Page soumise à validation"
+      "page_submitted": "Page soumise à validation",
+      "website_section_change": "Modification du site : {page}"
     },
     "kind": {
       "refund": "Remboursement",
       "ad_spend": "Publicité locale",
       "shift_swap": "Échange de service",
       "field": "Modification du site",
-      "page": "Page du site"
+      "page": "Page du site",
+      "section": "Modification de section du site"
     },
     "detail": {
       "threshold": "Au-dessus du seuil",
