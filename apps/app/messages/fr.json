@@ -2176,7 +2176,8 @@
       "ad_spend": "Publicité locale",
       "shift_swap": "Échange de service",
       "field": "Modification du site",
-      "page": "Page du site"
+      "page": "Page du site",
+      "location_go_live": "Ouverture d’un établissement"
     },
     "requested": "{location} · demandé par {name}",
     "waiting": "En attente de la décision d’une autre personne",
@@ -2196,7 +2197,8 @@
       "ad_spend": "Valider programme {amount} de dépenses publicitaires locales pour {location}.",
       "shift_swap": "Valider transfère le service de {from} à {to}. Les deux plannings sont mis à jour immédiatement.",
       "website": "Valider applique la modification à la page de {location}.",
-      "reject": "Refuser clôt la demande. Rien n’est modifié ; le demandeur voit votre commentaire."
+      "reject": "Refuser clôt la demande. Rien n’est modifié ; le demandeur voit votre commentaire.",
+      "location_go_live": "Approuver ouvre {location} : l’établissement passe en activité, devient visible pour les clients et le franchisé y garde son accès."
     },
     "approvedDone": "Validé · {result}",
     "rejectedDone": "Refusé — rien n’a été modifié.",

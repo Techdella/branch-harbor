@@ -116,3 +116,15 @@ export const NAV_SHARED: NavItem[] = [
   { key: 'connections', href: '/connections', icon: 'plug', perm: 'locations.read' },
   { key: 'settings', href: '/settings', icon: 'settings', perm: 'org.manage' },
 ];
+
+/**
+ * Franchise development (Sales workspace), new-location onboarding (Network) and Legal. Shown to network businesses
+ * in live mode, filtered by permission (items a person cannot use are not shown). `anyOf`: any one permission.
+ */
+export const NAV_FRANCHISE: Array<NavItem & { anyOf: Permission[] }> = [
+  { key: 'pipeline', href: '/franchise/pipeline', icon: 'flag', anyOf: ['franchise.pipeline.view'] },
+  { key: 'territories', href: '/franchise/territories', icon: 'map', anyOf: ['franchise.pipeline.view'] },
+  { key: 'onboarding', href: '/franchise/onboarding', icon: 'building', anyOf: ['franchise.pipeline.view'] },
+  { key: 'agreements', href: '/franchise/agreements', icon: 'scale', anyOf: ['legal.view', 'franchise.pipeline.view'] },
+  { key: 'rules', href: '/franchise/rules', icon: 'shield', anyOf: ['franchise.pipeline.view', 'legal.view'] },
+];

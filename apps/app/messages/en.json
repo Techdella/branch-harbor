@@ -2176,7 +2176,8 @@
       "ad_spend": "Local ad spend",
       "shift_swap": "Shift swap",
       "field": "Website change",
-      "page": "Website page"
+      "page": "Website page",
+      "location_go_live": "Location opening"
     },
     "requested": "{location} · requested by {name}",
     "waiting": "Waiting for someone else to decide",
@@ -2196,7 +2197,8 @@
       "ad_spend": "Approving schedules {amount} of local ad spend for {location}.",
       "shift_swap": "Approving moves the shift from {from} to {to}. Both schedules update immediately.",
       "website": "Approving applies the change to the {location} page.",
-      "reject": "Rejecting closes the request. Nothing is changed; the requester sees your comment."
+      "reject": "Rejecting closes the request. Nothing is changed; the requester sees your comment.",
+      "location_go_live": "Approving opens {location}: it becomes operating and visible to customers, and the franchise owner keeps access to it."
     },
     "approvedDone": "Approved · {result}",
     "rejectedDone": "Rejected — nothing was changed.",

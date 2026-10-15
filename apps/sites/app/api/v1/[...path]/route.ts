@@ -28,7 +28,9 @@ async function forward(req: NextRequest, { params }: { params: Promise<{ path: s
       cache: 'no-store',
       signal: AbortSignal.timeout(15000),
     });
-    return new Response(await res.text(), { status: res.status, headers: { 'content-type': res.headers.get('content-type') ?? 'application/json', 'cache-control': 'no-store' } });
+    // Bytes, not text: some public responses are files (e.g. a franchise disclosure document PDF).
+    const disposition = res.headers.get('content-disposition');
+    return new Response(await res.arrayBuffer(), { status: res.status, headers: { 'content-type': res.headers.get('content-type') ?? 'application/json', 'cache-control': 'no-store', ...(disposition ? { 'content-disposition': disposition } : {}) } });
   } catch {
     return Response.json({ error: { code: 'api_unreachable', message: 'The service is unreachable. Please try again.' } }, { status: 503 });
   }

@@ -476,8 +476,8 @@ function approvalView(a: ApiApprovalFull): ApprovalRequest {
   }
   const r = a.executionResult ?? {};
   const refundState = String(r.refundState ?? 'processed');
-  const result = a.status !== 'approved' ? null : a.kind === 'refund' ? `Refund ${refundState.replace(/_/g, ' ')}` : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : 'Change applied';
-  const resultKey = a.status !== 'approved' ? undefined : a.kind === 'refund' ? 'approval.result.refund' : a.kind === 'ad_spend' ? 'approval.result.campaignScheduled' : a.kind === 'shift_swap' ? 'approval.result.shiftReassigned' : 'approval.result.changeApplied';
+  const result = a.status !== 'approved' ? null : a.kind === 'refund' ? `Refund ${refundState.replace(/_/g, ' ')}` : a.kind === 'ad_spend' ? 'Campaign scheduled' : a.kind === 'shift_swap' ? 'Shift reassigned' : a.kind === 'location_go_live' ? 'Location opened' : 'Change applied';
+  const resultKey = a.status !== 'approved' ? undefined : a.kind === 'refund' ? 'approval.result.refund' : a.kind === 'ad_spend' ? 'approval.result.campaignScheduled' : a.kind === 'shift_swap' ? 'approval.result.shiftReassigned' : a.kind === 'location_go_live' ? 'approval.result.locationOpened' : 'approval.result.changeApplied';
   const title = approvalTitle(a);
   return {
     id: a.id, kind: a.kind, title: a.title, ...title, status: a.status, locationName: a.location?.name ?? nameOfLoc(a.locationId), amount: a.amount, requestedBy: a.requester.name ?? 'Someone', requestedAt: a.createdAt,

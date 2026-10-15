@@ -14,4 +14,4 @@ export function includedHosts(): string[] {
 }
 
 /** First path segments that are not location slugs under /{brand}/… */
-export const BRAND_RESERVED = new Set(['pages', 'sitemap.xml', 'robots.txt', 'properties', 'saved-search']);
+export const BRAND_RESERVED = new Set(['pages', 'sitemap.xml', 'robots.txt', 'properties', 'saved-search', 'franchise']);

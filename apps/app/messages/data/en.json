@@ -494,7 +494,8 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {in # day} other {in # days}}",
       "website_change": "Website change: {field}",
-      "page_submitted": "Page submitted for approval"
+      "page_submitted": "Page submitted for approval",
+      "location_go_live": "Open {location}"
     },
     "kind": {
       "refund": "Refund",
@@ -536,7 +537,8 @@
       "refund": "Refund {state}",
       "campaignScheduled": "Campaign scheduled",
       "shiftReassigned": "Shift reassigned",
-      "changeApplied": "Change applied"
+      "changeApplied": "Change applied",
+      "locationOpened": "Location opened"
     },
     "refundState": {
       "processed": "processed",

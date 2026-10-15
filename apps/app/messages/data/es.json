@@ -494,7 +494,8 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {dentro de # día} other {dentro de # días}}",
       "website_change": "Cambio en la web: {field}",
-      "page_submitted": "Página enviada para aprobación"
+      "page_submitted": "Página enviada para aprobación",
+      "location_go_live": "Abrir {location}"
     },
     "kind": {
       "refund": "Reembolso",
@@ -536,7 +537,8 @@
       "refund": "Reembolso {state}",
       "campaignScheduled": "Campaña programada",
       "shiftReassigned": "Turno reasignado",
-      "changeApplied": "Cambio aplicado"
+      "changeApplied": "Cambio aplicado",
+      "locationOpened": "Local abierto"
     },
     "refundState": {
       "processed": "procesado",

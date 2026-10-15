@@ -2176,7 +2176,8 @@
       "ad_spend": "Lokale Werbeausgaben",
       "shift_swap": "Schichttausch",
       "field": "Website-Änderung",
-      "page": "Website-Seite"
+      "page": "Website-Seite",
+      "location_go_live": "Standorteröffnung"
     },
     "requested": "{location} · angefragt von {name}",
     "waiting": "Wartet auf die Entscheidung einer anderen Person",
@@ -2196,7 +2197,8 @@
       "ad_spend": "Mit der Freigabe werden {amount} lokale Werbeausgaben für {location} eingeplant.",
       "shift_swap": "Mit der Freigabe geht die Schicht von {from} an {to}. Beide Dienstpläne werden sofort aktualisiert.",
       "website": "Mit der Freigabe wird die Änderung auf die Seite von {location} übernommen.",
-      "reject": "Mit der Ablehnung wird die Anfrage geschlossen. Es wird nichts geändert; die anfragende Person sieht Ihren Kommentar."
+      "reject": "Mit der Ablehnung wird die Anfrage geschlossen. Es wird nichts geändert; die anfragende Person sieht Ihren Kommentar.",
+      "location_go_live": "Mit der Freigabe wird {location} eröffnet: Der Standort ist dann in Betrieb und für Kundinnen und Kunden sichtbar, und der Franchisenehmer behält den Zugriff."
     },
     "approvedDone": "Freigegeben · {result}",
     "rejectedDone": "Abgelehnt – es wurde nichts geändert.",

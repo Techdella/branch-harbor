@@ -2176,7 +2176,8 @@
       "ad_spend": "Anúncios locais",
       "shift_swap": "Troca de turno",
       "field": "Alteração no site",
-      "page": "Página do site"
+      "page": "Página do site",
+      "location_go_live": "Abertura de unidade"
     },
     "requested": "{location} · solicitado por {name}",
     "waiting": "Aguardando a decisão de outra pessoa",
@@ -2196,7 +2197,8 @@
       "ad_spend": "Aprovar programa {amount} em anúncios locais para {location}.",
       "shift_swap": "Aprovar passa o turno de {from} para {to}. As duas escalas são atualizadas na hora.",
       "website": "Aprovar aplica a alteração à página de {location}.",
-      "reject": "Recusar encerra a solicitação. Nada é alterado; quem pediu verá seu comentário."
+      "reject": "Recusar encerra a solicitação. Nada é alterado; quem pediu verá seu comentário.",
+      "location_go_live": "Aprovar abre {location}: a unidade passa a operar e fica visível para os clientes, e o franqueado mantém o acesso."
     },
     "approvedDone": "Aprovado · {result}",
     "rejectedDone": "Recusado — nada foi alterado.",

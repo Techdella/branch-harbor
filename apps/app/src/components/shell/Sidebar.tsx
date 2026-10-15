@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon, LogoMark, cx } from '@bh/ui';
-import { INDUSTRY_UI, NAV_SHARED, NAV_TOP, OPS, type NavItem } from '@/lib/nav';
+import { INDUSTRY_UI, NAV_FRANCHISE, NAV_SHARED, NAV_TOP, OPS, type NavItem } from '@/lib/nav';
 import { useApp } from './AppContext';
 
 export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean; onNavigate?: () => void; mobile?: boolean }) {
@@ -24,13 +24,20 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
   // Sample-mode badges illustrate counts; live counts come from the overview's "Needs attention" and notifications.
   const badges: Record<string, number> = app.live ? {} : { approvals: 4, payments: 1, connections: app.industry === 'studios' ? 2 : 1, registrations: 4, cover: 1 };
 
-  const label = (it: NavItem, section: 'top' | 'ops' | 'shared') => {
+  // Franchise development / onboarding / legal (live network businesses only; hidden, not padlocked, without access).
+  const franchiseOwner = app.session.assignments.some((a) => a.role === 'franchise_owner');
+  const franchiseItems: NavItem[] = app.live && !independent
+    ? NAV_FRANCHISE.filter((i) => i.anyOf.some((p) => app.can(p)) || (i.key === 'onboarding' && franchiseOwner)).map(({ anyOf: _anyOf, ...i }) => i)
+    : [];
+
+  const label = (it: NavItem, section: 'top' | 'ops' | 'shared' | 'franchise') => {
+    if (section === 'franchise') return t(`franchise.nav.${it.key}`);
     if (section === 'ops') return t(`ops.${app.industry}.${it.key}.title`);
     if (it.key === 'customers') return t(`industries.${app.industry}.customers`);
     return t(`nav.${it.key}`);
   };
 
-  const item = (it: NavItem, section: 'top' | 'ops' | 'shared') => {
+  const item = (it: NavItem, section: 'top' | 'ops' | 'shared' | 'franchise') => {
     const active = path === it.href || path.startsWith(`${it.href}/`);
     const allowed = !it.perm || app.can(it.perm);
     const text = label(it, section);
@@ -104,6 +111,13 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
       {!collapsed && <div className={cx('px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute', railHide)}>{t(`industries.${app.industry}.name`)}</div>}
       {(collapsed || auto) && <hr className={cx('mx-3 my-2 border-line-soft', auto && 'lg:hidden')} />}
       <ul className="flex flex-col gap-0.5">{opsItems.map((i) => item(i, 'ops'))}</ul>
+      {franchiseItems.length > 0 && (
+        <>
+          {!collapsed && <div className={cx('px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute', railHide)}>{t('franchise.nav.section')}</div>}
+          {(collapsed || auto) && <hr className={cx('mx-3 my-2 border-line-soft', auto && 'lg:hidden')} />}
+          <ul className="flex flex-col gap-0.5">{franchiseItems.map((i) => item(i, 'franchise'))}</ul>
+        </>
+      )}
       {!collapsed && <div className={cx('px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute', railHide)}>{t('nav.shared')}</div>}
       {(collapsed || auto) && <hr className={cx('mx-3 my-2 border-line-soft', auto && 'lg:hidden')} />}
       <ul className="flex flex-col gap-0.5">{NAV_SHARED.map((i) => item(i, 'shared'))}</ul>

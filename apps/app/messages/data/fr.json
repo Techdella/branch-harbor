@@ -494,7 +494,8 @@
       "shift_swap": "{role} · {when}",
       "shift_swap_in": "{role} · {count, plural, one {dans # jour} other {dans # jours}}",
       "website_change": "Modification du site : {field}",
-      "page_submitted": "Page soumise à validation"
+      "page_submitted": "Page soumise à validation",
+      "location_go_live": "Ouvrir {location}"
     },
     "kind": {
       "refund": "Remboursement",
@@ -536,7 +537,8 @@
       "refund": "Remboursement {state}",
       "campaignScheduled": "Campagne programmée",
       "shiftReassigned": "Service réattribué",
-      "changeApplied": "Modification appliquée"
+      "changeApplied": "Modification appliquée",
+      "locationOpened": "Établissement ouvert"
     },
     "refundState": {
       "processed": "traité",

@@ -633,7 +633,7 @@ export interface ShiftView {
 }
 
 /* ---------- Approvals inbox (all kinds) ---------- */
-export type ApprovalKind = 'refund' | 'ad_spend' | 'shift_swap' | 'field' | 'page';
+export type ApprovalKind = 'refund' | 'ad_spend' | 'shift_swap' | 'field' | 'page' | 'location_go_live';
 export interface ApprovalRequest {
   id: string;
   kind: ApprovalKind;

@@ -2,7 +2,7 @@ import { and, asc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { RULES_DISCLAIMER, franchiseEnquirySchema } from '@bh/shared';
-import { consentRecords, franchiseDeliveries, franchiseTerritories, organizations } from '../db/schema/index.ts';
+import { consentRecords, franchiseDeliveries, franchiseTerritories, locations, organizations } from '../db/schema/index.ts';
 import { AppError, notFound, validationError } from '../lib/errors.ts';
 import { ESIGN_DISCLAIMER } from '../integrations/esign.ts';
 import { completeSignature, createEnquiry, deliveryByToken, franchiseSettings, prospectCompliance, signReceipt, signatureByToken } from '../services/franchise.ts';
@@ -33,7 +33,8 @@ export const franchisePublicRoutes: FastifyPluginAsyncZod = async (app) => {
     return {
       enabled: true as const, brand: { name: org.name }, currency: org.defaultCurrency, homeCountry: org.country,
       territories: terr.map((t) => ({ id: t.id, name: t.name, country: t.country, region: t.region })),
-      countries: [...new Set([org.country, ...terr.map((t) => t.country)])],
+      // Home country, territory countries and countries the network already operates in.
+      countries: [...new Set([org.country, ...terr.map((t) => t.country), ...(await s.db.selectDistinct({ c: locations.country }).from(locations).where(eq(locations.organizationId, org.id))).map((l) => l.c)])],
     };
   });
 

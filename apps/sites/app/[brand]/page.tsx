@@ -4,6 +4,8 @@ import { Icon } from '@bh/ui';
 import { NearMe } from '@/components/NearMe';
 import { OpenBadge } from '@/components/OpenBadge';
 import { SchematicMap } from '@/components/SchematicMap';
+import { FranchiseEnquiry } from '@/components/franchise/FranchiseEnquiry';
+import { getFranchiseForm } from '@/lib/franchise';
 import { getRouting, loadBrand, makeLinks, resolveSiteLocale, str } from '@/lib/site';
 import type { BrandSite } from '@/lib/types';
 
@@ -68,6 +70,9 @@ export default async function BrandHome({ params, searchParams }: Props) {
   const heroTitle = str(home?.content.hero_title) ?? data.brand.name;
   const heroText = data.brand.tagline ?? str(home?.content.brand_tagline) ?? str(home?.content.intro);
   const heroImage = data.brand.theme.heroImageUrl ?? str(home?.content.hero_image);
+  // "Own a franchise" module: franchise networks that switched the enquiry form on (posts to their pipeline).
+  const franchise = data.brand.model === 'independent' ? null : await getFranchiseForm(slug);
+  const tf = await getTranslations('franchiseSite');
 
   return (
     <main id="main">
@@ -86,6 +91,9 @@ export default async function BrandHome({ params, searchParams }: Props) {
           </form>
           {data.brand.industry === 'realty' && (
             <a href={links.brand('/properties')} className="btn mt-4 border border-white/60 bg-white/10 text-on-brand"><Icon name="house" size={18} />{tb('searchProperties')}</a>
+          )}
+          {franchise && (
+            <a href="#own-a-franchise" className="btn mt-4 ms-2 border border-white/60 bg-white/10 text-on-brand"><Icon name="briefcase" size={18} />{tf('cta')}</a>
           )}
         </div>
       </section>
@@ -140,6 +148,14 @@ export default async function BrandHome({ params, searchParams }: Props) {
           </div>
         </div>
       </section>
+
+      {franchise && (
+        <section id="own-a-franchise" aria-labelledby="franchise-h" className="mx-auto mt-14 max-w-3xl scroll-mt-20 px-4">
+          <h2 id="franchise-h" className="text-2xl font-extrabold tracking-tight sm:text-3xl">{tf('title', { brand: data.brand.name })}</h2>
+          <p className="mb-5 mt-2 text-graphite">{tf('intro')}</p>
+          <FranchiseEnquiry brandSlug={slug} brandName={data.brand.name} currency={franchise.currency ?? 'USD'} countries={franchise.countries ?? []} territories={franchise.territories ?? []} />
+        </section>
+      )}
 
       {str(home?.content.about) && (
         <section className="mx-auto mt-14 max-w-3xl px-4">
