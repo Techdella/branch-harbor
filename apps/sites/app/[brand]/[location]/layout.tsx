@@ -12,7 +12,7 @@ export default async function LocationLayout({ children, params }: { children: R
   const t = await getTranslations();
   const kind = data.module.kind;
   const modPath = MODULE_PATH[kind];
-  const extraPages = data.pages.filter((p) => p.slug !== 'home');
+  const extraPages = data.pages.filter((p) => p.slug !== 'home' && (p.nav?.show ?? true));
 
   return (
     <>
@@ -38,7 +38,10 @@ export default async function LocationLayout({ children, params }: { children: R
           ))}
           {kind === 'foods' && data.module.mode !== 'external' && <FoodsLinks locationId={data.location.id} href={(path) => links.location(location, path)} />}
           {extraPages.map((p) => (
-            <a key={p.slug} href={links.location(location, `/${p.slug}`)} className="flex h-10 shrink-0 items-center rounded-full px-3 hover:bg-white">{p.title}</a>
+            <a key={p.slug} href={links.location(location, `/${p.slug}`)} className="flex h-10 shrink-0 items-center rounded-full px-3 hover:bg-white">{p.nav?.label ?? p.title}</a>
+          ))}
+          {(data.site.navLinks ?? []).map((l) => (
+            <a key={l.href} href={l.href} className="flex h-10 shrink-0 items-center rounded-full px-3 hover:bg-white" {...(/^https:/.test(l.href) ? { rel: 'noopener' } : {})}>{l.label}</a>
           ))}
           {data.site.locationCount > 1 && (
             <a href={`${links.brand()}#finder`} className="ms-auto flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 hover:bg-white">

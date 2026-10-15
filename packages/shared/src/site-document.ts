@@ -476,7 +476,7 @@ const industryBlock: Record<string, SectionType> = { studios: 'class_schedule', 
  * other text fields) into a page document that renders the same information. Used by the migration script and for
  * pages that were never opened in the builder.
  */
-export function legacyFieldsToDocument(content: Record<string, unknown>, opts: { industry?: string; slug?: string } = {}): PageDocument {
+export function legacyFieldsToDocument(content: Record<string, unknown>, opts: { industry?: string; slug?: string; locationLevel?: boolean } = {}): PageDocument {
   const sections: Section[] = [];
   const known = new Set(['hero_title', 'hero_image', 'offer', 'intro_offer', 'about', 'brand_tagline']);
   const heading = str(content.hero_title);
@@ -490,7 +490,7 @@ export function legacyFieldsToDocument(content: Record<string, unknown>, opts: {
     if (/^https:\/\/\S+\.(png|jpe?g|webp|avif|gif)(\?\S*)?$/i.test(v)) sections.push({ id: `legacy-${k}`.slice(0, 64), type: 'gallery', props: { heading: '', columns: '2', items: [{ image: v, alt: '', caption: '' }] }, style: {} });
     else sections.push({ id: `legacy-${k}`.slice(0, 64), type: 'text', props: { heading: '', body: v.slice(0, 6000) }, style: {} });
   }
-  if (opts.slug === 'home') {
+  if (opts.slug === 'home' && opts.locationLevel !== false) {
     const block = opts.industry ? industryBlock[opts.industry] : undefined;
     if (block) sections.push({ id: 'legacy-module', type: block, props: { ...structuredClone((SECTION_DEFS[block] as SectionDef).defaults) }, style: {} });
     sections.push({ id: 'legacy-hours', type: 'hours', props: { heading: '', note: '' }, style: { background: 'muted' } });

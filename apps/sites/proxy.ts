@@ -59,7 +59,7 @@ async function singleLocationOf(brand: string): Promise<string | null> {
 }
 
 /** First segments under /{brand} that stay brand-level even for an independent business. */
-const BRAND_LEVEL = new Set(['sitemap.xml', 'robots.txt', 'pages']);
+const BRAND_LEVEL = new Set(['sitemap.xml', 'robots.txt', 'pages', 'f']);
 
 const LANG_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
 

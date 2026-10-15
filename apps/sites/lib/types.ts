@@ -1,3 +1,5 @@
+import type { PageDocument, ResolvedTheme } from '@bh/shared';
+
 export interface Money { amount: number; currency: string }
 
 export interface Theme {
@@ -9,6 +11,9 @@ export interface Theme {
   font: string;
   logoUrl: string | null;
   heroImageUrl: string | null;
+  /** Website builder theme (absent on older APIs). */
+  themeId?: string;
+  site?: ResolvedTheme;
 }
 
 export interface Brand {
@@ -28,10 +33,13 @@ export interface Brand {
 export interface PublishedPage {
   slug: string;
   title: string;
-  seo: { title: string | null; description: string | null; canonicalOwner: 'branchharbor' | 'external' };
+  seo: { title: string | null; description: string | null; canonicalOwner: 'branchharbor' | 'external'; socialImage?: string | null; noindex?: boolean };
   content: Record<string, unknown>;
   version: number;
   publishedAt: string;
+  /** Website builder document of the published version (null/absent = classic field page). */
+  document?: PageDocument | null;
+  nav?: { label: string; show: boolean; order: number };
 }
 
 export interface WeeklyHours { day: number; opens: string; closes: string }
@@ -76,7 +84,7 @@ export interface LocationSite {
     payAtPickup: boolean;
     sandboxPayments: boolean;
   };
-  site: { includedAddress: string; primaryHost: string | null; brandPrimaryHost: string | null; locationCount: number; singleLocation?: boolean };
+  site: { includedAddress: string; primaryHost: string | null; brandPrimaryHost: string | null; locationCount: number; singleLocation?: boolean; navLinks?: Array<{ label: string; href: string }> };
 }
 
 export interface ScheduleItem {

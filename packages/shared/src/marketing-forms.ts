@@ -3,6 +3,7 @@
  * standalone landing page; submissions become leads routed to a location, with explicit consent checkboxes.
  */
 import { z } from 'zod';
+import { isSafeImage } from './site-document.ts';
 
 export const FORM_FIELD_TYPES = ['text', 'email', 'phone', 'textarea', 'select', 'checkbox', 'date', 'number', 'location'] as const;
 export type FormFieldType = (typeof FORM_FIELD_TYPES)[number];
@@ -35,7 +36,7 @@ export const formSettingsSchema = z.object({
   notifyEmails: z.array(z.email()).max(10).default([]),
   consents: z.array(formConsentSchema).max(3).default([]),
   /** Standalone landing page. */
-  landing: z.object({ enabled: z.boolean().default(false), heading: z.string().max(140).default(''), intro: z.string().max(1000).default(''), image: z.string().max(2048).default('') }).default({ enabled: false, heading: '', intro: '', image: '' }),
+  landing: z.object({ enabled: z.boolean().default(false), heading: z.string().max(140).default(''), intro: z.string().max(1000).default(''), image: z.string().max(2048).refine((v) => !v || isSafeImage(v), 'Use an https image').default('') }).default({ enabled: false, heading: '', intro: '', image: '' }),
   /** Tag added to the contact (automations can start from it). */
   tag: z.string().max(40).default(''),
 });

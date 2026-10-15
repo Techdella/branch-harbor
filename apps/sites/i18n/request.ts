@@ -2,6 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import en from '../messages/en.json';
 import foodsEn from '../messages/foods/en.json';
 import paymentsEn from '../messages/payments/en.json';
+import builderEn from '../messages/builder/en.json';
 import { resolveSiteLocale } from '../lib/site';
 
 type Messages = Record<string, unknown>;
@@ -26,6 +27,18 @@ const loaders: Record<string, () => Promise<{ default: Messages }>> = {
   ar: () => trio(import('../messages/ar.json'), import('../messages/foods/ar.json'), import('../messages/payments/ar.json')),
 };
 
+/** Website builder strings (namespace "builder", messages/builder/*.json). */
+const builderLoaders: Record<string, () => Promise<{ default: unknown }>> = {
+  'en-GB': () => import('../messages/builder/en-GB.json'),
+  fr: () => import('../messages/builder/fr.json'),
+  es: () => import('../messages/builder/es.json'),
+  de: () => import('../messages/builder/de.json'),
+  'pt-BR': () => import('../messages/builder/pt-BR.json'),
+  nl: () => import('../messages/builder/nl.json'),
+  it: () => import('../messages/builder/it.json'),
+  ar: () => import('../messages/builder/ar.json'),
+};
+
 const isObject = (v: unknown): v is Messages => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function mergeMessages(base: Messages, override: Messages): Messages {
@@ -39,7 +52,10 @@ export function mergeMessages(base: Messages, override: Messages): Messages {
 
 export async function messagesFor(locale: string): Promise<Messages> {
   const load = loaders[locale] ?? loaders[locale.split('-')[0]!];
-  return mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), load ? (await load()).default : {});
+  const builder = builderLoaders[locale] ?? builderLoaders[locale.split('-')[0]!];
+  const base = mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), builderEn as Messages);
+  const translated = load ? (await load()).default : {};
+  return mergeMessages(builder ? mergeMessages(base, (await builder()).default as Messages) : base, translated);
 }
 
 export default getRequestConfig(async () => {

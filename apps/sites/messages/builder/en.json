@@ -1,0 +1,48 @@
+{
+  "builder": {
+    "hours": "Opening hours",
+    "contact": "Visit us",
+    "closed": "Closed",
+    "directions": "Get directions",
+    "call": "Call",
+    "email": "Email",
+    "map": "Map",
+    "livePreview": "Live information from your business appears here on the published site.",
+    "order": "Order now",
+    "viewAll": "See all",
+    "formUnavailable": "This form is not available right now.",
+    "highlighted": "Popular",
+    "empty": {
+      "class_schedule": "No classes are scheduled right now. Please check back soon.",
+      "programmes": "No programmes are open for registration right now.",
+      "services": "Services will be listed here soon.",
+      "product_grid": "No products are available at this location right now.",
+      "menu": "The menu is not available right now.",
+      "listings": "No properties are listed right now.",
+      "rooms": "Rooms will be listed here soon."
+    },
+    "form": {
+      "submit": "Send",
+      "sending": "Sending…",
+      "success": "Thank you. We received your message.",
+      "required": "This field is required",
+      "invalid": "Check this answer",
+      "fixErrors": "Please check the highlighted answers.",
+      "tooFast": "Please take a moment to fill in the form, then send it again.",
+      "optional": "optional",
+      "choose": "Choose…",
+      "chooseLocation": "Choose a location",
+      "honeypot": "Leave this field empty"
+    },
+    "newsletter": {
+      "email": "Email address",
+      "consent": "Yes, send me news and offers by email. I can unsubscribe at any time.",
+      "submit": "Subscribe",
+      "sending": "Subscribing…",
+      "success": "Thanks! You are subscribed.",
+      "consentRequired": "Tick the box to confirm you want to receive our emails.",
+      "invalidEmail": "Enter a valid email address",
+      "honeypot": "Leave this field empty"
+    }
+  }
+}

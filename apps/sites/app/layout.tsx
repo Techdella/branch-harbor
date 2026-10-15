@@ -7,6 +7,7 @@ import { getBrandSite } from '@/lib/api';
 import { fontFor, fontVariables } from '@/lib/fonts';
 import { getRouting, resolveSiteLocale } from '@/lib/site';
 import { CookieBanner } from '@/components/CookieBanner';
+import '@bh/ui/site.css';
 import './globals.css';
 
 export const viewport: Viewport = {

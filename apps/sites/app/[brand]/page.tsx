@@ -4,6 +4,7 @@ import { Icon } from '@bh/ui';
 import { NearMe } from '@/components/NearMe';
 import { OpenBadge } from '@/components/OpenBadge';
 import { SchematicMap } from '@/components/SchematicMap';
+import { BrandDocument } from '@/components/builder/SiteContent';
 import { getRouting, loadBrand, makeLinks, resolveSiteLocale, str } from '@/lib/site';
 import type { BrandSite } from '@/lib/types';
 
@@ -71,6 +72,8 @@ export default async function BrandHome({ params, searchParams }: Props) {
 
   return (
     <main id="main">
+      {/* Website builder brand home: the published document, then the location finder. */}
+      {home?.document ? <BrandDocument doc={home.document} brand={data.brand} pageUrl={links.brandCanonical()} /> : (
       <section className="relative overflow-hidden bg-brand text-on-brand">
         {heroImage && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -89,6 +92,7 @@ export default async function BrandHome({ params, searchParams }: Props) {
           )}
         </div>
       </section>
+      )}
 
       <section id="finder" aria-labelledby="finder-h" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-10">
         <h2 id="finder-h" className="text-2xl font-extrabold tracking-tight sm:text-3xl">{tb('ourLocations')}</h2>
@@ -141,7 +145,7 @@ export default async function BrandHome({ params, searchParams }: Props) {
         </div>
       </section>
 
-      {str(home?.content.about) && (
+      {!home?.document && str(home?.content.about) && (
         <section className="mx-auto mt-14 max-w-3xl px-4">
           <p className="whitespace-pre-line text-lg leading-relaxed">{str(home?.content.about)}</p>
         </section>

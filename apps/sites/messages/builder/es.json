@@ -1,0 +1,48 @@
+{
+  "builder": {
+    "hours": "Horario",
+    "contact": "Visítanos",
+    "closed": "Cerrado",
+    "directions": "Cómo llegar",
+    "call": "Llamar",
+    "email": "Correo",
+    "map": "Mapa",
+    "livePreview": "La información en directo de tu negocio aparecerá aquí en el sitio publicado.",
+    "order": "Pedir ahora",
+    "viewAll": "Ver todo",
+    "formUnavailable": "Este formulario no está disponible en este momento.",
+    "highlighted": "Popular",
+    "empty": {
+      "class_schedule": "No hay clases programadas por ahora. Vuelve pronto.",
+      "programmes": "No hay programas con inscripción abierta por ahora.",
+      "services": "Pronto verás aquí los servicios.",
+      "product_grid": "No hay productos disponibles en este local por ahora.",
+      "menu": "La carta no está disponible en este momento.",
+      "listings": "No hay inmuebles publicados por ahora.",
+      "rooms": "Pronto verás aquí las habitaciones."
+    },
+    "form": {
+      "submit": "Enviar",
+      "sending": "Enviando…",
+      "success": "Gracias. Hemos recibido tu mensaje.",
+      "required": "Este campo es obligatorio",
+      "invalid": "Revisa esta respuesta",
+      "fixErrors": "Revisa las respuestas marcadas.",
+      "tooFast": "Tómate un momento para rellenar el formulario y vuelve a enviarlo.",
+      "optional": "opcional",
+      "choose": "Elegir…",
+      "chooseLocation": "Elige un local",
+      "honeypot": "Deja este campo vacío"
+    },
+    "newsletter": {
+      "email": "Correo electrónico",
+      "consent": "Sí, envíame novedades y ofertas por correo. Puedo darme de baja cuando quiera.",
+      "submit": "Suscribirme",
+      "sending": "Suscribiendo…",
+      "success": "¡Gracias! Ya estás suscrito.",
+      "consentRequired": "Marca la casilla para confirmar que quieres recibir nuestros correos.",
+      "invalidEmail": "Introduce un correo electrónico válido",
+      "honeypot": "Deja este campo vacío"
+    }
+  }
+}

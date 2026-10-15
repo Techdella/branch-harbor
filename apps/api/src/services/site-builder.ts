@@ -34,7 +34,7 @@ async function industryOf(db: Exec, orgId: string) {
 export async function draftDocument(db: Exec, page: PageRow): Promise<PageDocument> {
   if (page.document) return page.document;
   const fields = await db.select().from(fieldOverrides).where(eq(fieldOverrides.pageId, page.id));
-  return legacyFieldsToDocument(Object.fromEntries(fields.map((f) => [f.fieldKey, f.value])), { industry: await industryOf(db, page.organizationId), slug: page.slug });
+  return legacyFieldsToDocument(Object.fromEntries(fields.map((f) => [f.fieldKey, f.value])), { industry: await industryOf(db, page.organizationId), slug: page.slug, locationLevel: !!page.locationId });
 }
 
 /** Keep the builder document in step with classic field edits (field editor still works after migration). */
@@ -219,17 +219,17 @@ export async function migrateSiteDocuments(db: Db) {
   for (const { p, industry } of rows) {
     await db.transaction(async (tx) => {
       const fields = await tx.select().from(fieldOverrides).where(eq(fieldOverrides.pageId, p.id));
-      const doc = legacyFieldsToDocument(Object.fromEntries(fields.map((f) => [f.fieldKey, f.value])), { industry, slug: p.slug });
+      const doc = legacyFieldsToDocument(Object.fromEntries(fields.map((f) => [f.fieldKey, f.value])), { industry, slug: p.slug, locationLevel: !!p.locationId });
       await tx.update(pages).set({ document: doc, revision: p.revision + 1 }).where(and(eq(pages.id, p.id), isNull(pages.document)));
       await tx.insert(pageRevisions).values({ organizationId: p.organizationId, pageId: p.id, revision: p.revision + 1, document: doc, reason: 'migration' });
       migratedPages++;
     });
   }
-  const versions = await db.select({ v: pageVersions, slug: pages.slug, industry: organizations.industry }).from(pageVersions)
+  const versions = await db.select({ v: pageVersions, slug: pages.slug, locationId: pages.locationId, industry: organizations.industry }).from(pageVersions)
     .innerJoin(pages, eq(pages.id, pageVersions.pageId)).innerJoin(organizations, eq(organizations.id, pages.organizationId))
     .where(and(isNull(pageVersions.document), inArray(pageVersions.id, db.select({ id: pages.publishedVersionId }).from(pages).where(isNotNull(pages.publishedVersionId)) as never)));
-  for (const { v, slug, industry } of versions) {
-    await db.update(pageVersions).set({ document: publicDocument(legacyFieldsToDocument(v.content, { industry, slug })) }).where(eq(pageVersions.id, v.id));
+  for (const { v, slug, industry, locationId } of versions) {
+    await db.update(pageVersions).set({ document: publicDocument(legacyFieldsToDocument(v.content, { industry, slug, locationLevel: !!locationId })) }).where(eq(pageVersions.id, v.id));
     migratedVersions++;
   }
   return { migratedPages, migratedVersions };

@@ -1,0 +1,48 @@
+{
+  "builder": {
+    "hours": "Openingstijden",
+    "contact": "Kom langs",
+    "closed": "Gesloten",
+    "directions": "Routebeschrijving",
+    "call": "Bellen",
+    "email": "E-mail",
+    "map": "Kaart",
+    "livePreview": "Live informatie van je bedrijf verschijnt hier op de gepubliceerde site.",
+    "order": "Nu bestellen",
+    "viewAll": "Alles bekijken",
+    "formUnavailable": "Dit formulier is momenteel niet beschikbaar.",
+    "highlighted": "Populair",
+    "empty": {
+      "class_schedule": "Er zijn momenteel geen lessen gepland. Kom snel terug.",
+      "programmes": "Er zijn momenteel geen programma’s open voor inschrijving.",
+      "services": "De behandelingen staan hier binnenkort.",
+      "product_grid": "Er zijn momenteel geen producten beschikbaar op deze locatie.",
+      "menu": "De menukaart is momenteel niet beschikbaar.",
+      "listings": "Er staan momenteel geen woningen te koop of te huur.",
+      "rooms": "De kamers staan hier binnenkort."
+    },
+    "form": {
+      "submit": "Versturen",
+      "sending": "Bezig met versturen…",
+      "success": "Bedankt. We hebben je bericht ontvangen.",
+      "required": "Dit veld is verplicht",
+      "invalid": "Controleer dit antwoord",
+      "fixErrors": "Controleer de gemarkeerde antwoorden.",
+      "tooFast": "Neem even de tijd om het formulier in te vullen en verstuur het opnieuw.",
+      "optional": "optioneel",
+      "choose": "Kies…",
+      "chooseLocation": "Kies een locatie",
+      "honeypot": "Laat dit veld leeg"
+    },
+    "newsletter": {
+      "email": "E-mailadres",
+      "consent": "Ja, stuur me nieuws en aanbiedingen per e-mail. Ik kan me altijd afmelden.",
+      "submit": "Aanmelden",
+      "sending": "Bezig met aanmelden…",
+      "success": "Bedankt! Je bent aangemeld.",
+      "consentRequired": "Vink het vakje aan om te bevestigen dat je onze e-mails wilt ontvangen.",
+      "invalidEmail": "Voer een geldig e-mailadres in",
+      "honeypot": "Laat dit veld leeg"
+    }
+  }
+}

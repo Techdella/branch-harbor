@@ -232,7 +232,7 @@ export function SectionView({ section, ctx, labels, live, renderForm, renderNews
     case 'cta':
       return wrap(<div className="bhs-cta-box"><Heading v={p.heading} /><Paras v={p.body} className="bhs-lead" /><div className="bhs-actions"><Btn label={p.ctaLabel} href={p.ctaHref} /><Btn label={p.secondaryLabel} href={p.secondaryHref} kind="secondary" /></div></div>);
     case 'contact_map': {
-      if (!loc) return wrap(<><Heading v={p.heading} /><p className="bhs-empty">{labels.livePreview}</p></>);
+      if (!loc) return preview ? wrap(<><Heading v={p.heading} /><p className="bhs-empty">{labels.livePreview}</p></>) : null;
       const map = p.showMap !== false && loc.geo ? `https://www.openstreetmap.org/export/embed.html?bbox=${loc.geo.lng - 0.006}%2C${loc.geo.lat - 0.004}%2C${loc.geo.lng + 0.006}%2C${loc.geo.lat + 0.004}&layer=mapnik&marker=${loc.geo.lat}%2C${loc.geo.lng}` : null;
       return wrap(
         <div className={map ? 'bhs-split' : ''}>
@@ -251,6 +251,7 @@ export function SectionView({ section, ctx, labels, live, renderForm, renderNews
       );
     }
     case 'hours':
+      if (!loc && !preview) return null;
       return wrap(<div className="bhs-narrow"><Heading v={has(p.heading) ? p.heading : labels.hours} />{loc ? <HoursTable loc={loc} locale={ctx.locale} closed={labels.closed} /> : <p className="bhs-empty">{labels.livePreview}</p>}<Paras v={p.note} className="bhs-subtle" /></div>);
     case 'team':
       return wrap(<><div className="bhs-head"><Heading v={p.heading} /><Paras v={p.intro} className="bhs-lead" /></div><ul className="bhs-grid bhs-cols-4" role="list">{arr<Record<string, unknown>>(p.items).map((it, i) => <li key={i} className="bhs-person"><Img src={it.image} alt={it.alt} className="bhs-avatar" /><h3 className="bhs-h3">{txt(it.name)}</h3>{has(it.role) && <p className="bhs-meta">{txt(it.role)}</p>}<Paras v={it.bio} className="bhs-subtle" /></li>)}</ul></>);
@@ -290,6 +291,8 @@ export function SectionView({ section, ctx, labels, live, renderForm, renderNews
     }
     case 'class_schedule': case 'programmes': case 'services': case 'product_grid': case 'menu': case 'listings': case 'rooms': {
       const type = section.type;
+      // Brand-level pages have no single location: live blocks only make sense on location sites.
+      if (!loc && !preview) return null;
       const body = preview ? <LivePlaceholder label={labels.livePreview} /> : <LiveList items={liveItems} empty={labels.empty[type]} cols={type === 'menu' ? 2 : 3} />;
       return wrap(
         <>

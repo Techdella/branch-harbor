@@ -1,0 +1,48 @@
+{
+  "builder": {
+    "hours": "Öffnungszeiten",
+    "contact": "Besuchen Sie uns",
+    "closed": "Geschlossen",
+    "directions": "Route planen",
+    "call": "Anrufen",
+    "email": "E-Mail",
+    "map": "Karte",
+    "livePreview": "Live-Informationen Ihres Unternehmens erscheinen hier auf der veröffentlichten Website.",
+    "order": "Jetzt bestellen",
+    "viewAll": "Alle ansehen",
+    "formUnavailable": "Dieses Formular ist derzeit nicht verfügbar.",
+    "highlighted": "Beliebt",
+    "empty": {
+      "class_schedule": "Derzeit sind keine Kurse geplant. Schauen Sie bald wieder vorbei.",
+      "programmes": "Derzeit sind keine Programme zur Anmeldung geöffnet.",
+      "services": "Die Leistungen werden bald hier aufgeführt.",
+      "product_grid": "An diesem Standort sind derzeit keine Produkte verfügbar.",
+      "menu": "Die Speisekarte ist derzeit nicht verfügbar.",
+      "listings": "Derzeit sind keine Immobilien inseriert.",
+      "rooms": "Die Zimmer werden bald hier aufgeführt."
+    },
+    "form": {
+      "submit": "Senden",
+      "sending": "Wird gesendet…",
+      "success": "Vielen Dank. Wir haben Ihre Nachricht erhalten.",
+      "required": "Dieses Feld ist erforderlich",
+      "invalid": "Bitte prüfen Sie diese Angabe",
+      "fixErrors": "Bitte prüfen Sie die markierten Angaben.",
+      "tooFast": "Nehmen Sie sich einen Moment Zeit für das Formular und senden Sie es erneut.",
+      "optional": "optional",
+      "choose": "Auswählen…",
+      "chooseLocation": "Standort wählen",
+      "honeypot": "Dieses Feld leer lassen"
+    },
+    "newsletter": {
+      "email": "E-Mail-Adresse",
+      "consent": "Ja, schicken Sie mir Neuigkeiten und Angebote per E-Mail. Ich kann mich jederzeit abmelden.",
+      "submit": "Abonnieren",
+      "sending": "Wird abonniert…",
+      "success": "Danke! Sie sind angemeldet.",
+      "consentRequired": "Bitte bestätigen Sie mit dem Häkchen, dass Sie unsere E-Mails erhalten möchten.",
+      "invalidEmail": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "honeypot": "Dieses Feld leer lassen"
+    }
+  }
+}
