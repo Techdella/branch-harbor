@@ -274,6 +274,8 @@ async function main() {
   const reviewsSeed = await seedReviewsAndDebitDemo(northlight.orgId);
   console.log(` Reviews:       ${reviewsSeed.reviews} demo reviews (Google sandbox + private feedback), ${reviewsSeed.requests} review requests; hosted page: ${reviewsSeed.link}`);
   console.log(` Bank debit:    Thames Hot Yoga on SEPA Direct Debit (EUR); ${reviewsSeed.statements} monthly franchisee statements issued`);
+  const quality = await (await import('./seed-quality.ts')).seedQuality({ db, today, upsertUser });
+  console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

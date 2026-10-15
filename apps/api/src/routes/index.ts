@@ -92,4 +92,9 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./reviews.ts')).reviewRoutes);
   // BranchHarbor plan billing (paid trial, checkout with billing-country lock, who pays per location) and data export.
   await app.register((await import('./billing.ts')).billingRoutes);
+  // Field audits, compliance documents, the league table, and signed links to their private files.
+  await app.register((await import('./audits.ts')).privateFileRoutes);
+  await app.register((await import('./audits.ts')).auditRoutes);
+  await app.register((await import('./compliance.ts')).complianceRoutes);
+  await app.register((await import('./league-table.ts')).leagueTableRoutes);
 };

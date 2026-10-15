@@ -31,6 +31,9 @@ const enqueueDunning = () => void (async () => {
 })().catch((err) => app.log.warn({ err }, 'finance dunning schedule failed'));
 const dunningStart = setTimeout(enqueueDunning, 60_000);
 const dunningSweep = setInterval(enqueueDunning, 24 * 3600_000);
+// Audits and compliance documents: overdue corrective actions / audits and expiry reminders. Hourly, each reminder is
+// recorded once, so repeated runs are harmless (one job per hour with BullMQ).
+const qualitySweep = setInterval(() => void app.ctx.jobs.enqueue('quality.daily', {}, { jobId: `quality-${Math.floor(Date.now() / 3600_000)}` }).catch(() => {}), 3600_000);
 
 // BranchHarbor billing: trial reminders 3 days and 1 day before the plan starts; in sandbox also trial conversions,
 // renewals and billing-country changes; expired data exports are purged.
@@ -50,6 +53,7 @@ const shutdown = async (signal: string) => {
   clearTimeout(dunningStart);
   clearInterval(dunningSweep);
   clearInterval(billingSweep);
+  clearInterval(qualitySweep);
   await app.close();
   process.exit(0);
 };

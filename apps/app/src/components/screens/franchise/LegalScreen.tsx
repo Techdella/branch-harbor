@@ -10,6 +10,7 @@ import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty, SectionCard } from '../../ui/States';
 import { NotAvailable } from '../NotAvailable';
 import { FAsync, NetworkOnly, useFmt } from './common';
+import { ComplianceExpiring } from '../../quality/ComplianceScreen';
 
 export function LegalScreen() {
   return <NetworkOnly><Legal /></NetworkOnly>;
@@ -35,6 +36,7 @@ function Legal() {
       <PageHeader icon="scale" title={t('legal.title')} description={t('legal.description')} scope={false} />
       {tabs.length > 1 && <Tabs items={tabs} value={tab} onChange={setTab} />}
       {tab === 'agreements' && <Agreements />}
+      {tab === 'agreements' && <ComplianceExpiring />}
       {tab === 'documents' && <Documents />}
       {tab === 'registrations' && <Registrations />}
     </>

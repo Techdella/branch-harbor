@@ -145,6 +145,8 @@ export const franchiseProjects = pgTable('franchise_projects', {
   targetOpenDate: date('target_open_date'),
   startedAt: ts('started_at').notNull().defaultNow(),
   approvalId: uuid('approval_id'),
+  /** Pre-opening checks: the audit checklist whose audit must pass before HQ approves the opening (null = none). */
+  preOpeningTemplateId: uuid('pre_opening_template_id'),
   openedAt: ts('opened_at'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),

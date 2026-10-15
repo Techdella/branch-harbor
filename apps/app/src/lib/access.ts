@@ -70,6 +70,10 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'finance.invoices': [{ key: 'financeStatements', href: '/finance/statements', icon: 'file' }],
   'finance.marketing_fund': [{ key: 'financeFund', href: '/finance/marketing-fund', icon: 'megaphone' }],
   'finance.payouts': [{ key: 'financePayouts', href: '/finance/payouts', icon: 'wallet' }],
+  // Field audits (Operations), compliance documents (Legal & compliance) and the league table (Network).
+  'operations.audits': [{ key: 'audits', href: '/audits', icon: 'check-circle' }],
+  'legal.compliance_documents': [{ key: 'compliance', href: '/compliance', icon: 'shield' }],
+  'network.league_table': [{ key: 'leagueTable', href: '/league-table', icon: 'trophy' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],

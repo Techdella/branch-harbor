@@ -10,6 +10,7 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty } from '../../ui/States';
 import { FAsync, NetworkOnly, useFmt } from './common';
+import { PreOpeningAudit } from '../../quality/PreOpeningAudit';
 
 const COLUMNS: Project['status'][] = ['active', 'go_live_requested', 'opened'];
 const SECTIONS = ['training', 'site_selection', 'lease', 'fit_out', 'suppliers', 'marketing', 'systems', 'pre_opening'] as const;
@@ -107,6 +108,7 @@ function ProjectDrawer({ id, onClose, onChanged }: { id: string; onClose: () => 
                 </div>
               ) : <Button icon="layers" variant="secondary" onClick={() => setProv((s) => ({ ...s, open: true }))}>{t('onboarding.provision')}</Button>
             )}
+            <PreOpeningAudit project={p} onChanged={refresh} />
             {p.status === 'active' && (
               <div className="flex flex-col gap-1 rounded-lg bg-canvas-raised p-3">
                 <span className="text-[13px] font-bold">{t('onboarding.goLiveTitle')}</span>

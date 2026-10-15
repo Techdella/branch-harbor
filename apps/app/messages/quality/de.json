@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "audits": "Audits",
+    "compliance": "Compliance-Dokumente",
+    "leagueTable": "Rangliste"
+  },
+  "access": {
+    "modules": {
+      "operations": {
+        "audits": {
+          "name": "Audits",
+          "description": "Standortbesuche und Audits: Checklisten-Vorlagen, geplante Audits mit Fotos und Bewertungen, Korrekturmaßnahmen und Nachaudits für die Standorte im Bereich."
+        }
+      },
+      "legal": {
+        "compliance_documents": {
+          "name": "Compliance-Dokumente",
+          "description": "Versicherungsnachweise, Lizenzen, Genehmigungen und Hygienezertifikate je Standort oder Inhabergruppe, mit Erinnerungen vor Ablauf."
+        }
+      },
+      "network": {
+        "league_table": {
+          "name": "Rangliste",
+          "description": "Standorte im Bereich nach Umsatz, Wachstum, Buchungen oder Bestellungen, Audit-Bewertung und Lizenzgebührenstatus. Franchisenehmer sehen ihre Standorte im Vergleich zu anonymisierten Netzwerk-Quartilen."
+        }
+      }
+    }
+  },
+  "quality": {
+    "common": {
+      "all": "Alle",
+      "choose": "Auswählen…",
+      "exportCsv": "CSV exportieren",
+      "ownerGroup": "Inhabergruppe",
+      "region": "Region"
+    },
+    "col": {
+      "location": "Standort",
+      "latestScore": "Letzte Bewertung",
+      "trend": "Letzte 6 Monate",
+      "actions": "Korrekturmaßnahmen",
+      "nextDue": "Nächstes Audit",
+      "due": "Fällig",
+      "auditor": "Auditor",
+      "status": "Status",
+      "score": "Bewertung",
+      "checklist": "Checkliste",
+      "item": "Punkt"
+    },
+    "auditStatus": {
+      "scheduled": "Geplant",
+      "in_progress": "Läuft",
+      "completed": "Abgeschlossen",
+      "cancelled": "Storniert"
+    },
+    "actionStatus": {
+      "open": "Zu beheben",
+      "submitted": "Wartet auf Prüfung",
+      "verified": "Bestätigt"
+    },
+    "purpose": {
+      "routine": "Routine",
+      "pre_opening": "Vor Eröffnung",
+      "reaudit": "Nachaudit"
+    },
+    "qtype": {
+      "yes_no": "Ja / Nein",
+      "scale": "Skala 1–5",
+      "number": "Zahl",
+      "text": "Text",
+      "photo": "Foto"
+    },
+    "reason": {
+      "no": "Mit Nein beantwortet",
+      "low_score": "Bewertung 2 oder schlechter",
+      "out_of_range": "Außerhalb des zulässigen Bereichs",
+      "photo_missing": "Foto fehlt",
+      "unanswered": "Nicht beantwortet"
+    },
+    "answer": {
+      "yes": "Ja",
+      "no": "Nein",
+      "na": "Entfällt",
+      "scaleN": "{n} von 5",
+      "scaleOf": "{n} / 5",
+      "range": "Bestanden: {min} bis {max}",
+      "atLeast": "Bestanden: mindestens {min}",
+      "atMost": "Bestanden: höchstens {max}",
+      "photoTaken": "Foto aufgenommen"
+    },
+    "audits": {
+      "title": "Audits",
+      "description": "Standortbesuche und Markenstandard-Audits: Bewertungen je Standort, Korrekturmaßnahmen und Nachaudits.",
+      "tab": {
+        "overview": "Übersicht",
+        "audits": "Audits",
+        "actions": "Korrekturmaßnahmen",
+        "templates": "Checklisten"
+      },
+      "filter": {
+        "open": "Offen",
+        "completed": "Abgeschlossen",
+        "all": "Alle"
+      },
+      "schedule": "Audit planen",
+      "scheduleSave": "Planen",
+      "auditorHint": "Personen mit Audits (bearbeiten) an diesem Standort.",
+      "empty": "Noch keine Audits",
+      "emptyBody": "Geplante Audits und fertige Berichte erscheinen hier."
+    },
+    "dashboard": {
+      "averageScore": "Durchschnittliche Bewertung",
+      "lastMonths": "Letzte {count} Monate",
+      "completed": "Abgeschlossene Audits",
+      "passed": "{count} bestanden",
+      "openActions": "Offene Korrekturmaßnahmen",
+      "overdueActions": "Überfällige Korrekturmaßnahmen",
+      "overdueAudits": "Überfällige Audits",
+      "byLocation": "Bewertungen je Standort",
+      "network": "Netzwerk-Durchschnitt",
+      "noAudit": "Noch kein Audit",
+      "open": "{count} offen",
+      "overdue": "{count} überfällig",
+      "noLocations": "Keine Standorte in Ihrem Bereich",
+      "overdueActionsTitle": "Überfällige Korrekturmaßnahmen",
+      "dueOn": "Fällig {date}",
+      "noOverdueActions": "Nichts überfällig.",
+      "upcomingTitle": "Überfällige und anstehende Audits",
+      "noUpcoming": "Keine Audits geplant."
+    },
+    "audit": {
+      "pageTitle": "Audit",
+      "back": "Alle Audits",
+      "critical": "Kritisch",
+      "criticalFail": "Kritischer Punkt nicht bestanden",
+      "noAuditor": "Noch kein Auditor",
+      "photoRequired": "Foto erforderlich",
+      "photoOf": "Foto zu {item}"
+    },
+    "conduct": {
+      "description": "Fällig {date}. Antworten werden laufend gespeichert, auch wenn die Verbindung abbricht.",
+      "progress": "{done} von {total} beantwortet",
+      "liveScore": "Bewertung",
+      "saving": "Wird gespeichert…",
+      "saved": "Alles gespeichert",
+      "offline": "Offline: Antworten bleiben auf diesem Gerät und werden gespeichert, sobald Sie wieder online sind",
+      "saveError": "Nicht gespeichert. Wir versuchen es erneut.",
+      "autosave": "Speichert automatisch",
+      "sectionProgress": "{done}/{total}",
+      "addPhoto": "Foto hinzufügen",
+      "uploading": "Wird hochgeladen…",
+      "photoOffline": "Im Web brauchen Fotos eine Verbindung. Nutzen Sie die mobile App, um offline Fotos aufzunehmen.",
+      "removePhoto": "Foto entfernen",
+      "addNote": "Notiz hinzufügen",
+      "note": "Notiz",
+      "notePlaceholder": "Was haben Sie gesehen?",
+      "willCreateAction": "wird zur Korrekturmaßnahme",
+      "finish": "Audit abschließen",
+      "passMark": "Bestehensgrenze {pct} %",
+      "failedItems": "Nicht bestandene Punkte",
+      "becomeActions": "Jeder wird zu einer Korrekturmaßnahme für den Standort",
+      "unanswered": "Noch offen",
+      "criticalBanner": "Ein kritischer Punkt ist nicht bestanden: Das Audit gilt unabhängig von der Bewertung als nicht bestanden.",
+      "summary": "Zusammenfassung für den Standort",
+      "complete": "Audit abschließen",
+      "answerAll": "Beantworten Sie jede Frage (oder markieren Sie sie als Entfällt), um das Audit abzuschließen."
+    },
+    "report": {
+      "completedOn": "Abgeschlossen am {date} von {auditor}",
+      "scheduledFor": "Geplant für {date}",
+      "notYet": "Der Bericht erscheint hier, sobald {auditor} das Audit abschließt.",
+      "passed": "Bestanden",
+      "failed": "Nicht bestanden",
+      "previous": "Vorheriges Audit: {score}",
+      "bySection": "Bewertung je Abschnitt",
+      "reaudit": "Nachaudit fällig am {date}",
+      "actions": "Korrekturmaßnahmen ({count})",
+      "noActions": "Keine Korrekturmaßnahmen: Alle Punkte bestanden."
+    },
+    "actions": {
+      "filter": {
+        "active": "Zu erledigen",
+        "overdue": "Überfällig",
+        "verified": "Bestätigt"
+      },
+      "empty": "Keine Korrekturmaßnahmen",
+      "overdue": "Überfällig",
+      "due": "Fällig {date}",
+      "auditorNote": "Auditor:",
+      "reopened": "Wieder geöffnet: {note}",
+      "fix": "Behebung:",
+      "evidenceOf": "Nachweis zu {item}",
+      "verifiedBy": "Bestätigt von {name} am {date}",
+      "whatFixed": "Was haben Sie behoben?",
+      "addEvidence": "Nachweisfoto hinzufügen",
+      "markDone": "Als behoben markieren",
+      "evidenceNeeded": "Fügen Sie zuerst ein Foto der Behebung hinzu.",
+      "reviewNote": "Notiz an den Standort",
+      "reopen": "Wieder öffnen",
+      "verify": "Bestätigen"
+    },
+    "templates": {
+      "active": "Aktiv",
+      "archived": "Archiviert",
+      "fromStarter": "Mit Vorlage beginnen",
+      "new": "Neue Checkliste",
+      "untitled": "Checkliste ohne Titel",
+      "empty": "Noch keine Checklisten",
+      "emptyBody": "Beginnen Sie mit einer fertigen Checkliste für Ihre Branche oder erstellen Sie Ihre eigene.",
+      "questions": "{count, plural, one {# Frage} other {# Fragen}}",
+      "critical": "{count} kritisch",
+      "passMark": "Bestanden ab {pct} %",
+      "version": "v{n}",
+      "starterHint": "Sinnvolle Ausgangspunkte. Kopieren Sie eine und passen Sie sie an Ihre Markenstandards an.",
+      "preOpening": "Vor Eröffnung",
+      "added": "Hinzugefügt",
+      "useStarter": "Diese Checkliste verwenden"
+    },
+    "editor": {
+      "pageTitle": "Checkliste",
+      "description": "Abschnitte und Fragen mit Gewichtung, kritischen Punkten und Pflichtfotos.",
+      "back": "Checklisten",
+      "archive": "Archivieren",
+      "restore": "Wiederherstellen",
+      "save": "Checkliste speichern",
+      "saved": "Als Version {version} gespeichert. Noch nicht begonnene Audits verwenden sie.",
+      "archivedNote": "Diese Checkliste ist archiviert: Sie kann nicht für neue Audits verwendet werden.",
+      "name": "Name",
+      "descriptionLabel": "Beschreibung",
+      "passMark": "Bestehensgrenze (%)",
+      "passMarkHint": "Ein nicht bestandener kritischer Punkt lässt das Audit ohnehin scheitern.",
+      "correctiveDays": "Tage zur Behebung",
+      "correctiveDaysHint": "Kritische Punkte erhalten die Hälfte.",
+      "reauditDays": "Nachaudit nach (Tagen)",
+      "reauditDaysHint": "Wird gesetzt, wenn ein Audit nicht besteht.",
+      "photoCount": "{count} mit Foto",
+      "totalWeight": "Gesamtgewicht {n}",
+      "section": "Abschnitt {n}",
+      "sectionPlaceholder": "z. B. Schaufenster",
+      "question": "Frage {n}",
+      "type": "Antworttyp",
+      "weight": "Gewichtung",
+      "min": "Bestanden ab",
+      "max": "Bestanden bis",
+      "unit": "Einheit",
+      "guidance": "Hinweise für den Auditor",
+      "critical": "Kritischer Punkt",
+      "criticalHint": "Wenn dieser Punkt nicht besteht, besteht das gesamte Audit nicht.",
+      "photoRequired": "Foto erforderlich",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "removeQuestion": "Frage entfernen",
+      "removeSection": "Abschnitt entfernen",
+      "addQuestion": "Frage hinzufügen",
+      "addSection": "Abschnitt hinzufügen"
+    },
+    "preOpening": {
+      "title": "Audit vor Eröffnung",
+      "passed": "Bestanden",
+      "required": "Vor der Eröffnung erforderlich",
+      "explain": "Die Eröffnung kann beantragt werden, sobald ein Audit „{name}“ bestanden ist.",
+      "none": "Nutzen Sie eine Audit-Checkliste für die Prüfungen vor der Eröffnung: Die Zentrale genehmigt die Eröffnung erst nach bestandenem Audit.",
+      "checklist": "Checkliste",
+      "noChecklist": "Kein Audit nötig",
+      "latestDone": "Letztes Audit vor Eröffnung",
+      "latestDue": "Audit vor Eröffnung fällig am {date}",
+      "schedule": "Audit vor Eröffnung planen",
+      "afterProvision": "Planen Sie es, sobald der Standort angelegt ist."
+    },
+    "state": {
+      "valid": "Gültig",
+      "expiring": "Läuft in 30 Tagen ab",
+      "expired": "Abgelaufen",
+      "missing": "Fehlt",
+      "pending": "Wartet auf Prüfung",
+      "below_minimum": "Unter dem Minimum",
+      "not_applicable": "Nicht erforderlich"
+    },
+    "docStatus": {
+      "pending": "Wartet auf Prüfung",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt"
+    },
+    "category": {
+      "insurance": "Versicherungsnachweis",
+      "licence": "Lizenz",
+      "permit": "Genehmigung",
+      "health_certificate": "Hygiene- / Lebensmittelsicherheitszertifikat",
+      "franchisee_document": "Dokument des Franchisenehmers"
+    },
+    "compliance": {
+      "title": "Compliance-Dokumente",
+      "description": "Versicherungen, Lizenzen, Genehmigungen und Hygienezertifikate für jeden Standort, mit Erinnerungen vor Ablauf.",
+      "tab": {
+        "matrix": "Matrix",
+        "documents": "Dokumente",
+        "requirements": "Anforderungen"
+      },
+      "upload": "Dokument hochladen",
+      "uploadFor": "Für diesen Standort hochladen",
+      "uploadSave": "Hochladen",
+      "category": "Art",
+      "compliant": "Erfüllt",
+      "companyOwned": "Eigener Standort",
+      "noRequirements": "Noch keine Anforderungen",
+      "noRequirementsBody": "Die Zentrale legt fest, was jeder Standort vorweisen muss, z. B. eine Betriebshaftpflicht ab einem Mindestbetrag.",
+      "noDocuments": "Noch keine Dokumente",
+      "superseded": "Ersetzt",
+      "issuer": "Versicherer oder Aussteller",
+      "reference": "Policen- oder Lizenznummer",
+      "coverage": "Deckung",
+      "coverageType": "Deckungsart",
+      "amount": "Betrag",
+      "amountInvalid": "Bitte Ziffern verwenden, z. B. 2000000",
+      "currency": "Währung",
+      "expires": "Läuft ab",
+      "issued": "Ausgestellt",
+      "noExpiry": "Kein Ablaufdatum",
+      "uploadedBy": "Hochgeladen von",
+      "reviewNote": "Prüfnotiz",
+      "openFile": "Datei öffnen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "filter": {
+        "pending": "Zu prüfen"
+      },
+      "requirement": "Anforderung",
+      "ownDocument": "Anderes Dokument (keine Anforderung der Zentrale)",
+      "docTitle": "Titel",
+      "minimumHint": "Die Zentrale verlangt mindestens {amount}.",
+      "file": "Datei",
+      "fileHint": "PDF oder Foto, bis 10 MB.",
+      "autoApproved": "Als Zentrale wird Ihr Upload sofort genehmigt.",
+      "reviewedByHq": "Die Zentrale prüft das Dokument. Sie erhalten Erinnerungen vor dem Ablauf.",
+      "expiringTitle": "Compliance-Dokumente: Verlängerungen und Abläufe",
+      "openMatrix": "Compliance-Matrix öffnen",
+      "nothingExpiring": "In den nächsten 60 Tagen läuft nichts ab.",
+      "inDays": "In {days} Tagen"
+    },
+    "requirements": {
+      "add": "Anforderung hinzufügen",
+      "save": "Anforderung speichern",
+      "name": "Anforderung",
+      "nameHint": "z. B. Betriebshaftpflichtversicherung",
+      "description": "Beschreibung",
+      "minimum": "Mindestbetrag",
+      "where": "Rechtsräume",
+      "whereHint": "Länder- oder Länder-Regionen-Codes, z. B. US, CA-ON. Leer = alle Standorte.",
+      "everywhere": "Alle Standorte",
+      "heldBy": "Vorzuweisen von",
+      "per": {
+        "location": "Jedem Standort",
+        "owner_group": "Jeder Inhabergruppe"
+      },
+      "requiresExpiry": "Hat ein Ablaufdatum",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "league": {
+      "title": "Rangliste",
+      "description": "Standorte nach Umsatz, Wachstum, Aktivität, Audit-Bewertung und Lizenzgebührenstatus.",
+      "descriptionOwn": "Ihre Standorte in der Rangliste, verglichen mit anonymisierten Netzwerk-Quartilen.",
+      "filters": "Filter",
+      "period": "Zeitraum",
+      "preset": {
+        "last_month": "Letzter Monat",
+        "this_month": "Dieser Monat",
+        "last_quarter": "Letzte 3 Monate",
+        "year": "Dieses Jahr",
+        "custom": "Benutzerdefiniert"
+      },
+      "from": "Von",
+      "to": "Bis",
+      "rankBy": "Sortieren nach",
+      "metric": {
+        "revenue": "Umsatz",
+        "growth": "Wachstum",
+        "occupancy": "Auslastung",
+        "auditScore": "Audit-Bewertung",
+        "royaltyStatus": "Lizenzgebühren",
+        "reviewRating": "Bewertungen"
+      },
+      "activity": {
+        "class_bookings": "Buchungen",
+        "registrations": "Anmeldungen",
+        "appointments": "Termine",
+        "orders": "Bestellungen",
+        "food_orders": "Bestellungen",
+        "enquiries": "Anfragen",
+        "room_nights": "Zimmernächte",
+        "default": "Aktivität"
+      },
+      "royalty": {
+        "on_time": "Pünktlich",
+        "overdue": "Überfällig",
+        "none": "Keine Rechnungen"
+      },
+      "quartile": {
+        "1": "Obere 25 %",
+        "2": "Über dem Median",
+        "3": "Unter dem Median",
+        "4": "Untere 25 %"
+      },
+      "col": {
+        "rank": "Rang",
+        "quartile": "Netzwerk",
+        "network": "Position"
+      },
+      "stars": "{rating} ★ ({count})",
+      "networkPosition": "Platz {position} von {of}",
+      "empty": "Keine Standorte für die Rangliste",
+      "perCurrency": "Der Umsatz wird je Währung gereiht und nie addiert: {currencies}.",
+      "benchmarksTitle": "Sie und das Netzwerk",
+      "benchmarksNote": "Anonymisiert: {count} Standorte, keine Namen",
+      "revenueIn": "Umsatz ({currency})",
+      "quartiles": "Unteres Quartil {q1} · Median {median} · oberes Quartil {q3}",
+      "tooFew": "Zu wenige Standorte für einen anonymen Vergleich.",
+      "quartilesOff": "Die Zentrale teilt keine Netzwerkvergleiche. Ihre Standorte werden untereinander gereiht.",
+      "onTimeNetwork": "{pct} der Standorte im Netzwerk zahlen Lizenzgebühren pünktlich.",
+      "settingsTitle": "Was Franchisenehmer sehen",
+      "settingQuartiles": "Netzwerk-Quartile für Franchisenehmer anzeigen",
+      "settingQuartilesHint": "Sie sehen ihre eigenen Standorte im Vergleich zu anonymisierten Quartilen und ihre Position, nie Namen oder Zahlen anderer Franchisenehmer."
+    }
+  }
+}

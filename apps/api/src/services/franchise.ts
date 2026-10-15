@@ -583,6 +583,8 @@ export async function requestGoLive(s: Services, req: FastifyRequest, proj: Proj
   const gates = await s.db.select().from(franchiseTasks).where(and(eq(franchiseTasks.projectId, proj.id), eq(franchiseTasks.gate, true)));
   const open = gates.filter((g) => g.status !== 'done');
   if (open.length) throw new AppError(409, 'checklist_incomplete', `${open.length} pre-opening checks are not done yet`, undefined, { open: open.map((g) => ({ id: g.id, title: g.title })) });
+  // Pre-opening checks can use an audit checklist: then an audit with it must have passed.
+  await (await import('./audits.ts')).assertPreOpeningPassed(s.db, proj);
   const [loc] = await s.db.select().from(locations).where(eq(locations.id, proj.locationId));
   const ap = await s.db.transaction(async (tx) => {
     const ap = await insertApproval(tx, {
@@ -601,6 +603,7 @@ async function executeGoLive(s: Services, projectId: string, approverId: string,
   return s.db.transaction(async (tx) => {
     const [proj] = await tx.select().from(franchiseProjects).where(eq(franchiseProjects.id, projectId)).for('update');
     if (!proj || proj.status !== 'go_live_requested' || !proj.locationId) throw conflict('project_changed', 'The project is no longer waiting for opening approval');
+    await (await import('./audits.ts')).assertPreOpeningPassed(tx, proj);
     const now = new Date();
     const [loc] = await tx.update(locations).set({ status: 'operating', publiclyVisible: true, updatedAt: now }).where(eq(locations.id, proj.locationId)).returning();
     await tx.update(franchiseProjects).set({ status: 'opened', openedAt: now, updatedAt: now }).where(eq(franchiseProjects.id, proj.id));

@@ -156,8 +156,9 @@ describe.skipIf(!hasDb)('access model (DB)', () => {
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/members/${foB.userId}/access`, { token: foA.token })).status).toBe(403);
     expect((await call(app, 'GET', `/v1/orgs/${orgId}/subscription`, { token: foA.token })).status).toBe(403);
     const access = (await call(app, 'GET', `/v1/orgs/${orgId}/access/me`, { token: foA.token })).body;
-    expect(access.capabilities.some((c: string) => c.startsWith('finance.royalties') || c.startsWith('legal.') || c.startsWith('sales.franchise_pipeline'))).toBe(false);
-    expect(access.workspaces.map((w: any) => w.key)).toEqual(['network', 'operations', 'sales', 'marketing', 'finance', 'training', 'community']);
+    // Legal & compliance holds only their own compliance documents (uploads), never agreements or disclosure.
+    expect(access.capabilities.some((c: string) => c.startsWith('finance.royalties') || (c.startsWith('legal.') && !c.startsWith('legal.compliance_documents:')) || c.startsWith('sales.franchise_pipeline'))).toBe(false);
+    expect(access.workspaces.map((w: any) => w.key)).toEqual(['network', 'operations', 'sales', 'marketing', 'finance', 'legal', 'training', 'community']);
     expect(access.primaryWorkspace).toBe('operations');
   });
 

@@ -62,6 +62,12 @@ export function registerJobHandlers(s: Services) {
     await (await import('../services/automation-engine.ts')).marketingTick(s);
   });
 
+  // Field audits and compliance documents: overdue reminders and expiry reminders (60/30/7 days, on expiry + HQ).
+  s.jobs.register('quality.daily', async () => {
+    await (await import('../services/audits.ts')).runAuditJobs(s);
+    await (await import('../services/compliance.ts')).runComplianceJobs(s);
+  });
+
   s.jobs.register('studios.expire-holds', async () => {
     await expireHolds(s);
     await (await import('../services/studios-commerce.ts')).runStudioLifecycle(s);

@@ -23,3 +23,4 @@ export * from './automation.ts';
 export * from './marketing-forms.ts';
 export * from './fees.ts';
 export * from './reviews.ts';
+export * from './quality.ts';

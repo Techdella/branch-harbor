@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
 import { Redirect } from 'expo-router';
+import { holdsAudits } from '@/features/quality/api';
 import { SvgXml } from 'react-native-svg';
 import { logoSvg } from '@bh/icons';
 import { Button, Card, Icon, Screen, Tag, Text, TextField, Banner, type IconName } from '@/components';
@@ -32,6 +33,11 @@ export default function Entry() {
         <ActivityIndicator color={color.ink} accessibilityLabel={t('common.loading')} />
       </View>
     );
+  }
+
+  // Auditors and field consultants (audits only, no staff or owner screens) go straight to their audits.
+  if (status === 'ready' && me && !me.guest && !me.experiences.includes('staff') && !me.experiences.includes('owner') && holdsAudits(me.capabilities)) {
+    return <Redirect href="/quality" />;
   }
 
   if (status === 'ready' && experience) {

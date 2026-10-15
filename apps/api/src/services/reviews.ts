@@ -33,6 +33,7 @@ import { audit } from './audit.ts';
 import { usersWithCapabilityAt } from './comms-scope.ts';
 import { CONSENT_FOR_CHANNEL, emitMarketingEvent, hasConsent } from './marketing.ts';
 import { notify } from './notifications.ts';
+import { registerReviewProvider } from './league-table.ts';
 
 export type ReviewRow = typeof reviews.$inferSelect;
 export type ReviewRequestRow = typeof reviewRequests.$inferSelect;
@@ -710,3 +711,13 @@ export function serializeRequest(r: ReviewRequestRow, locationsById: Map<string,
 }
 
 export type { LocationRow, OrgRow };
+
+// The league table's review-rating column uses the same summary as the Reviews dashboard
+// (the table fallback would otherwise also count private feedback differently).
+registerReviewProvider(async (db, orgId, locationIds, from, to) => {
+  const out = new Map<string, { rating: number; count: number }>();
+  for (const s of await getLocationRatingSummary(db, orgId, locationIds, { from, to })) {
+    if (s.averageRating !== null && s.reviews > 0) out.set(s.locationId, { rating: Math.round(s.averageRating * 100) / 100, count: s.reviews });
+  }
+  return out;
+});

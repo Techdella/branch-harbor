@@ -169,6 +169,13 @@
       "when": 1792098684794,
       "tag": "0023_billing_paid_trial",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792099144124,
+      "tag": "0024_audits_compliance",
+      "breakpoints": true
     }
   ]
 }
