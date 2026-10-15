@@ -7,6 +7,7 @@ import { getBrandSite } from '@/lib/api';
 import { fontFor, fontVariables } from '@/lib/fonts';
 import { getRouting, resolveSiteLocale } from '@/lib/site';
 import { CookieBanner } from '@/components/CookieBanner';
+import { DemoRibbon } from '@/components/DemoRibbon';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -57,6 +58,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <a href="#main" className="sr-only z-[100] rounded-full bg-ink px-5 py-3 text-sm font-bold text-white focus:not-sr-only focus:fixed focus:start-4 focus:top-4">
             {t('skip')}
           </a>
+          <DemoRibbon />
           {children}
           <CookieBanner />
         </NextIntlClientProvider>

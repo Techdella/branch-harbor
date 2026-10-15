@@ -18,7 +18,9 @@
     "errorSummary": "Corrija o seguinte:",
     "required": "{field} é obrigatório",
     "invalidEmail": "Informe um e-mail válido",
-    "languageSubmit": "Mudar idioma"
+    "languageSubmit": "Mudar idioma",
+    "demoRibbon": "Ambiente de demonstração",
+    "demoRibbonNote": "Este é um site de demonstração de uma empresa fictícia. Reservas e pedidos aqui não são reais."
   },
   "error": {
     "title": "Esta página não está disponível no momento",

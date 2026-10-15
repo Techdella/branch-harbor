@@ -18,7 +18,9 @@
     "errorSummary": "Correggi quanto segue:",
     "required": "{field} è obbligatorio",
     "invalidEmail": "Inserisci un indirizzo email valido",
-    "languageSubmit": "Cambia lingua"
+    "languageSubmit": "Cambia lingua",
+    "demoRibbon": "Ambiente demo",
+    "demoRibbonNote": "Questo è un sito dimostrativo di un’attività di esempio. Prenotazioni e ordini qui non sono reali."
   },
   "error": {
     "title": "Questa pagina non è disponibile al momento",

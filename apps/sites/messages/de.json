@@ -18,7 +18,9 @@
     "errorSummary": "Bitte korrigiere Folgendes:",
     "required": "{field} ist erforderlich",
     "invalidEmail": "Gib eine gültige E-Mail-Adresse ein",
-    "languageSubmit": "Sprache ändern"
+    "languageSubmit": "Sprache ändern",
+    "demoRibbon": "Demo-Umgebung",
+    "demoRibbonNote": "Dies ist eine Demo-Website für ein Beispielunternehmen. Buchungen und Bestellungen hier sind nicht echt."
   },
   "error": {
     "title": "Diese Seite ist gerade nicht verfügbar",

@@ -18,7 +18,9 @@
     "errorSummary": "Veuillez corriger les points suivants :",
     "required": "{field} est obligatoire",
     "invalidEmail": "Saisissez une adresse e-mail valide",
-    "languageSubmit": "Changer de langue"
+    "languageSubmit": "Changer de langue",
+    "demoRibbon": "Environnement de démonstration",
+    "demoRibbonNote": "Ceci est un site de démonstration d’une entreprise fictive. Les réservations et commandes ici ne sont pas réelles."
   },
   "error": {
     "title": "Cette page n’est pas disponible pour le moment",

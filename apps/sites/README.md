@@ -14,14 +14,15 @@ pnpm --filter @bh/api dev                      # seeded API (see apps/api/README
 pnpm --filter @bh/sites dev                    # http://localhost:3002/stillwater-yoga
 ```
 
-Seeded examples: `/stillwater-yoga` (studios, 5 public locations; Leslieville is hidden → 404) and
-`/maple-and-ember` (foods; Ballard, Fremont, Gastown).
+Examples from the demo seed (`pnpm db:seed:demo`): `/stillwater-yoga` (studios, 5 public locations; Leslieville is
+hidden → 404), `/maple-and-ember` (foods; Ballard, Fremont, Gastown) and `/northlight-yoga` (studios franchise).
 
 | Env | Meaning |
 |---|---|
 | `NEXT_PUBLIC_API_URL` | BranchHarbor API. Inlined at build time; `API_URL` overrides it at runtime for server code. |
 | `SITES_BASE_URL` | Public included address (`https://sites.branchharbor.com` in production). Used for canonicals, sitemaps and routing. |
 | `SITES_EXTRA_HOSTS` | Extra hostnames treated as the included address (comma-separated). |
+| `NEXT_PUBLIC_DEMO_MODE` | Demo site only: every page shows a slim "Demo environment" ribbon saying bookings and orders are not real. |
 
 ## Routing
 

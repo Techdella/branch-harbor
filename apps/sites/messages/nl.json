@@ -18,7 +18,9 @@
     "errorSummary": "Corrigeer het volgende:",
     "required": "{field} is verplicht",
     "invalidEmail": "Vul een geldig e-mailadres in",
-    "languageSubmit": "Taal wijzigen"
+    "languageSubmit": "Taal wijzigen",
+    "demoRibbon": "Demo-omgeving",
+    "demoRibbonNote": "Dit is een demowebsite van een voorbeeldbedrijf. Boekingen en bestellingen hier zijn niet echt."
   },
   "error": {
     "title": "Deze pagina is nu niet beschikbaar",

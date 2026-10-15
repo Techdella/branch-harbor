@@ -18,7 +18,9 @@
     "errorSummary": "Please fix the following:",
     "required": "{field} is required",
     "invalidEmail": "Enter a valid email address",
-    "languageSubmit": "Change language"
+    "languageSubmit": "Change language",
+    "demoRibbon": "Demo environment",
+    "demoRibbonNote": "This is a demonstration website for a sample business. Bookings and orders here are not real."
   },
   "error": {
     "title": "This page isn't available right now",
