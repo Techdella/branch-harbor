@@ -5,7 +5,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { IconName } from '@bh/icons';
 import { Icon, cx } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
-import { PLAN_KEYS, countryName, currencyName, formatPrice, perLocationPrice, type PlanKey, type PriceCurrency } from '@/content/pricing';
+import { NETWORK_INCLUDED_LOCATIONS } from '@bh/shared';
+import { PLAN_KEYS, countryName, currencyName, formatPrice, listPrice, perLocationPrice, planTotal, type PlanKey, type PriceCurrency, type PriceListKey } from '@/content/pricing';
 import { signUpUrl } from '@/lib/links';
 
 const STYLE: Record<PlanKey, { icon: IconName; card: string; iconBg: string; tag: string; line: string; btn: string }> = {
@@ -16,10 +17,11 @@ const STYLE: Record<PlanKey, { icon: IconName; card: string; iconBg: string; tag
 };
 
 /**
- * Plans in the visitor's local currency. The currency is chosen on the server from the visitor's location
- * (lib/geo.ts) — there is no currency picker: checkout charges the billing country's currency (docs/PRICING.md).
+ * Plans in the visitor's local currency and regional price list. Both are chosen on the server from the visitor's
+ * location (lib/geo.ts) — there is no currency picker: checkout recomputes and locks the price from the billing country
+ * (docs/PRICING.md). Network shows the HQ platform fee (includes 3 locations) plus the per-location fee beyond.
  */
-export function PricingPlans({ currency, country }: { currency: PriceCurrency; country: string | null }) {
+export function PricingPlans({ currency, priceList, country }: { currency: PriceCurrency; priceList: PriceListKey; country: string | null }) {
   const t = useTranslations('pricing');
   const locale = useLocale();
   const [annual, setAnnual] = useState(false);
@@ -81,7 +83,8 @@ export function PricingPlans({ currency, country }: { currency: PriceCurrency; c
       <ul className="grid gap-[var(--edge)] md:grid-cols-2 xl:grid-cols-4">
         {PLAN_KEYS.map((k) => {
           const s = STYLE[k];
-          const price = perLocationPrice(currency, k, annual);
+          const price = k === 'network' ? listPrice(priceList, 'platform', annual) : perLocationPrice(priceList, k, annual);
+          const muted = k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone';
           const features = t.raw(`plans.${k}.features`) as string[];
           return (
             <li key={k} className={cx('flex flex-col gap-5 rounded-[28px] p-6 md:p-8', s.card)}>
@@ -98,10 +101,15 @@ export function PricingPlans({ currency, country }: { currency: PriceCurrency; c
               <div aria-live="polite">
                 <p className="flex flex-wrap items-baseline gap-x-2">
                   <span className={cx('tabular leading-none font-extrabold tracking-[-0.04em]', priceSize(fmt(price)))}>{fmt(price)}</span>
-                  <span className={cx('text-sm font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>{k === 'solo' ? t('perMonthOneLocation') : t('perLocation')}</span>
+                  <span className={cx('text-sm font-semibold', muted)}>{k === 'solo' ? t('perMonthOneLocation') : k === 'network' ? t('platformFee') : t('perLocation')}</span>
                 </p>
-                <p className={cx('tabular mt-2 text-xs font-semibold', k === 'hosted' ? 'text-[#C9C9C3]' : 'text-stone')}>
-                  {k === 'solo' ? t(annual ? 'soloAnnual' : 'soloTotal') : t(annual ? 'totalAnnual' : 'total', { amount: fmt(price * count), count })}
+                {k === 'network' && (
+                  <p className="mt-2 text-sm font-semibold" data-testid="network-includes">
+                    {t('networkIncludes', { count: NETWORK_INCLUDED_LOCATIONS, price: fmt(perLocationPrice(priceList, 'network', annual)) })}
+                  </p>
+                )}
+                <p className={cx('tabular mt-2 text-xs font-semibold', muted)}>
+                  {k === 'solo' ? t(annual ? 'soloAnnual' : 'soloTotal') : t(annual ? 'totalAnnual' : 'total', { amount: fmt(planTotal(priceList, k, count, annual)), count })}
                 </p>
               </div>
               <ul className={cx('flex flex-col gap-2.5 border-t pt-5', s.line)}>
@@ -112,14 +120,13 @@ export function PricingPlans({ currency, country }: { currency: PriceCurrency; c
                   </li>
                 ))}
               </ul>
-              {k !== 'network' ? (
-                // Self-service sign-up for every industry; Network starts with a quote.
-                <a href={signUpUrl({ plan: k, model: k === 'solo' ? 'independent' : 'network' })} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
-                  {t(`plans.${k}.cta`)}
-                </a>
-              ) : (
-                <Link href={`/demo?plan=${k}`} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
-                  {t(`plans.${k}.cta`)}
+              <a href={signUpUrl({ plan: k, model: k === 'solo' ? 'independent' : 'network' })} className={cx('mt-auto inline-flex h-12 items-center justify-center rounded-full text-sm font-bold transition', s.btn)}>
+                {t(`plans.${k}.cta`)}
+              </a>
+              {k === 'network' && (
+                // Self-service like every plan; networks can also ask for a quote and guided onboarding.
+                <Link href={`/demo?plan=${k}`} className="-mt-2 text-center text-xs font-bold underline-offset-4 hover:underline">
+                  {t('quoteLink')}
                 </Link>
               )}
             </li>
