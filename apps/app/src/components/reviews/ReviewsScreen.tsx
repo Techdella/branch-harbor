@@ -15,8 +15,9 @@ import { NotAvailable } from '../screens/NotAvailable';
 import { Async, Banner, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { inboxApi } from '../marketing-comms/api';
 import { reviewsApi, type ConnectionVM, type DashboardVM, type RequestVM, type ReviewVM } from './api';
+import { ReplyTemplatesSection } from '../local-marketing/ReviewInbox';
 
-type Tab = 'overview' | 'reviews' | 'requests' | 'settings' | 'connections';
+type Tab = 'overview' | 'reviews' | 'requests' | 'templates' | 'settings' | 'connections';
 const REPLY_TONE: Record<string, Tone> = { none: 'neutral', draft: 'neutral', pending_approval: 'warning', published: 'success', rejected: 'danger', failed: 'danger' };
 const REQUEST_TONE: Record<string, Tone> = { scheduled: 'info', sending: 'info', sent: 'success', sandboxed: 'neutral', opened: 'info', completed: 'success', skipped: 'warning', failed: 'danger' };
 
@@ -51,6 +52,8 @@ export function ReviewsScreen() {
     { key: 'overview', label: t('tab.overview') },
     { key: 'reviews', label: t('tab.reviews') },
     { key: 'requests', label: t('tab.requests') },
+    // Reply templates and the reply SLA (used by Google reviews in the inbox).
+    { key: 'templates', label: t('tab.templates') },
     ...(canPublish ? [{ key: 'settings' as Tab, label: t('tab.settings') }, { key: 'connections' as Tab, label: t('tab.connections') }] : []),
   ];
   return (
@@ -60,6 +63,7 @@ export function ReviewsScreen() {
       {tab === 'overview' && <Overview />}
       {tab === 'reviews' && <ReviewList onOpen={setOpen} />}
       {tab === 'requests' && <Requests />}
+      {tab === 'templates' && <ReplyTemplatesSection />}
       {tab === 'settings' && canPublish && <Settings />}
       {tab === 'connections' && canPublish && <Connections />}
       <ReviewDrawer id={open} onClose={() => setOpen(null)} />

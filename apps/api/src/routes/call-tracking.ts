@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
 import { ALL_PARTY_CONSENT_US_STATES, recordingJurisdiction, recordingRule } from '@bh/shared';
-import { adCampaigns, locations, trackedCalls, trackingNumbers } from '../db/schema/index.ts';
+import { adCampaigns, locations, organizations, trackedCalls, trackingNumbers } from '../db/schema/index.ts';
 import { callTrackingLive } from '../integrations/call-tracking.ts';
 import { notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
@@ -30,6 +30,18 @@ export const callTrackingWebhookRoutes: FastifyPluginAsyncZod = async (app) => {
     reply.type('text/xml').send(await handleVoiceWebhook(s, (req.body ?? {}) as Record<string, string>, sig(req))));
   app.post('/webhooks/call-tracking/twilio/status', { config: { rateLimit: false }, schema: { tags: ['webhooks'], summary: 'Twilio <Dial action>: call outcome (missed calls alert the location and create a lead)', hide: true } }, async (req, reply) =>
     reply.type('text/xml').send(await handleStatusWebhook(s, (req.body ?? {}) as Record<string, string>, sig(req))));
+
+  /**
+   * DNI script for hosted sites and WordPress / external sites:
+   * `<span data-bh-phone>+1 416 555 0142</span><script async src=".../dni.js" data-brand="slug" data-location="slug"></script>`.
+   * Remembers the first UTM / referrer of the visit (sessionStorage) and swaps the text and tel: links of every
+   * `[data-bh-phone]` element. Without a matching tracking number the location's own number stays.
+   */
+  app.get('/public/call-tracking/dni.js', { schema: { tags: ['public'], summary: 'Dynamic number insertion script', hide: true } }, async (_req, reply) => {
+    const api = s.cfg.PUBLIC_API_URL.replace(/\/$/, '');
+    const js = `(function(){var c=document.currentScript;if(!c)return;var b=c.getAttribute('data-brand'),l=c.getAttribute('data-location');if(!b||!l)return;var k='bh_src',v=null;try{v=JSON.parse(sessionStorage.getItem(k)||'null')}catch(e){}if(!v){var q=new URLSearchParams(location.search);v={s:q.get('utm_source')||'',m:q.get('utm_medium')||'',c:q.get('utm_campaign')||'',r:document.referrer||''};try{sessionStorage.setItem(k,JSON.stringify(v))}catch(e){}}var u=${JSON.stringify(api)}+'/v1/public/call-tracking/'+encodeURIComponent(b)+'/'+encodeURIComponent(l)+'?utm_source='+encodeURIComponent(v.s)+'&utm_medium='+encodeURIComponent(v.m)+'&utm_campaign='+encodeURIComponent(v.c)+'&ref='+encodeURIComponent(v.r);fetch(u).then(function(r){return r.ok?r.json():null}).then(function(d){if(!d||!d.number)return;var t=d.number.replace(/^\\+1(\\d{3})(\\d{3})(\\d{4})$/,'+1 $1 $2 $3');document.querySelectorAll('[data-bh-phone]').forEach(function(e){e.textContent=t;var a=e.closest('a[href^="tel:"]')||(e.tagName==='A'?e:null);if(a)a.setAttribute('href','tel:'+d.number)})}).catch(function(){})})();`;
+    return reply.header('Cache-Control', 'public, max-age=3600').type('application/javascript; charset=utf-8').send(js);
+  });
 
   app.get('/public/call-tracking/:brand/:location', {
     schema: {
@@ -65,13 +77,15 @@ export const callTrackingRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!n) throw notFound('Tracking number');
     return n;
   };
-  const inScopeCond = (ids: string[] | 'all', col: typeof trackedCalls.locationId | typeof trackingNumbers.locationId): SQL | undefined => (ids === 'all' ? undefined : ids.length ? inArray(col, ids) : sql`false`);
+  const inScopeCond = (ids: string[] | 'all', col: typeof trackedCalls.locationId | typeof trackingNumbers.locationId | typeof locations.id): SQL | undefined => (ids === 'all' ? undefined : ids.length ? inArray(col, ids) : sql`false`);
 
   app.get('/orgs/:orgId/call-tracking/numbers', { schema: { tags, security: secured, params: orgParams, querystring: z.object({ includeReleased: z.coerce.boolean().default(false) }), summary: 'Tracking numbers of the locations in scope' } }, async (req) => {
     const { orgId } = req.params;
     const ids = await scopeIds(req, orgId);
     const rows = await db.select().from(trackingNumbers).where(and(eq(trackingNumbers.organizationId, orgId), inScopeCond(ids, trackingNumbers.locationId), req.query.includeReleased ? undefined : eq(trackingNumbers.status, 'active'))).orderBy(desc(trackingNumbers.createdAt));
-    return { items: rows.map(serializeNumber), live: callTrackingLive(s.cfg), canManage: await hasAt(req, db, orgId, null, CALLS, 'publish') || (ids !== 'all' && (await Promise.all(ids.map((l) => hasAt(req, db, orgId, l, CALLS, 'publish')))).some(Boolean)) };
+    const [org] = await db.select({ slug: organizations.slug }).from(organizations).where(eq(organizations.id, orgId));
+    const locs = await db.select({ id: locations.id, slug: locations.slug, phone: locations.phone }).from(locations).where(and(eq(locations.organizationId, orgId), inScopeCond(ids, locations.id)));
+    return { items: rows.map(serializeNumber), live: callTrackingLive(s.cfg), dni: { scriptUrl: `${s.cfg.PUBLIC_API_URL.replace(/\/$/, '')}/v1/public/call-tracking/dni.js`, brand: org?.slug ?? null, locations: locs }, canManage: await hasAt(req, db, orgId, null, CALLS, 'publish') || (ids !== 'all' && (await Promise.all(ids.map((l) => hasAt(req, db, orgId, l, CALLS, 'publish')))).some(Boolean)) };
   });
 
   app.post('/orgs/:orgId/call-tracking/numbers', {
