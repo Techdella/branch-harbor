@@ -16,34 +16,41 @@ pnpm --filter @bh/app build && pnpm --filter @bh/app start
 | Variable | Default | Meaning |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | Backend base URL (`apps/api`). All routes are under `/v1`. |
-| `NEXT_PUBLIC_USE_MOCKS` | `true` | Use the built-in sample data layer (zero setup). Set to `false` to use the API. |
+| `NEXT_PUBLIC_DEMO_MODE` | `false` | Demo site only: "Demo environment" ribbon and the demo sign-in picker (needs the API's `DEMO_MODE=true`). |
 
 Both are inlined at build time, so rebuild after changing them for `next start`.
+
+**There is no sample data in the app.** It always talks to the API. If the API can't be reached, the app shows an
+offline state with a retry button (and screens show their error states) — never fake data.
 
 ### Run against the API
 
 ```bash
 # 1. Backend (see apps/api/README.md): Postgres 16 with role bh/bh and db branchharbor
 cp apps/api/.env.example apps/api/.env
-pnpm --filter @bh/api db:migrate && SEED_DEMO_PASSWORD='HarborDemo2026!' pnpm --filter @bh/api db:seed
-pnpm --filter @bh/api dev                                   # http://localhost:4000 (CORS allows :3001)
+pnpm --filter @bh/api db:migrate
+pnpm --filter @bh/api db:seed                                # production-safe: starts empty
+SEED_DEMO_PASSWORD='HarborDemo2026!' pnpm --filter @bh/api db:seed:demo   # optional: demo businesses + teams
+pnpm --filter @bh/api dev                                    # http://localhost:4000 (CORS allows :3001)
 
-# 2. App in live mode
-NEXT_PUBLIC_USE_MOCKS=false pnpm dev:app                    # or set it in apps/app/.env.local
-# production: NEXT_PUBLIC_USE_MOCKS=false pnpm --filter @bh/app build && pnpm --filter @bh/app start
+# 2. App
+pnpm dev:app
+# production: pnpm --filter @bh/app build && pnpm --filter @bh/app start
 ```
 
-Sign in as `demo@branchharbor.com` (organisation owner of *Stillwater Yoga Collective* — studios —, *Maple & Ember
-Restaurants* — foods —, *North Shore Football Academy* — sports —, *Harbourline Wellness* and *Fieldnote Goods* — commerce;
-the industry switcher moves between them). Other seeded users with the same password:
-`maya.rao@demo.branchharbor.com` (location manager, Queen West), `priya.anand@demo.branchharbor.com` (regional manager,
-Europe), `carlos.ortega@demo.branchharbor.com` (staff, Ballard).
+A new sign-up starts with an empty business account and the onboarding checklist. With the demo seed, sign in as
+`demo@branchharbor.com` (owner of several demo businesses, one industry each — the account switcher moves between them)
+or any Northlight Yoga International team member (`*@northlight.demo.branchharbor.com`, one login per role — see
+apps/api/README.md).
 
-With `NEXT_PUBLIC_USE_MOCKS=false`, any call that fails with a **network error** (API unreachable) is retried
-against the mock layer and the app shows an "Offline · sample data" banner. HTTP errors (401/403/422/5xx) are
-not masked — they surface as error / permission-denied states.
+### Demo site
 
-## Auth (live mode)
+The demo site (e.g. `demo.branchharbor.com`) is this same app built with `NEXT_PUBLIC_DEMO_MODE=true`, pointed at an API
+running with `DEMO_MODE=true` on its own database seeded with `pnpm db:seed:demo`. It shows a slim "Demo environment"
+ribbon on every page and a "Try a demo account" picker on the sign-in page listing every demo account by business and
+role (one click signs in). Production builds never show either.
+
+## Auth
 
 - `POST /v1/auth/login` / `signup` return a short-lived access token (kept in `localStorage.bh_token`, sent as
   `Authorization: Bearer`) and set the rotating `bh_refresh` httpOnly cookie on the API origin (`credentials: 'include'`).
@@ -53,7 +60,7 @@ not masked — they surface as error / permission-denied states.
 - Route guard: `src/proxy.ts` (Next 16 Proxy) redirects app routes to `/sign-in` when the non-secret `bh_session`
   marker cookie (set by the client while it holds a session) is missing. `AppContext` is the second guard: it loads
   `/v1/auth/me` and redirects on 401, or to `/onboarding` when the user has no organisation yet. The API enforces
-  every permission regardless; both guards are UX only. Sample mode is never guarded.
+  every permission regardless; both guards are UX only.
 - Sign-up sends `acceptTerms: true` (the form's submit is the acceptance) and the email is verified with the token
   from the emailed link (`/verify-email?token=…` verifies automatically; the link or token can also be pasted). In
   development the API returns the token (`EXPOSE_DEV_TOKENS`) and the page offers a "Development: use the token" link.
@@ -61,22 +68,20 @@ not masked — they surface as error / permission-denied states.
 
 ## Data layer
 
-- `src/lib/api.ts` — the `BranchHarborApi` interface, `getApi()` selection and the automatic offline fallback.
+- `src/lib/api.ts` — the `BranchHarborApi` interface and `getApi()` (the live client).
 - `src/lib/http/client.ts` — fetch wrapper: bearer + cookie auth, refresh-on-401 with the storm guard, `ApiError`
   normalisation of `{ error: { code, message, fields } }` (dotted field paths are also exposed by their last segment).
-- `src/lib/http/workspace.ts` — the live workspace: `/v1/auth/me` (user, organisations, role assignments) plus the
-  selected organisation's directory (`/orgs/:id`, `/locations`, `/regions`, `/owner-groups`, `/websites`,
-  `/connections`, `/templates`), adapted to the app's `Location` / `Organization` view models. It derives the
-  session, the scope options (all authorised locations / region / owner group / location) and the API scope
-  (`scopeKind` + `scopeId`) sent to reports and AI.
-- `src/lib/http/httpApi.ts` — the live implementation; adapts every response to the existing view models so screens
-  don't change. Money stays integer minor units + currency and is always grouped per currency.
-- `src/lib/mock/*` — same interface, in-memory and stateful (`orgs.ts` organisations/locations, `content.ts`
-  metrics/tables/AI copy, `mockApi.ts` behaviour). It enforces permissions like the server (throws `forbidden`),
-  simulates latency, and supports `?demo=loading|empty|error|ai-down` on any page to review states.
-- `src/lib/types.ts` — view models shared by both. `src/lib/useApi.ts` — `useApi` (loading/error/ready) and `useMutation`.
+- `src/lib/http/workspace.ts` — the workspace: `/v1/auth/me` (user, business accounts, role assignments, **access**) plus
+  the selected account's directory (`/orgs/:id`, `/locations`, `/regions`, `/owner-groups`, `/websites`, `/connections`,
+  `/templates`), adapted to the app's `Location` / `Organization` view models, with the scope options and API scope.
+- `src/lib/access.ts` — workspaces and navigation from capabilities (see "Access model" below).
+- `src/lib/http/access.ts` — roles, custom roles and per-person access (Team & access).
+- `src/lib/http/httpApi.ts` — adapts every response to the existing view models. Money stays integer minor units +
+  currency and is always grouped per currency.
+- `src/lib/<industry>/` — industry clients (`/v1/orgs/:orgId/<industry>/…`).
+- `src/lib/types.ts` — view models. `src/lib/useApi.ts` — `useApi` (loading/error/ready) and `useMutation`.
 
-### Endpoint mapping (live)
+### Endpoint mapping
 
 All org routes are `/v1/orgs/:orgId/…` for the selected organisation; lists are filtered client-side to the selected scope.
 
@@ -110,7 +115,9 @@ All org routes are `/v1/orgs/:orgId/…` for the selected organisation; lists ar
 | `payments.accounts` | `GET /payments/connect/status` |
 | `payments.automation` / `setAutomation` | `GET /payments/automation` + `GET /payments/off-session-charges`; `PUT /payments/automation { autoChargeFees, feeChargeDelayHours, autoChargeInstalments }` |
 | `connections.list` / `fix` | `GET /connections`; `POST /connections/:id/sync` (degraded) or `/test` (disconnected / expired) |
-| `team.members` / `invite` | `GET /members` + `GET /invitations`; `POST /invitations { email, role, scope }` |
+| `team.members` / `invite` | `GET /members` + `GET /invitations`; `POST /invitations { email, role, scope }` (custom roles: `role: 'custom', customRoleId`) |
+| Team & access (`lib/http/access.ts`) | `GET /roles`, `POST /roles`, `PATCH|DELETE /roles/:id`, `GET /members/:userId/access`, `PUT /role-assignments/:id/access`, `GET /access/me` |
+| demo sign-in (`lib/demo.ts`, demo site only) | `GET /v1/demo/accounts`, `POST /v1/demo/login` |
 | `reports` | `GET /reports/overview` (revenue per currency per location; combined revenue is never computed) |
 | `settings.get` / `save` | `GET /orgs/:id` (`policies`) + `/subscription` (`pricePerLocation`, billed locations); `PATCH /orgs/:id` incl. `customerDataSharing` and `aiTrainingOptOut` |
 | `onboarding.get` / `save` | `GET /onboarding`; `PUT /onboarding/:step` (the draft is kept in the current step's `data.draft`). A new account creates its organisation (`POST /orgs`) when the business step is completed and its first location (`POST /locations`) after the location step. |
@@ -126,7 +133,7 @@ operating and publicly listed); `sync` needs attention when one of its connectio
 
 ## International by default
 
-Sample organisations have locations in Canada, the US, the UK, Ireland, Germany, the Netherlands, Portugal and
+Demo organisations (demo seed) have locations in Canada, the US, the UK, Ireland, Germany, the Netherlands, Portugal and
 Australia. Times are stored as UTC and shown in each location's IANA time zone (with the zone label); money is
 integer minor units + ISO currency, formatted with `Intl` in the viewer's locale. Mixed currencies are always shown
 per currency — "Combined total: Not shown — no conversion method defined".
@@ -135,29 +142,32 @@ UI language is cookie-based (`NEXT_LOCALE`, no URL prefix), chosen from the prof
 falling back to `Accept-Language`. Every catalogue (`messages/*.json`, `messages/single/*`, `messages/foods/*`) is complete in `en` (US English), `fr`,
 `es`, `de` and `pt-BR`; `pnpm lint` runs `check:messages` (same keys, same ICU arguments and plural forms in every
 locale) and `lint:strings` (no hard-coded JSX text or labels; exceptions in `i18n-allowlist.json`). Terminology lives
-in [`docs/i18n-glossary.md`](../../docs/i18n-glossary.md). Sample business content (metric names, record text) and API
-error messages come from the data layer and are English.
+in [`docs/i18n-glossary.md`](../../docs/i18n-glossary.md). Business content (record text) and API error messages come from
+the data layer and are English unless the data catalogue knows them. Access-model text (workspaces, modules, roles, Team &
+access, demo site) lives in `messages/access/*.json` (namespaces `access` and `demo`); a module added by another feature
+without translations falls back to the English name and description from `@bh/shared`.
 
 ## Routes
 
 | Route | Screen |
 |---|---|
-| `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password` | Auth (mock: any 10+ char password; any 6-digit code, `000000` = expired) |
+| `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password` | Auth (demo site: plus the demo account picker) |
 | `/onboarding` (`?step=…`) | 9-step checklist, location wizard, CSV import, website address + domain connection, publish readiness |
-| `/overview` | Metrics with range/source/definition, Unavailable/Not connected, upcoming (local times), needs attention |
-| `/locations`, `/locations/new` | Directory (country/currency/time zone/local time), detail drawer (inherited vs local), wizard |
-| `/ops/[screen]` | Industry operations — see below; "Later" items show an honest placeholder |
-| `/customers`, `/marketing` | Scoped tables (members / participants / clients / customers / guests; campaigns) |
-| `/websites` (`?tab=editor|approvals|publish|domains`) | Field governance, approval queue, group publish with per-location results + retry |
-| `/payments` (`?tab=transactions|reconciliation|automatic|setup`) | Per-currency totals, detail timeline, reconciliation (recreate / finance-gated refund), automatic charges (fee/instalment auto-charging switches, waive window, every off-session charge with failures), accounts |
-| `/approvals` | One inbox: refunds over the threshold, local ad spend, shift swaps, website changes — consequence preview, approve/reject with comment, result after execution |
-| `/team`, `/reports`, `/connections`, `/settings`, `/community` | Members & roles + invite, and **Schedule** (week of shifts per location in local time, clock-in state, pending swaps; staff see it too); freshness-labelled charts; sync health + fix; org defaults, data region, customer sharing + AI training (saved), billing per location (price from the subscription); Later |
+| `/overview` | Home of the active workspace: the person's modules there, plus metrics (range/source/definition, Unavailable/Not connected, upcoming in local times, needs attention) on Network/Operations for people with Reports. Independent businesses: the single overview |
+| `/locations`, `/locations/new` | Network → directory (country/currency/time zone/local time), detail drawer (inherited vs local), wizard |
+| `/ops/[screen]` | Operations → industry screens (see below), shown per operations module |
+| `/schedule` | Operations → staff schedule (week of shifts per location in local time, clock-in state, pending swaps) |
+| `/customers` | Sales → customers / members / participants / clients / guests |
+| `/websites` (`?tab=editor|approvals|publish|domains`), `/marketing` | Marketing → field governance, approval queue, group publish with per-location results + retry; campaigns |
+| `/payments` (`?tab=transactions|reconciliation|automatic|setup`) | Finance → per-currency totals, detail timeline, reconciliation, automatic charges, accounts |
+| `/approvals`, `/reports` | Network → one approvals inbox (refunds over the threshold, local ad spend, shift swaps, website changes); freshness-labelled reports |
+| `/team`, `/connections`, `/settings` | Settings → Team & access (members, invitations, "What can this person see?", roles); sync health + fix; business settings and billing |
 
 Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `overview` `programmes`
 (+ season setup wizard) `registrations` `teams` (transfers, coaches, squad selection) `schedule` (week/list, fixtures, clash resolutions)
-`attendance` `balances` `announcements` `guardians` (relationships, disputes, messages) `reports` — data via `src/lib/sports/` (live `/v1/orgs/:orgId/sports/*`, sample mode `mock.ts`) · Wellness `calendar` (practitioner/room/list +
+`attendance` `balances` `announcements` `guardians` (relationships, disputes, messages) `reports` — data via `src/lib/sports/` (`/v1/orgs/:orgId/sports/*`) · Wellness `calendar` (practitioner/room/list +
 reschedule) `services` `practitioners` `forms` `packages`·Later · Commerce `orders` (partial refund + sync timeline)
-Wellness (full product, `src/components/screens/wellness/*`, data layer `src/lib/wellness/*` with its own live client + stateful mock): `calendar` (practitioner / room & equipment / list views, drag to move with a conflict dry run, appointment drawer: check-in, complete, no-show and cancel with policy preview, voucher, keyboard move form; new booking with any-available, couples, voucher), `services` (variants with per-location prices, buffers, deposit rule, policy, eligible practitioners, room/equipment, online flag, AI copy draft with health-claim screening), `practitioners` (weekly hours per location without overlaps, leave/absence with affected appointments and per-appointment rebook), `clients` (history, packages, preferences, confidential/shared notes, intake restricted + excluded from AI, policy reply assistant), `packages` (plans, client packages, gift vouchers with ledger), `insights` (utilisation, cancellations, revenue per currency, liability, AI summary).
+Wellness (full product, `src/components/screens/wellness/*`, data layer `src/lib/wellness/*`): `calendar` (practitioner / room & equipment / list views, drag to move with a conflict dry run, appointment drawer: check-in, complete, no-show and cancel with policy preview, voucher, keyboard move form; new booking with any-available, couples, voucher), `services` (variants with per-location prices, buffers, deposit rule, policy, eligible practitioners, room/equipment, online flag, AI copy draft with health-claim screening), `practitioners` (weekly hours per location without overlaps, leave/absence with affected appointments and per-appointment rebook), `clients` (history, packages, preferences, confidential/shared notes, intake restricted + excluded from AI, policy reply assistant), `packages` (plans, client packages, gift vouchers with ledger), `insights` (utilisation, cancellations, revenue per currency, liability, AI summary).
 
 Operations: Studios `classes` (week/list + class drawer) `cover` `offers` `online`·Later · Sports `registrations`
 `attendance` `programmes` `teams` `schedule` `guardian`·Later · Wellness `calendar` (practitioner/room/list +
@@ -171,19 +181,34 @@ reschedule) `services` `practitioners` `clients` `packages` `forms` `insights` (
 Operations → Pulse, Listings (board by status, editor, HQ approval, AI description draft, portal opt-in), Enquiries (mine / office pool / all,
 claim and reassign), Viewings (confirm, cancel, feedback), Offers (visible only to listing agents, the buyer's agent and office managers;
 negotiation trail), Agents & offices (governance tier, area unit, lead routing, accepts leads) and Portal feeds (sandbox). Data layer:
-`src/lib/realty/` (live `/v1/orgs/:orgId/realty/*`, sample data in `mock.ts` with the same visibility rules per persona).
+`src/lib/realty/` (`/v1/orgs/:orgId/realty/*`).
 
-## Shell and prototype controls
+## Access model: workspaces, navigation and account switching
 
-Left nav (248px; icon rail on tablet; drawer on mobile), top bar with the always-visible scope selector
-(all authorised locations / region / owner group / location), permission-aware search, notifications
-(information / action required / integration failure), profile + language. Two prototype controls:
-**industry switcher** (top of the nav) and **Viewing as** (HQ admin = organisation owner, Location manager = one
-location, Staff = assigned work only) to demonstrate permission and scope states. With the API, the industry switcher
-moves between the user's own organisations (only their industries are shown) and "Viewing as" lists only the
-personas the user actually holds (organisation-wide roles → HQ admin; regional / owner-group / location roles →
-Location manager; staff → Staff); with a single role it is shown as a read-only "Your role" label. The AI panel is persistent on
-≥1280px and full-screen below; it shows scope, suggestions, sources, assumptions, usage, status, "Drafts only", and
-proposed-action cards that need explicit approval (and the right permission).
+One app, several **workspaces** (docs/PRODUCT_PLAN.md): Network, Operations, Sales, Marketing, Finance, Legal &
+compliance, Training and Community, plus Settings under every workspace. `/v1/auth/me` returns, per business account,
+the person's capabilities (`<module>:<action>`), visible workspaces and landing workspace; `src/lib/access.ts` maps
+modules to screens.
 
-State persists per browser in `localStorage.bh_app_state` (industry, role, scope, AI panel, nav collapsed).
+- **No padlocks.** The navigation only lists screens of modules the person holds; workspaces without a built screen
+  (Legal, Training, Community today) never appear. A direct link to anything else shows "Not available" and loads no
+  data (the API refuses it too: 403 `module_not_available`).
+- **Workspace switcher** at the top of the navigation when the person has more than one workspace; each workspace has
+  its own home (`/overview`) and navigation. The default is the person's primary workspace (e.g. CMO → Marketing,
+  franchise owner → Operations). Following a link into another workspace switches the navigation to it.
+- **Account switcher** (business name + industry) when the login belongs to several business accounts. Each account
+  has exactly one industry, which fixes the operations screens and words; data is never mixed between accounts.
+- **Independent businesses** keep the simplified mode (`useBusinessMode`): one navigation with everything the owner
+  holds, no workspace switcher, scope selector or network concepts.
+- **Team & access** (`/team`): invite with a role template or a custom role; "What can this person see?" per
+  assignment — role, modules and actions grouped by workspace in plain language (HQ-only modules and access you don't
+  hold yourself can't be ticked), and a live preview of the navigation they'll get; the Roles tab creates and edits
+  custom roles. Changes are audited and apply on the person's next request.
+
+The shell (left nav 248px; icon rail on tablet; drawer on mobile) has the always-visible scope selector (all authorised
+locations / region / owner group / location), permission-aware search, notifications, the role chip ("Your role") and
+profile + language. The AI panel (shown only with the AI assistant module) is persistent on ≥1280px and full-screen
+below; it shows scope, suggestions, sources, assumptions, usage, status, "Drafts only", and proposed-action cards that
+need explicit approval (and the right permission).
+
+State persists per browser in `localStorage.bh_app_state` (selected account, workspace, scope, AI panel, nav collapsed).

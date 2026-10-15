@@ -20,9 +20,9 @@ export function InventoryScreen() {
   const [loc, setLoc] = useStore();
   const [adjust, setAdjust] = useState<StockRow | null>(null);
   const [explain, setExplain] = useState<StockRow | null>(null);
-  const stock = useCommerce(() => call<{ items: StockRow[] }>('GET', '/inventory', undefined, { locationId: loc }), [loc, app.apiMode], !!loc && tab === 'stock');
-  const alerts = useCommerce(() => call<{ items: Alert[] }>('GET', '/inventory/alerts'), [app.apiMode, tab], tab === 'alerts');
-  const history = useCommerce(() => call<{ items: Movement[] }>('GET', '/stock-movements', undefined, { locationId: loc, limit: 200 }), [loc, app.apiMode, tab], !!loc && tab === 'history');
+  const stock = useCommerce(() => call<{ items: StockRow[] }>('GET', '/inventory', undefined, { locationId: loc }), [loc], !!loc && tab === 'stock');
+  const alerts = useCommerce(() => call<{ items: Alert[] }>('GET', '/inventory/alerts'), [app.org.id, tab], tab === 'alerts');
+  const history = useCommerce(() => call<{ items: Movement[] }>('GET', '/stock-movements', undefined, { locationId: loc, limit: 200 }), [loc, app.org.id, tab], !!loc && tab === 'history');
   const ids = app.scope.locationIds;
 
   return (
@@ -139,7 +139,7 @@ function Counts({ loc }: { loc: string }) {
   const app = useApp();
   const [open, setOpen] = useState<string | null>(null);
   const [name, setName] = useState('');
-  const list = useCommerce(() => call<{ items: CountSummary[] }>('GET', '/stock-counts'), [app.apiMode]);
+  const list = useCommerce(() => call<{ items: CountSummary[] }>('GET', '/stock-counts'), [app.org.id]);
   const create = useAction(async () => { const c = await call<CountDetail>('POST', '/stock-counts', { locationId: loc, name: name || t('inventory.defaultCountName') }); list.reload(); setOpen(c.id); return c; });
   return (
     <div className="flex flex-col gap-3">

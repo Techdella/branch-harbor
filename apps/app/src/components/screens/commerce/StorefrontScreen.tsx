@@ -17,8 +17,8 @@ export function StorefrontScreen() {
   const t = useCt();
   const app = useApp();
   const [loc, setLoc] = useStore();
-  const res = useCommerce(() => call<{ items: StoreSettings[] }>('GET', '/fulfilment-settings'), [app.org.id, app.apiMode]);
-  const cols = useCommerce(() => call<{ items: Collection[] }>('GET', '/collections'), [app.org.id, app.apiMode]);
+  const res = useCommerce(() => call<{ items: StoreSettings[] }>('GET', '/fulfilment-settings'), [app.org.id]);
+  const cols = useCommerce(() => call<{ items: Collection[] }>('GET', '/collections'), [app.org.id]);
   const store = res.data?.items.find((s) => s.location.id === loc);
   const slug = app.locations.find((l) => l.id === loc);
   return (

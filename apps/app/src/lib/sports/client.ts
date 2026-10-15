@@ -1,12 +1,10 @@
 /**
- * Sports data client. Live: apps/api `/v1/orgs/:orgId/sports/*` for the selected organisation (lists are
- * filtered client-side to the selected scope's locations). Mock: in-memory sample academy (./mock.ts).
- * A network failure in live mode switches the whole app to the offline sample data (same rule as getApi()).
+ * Sports data client: apps/api `/v1/orgs/:orgId/sports/*` for the selected organisation (lists are filtered
+ * client-side to the selected scope's locations).
  */
 import { ApiError } from '../errors';
-import { USE_MOCKS, http } from '../http/client';
+import { http } from '../http/client';
 import { orgId } from '../http/workspace';
-import { apiMode, enterFallback } from '../api';
 import type {
   AgePreview, SAnnouncement, SBalanceRow, SBalanceTotals, SCoach, SDispute, SForm, SGuardianRel, SOverview, SProgramme, SProposal, SQuestion, SRegistration, SReport,
   SRoster, SSeason, SSelection, SSession, STeam, STeamDetail, SThread, SVenue, SetupInput,
@@ -148,31 +146,7 @@ export function totalsOf(rows: SBalanceRow[]): SBalanceTotals[] {
   return [...m.values()];
 }
 
-function withFallback(live: SportsClient, mock: () => Promise<SportsClient>): SportsClient {
-  return new Proxy(live, {
-    get(target, prop) {
-      const fn = Reflect.get(target, prop) as unknown;
-      if (typeof fn !== 'function') return fn;
-      return async (...args: unknown[]) => {
-        if (apiMode() === 'fallback') return ((await mock()) as unknown as Record<string, (...a: unknown[]) => unknown>)[prop as string]!(...args);
-        try {
-          return await (fn as (...a: unknown[]) => Promise<unknown>).apply(target, args);
-        } catch (e) {
-          if (e instanceof ApiError && e.isNetwork) {
-            enterFallback();
-            return ((await mock()) as unknown as Record<string, (...a: unknown[]) => unknown>)[prop as string]!(...args);
-          }
-          throw e;
-        }
-      };
-    },
-  });
-}
-
-let instance: SportsClient | null = null;
+/** The live Sports client. */
 export async function getSports(): Promise<SportsClient> {
-  if (instance) return instance;
-  const loadMock = async () => (await import('./mock')).mockSports;
-  instance = USE_MOCKS ? await loadMock() : withFallback(liveSports, loadMock);
-  return instance;
+  return liveSports;
 }

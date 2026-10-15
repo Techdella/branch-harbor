@@ -233,8 +233,7 @@ export function UpgradeFlow({ onCancel }: { onCancel?: () => void }) {
     setDone(true);
   };
   const leave = async (href: string) => {
-    if (app.live) await app.reloadWorkspace();
-    else app.setSampleBusiness('network');
+    await app.reloadWorkspace();
     router.push(href);
   };
 

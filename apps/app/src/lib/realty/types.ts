@@ -1,4 +1,4 @@
-/** View models for Real Estate screens — the shapes returned by /v1/orgs/:orgId/realty/* (and the sample layer). */
+/** View models for Real Estate screens — the shapes returned by /v1/orgs/:orgId/realty/*. */
 import type { Money } from '@bh/shared';
 
 export type ListingStatus = 'draft' | 'coming_soon' | 'active' | 'under_offer' | 'sold' | 'let' | 'withdrawn';

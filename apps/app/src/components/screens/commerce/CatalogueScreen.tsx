@@ -18,8 +18,8 @@ export function CatalogueScreen() {
   const [selected, setSelected] = useState<string[]>([]);
   const [editing, setEditing] = useState<string | 'new' | null>(null);
   const [distributing, setDistributing] = useState(false);
-  const res = useCommerce(() => call<{ items: CatalogueItem[] }>('GET', '/catalogue'), [app.org.id, app.apiMode]);
-  const dists = useCommerce(() => call<{ items: Distribution[] }>('GET', '/distributions'), [app.org.id, app.apiMode], app.can('templates.write'));
+  const res = useCommerce(() => call<{ items: CatalogueItem[] }>('GET', '/catalogue'), [app.org.id]);
+  const dists = useCommerce(() => call<{ items: Distribution[] }>('GET', '/distributions'), [app.org.id], app.can('templates.write'));
   const hq = app.can('templates.write');
   const items = (res.data?.items ?? []).filter((p) => (status === 'all' || p.status === status) && (!q || `${p.name} ${p.sku}`.toLowerCase().includes(q.toLowerCase())));
 

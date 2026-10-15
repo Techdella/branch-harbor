@@ -14,7 +14,6 @@
 import { ApiError } from '../errors';
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000').replace(/\/$/, '');
-export const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== 'false';
 
 export const SESSION_COOKIE = 'bh_session';
 const TOKEN_KEY = 'bh_token';
@@ -52,11 +51,6 @@ function setMarker(on: boolean) {
   document.cookie = on
     ? `${SESSION_COOKIE}=1; path=/; max-age=${REFRESH_DAYS * 86400}; samesite=lax`
     : `${SESSION_COOKIE}=; path=/; max-age=0; samesite=lax`;
-}
-
-/** Offline fallback (API unreachable): mark the browser so the route guard shows sample data instead of looping to sign-in. */
-export function markOfflineSession() {
-  setMarker(true);
 }
 
 /** Stores (or clears) the access token. `expiresIn` is in seconds. */
@@ -220,6 +214,13 @@ export const http = {
 };
 
 /* ---------------- auth endpoints ---------------- */
+
+/** Demo site only (`NEXT_PUBLIC_DEMO_MODE`, API `DEMO_MODE`): sign in as a listed demo account. */
+export async function demoLogin(email: string): Promise<SessionResponse> {
+  const s = await request<SessionResponse>('POST', '/demo/login', { body: { email }, auth: false });
+  setAccessToken(s.accessToken, s.accessTokenExpiresIn);
+  return s;
+}
 
 export async function login(email: string, password: string): Promise<SessionResponse> {
   const s = await request<SessionResponse>('POST', '/auth/login', { body: { email, password }, auth: false });

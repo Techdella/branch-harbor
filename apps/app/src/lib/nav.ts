@@ -1,5 +1,4 @@
 import type { IconName } from '@bh/icons';
-import type { Permission } from '@bh/shared';
 import type { IndustryKey } from './types';
 
 export type OpsKind = 'screen' | 'table' | 'later';
@@ -9,7 +8,7 @@ export interface OpsDef {
   kind: OpsKind;
 }
 
-/** Industry operations per vertical. `later` items are honest placeholders, not working features. */
+/** Industry operations screens per vertical. Which ones a person sees comes from their operations modules (lib/access.ts). */
 export const OPS: Record<IndustryKey, OpsDef[]> = {
   studios: [
     { key: 'classes', icon: 'calendar', kind: 'screen' },
@@ -80,6 +79,8 @@ export const OPS: Record<IndustryKey, OpsDef[]> = {
     { key: 'agents', icon: 'users', kind: 'screen' },
     { key: 'portals', icon: 'plug', kind: 'screen' },
   ],
+  // Screens arrive with the Hospitality release (operations modules in @bh/shared access.ts list them).
+  hospitality: [],
 };
 
 export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }> = {
@@ -89,30 +90,7 @@ export const INDUSTRY_UI: Record<IndustryKey, { icon: IconName; pastel: string }
   commerce: { icon: 'bag', pastel: '#F7EDA8' },
   foods: { icon: 'utensils', pastel: '#F8D6D8' },
   realty: { icon: 'house', pastel: '#CDEEEE' },
+  hospitality: { icon: 'bed', pastel: '#EFE3D3' },
 };
 
-export interface NavItem {
-  key: string;
-  href: string;
-  icon: IconName;
-  perm?: Permission;
-  later?: boolean;
-}
-
-export const NAV_TOP: NavItem[] = [
-  { key: 'overview', href: '/overview', icon: 'grid' },
-  { key: 'locations', href: '/locations', icon: 'pin', perm: 'locations.read' },
-];
-
-export const NAV_SHARED: NavItem[] = [
-  { key: 'approvals', href: '/approvals', icon: 'shield', perm: 'locations.read' },
-  { key: 'customers', href: '/customers', icon: 'users', perm: 'customers.read' },
-  { key: 'websites', href: '/websites', icon: 'globe', perm: 'website.edit' },
-  { key: 'marketing', href: '/marketing', icon: 'megaphone', perm: 'marketing.draft' },
-  { key: 'payments', href: '/payments', icon: 'card', perm: 'payments.read' },
-  { key: 'team', href: '/team', icon: 'user', perm: 'operations.read' },
-  { key: 'community', href: '/community', icon: 'message', later: true },
-  { key: 'reports', href: '/reports', icon: 'chart', perm: 'reports.read' },
-  { key: 'connections', href: '/connections', icon: 'plug', perm: 'locations.read' },
-  { key: 'settings', href: '/settings', icon: 'settings', perm: 'org.manage' },
-];
+// Navigation is built from the person's capabilities: see lib/access.ts.

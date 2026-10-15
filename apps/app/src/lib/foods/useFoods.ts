@@ -11,7 +11,7 @@ function toApiError(e: unknown): ApiError {
   return new ApiError('unknown_error', e instanceof Error ? e.message : 'Something went wrong.');
 }
 
-/** Same contract as `useApi`, against the Foods client (live or sample). */
+/** Same contract as `useApi`, against the Foods client. */
 export function useFoods<T>(fn: (api: FoodsApi) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<Resource<T>>({ status: 'loading' });
   const localize = useLocalizeErrorRef();

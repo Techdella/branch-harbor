@@ -1,6 +1,6 @@
 /**
  * Foods (full product) view models. They mirror the apps/api response shapes (see apps/api README,
- * "foods — full product"), so the live client passes responses through and the mock serves the same shapes.
+ * "foods — full product"), so the client passes responses through.
  */
 import type { Money } from '@bh/shared';
 

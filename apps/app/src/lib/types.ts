@@ -5,14 +5,17 @@ import type { MsgParams, MsgRef } from './msg';
 
 /**
  * Translatable text in view models: `xKey` (+ `xParams`) is a catalogue key in the "data" namespace that components
- * translate (see lib/msg.ts); the plain `x` string next to it is the English fallback. Mock and live fill both.
+ * translate (see lib/msg.ts); the plain `x` string next to it is the English fallback.
  */
 
-/** The verticals demonstrated in the business app (realty: Real Estate, release "next"). */
-export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty'] as const;
+/** Industries a business account can have (one per account; hospitality screens ship with the Hospitality release). */
+export const APP_INDUSTRIES = ['studios', 'sports', 'wellness', 'commerce', 'foods', 'realty', 'hospitality'] as const;
 export type IndustryKey = (typeof APP_INDUSTRIES)[number];
 
-/** "Viewing as" personas used to demonstrate permission states. */
+/**
+ * Broad persona derived from a person's widest assignment (organisation-wide → hq, region / owner group / location
+ * manager roles → local, otherwise staff). Read-only: what someone sees comes from their capabilities.
+ */
 export const VIEW_ROLES = ['hq', 'local', 'staff'] as const;
 export type ViewRole = (typeof VIEW_ROLES)[number];
 
@@ -578,7 +581,7 @@ export interface DomainStatus {
 
 /* ---------- AI ---------- */
 /** AI panel text: the plain strings are what the API sent (or the English fallback); `…Msg` references are phrased from the
- * "data" catalogue (sample answers in mock mode, fixed prompts, freshness). Model replies from the live API stay as sent. */
+ * "data" catalogue (fixed prompts, freshness). Model replies from the live API stay as sent. */
 export interface AiProposedAction {
   id: string;
   title: string;

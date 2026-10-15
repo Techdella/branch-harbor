@@ -1,4 +1,4 @@
-/** Wellness view models (shapes follow the API so live and sample data render the same). Money = minor units + currency. */
+/** Wellness view models (shapes follow the API). Money = minor units + currency. */
 export type WMoney = { amount: number; currency: string };
 export type Window = { weekday: number; start: string; end: string };
 export type Policy = { freeCancelHours: number; lateCancelFeePercent: number; noShowFeePercent: number; depositRefundable: boolean };

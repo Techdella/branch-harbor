@@ -1,42 +1,23 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { apiMode, enterFallback } from '../api';
 import { ApiError } from '../errors';
 import { http, type Query } from '../http/client';
 import { orgId } from '../http/workspace';
 import { useLocalizeErrorRef } from '../useErrorText';
 
-/**
- * Commerce data access. Live: `/v1/orgs/:orgId/commerce/*` (and a few shared routes). Sample mode: an in-memory
- * router with the same paths and shapes (src/lib/commerce/mock.ts). A network failure in live mode switches to the
- * sample data and the shell shows the "Offline · sample data" banner.
- */
+/** Commerce data access: `/v1/orgs/:orgId/commerce/*` (and a few shared routes). */
 type Method = 'GET' | 'POST' | 'PUT';
 
-async function mock<T>(method: Method, path: string, body?: unknown, query?: Query): Promise<T> {
-  const { mockCommerce } = await import('./mock');
-  return mockCommerce(method, path, body, query) as Promise<T>;
-}
-
 export async function cx<T>(method: Method, path: string, body?: unknown, query?: Query): Promise<T> {
-  if (apiMode() !== 'live') return mock<T>(method, path, body, query);
   const full = path.startsWith('/~') ? path.slice(2) : `/orgs/${orgId()}/commerce${path}`;
-  try {
-    if (method === 'GET') return await http.get<T>(full, query);
-    if (method === 'PUT') return await http.put<T>(full, body ?? {});
-    return await http.post<T>(full, body ?? {});
-  } catch (e) {
-    if (e instanceof ApiError && e.isNetwork) {
-      enterFallback();
-      return mock<T>(method, path, body, query);
-    }
-    throw e;
-  }
+  if (method === 'GET') return http.get<T>(full, query);
+  if (method === 'PUT') return http.put<T>(full, body ?? {});
+  return http.post<T>(full, body ?? {});
 }
 
 /** Shared org routes (approvals, connections) are addressed with `/~/orgs/:orgId/...`. */
-export const orgPath = (p: string) => `/~/orgs/${apiMode() === 'live' ? orgId() : 'org_fieldnote'}${p}`;
+export const orgPath = (p: string) => `/~/orgs/${orgId()}${p}`;
 
 export type CState<T> = { status: 'loading'; data?: T; error?: undefined } | { status: 'ready'; data: T; error?: undefined } | { status: 'error'; data?: T; error: ApiError };
 

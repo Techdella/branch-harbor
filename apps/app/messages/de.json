@@ -47,14 +47,10 @@
     "marketing": "Marketing",
     "payments": "Zahlungen",
     "team": "Team",
-    "community": "Community & Ressourcen",
     "reports": "Berichte",
     "connections": "Verbindungen",
     "settings": "Einstellungen",
-    "shared": "Gemeinsam",
     "setup": "Einrichtungsliste",
-    "restricted": "(für Ihre Rolle nicht verfügbar)",
-    "badge": "{count} erfordern Aufmerksamkeit",
     "approvals": "Freigaben"
   },
   "industries": {
@@ -81,6 +77,10 @@
     "realty": {
       "name": "Immobilien",
       "customers": "Kunden"
+    },
+    "hospitality": {
+      "name": "Hotellerie",
+      "customers": "Gäste"
     }
   },
   "shell": {
@@ -90,7 +90,6 @@
     "closeNav": "Navigation schließen",
     "collapseNav": "Einklappen",
     "expandNav": "Navigation ausklappen",
-    "industrySwitcher": "Branche (Prototyp-Umschalter)",
     "scope": "Bereich",
     "allLocations": "Alle berechtigten Standorte ({count})",
     "scopeKind": {
@@ -111,22 +110,11 @@
       "integration": "Integrationsfehler",
       "info": "Information"
     },
-    "viewingAs": "Ansicht als",
-    "roles": {
-      "hq": "Zentrale (Admin)",
-      "local": "Standortleitung",
-      "staff": "Mitarbeitende"
-    },
     "profile": "Profil",
     "profileOf": "Kontomenü von {name}",
     "language": "Sprache",
     "settings": "Einstellungen",
     "signOut": "Abmelden",
-    "sample": "Beispieldaten",
-    "sampleHint": "Integrierte Beispieldaten (NEXT_PUBLIC_USE_MOCKS).",
-    "fallback": "Offline · Beispiel",
-    "fallbackTitle": "BranchHarbor-Dienst nicht erreichbar",
-    "fallbackHint": "Bis die Verbindung zurück ist, sehen Sie Beispieldaten. Änderungen werden nicht gespeichert.",
     "signedInAs": "Ihre Rolle",
     "searchGroup": {
       "locations": "Standorte",
@@ -199,8 +187,6 @@
     "needsPermission": "Sie können die Vorschau sehen, die Freigabe erfordert jedoch {permission}."
   },
   "ops": {
-    "notInIndustry": "Dieser Bildschirm gehört zu einer anderen Branche",
-    "notInIndustryBody": "Wechseln Sie die Branche in der Navigation oder kehren Sie zur Übersicht zurück.",
     "laterTitle": "{name} ist nicht in der ersten Version",
     "laterBadge": "Geplant · noch nicht verfügbar",
     "studios": {
@@ -369,8 +355,6 @@
         "later": "Vorbestellungen mit Zubereitungsdatum, Catering-Angebote und Produktionsübersichten folgen nach den Abholbestellungen."
       }
     },
-    "switchTo": "Zu {industry} wechseln",
-    "backToOverview": "Zurück zur Übersicht",
     "realty": {
       "pulse": {
         "title": "Überblick",
@@ -400,12 +384,6 @@
         "title": "Portal-Feeds",
         "description": "Vorschau der Inseratsfeeds für Immobilienportale. Nur Sandbox – es wird nichts gesendet."
       }
-    }
-  },
-  "later": {
-    "community": {
-      "title": "Community & Ressourcen",
-      "body": "Ankündigungen, gemeinsame Dokumente und Support-Austausch zwischen Zentrale und Standorten folgen in einem späteren Release. Bis dahin verwaltet die Zentrale Richtlinien und Markendokumente."
     }
   },
   "table": {
@@ -1658,25 +1636,6 @@
     "scope": "Bereich",
     "scopeHint": "Die Standorte, für die diese Rolle gilt.",
     "wholeOrg": "Alle freigegebenen Standorte",
-    "role": {
-      "org_owner": "Organisationsinhaber",
-      "hq_admin": "Admin der Zentrale",
-      "regional_manager": "Regionalleitung",
-      "franchise_owner": "Franchisenehmer",
-      "location_manager": "Standortleitung",
-      "staff": "Mitarbeitende / Trainer / Coach",
-      "marketing_contributor": "Marketing-Mitwirkende",
-      "finance": "Finanznutzer"
-    },
-    "roleHelp": {
-      "hq_admin": "Vorlagen, Standorte, Richtlinien und freigegebene Berichte. Enthält standardmäßig keine Kundendaten.",
-      "regional_manager": "Standortaufsicht und Freigaben in den zugewiesenen Regionen.",
-      "franchise_owner": "Lokaler Betrieb, erlaubte Zahlungen und Personal der eigenen Standorte.",
-      "location_manager": "Tagesgeschäft und lokale Veröffentlichung für zugewiesene Standorte.",
-      "staff": "Nur relevante Pläne, Anwesenheit oder Bestellungen für die zugewiesene Arbeit.",
-      "marketing_contributor": "Erstellt Inhalte; veröffentlicht nur mit Berechtigung.",
-      "finance": "Zahlungen, Abgleich und erlaubte Erstattungen."
-    },
     "send": "Einladung senden",
     "cancel": "Abbrechen",
     "invited": "Einladung an {email} gesendet.",
@@ -1693,8 +1652,7 @@
     },
     "footer": "Support-Zugriff ist autorisiert, zeitlich begrenzt und protokolliert.",
     "tab": {
-      "members": "Mitglieder & Rollen",
-      "schedule": "Dienstplan"
+      "members": "Mitglieder & Rollen"
     },
     "schedule": {
       "title": "Dienstplan des Teams",
@@ -1772,7 +1730,6 @@
     "email": "E-Mail",
     "workEmail": "Geschäftliche E-Mail",
     "password": "Passwort",
-    "demoPassword": "Beispielmodus: Jedes Passwort mit mindestens 10 Zeichen funktioniert.",
     "forgot": "Passwort vergessen?",
     "signIn": "Anmelden",
     "noAccount": "Neu bei BranchHarbor?",
@@ -1784,9 +1741,6 @@
     "languageNote": "Ihr Konto verwendet die oben gewählte Sprache. Sie können sie jederzeit ändern.",
     "haveAccount": "Bereits ein Konto?",
     "verifyTitle": "Prüfen Sie Ihre E-Mails",
-    "verifySub": "Wir haben einen 6-stelligen Code an {email} gesendet.",
-    "code": "Bestätigungscode",
-    "codeHint": "Beispielmodus: Beliebige 6 Ziffern funktionieren; 000000 zeigt den Zustand „Code abgelaufen“.",
     "verify": "E-Mail bestätigen",
     "resend": "Neuen Code senden",
     "resent": "Ein neuer Code ist unterwegs.",

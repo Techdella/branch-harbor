@@ -161,7 +161,7 @@ export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
   ],
   foods: [
     ops('menu', 'Menu', 'Menus, item builder, availability and ingredients.', ['menu', 'builder', 'availability', 'ingredients']),
-    ops('orders', 'Orders & kitchen', 'Orders, kitchen display, pickup, delivery, tables, catering and meal plans.', ['orders', 'kitchen', 'pickup', 'delivery', 'tables', 'catering', 'mealplans']),
+    ops('food_orders', 'Orders & kitchen', 'Orders, kitchen display, pickup, delivery, tables, catering and meal plans.', ['orders', 'kitchen', 'pickup', 'delivery', 'tables', 'catering', 'mealplans']),
     ops('ordering_settings', 'Ordering settings', 'Online ordering rules per location.', ['ordering']),
     ops('food_reports', 'Food reports', 'Sales, prep times and waste.', ['foodreports']),
   ],
@@ -378,7 +378,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   finance: {
     key: 'finance', name: 'Finance', description: 'Payments, refunds, reconciliation and financial reports. Royalties and payouts at HQ level.',
     primaryWorkspace: 'finance', defaultScope: 'organization',
-    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'] },
+    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': V },
   },
   legal: {
     key: 'legal', name: 'Legal', description: 'Franchise agreements, disclosure and compliance across the network.',

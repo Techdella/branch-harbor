@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Icon, cx } from '@bh/ui';
-import { Banner } from '../ui/States';
+import { Button, Icon, LogoMark, cx } from '@bh/ui';
+import { canSeeRoute } from '@/lib/access';
+import { NotAvailable } from '../screens/NotAvailable';
+import { LoadingBlock } from '../ui/States';
 import { AppProvider, useApp } from './AppContext';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -72,14 +74,10 @@ function Shell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <TopBar onOpenNav={() => setMobileNav(true)} />
-        {app.apiMode === 'fallback' && (
-          <Banner tone="warning" title={t('fallbackTitle')}>
-            {t('fallbackHint')}
-          </Banner>
-        )}
         <div className="flex items-start gap-3">
           <main id="main" ref={mainRef} tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-3 outline-none">
-            {app.ready ? children : null}
+            {/* No padlocks: a route outside the person's access shows "not available" and never loads its data. */}
+            {canSeeRoute(path, app.capabilities, app.industry) ? children : <NotAvailable />}
           </main>
           {app.aiOpen && xl && (
             <div className="sticky top-3 w-[380px] shrink-0">
@@ -101,10 +99,37 @@ function Shell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Before the workspace is loaded: loading, or a proper offline / error state (never sample data). */
+function Gate({ children }: { children: ReactNode }) {
+  const t = useTranslations('access');
+  const app = useApp();
+  if (app.ready) return <Shell>{children}</Shell>;
+  if (app.loadState === 'loading')
+    return (
+      <div className="mx-auto flex min-h-viewport w-full max-w-3xl flex-col justify-center gap-4 p-4" aria-busy="true">
+        <span className="sr-only" role="status">{t('loading')}</span>
+        <LoadingBlock variant="cards" rows={3} label={t('loading')} />
+      </div>
+    );
+  const offline = app.loadState === 'offline';
+  return (
+    <div className="flex min-h-viewport items-center justify-center p-4">
+      <div role="alert" className="flex w-full max-w-md flex-col items-center gap-3 rounded-xl bg-surface px-6 py-12 text-center">
+        <LogoMark size={40} />
+        <h1 className="text-h3 font-bold">{offline ? t('offline.title') : t('error.title')}</h1>
+        <p className="text-sm text-stone">{offline ? t('offline.body') : t('error.body')}</p>
+        <Button icon="refresh" onClick={app.retry}>
+          {t('offline.retry')}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <AppProvider>
-      <Shell>{children}</Shell>
+      <Gate>{children}</Gate>
     </AppProvider>
   );
 }

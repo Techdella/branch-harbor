@@ -50,7 +50,7 @@ export function fieldMessage(t: Translate, msg: string): string {
   return msg;
 }
 
-/** The English sentence the API (or the mock layer) sent, phrased in the viewer's language when the code is known. */
+/** The English sentence the API sent, phrased in the viewer's language when the code is known. */
 function messageFor(t: Translate, locale: string, e: { code: string; message: string; details?: Record<string, unknown>; fields?: Record<string, string> }): string {
   const d = e.details ?? {};
   const currency = typeof d.currency === 'string' ? (d.currency as Currency) : undefined;

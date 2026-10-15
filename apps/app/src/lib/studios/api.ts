@@ -1,11 +1,8 @@
 'use client';
 
-/**
- * Studios full-product client: the live implementation calls `/v1/orgs/:orgId/studios/...`; sample mode (and the
- * offline fallback) uses `./mock`. Same view models either way.
- */
+/** Studios full-product client: `/v1/orgs/:orgId/studios/...`. */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ApiError, apiMode, enterFallback } from '../api';
+import { ApiError } from '../api';
 import { http } from '../http/client';
 import { orgId } from '../http/workspace';
 import type {
@@ -118,34 +115,9 @@ const liveApi: StudioApi = {
   aiAudiences: (locationId) => http.post<{ proposals: AiAudience[]; notes: string[] }>(o('/ai/follow-up-audiences'), { locationId }),
 };
 
-let mockInstance: StudioApi | null = null;
-async function mock(): Promise<StudioApi> {
-  if (!mockInstance) mockInstance = (await import('./mock')).studioMockApi;
-  return mockInstance;
-}
-
-/** Live API with the same offline fallback as the rest of the app. */
+/** The live Studios client. */
 export async function getStudioApi(): Promise<StudioApi> {
-  if (apiMode() !== 'live') return mock();
-  const m = await mock();
-  return new Proxy(liveApi, {
-    get(target, prop) {
-      const fn = Reflect.get(target, prop) as (...a: unknown[]) => Promise<unknown>;
-      // Not an API method (e.g. `then` when the proxy is awaited): behave like a plain object.
-      if (typeof fn !== 'function') return fn;
-      return async (...args: unknown[]) => {
-        try {
-          return await fn(...args);
-        } catch (e) {
-          if (e instanceof ApiError && e.isNetwork) {
-            enterFallback();
-            return (Reflect.get(m, prop) as (...a: unknown[]) => Promise<unknown>)(...args);
-          }
-          throw e;
-        }
-      };
-    },
-  });
+  return liveApi;
 }
 
 export type StudioResource<T> = { status: 'loading'; data?: T; error?: undefined } | { status: 'ready'; data: T; error?: undefined } | { status: 'error'; data?: T; error: ApiError };

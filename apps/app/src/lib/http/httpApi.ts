@@ -75,6 +75,8 @@ async function maybe<T>(p: Promise<T>, fallback: T): Promise<T> {
 const ROLE_LABEL: Record<string, string> = {
   org_owner: 'Organisation owner', hq_admin: 'HQ admin', regional_manager: 'Regional manager', franchise_owner: 'Franchise owner',
   location_manager: 'Location manager', staff: 'Staff', marketing_contributor: 'Marketing contributor', finance: 'Finance user', customer: 'Customer',
+  vp_franchise: 'VP Franchise', cmo: 'CMO', brand_lead: 'Brand lead', digital_marketer: 'Digital marketer', instructor_trainer: 'Instructor-trainer',
+  operations_manager: 'Operations manager', legal: 'Legal',
 };
 
 /** Scope label plus its catalogue key (data `scope.*`); location scopes are just the location name. */
@@ -100,7 +102,7 @@ function scopeLabel(scope: { kind: string; id: string; name?: string | null }): 
 
 interface ApiMember {
   user: { id: string; name: string; email: string };
-  assignments: { id: string; role: string; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string }[];
+  assignments: { id: string; role: string; roleName?: string; customRoleId?: string | null; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string }[];
 }
 let memberCache: { org: string; at: number; list: ApiMember[] } | null = null;
 async function members(): Promise<ApiMember[]> {
@@ -198,6 +200,7 @@ function overviewMetrics(ind: IndustryKey, r: ApiReport): Metric[] {
     foods: [
       metricOf('orders', 'Pickup orders', 'receipt', P.blush, M.foodOrders, (v) => ({ kind: 'count', value: sumRecord(v) })),
     ],
+    hospitality: [],
     // Real Estate KPIs (listings, funnel, volume per currency) live on Operations → Pulse (/v1/orgs/:id/realty/reports).
     realty: [],
   };
@@ -312,6 +315,7 @@ const AI_SUGGESTIONS: Record<IndustryKey, [text: string, multiLocation?: boolean
   commerce: [['Explain this week’s order trend'], ['Draft product copy', false, true], ['Which stores failed the last sync?', true]],
   foods: [['Summarize today’s orders by location', true], ['Draft menu copy', false, true], ['Plan a lunch promotion', false, true]],
   realty: [['Which offices need attention?', true], ['Draft a campaign for new listings', false, true], ['Summarize inquiries this week']],
+  hospitality: [],
 };
 
 /* ------------------------------------------------------------------ */
@@ -1203,7 +1207,6 @@ export function devVerificationToken(): string | null {
 }
 
 const httpApiCore: Omit<BranchHarborApi, 'business'> = {
-  mode: 'live',
 
   auth: {
     session: async (ctx) => {
@@ -1510,7 +1513,7 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
       const [list, invites] = await Promise.all([members(), maybe(http.get<{ items: { id: string; email: string; role: string; scope?: { kind: string; id: string }; scopeKind?: string; scopeId?: string; createdAt: string; expiresAt?: string; status?: string }[] }>(o('/invitations')).then(items), [])]);
       const out: Member[] = list.map((x) => ({
         id: x.user.id, name: x.user.name, email: x.user.email,
-        assignments: x.assignments.map((a) => ({ ...roleOf(a.role), ...scopeMsg(a.scope) })),
+        assignments: x.assignments.map((a) => ({ ...(a.role === 'custom' ? { role: a.roleName ?? 'Custom role' } : roleOf(a.role)), ...scopeMsg(a.scope) })),
         lastActive: `Member since ${fmtDate(x.assignments[0]?.createdAt)}`,
         ...(x.assignments[0]?.createdAt ? { lastActiveKey: 'member.since', lastActiveParams: { date: dateArg(x.assignments[0].createdAt) } } : {}),
         status: 'active',
@@ -1533,7 +1536,10 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     },
     invite: async (input) => {
       const s = input.scopeId === 'all' ? { kind: 'organization', id: orgId() } : apiScope(input.scopeId);
-      await http.post(o('/invitations'), { email: input.email, role: (input.roleKey ?? 'staff') as Role, scope: s });
+      // Custom roles are passed as `custom:<id>`.
+      const key = input.roleKey ?? 'staff';
+      const custom = key.startsWith('custom:') ? key.slice(7) : null;
+      await http.post(o('/invitations'), custom ? { email: input.email, role: 'custom', customRoleId: custom, scope: s } : { email: input.email, role: key as Role, scope: s });
       return { id: `inv_${Date.now()}`, name: input.email, email: input.email, assignments: [{ role: input.role, roleKey: input.roleKey, scopeLabel: input.scopeLabel }], lastActive: 'Invitation sent just now', lastActiveKey: 'member.invitedJustNow', status: 'invited' };
     },
   },

@@ -1,7 +1,6 @@
 /**
  * Business mode: an independent (single-location) business or a network (spec §6: "Single-location customers skip
- * network concepts unless they add a location"). Types for the `business` API namespace, shared by the live and
- * sample implementations.
+ * network concepts unless they add a location"). Types for the `business` API namespace.
  */
 import type { Currency } from '@bh/shared';
 import type { RequestContext } from './types';

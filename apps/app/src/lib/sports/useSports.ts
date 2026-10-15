@@ -8,7 +8,7 @@ import { useLocalizeErrorRef } from '../useErrorText';
 
 const toApiError = (e: unknown) => (e instanceof ApiError ? e : new ApiError('unknown_error', e instanceof Error ? e.message : 'Something went wrong.'));
 
-/** Loads sports data through the live or sample client. Same states as `useApi` (works with <Async>). */
+/** Loads sports data through the Sports client. Same states as `useApi` (works with <Async>). */
 export function useSports<T>(fn: (c: SportsClient) => Promise<T>, deps: unknown[], enabled = true) {
   const [res, setRes] = useState<Resource<T>>({ status: 'loading' });
   const localize = useLocalizeErrorRef();

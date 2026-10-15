@@ -1,11 +1,8 @@
 'use client';
 
-/**
- * Real Estate data layer. Live: /v1/orgs/:orgId/realty/* (see apps/api/README.md → realty). Sample mode (and the
- * automatic offline fallback) use lib/realty/mock.ts, which enforces the same visibility rules per persona.
- */
+/** Real Estate data layer: /v1/orgs/:orgId/realty/* (see apps/api/README.md → realty). */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ApiError, apiMode, enterFallback } from '../api';
+import { ApiError } from '../api';
 import { http } from '../http/client';
 import { orgId } from '../http/workspace';
 import type { ViewRole } from '../types';
@@ -91,36 +88,9 @@ const live: RealtyApi = {
   aiDecision: (_c, id, decision) => http.post(R(`/ai/proposals/${id}/decision`), { decision }),
 };
 
-/** Live with automatic fallback to sample data when the API is unreachable (same rule as the main data layer). */
-function withFallback(l: RealtyApi, m: RealtyApi): RealtyApi {
-  return new Proxy(l, {
-    get(target, prop) {
-      // Not a thenable (the proxy is awaited when returned from an async function).
-      if (typeof Reflect.get(target, prop) !== 'function') return undefined;
-      const lv = Reflect.get(target, prop) as (...a: unknown[]) => Promise<unknown>;
-      const mv = Reflect.get(m, prop) as (...a: unknown[]) => Promise<unknown>;
-      return async (...args: unknown[]) => {
-        if (apiMode() === 'fallback') return mv(...args);
-        try {
-          return await lv(...args);
-        } catch (e) {
-          if (e instanceof ApiError && e.isNetwork) {
-            enterFallback();
-            return mv(...args);
-          }
-          throw e;
-        }
-      };
-    },
-  });
-}
-
-let instance: RealtyApi | null = null;
+/** The live Real Estate client. */
 export async function getRealtyApi(): Promise<RealtyApi> {
-  if (instance) return instance;
-  const { mockRealty } = await import('./mock');
-  instance = apiMode() === 'mock' ? mockRealty : withFallback(live, mockRealty);
-  return instance;
+  return live;
 }
 
 type Res<T> = { status: 'loading'; data?: T; error?: undefined } | { status: 'ready'; data: T; error?: undefined } | { status: 'error'; data?: T; error: ApiError };

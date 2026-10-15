@@ -1,0 +1,379 @@
+{
+  "access": {
+    "loading": "Ihr Arbeitsbereich wird geladen…",
+    "offline": {
+      "title": "BranchHarbor ist nicht erreichbar",
+      "body": "Prüfen Sie Ihre Internetverbindung. Solange der Dienst nicht erreichbar ist, wird nichts angezeigt – Ihre Daten sind sicher.",
+      "retry": "Erneut versuchen"
+    },
+    "error": {
+      "title": "Etwas ist schiefgelaufen",
+      "body": "Ihr Unternehmenskonto konnte nicht geladen werden. Versuchen Sie es gleich noch einmal."
+    },
+    "notAvailable": {
+      "title": "Nicht verfügbar",
+      "body": "Diese Seite gehört nicht zu Ihren Zugriffsrechten bei {business}. Wenn Sie sie brauchen, bitten Sie einen Inhaber oder Admin, sie hinzuzufügen.",
+      "home": "Zu Ihrer Startseite"
+    },
+    "nav": {
+      "settings": "Einstellungen",
+      "schedule": "Dienstplan"
+    },
+    "account": {
+      "title": "Unternehmenskonten",
+      "switch": "Unternehmenskonto wechseln",
+      "switchFrom": "Unternehmenskonto: {name}. Konto wechseln",
+      "note": "Jedes Unternehmenskonto hat genau eine Branche und eigene Daten. Zwischen Konten wird nichts geteilt."
+    },
+    "switcher": {
+      "label": "Arbeitsbereiche",
+      "current": "Arbeitsbereich: {workspace}. Arbeitsbereich wechseln"
+    },
+    "workspace": {
+      "network": {
+        "name": "Netzwerk",
+        "description": "Standorte, Freigaben und Leistung im ganzen Netzwerk."
+      },
+      "operations": {
+        "name": "Betrieb",
+        "description": "Das Tagesgeschäft an Ihren Standorten."
+      },
+      "sales": {
+        "name": "Vertrieb",
+        "description": "Kunden, Leads und Franchise-Entwicklung."
+      },
+      "marketing": {
+        "name": "Marketing",
+        "description": "Websites, Kampagnen und Marke."
+      },
+      "finance": {
+        "name": "Finanzen",
+        "description": "Zahlungen, Erstattungen, Lizenzgebühren und Auszahlungen."
+      },
+      "legal": {
+        "name": "Recht & Compliance",
+        "description": "Verträge, Offenlegung und Registrierungen."
+      },
+      "training": {
+        "name": "Schulung",
+        "description": "Kurse und Zertifizierungen für das Netzwerk."
+      },
+      "community": {
+        "name": "Community",
+        "description": "Ankündigungen und Support für das Netzwerk."
+      }
+    },
+    "home": {
+      "navLabel": "Start: {workspace}",
+      "modules": "In diesem Arbeitsbereich",
+      "emptyTitle": "Noch nichts anzuzeigen",
+      "emptyBody": "Ihre Zugriffsrechte bei {business} umfassen noch keine Bildschirme. Bitten Sie einen Inhaber oder Admin um die Module, die Sie brauchen."
+    },
+    "actions": {
+      "view": {
+        "name": "Ansehen",
+        "description": "Bildschirme und Datensätze sehen."
+      },
+      "edit": {
+        "name": "Bearbeiten",
+        "description": "Datensätze anlegen und ändern."
+      },
+      "publish": {
+        "name": "Veröffentlichen / freigeben",
+        "description": "Änderungen live schalten und über Anfragen entscheiden."
+      },
+      "export": {
+        "name": "Exportieren",
+        "description": "Daten und Berichte herunterladen."
+      }
+    },
+    "scope": {
+      "region": "Region",
+      "owner_group": "Inhabergruppe",
+      "location": "Standort"
+    },
+    "modules": {
+      "network": {
+        "locations": {
+          "name": "Standorte",
+          "description": "Das Standortverzeichnis: Adressen, Öffnungszeiten, Status und lokale Angaben."
+        },
+        "approvals": {
+          "name": "Freigaben",
+          "description": "Anfragen, die auf eine Entscheidung warten: Erstattungen über dem Limit, lokale Werbeausgaben, Schichttausch und Website-Änderungen."
+        },
+        "reports": {
+          "name": "Berichte",
+          "description": "Leistungsberichte für die Standorte im Bereich. Umsatzzahlen erfordern zusätzlich Zahlungen."
+        },
+        "templates": {
+          "name": "Markenvorlagen & Richtlinien",
+          "description": "Website-Vorlagen, gesperrte Markenfelder und Richtlinien der Zentrale."
+        }
+      },
+      "operations": {
+        "schedule": {
+          "name": "Dienstplan",
+          "description": "Schichten, Zeiterfassung und Schichttausch."
+        },
+        "classes": {
+          "name": "Kurse & Stundenplan",
+          "description": "Kursplan, Räume, Buchungen, Anwesenheit und Vertretungen."
+        },
+        "memberships": {
+          "name": "Mitglieder & Preise",
+          "description": "Mitglieder, Mitgliedschaften, Kursguthaben, Angebote und On-Demand-Kurse."
+        },
+        "studio_insights": {
+          "name": "Studio-Auswertungen",
+          "description": "Auslastung, Anwesenheit und Kündigungen."
+        },
+        "programmes": {
+          "name": "Programme & Anmeldungen",
+          "description": "Saisons, Programme, Anmeldungen und Salden."
+        },
+        "teams": {
+          "name": "Teams & Einheiten",
+          "description": "Teams, Spielplan, Anwesenheit, Ankündigungen und Erziehungsberechtigte."
+        },
+        "sports_reports": {
+          "name": "Sportberichte",
+          "description": "Berichte zu Anmeldungen und Anwesenheit."
+        },
+        "appointments": {
+          "name": "Termine",
+          "description": "Kalender, Behandler und ihre Zeiten."
+        },
+        "services": {
+          "name": "Leistungen & Pakete",
+          "description": "Leistungen, Pakete, Gutscheine und Aufnahmeformulare."
+        },
+        "clients": {
+          "name": "Klienten",
+          "description": "Verlauf, Vorlieben und Notizen der Klienten."
+        },
+        "wellness_insights": {
+          "name": "Wellness-Auswertungen",
+          "description": "Auslastung, Stornierungen und Umsatz."
+        },
+        "orders": {
+          "name": "Bestellungen",
+          "description": "Bestellungen, Retouren und Geschenkkarten."
+        },
+        "catalogue": {
+          "name": "Katalog",
+          "description": "Produkte, Sortiment je Standort und Onlineshop."
+        },
+        "inventory": {
+          "name": "Bestand",
+          "description": "Lagerbestand, Umlagerungen und Einkauf."
+        },
+        "commerce_insights": {
+          "name": "Handels-Auswertungen",
+          "description": "Verkaufs- und Bestandsberichte."
+        },
+        "menu": {
+          "name": "Speisekarte",
+          "description": "Speisekarten, Gerichte-Editor, Verfügbarkeit und Zutaten."
+        },
+        "food_orders": {
+          "name": "Bestellungen & Küche",
+          "description": "Bestellungen, Küchendisplay, Abholung, Lieferung, Tische, Catering und Essenspläne."
+        },
+        "ordering_settings": {
+          "name": "Bestelleinstellungen",
+          "description": "Regeln für Onlinebestellungen je Standort."
+        },
+        "food_reports": {
+          "name": "Gastro-Berichte",
+          "description": "Umsatz, Zubereitungszeiten und Abfall."
+        },
+        "listings": {
+          "name": "Inserate",
+          "description": "Inserate, Freigaben und Portal-Feeds."
+        },
+        "enquiries": {
+          "name": "Anfragen & Besichtigungen",
+          "description": "Anfragen, Besichtigungen und Angebote."
+        },
+        "agents": {
+          "name": "Makler & Büros",
+          "description": "Makler, Büros und Lead-Verteilung."
+        }
+      },
+      "sales": {
+        "customers": {
+          "name": "Kunden",
+          "description": "Kundendatensätze mit Kontaktdaten und Verlauf (personenbezogene Daten)."
+        }
+      },
+      "marketing": {
+        "website_builder": {
+          "name": "Websites",
+          "description": "Standort-Websites: Seiten, Freigaben, Veröffentlichung und Domains."
+        },
+        "campaigns": {
+          "name": "Kampagnen",
+          "description": "Marketingkampagnen und Angebote für die Standorte im Bereich."
+        }
+      },
+      "finance": {
+        "payments": {
+          "name": "Zahlungen",
+          "description": "Transaktionen, Erstattungen, Abgleich und Zahlungskonten (Finanzdaten)."
+        }
+      },
+      "settings": {
+        "business": {
+          "name": "Unternehmenseinstellungen",
+          "description": "Unternehmensdaten, Standardwerte, Datenfreigabe und KI-Einstellungen."
+        },
+        "team": {
+          "name": "Team & Zugriff",
+          "description": "Personen einladen und festlegen, was jede Person sieht."
+        },
+        "connections": {
+          "name": "Verbindungen",
+          "description": "Verbundene Systeme und ihr Synchronisationsstatus."
+        },
+        "billing": {
+          "name": "Abrechnung",
+          "description": "Ihr BranchHarbor-Tarif und Ihre Rechnungen."
+        },
+        "audit": {
+          "name": "Audit-Protokoll",
+          "description": "Wer hat was wann geändert."
+        },
+        "ai": {
+          "name": "KI-Assistent",
+          "description": "BranchHarbor AI zu Daten befragen, die diese Person ohnehin sieht. Er entwirft und schlägt nur vor."
+        }
+      }
+    },
+    "roles": {
+      "custom": "Eigene Rolle",
+      "org_owner": {
+        "name": "Inhaber",
+        "description": "Alles, einschließlich Abrechnung, Eigentum und Zugriffsverwaltung."
+      },
+      "hq_admin": {
+        "name": "Admin der Zentrale",
+        "description": "Steuert das Netzwerk: Standorte, Markenvorlagen, Websites, Marketing, Freigaben, Berichte, Team und Verbindungen. Ohne Kundendaten oder Zahlungen."
+      },
+      "vp_franchise": {
+        "name": "VP Franchise",
+        "description": "Franchise-Entwicklung: Pipeline, Offenlegung und Verträge, neue Standorte und Schulung der Franchisenehmer."
+      },
+      "cmo": {
+        "name": "Marketingleitung",
+        "description": "Das gesamte Marketing im Netzwerk, Markenvorlagen, Marketingberichte und Coaching der Franchisenehmer im lokalen Marketing."
+      },
+      "brand_lead": {
+        "name": "Markenverantwortliche/r",
+        "description": "Markenmaterial, Markenvorlagen und gesperrte Felder, Websites und Social-Media-Inhalte."
+      },
+      "digital_marketer": {
+        "name": "Digital-Marketing",
+        "description": "Websites, Social Media, Anzeigen, E-Mail und Netzwerkkampagnen. Ohne Betrieb, Kunden oder Finanzen."
+      },
+      "instructor_trainer": {
+        "name": "Ausbilder/in",
+        "description": "Lehrerausbildung und Kurs-Interessenten, dazu Betrieb nur lesend, um Kurse zu sehen."
+      },
+      "operations_manager": {
+        "name": "Betriebsleitung",
+        "description": "Zahlungen und Finanzen, Websites, Verbindungen, Kunden und Tagesgeschäft."
+      },
+      "finance": {
+        "name": "Finanzen",
+        "description": "Zahlungen, Erstattungen, Abgleich und Finanzberichte. Lizenzgebühren und Auszahlungen auf Ebene der Zentrale."
+      },
+      "legal": {
+        "name": "Recht",
+        "description": "Franchiseverträge, Offenlegung und Compliance im ganzen Netzwerk."
+      },
+      "regional_manager": {
+        "name": "Regionalleitung",
+        "description": "Aufsicht über die Standorte einer Region: Betrieb, Berichte, Website-Freigaben und Kampagnenentwürfe."
+      },
+      "franchise_owner": {
+        "name": "Franchisenehmer",
+        "description": "Das komplette Dashboard für die eigenen Standorte: Betrieb, Marketing, Kunden, Zahlungen und Team. Nichts von anderen Franchisenehmern oder privaten Bereichen der Zentrale."
+      },
+      "location_manager": {
+        "name": "Standortleitung",
+        "description": "Führt einen Standort im Alltag: Betrieb, Kunden, lokale Website und Kampagnenentwürfe."
+      },
+      "staff": {
+        "name": "Mitarbeitende",
+        "description": "Die zugewiesene Arbeit: Pläne, Anwesenheit und Bestellungen am eigenen Standort."
+      },
+      "marketing_contributor": {
+        "name": "Marketing-Mitarbeit",
+        "description": "Entwirft Website- und Kampagnenänderungen; Veröffentlichen braucht jemanden mit Freigaberecht."
+      },
+      "customer": {
+        "name": "Kunde",
+        "description": "Eigene Buchungen, Bestellungen und Einstellungen in der Kunden-App."
+      }
+    },
+    "roleAdmin": {
+      "tab": "Rollen",
+      "intro": "Beginnen Sie mit einer Rollenvorlage oder erstellen Sie eine eigene Rolle, indem Sie Module und Aktionen ankreuzen. Jede Person sieht nur, was ihre Rolle erlaubt.",
+      "create": "Rolle erstellen",
+      "createTitle": "Neue Rolle",
+      "editTitle": "{name} bearbeiten",
+      "customTitle": "Ihre Rollen",
+      "customEmpty": "Noch keine eigenen Rollen. Erstellen Sie eine, wenn eine Aufgabe zu keiner Vorlage passt.",
+      "assigned": "{count, plural, =0 {Niemand hat diese Rolle.} one {# Person hat diese Rolle.} other {# Personen haben diese Rolle.}}",
+      "edit": "Bearbeiten",
+      "templatesTitle": "Rollenvorlagen",
+      "name": "Rollenname",
+      "description": "Beschreibung",
+      "startFrom": "Ausgehend von",
+      "blank": "Nichts angekreuzt",
+      "appliesNow": "{count, plural, one {Speichern ändert den Zugriff von # Person sofort.} other {Speichern ändert den Zugriff von # Personen sofort.}}",
+      "save": "Rolle speichern",
+      "delete": "Rolle löschen",
+      "scopeNote": "Wofür eine Rolle gilt (ganzes Unternehmen, Region, Inhabergruppe oder Standort), legen Sie bei der Vergabe fest. Module nur für die Zentrale funktionieren nur mit unternehmensweiten Rollen."
+    },
+    "editor": {
+      "column": "Zugriff",
+      "open": "Was sieht diese Person?",
+      "title": "Was sieht {name}?",
+      "intro": "Kreuzen Sie die Module und Aktionen an, die diese Person braucht. Nicht Angekreuztes wird ihr gar nicht angezeigt, und der Server lehnt es ab.",
+      "close": "Schließen",
+      "cancel": "Abbrechen",
+      "role": "Rolle",
+      "customRoles": "Ihre Rollen",
+      "scope": "Gilt für",
+      "wholeBusiness": "Das ganze Unternehmen",
+      "overrides": "{count, plural, one {# persönliche Änderung} other {# persönliche Änderungen}}",
+      "ownerNote": "Inhaber haben immer vollen Zugriff. Eigentum kann nur ein anderer Inhaber ändern.",
+      "readOnly": "Sie können diesen Zugriff sehen, aber nicht ändern: Er enthält Rechte, die Sie selbst nicht haben.",
+      "notEditable": "Sie können den Zugriff dieser Person nicht ändern.",
+      "hqOnly": "Nur Zentrale: erfordert Zugriff auf das ganze Unternehmen.",
+      "notHeld": "Sie haben dieses Recht selbst nicht und können es daher nicht vergeben.",
+      "save": "Zugriff speichern",
+      "reset": "Auf Rolle zurücksetzen",
+      "saved": "Gespeichert. {added, plural, =0 {Nichts hinzugefügt} one {# Aktion hinzugefügt} other {# Aktionen hinzugefügt}}, {removed, plural, =0 {nichts entfernt} one {# entfernt} other {# entfernt}}. Gilt ab dem nächsten Klick.",
+      "previewTitle": "Was die Person sieht",
+      "previewSwitcher": "Ein Umschalter mit {count} Arbeitsbereichen.",
+      "previewSingle": "Ein Arbeitsbereich, kein Umschalter.",
+      "previewNothing": "Noch nichts – kreuzen Sie mindestens ein Modul an."
+    }
+  },
+  "demo": {
+    "ribbon": "Demo-Umgebung",
+    "ribbonNote": "Beispielunternehmen und -personen zur Vorführung. Keine echten Kunden.",
+    "picker": {
+      "title": "Demo-Konto ausprobieren",
+      "body": "Melden Sie sich als beliebige Person dieser Beispielteams an, um zu sehen, was jede Rolle sieht.",
+      "failed": "Demo-Konten sind gerade nicht verfügbar.",
+      "loading": "Demo-Konten werden geladen…",
+      "accounts": "{industry} · {count, plural, one {# Konto} other {# Konten}}",
+      "signIn": "Anmelden",
+      "signingIn": "Anmeldung…"
+    }
+  }
+}

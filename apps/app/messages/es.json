@@ -47,14 +47,10 @@
     "marketing": "Marketing",
     "payments": "Pagos",
     "team": "Equipo",
-    "community": "Comunidad y recursos",
     "reports": "Informes",
     "connections": "Conexiones",
     "settings": "Ajustes",
-    "shared": "Compartido",
     "setup": "Lista de configuración",
-    "restricted": "(no disponible para tu rol)",
-    "badge": "{count} requieren atención",
     "approvals": "Aprobaciones"
   },
   "industries": {
@@ -81,6 +77,10 @@
     "realty": {
       "name": "Inmobiliaria",
       "customers": "Clientes"
+    },
+    "hospitality": {
+      "name": "Hostelería",
+      "customers": "Huéspedes"
     }
   },
   "shell": {
@@ -90,7 +90,6 @@
     "closeNav": "Cerrar navegación",
     "collapseNav": "Contraer",
     "expandNav": "Expandir navegación",
-    "industrySwitcher": "Sector (selector del prototipo)",
     "scope": "Ámbito",
     "allLocations": "Todas las sedes autorizadas ({count})",
     "scopeKind": {
@@ -111,22 +110,11 @@
       "integration": "Fallo de integración",
       "info": "Información"
     },
-    "viewingAs": "Viendo como",
-    "roles": {
-      "hq": "Admin. central",
-      "local": "Gerente de sede",
-      "staff": "Personal"
-    },
     "profile": "Perfil",
     "profileOf": "Menú de la cuenta de {name}",
     "language": "Idioma",
     "settings": "Ajustes",
     "signOut": "Cerrar sesión",
-    "sample": "Datos de ejemplo",
-    "sampleHint": "Datos de ejemplo integrados (NEXT_PUBLIC_USE_MOCKS).",
-    "fallback": "Sin conexión · ejemplo",
-    "fallbackTitle": "No se pudo conectar con BranchHarbor",
-    "fallbackHint": "Verás datos de ejemplo hasta que vuelva la conexión. Los cambios no se guardan.",
     "signedInAs": "Tu rol",
     "searchGroup": {
       "locations": "Sedes",
@@ -199,8 +187,6 @@
     "needsPermission": "Puedes previsualizar, pero aprobar requiere {permission}."
   },
   "ops": {
-    "notInIndustry": "Esta pantalla pertenece a otro sector",
-    "notInIndustryBody": "Cambia de sector en la navegación o vuelve al resumen.",
     "laterTitle": "{name} no está en la primera versión",
     "laterBadge": "Previsto · aún no disponible",
     "studios": {
@@ -369,8 +355,6 @@
         "later": "Los pedidos anticipados con fecha de elaboración, presupuestos de catering y resúmenes de producción llegarán después de los pedidos para recoger."
       }
     },
-    "switchTo": "Cambiar a {industry}",
-    "backToOverview": "Volver al resumen",
     "realty": {
       "pulse": {
         "title": "Pulso",
@@ -400,12 +384,6 @@
         "title": "Feeds de portales",
         "description": "Vista previa de los feeds de anuncios para portales inmobiliarios. Solo entorno de pruebas: no se envía nada."
       }
-    }
-  },
-  "later": {
-    "community": {
-      "title": "Comunidad y recursos",
-      "body": "Los anuncios, documentos compartidos y conversaciones de soporte entre la sede central y las sedes llegarán en una próxima versión. Por ahora, las políticas y los documentos de marca los gestiona la sede central."
     }
   },
   "table": {
@@ -1658,25 +1636,6 @@
     "scope": "Ámbito",
     "scopeHint": "Las sedes a las que se aplica este rol.",
     "wholeOrg": "Todas las sedes autorizadas",
-    "role": {
-      "org_owner": "Propietario de la organización",
-      "hq_admin": "Administrador de la sede central",
-      "regional_manager": "Responsable regional",
-      "franchise_owner": "Franquiciado",
-      "location_manager": "Responsable de sede",
-      "staff": "Equipo / instructor / entrenador",
-      "marketing_contributor": "Colaborador de marketing",
-      "finance": "Usuario de finanzas"
-    },
-    "roleHelp": {
-      "hq_admin": "Plantillas, sedes, políticas e informes autorizados. Por defecto no incluye datos de clientes.",
-      "regional_manager": "Supervisión de sedes y aprobaciones en las regiones asignadas.",
-      "franchise_owner": "Operaciones locales, pagos permitidos y equipo de las sedes propias.",
-      "location_manager": "Gestión diaria y publicación local de las sedes asignadas.",
-      "staff": "Solo horarios, asistencia o pedidos relevantes para su trabajo.",
-      "marketing_contributor": "Redacta contenido; solo publica si está autorizado.",
-      "finance": "Pagos, conciliación y reembolsos permitidos."
-    },
     "send": "Enviar invitación",
     "cancel": "Cancelar",
     "invited": "Invitación enviada a {email}.",
@@ -1693,8 +1652,7 @@
     },
     "footer": "El acceso de soporte está autorizado, tiene un límite de tiempo y queda registrado.",
     "tab": {
-      "members": "Miembros y roles",
-      "schedule": "Horario"
+      "members": "Miembros y roles"
     },
     "schedule": {
       "title": "Horario del equipo",
@@ -1772,7 +1730,6 @@
     "email": "Correo electrónico",
     "workEmail": "Correo del trabajo",
     "password": "Contraseña",
-    "demoPassword": "Modo de ejemplo: sirve cualquier contraseña de 10 caracteres o más.",
     "forgot": "¿Olvidaste la contraseña?",
     "signIn": "Iniciar sesión",
     "noAccount": "¿Nuevo en BranchHarbor?",
@@ -1784,9 +1741,6 @@
     "languageNote": "Tu cuenta usa el idioma elegido arriba. Puedes cambiarlo cuando quieras.",
     "haveAccount": "¿Ya tienes cuenta?",
     "verifyTitle": "Revisa tu correo",
-    "verifySub": "Enviamos un código de 6 dígitos a {email}.",
-    "code": "Código de verificación",
-    "codeHint": "Modo de ejemplo: sirven 6 dígitos cualesquiera; 000000 muestra el estado de código caducado.",
     "verify": "Verificar correo",
     "resend": "Enviar un código nuevo",
     "resent": "Te hemos enviado un nuevo código.",

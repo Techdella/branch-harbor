@@ -43,7 +43,7 @@ export function PartnerIntegrationsPanel({ industry }: { industry: 'foods' | 're
   const pt = usePartnerText();
   const locale = useLocale();
   const app = useApp();
-  const res = usePartners((a) => a.overview(industry), [industry, app.apiMode]);
+  const res = usePartners((a) => a.overview(industry), [industry]);
   const [editing, setEditing] = useState<{ entry: PartnerCatalogEntry; loc: PartnerLocation; conn: PartnerConnection | null } | null>(null);
   const [note, setNote] = useState<{ tone: NoteTone; text: string } | null>(null);
   const act = usePartnersMutation(async (a, kind: 'test' | 'enable' | 'disable' | 'live' | 'sandbox' | 'rotate' | 'menu' | 'busyOn' | 'busyOff', c: PartnerConnection) => {
@@ -73,7 +73,7 @@ export function PartnerIntegrationsPanel({ industry }: { industry: 'foods' | 're
         <h2 id="partners-title" className="text-lg font-extrabold">{t('title')}</h2>
         <p className="text-sm text-stone">{industry === 'foods' ? t('descriptionFoods') : t('descriptionRealty')}</p>
       </div>
-      <Banner tone="info" icon="lock">{app.live ? t('sandboxBanner') : t('sampleBanner')}</Banner>
+      <Banner tone="info" icon="lock">{t('sandboxBanner')}</Banner>
       {note && <Banner tone={note.tone} live="polite">{note.text}</Banner>}
       {act.error && <Banner tone="danger" live="assertive">{act.error.message}</Banner>}
       {res.status === 'loading' && !res.data && <LoadingBlock variant="cards" rows={2} />}

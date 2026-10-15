@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button, Field, Input } from '@bh/ui';
 import { useMutation } from '@/lib/useApi';
-import { USE_MOCKS } from '@/lib/api';
+import { DEMO_MODE } from '@/lib/demo';
+import { DemoPicker } from '../demo/DemoPicker';
 import { devVerificationToken } from '@/lib/http/httpApi';
 import { AuthFrame, ErrorSummary } from './AuthFrame';
 
@@ -15,7 +16,7 @@ export function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get('next'));
-  const [email, setEmail] = useState(USE_MOCKS ? 'jamie@stillwater-sample.com' : '');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const m = useMutation((api) => api.auth.signIn({ email, password }));
   return (
@@ -31,7 +32,7 @@ export function SignInForm() {
       >
         {m.error && <ErrorSummary message={m.error.message} fields={m.error.fields} />}
         <Field label={t('email')} error={m.error?.fields?.email}>{(p) => <Input id={p.id} type="email" autoComplete="email" aria-invalid={p.invalid} aria-describedby={p.describedBy} value={email} onChange={(e) => setEmail(e.target.value)} />}</Field>
-        <Field label={t('password')} error={m.error?.fields?.password} hint={USE_MOCKS ? t('demoPassword') : undefined}>{(p) => <Input id={p.id} type="password" autoComplete="current-password" aria-invalid={p.invalid} aria-describedby={p.describedBy} value={password} onChange={(e) => setPassword(e.target.value)} />}</Field>
+        <Field label={t('password')} error={m.error?.fields?.password}>{(p) => <Input id={p.id} type="password" autoComplete="current-password" aria-invalid={p.invalid} aria-describedby={p.describedBy} value={password} onChange={(e) => setPassword(e.target.value)} />}</Field>
         <div className="flex justify-end">
           <Link href="/forgot-password" className="text-sm font-semibold underline">
             {t('forgot')}
@@ -41,6 +42,7 @@ export function SignInForm() {
           {t('signIn')}
         </Button>
       </form>
+      {DEMO_MODE && <DemoPicker next={next} />}
     </AuthFrame>
   );
 }
@@ -104,14 +106,13 @@ export function VerifyEmailForm() {
   const auto = useRef(false);
   // Live API: email links land here with ?token=…; verify straight away.
   useEffect(() => {
-    if (USE_MOCKS) return;
     setDevToken(devVerificationToken());
     if (!linkToken || auto.current) return;
     auto.current = true;
     void m.run(linkToken).then((r) => r && router.push('/onboarding'));
   }, [linkToken]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <AuthFrame title={t('verifyTitle')} subtitle={USE_MOCKS ? t('verifySub', { email }) : t('verifySubLink', { email })}>
+    <AuthFrame title={t('verifyTitle')} subtitle={t('verifySubLink', { email })}>
       <form
         noValidate
         className="flex flex-col gap-4"
@@ -122,21 +123,15 @@ export function VerifyEmailForm() {
         }}
       >
         {m.error && <ErrorSummary message={m.error.message} />}
-        {USE_MOCKS ? (
-          <Field label={t('code')} hint={t('codeHint')} error={m.error?.fields?.code}>
-            {(p) => <Input id={p.id} inputMode="numeric" autoComplete="one-time-code" maxLength={6} aria-invalid={p.invalid} aria-describedby={p.describedBy} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} className="tabular text-center text-2xl font-bold tracking-[0.4em]" />}
-          </Field>
-        ) : (
-          <Field label={t('linkLabel')} hint={t('linkHint')} error={m.error?.fields?.code}>
-            {(p) => <Input id={p.id} autoComplete="off" aria-invalid={p.invalid} aria-describedby={p.describedBy} value={code} onChange={(e) => setCode(e.target.value.trim())} />}
-          </Field>
-        )}
-        {!USE_MOCKS && devToken && (
+        <Field label={t('linkLabel')} hint={t('linkHint')} error={m.error?.fields?.code}>
+          {(p) => <Input id={p.id} autoComplete="off" aria-invalid={p.invalid} aria-describedby={p.describedBy} value={code} onChange={(e) => setCode(e.target.value.trim())} />}
+        </Field>
+        {devToken && (
           <button type="button" onClick={() => setCode(devToken)} className="self-start text-xs font-semibold underline">
             {t('devToken')}
           </button>
         )}
-        <Button type="submit" size="lg" loading={m.pending} disabled={USE_MOCKS ? code.length !== 6 : code.length < 10}>
+        <Button type="submit" size="lg" loading={m.pending} disabled={code.length < 10}>
           {t('verify')}
         </Button>
         <Button
@@ -146,7 +141,7 @@ export function VerifyEmailForm() {
           onClick={async () => {
             if (await resend.run()) {
               setResent(true);
-              if (!USE_MOCKS) setDevToken(devVerificationToken());
+              setDevToken(devVerificationToken());
             }
           }}
         >

@@ -47,14 +47,10 @@
     "marketing": "Marketing",
     "payments": "Paiements",
     "team": "Équipe",
-    "community": "Communauté et ressources",
     "reports": "Rapports",
     "connections": "Connexions",
     "settings": "Paramètres",
-    "shared": "Commun",
     "setup": "Liste de configuration",
-    "restricted": "(non disponible pour votre rôle)",
-    "badge": "{count} à traiter",
     "approvals": "Validations"
   },
   "industries": {
@@ -81,6 +77,10 @@
     "realty": {
       "name": "Immobilier",
       "customers": "Clients"
+    },
+    "hospitality": {
+      "name": "Hôtellerie",
+      "customers": "Clients"
     }
   },
   "shell": {
@@ -90,7 +90,6 @@
     "closeNav": "Fermer la navigation",
     "collapseNav": "Réduire",
     "expandNav": "Développer la navigation",
-    "industrySwitcher": "Secteur (sélecteur du prototype)",
     "scope": "Périmètre",
     "allLocations": "Tous les établissements autorisés ({count})",
     "scopeKind": {
@@ -111,22 +110,11 @@
       "integration": "Échec d’intégration",
       "info": "Information"
     },
-    "viewingAs": "Vue en tant que",
-    "roles": {
-      "hq": "Admin siège",
-      "local": "Responsable d’établissement",
-      "staff": "Personnel"
-    },
     "profile": "Profil",
     "profileOf": "Menu du compte de {name}",
     "language": "Langue",
     "settings": "Paramètres",
     "signOut": "Se déconnecter",
-    "sample": "Données d’exemple",
-    "sampleHint": "Données d’exemple intégrées (NEXT_PUBLIC_USE_MOCKS).",
-    "fallback": "Hors ligne · exemple",
-    "fallbackTitle": "Impossible de joindre le service BranchHarbor",
-    "fallbackHint": "Vous voyez des données d’exemple jusqu’au retour de la connexion. Les modifications ne sont pas enregistrées.",
     "signedInAs": "Votre rôle",
     "searchGroup": {
       "locations": "Établissements",
@@ -199,8 +187,6 @@
     "needsPermission": "Vous pouvez prévisualiser, mais l’approbation requiert {permission}."
   },
   "ops": {
-    "notInIndustry": "Cet écran appartient à un autre secteur",
-    "notInIndustryBody": "Changez de secteur dans la navigation ou revenez à la vue d’ensemble.",
     "laterTitle": "{name} n’est pas dans la première version",
     "laterBadge": "Prévu · pas encore disponible",
     "studios": {
@@ -369,8 +355,6 @@
         "later": "Les précommandes avec dates de préparation, devis traiteur et récapitulatifs de production arriveront après la commande à emporter."
       }
     },
-    "switchTo": "Passer à {industry}",
-    "backToOverview": "Retour à la vue d’ensemble",
     "realty": {
       "pulse": {
         "title": "Tableau de bord",
@@ -400,12 +384,6 @@
         "title": "Flux portails",
         "description": "Aperçu des flux d’annonces pour les portails immobiliers. Bac à sable uniquement — rien n’est envoyé."
       }
-    }
-  },
-  "later": {
-    "community": {
-      "title": "Communauté et ressources",
-      "body": "Les annonces, documents partagés et échanges d’assistance entre le siège et les établissements arriveront dans une prochaine version. En attendant, les politiques et documents de marque sont gérés par le siège."
     }
   },
   "table": {
@@ -1658,25 +1636,6 @@
     "scope": "Périmètre",
     "scopeHint": "Les établissements concernés par ce rôle.",
     "wholeOrg": "Tous les établissements autorisés",
-    "role": {
-      "org_owner": "Propriétaire de l’organisation",
-      "hq_admin": "Administrateur du siège",
-      "regional_manager": "Responsable régional",
-      "franchise_owner": "Franchisé",
-      "location_manager": "Responsable d’établissement",
-      "staff": "Équipe / professeur / entraîneur",
-      "marketing_contributor": "Contributeur marketing",
-      "finance": "Utilisateur finance"
-    },
-    "roleHelp": {
-      "hq_admin": "Modèles, établissements, politiques et rapports autorisés. N’inclut pas les données clients par défaut.",
-      "regional_manager": "Supervision des établissements et validations dans les régions attribuées.",
-      "franchise_owner": "Opérations locales, paiements autorisés et équipe des établissements détenus.",
-      "location_manager": "Gestion quotidienne et publication locale pour les établissements attribués.",
-      "staff": "Plannings, présences ou commandes utiles au travail attribué uniquement.",
-      "marketing_contributor": "Rédige des contenus ; ne publie que s’il y est autorisé.",
-      "finance": "Paiements, rapprochement et remboursements autorisés."
-    },
     "send": "Envoyer l’invitation",
     "cancel": "Annuler",
     "invited": "Invitation envoyée à {email}.",
@@ -1693,8 +1652,7 @@
     },
     "footer": "L’accès de l’assistance est autorisé, limité dans le temps et journalisé.",
     "tab": {
-      "members": "Membres et rôles",
-      "schedule": "Planning"
+      "members": "Membres et rôles"
     },
     "schedule": {
       "title": "Planning de l’équipe",
@@ -1772,7 +1730,6 @@
     "email": "E-mail",
     "workEmail": "E-mail professionnel",
     "password": "Mot de passe",
-    "demoPassword": "Mode exemple : tout mot de passe de 10 caractères ou plus fonctionne.",
     "forgot": "Mot de passe oublié ?",
     "signIn": "Se connecter",
     "noAccount": "Nouveau sur BranchHarbor ?",
@@ -1784,9 +1741,6 @@
     "languageNote": "Votre compte utilise la langue choisie ci-dessus. Vous pouvez la changer à tout moment.",
     "haveAccount": "Vous avez déjà un compte ?",
     "verifyTitle": "Vérifiez votre e-mail",
-    "verifySub": "Nous avons envoyé un code à 6 chiffres à {email}.",
-    "code": "Code de vérification",
-    "codeHint": "Mode exemple : n’importe quels 6 chiffres fonctionnent ; 000000 affiche l’état « code expiré ».",
     "verify": "Vérifier l’e-mail",
     "resend": "Envoyer un nouveau code",
     "resent": "Un nouveau code est en route.",

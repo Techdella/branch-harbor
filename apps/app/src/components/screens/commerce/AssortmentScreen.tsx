@@ -14,7 +14,7 @@ export function AssortmentScreen() {
   const t = useCt();
   const app = useApp();
   const [loc, setLoc] = useStore();
-  const res = useCommerce(() => call<{ location: { id: string; name: string; currency: string }; items: AssortmentItem[] }>('GET', `/locations/${loc}/assortment`), [loc, app.apiMode], !!loc);
+  const res = useCommerce(() => call<{ location: { id: string; name: string; currency: string }; items: AssortmentItem[] }>('GET', `/locations/${loc}/assortment`), [loc], !!loc);
   const manager = app.can('locations.read') && app.can('operations.write');
   const reset = useAction(async () => { const r = await call<{ reset: number; items: AssortmentItem[] }>('POST', `/locations/${loc}/assortment/reset`, {}); if (res.data) res.setData({ ...res.data, items: r.items }); return r; });
   const local = res.data?.items.flatMap((i) => i.variants).filter((v) => v.priceOrigin === 'local').length ?? 0;

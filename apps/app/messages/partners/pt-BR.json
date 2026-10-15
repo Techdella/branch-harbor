@@ -3,7 +3,6 @@
   "descriptionFoods": "Parceiros de entrega e pedidos de PDV / marketplaces por unidade. Sem credenciais, tudo roda em sandbox — nada é enviado.",
   "descriptionRealty": "Feeds para portais imobiliários por escritório. Sem credenciais do portal, os feeds são prévias em sandbox — nada é enviado nem publicado.",
   "sandboxBanner": "O sandbox fica claramente separado do modo real: uma conexão só entra em produção quando as credenciais estão completas, um teste de conexão é aprovado e você a muda para real.",
-  "sampleBanner": "Dados de exemplo: os parceiros nunca são contatados no modo de exemplo.",
   "status": {
     "not_configured": "Não configurada",
     "disabled": "Desligada",

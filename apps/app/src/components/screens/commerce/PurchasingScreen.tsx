@@ -15,8 +15,8 @@ export function PurchasingScreen() {
   const app = useApp();
   const [open, setOpen] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const pos = useCommerce(() => call<{ items: PurchaseOrderView[] }>('GET', '/purchase-orders'), [app.org.id, app.apiMode]);
-  const sups = useCommerce(() => call<{ items: Supplier[] }>('GET', '/suppliers'), [app.org.id, app.apiMode]);
+  const pos = useCommerce(() => call<{ items: PurchaseOrderView[] }>('GET', '/purchase-orders'), [app.org.id]);
+  const sups = useCommerce(() => call<{ items: Supplier[] }>('GET', '/suppliers'), [app.org.id]);
   const [sup, setSup] = useState({ name: '', currency: app.org.defaultCurrency as string, email: '' });
   const addSup = useAction(async () => { const r = await call<Supplier>('POST', '/suppliers', { name: sup.name, currency: sup.currency, email: sup.email || null }); sups.reload(); setSup({ ...sup, name: '', email: '' }); return r; });
   const manager = app.can('locations.read') && app.can('operations.write');

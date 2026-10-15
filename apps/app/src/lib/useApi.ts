@@ -15,7 +15,7 @@ function toApiError(e: unknown): ApiError {
 }
 
 /**
- * Loads data through the active API (live or mock). Re-runs when `deps` change.
+ * Loads data through the API. Re-runs when `deps` change.
  * Returns the resource plus `reload` and `setData` for optimistic-free local updates
  * after a server-acknowledged mutation.
  */

@@ -7,6 +7,7 @@ import foodsEn from '../../messages/foods/en.json';
 import partnersEn from '../../messages/partners/en.json';
 import paymentsEn from '../../messages/payments/en.json';
 import dataEn from '../../messages/data/en.json';
+import accessEn from '../../messages/access/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -34,6 +35,8 @@ export default getRequestConfig(async () => {
   // Text the data layer builds (metrics, history entries, roles…) is referenced by key: namespace "data" in messages/data/*.json.
   let messages: Messages = merge({ ...(en as Messages), single: singleEn as Messages, partners: partnersEn as Messages, data: dataEn as Messages }, foodsEn as Messages);
   messages = merge(messages, paymentsEn as Messages);
+  // Access model (workspaces, modules, roles, Team & access) and the demo site: namespaces "access" and "demo".
+  messages = merge(messages, accessEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
@@ -42,6 +45,7 @@ export default getRequestConfig(async () => {
     messages = merge(messages, { ...translated, single, partners, data });
     messages = merge(messages, (await import(`../../messages/foods/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/payments/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/access/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

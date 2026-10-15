@@ -1,0 +1,379 @@
+{
+  "access": {
+    "loading": "Chargement de votre espace…",
+    "offline": {
+      "title": "Impossible de joindre BranchHarbor",
+      "body": "Vérifiez votre connexion Internet. Rien n’est affiché tant que le service est injoignable, et vos données sont en sécurité.",
+      "retry": "Réessayer"
+    },
+    "error": {
+      "title": "Un problème est survenu",
+      "body": "Impossible de charger votre compte d’entreprise. Réessayez dans un instant."
+    },
+    "notAvailable": {
+      "title": "Non disponible",
+      "body": "Cette page ne fait pas partie de vos accès chez {business}. Si vous en avez besoin, demandez à un propriétaire ou un administrateur de l’ajouter.",
+      "home": "Aller à votre accueil"
+    },
+    "nav": {
+      "settings": "Paramètres",
+      "schedule": "Planning du personnel"
+    },
+    "account": {
+      "title": "Comptes d’entreprise",
+      "switch": "Changer de compte d’entreprise",
+      "switchFrom": "Compte d’entreprise : {name}. Changer de compte",
+      "note": "Chaque compte d’entreprise a un seul secteur et ses propres données. Rien n’est partagé entre les comptes."
+    },
+    "switcher": {
+      "label": "Espaces de travail",
+      "current": "Espace de travail : {workspace}. Changer d’espace"
+    },
+    "workspace": {
+      "network": {
+        "name": "Réseau",
+        "description": "Établissements, approbations et performance de tout le réseau."
+      },
+      "operations": {
+        "name": "Opérations",
+        "description": "Le travail au quotidien dans vos établissements."
+      },
+      "sales": {
+        "name": "Ventes",
+        "description": "Clients, prospects et développement de la franchise."
+      },
+      "marketing": {
+        "name": "Marketing",
+        "description": "Sites web, campagnes et marque."
+      },
+      "finance": {
+        "name": "Finance",
+        "description": "Paiements, remboursements, redevances et versements."
+      },
+      "legal": {
+        "name": "Juridique et conformité",
+        "description": "Contrats, documents d’information et enregistrements."
+      },
+      "training": {
+        "name": "Formation",
+        "description": "Cours et certifications pour le réseau."
+      },
+      "community": {
+        "name": "Communauté",
+        "description": "Annonces et assistance pour le réseau."
+      }
+    },
+    "home": {
+      "navLabel": "Accueil {workspace}",
+      "modules": "Dans cet espace",
+      "emptyTitle": "Rien à afficher pour l’instant",
+      "emptyBody": "Vos accès chez {business} ne comprennent encore aucun écran. Demandez à un propriétaire ou un administrateur de vous donner les modules nécessaires."
+    },
+    "actions": {
+      "view": {
+        "name": "Voir",
+        "description": "Voir les écrans et les fiches."
+      },
+      "edit": {
+        "name": "Modifier",
+        "description": "Créer et modifier des fiches."
+      },
+      "publish": {
+        "name": "Publier / approuver",
+        "description": "Mettre les changements en ligne et trancher les demandes."
+      },
+      "export": {
+        "name": "Exporter",
+        "description": "Télécharger des données et des rapports."
+      }
+    },
+    "scope": {
+      "region": "Région",
+      "owner_group": "Groupe de propriétaires",
+      "location": "Établissement"
+    },
+    "modules": {
+      "network": {
+        "locations": {
+          "name": "Établissements",
+          "description": "L’annuaire des établissements : adresses, horaires, statut et informations locales."
+        },
+        "approvals": {
+          "name": "Approbations",
+          "description": "Demandes en attente de décision : remboursements au-delà du seuil, dépenses publicitaires locales, échanges de quarts et modifications de site."
+        },
+        "reports": {
+          "name": "Rapports",
+          "description": "Rapports de performance des établissements du périmètre. Les chiffres de revenus nécessitent aussi Paiements."
+        },
+        "templates": {
+          "name": "Modèles de marque et règles",
+          "description": "Modèles de site, champs de marque verrouillés et règles définies par le siège."
+        }
+      },
+      "operations": {
+        "schedule": {
+          "name": "Planning du personnel",
+          "description": "Quarts, pointage et échanges de quarts."
+        },
+        "classes": {
+          "name": "Cours et planning",
+          "description": "Planning des cours, salles, réservations, présences et remplacements."
+        },
+        "memberships": {
+          "name": "Membres et tarifs",
+          "description": "Membres, abonnements, carnets de cours, offres et cours à la demande."
+        },
+        "studio_insights": {
+          "name": "Analyses du studio",
+          "description": "Taux de remplissage, présence et attrition."
+        },
+        "programmes": {
+          "name": "Programmes et inscriptions",
+          "description": "Saisons, programmes, inscriptions et soldes."
+        },
+        "teams": {
+          "name": "Équipes et séances",
+          "description": "Équipes, calendrier, présences, annonces et responsables légaux."
+        },
+        "sports_reports": {
+          "name": "Rapports sportifs",
+          "description": "Rapports d’inscriptions et de présence."
+        },
+        "appointments": {
+          "name": "Rendez-vous",
+          "description": "Agenda, praticiens et leurs horaires."
+        },
+        "services": {
+          "name": "Prestations et forfaits",
+          "description": "Prestations, forfaits, bons cadeaux et formulaires d’accueil."
+        },
+        "clients": {
+          "name": "Clients",
+          "description": "Historique, préférences et notes des clients."
+        },
+        "wellness_insights": {
+          "name": "Analyses bien-être",
+          "description": "Taux d’occupation, annulations et revenus."
+        },
+        "orders": {
+          "name": "Commandes",
+          "description": "Commandes, retours et cartes cadeaux."
+        },
+        "catalogue": {
+          "name": "Catalogue",
+          "description": "Produits, assortiment par établissement et boutique en ligne."
+        },
+        "inventory": {
+          "name": "Stock",
+          "description": "Stock, transferts et achats."
+        },
+        "commerce_insights": {
+          "name": "Analyses commerce",
+          "description": "Rapports de ventes et de stock."
+        },
+        "menu": {
+          "name": "Menu",
+          "description": "Menus, éditeur de plats, disponibilité et ingrédients."
+        },
+        "food_orders": {
+          "name": "Commandes et cuisine",
+          "description": "Commandes, écran cuisine, retrait, livraison, tables, traiteur et formules repas."
+        },
+        "ordering_settings": {
+          "name": "Paramètres de commande",
+          "description": "Règles de commande en ligne par établissement."
+        },
+        "food_reports": {
+          "name": "Rapports restauration",
+          "description": "Ventes, temps de préparation et pertes."
+        },
+        "listings": {
+          "name": "Annonces",
+          "description": "Annonces, approbations et flux vers les portails."
+        },
+        "enquiries": {
+          "name": "Demandes et visites",
+          "description": "Demandes, visites et offres."
+        },
+        "agents": {
+          "name": "Agents et agences",
+          "description": "Agents, agences et attribution des prospects."
+        }
+      },
+      "sales": {
+        "customers": {
+          "name": "Clients",
+          "description": "Fiches clients avec coordonnées et historique (données personnelles)."
+        }
+      },
+      "marketing": {
+        "website_builder": {
+          "name": "Sites web",
+          "description": "Sites des établissements : pages, approbations, publication et domaines."
+        },
+        "campaigns": {
+          "name": "Campagnes",
+          "description": "Campagnes marketing et offres pour les établissements du périmètre."
+        }
+      },
+      "finance": {
+        "payments": {
+          "name": "Paiements",
+          "description": "Transactions, remboursements, rapprochement et comptes de paiement (données financières)."
+        }
+      },
+      "settings": {
+        "business": {
+          "name": "Paramètres de l’entreprise",
+          "description": "Coordonnées, valeurs par défaut, partage des données et préférences IA."
+        },
+        "team": {
+          "name": "Équipe et accès",
+          "description": "Inviter des personnes et décider de ce que chacune peut voir."
+        },
+        "connections": {
+          "name": "Connexions",
+          "description": "Systèmes connectés et état de leur synchronisation."
+        },
+        "billing": {
+          "name": "Facturation",
+          "description": "Votre forfait BranchHarbor et vos factures."
+        },
+        "audit": {
+          "name": "Journal d’audit",
+          "description": "Qui a modifié quoi, et quand."
+        },
+        "ai": {
+          "name": "Assistant IA",
+          "description": "Interroger BranchHarbor AI sur les données que cette personne voit déjà. Il ne fait que rédiger et proposer."
+        }
+      }
+    },
+    "roles": {
+      "custom": "Rôle personnalisé",
+      "org_owner": {
+        "name": "Propriétaire",
+        "description": "Tout, y compris la facturation, la propriété et la gestion des accès."
+      },
+      "hq_admin": {
+        "name": "Administrateur du siège",
+        "description": "Pilote le réseau : établissements, modèles de marque, sites, marketing, approbations, rapports, équipe et connexions. Sans fiches clients ni paiements."
+      },
+      "vp_franchise": {
+        "name": "VP Franchise",
+        "description": "Développement de la franchise : pipeline, documents d’information et contrats, nouveaux établissements et formation des franchisés."
+      },
+      "cmo": {
+        "name": "Directeur marketing",
+        "description": "Tout le marketing du réseau, modèles de marque, rapports marketing et accompagnement des franchisés en marketing local."
+      },
+      "brand_lead": {
+        "name": "Responsable de marque",
+        "description": "Ressources de marque, modèles et champs verrouillés, sites web et contenus sociaux."
+      },
+      "digital_marketer": {
+        "name": "Marketeur digital",
+        "description": "Sites web, réseaux sociaux, publicités, e-mails et campagnes réseau. Sans opérations, clients ni finance."
+      },
+      "instructor_trainer": {
+        "name": "Formateur d’instructeurs",
+        "description": "Formations des enseignants et prospects des cours, plus les opérations en lecture seule pour voir les cours."
+      },
+      "operations_manager": {
+        "name": "Responsable des opérations",
+        "description": "Paiements et finance, sites web, connexions, clients et opérations au quotidien."
+      },
+      "finance": {
+        "name": "Finance",
+        "description": "Paiements, remboursements, rapprochement et rapports financiers. Redevances et versements au niveau du siège."
+      },
+      "legal": {
+        "name": "Juridique",
+        "description": "Contrats de franchise, documents d’information et conformité dans tout le réseau."
+      },
+      "regional_manager": {
+        "name": "Responsable régional",
+        "description": "Supervision des établissements d’une région : opérations, rapports, approbations de site et brouillons de campagnes."
+      },
+      "franchise_owner": {
+        "name": "Franchisé",
+        "description": "Le tableau de bord complet pour ses propres établissements : opérations, marketing, clients, paiements et équipe. Rien des autres franchisés ni des espaces privés du siège."
+      },
+      "location_manager": {
+        "name": "Responsable d’établissement",
+        "description": "Gère un établissement au quotidien : opérations, clients, site local et brouillons de campagnes."
+      },
+      "staff": {
+        "name": "Personnel",
+        "description": "Son travail assigné : plannings, présences et commandes dans son établissement."
+      },
+      "marketing_contributor": {
+        "name": "Contributeur marketing",
+        "description": "Rédige des modifications de site et de campagne ; la publication nécessite une personne autorisée."
+      },
+      "customer": {
+        "name": "Client",
+        "description": "Ses propres réservations, commandes et préférences dans l’application client."
+      }
+    },
+    "roleAdmin": {
+      "tab": "Rôles",
+      "intro": "Partez d’un modèle de rôle ou créez le vôtre en cochant des modules et des actions. Chacun ne voit que ce que son rôle lui donne.",
+      "create": "Créer un rôle",
+      "createTitle": "Nouveau rôle",
+      "editTitle": "Modifier {name}",
+      "customTitle": "Vos rôles",
+      "customEmpty": "Aucun rôle personnalisé pour l’instant. Créez-en un quand un poste ne correspond à aucun modèle.",
+      "assigned": "{count, plural, =0 {Personne n’a ce rôle.} one {# personne a ce rôle.} other {# personnes ont ce rôle.}}",
+      "edit": "Modifier",
+      "templatesTitle": "Modèles de rôle",
+      "name": "Nom du rôle",
+      "description": "Description",
+      "startFrom": "Partir de",
+      "blank": "Rien de coché",
+      "appliesNow": "{count, plural, one {L’enregistrement modifie immédiatement l’accès de # personne.} other {L’enregistrement modifie immédiatement l’accès de # personnes.}}",
+      "save": "Enregistrer le rôle",
+      "delete": "Supprimer le rôle",
+      "scopeNote": "Le périmètre d’un rôle (toute l’entreprise, une région, un groupe de propriétaires ou un établissement) se choisit quand vous l’attribuez. Les modules réservés au siège ne fonctionnent qu’avec un rôle sur toute l’entreprise."
+    },
+    "editor": {
+      "column": "Accès",
+      "open": "Que voit cette personne ?",
+      "title": "Que voit {name} ?",
+      "intro": "Cochez les modules et actions dont cette personne a besoin. Ce qui n’est pas coché ne lui est pas affiché du tout, et le serveur le refuse.",
+      "close": "Fermer",
+      "cancel": "Annuler",
+      "role": "Rôle",
+      "customRoles": "Vos rôles",
+      "scope": "S’applique à",
+      "wholeBusiness": "Toute l’entreprise",
+      "overrides": "{count, plural, one {# modification personnelle} other {# modifications personnelles}}",
+      "ownerNote": "Les propriétaires ont toujours un accès complet. Seul un autre propriétaire peut modifier la propriété.",
+      "readOnly": "Vous pouvez voir cet accès mais pas le modifier : il comprend des accès que vous n’avez pas vous-même.",
+      "notEditable": "Vous ne pouvez pas modifier l’accès de cette personne.",
+      "hqOnly": "Réservé au siège : nécessite un accès à toute l’entreprise.",
+      "notHeld": "Vous ne l’avez pas vous-même, vous ne pouvez donc pas le donner.",
+      "save": "Enregistrer l’accès",
+      "reset": "Revenir au rôle",
+      "saved": "Enregistré. {added, plural, =0 {Rien d’ajouté} one {# action ajoutée} other {# actions ajoutées}}, {removed, plural, =0 {rien de retiré} one {# retirée} other {# retirées}}. Effectif dès son prochain clic.",
+      "previewTitle": "Ce que la personne verra",
+      "previewSwitcher": "Un sélecteur avec {count} espaces de travail.",
+      "previewSingle": "Un seul espace de travail, sans sélecteur.",
+      "previewNothing": "Rien pour l’instant : cochez au moins un module."
+    }
+  },
+  "demo": {
+    "ribbon": "Environnement de démonstration",
+    "ribbonNote": "Entreprises et personnes fictives pour la démonstration. Pas de vrais clients.",
+    "picker": {
+      "title": "Essayer un compte de démonstration",
+      "body": "Connectez-vous en tant que n’importe quel membre de ces équipes fictives pour voir ce que voit chaque rôle.",
+      "failed": "Les comptes de démonstration ne sont pas disponibles pour le moment.",
+      "loading": "Chargement des comptes de démonstration…",
+      "accounts": "{industry} · {count, plural, one {# compte} other {# comptes}}",
+      "signIn": "Se connecter",
+      "signingIn": "Connexion…"
+    }
+  }
+}

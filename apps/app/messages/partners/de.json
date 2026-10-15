@@ -3,7 +3,6 @@
   "descriptionFoods": "Lieferpartner sowie Kassen- und Marktplatzbestellungen pro Standort. Ohne Zugangsdaten läuft alles in der Sandbox – es wird nichts gesendet.",
   "descriptionRealty": "Portal-Feeds pro Büro. Ohne Portal-Zugangsdaten sind die Feeds Sandbox-Vorschauen – es wird nichts gesendet oder veröffentlicht.",
   "sandboxBanner": "Sandbox und Livebetrieb sind klar getrennt: Eine Verbindung geht erst live, wenn ihre Zugangsdaten vollständig sind, ein Verbindungstest erfolgreich war und Sie sie auf live schalten.",
-  "sampleBanner": "Beispieldaten: Im Beispielmodus werden Partner nie kontaktiert.",
   "status": {
     "not_configured": "Nicht eingerichtet",
     "disabled": "Ausgeschaltet",

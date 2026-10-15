@@ -18,7 +18,7 @@ export function ReturnsScreen() {
   const app = useApp();
   const [tab, setTab] = useState<Tab>('open');
   const [open, setOpen] = useState<string | null>(null);
-  const res = useCommerce(() => call<{ items: ReturnView[] }>('GET', '/returns'), [app.org.id, app.apiMode]);
+  const res = useCommerce(() => call<{ items: ReturnView[] }>('GET', '/returns'), [app.org.id]);
   const ids = app.scope.locationIds;
   const all = (res.data?.items ?? []).filter((r) => !ids.length || ids.includes(r.locationId));
   const pick: Record<Tab, (r: ReturnView) => boolean> = { open: (r) => ['requested', 'reviewed', 'authorised', 'received'].includes(r.status), approval: (r) => r.status === 'refund_pending_approval', closed: (r) => ['resolved', 'rejected'].includes(r.status) };

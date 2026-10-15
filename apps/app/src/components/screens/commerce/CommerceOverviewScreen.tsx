@@ -13,7 +13,7 @@ import { ActionError, Money, Stat, StatusBadge, View, When, useCt } from './kit'
 export function CommerceOverviewScreen() {
   const t = useCt();
   const app = useApp();
-  const res = useCommerce(() => call<Overview>('GET', '/overview'), [app.org.id, app.apiMode]);
+  const res = useCommerce(() => call<Overview>('GET', '/overview'), [app.org.id]);
   const sync = useAction((connectionId: string) => call<{ created: number; updated: number; unchanged: number; errors: unknown[] }>('POST', orgPath(`/commerce/connections/${connectionId}/sync-orders`)));
   const ids = app.scope.locationIds;
   const inScope = (lid: string | null) => !lid || !ids.length || ids.includes(lid);

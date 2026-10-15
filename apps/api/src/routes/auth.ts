@@ -2,7 +2,8 @@ import { and, asc, eq, gt, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { signUpSchema, apiError } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { consentRecords, emailVerificationTokens, locations, roleAssignments, organizations, users } from '../db/schema/index.ts';
+import { consentRecords, customRoles, emailVerificationTokens, locations, roleAssignments, organizations, users } from '../db/schema/index.ts';
+import { roleName } from '../services/access.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { AppError, badRequest, conflict, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser, signAccessToken } from '../plugins/auth.ts';
@@ -152,12 +153,14 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
         .where(and(inArray(locations.organizationId, indepIds), isNull(locations.archivedAt))).orderBy(asc(locations.createdAt));
       for (const l of locs) if (!primary.has(l.organizationId)) primary.set(l.organizationId, l.id);
     }
-    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; customRoleId: string | null; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
+    const customIds = [...new Set(rows.map((r) => r.assignment.customRoleId).filter((x): x is string => !!x))];
+    const custom = customIds.length ? await s.db.select({ id: customRoles.id, name: customRoles.name }).from(customRoles).where(inArray(customRoles.id, customIds)) : [];
+    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; customRoleId: string | null; name: string; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
     const orgs = new Map<string, MeOrg>();
     for (const r of rows) {
       const { settings, model: _model, ...base } = r.org;
       const o = orgs.get(r.org.id) ?? { ...base, ...businessModeView({ model: r.org.model, settings }, primary.get(r.org.id) ?? null), roles: [] };
-      o.roles.push({ id: r.assignment.id, role: r.assignment.role, customRoleId: r.assignment.customRoleId, scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
+      o.roles.push({ id: r.assignment.id, role: r.assignment.role, customRoleId: r.assignment.customRoleId, name: roleName(r.assignment.role, custom.find((c) => c.id === r.assignment.customRoleId)), scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
       orgs.set(r.org.id, o);
     }
     // What each organisation shows this person (workspaces, settings, landing workspace) — for navigation only;

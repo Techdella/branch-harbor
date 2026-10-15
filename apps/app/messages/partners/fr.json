@@ -3,7 +3,6 @@
   "descriptionFoods": "Partenaires de livraison et commandes de caisse / places de marché par établissement. Sans identifiants, tout fonctionne en bac à sable — rien n’est envoyé.",
   "descriptionRealty": "Flux vers les portails immobiliers par agence. Sans identifiants de portail, les flux sont des aperçus en bac à sable — rien n’est envoyé ni publié.",
   "sandboxBanner": "Le bac à sable est clairement séparé du direct : une connexion ne passe en direct que lorsque ses identifiants sont complets, qu’un test de connexion réussit et que vous l’activez en direct.",
-  "sampleBanner": "Données d’exemple : les partenaires ne sont jamais contactés en mode exemple.",
   "status": {
     "not_configured": "Non configurée",
     "disabled": "Désactivée",

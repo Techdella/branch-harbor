@@ -15,7 +15,7 @@ export function GiftCardsScreen() {
   const app = useApp();
   const [issuing, setIssuing] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
-  const res = useCommerce(() => call<{ items: GiftCard[]; outstandingByCurrency: M[] }>('GET', '/gift-cards'), [app.org.id, app.apiMode], app.can('payments.read'));
+  const res = useCommerce(() => call<{ items: GiftCard[]; outstandingByCurrency: M[] }>('GET', '/gift-cards'), [app.org.id], app.can('payments.read'));
   if (!app.can('payments.read')) return <DeniedState permission="payments.read" />;
   return (
     <>

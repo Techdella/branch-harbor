@@ -3,7 +3,7 @@
  * (locations, regions, owner groups, websites, connections), all loaded from the API and adapted to the
  * app's view models. `AppContext` drives it; `httpApi` reads it to scope requests.
  */
-import type { Currency, Role, RoleAssignment } from '@bh/shared';
+import type { AccessSummary, Currency, Role, RoleAssignment } from '@bh/shared';
 import { ApiError } from '../errors';
 import type { IndustryKey, Location, Organization, ScopeOptionT, Session, ViewRole } from '../types';
 import { APP_INDUSTRIES } from '../types';
@@ -31,7 +31,9 @@ export interface ApiMeOrg {
   model?: 'independent' | 'network';
   isSingleLocation?: boolean;
   primaryLocationId?: string | null;
-  roles: { id: string; role: string; scope: ApiScope }[];
+  roles: { id: string; role: string; customRoleId?: string | null; name?: string; scope: ApiScope }[];
+  /** What this person sees in the organisation (workspaces, landing workspace, capabilities). */
+  access?: AccessSummary;
 }
 export interface ApiOrg {
   id: string;
@@ -245,23 +247,25 @@ const LOCAL_ROLES: Role[] = ['hq_admin', 'regional_manager', 'franchise_owner', 
 
 export function viewRoleOf(a: RoleAssignment): ViewRole {
   if (a.scope.kind === 'organization') return 'hq';
-  if (LOCAL_ROLES.includes(a.role)) return 'local';
+  if (LOCAL_ROLES.includes(a.role) || (a.role as string) === 'custom') return 'local';
   return 'staff';
 }
 
-/** "Viewing as" options: only the personas the user actually holds in the selected organisation. */
-export function availableRoles(w: Workspace | null = ws): ViewRole[] {
+/** The person's broad persona: their widest assignment (there is no "Viewing as" switch — access is what they hold). */
+export function effectiveRole(_requested?: ViewRole, w: Workspace | null = ws): ViewRole {
   const set = new Set((w?.assignments ?? []).map(viewRoleOf));
-  return (['hq', 'local', 'staff'] as const).filter((r) => set.has(r));
+  return (['hq', 'local', 'staff'] as const).find((r) => set.has(r)) ?? 'staff';
 }
 
-export function effectiveRole(requested: ViewRole, w: Workspace | null = ws): ViewRole {
-  const avail = availableRoles(w);
-  return avail.includes(requested) ? requested : (avail[0] ?? 'staff');
+/** Every assignment counts: scopes and sessions cover everything the person holds in the organisation. */
+function assignmentsFor(_role: ViewRole, w: Workspace) {
+  return w.assignments;
 }
 
-function assignmentsFor(role: ViewRole, w: Workspace) {
-  return w.assignments.filter((a) => viewRoleOf(a) === role);
+/** The selected organisation's access summary from /auth/me. */
+export function orgAccess(w: Workspace | null = ws): AccessSummary {
+  const o = w?.orgs.find((x) => x.id === w.org?.id);
+  return o?.access ?? { capabilities: [], workspaces: [], settings: [], primaryWorkspace: null };
 }
 
 function coveredLocationIds(assignments: RoleAssignment[], w: Workspace): string[] {
@@ -346,6 +350,6 @@ export function locationById(id: string | null | undefined): Location | undefine
   return ws?.locations.find((l) => l.id === id);
 }
 
-export function industriesAvailable(w: Workspace | null = ws): IndustryKey[] {
-  return [...new Set((w?.orgs ?? []).map((o) => asIndustry(o.industry)))];
+export function asIndustryKey(v: string): IndustryKey {
+  return asIndustry(v);
 }

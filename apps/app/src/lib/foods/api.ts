@@ -1,12 +1,7 @@
-/**
- * Foods (full product) client. Live mode calls apps/api `/v1/orgs/:orgId/foods/...` for the selected
- * organisation; mock mode serves the in-memory sample (./mock). Same selection and offline fallback rules
- * as the main client: a network failure retries against the mock and switches the app to "Offline · sample".
- */
+/** Foods (full product) client: apps/api `/v1/orgs/:orgId/foods/...` for the selected organisation. */
 import type { Money } from '@bh/shared';
 import { ApiError } from '../errors';
-import { apiMode, enterFallback } from '../api';
-import { USE_MOCKS, http } from '../http/client';
+import { http } from '../http/client';
 import { orgId } from '../http/workspace';
 import type {
   Builder, BuilderCategory, BuilderItem, BuilderModifier, BuilderModifierGroup, CateringEnquiry, CateringPackage, DayPart, Delivery, DeliveryZone, Driver, EffectiveItem,
@@ -17,7 +12,7 @@ import type {
 export type QuoteBody = { lines?: Array<{ description: string; menuItemId?: string | null; quantity: number; unitPriceMinor: number }>; fromPackage?: boolean; deliveryFeeMinor?: number; depositBps?: number; validDays?: number; terms?: string | null };
 
 export interface FoodsApi {
-  readonly mode: 'live' | 'mock';
+  readonly mode: 'live';
   overview(locationId?: string): Promise<FoodsOverview>;
   vocabulary(): Promise<Vocabulary>;
   builder(): Promise<Builder>;
@@ -196,34 +191,9 @@ export const liveFoodsApi: FoodsApi = {
   aiProductionSummary: (locationId, date) => http.post(o('/ai/production-summary'), { locationId, date }),
 };
 
-function withFallback(live: FoodsApi, mock: FoodsApi): FoodsApi {
-  return new Proxy(live, {
-    get(target, prop, receiver) {
-      const lv = Reflect.get(target, prop, receiver) as unknown;
-      const mv = Reflect.get(mock, prop) as unknown;
-      if (typeof lv !== 'function') return lv;
-      return async (...args: unknown[]) => {
-        if (apiMode() === 'fallback') return (mv as (...a: unknown[]) => unknown)(...args);
-        try {
-          return await (lv as (...a: unknown[]) => Promise<unknown>).apply(target, args);
-        } catch (e) {
-          if (e instanceof ApiError && e.isNetwork) {
-            enterFallback();
-            return (mv as (...a: unknown[]) => unknown)(...args);
-          }
-          throw e;
-        }
-      };
-    },
-  });
-}
-
-let instance: FoodsApi | null = null;
+/** The live Foods client. */
 export async function getFoodsApi(): Promise<FoodsApi> {
-  if (instance) return instance;
-  const { mockFoodsApi } = await import('./mock');
-  instance = USE_MOCKS ? mockFoodsApi : withFallback(liveFoodsApi, mockFoodsApi);
-  return instance;
+  return liveFoodsApi;
 }
 
 export const fmtBps = (bps: number, locale: string) => `${(bps / 100).toLocaleString(locale, { maximumFractionDigits: 2 })}%`;

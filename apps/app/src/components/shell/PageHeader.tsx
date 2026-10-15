@@ -20,8 +20,7 @@ export function PageHeader({ icon, title, description, actions, scope = true }: 
         </span>
         <div className="min-w-0">
           <div className="truncate text-[13px] text-stone">
-            {org.name}
-            {org.sample && ` (${t('common.sample')})`} · {t(`industries.${app.industry}.name`)}
+            {org.name} · {t(`industries.${app.industry}.name`)}
           </div>
           <h1 className="text-[26px] font-bold leading-tight tracking-[-0.035em] md:text-[30px]">{title}</h1>
           {description && <p className="mt-1 max-w-2xl text-sm text-stone">{description}</p>}

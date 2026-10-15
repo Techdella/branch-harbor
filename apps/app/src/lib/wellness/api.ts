@@ -1,13 +1,8 @@
 'use client';
-/**
- * Wellness data layer (full product). Live: `/v1/orgs/:orgId/wellness/...` (see apps/api/README.md). Sample: an
- * in-memory, stateful mock built from the current organisation's locations. A network failure in live mode falls
- * back to the sample data and flips the app-wide "Offline · sample data" banner (same rule as the main client).
- */
+/** Wellness data layer (full product): `/v1/orgs/:orgId/wellness/...` (see apps/api/README.md). */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError } from '../errors';
-import { enterFallback, apiMode } from '../api';
-import { USE_MOCKS, http } from '../http/client';
+import { http } from '../http/client';
 import { orgId } from '../http/workspace';
 import type { Location } from '../types';
 import type {
@@ -17,7 +12,7 @@ import type {
 import { useLocalizeErrorRef } from '../useErrorText';
 
 export interface WellnessApi {
-  readonly mode: 'live' | 'mock';
+  readonly mode: 'live';
   services(): Promise<WService[]>;
   createService(input: ServiceInput): Promise<WService>;
   updateService(id: string, patch: Partial<ServiceInput> & { active?: boolean; practitionerIds?: string[]; description?: string | null }): Promise<void>;
@@ -122,40 +117,9 @@ export const liveWellness: WellnessApi = {
   runReminders: () => http.post<Record<string, unknown>>(o('/reminders/run'), {}),
 };
 
-let mockInstance: WellnessApi | null = null;
-let mockKey = '';
-async function mockFor(locations: Location[]): Promise<WellnessApi> {
-  const key = locations.map((l) => l.id).join(',');
-  if (!mockInstance || mockKey !== key) {
-    const { createWellnessMock } = await import('./mock');
-    mockInstance = createWellnessMock(locations);
-    mockKey = key;
-  }
-  return mockInstance;
-}
-
-/** Live API with automatic fallback to sample data on network failure (never on HTTP errors). */
-export async function getWellnessApi(locations: Location[]): Promise<WellnessApi> {
-  if (USE_MOCKS || apiMode() === 'fallback') return mockFor(locations);
-  const mock = () => mockFor(locations);
-  return new Proxy(liveWellness, {
-    get(target, prop, receiver) {
-      const v = Reflect.get(target, prop, receiver) as unknown;
-      if (typeof v !== 'function') return v;
-      return async (...args: unknown[]) => {
-        try {
-          return await (v as (...a: unknown[]) => Promise<unknown>).apply(target, args);
-        } catch (e) {
-          if (e instanceof ApiError && e.isNetwork) {
-            enterFallback();
-            const m = (await mock()) as unknown as Record<string, (...a: unknown[]) => unknown>;
-            return m[prop as string]!(...args);
-          }
-          throw e;
-        }
-      };
-    },
-  });
+/** The live Wellness client (`locations` is kept for call-site compatibility). */
+export async function getWellnessApi(_locations: Location[]): Promise<WellnessApi> {
+  return liveWellness;
 }
 
 function toApiError(e: unknown): ApiError {

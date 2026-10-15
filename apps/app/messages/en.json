@@ -47,14 +47,10 @@
     "marketing": "Marketing",
     "payments": "Payments",
     "team": "Team",
-    "community": "Community & resources",
     "reports": "Reports",
     "connections": "Connections",
     "settings": "Settings",
-    "shared": "Shared",
     "setup": "Setup checklist",
-    "restricted": "(not available for your role)",
-    "badge": "{count} need attention",
     "approvals": "Approvals"
   },
   "industries": {
@@ -81,6 +77,10 @@
     "realty": {
       "name": "Real Estate",
       "customers": "Clients"
+    },
+    "hospitality": {
+      "name": "Hospitality",
+      "customers": "Guests"
     }
   },
   "shell": {
@@ -90,7 +90,6 @@
     "closeNav": "Close navigation",
     "collapseNav": "Collapse",
     "expandNav": "Expand navigation",
-    "industrySwitcher": "Industry (prototype switcher)",
     "scope": "Scope",
     "allLocations": "All authorized locations ({count})",
     "scopeKind": {
@@ -111,22 +110,11 @@
       "integration": "Integration failure",
       "info": "Information"
     },
-    "viewingAs": "Viewing as",
-    "roles": {
-      "hq": "HQ admin",
-      "local": "Location manager",
-      "staff": "Staff"
-    },
     "profile": "Profile",
     "profileOf": "Account menu for {name}",
     "language": "Language",
     "settings": "Settings",
     "signOut": "Sign out",
-    "sample": "Sample data",
-    "sampleHint": "Showing built-in sample data (NEXT_PUBLIC_USE_MOCKS).",
-    "fallback": "Offline · sample data",
-    "fallbackTitle": "Couldn't reach the BranchHarbor service",
-    "fallbackHint": "You're seeing sample data until the connection returns. Changes here are not saved to your account.",
     "signedInAs": "Your role",
     "searchGroup": {
       "locations": "Locations",
@@ -199,8 +187,6 @@
     "needsPermission": "You can preview this, but approving needs {permission}. It will be sent to someone who has it."
   },
   "ops": {
-    "notInIndustry": "This screen belongs to another industry",
-    "notInIndustryBody": "Switch industry in the navigation, or go back to the overview.",
     "laterTitle": "{name} isn't in the first release",
     "laterBadge": "Planned · not available yet",
     "studios": {
@@ -369,8 +355,6 @@
         "later": "Preorders with cooking dates, catering quotes and production summaries arrive after pickup ordering."
       }
     },
-    "switchTo": "Switch to {industry}",
-    "backToOverview": "Back to overview",
     "realty": {
       "pulse": {
         "title": "Pulse",
@@ -400,12 +384,6 @@
         "title": "Portal feeds",
         "description": "Preview listing feeds for property portals. Sandbox only — nothing is sent."
       }
-    }
-  },
-  "later": {
-    "community": {
-      "title": "Community & resources",
-      "body": "Announcements, shared documents and support discussions between headquarters and locations arrive in a later release. For now, policies and brand documents live with headquarters."
     }
   },
   "table": {
@@ -1658,25 +1636,6 @@
     "scope": "Scope",
     "scopeHint": "The locations this role applies to.",
     "wholeOrg": "All authorized locations",
-    "role": {
-      "org_owner": "Organization owner",
-      "hq_admin": "Headquarters admin",
-      "regional_manager": "Regional manager",
-      "franchise_owner": "Franchise owner",
-      "location_manager": "Location manager",
-      "staff": "Staff / instructor / coach",
-      "marketing_contributor": "Marketing contributor",
-      "finance": "Finance user"
-    },
-    "roleHelp": {
-      "hq_admin": "Templates, locations, policies and authorized reports. Does not include customer details by default.",
-      "regional_manager": "Location oversight and approvals within assigned regions.",
-      "franchise_owner": "Local operations, permitted payments and staff for owned locations.",
-      "location_manager": "Daily management and local publishing for assigned locations.",
-      "staff": "Relevant schedules, attendance or orders for assigned work only.",
-      "marketing_contributor": "Drafts content; publishes only if authorized.",
-      "finance": "Payments, reconciliation and permitted refunds."
-    },
     "send": "Send invitation",
     "cancel": "Cancel",
     "invited": "Invitation sent to {email}.",
@@ -1693,8 +1652,7 @@
     },
     "footer": "Support access is authorized, time-limited and logged.",
     "tab": {
-      "members": "Members & roles",
-      "schedule": "Schedule"
+      "members": "Members & roles"
     },
     "schedule": {
       "title": "Team schedule",
@@ -1772,7 +1730,6 @@
     "email": "Email",
     "workEmail": "Work email",
     "password": "Password",
-    "demoPassword": "Sample mode: any password of 10+ characters works.",
     "forgot": "Forgot password?",
     "signIn": "Sign in",
     "noAccount": "New to BranchHarbor?",
@@ -1784,9 +1741,6 @@
     "languageNote": "Your account uses the language selected above. You can change it any time.",
     "haveAccount": "Already have an account?",
     "verifyTitle": "Check your email",
-    "verifySub": "We sent a 6-digit code to {email}.",
-    "code": "Verification code",
-    "codeHint": "Sample mode: any 6 digits work; 000000 shows the expired-code state.",
     "verify": "Verify email",
     "resend": "Send a new code",
     "resent": "A new code is on its way.",

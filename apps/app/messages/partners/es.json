@@ -3,7 +3,6 @@
   "descriptionFoods": "Socios de entrega a domicilio y pedidos de TPV / marketplaces por sede. Sin credenciales todo funciona en sandbox: no se envía nada.",
   "descriptionRealty": "Feeds para portales inmobiliarios por oficina. Sin credenciales del portal, los feeds son vistas previas en sandbox: no se envía ni se publica nada.",
   "sandboxBanner": "El sandbox está claramente separado del modo real: una conexión solo pasa a real cuando sus credenciales están completas, una prueba de conexión se supera y tú la cambias a real.",
-  "sampleBanner": "Datos de ejemplo: en modo de ejemplo nunca se contacta con los socios.",
   "status": {
     "not_configured": "Sin configurar",
     "disabled": "Desactivada",

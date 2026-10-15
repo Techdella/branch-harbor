@@ -28,7 +28,7 @@ export function OrderDeskScreen() {
   const params = useSearchParams();
   const [filter, setFilter] = useState<Filter>('action');
   const [q, setQ] = useState('');
-  const res = useCommerce(() => call<{ items: SalesOrder[] }>('GET', '/sales-orders'), [app.org.id, app.apiMode]);
+  const res = useCommerce(() => call<{ items: SalesOrder[] }>('GET', '/sales-orders'), [app.org.id]);
   const ids = app.scope.locationIds;
   const scoped = (res.data?.items ?? []).filter((o) => !ids.length || ids.includes(o.locationId) || ids.includes(o.fulfilmentLocationId));
   const rows = scoped.filter(FILTERS[filter]).filter((o) => !q || `${o.number} ${o.customer.name ?? ''} ${o.customer.email ?? ''}`.toLowerCase().includes(q.toLowerCase()));

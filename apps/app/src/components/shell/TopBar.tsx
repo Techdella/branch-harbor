@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Avatar, Icon, LogoMark, cx } from '@bh/ui';
-import type { SearchGroup, ViewRole } from '@/lib/types';
+import type { SearchGroup } from '@/lib/types';
+import { workspace } from '@/lib/http/workspace';
 import { INDUSTRY_UI } from '@/lib/nav';
 import { getApi } from '@/lib/api';
 import { relativeTime } from '@/lib/format';
@@ -152,71 +153,32 @@ function Notifications() {
   );
 }
 
-/** "Viewing as": every persona in sample mode; with the API, only the roles the user actually holds. */
-function RoleSelect({ className }: { className?: string }) {
+/** Who you are in this business: your role names (custom roles included). Read-only — access is what you hold. */
+function RoleChip({ className }: { className?: string }) {
   const t = useTranslations('shell');
-  const ts = useTranslations('single');
-  const app = useApp();
-  const independent = app.org.model === 'independent';
-  // Sample mode also offers the independent-business demo (one location, no network concepts).
-  if (!app.live) {
-    const value = app.sampleBusiness === 'independent' ? 'independent' : app.role;
-    return (
-      <label className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas pl-3.5 pr-2 text-xs font-semibold text-stone', className)}>
-        {t('viewingAs')}
-        <select
-          value={value}
-          data-testid="persona-select"
-          onChange={(e) => {
-            const v = e.target.value;
-            if (v === 'independent') app.setSampleBusiness('independent');
-            else {
-              app.setSampleBusiness('network');
-              app.setRole(v as ViewRole);
-            }
-          }}
-          className="h-10 bg-transparent text-[13px] font-bold text-ink focus:outline-none"
-        >
-          <optgroup label={ts('personaNetwork')}>
-            {(['hq', 'local', 'staff'] as const).map((r) => (
-              <option key={r} value={r}>
-                {t(`roles.${r}`)}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label={ts('personaIndependent')}>
-            <option value="independent">{ts('personaOwner')}</option>
-          </optgroup>
-        </select>
-      </label>
-    );
-  }
-  if (app.roles.length <= 1)
-    return (
-      <span className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas px-3.5 text-xs font-semibold text-stone', className)}>
-        {t('signedInAs')}
-        <strong className="text-[13px] text-ink">{independent ? ts(`roles.${app.role}`) : t(`roles.${app.role}`)}</strong>
-      </span>
-    );
+  const names = useRoleNames();
+  if (!names) return null;
   return (
-    <label className={cx('flex h-11 items-center gap-1.5 rounded-full bg-canvas pl-3.5 pr-2 text-xs font-semibold text-stone', className)}>
-      {t('viewingAs')}
-      <select value={app.role} onChange={(e) => app.setRole(e.target.value as ViewRole)} className="h-10 bg-transparent text-[13px] font-bold text-ink focus:outline-none">
-        {app.roles.map((r) => (
-          <option key={r} value={r}>
-            {independent ? ts(`roles.${r}`) : t(`roles.${r}`)}
-          </option>
-        ))}
-      </select>
-    </label>
+    <span className={cx('flex h-11 max-w-[280px] items-center gap-1.5 rounded-full bg-canvas px-3.5 text-xs font-semibold text-stone', className)} data-testid="role-chip">
+      {t('signedInAs')}
+      <strong className="truncate text-[13px] text-ink">{names}</strong>
+    </span>
   );
+}
+
+function useRoleNames() {
+  const t = useTranslations('access.roles');
+  const app = useApp();
+  const roles = workspace()?.orgs.find((o) => o.id === app.org.id)?.roles ?? [];
+  const names = [...new Set(roles.map((r) => (r.role === 'custom' ? (r.name ?? t('custom')) : t.has(`${r.role}.name`) ? t(`${r.role}.name`) : r.role)))];
+  return names.join(', ');
 }
 
 function ProfileMenu() {
   const t = useTranslations('shell');
-  const ts = useTranslations('single');
   const app = useApp();
   const router = useRouter();
+  const roleNames = useRoleNames();
   return (
     <Popover
       label={t('profile')}
@@ -233,15 +195,16 @@ function ProfileMenu() {
             <div className="min-w-0">
               <div className="truncate text-sm font-bold">{app.session.user.name}</div>
               <div className="truncate text-xs text-stone">{app.session.user.email}</div>
-              <div className="mt-0.5 text-xs font-semibold">{app.org.model === 'independent' ? ts(`roles.${app.role}`) : t(`roles.${app.role}`)}</div>
+              <div className="mt-0.5 text-xs font-semibold">{roleNames}</div>
             </div>
           </div>
-          <RoleSelect className="md:hidden" />
           <LanguageSelect className="px-2 py-1" />
-          <Link href="/settings" onClick={close} className="flex items-center gap-2 rounded-sm px-2 py-2 text-sm font-semibold hover:bg-canvas">
-            <Icon name="settings" size={16} />
-            {t('settings')}
-          </Link>
+          {(app.hasModule('settings.business') || app.hasModule('settings.billing')) && (
+            <Link href="/settings" onClick={close} className="flex items-center gap-2 rounded-sm px-2 py-2 text-sm font-semibold hover:bg-canvas">
+              <Icon name="settings" size={16} />
+              {t('settings')}
+            </Link>
+          )}
           <button
             type="button"
             onClick={async () => {
@@ -270,21 +233,15 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
         </button>
         <LogoMark size={30} />
         <span className="min-w-0 flex-1" />
-        <AiButton compact />
+        {app.hasModule('settings.ai') && <AiButton compact />}
         <Notifications />
         <ProfileMenu />
       </div>
       <ScopePicker className="w-full md:w-auto" compact />
       <Search />
       <div className="hidden items-center gap-2 md:ml-auto md:flex">
-        {app.apiMode !== 'live' && (
-          <span title={app.apiMode === 'fallback' ? t('fallbackHint') : t('sampleHint')} className="hidden items-center gap-1.5 rounded-full bg-butter px-3 py-1.5 text-xs font-bold xl:inline-flex">
-            <Icon name="info" size={13} />
-            {app.apiMode === 'fallback' ? t('fallback') : t('sample')}
-          </span>
-        )}
-        <RoleSelect />
-        <AiButton />
+        <RoleChip className="hidden xl:flex" />
+        {app.hasModule('settings.ai') && <AiButton />}
         <Notifications />
         <ProfileMenu />
       </div>

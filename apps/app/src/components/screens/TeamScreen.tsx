@@ -7,66 +7,78 @@ import { Avatar, Badge, Button, DataTable, Field, Icon, Input, Select, Tabs } fr
 import type { Member, ShiftView } from '@/lib/types';
 import { addDays, dateInZone, fmtTime, fmtYmd, weekStart, zoneLabel } from '@/lib/format';
 import { useApi, useMutation } from '@/lib/useApi';
-import { INDEPENDENT_ROLES } from '@bh/shared';
+import { accessApi, useAccess } from '@/lib/http/access';
+import { MemberAccessPanel, RolesTab, useRoleName } from './team/AccessEditor';
 import { useApp } from '../shell/AppContext';
 import { useBusinessMode } from '@/lib/useBusinessMode';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { useDataText } from '../ui/useDataText';
 
-const ROLE_OPTIONS = ['hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance'] as const;
-/** Independent businesses: owner, manager, staff, marketing contributor, finance — no HQ, regional or franchise roles. */
-const INDEPENDENT_ROLE_OPTIONS = INDEPENDENT_ROLES;
-const ORG_WIDE_ROLES: readonly string[] = ['org_owner', 'finance'];
-
+/** Team & access: members with "What can this person see?", and the business's roles. The staff schedule lives in Operations. */
 export function TeamScreen() {
   const t = useTranslations('team');
+  const ta = useTranslations('access');
   const app = useApp();
-  const canMembers = app.can('members.manage');
-  const [tab, setTab] = useState<'members' | 'schedule'>(canMembers ? 'members' : 'schedule');
-  if (!canMembers && !app.can('operations.read')) return <DeniedState permission="operations.read" />;
+  const [tab, setTab] = useState<'members' | 'roles'>('members');
+  if (!app.hasModule('settings.team')) return <DeniedState />;
+  const canEdit = app.capabilities.has('settings.team:edit');
   return (
     <>
       <PageHeader icon="user" title={t('title')} description={t('description')} />
-      <Tabs
-        items={[...(canMembers ? [{ key: 'members' as const, label: t('tab.members') }] : []), ...(app.can('operations.read') ? [{ key: 'schedule' as const, label: t('tab.schedule') }] : [])]}
-        value={tab}
-        onChange={setTab}
-      />
-      {tab === 'members' && canMembers ? <MembersTab /> : <ScheduleTab />}
+      {canEdit && (
+        <Tabs
+          items={[
+            { key: 'members' as const, label: t('tab.members') },
+            { key: 'roles' as const, label: ta('roleAdmin.tab') },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
+      )}
+      {tab === 'roles' && canEdit ? <RolesTab /> : <MembersTab />}
     </>
   );
 }
 
 function MembersTab() {
   const t = useTranslations('team');
+  const ta = useTranslations('access');
   const ts = useTranslations('single.team');
   const app = useApp();
   const mode = useBusinessMode();
-  const res = useApi((api) => api.team.members(app.ctx), [app.industry, app.role, app.org.id], app.can('members.manage'));
+  const roleName = useRoleName();
+  const canEdit = app.capabilities.has('settings.team:edit');
+  const res = useApi((api) => api.team.members(app.ctx), [app.industry, app.org.id]);
+  const roles = useAccess(() => accessApi.roles(), [app.org.id], canEdit);
   const [inviting, setInviting] = useState(false);
+  const [access, setAccess] = useState<string | null>(null);
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<string>('location_manager');
+  const [role, setRole] = useState<string>(mode.isIndependent ? 'staff' : 'location_manager');
   const [scopeId, setScopeId] = useState(app.scopes.find((s) => s.kind === 'location')?.id ?? 'all');
   const [ok, setOk] = useState('');
+  const template = roles.data?.templates.find((r) => r.key === role);
+  const custom = role.startsWith('custom:') ? roles.data?.custom.find((c) => `custom:${c.id}` === role) : undefined;
   // Independent: no scope to pick — org-wide roles cover the business, the others its one location.
-  const independentScope = ORG_WIDE_ROLES.includes(role) || !mode.location ? 'all' : `loc:${mode.location.id}`;
-  const roleLabel = (r: string) => (mode.isIndependent ? ts(`role.${r}`) : t(`role.${r}`));
+  const independentScope = template?.defaultScope === 'organization' || !mode.location ? 'all' : `loc:${mode.location.id}`;
+  const roleLabel = (r: string) => (r.startsWith('custom:') ? (custom?.name ?? r) : roleName(r));
   const dt = useDataText();
-  /** Assignment role: independent businesses use their own role names; otherwise data `role.*`, else the API label. */
-  const assignmentRole = (a: Member['assignments'][number]) => (a.roleKey && mode.isIndependent && ts.has(`role.${a.roleKey}`) ? ts(`role.${a.roleKey}`) : dt(a.roleKey ? `role.${a.roleKey}` : undefined, undefined, a.role));
+  /** Assignment role: independent businesses use their own role names; otherwise the access catalogue, else the API label. */
+  const assignmentRole = (a: Member['assignments'][number]) =>
+    a.roleKey && mode.isIndependent && ts.has(`role.${a.roleKey}`) ? ts(`role.${a.roleKey}`) : a.roleKey ? roleName(a.roleKey) : dt(undefined, undefined, a.role);
   const invite = useMutation((api) =>
     mode.isIndependent
       ? api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId: independentScope, scopeLabel: mode.businessName })
-      : api.team.invite({ email, role: t(`role.${role}`), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }),
+      : api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }),
   );
-  if (!app.can('members.manage')) return <DeniedState permission="members.manage" />;
 
   return (
     <>
-      <div className="flex justify-end">
-        <Button icon="plus" onClick={() => (setInviting(true), setOk(''))}>{t('invite')}</Button>
-      </div>
+      {canEdit && (
+        <div className="flex justify-end">
+          <Button icon="plus" onClick={() => (setInviting(true), setOk(''))}>{t('invite')}</Button>
+        </div>
+      )}
       {ok && <Banner tone="success" live="polite">{ok}</Banner>}
       {inviting && (
         <section className="flex flex-col gap-3 rounded-xl bg-surface p-5" aria-label={t('invite')}>
@@ -78,11 +90,18 @@ function MembersTab() {
             <Field label={t('roleLabel')}>
               {(p) => (
                 <Select id={p.id} value={role} onChange={(e) => setRole(e.target.value)} data-testid="invite-role">
-                  {(mode.isIndependent ? INDEPENDENT_ROLE_OPTIONS : ROLE_OPTIONS).map((r) => (
-                    <option key={r} value={r}>
-                      {roleLabel(r)}
+                  {(roles.data?.templates ?? []).filter((r) => r.key !== 'org_owner').map((r) => (
+                    <option key={r.key} value={r.key}>
+                      {roleLabel(r.key)}
                     </option>
                   ))}
+                  {(roles.data?.custom.length ?? 0) > 0 && (
+                    <optgroup label={ta('editor.customRoles')}>
+                      {roles.data!.custom.map((c) => (
+                        <option key={c.id} value={`custom:${c.id}`}>{c.name}</option>
+                      ))}
+                    </optgroup>
+                  )}
                 </Select>
               )}
             </Field>
@@ -100,7 +119,7 @@ function MembersTab() {
             </Field>
             )}
           </div>
-          <p className="text-xs text-stone">{mode.isIndependent ? ts(`roleHelp.${role}`) : t(`roleHelp.${role}`)}</p>
+          <p className="text-xs text-stone">{custom ? (custom.description ?? '') : ta.has(`roles.${role}.description`) ? ta(`roles.${role}.description`) : (template?.description ?? '')}</p>
           <div className="flex gap-2">
             <Button
               loading={invite.pending}
@@ -122,7 +141,8 @@ function MembersTab() {
           </div>
         </section>
       )}
-      <Async res={res} permission="members.manage" loading={<LoadingBlock variant="table" />}>
+      {access && <MemberAccessPanel userId={access} onClose={() => setAccess(null)} onSaved={() => res.reload()} />}
+      <Async res={res} loading={<LoadingBlock variant="table" />}>
         {(members) => (
           <section className="overflow-x-auto rounded-xl bg-surface p-3.5">
             <DataTable<Member>
@@ -133,6 +153,16 @@ function MembersTab() {
                 { key: 'roles', header: t('col.assignments'), render: (m) => <ul className="flex flex-col gap-0.5">{m.assignments.map((a, i) => <li key={i}><strong>{assignmentRole(a)}</strong> <span className="text-stone">· {dt(a.scopeKey, a.scopeParams, a.scopeLabel)}</span></li>)}</ul> },
                 { key: 'last', header: t('col.lastActive'), render: (m) => dt(m.lastActiveKey, m.lastActiveParams, m.lastActive) },
                 { key: 'status', header: t('col.status'), render: (m) => <Badge tone={m.status === 'active' ? 'success' : m.status === 'invited' ? 'info' : 'warning'} icon={m.status === 'support' ? 'shield' : undefined}>{t(`status.${m.status}`)}</Badge> },
+                {
+                  key: 'access',
+                  header: ta('editor.column'),
+                  render: (m) =>
+                    m.status === 'active' ? (
+                      <Button size="sm" variant="secondary" icon="eye" onClick={() => setAccess(m.id)} data-testid={`access-${m.email}`}>
+                        {ta('editor.open')}
+                      </Button>
+                    ) : null,
+                },
               ]}
             />
           </section>
@@ -143,14 +173,26 @@ function MembersTab() {
   );
 }
 
-/** Team → Schedule: shifts per location and person for one week, in each location's own time zone. */
+/** Operations → Staff schedule: shifts per location and person for one week, in each location's own time zone. */
+export function ScheduleScreen() {
+  const t = useTranslations('team.schedule');
+  const app = useApp();
+  if (!app.hasModule('operations.schedule')) return <DeniedState />;
+  return (
+    <>
+      <PageHeader icon="clock" title={t('title')} />
+      <ScheduleTab />
+    </>
+  );
+}
+
 function ScheduleTab() {
   const t = useTranslations('team.schedule');
   const locale = useLocale();
   const app = useApp();
   const tz = app.locations[0]?.timeZone ?? 'UTC';
   const [week, setWeek] = useState(() => weekStart(dateInZone(new Date(), tz)));
-  const res = useApi((api) => api.team.schedule(app.ctx, week), [app.industry, app.role, app.scopeId, week], app.can('operations.read'));
+  const res = useApi((api) => api.team.schedule(app.ctx, week), [app.industry, app.scopeId, week]);
   const now = Date.now();
 
   const byDay = (list: ShiftView[]) => {
@@ -169,9 +211,9 @@ function ScheduleTab() {
         <Button variant="secondary" icon="chevron-left" onClick={() => setWeek(addDays(week, -7))} aria-label={t('prev')}>{t('prev')}</Button>
         <span className="text-sm font-bold" aria-live="polite">{t('weekOf', { date: fmtYmd(week, locale, { day: 'numeric', month: 'long', year: 'numeric' }) })}</span>
         <Button variant="secondary" onClick={() => setWeek(addDays(week, 7))} aria-label={t('next')}>{t('next')} <Icon name="chevron-right" size={14} /></Button>
-        <Link href="/approvals" className="ml-auto text-xs font-bold underline">{t('swapsLink')}</Link>
+        {app.hasModule('network.approvals') && <Link href="/approvals" className="ml-auto text-xs font-bold underline">{t('swapsLink')}</Link>}
       </div>
-      <Async res={res} permission="operations.read" loading={<LoadingBlock variant="table" />}>
+      <Async res={res} loading={<LoadingBlock variant="table" />}>
         {(list) => {
           const days = byDay(list);
           if (!days.length) return <Empty icon="calendar" title={t('emptyTitle')} body={t('emptyBody')} />;

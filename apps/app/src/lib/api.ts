@@ -1,23 +1,17 @@
 /**
  * Typed client for the BranchHarbor API (`NEXT_PUBLIC_API_URL`, routes under /v1).
  *
- * Two implementations share the `BranchHarborApi` interface:
- *  - `httpApi`  (src/lib/http) calls apps/api with bearer + refresh-cookie auth, maps every method to the real
- *               `/v1/orgs/:orgId/...` endpoints and adapts responses to the view models in ./types.
- *  - `mockApi`  (src/lib/mock) serves internationalised sample data in memory.
- *
- * `getApi()` returns the mock when NEXT_PUBLIC_USE_MOCKS is not "false", and falls back to it
- * automatically when the backend is unreachable (network failure), reporting that via `apiMode`.
+ * `httpApi` (src/lib/http) calls apps/api with bearer + refresh-cookie auth, maps every method to the real
+ * `/v1/orgs/:orgId/...` endpoints and adapts responses to the view models in ./types. There is no sample data:
+ * when the API is unreachable, calls fail with a network `ApiError` and screens show their offline / error state.
  */
-import { ApiError } from './errors';
-import { USE_MOCKS, markOfflineSession } from './http/client';
 import { httpApi } from './http/httpApi';
 import type { BusinessApi } from './business';
 import type { AiAnswer, AiSuggestion, SearchGroup, ApprovalItem, ApprovalRequest, ClassOccurrence, Connection, CoverRequest, DomainStatus, FoodOrder, FoodOrderStatus, GroupPublish, ImportRow, KitchenFeed, Location, Member, MenuItem, OnboardingProgress, Organization, OrgSettings, Overview, PaymentAccount, PaymentAutomation, AutoChargeRow, ReconciliationItem, Report, RequestContext, ScopeOptionT, Session, ShiftView, TableData, Transaction, WebsitePage } from './types';
 import type { MsgParams } from './msg';
 
 export { ApiError } from './errors';
-export { API_URL, USE_MOCKS, setAccessToken as setAuthToken } from './http/client';
+export { API_URL, setAccessToken as setAuthToken } from './http/client';
 
 /** Public addresses of a location's website (included address + optional custom domain). */
 export interface SiteAddress {
@@ -29,8 +23,6 @@ export interface SiteAddress {
 }
 
 export interface BranchHarborApi {
-  readonly mode: 'live' | 'mock';
-
   auth: {
     session(ctx: RequestContext): Promise<Session>;
     signIn(input: { email: string; password: string }): Promise<{ needsVerification: boolean }>;
@@ -125,64 +117,9 @@ export interface BranchHarborApi {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Selection + automatic fallback                                      */
-/* ------------------------------------------------------------------ */
-
-type Listener = (mode: 'live' | 'mock' | 'fallback') => void;
-let currentMode: 'live' | 'mock' | 'fallback' = USE_MOCKS ? 'mock' : 'live';
-const listeners = new Set<Listener>();
-export function apiMode() {
-  return currentMode;
-}
-export function onApiMode(fn: Listener) {
-  listeners.add(fn);
-  return () => listeners.delete(fn);
-}
-/** Switches to sample data after the API proved unreachable outside a wrapped call (e.g. workspace bootstrap). */
-export function enterFallback() {
-  if (!USE_MOCKS) setMode('fallback');
-}
-function setMode(m: typeof currentMode) {
-  if (m === currentMode) return;
-  currentMode = m;
-  // Offline sample data needs no session; let the route guard (src/proxy.ts) through while it lasts.
-  if (m === 'fallback') markOfflineSession();
-  listeners.forEach((l) => l(m));
-}
-
-/** Wraps every method of `live` so a network failure retries once against `mock`. */
-function withFallback<T extends object>(live: T, mock: T): T {
-  return new Proxy(live, {
-    get(target, prop, receiver) {
-      const lv = Reflect.get(target, prop, receiver) as unknown;
-      const mv = Reflect.get(mock, prop) as unknown;
-      if (typeof lv === 'function') {
-        return async (...args: unknown[]) => {
-          if (currentMode === 'fallback') return (mv as (...a: unknown[]) => unknown)(...args);
-          try {
-            return await (lv as (...a: unknown[]) => Promise<unknown>).apply(target, args);
-          } catch (e) {
-            if (e instanceof ApiError && e.isNetwork) {
-              setMode('fallback');
-              return (mv as (...a: unknown[]) => unknown)(...args);
-            }
-            throw e;
-          }
-        };
-      }
-      if (lv && typeof lv === 'object') return withFallback(lv as object, mv as object);
-      return lv;
-    },
-  });
-}
-
 export { httpApi };
 
-let instance: BranchHarborApi | null = null;
+/** The API client (async for call sites written against the former mock/live selection). */
 export async function getApi(): Promise<BranchHarborApi> {
-  if (instance) return instance;
-  const { mockApi } = await import('./mock/mockApi');
-  instance = USE_MOCKS ? mockApi : withFallback(httpApi, mockApi);
-  return instance;
+  return httpApi;
 }

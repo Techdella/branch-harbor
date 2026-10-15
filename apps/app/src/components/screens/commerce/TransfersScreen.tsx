@@ -18,7 +18,7 @@ export function TransfersScreen() {
   const [tab, setTab] = useState<Tab>('open');
   const [open, setOpen] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const res = useCommerce(() => call<{ items: TransferView[] }>('GET', '/transfers'), [app.org.id, app.apiMode]);
+  const res = useCommerce(() => call<{ items: TransferView[] }>('GET', '/transfers'), [app.org.id]);
   const ids = app.scope.locationIds;
   const all = (res.data?.items ?? []).filter((x) => !ids.length || ids.includes(x.fromLocationId) || ids.includes(x.toLocationId));
   const pick: Record<Tab, (x: TransferView) => boolean> = { open: (x) => ['requested', 'approved'].includes(x.status), in_transit: (x) => x.status === 'in_transit', done: (x) => ['received', 'rejected', 'cancelled'].includes(x.status) };

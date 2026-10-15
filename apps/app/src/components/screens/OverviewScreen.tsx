@@ -12,7 +12,7 @@ import { Async, LoadingBlock, SectionCard } from '../ui/States';
 import { MetricCard } from './MetricCard';
 import { useDataText } from '../ui/useDataText';
 
-export function OverviewScreen() {
+export function OverviewScreen({ header = true }: { header?: boolean }) {
   const t = useTranslations('overview');
   const locale = useLocale();
   const app = useApp();
@@ -23,7 +23,7 @@ export function OverviewScreen() {
 
   return (
     <>
-      <PageHeader icon="grid" title={t('title')} />
+      {header && <PageHeader icon="grid" title={t('title')} />}
       <Async res={res} loading={<LoadingBlock variant="cards" rows={4} />}>
         {(ov) => (
           <>

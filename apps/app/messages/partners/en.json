@@ -3,7 +3,6 @@
   "descriptionFoods": "Delivery partners and POS / marketplace orders per location. Without credentials everything runs in sandbox — nothing is sent.",
   "descriptionRealty": "Property portal feeds per office. Without portal credentials feeds are sandbox previews — nothing is sent or published.",
   "sandboxBanner": "Sandbox is clearly separate from live: a connection only goes live when its credentials are complete, a connection test passes and you switch it to live.",
-  "sampleBanner": "Sample data: partners are never contacted in sample mode.",
   "status": {
     "not_configured": "Not configured",
     "disabled": "Switched off",

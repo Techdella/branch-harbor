@@ -3,7 +3,6 @@
 import { useTranslations } from 'next-intl';
 import { useApp } from '../shell/AppContext';
 import { DeniedState } from '../ui/States';
-import { LaterScreen } from './LaterScreen';
 import { TableScreen } from './TableScreen';
 
 export function CustomersScreen() {
@@ -16,11 +15,6 @@ export function CustomersScreen() {
 export function MarketingScreen() {
   const t = useTranslations();
   const app = useApp();
-  if (!app.can('marketing.draft')) return <DeniedState permission="marketing.draft" />;
-  return <TableScreen tableKey="marketing" icon="megaphone" permission="marketing.draft" title={t('nav.marketing')} description={t('marketing.description')} />;
-}
-
-export function CommunityScreen() {
-  const t = useTranslations('later.community');
-  return <LaterScreen icon="message" title={t('title')} note={t('body')} />;
+  if (!app.hasModule('marketing.campaigns')) return <DeniedState />;
+  return <TableScreen tableKey="marketing" icon="megaphone" title={t('nav.marketing')} description={t('marketing.description')} />;
 }

@@ -1,0 +1,379 @@
+{
+  "access": {
+    "loading": "Cargando tu espacio…",
+    "offline": {
+      "title": "No se puede conectar con BranchHarbor",
+      "body": "Revisa tu conexión a internet. No se muestra nada hasta que el servicio vuelva a estar disponible, y tus datos están a salvo.",
+      "retry": "Reintentar"
+    },
+    "error": {
+      "title": "Algo salió mal",
+      "body": "No pudimos cargar tu cuenta de empresa. Inténtalo de nuevo en un momento."
+    },
+    "notAvailable": {
+      "title": "No disponible",
+      "body": "Esta página no forma parte de tu acceso en {business}. Si la necesitas, pide a un propietario o administrador que la añada.",
+      "home": "Ir a tu inicio"
+    },
+    "nav": {
+      "settings": "Configuración",
+      "schedule": "Horario del personal"
+    },
+    "account": {
+      "title": "Cuentas de empresa",
+      "switch": "Cambiar de cuenta de empresa",
+      "switchFrom": "Cuenta de empresa: {name}. Cambiar de cuenta",
+      "note": "Cada cuenta de empresa tiene un solo sector y sus propios datos. No se comparte nada entre cuentas."
+    },
+    "switcher": {
+      "label": "Espacios de trabajo",
+      "current": "Espacio de trabajo: {workspace}. Cambiar de espacio"
+    },
+    "workspace": {
+      "network": {
+        "name": "Red",
+        "description": "Ubicaciones, aprobaciones y rendimiento de toda la red."
+      },
+      "operations": {
+        "name": "Operaciones",
+        "description": "El trabajo diario en tus ubicaciones."
+      },
+      "sales": {
+        "name": "Ventas",
+        "description": "Clientes, prospectos y desarrollo de la franquicia."
+      },
+      "marketing": {
+        "name": "Marketing",
+        "description": "Sitios web, campañas y marca."
+      },
+      "finance": {
+        "name": "Finanzas",
+        "description": "Pagos, reembolsos, regalías y liquidaciones."
+      },
+      "legal": {
+        "name": "Legal y cumplimiento",
+        "description": "Contratos, documentos informativos y registros."
+      },
+      "training": {
+        "name": "Formación",
+        "description": "Cursos y certificaciones para la red."
+      },
+      "community": {
+        "name": "Comunidad",
+        "description": "Anuncios y soporte para la red."
+      }
+    },
+    "home": {
+      "navLabel": "Inicio de {workspace}",
+      "modules": "En este espacio",
+      "emptyTitle": "Aún no hay nada que mostrar",
+      "emptyBody": "Tu acceso en {business} aún no incluye ninguna pantalla. Pide a un propietario o administrador que te dé los módulos que necesitas."
+    },
+    "actions": {
+      "view": {
+        "name": "Ver",
+        "description": "Ver las pantallas y los registros."
+      },
+      "edit": {
+        "name": "Editar",
+        "description": "Crear y cambiar registros."
+      },
+      "publish": {
+        "name": "Publicar / aprobar",
+        "description": "Publicar cambios y resolver solicitudes."
+      },
+      "export": {
+        "name": "Exportar",
+        "description": "Descargar datos e informes."
+      }
+    },
+    "scope": {
+      "region": "Región",
+      "owner_group": "Grupo de propietarios",
+      "location": "Ubicación"
+    },
+    "modules": {
+      "network": {
+        "locations": {
+          "name": "Ubicaciones",
+          "description": "El directorio de ubicaciones: direcciones, horarios, estado y datos locales."
+        },
+        "approvals": {
+          "name": "Aprobaciones",
+          "description": "Solicitudes pendientes de decisión: reembolsos por encima del límite, gasto publicitario local, cambios de turno y cambios en el sitio web."
+        },
+        "reports": {
+          "name": "Informes",
+          "description": "Informes de rendimiento de las ubicaciones del ámbito. Las cifras de ingresos también requieren Pagos."
+        },
+        "templates": {
+          "name": "Plantillas de marca y políticas",
+          "description": "Plantillas de sitio, campos de marca bloqueados y políticas definidas por la sede."
+        }
+      },
+      "operations": {
+        "schedule": {
+          "name": "Horario del personal",
+          "description": "Turnos, fichaje y cambios de turno."
+        },
+        "classes": {
+          "name": "Clases y horario",
+          "description": "Horario de clases, salas, reservas, asistencia y sustituciones."
+        },
+        "memberships": {
+          "name": "Miembros y precios",
+          "description": "Miembros, membresías, bonos de clases, ofertas y clases a la carta."
+        },
+        "studio_insights": {
+          "name": "Análisis del estudio",
+          "description": "Ocupación, asistencia y bajas."
+        },
+        "programmes": {
+          "name": "Programas e inscripciones",
+          "description": "Temporadas, programas, inscripciones y saldos."
+        },
+        "teams": {
+          "name": "Equipos y sesiones",
+          "description": "Equipos, calendario, asistencia, anuncios y tutores."
+        },
+        "sports_reports": {
+          "name": "Informes deportivos",
+          "description": "Informes de inscripción y asistencia."
+        },
+        "appointments": {
+          "name": "Citas",
+          "description": "Agenda, profesionales y sus horarios."
+        },
+        "services": {
+          "name": "Servicios y paquetes",
+          "description": "Servicios, paquetes, bonos regalo y formularios de admisión."
+        },
+        "clients": {
+          "name": "Clientes",
+          "description": "Historial, preferencias y notas de los clientes."
+        },
+        "wellness_insights": {
+          "name": "Análisis de bienestar",
+          "description": "Ocupación, cancelaciones e ingresos."
+        },
+        "orders": {
+          "name": "Pedidos",
+          "description": "Pedidos, devoluciones y tarjetas regalo."
+        },
+        "catalogue": {
+          "name": "Catálogo",
+          "description": "Productos, surtido por ubicación y la tienda en línea."
+        },
+        "inventory": {
+          "name": "Inventario",
+          "description": "Existencias, traspasos y compras."
+        },
+        "commerce_insights": {
+          "name": "Análisis de comercio",
+          "description": "Informes de ventas y existencias."
+        },
+        "menu": {
+          "name": "Menú",
+          "description": "Menús, editor de platos, disponibilidad e ingredientes."
+        },
+        "food_orders": {
+          "name": "Pedidos y cocina",
+          "description": "Pedidos, pantalla de cocina, recogida, entrega, mesas, catering y planes de comidas."
+        },
+        "ordering_settings": {
+          "name": "Ajustes de pedidos",
+          "description": "Reglas de pedidos en línea por ubicación."
+        },
+        "food_reports": {
+          "name": "Informes de restauración",
+          "description": "Ventas, tiempos de preparación y mermas."
+        },
+        "listings": {
+          "name": "Inmuebles",
+          "description": "Inmuebles, aprobaciones y envíos a portales."
+        },
+        "enquiries": {
+          "name": "Consultas y visitas",
+          "description": "Consultas, visitas y ofertas."
+        },
+        "agents": {
+          "name": "Agentes y oficinas",
+          "description": "Agentes, oficinas y asignación de prospectos."
+        }
+      },
+      "sales": {
+        "customers": {
+          "name": "Clientes",
+          "description": "Fichas de clientes con datos de contacto e historial (datos personales)."
+        }
+      },
+      "marketing": {
+        "website_builder": {
+          "name": "Sitios web",
+          "description": "Sitios de las ubicaciones: páginas, aprobaciones, publicación y dominios."
+        },
+        "campaigns": {
+          "name": "Campañas",
+          "description": "Campañas de marketing y ofertas para las ubicaciones del ámbito."
+        }
+      },
+      "finance": {
+        "payments": {
+          "name": "Pagos",
+          "description": "Transacciones, reembolsos, conciliación y cuentas de pago (datos financieros)."
+        }
+      },
+      "settings": {
+        "business": {
+          "name": "Configuración de la empresa",
+          "description": "Datos de la empresa, valores predeterminados, uso compartido de datos y preferencias de IA."
+        },
+        "team": {
+          "name": "Equipo y acceso",
+          "description": "Invitar personas y decidir qué puede ver cada una."
+        },
+        "connections": {
+          "name": "Conexiones",
+          "description": "Sistemas conectados y estado de su sincronización."
+        },
+        "billing": {
+          "name": "Facturación",
+          "description": "Tu plan de BranchHarbor y tus facturas."
+        },
+        "audit": {
+          "name": "Registro de auditoría",
+          "description": "Quién cambió qué y cuándo."
+        },
+        "ai": {
+          "name": "Asistente de IA",
+          "description": "Preguntar a BranchHarbor AI sobre los datos que esta persona ya puede ver. Solo redacta y propone."
+        }
+      }
+    },
+    "roles": {
+      "custom": "Rol personalizado",
+      "org_owner": {
+        "name": "Propietario",
+        "description": "Todo, incluida la facturación, la propiedad y quién tiene acceso."
+      },
+      "hq_admin": {
+        "name": "Administrador de la sede",
+        "description": "Gestiona la red: ubicaciones, plantillas de marca, sitios web, marketing, aprobaciones, informes, equipo y conexiones. Sin fichas de clientes ni pagos."
+      },
+      "vp_franchise": {
+        "name": "VP de Franquicias",
+        "description": "Desarrollo de la franquicia: el pipeline, documentos informativos y contratos, nuevas ubicaciones y formación de franquiciados."
+      },
+      "cmo": {
+        "name": "Director de marketing",
+        "description": "Todo el marketing de la red, plantillas de marca, informes de marketing y acompañamiento a franquiciados en marketing local."
+      },
+      "brand_lead": {
+        "name": "Responsable de marca",
+        "description": "Recursos de marca, plantillas y campos bloqueados, sitios web y contenido social."
+      },
+      "digital_marketer": {
+        "name": "Especialista en marketing digital",
+        "description": "Sitios web, redes sociales, anuncios, correo y campañas de red. Sin operaciones, clientes ni finanzas."
+      },
+      "instructor_trainer": {
+        "name": "Formador de instructores",
+        "description": "Cursos de formación de profesores y prospectos de cursos, más operaciones de solo lectura para ver las clases."
+      },
+      "operations_manager": {
+        "name": "Responsable de operaciones",
+        "description": "Pagos y finanzas, sitios web, conexiones, clientes y operaciones diarias."
+      },
+      "finance": {
+        "name": "Finanzas",
+        "description": "Pagos, reembolsos, conciliación e informes financieros. Regalías y liquidaciones a nivel de sede."
+      },
+      "legal": {
+        "name": "Legal",
+        "description": "Contratos de franquicia, documentos informativos y cumplimiento en toda la red."
+      },
+      "regional_manager": {
+        "name": "Responsable regional",
+        "description": "Supervisión de las ubicaciones de una región: operaciones, informes, aprobaciones de sitios y borradores de campañas."
+      },
+      "franchise_owner": {
+        "name": "Franquiciado",
+        "description": "El panel completo de sus propias ubicaciones: operaciones, marketing, clientes, pagos y su equipo. Nada de otros franquiciados ni de áreas privadas de la sede."
+      },
+      "location_manager": {
+        "name": "Gerente de ubicación",
+        "description": "Lleva una ubicación en el día a día: operaciones, clientes, el sitio local y borradores de campañas."
+      },
+      "staff": {
+        "name": "Personal",
+        "description": "Su trabajo asignado: horarios, asistencia y pedidos en su ubicación."
+      },
+      "marketing_contributor": {
+        "name": "Colaborador de marketing",
+        "description": "Redacta cambios en el sitio y en campañas; publicar requiere a alguien con permiso."
+      },
+      "customer": {
+        "name": "Cliente",
+        "description": "Sus propias reservas, pedidos y preferencias en la app de clientes."
+      }
+    },
+    "roleAdmin": {
+      "tab": "Roles",
+      "intro": "Parte de una plantilla de rol o crea el tuyo marcando módulos y acciones. Cada persona solo ve lo que su rol le da.",
+      "create": "Crear un rol",
+      "createTitle": "Nuevo rol",
+      "editTitle": "Editar {name}",
+      "customTitle": "Tus roles",
+      "customEmpty": "Aún no hay roles personalizados. Crea uno cuando un puesto no encaje con ninguna plantilla.",
+      "assigned": "{count, plural, =0 {Nadie tiene este rol.} one {# persona tiene este rol.} other {# personas tienen este rol.}}",
+      "edit": "Editar",
+      "templatesTitle": "Plantillas de rol",
+      "name": "Nombre del rol",
+      "description": "Descripción",
+      "startFrom": "Partir de",
+      "blank": "Nada marcado",
+      "appliesNow": "{count, plural, one {Al guardar cambia el acceso de # persona de inmediato.} other {Al guardar cambia el acceso de # personas de inmediato.}}",
+      "save": "Guardar rol",
+      "delete": "Eliminar rol",
+      "scopeNote": "Dónde se aplica un rol (toda la empresa, una región, un grupo de propietarios o una ubicación) se elige al asignarlo. Los módulos exclusivos de la sede solo funcionan con roles para toda la empresa."
+    },
+    "editor": {
+      "column": "Acceso",
+      "open": "¿Qué puede ver?",
+      "title": "¿Qué puede ver {name}?",
+      "intro": "Marca los módulos y acciones que necesita esta persona. Lo que no esté marcado no se le muestra en absoluto, y el servidor lo rechaza.",
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "role": "Rol",
+      "customRoles": "Tus roles",
+      "scope": "Se aplica a",
+      "wholeBusiness": "Toda la empresa",
+      "overrides": "{count, plural, one {# cambio personal} other {# cambios personales}}",
+      "ownerNote": "Los propietarios siempre tienen acceso completo. Solo otro propietario puede cambiar la propiedad.",
+      "readOnly": "Puedes ver este acceso pero no cambiarlo: incluye accesos que tú no tienes.",
+      "notEditable": "No puedes cambiar el acceso de esta persona.",
+      "hqOnly": "Solo sede: requiere acceso a toda la empresa.",
+      "notHeld": "No lo tienes tú, así que no puedes darlo.",
+      "save": "Guardar acceso",
+      "reset": "Volver al rol",
+      "saved": "Guardado. {added, plural, =0 {Nada añadido} one {# acción añadida} other {# acciones añadidas}}, {removed, plural, =0 {nada quitado} one {# quitada} other {# quitadas}}. Se aplica desde su próximo clic.",
+      "previewTitle": "Lo que verá",
+      "previewSwitcher": "Un selector con {count} espacios de trabajo.",
+      "previewSingle": "Un solo espacio de trabajo, sin selector.",
+      "previewNothing": "Nada todavía: marca al menos un módulo."
+    }
+  },
+  "demo": {
+    "ribbon": "Entorno de demostración",
+    "ribbonNote": "Empresas y personas de ejemplo para la demostración. No son clientes reales.",
+    "picker": {
+      "title": "Prueba una cuenta de demostración",
+      "body": "Inicia sesión como cualquier persona de estos equipos de ejemplo para ver lo que ve cada rol.",
+      "failed": "Las cuentas de demostración no están disponibles ahora.",
+      "loading": "Cargando cuentas de demostración…",
+      "accounts": "{industry} · {count, plural, one {# cuenta} other {# cuentas}}",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión…"
+    }
+  }
+}

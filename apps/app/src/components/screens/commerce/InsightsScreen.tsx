@@ -15,8 +15,8 @@ export function InsightsScreen() {
   const app = useApp();
   const [days, setDays] = useState<'7' | '30' | '90'>('30');
   const from = new Date(Date.now() - Number(days) * 86400_000).toISOString();
-  const res = useCommerce(() => call<Report>('GET', '/reports', undefined, { from }), [days, app.org.id, app.apiMode], app.can('reports.read'));
-  const merch = useCommerce(() => call<{ suggestions: Suggestion[]; narrative: string | null; aiAvailable: boolean; method: string }>('GET', '/ai/merchandising', undefined, { days }), [days, app.org.id, app.apiMode], app.can('ai.use'));
+  const res = useCommerce(() => call<Report>('GET', '/reports', undefined, { from }), [days, app.org.id], app.can('reports.read'));
+  const merch = useCommerce(() => call<{ suggestions: Suggestion[]; narrative: string | null; aiAvailable: boolean; method: string }>('GET', '/ai/merchandising', undefined, { days }), [days, app.org.id], app.can('ai.use'));
   if (!app.can('reports.read')) return <DeniedState permission="reports.read" />;
   const ids = app.scope.locationIds;
   const inScope = <T extends { locationId: string }>(rows: T[]) => rows.filter((r) => !ids.length || ids.includes(r.locationId));

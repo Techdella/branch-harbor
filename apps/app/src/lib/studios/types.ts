@@ -1,4 +1,4 @@
-/** View models for the Studios full-product screens (live API and sample data share them). */
+/** View models for the Studios full-product screens. */
 export interface Money { amount: number; currency: string }
 export type AccessPolicy = 'home_only' | 'any_location' | 'same_currency' | 'listed';
 
