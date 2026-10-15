@@ -88,9 +88,9 @@ describe.skipIf(!hasDb)('finance: bank-debit collection and monthly statements (
     const id = issued.body.invoice.id;
     expect((await call(app, 'GET', `${base()}/invoices/${id}`, { token: foEu.token })).body.status).toBe('processing');
     const [att1] = await app.ctx.db.select().from(financeCollectionAttempts).where(eq(financeCollectionAttempts.invoiceId, id));
-    // Flat BranchHarbor collection fee in the price-book currency (EUR 0.95), taken as the platform fee — not a percentage.
-    expect(att1).toMatchObject({ methodType: 'sepa_debit', platformFeeMinor: 95, status: 'processing', settledAt: null });
-    expect((await app.ctx.db.select().from(paymentReferences).where(eq(paymentReferences.id, att1!.paymentId!)))[0]!.applicationFeeMinor).toBe(95);
+    // Flat BranchHarbor collection fee in the price-book currency (EUR 0.90, from the price book), taken as the platform fee — not a percentage.
+    expect(att1).toMatchObject({ methodType: 'sepa_debit', platformFeeMinor: 90, status: 'processing', settledAt: null });
+    expect((await app.ctx.db.select().from(paymentReferences).where(eq(paymentReferences.id, att1!.paymentId!)))[0]!.applicationFeeMinor).toBe(90);
 
     // Days later the bank returns the debit.
     const failed = await call(app, 'POST', `${base()}/invoices/${id}/sandbox-settle`, { token: finance.token, body: { outcome: 'failed' } });
@@ -114,7 +114,7 @@ describe.skipIf(!hasDb)('finance: bank-debit collection and monthly statements (
     const r2 = await call(app, 'POST', `${base()}/dunning/run`, { token: finance.token, body: { today: day(3) } });
     expect(r2.body.retries).toBe(1);
     const [, att2] = await app.ctx.db.select().from(financeCollectionAttempts).where(eq(financeCollectionAttempts.invoiceId, id)).orderBy(financeCollectionAttempts.attempt);
-    expect(att2).toMatchObject({ status: 'processing', platformFeeMinor: 95 });
+    expect(att2).toMatchObject({ status: 'processing', platformFeeMinor: 90 });
     expect((await call(app, 'POST', `${base()}/invoices/${id}/sandbox-settle`, { token: finance.token, body: { outcome: 'succeeded' } })).body.invoice.status).toBe('paid');
   });
 
@@ -144,8 +144,8 @@ describe.skipIf(!hasDb)('finance: bank-debit collection and monthly statements (
     expect(issued.body.items).toHaveLength(2);
     expect(issued.body.emailed).toBe(2);
     const eu = issued.body.items.find((x: any) => x.ownerGroup.id === gEu);
-    expect(eu).toMatchObject({ currency: 'EUR', grossSalesMinor: 500_000, royaltyMinor: 30_000, marketingFundMinor: 10_000, totalMinor: 40_000, collectedMinor: 40_000, collectionFeeMinor: 95 });
-    expect(eu.lines[0]).toMatchObject({ locationName: 'Dublin Docklands', salesSource: 'branchharbor', royaltyRateBps: 600, marketingFundRateBps: 200, collectionMethod: 'sepa_debit', collectionStatus: 'succeeded', invoiceStatus: 'paid', collectionFeeMinor: 95 });
+    expect(eu).toMatchObject({ currency: 'EUR', grossSalesMinor: 500_000, royaltyMinor: 30_000, marketingFundMinor: 10_000, totalMinor: 40_000, collectedMinor: 40_000, collectionFeeMinor: 90 });
+    expect(eu.lines[0]).toMatchObject({ locationName: 'Dublin Docklands', salesSource: 'branchharbor', royaltyRateBps: 600, marketingFundRateBps: 200, collectionMethod: 'sepa_debit', collectionStatus: 'succeeded', invoiceStatus: 'paid', collectionFeeMinor: 90 });
     expect(eu.lines[0].collectionDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     const mail = app.ctx.mailer.outbox.slice(before).find((m) => m.to === foEu.email)!;
     expect(mail.subject).toContain('September 2026');
