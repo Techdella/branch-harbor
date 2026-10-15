@@ -72,6 +72,35 @@ describe('royalty collection adapter (live code path, mocked Stripe)', () => {
   });
 });
 
+describe('bank-debit schemes by collection-account country and the collection fee', () => {
+  const live = (client: unknown) => createCollectionAdapter({ mode: 'live', client: client as Stripe } as PaymentsProvider);
+
+  it('offers the bank debit only where the franchisor collection account can take it', () => {
+    expect(methodTypesFor('EUR', 'IE')).toEqual(['card', 'sepa_debit']);
+    expect(methodTypesFor('EUR', 'GB')).toEqual(['card', 'sepa_debit']);
+    expect(methodTypesFor('EUR', 'CA')).toEqual(['card']);
+    expect(methodTypesFor('USD', 'US')).toEqual(['card', 'us_bank_account']);
+    expect(methodTypesFor('USD', 'CA')).toEqual(['card']);
+    expect(methodTypesFor('CAD', 'CA')).toEqual(['card', 'acss_debit']);
+    expect(methodTypesFor('GBP', 'IE')).toEqual(['card']);
+    expect(methodTypesFor('AUD', 'au')).toEqual(['card', 'au_becs_debit']);
+    expect(methodTypesFor('EUR', null)).toEqual(['card', 'sepa_debit']);
+  });
+
+  it('reads the account country, passes the flat fee as the platform fee and reports micro-deposit verification', async () => {
+    const retrieve = vi.fn(async () => ({ country: 'us' }));
+    const create = vi.fn(async () => ({ id: 'pi_1', status: 'processing', last_payment_error: null }));
+    const siRetrieve = vi.fn(async () => ({ status: 'requires_action', payment_method: 'pm_1', mandate: null, next_action: { type: 'verify_with_microdeposits', verify_with_microdeposits: { hosted_verification_url: 'https://payments.stripe.com/microdeposit/x' } } }));
+    const a = live({ accounts: { retrieve }, paymentIntents: { create }, setupIntents: { retrieve: siRetrieve } });
+    expect(await a.accountCountry('acct_hq')).toBe('US');
+    expect(await a.accountCountry('acct_hq')).toBe('US');
+    expect(retrieve).toHaveBeenCalledTimes(1);
+    await a.debit({ accountId: 'acct_hq', customerId: 'cus_1', paymentMethodId: 'pm_1', methodType: 'us_bank_account', amountMinor: 50_000, currency: 'USD', metadata: {}, idempotencyKey: 'k', description: 'd', applicationFeeMinor: 100 });
+    expect((create.mock.calls[0] as unknown as [Record<string, unknown>])[0].application_fee_amount).toBe(100);
+    expect(await a.retrieveSetupIntent({ accountId: 'acct_hq', id: 'seti_1' })).toMatchObject({ status: 'requires_action', verificationUrl: 'https://payments.stripe.com/microdeposit/x' });
+  });
+});
+
 describe('export and document helpers', () => {
   it('formats minor units per currency exponent and neutralises spreadsheet formulas', () => {
     expect(major(123_456, 'CAD')).toBe('1234.56');

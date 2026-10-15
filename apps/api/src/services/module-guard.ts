@@ -41,6 +41,7 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   tags: ['sales.customers', 'marketing.*'],
   inbox: ['marketing.inbox'],
   social: ['marketing.social'],
+  reviews: ['marketing.reviews'],
   'ad-campaigns': ['marketing.ads', 'marketing.network_campaigns', 'finance.royalties'],
   // Franchise development (Sales), new locations (Network) and Legal. Franchise owners reach their own onboarding
   // projects and agreement through New locations; each route checks the module it needs.

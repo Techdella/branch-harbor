@@ -18,11 +18,31 @@ import { randomToken, sha256 } from '../lib/crypto.ts';
 
 export type DebitMethodType = 'card' | 'us_bank_account' | 'acss_debit' | 'bacs_debit' | 'sepa_debit' | 'au_becs_debit';
 
-/** Methods offered for a currency: card everywhere, plus the local bank debit scheme. */
-export function methodTypesFor(currency: string): DebitMethodType[] {
-  const bank: Record<string, DebitMethodType> = { USD: 'us_bank_account', CAD: 'acss_debit', GBP: 'bacs_debit', EUR: 'sepa_debit', AUD: 'au_becs_debit' };
-  const b = bank[currency.toUpperCase()];
-  return b ? ['card', b] : ['card'];
+/** SEPA Direct Debit is available to collection accounts in the EEA, Switzerland and the UK. */
+const SEPA_ACCOUNT_COUNTRIES = new Set(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO', 'CH', 'GB']);
+
+/**
+ * The bank-debit scheme for a franchisee's currency, and the collection-account countries that can use it:
+ * ACH (USD, US accounts), Canadian PAD (CAD, Canadian accounts), Bacs (GBP, UK accounts), SEPA (EUR, EEA/CH/UK
+ * accounts) and BECS (AUD, Australian accounts).
+ */
+export const BANK_DEBIT_SCHEMES: Record<string, { type: DebitMethodType; accountCountries: (country: string) => boolean }> = {
+  USD: { type: 'us_bank_account', accountCountries: (c) => c === 'US' },
+  CAD: { type: 'acss_debit', accountCountries: (c) => c === 'CA' },
+  GBP: { type: 'bacs_debit', accountCountries: (c) => c === 'GB' },
+  EUR: { type: 'sepa_debit', accountCountries: (c) => SEPA_ACCOUNT_COUNTRIES.has(c) },
+  AUD: { type: 'au_becs_debit', accountCountries: (c) => c === 'AU' },
+};
+
+/**
+ * Methods offered for a franchisee's currency: card everywhere, plus the local bank-debit scheme when HQ's collection
+ * account country supports it (unknown country, e.g. sandbox without an account: offered by currency).
+ */
+export function methodTypesFor(currency: string, accountCountry?: string | null): DebitMethodType[] {
+  const scheme = BANK_DEBIT_SCHEMES[currency.toUpperCase()];
+  if (!scheme) return ['card'];
+  if (accountCountry && !scheme.accountCountries(accountCountry.toUpperCase())) return ['card'];
+  return ['card', scheme.type];
 }
 
 export interface DebitResult { id: string; status: 'succeeded' | 'processing' | 'requires_action' | 'failed'; failureCode?: string | null; failureMessage?: string | null }
@@ -32,12 +52,24 @@ export interface ProviderPayout {
   transactions: Array<{ id: string; type: string; sourcePaymentIntent: string | null; sourceId: string | null; amountMinor: number; feeMinor: number; netMinor: number }>;
 }
 
+export interface SetupIntentState {
+  status: string;
+  paymentMethodId: string | null;
+  display: { brand?: string | null; last4?: string | null; bankName?: string | null };
+  mandateId?: string | null;
+  /** ACH micro-deposit verification (Stripe-hosted page) when Financial Connections could not verify instantly. */
+  verificationUrl?: string | null;
+}
+
 export interface CollectionAdapter {
   readonly mode: 'live' | 'sandbox';
+  /** Country of the collection account (live), used to decide which bank-debit schemes HQ can offer. */
+  accountCountry(accountId: string | null): Promise<string | null>;
   ensureCustomer(input: { accountId: string | null; name: string; email: string | null; metadata: Record<string, string>; idempotencyKey: string }): Promise<{ id: string }>;
   createSetupIntent(input: { accountId: string | null; customerId: string; methodType: DebitMethodType; currency: string; metadata: Record<string, string>; idempotencyKey: string }): Promise<{ id: string; clientSecret: string | null }>;
-  retrieveSetupIntent(input: { accountId: string | null; id: string }): Promise<{ status: string; paymentMethodId: string | null; display: { brand?: string | null; last4?: string | null; bankName?: string | null } }>;
-  debit(input: { accountId: string | null; customerId: string; paymentMethodId: string; methodType: DebitMethodType; amountMinor: number; currency: string; metadata: Record<string, string>; idempotencyKey: string; description: string }): Promise<DebitResult>;
+  retrieveSetupIntent(input: { accountId: string | null; id: string }): Promise<SetupIntentState>;
+  /** Off-session debit; `applicationFeeMinor` is BranchHarbor's flat collection fee (platform fee on the franchisor's account). */
+  debit(input: { accountId: string | null; customerId: string; paymentMethodId: string; methodType: DebitMethodType; amountMinor: number; currency: string; metadata: Record<string, string>; idempotencyKey: string; description: string; applicationFeeMinor?: number }): Promise<DebitResult>;
   /** Recent payouts of a connected account with their balance transactions (live mode only). */
   listPayouts(accountId: string, limit?: number): Promise<ProviderPayout[]>;
 }
@@ -49,8 +81,14 @@ export function createCollectionAdapter(payments: PaymentsProvider): CollectionA
   const opts = (acct: string | null, idem?: string): Stripe.RequestOptions => ({ ...(acct ? { stripeAccount: acct } : {}), ...(idem ? { idempotencyKey: idem } : {}) });
   const fake = (prefix: string, seed: string) => `${prefix}_sandbox_${sha256(seed).slice(0, 14)}`;
 
+  const countries = new Map<string, string | null>();
   return {
     mode: stripe ? 'live' : 'sandbox',
+    async accountCountry(accountId) {
+      if (!stripe || !accountId || isSandboxId(accountId)) return null;
+      if (!countries.has(accountId)) countries.set(accountId, (await stripe.accounts.retrieve(accountId)).country?.toUpperCase() ?? null);
+      return countries.get(accountId) ?? null;
+    },
     async ensureCustomer({ accountId, name, email, metadata, idempotencyKey }) {
       if (!stripe) return { id: fake('cus', idempotencyKey) };
       const c = await stripe.customers.create({ name, email: email ?? undefined, metadata }, opts(accountId, idempotencyKey));
@@ -72,10 +110,13 @@ export function createCollectionAdapter(payments: PaymentsProvider): CollectionA
       const si = await stripe.setupIntents.retrieve(id, { expand: ['payment_method'] }, opts(accountId));
       const pm = si.payment_method && typeof si.payment_method !== 'string' ? si.payment_method : null;
       const bank = pm?.us_bank_account ?? pm?.acss_debit ?? pm?.bacs_debit ?? pm?.sepa_debit ?? pm?.au_becs_debit ?? null;
+      const micro = si.next_action?.type === 'verify_with_microdeposits' ? si.next_action.verify_with_microdeposits?.hosted_verification_url ?? null : null;
       return {
         status: si.status,
         paymentMethodId: typeof si.payment_method === 'string' ? si.payment_method : pm?.id ?? null,
         display: { brand: pm?.card?.brand ?? null, last4: pm?.card?.last4 ?? (bank as { last4?: string } | null)?.last4 ?? null, bankName: (bank as { bank_name?: string } | null)?.bank_name ?? null },
+        mandateId: typeof si.mandate === 'string' ? si.mandate : si.mandate?.id ?? null,
+        verificationUrl: micro,
       };
     },
     async debit(i) {
@@ -88,6 +129,7 @@ export function createCollectionAdapter(payments: PaymentsProvider): CollectionA
         const pi = await stripe.paymentIntents.create({
           amount: i.amountMinor, currency: i.currency.toLowerCase(), customer: i.customerId, payment_method: i.paymentMethodId, allowed_payment_method_types: [i.methodType as Stripe.PaymentIntentCreateParams.AllowedPaymentMethodType],
           off_session: true, confirm: true, metadata: i.metadata, description: i.description,
+          ...(i.applicationFeeMinor ? { application_fee_amount: i.applicationFeeMinor } : {}),
         }, opts(i.accountId, i.idempotencyKey));
         const status = pi.status === 'succeeded' ? 'succeeded' : pi.status === 'processing' ? 'processing' : pi.status === 'requires_action' ? 'requires_action' : 'failed';
         return { id: pi.id, status, failureCode: pi.last_payment_error?.code ?? null, failureMessage: pi.last_payment_error?.message ?? null };
