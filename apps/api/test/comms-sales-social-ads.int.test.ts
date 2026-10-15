@@ -5,7 +5,7 @@ import { splitBudget } from '@bh/shared';
 import { locations, marketingFundEntries, socialPosts } from '../src/db/schema/index.ts';
 import { onMarketingFundSpend, type MarketingFundSpendEvent } from '../src/services/marketing-fund.ts';
 import { publishDuePosts } from '../src/services/social.ts';
-import { call, createLocation, createOrg, hasDb, makeApp, memberWithRole, verifiedUser } from './helpers.ts';
+import { call, createLocation, createOrg, hasDb, makeApp, grantCaps, memberWithRole, verifiedUser } from './helpers.ts';
 
 describe('budget split per currency (unit)', () => {
   it('splits each currency over its locations and keeps the exact total', () => {
@@ -36,8 +36,10 @@ describe.skipIf(!hasDb)('lead routing, social approval + handover, network and c
     rep1 = await memberWithRole(app, owner.token, orgId, 'location_manager', { kind: 'location', id: tor.id }, 'Rae Rep');
     rep2 = await memberWithRole(app, owner.token, orgId, 'location_manager', { kind: 'location', id: tor.id }, 'Ravi Rep');
     mgrTor = rep1;
-    trainer1 = await memberWithRole(app, owner.token, orgId, 'instructor_trainer', { kind: 'organization', id: orgId }, 'Sofia Trainer');
-    trainer2 = await memberWithRole(app, owner.token, orgId, 'instructor_trainer', { kind: 'organization', id: orgId }, 'Marcus Trainer');
+    trainer1 = await memberWithRole(app, owner.token, orgId, 'trainer', { kind: 'organization', id: orgId }, 'Sofia Trainer');
+    trainer2 = await memberWithRole(app, owner.token, orgId, 'trainer', { kind: 'organization', id: orgId }, 'Marcus Trainer');
+    // Trainers who follow up course leads (the old instructor-trainer template) hold Course leads as a per-person grant.
+    for (const tr of [trainer1, trainer2]) await grantCaps(app, owner.token, orgId, tr.userId, ['sales.course_leads:view', 'sales.course_leads:edit']);
     marketer = await memberWithRole(app, owner.token, orgId, 'digital_marketer', { kind: 'organization', id: orgId }, 'Priyanka Marketer');
   });
   afterAll(async () => { await app?.close(); });

@@ -1,9 +1,9 @@
 import { and, asc, eq, gt, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
-import { signUpSchema, apiError } from '@bh/shared';
+import { canonicalRole, signUpSchema, apiError } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { consentRecords, customRoles, emailVerificationTokens, locations, roleAssignments, organizations, users } from '../db/schema/index.ts';
-import { roleName } from '../services/access.ts';
+import { loadRoleLabels, roleName } from '../services/access.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { AppError, badRequest, conflict, unauthorized } from '../lib/errors.ts';
 import { authenticate, requireUser, signAccessToken } from '../plugins/auth.ts';
@@ -155,12 +155,14 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
     }
     const customIds = [...new Set(rows.map((r) => r.assignment.customRoleId).filter((x): x is string => !!x))];
     const custom = customIds.length ? await s.db.select({ id: customRoles.id, name: customRoles.name }).from(customRoles).where(inArray(customRoles.id, customIds)) : [];
-    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; customRoleId: string | null; name: string; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
+    type MeOrg = { id: string; name: string; slug: string; industry: string; roles: Array<{ id: string; role: string; customRoleId: string | null; name: string; label: string | null; scope: { kind: string; id: string } }> } & ReturnType<typeof businessModeView>;
     const orgs = new Map<string, MeOrg>();
+    const labels = new Map<string, Map<string, string>>();
     for (const r of rows) {
       const { settings, model: _model, ...base } = r.org;
       const o = orgs.get(r.org.id) ?? { ...base, ...businessModeView({ model: r.org.model, settings }, primary.get(r.org.id) ?? null), roles: [] };
-      o.roles.push({ id: r.assignment.id, role: r.assignment.role, customRoleId: r.assignment.customRoleId, name: roleName(r.assignment.role, custom.find((c) => c.id === r.assignment.customRoleId)), scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
+      if (!labels.has(r.org.id)) labels.set(r.org.id, await loadRoleLabels(s.db, r.org.id));
+      o.roles.push({ id: r.assignment.id, role: canonicalRole(r.assignment.role), customRoleId: r.assignment.customRoleId, name: roleName(r.assignment.role, custom.find((c) => c.id === r.assignment.customRoleId), labels.get(r.org.id)), label: labels.get(r.org.id)?.get(canonicalRole(r.assignment.role)) ?? null, scope: { kind: r.assignment.scopeKind, id: r.assignment.scopeId } });
       orgs.set(r.org.id, o);
     }
     // What each organisation shows this person (workspaces, settings, landing workspace) — for navigation only;

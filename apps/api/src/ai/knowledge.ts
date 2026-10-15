@@ -4,10 +4,10 @@ import type { AiCitation } from '@bh/shared';
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import {
-  aiKnowledgeChunks, aiKnowledgeSources, assetBlobs, brandAssets, courseLessons, courseModules, courses, libraryFolders, libraryResources, locations, ticketMessages, tickets,
+  aiKnowledgeChunks, aiKnowledgeSources, assetBlobs, brandAssets, courseLessons, courseModules, courses, libraryFolders, libraryResources, ticketMessages, tickets,
   type Audience,
 } from '../db/schema/index.ts';
-import { audienceIncludes, buildViewer } from '../services/network-access.ts';
+import { audienceIncludes, buildViewer, orgLocations } from '../services/network-access.ts';
 import type { AssistantContext } from './context.ts';
 import { chunkText, extractText } from './extract.ts';
 
@@ -140,8 +140,7 @@ export async function ensureIndexed(s: Services, orgId: string) {
 export interface KnowledgeHit { chunkId: string; sourceId: string; title: string; url: string | null; sourceType: string; heading: string | null; content: string; score: number }
 
 async function canSeeSource(db: Exec, ctx: AssistantContext): Promise<(src: typeof aiKnowledgeSources.$inferSelect) => boolean> {
-  const locs = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.organizationId, ctx.orgId));
-  const viewer = buildViewer(ctx.user.id, ctx.orgId, ctx.assignments, locs);
+  const viewer = buildViewer(ctx.user.id, ctx.orgId, ctx.assignments, await orgLocations(db, ctx.orgId));
   return (src) => (!src.hqOnly || ctx.hq) && ctx.can(src.module, src.module === 'community.help_desk' ? 'edit' : 'view') && (src.audiences ?? []).every((a) => audienceIncludes(a, viewer, { hqSeesAll: true }));
 }
 

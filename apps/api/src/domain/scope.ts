@@ -1,5 +1,5 @@
 import {
-  ROLE_PERMISSIONS, capability, effectiveCapabilities, permissionsFromCapabilities, type AccessAction, type Capability, type Industry, type Permission, type Role, type ScopeKind,
+  ROLE_PERMISSIONS, canonicalRole, capability, effectiveCapabilities, permissionsFromCapabilities, type AccessAction, type Capability, type Industry, type Permission, type Role, type ScopeKind,
 } from '@bh/shared';
 
 export interface Assignment {
@@ -19,12 +19,21 @@ export interface Assignment {
   permissions?: ReadonlySet<Permission>;
 }
 
-/** The full ancestry of a target scope, resolved from the database. */
+/**
+ * The full ancestry of a target scope, resolved from the database. For a location: its region, owner group,
+ * territory, brand (the default brand when it has none) and the portfolios it is in. For a territory: its brand.
+ */
 export interface ScopeChain {
   organizationId: string;
   regionId?: string | null;
   ownerGroupId?: string | null;
   locationId?: string | null;
+  territoryId?: string | null;
+  brandId?: string | null;
+  /** Target portfolio (kind `portfolio`). */
+  portfolioId?: string | null;
+  /** Portfolios a target location is in. */
+  portfolioIds?: readonly string[];
   /** The kind of the target itself. */
   kind: ScopeKind;
 }
@@ -33,14 +42,14 @@ export interface ScopeChain {
 export function withAccess<A extends Assignment>(
   a: A,
   industry: Industry | string,
-  extra: { customCapabilities?: Iterable<string> | null; grants?: Iterable<string> | null; revokes?: Iterable<string> | null } = {},
+  extra: { customCapabilities?: Iterable<string> | null; grants?: Iterable<string> | null; revokes?: Iterable<string> | null; deniedClasses?: Iterable<string> | null } = {},
 ): A & { capabilities: Set<Capability>; permissions: Set<Permission> } {
   const capabilities = effectiveCapabilities({ role: a.role, scopeKind: a.scopeKind, ...extra }, industry);
   return { ...a, capabilities, permissions: permissionsFromCapabilities(capabilities) };
 }
 
 export function permissionsOf(a: Assignment): ReadonlySet<Permission> {
-  return a.permissions ?? new Set(ROLE_PERMISSIONS[a.role as Role] ?? []);
+  return a.permissions ?? new Set(ROLE_PERMISSIONS[canonicalRole(a.role) as Role] ?? []);
 }
 
 export function capabilitiesOf(a: Assignment): ReadonlySet<Capability> {
@@ -53,6 +62,9 @@ export function capabilitiesOf(a: Assignment): ReadonlySet<Capability> {
  * - region assignment covers that region and locations in it.
  * - owner_group assignment covers that owner group and its locations.
  * - location assignment covers only that location.
+ * - brand assignment covers that brand, its territories and its locations.
+ * - territory assignment (a sub-network) covers that territory and its locations.
+ * - portfolio assignment covers that portfolio and the locations in it (across regions and owners).
  * A narrower assignment never covers a wider target (a location manager cannot act at org scope).
  */
 export function assignmentCovers(a: Assignment, target: ScopeChain, now = new Date()): boolean {
@@ -60,6 +72,12 @@ export function assignmentCovers(a: Assignment, target: ScopeChain, now = new Da
   switch (a.scopeKind) {
     case 'organization':
       return a.scopeId === target.organizationId;
+    case 'brand':
+      return (target.kind === 'brand' || target.kind === 'territory' || target.kind === 'location') && !!target.brandId && a.scopeId === target.brandId;
+    case 'territory':
+      return (target.kind === 'territory' || target.kind === 'location') && !!target.territoryId && a.scopeId === target.territoryId;
+    case 'portfolio':
+      return (target.kind === 'portfolio' && target.portfolioId === a.scopeId) || (target.kind === 'location' && !!target.portfolioIds?.includes(a.scopeId));
     case 'region':
       return (target.kind === 'region' || target.kind === 'location') && !!target.regionId && a.scopeId === target.regionId;
     case 'owner_group':
@@ -97,17 +115,43 @@ export function capabilitiesAnywhere(assignments: Assignment[], now = new Date()
   return out;
 }
 
-export interface LocationRef { id: string; regionId: string | null; ownerGroupId: string | null }
+/** A location with every scope it belongs to (brand resolved to the default brand when unset). */
+export interface LocationRef {
+  id: string;
+  regionId: string | null;
+  ownerGroupId: string | null;
+  territoryId?: string | null;
+  brandId?: string | null;
+  portfolioIds?: readonly string[];
+}
+
+/** The scope chain of a location. */
+export function locationChain(organizationId: string, l: LocationRef): ScopeChain {
+  return { organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId, territoryId: l.territoryId ?? null, brandId: l.brandId ?? null, portfolioIds: l.portfolioIds ?? [] };
+}
+
+/** Does the assignment cover this location (any scope kind)? */
+export function coversLocation(a: Assignment, organizationId: string, l: LocationRef, now = new Date()): boolean {
+  return assignmentCovers(a, locationChain(organizationId, l), now);
+}
 
 function locationIdsWhere(assignments: Assignment[], relevant: (a: Assignment) => boolean, organizationId: string, locations: LocationRef[], now: Date): 'all' | Set<string> {
   const rel = assignments.filter((a) => relevant(a) && !(a.expiresAt && a.expiresAt <= now));
   if (rel.some((a) => a.scopeKind === 'organization' && a.scopeId === organizationId)) return 'all';
   const ids = new Set<string>();
   for (const l of locations) {
-    const chain: ScopeChain = { organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
+    const chain = locationChain(organizationId, l);
     if (rel.some((a) => assignmentCovers(a, chain, now))) ids.add(l.id);
   }
   return ids;
+}
+
+/** Territories (sub-networks) where the user holds a module action through a territory assignment; 'all' for organisation-wide. */
+export function capabilityTerritoryIds(assignments: Assignment[], module: string, action: AccessAction, organizationId: string, now = new Date()): 'all' | Set<string> {
+  const c = capability(module, action);
+  const rel = assignments.filter((a) => capabilitiesOf(a).has(c) && !(a.expiresAt && a.expiresAt <= now));
+  if (rel.some((a) => a.scopeKind === 'organization' && a.scopeId === organizationId)) return 'all';
+  return new Set(rel.filter((a) => a.scopeKind === 'territory').map((a) => a.scopeId));
 }
 
 /** Locations (from the given list) where the user holds `permission`. Returns 'all' for org-wide grants. */

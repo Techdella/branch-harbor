@@ -61,7 +61,7 @@
       "Ihr Standort, Ihre Kunden, Website, Ihr Team und Ihr Zahlungsverlauf bleiben unverändert.",
       "Bereichsauswahl, Standortverzeichnis, Regionen und Inhabergruppen werden verfügbar.",
       "Website-Vorlagen können Felder sperren oder eine Freigabe verlangen, und Seiten können an mehrere Standorte gleichzeitig veröffentlicht werden.",
-      "Rollen für Zentrale, Regionalleitung und Franchisenehmer können eingeladen werden.",
+      "Rollen für Zentrale, Field Consultants, Franchise-Partner und Franchisenehmer können eingeladen werden.",
       "Die Abrechnung wechselt vom Solo-Tarif zur Preisgestaltung pro Standort, sobald ein zweiter Standort in Betrieb ist.",
       "Ihre Kunden-Website erhält unter Ihrer aktuellen Adresse eine Standortsuche, und jeder Standort bekommt eine eigene Seite."
     ],
@@ -137,15 +137,19 @@
       "org_owner": "Inhaber",
       "location_manager": "Leitung",
       "staff": "Mitarbeitende / Trainer / Coach",
-      "marketing_contributor": "Marketing-Mitwirkende",
-      "finance": "Finanzen"
+      "content_social": "Content & Social Media",
+      "finance_lead": "Finanzen",
+      "accountant": "Buchhaltung",
+      "sales_rep": "Vertrieb"
     },
     "roleHelp": {
-      "org_owner": "Voller Zugriff, inklusive Abrechnung, Team und Unternehmenseinstellungen.",
-      "location_manager": "Führt den Alltag: Pläne, Kunden, Bestellungen und Website-Veröffentlichung.",
-      "staff": "Nur eigener Plan, Anwesenheit oder Bestellungen.",
-      "marketing_contributor": "Entwirft Website- und Marketing-Inhalte; veröffentlicht nur, wenn Sie es erlauben.",
-      "finance": "Zahlungen, Abgleich und erlaubte Erstattungen."
+      "org_owner": "Voller Zugriff, einschließlich Abrechnung, Team und Unternehmenseinstellungen.",
+      "location_manager": "Führt den Tag: Pläne, Kunden, Bestellungen und das Veröffentlichen der Website.",
+      "staff": "Nur der eigene Plan, Anwesenheiten oder Bestellungen.",
+      "content_social": "Entwirft Website- und Marketinginhalte; veröffentlicht nur, wenn Sie es erlauben.",
+      "finance_lead": "Zahlungen, Abgleich und erlaubte Erstattungen.",
+      "accountant": "Sieht und exportiert Zahlungen für die Buchhaltung.",
+      "sales_rep": "Leads, Kunden und Mitgliedschaften."
     }
   },
   "payments": {

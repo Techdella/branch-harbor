@@ -81,9 +81,9 @@ export function requireNetwork(o: Pick<Org, 'model' | 'id'>, feature: string) {
 export function assertRoleForModel(o: Pick<Org, 'model'>, role: Role, scopeKind: string) {
   const model = asBusinessModel(o.model);
   if (!inviteRolesFor(model).includes(role)) {
-    throw new AppError(400, 'role_not_available', `The ${role.replace(/_/g, ' ')} role is only available to networks. Independent businesses can invite an owner, manager, staff, marketing contributor or finance user.`, { role: 'Not available for independent businesses' }, { availableRoles: inviteRolesFor(model) });
+    throw new AppError(400, 'role_not_available', `The ${role.replace(/_/g, ' ')} role is only available to networks. Independent businesses can invite an owner, manager, staff, content & social, sales or finance user.`, { role: 'Not available for independent businesses' }, { availableRoles: inviteRolesFor(model) });
   }
-  if (model === 'independent' && (scopeKind === 'region' || scopeKind === 'owner_group')) {
+  if (model === 'independent' && scopeKind !== 'organization' && scopeKind !== 'location') {
     throw new AppError(400, 'scope_not_available', 'Independent businesses have no regions or owner groups. Assign the business or its location.', { scope: 'Use organization or location' });
   }
 }

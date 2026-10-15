@@ -1,10 +1,11 @@
 import { eq } from 'drizzle-orm';
-import { capabilityLocationIds, capabilitiesAnywhere, type Assignment } from '../domain/scope.ts';
+import type { FastifyRequest } from 'fastify';
+import { capabilitiesAnywhere, type Assignment } from '../domain/scope.ts';
 import type { AccessAction } from '@bh/shared';
 import type { Services } from '../context.ts';
-import { locations, organizations, users } from '../db/schema/index.ts';
+import { organizations, users } from '../db/schema/index.ts';
 import { signAccessToken, type AuthUser } from '../plugins/auth.ts';
-import { loadAssignments } from '../services/authz.ts';
+import { capabilityLocations, hasCapability, loadAssignments, type ScopeTarget } from '../services/authz.ts';
 import { ToolError } from './types.ts';
 
 type Query = Record<string, string | number | boolean | null | undefined>;
@@ -35,8 +36,12 @@ export interface AssistantContext {
   api: AssistantApi;
   /** Does the person hold `module:action` anywhere? */
   can(module: string, action?: AccessAction): boolean;
-  /** Location ids where the person holds `module:action` ('all' for organisation-wide). */
+  /** Location ids where the person holds `module:action` ('all' for organisation-wide), via the access model's scope resolution. */
   locationsWith(module: string, action?: AccessAction): Promise<'all' | Set<string>>;
+  /** Does the person hold `module:action` at a scope (any kind: organisation, region, portfolio, territory, brand…)? */
+  canAt(module: string, action: AccessAction, target: Omit<ScopeTarget, 'organizationId'>): Promise<boolean>;
+  /** A request-shaped access context for the authz helpers (the person's user and their assignments). */
+  req: FastifyRequest;
   /** `/orgs/:orgId` prefix for REST paths. */
   o(path: string): string;
 }
@@ -80,6 +85,8 @@ export async function buildAssistantContext(s: Services, orgId: string, userId: 
     return json as T;
   };
   const o2 = (path: string) => `/orgs/${orgId}${path}`;
+  // The same scope resolution as the REST routes (capabilityLocations / resolveScopeChain) for this person.
+  const req = { user, assignmentCache: new Map([[orgId, assignments]]), server: { ctx: s }, headers: {}, log: s.log } as unknown as FastifyRequest;
   return {
     s,
     orgId,
@@ -97,10 +104,9 @@ export async function buildAssistantContext(s: Services, orgId: string, userId: 
       delete: (path) => call('DELETE', path),
     },
     can: (module, action = 'view') => caps.has(`${module}:${action}`),
-    locationsWith: async (module, action = 'view') => {
-      const locs = await s.db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.organizationId, orgId));
-      return capabilityLocationIds(assignments, module, action, orgId, locs);
-    },
+    locationsWith: (module, action = 'view') => capabilityLocations(req, s.db, orgId, module, action),
+    canAt: (module, action, target) => hasCapability(req, s.db, module, action, { organizationId: orgId, ...target } as ScopeTarget),
+    req,
     o: o2,
   };
 }

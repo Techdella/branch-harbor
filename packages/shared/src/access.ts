@@ -18,7 +18,7 @@
  */
 import { AI_ASSISTANT_MODULE, ASSISTANT_NAME } from './ai.ts';
 import type { Industry } from './industries.ts';
-import { PERMISSIONS, type Permission, type Role, type RoleAssignment, type ScopeKind } from './permissions.ts';
+import { PERMISSIONS, SENSITIVE_CLASSES, canonicalRole, type Permission, type Role, type RoleAssignment, type ScopeKind, type SensitiveClass } from './permissions.ts';
 
 /* ------------------------------------------------------------------ */
 /* Workspaces and actions                                              */
@@ -75,10 +75,15 @@ export interface ModuleDef {
   status: 'available' | 'planned';
   /** HQ-private: only effective on organisation-wide assignments (never for franchisees or location roles). */
   hqOnly?: boolean;
+  /**
+   * HQ-private module that a territory (sub-network) also runs for itself: effective on territory assignments too,
+   * filtered to the territory's records (master franchisees, area developers).
+   */
+  territoryOk?: boolean;
   /** Franchise / multi-location only: independent businesses never see it. */
   networkOnly?: boolean;
   /** Sensitive data the module exposes; the API filters these fields by capability. */
-  sensitive?: 'finance' | 'legal' | 'personal_data';
+  sensitive?: SensitiveClass;
   /** Operations modules: the industry screens (dashboard route keys) the module covers. */
   screens?: readonly string[];
   /**
@@ -148,20 +153,13 @@ export const AI_MODULES: readonly ModuleDef[] = [
   },
 ];
 
-/** AI assistant grants per role template (merged into the template's grants; roles not listed get none). */
+/**
+ * AI assistant grants. Every role template that includes `settings.ai` also gets `ai.assistant` view and edit (the
+ * assistant only ever acts as the person, so this never widens access); the roles listed here get more on top.
+ */
+export const AI_DEFAULT_ACTIONS: readonly AccessAction[] = ['view', 'edit'];
 export const AI_ROLE_GRANTS: Partial<Record<Role, GrantSpec>> = {
   hq_admin: { [AI_ASSISTANT_MODULE]: ['view', 'edit', 'publish', 'export'] },
-  vp_franchise: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  cmo: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  brand_lead: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  digital_marketer: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  instructor_trainer: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  operations_manager: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  legal: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  regional_manager: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  franchise_owner: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  location_manager: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
-  marketing_contributor: { [AI_ASSISTANT_MODULE]: ['view', 'edit'] },
 };
 
 /** Modules every business account has, whatever its industry. */
@@ -169,7 +167,7 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   // Network (HQ)
   { key: 'network.locations', area: 'network', name: 'Locations', description: 'The location directory: addresses, opening hours, status and local details.', actions: VE, status: 'available' },
   { key: 'network.onboarding', area: 'network', name: 'New locations', description: 'Onboarding checklists, pre-opening checks and go-live requests for new locations. Franchise owners see the projects of their own locations and their own franchise agreement.', actions: VE, actionNotes: { edit: 'Complete checklist tasks and ask HQ to approve the opening.' }, networkOnly: true, status: 'available' },
-  { key: 'network.franchisees', area: 'network', name: 'Franchisees & owner groups', description: 'Franchise owners, their companies and which locations they run.', actions: VE, networkOnly: true, status: 'planned', hqOnly: true },
+  { key: 'network.franchisees', area: 'network', name: 'Franchisees & owner groups', description: 'Franchise owners, their companies and which locations they run.', actions: VE, networkOnly: true, status: 'planned', hqOnly: true, territoryOk: true },
   { key: 'network.approvals', area: 'network', name: 'Approvals', description: 'Requests waiting for a decision: refunds over the limit, local ad spend, shift swaps and website changes.', actions: ['view', 'publish'], actionNotes: { publish: 'Approve or reject website changes from locations.' }, status: 'available' },
   { key: 'network.reports', area: 'network', name: 'Reports', description: 'Performance reports for the locations in scope. Revenue figures also need Payments.', actions: ['view', 'export'], status: 'available' },
   { key: 'network.templates', area: 'network', name: 'Brand templates & policies', description: 'Website templates, locked brand fields and business policies set by HQ.', actions: VEP, status: 'available' },
@@ -178,7 +176,7 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   // Sales
   { key: 'sales.customers', area: 'sales', name: 'Customers', description: 'Customer records with contact details and history (personal data).', actions: VEX, status: 'available', sensitive: 'personal_data' },
   { key: 'sales.customer_pipeline', area: 'sales', name: 'Leads & enquiries', description: 'New enquiries, the customer sales pipeline (deals, tasks, activities) and lead routing.', actions: ALL, actionNotes: { publish: 'Change lead routing rules and pipeline stages.' }, status: 'available', sensitive: 'personal_data' },
-  { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'personal_data' },
+  { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, sensitive: 'personal_data' },
   { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and public courses. Routed to the course’s trainers or by lead-routing rules; trainers see the leads at their locations and those assigned to them.', actions: VEX, status: 'available', sensitive: 'personal_data' },
   // Marketing
   { key: 'marketing.website_builder', area: 'marketing', name: 'Websites', description: 'Location websites: pages, approvals, publishing and domains.', actions: VEP, status: 'available' },
@@ -337,10 +335,13 @@ export function normalizeCapabilities(caps: Iterable<string>, industry: Industry
   return out;
 }
 
-/** Drops HQ-private modules unless the assignment covers the whole organisation. */
+/**
+ * Drops HQ-private modules unless the assignment covers the whole organisation; a territory (sub-network) keeps the
+ * HQ-private modules it runs for itself (`territoryOk`).
+ */
 export function scopeFilter(caps: Set<Capability>, scopeKind: ScopeKind, industry: Industry | string): Set<Capability> {
   if (scopeKind === 'organization') return caps;
-  const hq = new Set(modulesFor(industry).filter((m) => m.hqOnly).map((m) => m.key));
+  const hq = new Set(modulesFor(industry).filter((m) => m.hqOnly && !(scopeKind === 'territory' && m.territoryOk)).map((m) => m.key));
   return new Set([...caps].filter((c) => !hq.has(parseCapability(c)!.module)));
 }
 
@@ -428,10 +429,18 @@ export function permissionsFromCapabilities(caps: ReadonlySet<string>): Set<Perm
 /* Role templates                                                      */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Teams the templates are grouped by. Templates are starting points, not an org chart: a small team combines them
+ * (a person can hold several roles, access is the union), renames them, or builds its own roles from modules.
+ */
+export const ROLE_TEAMS = ['leadership', 'development', 'sales', 'marketing', 'operations', 'finance', 'legal', 'training', 'partners', 'locations', 'other'] as const;
+export type RoleTeam = (typeof ROLE_TEAMS)[number];
+
 export interface RoleTemplate {
   key: Role;
   name: string;
   description: string;
+  team: RoleTeam;
   /** Where the person lands after signing in. */
   primaryWorkspace: WorkspaceKey;
   /** Typical scope when assigning this role. */
@@ -440,19 +449,64 @@ export interface RoleTemplate {
   networkOnly?: boolean;
   /** Not offered when inviting team members. */
   hidden?: boolean;
+  /**
+   * Support role (field consultant, area representative, auditor): views and supports locations it doesn't own. Its
+   * template never includes a sensitive data class (finance, legal, personal data); those need an explicit grant.
+   */
+  support?: boolean;
   grants: GrantSpec;
 }
 
 /** Everyone in a business (docs/PRODUCT_PLAN.md): read the community and take part, learn, ask HQ for help. */
 const everyone: GrantSpec = { 'training.academy': V, 'community.*': V, 'community.discussions': VE };
 
+/**
+ * Capability keys of modules other features are building (the module is added to the catalogue when it ships). Templates
+ * may name them; until the module exists, `expandGrants` ignores the key, so the grant is harmless.
+ */
+export const PENDING_MODULES = ['operations.audits'] as const;
+/** Audits (Operations): run checklists and visits at locations. Key reserved here; the audits feature defines the module. */
+export const AUDITS_MODULE = 'operations.audits';
+
+/** What sales sells, per industry: memberships and packs, packages, registrations or enquiries. */
+const SALES_PRODUCTS = ['operations.memberships', 'operations.services', 'operations.programmes', 'operations.enquiries'] as const;
+/**
+ * Front-line operations for staff, per industry: classes and check-in, team sessions, appointments and the clients
+ * they see, store orders and stock, kitchen orders, the front desk and housekeeping, listings and enquiries.
+ */
+const STAFF_FRONTLINE = [
+  'operations.classes', 'operations.teams', 'operations.appointments', 'operations.clients', 'operations.orders', 'operations.inventory', 'operations.food_orders',
+  'operations.reservations', 'operations.housekeeping', 'operations.listings', 'operations.enquiries', 'operations.agents',
+] as const;
+/** What staff look up but don't change: registrations, the catalogue, the menu and ordering hours. */
+const STAFF_LOOKUP = ['operations.programmes', 'operations.catalogue', 'operations.menu', 'operations.ordering_settings'] as const;
+const each = (keys: readonly string[], actions: readonly AccessAction[]): GrantSpec => Object.fromEntries(keys.map((k) => [k, actions]));
+
+/** Franchise owners: the full dashboard for their own locations (also the base of area developers and multi-unit operators). */
+const ownerGrants: GrantSpec = {
+  'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
+  'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP, 'marketing.reviews': VEP,
+  'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX, 'finance.invoices': VEX, 'finance.marketing_fund': V,
+  'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
+  // Field audits, compliance documents and the league table (own locations; network quartiles, never other franchisees).
+  [AUDITS_MODULE]: VEX, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'],
+};
+
+/** Support roles: see and support locations, coach, run audits. Never finance, legal or customers' personal data. */
+const supportGrants: GrantSpec = {
+  // Audits are granted by name (`operations.*` never includes them).
+  'network.locations': V, 'network.onboarding': V, 'network.approvals': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: VE, 'network.league_table': V,
+  ...everyone, 'community.help_desk': VE, 'training.assignments': VE, 'settings.ai': V,
+};
+
 export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
+  // ── Leadership ──
   org_owner: {
-    key: 'org_owner', name: 'Owner', description: 'Everything, including billing, ownership and who has access.', primaryWorkspace: 'network', defaultScope: 'organization',
+    key: 'org_owner', name: 'Owner', team: 'leadership', description: 'Everything, including billing, ownership and who has access.', primaryWorkspace: 'network', defaultScope: 'organization',
     grants: { '*': ALL },
   },
   hq_admin: {
-    key: 'hq_admin', name: 'HQ admin', description: 'Runs the network: locations, brand templates, websites, marketing, approvals, reports, team and connections. No customer records or payments.',
+    key: 'hq_admin', name: 'HQ admin', team: 'leadership', description: 'Runs the network: locations, brand templates, websites, marketing, approvals, reports, team and connections. No customer records or payments.',
     primaryWorkspace: 'network', defaultScope: 'organization', networkOnly: true,
     grants: {
       'network.locations': VE, 'network.franchisees': VE, 'network.onboarding': VE, 'network.templates': VEP, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'],
@@ -461,24 +515,45 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'operations.audits': ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'publish', 'export'],
     },
   },
-  vp_franchise: {
-    key: 'vp_franchise', name: 'VP Franchise', description: 'Franchise development: the franchise pipeline, disclosure and agreements, new locations and franchisee training.',
+  // ── Franchise development ──
+  development_lead: {
+    key: 'development_lead', name: 'Development lead', team: 'development', description: 'Franchise development: the franchise pipeline and territories, disclosure and agreements, and new locations. No customer sales.',
     primaryWorkspace: 'sales', defaultScope: 'organization', networkOnly: true,
     grants: {
-      'sales.franchise_pipeline': ALL, 'legal.disclosure': VE, 'legal.agreements': VE, 'training.*': ALL, 'network.locations': VE, 'network.franchisees': VE,
-      'network.onboarding': VE, 'network.reports': V, 'sales.course_leads': V, ...everyone, 'settings.ai': V,
+      'sales.franchise_pipeline': ALL, 'legal.disclosure': VE, 'legal.agreements': VE, 'network.locations': V, 'network.franchisees': VE, 'network.onboarding': VE, 'network.reports': V,
+      ...everyone, 'settings.ai': V,
     },
   },
-  cmo: {
-    key: 'cmo', name: 'CMO', description: 'All marketing across the network, brand templates, marketing reports and coaching franchisees on local marketing.',
+  development_rep: {
+    key: 'development_rep', name: 'Development rep', team: 'development', description: 'Works franchise enquiries through the pipeline and sends disclosure. Agreements and approvals stay with the lead.',
+    primaryWorkspace: 'sales', defaultScope: 'organization', networkOnly: true,
+    grants: { 'sales.franchise_pipeline': VE, 'legal.disclosure': V, 'network.onboarding': V, 'network.locations': V, ...everyone, 'settings.ai': V },
+  },
+  // ── Sales ──
+  sales_lead: {
+    key: 'sales_lead', name: 'Sales lead', team: 'sales', description: 'Customer sales: leads and deals, routing rules, customers, memberships and packages, and course leads.',
+    primaryWorkspace: 'sales', defaultScope: 'organization',
+    grants: {
+      'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'sales.course_leads': VEX, ...each(SALES_PRODUCTS, VE), 'marketing.inbox': VE, 'marketing.forms': V,
+      'network.locations': V, 'network.reports': V, ...everyone, 'settings.ai': V,
+    },
+  },
+  sales_rep: {
+    key: 'sales_rep', name: 'Sales rep', team: 'sales', description: 'Works leads and deals, follows up customers and course leads, and sells memberships and packages.',
+    primaryWorkspace: 'sales', defaultScope: 'organization',
+    grants: { 'sales.customers': VE, 'sales.customer_pipeline': VE, 'sales.course_leads': VE, ...each(SALES_PRODUCTS, V), 'marketing.inbox': VE, 'network.locations': V, ...everyone, 'settings.ai': V },
+  },
+  // ── Marketing ──
+  marketing_lead: {
+    key: 'marketing_lead', name: 'Marketing lead', team: 'marketing', description: 'All marketing across the network, brand templates, announcements, marketing reports and the marketing fund report.',
     primaryWorkspace: 'marketing', defaultScope: 'organization', networkOnly: true,
     grants: {
-      'marketing.*': ALL, 'network.templates': VEP, 'network.reports': ['view', 'export'], 'network.approvals': V, 'network.locations': V, 'sales.customer_pipeline': V,
-      'community.*': ALL, 'training.academy': VE, 'settings.ai': V,
+      'marketing.*': ALL, 'network.templates': VEP, 'network.reports': ['view', 'export'], 'network.approvals': V, 'network.locations': V, 'sales.customer_pipeline': V, 'finance.marketing_fund': V,
+      ...everyone, 'community.announcements': VEP, 'settings.ai': V,
     },
   },
-  brand_lead: {
-    key: 'brand_lead', name: 'Brand lead', description: 'Brand assets, brand templates and locked fields, websites and social content.',
+  brand_manager: {
+    key: 'brand_manager', name: 'Brand manager', team: 'marketing', description: 'Brand assets, brand templates and locked fields, websites and social content.',
     primaryWorkspace: 'marketing', defaultScope: 'organization', networkOnly: true,
     grants: {
       'marketing.brand_assets': VEP, 'network.templates': VEP, 'marketing.website_builder': VEP, 'marketing.social': VE, 'marketing.campaigns': V, 'marketing.email': V, 'network.locations': V,
@@ -486,62 +561,99 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     },
   },
   digital_marketer: {
-    key: 'digital_marketer', name: 'Digital marketer', description: 'Websites, social, ads, email and network campaigns. No operations, customers or finance.',
+    key: 'digital_marketer', name: 'Digital marketer', team: 'marketing', description: 'Websites, social, ads, email and network campaigns. No operations, customers or finance.',
     primaryWorkspace: 'marketing', defaultScope: 'organization',
     grants: {
       'marketing.website_builder': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.network_campaigns': ALL, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.inbox': VE,
-      'marketing.forms': VEP, 'marketing.brand_assets': V,
+      'marketing.forms': VEP, 'marketing.brand_assets': V, 'marketing.reviews': VEP,
       'marketing.campaigns': VEP, 'network.locations': V, 'network.reports': V, ...everyone, 'settings.ai': V,
     },
   },
-  instructor_trainer: {
-    key: 'instructor_trainer', name: 'Instructor-trainer', description: 'Teacher training courses and course leads, plus read-only operations to see classes.',
-    primaryWorkspace: 'training', defaultScope: 'organization', networkOnly: true,
-    // Trainers write courses and work their own course leads; managing every course (and all leads) is Academy publish.
-    grants: { ...everyone, 'training.academy': ['view', 'edit', 'export'], 'training.assignments': VE, 'sales.course_leads': VE, 'operations.*': V, 'settings.ai': V },
+  content_social: {
+    key: 'content_social', name: 'Content & social', team: 'marketing', description: 'Drafts posts, emails, website pages and campaigns; publishing needs someone with publish rights.',
+    primaryWorkspace: 'marketing', defaultScope: 'organization',
+    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, 'marketing.forms': VE, 'marketing.brand_assets': VE, 'marketing.reviews': VE, ...everyone, 'settings.ai': V },
   },
-  operations_manager: {
-    key: 'operations_manager', name: 'Operations manager', description: 'Payments and finance, websites, connections, customers and day-to-day operations.',
+  // ── Operations ──
+  operations_lead: {
+    key: 'operations_lead', name: 'Operations lead', team: 'operations', description: 'Day-to-day operations across the network: locations, approvals, new locations, audits, support and the help desk. No finance.',
     primaryWorkspace: 'operations', defaultScope: 'organization',
     grants: {
-      'finance.payments': VEX, 'finance.royalties': V, 'marketing.website_builder': VEP, 'settings.connections': VE, 'network.locations': VE, 'network.approvals': ['view', 'publish'],
-      'network.reports': ['view', 'export'], 'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, ...everyone, 'settings.ai': V,
+      'operations.*': VE, 'network.locations': VE, 'network.onboarding': VE, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'sales.customers': V,
+      ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'community.help_desk': VE, 'community.library': VE, 'training.assignments': VE, 'settings.connections': VE, 'settings.ai': V,
       // Field audits, compliance documents and the league table.
-      'operations.audits': ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'export'],
+      [AUDITS_MODULE]: ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'export'],
     },
   },
-  finance: {
-    key: 'finance', name: 'Finance', description: 'Payments, refunds, reconciliation and financial reports. Royalties and payouts at HQ level.',
-    primaryWorkspace: 'finance', defaultScope: 'organization',
-    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': V, ...everyone },
+  field_consultant: {
+    key: 'field_consultant', name: 'Field consultant', team: 'operations', description: 'Business coach for a portfolio of locations: views and supports them, runs audits and coaching threads. No owner finances or customer data.',
+    primaryWorkspace: 'network', defaultScope: 'portfolio', networkOnly: true, support: true,
+    grants: supportGrants,
   },
-  legal: {
-    key: 'legal', name: 'Legal', description: 'Franchise agreements, disclosure and compliance across the network.',
+  // ── Finance ──
+  finance_lead: {
+    key: 'finance_lead', name: 'Finance lead', team: 'finance', description: 'Payments, refunds, reconciliation, royalties, invoices, the marketing fund, payouts and financial reports.',
+    primaryWorkspace: 'finance', defaultScope: 'organization',
+    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': ['view', 'publish'], 'network.locations': V, 'settings.billing': V, ...everyone },
+  },
+  accountant: {
+    key: 'accountant', name: 'Accountant', team: 'finance', description: 'Reads and exports payments, statements, royalties, payouts and fund reports for the books. Changes nothing.',
+    primaryWorkspace: 'finance', defaultScope: 'organization',
+    grants: { 'finance.*': ['view', 'export'], 'network.reports': ['view', 'export'], 'network.locations': V, ...everyone },
+  },
+  // ── Legal & compliance ──
+  legal_lead: {
+    key: 'legal_lead', name: 'Legal lead', team: 'legal', description: 'Franchise agreements, disclosure, registrations and jurisdiction rules across the network.',
     primaryWorkspace: 'legal', defaultScope: 'organization', networkOnly: true,
     grants: { 'legal.*': ALL, 'sales.franchise_pipeline': V, 'network.franchisees': V, 'network.locations': V, ...everyone, 'settings.ai': V },
   },
-  regional_manager: {
-    key: 'regional_manager', name: 'Regional manager', description: 'Oversight of the locations in a region: operations, reports, website approvals and campaign drafts.',
-    primaryWorkspace: 'network', defaultScope: 'region', networkOnly: true,
+  // ── Training ──
+  training_lead: {
+    key: 'training_lead', name: 'Training lead', team: 'training', description: 'The academy: every course, learning path and certificate, assignments and training reports.',
+    primaryWorkspace: 'training', defaultScope: 'organization',
+    grants: { ...everyone, 'training.*': ALL, 'community.library': VE, 'network.locations': V, 'settings.ai': V },
+  },
+  trainer: {
+    key: 'trainer', name: 'Trainer', team: 'training', description: 'Writes and teaches courses, assigns them and follows learners’ progress.',
+    primaryWorkspace: 'training', defaultScope: 'organization',
+    // Trainers write their own (and co-taught) courses; managing every course is Academy publish.
+    grants: { ...everyone, 'training.academy': ['view', 'edit', 'export'], 'training.assignments': VE, 'settings.ai': V },
+  },
+  // ── Franchise partners ──
+  master_franchisee: {
+    key: 'master_franchisee', name: 'Master franchisee', team: 'partners', description: 'Runs a territory (for example a country) like HQ: its locations, franchise pipeline, new locations, community, training, team and finances.',
+    primaryWorkspace: 'network', defaultScope: 'territory', networkOnly: true,
     grants: {
-      'network.locations': V, 'network.onboarding': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V, 'marketing.email': VE,
-      'operations.*': V, ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'training.assignments': VE, 'settings.ai': V,
+      'network.locations': VE, 'network.onboarding': VE, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'network.franchisees': VE, 'sales.franchise_pipeline': ALL,
+      'sales.customers': V, 'sales.customer_pipeline': V, 'marketing.campaigns': VEP, 'marketing.website_builder': VEP, 'marketing.email': VEP, 'marketing.social': VEP, 'marketing.brand_assets': V,
+      'operations.*': V, [AUDITS_MODULE]: VEP, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'], 'marketing.reviews': VEP, 'finance.payments': ['view', 'export'], 'finance.invoices': VEX, 'finance.marketing_fund': V,
+      ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'community.library': VE, 'community.help_desk': VE, 'training.academy': VE, 'training.assignments': VE,
+      'settings.team': VE, 'settings.ai': V,
     },
   },
+  area_developer: {
+    key: 'area_developer', name: 'Area developer', team: 'partners', description: 'Owns the units of a development schedule: the full dashboard for their own units, plus the franchise pipeline of their territory.',
+    primaryWorkspace: 'operations', defaultScope: 'territory', networkOnly: true,
+    grants: { ...ownerGrants, 'sales.franchise_pipeline': VE },
+  },
+  area_representative: {
+    key: 'area_representative', name: 'Area representative', team: 'partners', description: 'Supports franchisees in a territory they don’t own: views, supports and audits their locations. No owner finances unless granted.',
+    primaryWorkspace: 'network', defaultScope: 'territory', networkOnly: true, support: true,
+    grants: supportGrants,
+  },
+  multi_unit_operator: {
+    key: 'multi_unit_operator', name: 'Multi-unit operator', team: 'partners', description: 'Runs an owner group with several units: the full dashboard for every unit of the group, its team and its finances.',
+    primaryWorkspace: 'network', defaultScope: 'owner_group', networkOnly: true,
+    grants: ownerGrants,
+  },
+  // ── Locations ──
   franchise_owner: {
-    key: 'franchise_owner', name: 'Franchise owner', description: 'The full dashboard for their own locations: operations, marketing, customers, payments and their team. Nothing from other franchisees or HQ-private areas.',
+    key: 'franchise_owner', name: 'Franchise owner', team: 'locations', description: 'The full dashboard for their own locations: operations, marketing, customers, payments and their team. Nothing from other franchisees or HQ-private areas.',
     primaryWorkspace: 'operations', defaultScope: 'owner_group', networkOnly: true,
-    grants: {
-      'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
-      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP, 'marketing.reviews': VEP,
-      'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX, 'finance.invoices': VEX, 'finance.marketing_fund': V,
-      'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
-      // Field audits, compliance documents and the league table (own locations; network quartiles, never other franchisees).
-      'operations.audits': VEX, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'],
-    },
+    grants: ownerGrants,
   },
   location_manager: {
-    key: 'location_manager', name: 'Location manager', description: 'Runs a location day to day: operations, customers, the local website and campaign drafts.',
+    key: 'location_manager', name: 'Location manager', team: 'locations', description: 'Runs a location day to day: operations, customers, the local website and campaign drafts.',
     primaryWorkspace: 'operations', defaultScope: 'location',
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE, 'marketing.inbox': VE, 'marketing.social': VE,
@@ -552,36 +664,43 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     },
   },
   staff: {
-    key: 'staff', name: 'Staff', description: 'Their assigned work: schedules, attendance and orders at their location.',
+    key: 'staff', name: 'Staff', team: 'locations', description: 'Their own shifts, classes and appointments, cover requests and check-in at their location, plus community and training.',
     primaryWorkspace: 'operations', defaultScope: 'location',
-    grants: { 'operations.*': VE, ...everyone },
+    grants: { 'operations.schedule': VE, ...each(STAFF_LOOKUP, V), ...each(STAFF_FRONTLINE, VE), ...everyone },
   },
-  marketing_contributor: {
-    key: 'marketing_contributor', name: 'Marketing contributor', description: 'Drafts website and campaign changes; publishing needs someone with publish rights.',
-    primaryWorkspace: 'marketing', defaultScope: 'location',
-    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, 'marketing.forms': VE, 'marketing.brand_assets': VE, ...everyone, 'settings.ai': V },
+  // ── Other ──
+  auditor: {
+    key: 'auditor', name: 'Auditor', team: 'other', description: 'Read-only view of locations and operations, and runs audits. No finance, legal files or customer data.',
+    primaryWorkspace: 'network', defaultScope: 'organization', support: true,
+    grants: { 'network.locations': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: ['view', 'edit', 'export'], 'network.league_table': V, 'settings.audit': V, ...everyone },
   },
   customer: {
-    key: 'customer', name: 'Customer', description: 'Their own bookings, orders and preferences in the customer app.', primaryWorkspace: 'operations', defaultScope: 'location', hidden: true,
+    key: 'customer', name: 'Customer', team: 'other', description: 'Their own bookings, orders and preferences in the customer app.', primaryWorkspace: 'operations', defaultScope: 'location', hidden: true,
     grants: {},
   },
 };
 
-/** System roles offered when inviting, in display order. */
-export const TEAM_ROLE_ORDER: readonly Role[] = [
-  'org_owner', 'hq_admin', 'vp_franchise', 'cmo', 'brand_lead', 'digital_marketer', 'instructor_trainer', 'operations_manager', 'finance', 'legal',
-  'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor',
-];
+/** System roles offered when inviting, in display order (grouped by team). */
+export const TEAM_ROLE_ORDER: readonly Role[] = (Object.keys(ROLE_TEMPLATES) as Role[]).filter((r) => !ROLE_TEMPLATES[r].hidden);
 
-/** Capabilities of a system role for an industry (before scope filtering and overrides). */
+/** The templates of each team, in display order. */
+export function rolesByTeam(roles: readonly Role[] = TEAM_ROLE_ORDER): { team: RoleTeam; roles: Role[] }[] {
+  return ROLE_TEAMS.map((team) => ({ team, roles: roles.filter((r) => ROLE_TEMPLATES[r]?.team === team) })).filter((g) => g.roles.length > 0);
+}
+
+/** Capabilities of a system role for an industry (before scope filtering and overrides). Legacy keys resolve to their template. */
 export function templateCapabilities(role: Role | string, industry: Industry | string): Set<Capability> {
-  const t = ROLE_TEMPLATES[role as Role];
-  return t ? expandGrants({ ...t.grants, ...(AI_ROLE_GRANTS[role as Role] ?? {}) }, industry) : new Set();
+  const key = canonicalRole(role) as Role;
+  const t = ROLE_TEMPLATES[key];
+  if (!t) return new Set();
+  const caps = expandGrants({ ...t.grants, ...(AI_ROLE_GRANTS[key] ?? {}) }, industry);
+  if (caps.has('settings.ai:view')) for (const a of AI_DEFAULT_ACTIONS) caps.add(capability(AI_ASSISTANT_MODULE, a));
+  return caps;
 }
 
 /**
  * Legacy permission sets per role, derived from the templates (industry-independent: every industry has
- * Operations modules). `test/access.test.ts` pins these to the original fixed lists.
+ * Operations modules).
  */
 export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = Object.fromEntries(
   (Object.keys(ROLE_TEMPLATES) as Role[]).map((r) => [r, [...permissionsFromCapabilities(templateCapabilities(r, 'studios'))]]),
@@ -589,7 +708,131 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = Object.from
 
 /** Client-side helper: does any assignment's role grant the permission (scope is enforced server-side). */
 export function can(assignments: RoleAssignment[], permission: Permission): boolean {
-  return assignments.some((a) => ROLE_PERMISSIONS[a.role]?.includes(permission));
+  return assignments.some((a) => ROLE_PERMISSIONS[canonicalRole(a.role) as Role]?.includes(permission));
+}
+
+/* ------------------------------------------------------------------ */
+/* Sensitive data classes (ownership vs support)                       */
+/* ------------------------------------------------------------------ */
+
+/** The sensitive class a module carries, if any. */
+export function sensitiveClassOf(industry: Industry | string, module: string): SensitiveClass | null {
+  return moduleDef(industry, module)?.sensitive ?? null;
+}
+
+/** Sensitive classes a capability set reaches (any action on a module carrying the class). */
+export function sensitiveClassesIn(caps: ReadonlySet<string>, industry: Industry | string): Set<SensitiveClass> {
+  const out = new Set<SensitiveClass>();
+  for (const c of caps) {
+    const cls = sensitiveClassOf(industry, parseCapability(c)?.module ?? '');
+    if (cls) out.add(cls);
+  }
+  return out;
+}
+
+/** Removes every capability on a module of a denied sensitive class (explicit denies only apply to these classes). */
+export function applyDenies(caps: ReadonlySet<Capability>, denied: Iterable<string> | null | undefined, industry: Industry | string): Set<Capability> {
+  const d = new Set([...(denied ?? [])].filter((x): x is SensitiveClass => (SENSITIVE_CLASSES as readonly string[]).includes(x)));
+  if (!d.size) return new Set(caps);
+  return new Set([...caps].filter((c) => {
+    const cls = sensitiveClassOf(industry, parseCapability(c)?.module ?? '');
+    return !cls || !d.has(cls);
+  }));
+}
+
+/* ------------------------------------------------------------------ */
+/* Scopes                                                              */
+/* ------------------------------------------------------------------ */
+
+/** Display order of scope kinds, widest first (decides the landing workspace and grouping). */
+export const SCOPE_ORDER: readonly ScopeKind[] = ['organization', 'brand', 'territory', 'region', 'portfolio', 'owner_group', 'location'];
+
+/** Scope kinds offered when assigning a role, by business model (independent businesses have one location). */
+export function scopeKindsFor(model: 'independent' | 'network'): ScopeKind[] {
+  return model === 'independent' ? ['organization', 'location'] : [...SCOPE_ORDER];
+}
+
+/* ------------------------------------------------------------------ */
+/* Team shape (onboarding and Team & access)                           */
+/* ------------------------------------------------------------------ */
+
+export const TEAM_SHAPES = ['full', 'small', 'solo', 'custom'] as const;
+export type TeamShape = (typeof TEAM_SHAPES)[number];
+
+/** A combined role a small team starts with: the union of templates, saved as one of the business's own roles. */
+export interface CombinedRole {
+  key: string;
+  name: string;
+  description: string;
+  from: readonly Role[];
+  primaryWorkspace: WorkspaceKey;
+}
+
+/** Combined roles for teams where people cover several areas ("Marketing & sales", "Operations & finance"…). */
+export const COMBINED_ROLES: readonly CombinedRole[] = [
+  { key: 'marketing_sales', name: 'Marketing & sales', description: 'Marketing across the network plus customer sales: leads, deals and memberships.', from: ['marketing_lead', 'sales_lead'], primaryWorkspace: 'marketing' },
+  { key: 'operations_finance', name: 'Operations & finance', description: 'Day-to-day operations plus payments, royalties, invoices and payouts.', from: ['operations_lead', 'finance_lead'], primaryWorkspace: 'operations' },
+  { key: 'development_training', name: 'Franchise development & training', description: 'The franchise pipeline, disclosure, agreements and new locations, plus the academy.', from: ['development_lead', 'training_lead'], primaryWorkspace: 'sales' },
+];
+
+/**
+ * What each team shape suggests. Nothing is locked: the shape only pre-creates roles and can be changed later in Team
+ * & access ("Team shape"). `templates` are the system templates to suggest when inviting; `combined` are created as
+ * the business's own roles.
+ */
+export const TEAM_SHAPE_SUGGESTIONS: Record<TeamShape, { templates: readonly Role[]; combined: readonly string[] }> = {
+  full: {
+    templates: ['hq_admin', 'development_lead', 'development_rep', 'sales_lead', 'sales_rep', 'marketing_lead', 'brand_manager', 'digital_marketer', 'content_social', 'operations_lead', 'field_consultant', 'finance_lead', 'accountant', 'legal_lead', 'training_lead', 'trainer'],
+    combined: [],
+  },
+  small: { templates: ['hq_admin', 'trainer', 'field_consultant'], combined: COMBINED_ROLES.map((c) => c.key) },
+  solo: { templates: [], combined: [] },
+  custom: { templates: [], combined: [] },
+};
+
+/** Capabilities of a combined role (the union of its templates, organisation-wide). */
+export function combinedRoleCapabilities(key: string, industry: Industry | string): Set<Capability> {
+  const c = COMBINED_ROLES.find((x) => x.key === key);
+  const out = new Set<Capability>();
+  for (const r of c?.from ?? []) for (const cap of templateCapabilities(r, industry)) out.add(cap);
+  return out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Coverage: who handles each area                                     */
+/* ------------------------------------------------------------------ */
+
+export interface CoverageArea {
+  key: string;
+  /** The capability that means "handles this area". */
+  capability: string;
+  /** The template that usually handles it (suggested when assigning). */
+  suggestedRole: Role;
+  networkOnly?: boolean;
+}
+
+/**
+ * Areas somebody should handle. An area nobody but the owner holds is "uncovered": Team & access shows it, and the
+ * approvals and notifications for it go to the owner until someone is assigned.
+ */
+export const COVERAGE_AREAS: readonly CoverageArea[] = [
+  { key: 'franchise_pipeline', capability: 'sales.franchise_pipeline:edit', suggestedRole: 'development_lead', networkOnly: true },
+  { key: 'customer_sales', capability: 'sales.customer_pipeline:edit', suggestedRole: 'sales_lead' },
+  { key: 'marketing', capability: 'marketing.campaigns:publish', suggestedRole: 'marketing_lead' },
+  { key: 'websites', capability: 'marketing.website_builder:publish', suggestedRole: 'digital_marketer' },
+  { key: 'approvals', capability: 'network.approvals:publish', suggestedRole: 'operations_lead', networkOnly: true },
+  { key: 'new_locations', capability: 'network.onboarding:edit', suggestedRole: 'operations_lead', networkOnly: true },
+  { key: 'help_desk', capability: 'community.help_desk:edit', suggestedRole: 'operations_lead', networkOnly: true },
+  { key: 'payments', capability: 'finance.payments:edit', suggestedRole: 'finance_lead' },
+  { key: 'royalties', capability: 'finance.royalties:edit', suggestedRole: 'finance_lead', networkOnly: true },
+  { key: 'agreements', capability: 'legal.agreements:edit', suggestedRole: 'legal_lead', networkOnly: true },
+  { key: 'disclosure', capability: 'legal.disclosure:publish', suggestedRole: 'legal_lead', networkOnly: true },
+  { key: 'training', capability: 'training.academy:publish', suggestedRole: 'training_lead' },
+];
+
+/** Coverage areas that exist for this business (their module is in the industry's catalogue). */
+export function coverageAreasFor(industry: Industry | string, model: 'independent' | 'network'): CoverageArea[] {
+  return COVERAGE_AREAS.filter((a) => (model === 'network' || !a.networkOnly) && !!moduleDef(industry, parseCapability(a.capability)!.module));
 }
 
 /* ------------------------------------------------------------------ */
@@ -604,6 +847,8 @@ export interface AccessInput {
   /** Per-person overrides on this assignment. */
   grants?: Iterable<string> | null;
   revokes?: Iterable<string> | null;
+  /** Person-level denies of sensitive data classes (apply to every role the person holds). */
+  deniedClasses?: Iterable<string> | null;
 }
 
 /** The capabilities one role assignment gives, for an organisation of `industry`. */
@@ -614,7 +859,7 @@ export function effectiveCapabilities(a: AccessInput, industry: Industry | strin
   // Revoking `view` removes the whole module; revoking another action removes just that action.
   const revokedModules = new Set([...revoked].map(parseCapability).filter((p) => p?.action === 'view').map((p) => p!.module));
   const kept = new Set([...base].filter((c) => !revoked.has(c) && !revokedModules.has(parseCapability(c)!.module)));
-  return scopeFilter(kept, a.scopeKind, industry);
+  return applyDenies(scopeFilter(kept, a.scopeKind, industry), a.deniedClasses, industry);
 }
 
 export interface WorkspaceView {
@@ -645,7 +890,7 @@ export function settingsModulesFor(caps: ReadonlySet<string>, industry: Industry
 /** Landing workspace: the first role's primary workspace when visible, otherwise the first visible one. */
 export function primaryWorkspace(roles: readonly { role: string; primaryWorkspace?: WorkspaceKey | null }[], visible: readonly WorkspaceKey[]): WorkspaceKey | null {
   for (const r of roles) {
-    const w = r.primaryWorkspace ?? ROLE_TEMPLATES[r.role as Role]?.primaryWorkspace;
+    const w = r.primaryWorkspace ?? ROLE_TEMPLATES[canonicalRole(r.role) as Role]?.primaryWorkspace;
     if (w && visible.includes(w)) return w;
   }
   return visible[0] ?? null;

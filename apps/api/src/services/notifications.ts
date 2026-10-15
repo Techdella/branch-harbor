@@ -4,7 +4,7 @@ import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import { consentRecords, customers, locations, pushNotifications, pushTokens, roleAssignments, users } from '../db/schema/index.ts';
 import { hasPermissionInScope, type ScopeChain } from '../domain/scope.ts';
-import { loadOrgAssignments } from './authz.ts';
+import { loadOrgAssignments, resolveScopeChain } from './authz.ts';
 
 export type PushCategory = 'order_status' | 'approval_request' | 'cover_request' | 'waitlist_promotion' | 'class_update' | 'network_update';
 
@@ -83,13 +83,24 @@ export async function deliverPush(s: Services, input: NotifyInput) {
 
 /** Users holding `permission` at a location (optionally also `alsoPermission`), e.g. who can approve. */
 export async function usersWithPermissionAt(db: Exec, organizationId: string, locationId: string | null, permission: Permission, alsoPermission?: Permission): Promise<string[]> {
-  let chain: ScopeChain = { organizationId, kind: 'organization' };
-  if (locationId) {
-    const [l] = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.id, locationId));
-    if (l) chain = { organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
-  }
+  const chain: ScopeChain = locationId
+    ? await resolveScopeChain(db, { organizationId, kind: 'location', id: locationId }).catch(() => ({ organizationId, kind: 'organization' as const }))
+    : { organizationId, kind: 'organization' };
   const byUser = await loadOrgAssignments(db, organizationId);
   return [...byUser.entries()].filter(([, a]) => hasPermissionInScope(a, permission, chain) && (!alsoPermission || hasPermissionInScope(a, alsoPermission, chain))).map(([id]) => id);
+}
+
+/**
+ * Who should get an approval or notification (coverage fallback): the people whose role handles it — anyone holding
+ * the permission there other than owners, who hold everything. When nobody does (the responsible role is empty, e.g.
+ * nobody handles royalties yet), it goes to the owners instead, so nothing waits unseen.
+ */
+export async function responsibleUsersAt(db: Exec, organizationId: string, locationId: string | null, permission: Permission, alsoPermission?: Permission): Promise<{ userIds: string[]; fallback: boolean }> {
+  const holders = await usersWithPermissionAt(db, organizationId, locationId, permission, alsoPermission);
+  const owners = new Set((await db.select({ userId: roleAssignments.userId }).from(roleAssignments)
+    .where(and(eq(roleAssignments.organizationId, organizationId), eq(roleAssignments.role, 'org_owner')))).map((r) => r.userId));
+  const responsible = holders.filter((id) => !owners.has(id));
+  return responsible.length ? { userIds: responsible, fallback: false } : { userIds: [...owners], fallback: true };
 }
 
 /** The signed-in account behind a customer record: linked user, or a verified account with the same email. */

@@ -94,7 +94,7 @@ async function seedNorthlightFinance(s: Services, db: Db, org: typeof t.organiza
   const orgId = org.id;
   const ceo = (await db.select().from(t.users).where(eq(t.users.email, 'elena.marsh@northlight.demo.branchharbor.com')))[0]!;
   const finance = await upsertUser('ruth.adeyemi@northlight.demo.branchharbor.com', 'Ruth Adeyemi');
-  await db.insert(t.roleAssignments).values({ organizationId: orgId, userId: finance.id, role: 'finance', scopeKind: 'organization', scopeId: orgId, createdBy: ceo.id }).onConflictDoNothing();
+  await db.insert(t.roleAssignments).values({ organizationId: orgId, userId: finance.id, role: 'finance_lead', scopeKind: 'organization', scopeId: orgId, createdBy: ceo.id }).onConflictDoNothing();
   const groups = await db.select().from(t.ownerGroups).where(eq(t.ownerGroups.organizationId, orgId));
   const g = (name: string) => groups.find((x) => x.name.startsWith(name))!;
   const pacific = g('Pacific'), rose = g('Rose'), thames = g('Thames');
