@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { NetworkEntry } from '@/features/network/NetworkEntry';
 import { QualityEntry } from '@/features/quality/QualityEntry';
+import { MarinaEntry } from '@/features/marina/MarinaEntry';
 import { Avatar, Badge, Card, DataStatus, Screen, ScreenHeader, SkeletonCard, Text } from '@/components';
 import { useI18n } from '@/i18n';
 import { api } from '@/lib/api';
@@ -15,6 +16,7 @@ export default function StaffMessages() {
     <Screen onRefresh={q.refresh} refreshing={q.refreshing}>
       <ScreenHeader title={t('staff.messagesTitle')} />
       <NetworkEntry onPress={() => router.push('/network')} />
+      <MarinaEntry onPress={() => router.push('/marina')} />
       <QualityEntry onPress={() => router.push('/quality')} />
       <DataStatus q={q} />
       {q.loading ? <SkeletonCard /> : null}
