@@ -391,7 +391,7 @@
       "fund": "Marketing fund",
       "feeNote": "BranchHarbor’s flat collection fee for this period was {fee}. HQ pays it; it is never added to what you owe.",
       "method": "Collected by {method} ending {last4}.",
-      "emailed": "Emailed to {n} people on {at}.",
+      "emailed": "Emailed to {n, plural, one {# person} other {# people}} on {at}.",
       "notEmailed": "Not emailed (no franchise owner on file)."
     }
   }

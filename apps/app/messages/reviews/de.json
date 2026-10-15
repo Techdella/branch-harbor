@@ -391,7 +391,7 @@
       "fund": "Marketingfonds",
       "feeNote": "Die pauschale BranchHarbor-Einzugsgebühr für diesen Zeitraum betrug {fee}. Die Zentrale zahlt sie; sie wird nie zu Ihrem Betrag addiert.",
       "method": "Eingezogen per {method}, endet auf {last4}.",
-      "emailed": "Am {at} an {n} Personen gesendet.",
+      "emailed": "Am {at} an {n, plural, one {# Person} other {# Personen}} gesendet.",
       "notEmailed": "Nicht gesendet (kein Franchisenehmer hinterlegt)."
     }
   }

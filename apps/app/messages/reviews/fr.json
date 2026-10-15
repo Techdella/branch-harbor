@@ -391,7 +391,7 @@
       "fund": "Fonds marketing",
       "feeNote": "Les frais fixes de prélèvement BranchHarbor pour cette période s’élèvent à {fee}. Le siège les paie ; ils ne s’ajoutent jamais à votre montant dû.",
       "method": "Prélevé par {method} se terminant par {last4}.",
-      "emailed": "Envoyé par e-mail à {n} personnes le {at}.",
+      "emailed": "Envoyé par e-mail à {n, plural, one {# personne} other {# personnes}} le {at}.",
       "notEmailed": "Non envoyé (aucun franchisé enregistré)."
     }
   }

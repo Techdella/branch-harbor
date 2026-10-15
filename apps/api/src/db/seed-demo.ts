@@ -342,7 +342,7 @@ async function seedReviewsAndDebitDemo(orgId: string) {
       reviews++;
     }
     // Review requests after classes; some answered with private feedback (in the inbox), some skipped.
-    const custs = await db.select().from(t.customers).where(sql`${t.customers.locationId} = ${loc.id}`).limit(6);
+    const custs = await db.select().from(t.customers).where(sql`${t.customers.locationId} = ${loc.id}`).orderBy(t.customers.name).offset(li % 4).limit(6);
     for (const [ci, c] of custs.entries()) {
       const id = randomUUID();
       const sentAt = ago(2 + ci * 6 + li, 3);

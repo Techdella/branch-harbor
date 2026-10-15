@@ -391,7 +391,7 @@
       "fund": "Fondo de marketing",
       "feeNote": "La tarifa fija de cobro de BranchHarbor de este periodo fue {fee}. La paga la central; nunca se suma a lo que debes.",
       "method": "Cobrado por {method} que termina en {last4}.",
-      "emailed": "Enviado por correo a {n} personas el {at}.",
+      "emailed": "Enviado por correo a {n, plural, one {# persona} other {# personas}} el {at}.",
       "notEmailed": "No enviado (no hay franquiciado registrado)."
     }
   }
