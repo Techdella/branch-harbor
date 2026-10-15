@@ -123,6 +123,37 @@ export const QUALITY_MODULES: readonly ModuleDef[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Suppliers, rebates and self-checks                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Supply network and audits phase 2 modules (one block, appended after the quality modules):
+ * - `operations.suppliers`: HQ's approved suppliers per region / country with catalogues and contracts; locations order
+ *   from the catalogue, receive deliveries and log off-contract purchases. Publish = manage suppliers and approve
+ *   purchase orders above the threshold. Granted by name only (never through `operations.*`).
+ * - `finance.supplier_rebates`: rebate programmes negotiated by HQ, accruals from orders, claims and statements, and
+ *   the share booked into the marketing fund. HQ only.
+ * - `operations.self_checks`: daily / weekly checklists a location runs itself (opening, closing, temperature logs),
+ *   kept apart from HQ audits. Part of `operations.*`, so staff run them; publish = set the schedules.
+ */
+export const SUPPLY_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'operations.suppliers', area: 'operations', name: 'Suppliers', description: 'Approved suppliers and their catalogues, purchase orders from the catalogue, receiving deliveries, off-contract purchases and supplier scorecards for the locations in scope.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { view: 'See approved suppliers, catalogues and orders.', edit: 'Place purchase orders, receive deliveries and log off-contract purchases.', publish: 'Manage suppliers and catalogues, approve purchase orders above the threshold and review off-contract spend.', export: 'Download orders and spend.' },
+    networkOnly: true, status: 'available', explicitGrant: true,
+  },
+  {
+    key: 'finance.supplier_rebates', area: 'finance', name: 'Supplier rebates', description: 'Rebate programmes negotiated with suppliers, accrued rebates from orders, claims, statements and the share paid into the marketing fund.',
+    actions: ['view', 'edit', 'export'], actionNotes: { edit: 'Set up programmes, raise claims and record payments.' }, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'finance',
+  },
+  {
+    key: 'operations.self_checks', area: 'operations', name: 'Self-checks', description: 'Checklists a location runs itself every day or week (opening, closing, food-safety temperature logs) with reminders, kept apart from HQ audits.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { edit: 'Fill in the day’s checklists.', publish: 'Set which checklists each location runs and when.', export: 'Download self-check results.' },
+    status: 'available',
+  },
+];
+
 /** Modules every business account has, whatever its industry. */
 export const CORE_MODULES: readonly ModuleDef[] = [
   // Network (HQ)
@@ -181,7 +212,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'settings.audit', area: 'settings', name: 'Audit log', description: 'Who changed what, and when.', actions: V, status: 'available' },
   { key: 'settings.ai', area: 'settings', name: 'AI assistant', description: 'Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes.', actions: V, status: 'available' },
   // Field audits, compliance documents and the league table (see QUALITY_MODULES).
-  ...QUALITY_MODULES,
+  ...QUALITY_MODULES,  // Suppliers, supplier rebates and self-checks (see SUPPLY_MODULES).
+  ...SUPPLY_MODULES,
 ];
 
 const ops = (key: string, name: string, description: string, screens: readonly string[], status: ModuleDef['status'] = 'available'): ModuleDef => ({
@@ -416,6 +448,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'marketing.*': ALL, 'operations.*': V, 'settings.team': VE, 'settings.connections': VE, 'settings.audit': V, 'settings.ai': V, 'training.*': ALL, 'community.*': ALL,
       // Field audits, compliance documents and the league table.
       'operations.audits': ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'publish', 'export'],
+      // Suppliers, supplier rebates and self-checks.
+      'operations.suppliers': ALL, 'finance.supplier_rebates': ['view', 'export'], 'operations.self_checks': ['view', 'publish', 'export'],
     },
   },
   vp_franchise: {
@@ -465,12 +499,14 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'network.reports': ['view', 'export'], 'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, ...everyone, 'settings.ai': V,
       // Field audits, compliance documents and the league table.
       'operations.audits': ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'export'],
+      // Suppliers, supplier rebates and self-checks.
+      'operations.suppliers': ALL, 'finance.supplier_rebates': ALL, 'operations.self_checks': ALL,
     },
   },
   finance: {
     key: 'finance', name: 'Finance', description: 'Payments, refunds, reconciliation and financial reports. Royalties and payouts at HQ level.',
     primaryWorkspace: 'finance', defaultScope: 'organization',
-    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': V, ...everyone },
+    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': V, ...everyone, 'operations.suppliers': ['view', 'export'] },
   },
   legal: {
     key: 'legal', name: 'Legal', description: 'Franchise agreements, disclosure and compliance across the network.',
@@ -483,6 +519,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {
       'network.locations': V, 'network.onboarding': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V, 'marketing.email': VE,
       'operations.*': V, ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'training.assignments': VE, 'settings.ai': V,
+      // Suppliers in the region (read-only; self-checks come with operations.*).
+      'operations.suppliers': V,
     },
   },
   franchise_owner: {
@@ -495,6 +533,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
       // Field audits, compliance documents and the league table (own locations; network quartiles, never other franchisees).
       'operations.audits': VEX, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'],
+      // Suppliers (order, receive, log off-contract spend) and self-checks for their own locations.
+      'operations.suppliers': VEX, 'operations.self_checks': ALL,
     },
   },
   location_manager: {
@@ -506,6 +546,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
       // Field audits, compliance documents and the league table.
       'operations.audits': VE, 'legal.compliance_documents': VE, 'network.league_table': V,
+      // Suppliers (order, receive, log off-contract spend) and self-checks.
+      'operations.suppliers': VE, 'operations.self_checks': VE,
     },
   },
   staff: {
