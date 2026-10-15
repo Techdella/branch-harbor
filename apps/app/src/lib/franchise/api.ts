@@ -43,6 +43,8 @@ export interface Project {
   id: string; name: string; status: 'active' | 'go_live_requested' | 'opened' | 'cancelled'; prospectId: string | null; prospectName: string | null; ownerGroupId: string | null; ownerEmail: string | null; ownerInvitationId: string | null;
   location: { id: string; name: string; status: string; publiclyVisible: boolean; slug: string } | null; targetOpenDate: string | null; startedAt: string; openedAt: string | null;
   progress: { done: number; total: number; overdue: number }; gates: { done: number; total: number }; canRequestGoLive: boolean; tasks?: Task[];
+  /** Pre-opening checks with an audit checklist (Operations → Audits): an audit with it must pass before go-live. */
+  preOpening?: { templateId: string; templateName: string | null; passed: boolean; passedAuditId: string | null; latest: { id: string; status: string; dueDate: string; scorePct: number | null; passed: boolean | null } | null } | null;
 }
 export interface Agreement {
   id: string; ownerGroupId: string | null; ownerGroupName: string | null; territory: string | null; jurisdiction: string | null; startDate: string; endDate: string; termYears: number | null;

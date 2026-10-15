@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "audits": "Audits",
+    "compliance": "Compliance documents",
+    "leagueTable": "League table"
+  },
+  "access": {
+    "modules": {
+      "operations": {
+        "audits": {
+          "name": "Audits",
+          "description": "Field visits and audits: checklist templates, scheduled audits with photos and scores, corrective actions and re-audits for the locations in scope."
+        }
+      },
+      "legal": {
+        "compliance_documents": {
+          "name": "Compliance documents",
+          "description": "Certificates of insurance, licences, permits and health certificates per location or owner group, with expiry reminders."
+        }
+      },
+      "network": {
+        "league_table": {
+          "name": "League table",
+          "description": "Locations in scope ranked by revenue, growth, bookings or orders, audit score and royalty status. Franchise owners see their own locations against anonymised network quartiles."
+        }
+      }
+    }
+  },
+  "quality": {
+    "common": {
+      "all": "All",
+      "choose": "Choose…",
+      "exportCsv": "Export CSV",
+      "ownerGroup": "Owner group",
+      "region": "Region"
+    },
+    "col": {
+      "location": "Location",
+      "latestScore": "Latest score",
+      "trend": "Last 6 months",
+      "actions": "Corrective actions",
+      "nextDue": "Next audit",
+      "due": "Due",
+      "auditor": "Auditor",
+      "status": "Status",
+      "score": "Score",
+      "checklist": "Checklist",
+      "item": "Item"
+    },
+    "auditStatus": {
+      "scheduled": "Scheduled",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "actionStatus": {
+      "open": "To fix",
+      "submitted": "Waiting for verification",
+      "verified": "Verified"
+    },
+    "purpose": {
+      "routine": "Routine",
+      "pre_opening": "Pre-opening",
+      "reaudit": "Re-audit"
+    },
+    "qtype": {
+      "yes_no": "Yes / no",
+      "scale": "Scale 1–5",
+      "number": "Number",
+      "text": "Text",
+      "photo": "Photo"
+    },
+    "reason": {
+      "no": "Answered no",
+      "low_score": "Scored 2 or lower",
+      "out_of_range": "Outside the allowed range",
+      "photo_missing": "Photo missing",
+      "unanswered": "Not answered"
+    },
+    "answer": {
+      "yes": "Yes",
+      "no": "No",
+      "na": "N/A",
+      "scaleN": "{n} out of 5",
+      "scaleOf": "{n} / 5",
+      "range": "Pass: {min} to {max}",
+      "atLeast": "Pass: at least {min}",
+      "atMost": "Pass: at most {max}",
+      "photoTaken": "Photo taken"
+    },
+    "audits": {
+      "title": "Audits",
+      "description": "Field visits and brand-standards audits: scores by location, corrective actions and re-audits.",
+      "tab": {
+        "overview": "Overview",
+        "audits": "Audits",
+        "actions": "Corrective actions",
+        "templates": "Checklists"
+      },
+      "filter": {
+        "open": "Open",
+        "completed": "Completed",
+        "all": "All"
+      },
+      "schedule": "Schedule an audit",
+      "scheduleSave": "Schedule",
+      "auditorHint": "People with Audits (edit) at this location.",
+      "empty": "No audits here yet",
+      "emptyBody": "Scheduled audits and finished reports appear here."
+    },
+    "dashboard": {
+      "averageScore": "Average score",
+      "lastMonths": "Last {count} months",
+      "completed": "Audits completed",
+      "passed": "{count} passed",
+      "openActions": "Open corrective actions",
+      "overdueActions": "Overdue corrective actions",
+      "overdueAudits": "Overdue audits",
+      "byLocation": "Scores by location",
+      "network": "Network average",
+      "noAudit": "No audit yet",
+      "open": "{count} open",
+      "overdue": "{count} overdue",
+      "noLocations": "No locations in your scope",
+      "overdueActionsTitle": "Overdue corrective actions",
+      "dueOn": "Due {date}",
+      "noOverdueActions": "Nothing overdue.",
+      "upcomingTitle": "Overdue and upcoming audits",
+      "noUpcoming": "No audits scheduled."
+    },
+    "audit": {
+      "pageTitle": "Audit",
+      "back": "All audits",
+      "critical": "Critical",
+      "criticalFail": "Critical item failed",
+      "noAuditor": "No auditor yet",
+      "photoRequired": "Photo required",
+      "photoOf": "Photo for {item}"
+    },
+    "conduct": {
+      "description": "Due {date}. Answers save as you go, also when the connection drops.",
+      "progress": "{done} of {total} answered",
+      "liveScore": "Score",
+      "saving": "Saving…",
+      "saved": "All changes saved",
+      "offline": "Offline: answers are kept on this device and saved when you're back online",
+      "saveError": "Not saved. We'll try again.",
+      "autosave": "Saves automatically",
+      "sectionProgress": "{done}/{total}",
+      "addPhoto": "Add photo",
+      "uploading": "Uploading…",
+      "photoOffline": "Photos need a connection on the web. Use the mobile app to take photos offline.",
+      "removePhoto": "Remove photo",
+      "addNote": "Add note",
+      "note": "Note",
+      "notePlaceholder": "What did you see?",
+      "willCreateAction": "becomes a corrective action",
+      "finish": "Finish the audit",
+      "passMark": "Pass mark {pct}%",
+      "failedItems": "Failed items",
+      "becomeActions": "Each becomes a corrective action for the location",
+      "unanswered": "Still to answer",
+      "criticalBanner": "A critical item failed: this audit fails whatever the score.",
+      "summary": "Summary for the location",
+      "complete": "Complete audit",
+      "answerAll": "Answer every question (or mark it N/A) to complete the audit."
+    },
+    "report": {
+      "completedOn": "Completed {date} by {auditor}",
+      "scheduledFor": "Scheduled for {date}",
+      "notYet": "The report appears here when {auditor} completes the audit.",
+      "passed": "Passed",
+      "failed": "Failed",
+      "previous": "Previous audit: {score}",
+      "bySection": "Score by section",
+      "reaudit": "Re-audit due {date}",
+      "actions": "Corrective actions ({count})",
+      "noActions": "No corrective actions: every item passed."
+    },
+    "actions": {
+      "filter": {
+        "active": "To do",
+        "overdue": "Overdue",
+        "verified": "Verified"
+      },
+      "empty": "No corrective actions",
+      "overdue": "Overdue",
+      "due": "Due {date}",
+      "auditorNote": "Auditor:",
+      "reopened": "Reopened: {note}",
+      "fix": "Fix:",
+      "evidenceOf": "Evidence for {item}",
+      "verifiedBy": "Verified by {name} on {date}",
+      "whatFixed": "What did you fix?",
+      "addEvidence": "Add evidence photo",
+      "markDone": "Mark as fixed",
+      "evidenceNeeded": "Add a photo of the fix first.",
+      "reviewNote": "Note to the location",
+      "reopen": "Reopen",
+      "verify": "Verify"
+    },
+    "templates": {
+      "active": "Active",
+      "archived": "Archived",
+      "fromStarter": "Start from a template",
+      "new": "New checklist",
+      "untitled": "Untitled checklist",
+      "empty": "No checklists yet",
+      "emptyBody": "Start from a ready-made checklist for your industry or build your own.",
+      "questions": "{count, plural, one {# question} other {# questions}}",
+      "critical": "{count} critical",
+      "passMark": "Pass {pct}%",
+      "version": "v{n}",
+      "starterHint": "Sensible starting points. Copy one and edit it into your own brand standards.",
+      "preOpening": "Pre-opening",
+      "added": "Added",
+      "useStarter": "Use this checklist"
+    },
+    "editor": {
+      "pageTitle": "Checklist",
+      "description": "Sections and questions, with weights, critical items and required photos.",
+      "back": "Checklists",
+      "archive": "Archive",
+      "restore": "Restore",
+      "save": "Save checklist",
+      "saved": "Saved as version {version}. Audits not started yet use it.",
+      "archivedNote": "This checklist is archived: it can't be used for new audits.",
+      "name": "Name",
+      "descriptionLabel": "Description",
+      "passMark": "Pass mark (%)",
+      "passMarkHint": "A failed critical item fails the audit anyway.",
+      "correctiveDays": "Days to fix",
+      "correctiveDaysHint": "Critical items get half.",
+      "reauditDays": "Re-audit after (days)",
+      "reauditDaysHint": "Set when an audit fails.",
+      "photoCount": "{count} with photos",
+      "totalWeight": "Total weight {n}",
+      "section": "Section {n}",
+      "sectionPlaceholder": "e.g. Storefront",
+      "question": "Question {n}",
+      "type": "Answer type",
+      "weight": "Weight",
+      "min": "Pass from",
+      "max": "Pass up to",
+      "unit": "Unit",
+      "guidance": "Guidance for the auditor",
+      "critical": "Critical item",
+      "criticalHint": "If this item fails, the whole audit fails.",
+      "photoRequired": "Photo required",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removeQuestion": "Remove question",
+      "removeSection": "Remove section",
+      "addQuestion": "Add question",
+      "addSection": "Add section"
+    },
+    "preOpening": {
+      "title": "Pre-opening audit",
+      "passed": "Passed",
+      "required": "Required before opening",
+      "explain": "The opening can be requested once a “{name}” audit has passed.",
+      "none": "Use an audit checklist for the pre-opening checks: HQ approves the opening only after it passes.",
+      "checklist": "Checklist",
+      "noChecklist": "No audit needed",
+      "latestDone": "Latest pre-opening audit",
+      "latestDue": "Pre-opening audit due {date}",
+      "schedule": "Schedule the pre-opening audit",
+      "afterProvision": "Schedule it once the location is created."
+    },
+    "state": {
+      "valid": "Valid",
+      "expiring": "Expiring in 30 days",
+      "expired": "Expired",
+      "missing": "Missing",
+      "pending": "Waiting for review",
+      "below_minimum": "Below the minimum",
+      "not_applicable": "Not needed"
+    },
+    "docStatus": {
+      "pending": "Waiting for review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "category": {
+      "insurance": "Certificate of insurance",
+      "licence": "Licence",
+      "permit": "Permit",
+      "health_certificate": "Health / food safety certificate",
+      "franchisee_document": "Franchisee document"
+    },
+    "compliance": {
+      "title": "Compliance documents",
+      "description": "Insurance, licences, permits and health certificates for every location, with expiry reminders.",
+      "tab": {
+        "matrix": "Matrix",
+        "documents": "Documents",
+        "requirements": "Requirements"
+      },
+      "upload": "Upload a document",
+      "uploadFor": "Upload for this location",
+      "uploadSave": "Upload",
+      "category": "Type",
+      "compliant": "Compliant",
+      "companyOwned": "Company-owned",
+      "noRequirements": "No requirements yet",
+      "noRequirementsBody": "HQ sets what each location must hold, e.g. general liability insurance of at least a set amount.",
+      "noDocuments": "No documents yet",
+      "superseded": "Replaced",
+      "issuer": "Insurer or issuer",
+      "reference": "Policy or licence number",
+      "coverage": "Coverage",
+      "coverageType": "Coverage type",
+      "amount": "Amount",
+      "amountInvalid": "Use digits, e.g. 2000000",
+      "currency": "Currency",
+      "expires": "Expires",
+      "issued": "Issued",
+      "noExpiry": "No expiry",
+      "uploadedBy": "Uploaded by",
+      "reviewNote": "Review note",
+      "openFile": "Open file",
+      "approve": "Approve",
+      "reject": "Reject",
+      "filter": {
+        "pending": "To review"
+      },
+      "requirement": "Requirement",
+      "ownDocument": "Another document (not an HQ requirement)",
+      "docTitle": "Title",
+      "minimumHint": "HQ requires at least {amount}.",
+      "file": "File",
+      "fileHint": "PDF or photo, up to 10 MB.",
+      "autoApproved": "As HQ, your upload is approved straight away.",
+      "reviewedByHq": "HQ reviews the document. You'll get reminders before it expires.",
+      "expiringTitle": "Compliance documents: renewals and expiries",
+      "openMatrix": "Open the compliance matrix",
+      "nothingExpiring": "Nothing expires in the next 60 days.",
+      "inDays": "In {days} days"
+    },
+    "requirements": {
+      "add": "Add a requirement",
+      "save": "Save requirement",
+      "name": "Requirement",
+      "nameHint": "e.g. General liability insurance",
+      "description": "Description",
+      "minimum": "Minimum amount",
+      "where": "Jurisdictions",
+      "whereHint": "Country or country-region codes, e.g. US, CA-ON. Empty means every location.",
+      "everywhere": "Every location",
+      "heldBy": "Held by",
+      "per": {
+        "location": "Each location",
+        "owner_group": "Each owner group"
+      },
+      "requiresExpiry": "Has an expiry date",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "league": {
+      "title": "League table",
+      "description": "Locations ranked by revenue, growth, activity, audit score and royalty status.",
+      "descriptionOwn": "Your locations ranked, compared with anonymised network quartiles.",
+      "filters": "Filters",
+      "period": "Period",
+      "preset": {
+        "last_month": "Last month",
+        "this_month": "This month",
+        "last_quarter": "Last 3 months",
+        "year": "This year",
+        "custom": "Custom"
+      },
+      "from": "From",
+      "to": "To",
+      "rankBy": "Rank by",
+      "metric": {
+        "revenue": "Revenue",
+        "growth": "Growth",
+        "occupancy": "Occupancy",
+        "auditScore": "Audit score",
+        "royaltyStatus": "Royalties",
+        "reviewRating": "Reviews"
+      },
+      "activity": {
+        "class_bookings": "Bookings",
+        "registrations": "Registrations",
+        "appointments": "Appointments",
+        "orders": "Orders",
+        "food_orders": "Orders",
+        "enquiries": "Enquiries",
+        "room_nights": "Room nights",
+        "default": "Activity"
+      },
+      "royalty": {
+        "on_time": "On time",
+        "overdue": "Overdue",
+        "none": "No invoices"
+      },
+      "quartile": {
+        "1": "Top 25%",
+        "2": "Above median",
+        "3": "Below median",
+        "4": "Bottom 25%"
+      },
+      "col": {
+        "rank": "Rank",
+        "quartile": "Network",
+        "network": "Position"
+      },
+      "stars": "{rating} ★ ({count})",
+      "networkPosition": "#{position} of {of}",
+      "empty": "No locations to rank",
+      "perCurrency": "Revenue is ranked within each currency and never added up: {currencies}.",
+      "benchmarksTitle": "You and the network",
+      "benchmarksNote": "Anonymised: {count} locations, no names",
+      "revenueIn": "Revenue ({currency})",
+      "quartiles": "Lower quartile {q1} · median {median} · upper quartile {q3}",
+      "tooFew": "Not enough locations to compare anonymously.",
+      "quartilesOff": "HQ has not shared network comparisons. Your locations are ranked among themselves.",
+      "onTimeNetwork": "{pct} of locations in the network pay royalties on time.",
+      "settingsTitle": "What franchise owners see",
+      "settingQuartiles": "Show network quartiles to franchise owners",
+      "settingQuartilesHint": "They see their own locations against anonymised quartiles and their position, never other franchisees' names or figures."
+    }
+  }
+}

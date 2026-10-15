@@ -13,6 +13,7 @@ import networkEn from '../../messages/network/en.json';
 import commsEn from '../../messages/comms/en.json';
 import mktEn from '../../messages/mkt/en.json';
 import financeEn from '../../messages/finance/en.json';
+import qualityEn from '../../messages/quality/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -52,6 +53,8 @@ export default getRequestConfig(async () => {
   messages = merge(messages, mktEn as Messages);
   // Finance workspace (royalties, statements & invoices, marketing fund, payouts): namespace "finance" plus its nav and module names.
   messages = merge(messages, financeEn as Messages);
+  // Field audits, compliance documents and the league table: namespace "quality" plus its nav and module names.
+  messages = merge(messages, qualityEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
@@ -66,6 +69,7 @@ export default getRequestConfig(async () => {
     messages = merge(messages, (await import(`../../messages/comms/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/mkt/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/finance/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/quality/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "audits": "Auditorías",
+    "compliance": "Documentos de cumplimiento",
+    "leagueTable": "Clasificación"
+  },
+  "access": {
+    "modules": {
+      "operations": {
+        "audits": {
+          "name": "Auditorías",
+          "description": "Visitas de campo y auditorías: plantillas de checklist, auditorías programadas con fotos y puntuaciones, acciones correctivas y reauditorías para los locales del ámbito."
+        }
+      },
+      "legal": {
+        "compliance_documents": {
+          "name": "Documentos de cumplimiento",
+          "description": "Certificados de seguro, licencias, permisos y certificados sanitarios por local o grupo de propietarios, con recordatorios de vencimiento."
+        }
+      },
+      "network": {
+        "league_table": {
+          "name": "Clasificación",
+          "description": "Locales del ámbito clasificados por ingresos, crecimiento, reservas o pedidos, puntuación de auditoría y estado de royalties. Los franquiciados ven sus locales frente a los cuartiles anónimos de la red."
+        }
+      }
+    }
+  },
+  "quality": {
+    "common": {
+      "all": "Todos",
+      "choose": "Elegir…",
+      "exportCsv": "Exportar CSV",
+      "ownerGroup": "Grupo de propietarios",
+      "region": "Región"
+    },
+    "col": {
+      "location": "Local",
+      "latestScore": "Última puntuación",
+      "trend": "Últimos 6 meses",
+      "actions": "Acciones correctivas",
+      "nextDue": "Próxima auditoría",
+      "due": "Vence",
+      "auditor": "Auditor",
+      "status": "Estado",
+      "score": "Puntuación",
+      "checklist": "Checklist",
+      "item": "Punto"
+    },
+    "auditStatus": {
+      "scheduled": "Programada",
+      "in_progress": "En curso",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    },
+    "actionStatus": {
+      "open": "Por corregir",
+      "submitted": "Pendiente de verificación",
+      "verified": "Verificada"
+    },
+    "purpose": {
+      "routine": "Rutina",
+      "pre_opening": "Preapertura",
+      "reaudit": "Reauditoría"
+    },
+    "qtype": {
+      "yes_no": "Sí / no",
+      "scale": "Escala 1–5",
+      "number": "Número",
+      "text": "Texto",
+      "photo": "Foto"
+    },
+    "reason": {
+      "no": "Respuesta no",
+      "low_score": "Puntuación de 2 o menos",
+      "out_of_range": "Fuera del rango permitido",
+      "photo_missing": "Falta la foto",
+      "unanswered": "Sin respuesta"
+    },
+    "answer": {
+      "yes": "Sí",
+      "no": "No",
+      "na": "N/A",
+      "scaleN": "{n} de 5",
+      "scaleOf": "{n} / 5",
+      "range": "Correcto: de {min} a {max}",
+      "atLeast": "Correcto: al menos {min}",
+      "atMost": "Correcto: como máximo {max}",
+      "photoTaken": "Foto tomada"
+    },
+    "audits": {
+      "title": "Auditorías",
+      "description": "Visitas de campo y auditorías de estándares de marca: puntuaciones por local, acciones correctivas y reauditorías.",
+      "tab": {
+        "overview": "Resumen",
+        "audits": "Auditorías",
+        "actions": "Acciones correctivas",
+        "templates": "Checklists"
+      },
+      "filter": {
+        "open": "Abiertas",
+        "completed": "Completadas",
+        "all": "Todas"
+      },
+      "schedule": "Programar una auditoría",
+      "scheduleSave": "Programar",
+      "auditorHint": "Personas con Auditorías (editar) en este local.",
+      "empty": "Todavía no hay auditorías",
+      "emptyBody": "Aquí aparecen las auditorías programadas y los informes terminados."
+    },
+    "dashboard": {
+      "averageScore": "Puntuación media",
+      "lastMonths": "Últimos {count} meses",
+      "completed": "Auditorías completadas",
+      "passed": "{count} aprobadas",
+      "openActions": "Acciones correctivas abiertas",
+      "overdueActions": "Acciones correctivas vencidas",
+      "overdueAudits": "Auditorías vencidas",
+      "byLocation": "Puntuaciones por local",
+      "network": "Media de la red",
+      "noAudit": "Sin auditoría todavía",
+      "open": "{count} abiertas",
+      "overdue": "{count} vencidas",
+      "noLocations": "No hay locales en tu ámbito",
+      "overdueActionsTitle": "Acciones correctivas vencidas",
+      "dueOn": "Vence el {date}",
+      "noOverdueActions": "Nada vencido.",
+      "upcomingTitle": "Auditorías vencidas y próximas",
+      "noUpcoming": "No hay auditorías programadas."
+    },
+    "audit": {
+      "pageTitle": "Auditoría",
+      "back": "Todas las auditorías",
+      "critical": "Crítico",
+      "criticalFail": "Punto crítico no superado",
+      "noAuditor": "Sin auditor todavía",
+      "photoRequired": "Foto obligatoria",
+      "photoOf": "Foto de {item}"
+    },
+    "conduct": {
+      "description": "Vence el {date}. Las respuestas se guardan sobre la marcha, también si se corta la conexión.",
+      "progress": "{done} de {total} respondidas",
+      "liveScore": "Puntuación",
+      "saving": "Guardando…",
+      "saved": "Todo guardado",
+      "offline": "Sin conexión: las respuestas se guardan en este dispositivo y se envían al volver la conexión",
+      "saveError": "No guardado. Lo intentaremos de nuevo.",
+      "autosave": "Se guarda automáticamente",
+      "sectionProgress": "{done}/{total}",
+      "addPhoto": "Añadir foto",
+      "uploading": "Subiendo…",
+      "photoOffline": "En la web, las fotos necesitan conexión. Usa la app móvil para hacer fotos sin conexión.",
+      "removePhoto": "Quitar foto",
+      "addNote": "Añadir nota",
+      "note": "Nota",
+      "notePlaceholder": "¿Qué has visto?",
+      "willCreateAction": "se convertirá en una acción correctiva",
+      "finish": "Terminar la auditoría",
+      "passMark": "Nota de aprobado {pct} %",
+      "failedItems": "Puntos no superados",
+      "becomeActions": "Cada uno se convierte en una acción correctiva para el local",
+      "unanswered": "Por responder",
+      "criticalBanner": "Un punto crítico no se ha superado: la auditoría suspende sea cual sea la puntuación.",
+      "summary": "Resumen para el local",
+      "complete": "Completar auditoría",
+      "answerAll": "Responde a todas las preguntas (o márcalas como N/A) para completar la auditoría."
+    },
+    "report": {
+      "completedOn": "Completada el {date} por {auditor}",
+      "scheduledFor": "Programada para el {date}",
+      "notYet": "El informe aparecerá aquí cuando {auditor} complete la auditoría.",
+      "passed": "Aprobada",
+      "failed": "Suspendida",
+      "previous": "Auditoría anterior: {score}",
+      "bySection": "Puntuación por sección",
+      "reaudit": "Reauditoría prevista el {date}",
+      "actions": "Acciones correctivas ({count})",
+      "noActions": "Sin acciones correctivas: todos los puntos se superaron."
+    },
+    "actions": {
+      "filter": {
+        "active": "Pendientes",
+        "overdue": "Vencidas",
+        "verified": "Verificadas"
+      },
+      "empty": "No hay acciones correctivas",
+      "overdue": "Vencida",
+      "due": "Vence el {date}",
+      "auditorNote": "Auditor:",
+      "reopened": "Reabierta: {note}",
+      "fix": "Corrección:",
+      "evidenceOf": "Prueba de {item}",
+      "verifiedBy": "Verificada por {name} el {date}",
+      "whatFixed": "¿Qué has corregido?",
+      "addEvidence": "Añadir foto de prueba",
+      "markDone": "Marcar como corregida",
+      "evidenceNeeded": "Primero añade una foto de la corrección.",
+      "reviewNote": "Nota para el local",
+      "reopen": "Reabrir",
+      "verify": "Verificar"
+    },
+    "templates": {
+      "active": "Activas",
+      "archived": "Archivadas",
+      "fromStarter": "Partir de una plantilla",
+      "new": "Nueva checklist",
+      "untitled": "Checklist sin título",
+      "empty": "Todavía no hay checklists",
+      "emptyBody": "Parte de una checklist lista para tu sector o crea la tuya.",
+      "questions": "{count, plural, one {# pregunta} other {# preguntas}}",
+      "critical": "{count} críticas",
+      "passMark": "Aprobado {pct} %",
+      "version": "v{n}",
+      "starterHint": "Puntos de partida razonables. Copia uno y adáptalo a tus estándares de marca.",
+      "preOpening": "Preapertura",
+      "added": "Añadida",
+      "useStarter": "Usar esta checklist"
+    },
+    "editor": {
+      "pageTitle": "Checklist",
+      "description": "Secciones y preguntas, con pesos, puntos críticos y fotos obligatorias.",
+      "back": "Checklists",
+      "archive": "Archivar",
+      "restore": "Restaurar",
+      "save": "Guardar checklist",
+      "saved": "Guardada como versión {version}. La usan las auditorías que aún no han empezado.",
+      "archivedNote": "Esta checklist está archivada: no se puede usar en nuevas auditorías.",
+      "name": "Nombre",
+      "descriptionLabel": "Descripción",
+      "passMark": "Nota de aprobado (%)",
+      "passMarkHint": "Un punto crítico no superado suspende la auditoría de todos modos.",
+      "correctiveDays": "Días para corregir",
+      "correctiveDaysHint": "La mitad para los puntos críticos.",
+      "reauditDays": "Reauditoría a los (días)",
+      "reauditDaysHint": "Se fija cuando una auditoría suspende.",
+      "photoCount": "{count} con foto",
+      "totalWeight": "Peso total {n}",
+      "section": "Sección {n}",
+      "sectionPlaceholder": "p. ej. Fachada",
+      "question": "Pregunta {n}",
+      "type": "Tipo de respuesta",
+      "weight": "Peso",
+      "min": "Correcto desde",
+      "max": "Correcto hasta",
+      "unit": "Unidad",
+      "guidance": "Indicaciones para el auditor",
+      "critical": "Punto crítico",
+      "criticalHint": "Si este punto no se supera, suspende toda la auditoría.",
+      "photoRequired": "Foto obligatoria",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "removeQuestion": "Quitar pregunta",
+      "removeSection": "Quitar sección",
+      "addQuestion": "Añadir pregunta",
+      "addSection": "Añadir sección"
+    },
+    "preOpening": {
+      "title": "Auditoría de preapertura",
+      "passed": "Aprobada",
+      "required": "Obligatoria antes de abrir",
+      "explain": "La apertura se puede solicitar en cuanto se apruebe una auditoría «{name}».",
+      "none": "Usa una checklist de auditoría para las comprobaciones de preapertura: la central solo aprueba la apertura cuando se supera.",
+      "checklist": "Checklist",
+      "noChecklist": "Sin auditoría",
+      "latestDone": "Última auditoría de preapertura",
+      "latestDue": "Auditoría de preapertura prevista el {date}",
+      "schedule": "Programar la auditoría de preapertura",
+      "afterProvision": "Prográmala cuando se haya creado el local."
+    },
+    "state": {
+      "valid": "Vigente",
+      "expiring": "Vence en 30 días",
+      "expired": "Vencido",
+      "missing": "Falta",
+      "pending": "Pendiente de revisión",
+      "below_minimum": "Por debajo del mínimo",
+      "not_applicable": "No requerido"
+    },
+    "docStatus": {
+      "pending": "Pendiente de revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "category": {
+      "insurance": "Certificado de seguro",
+      "licence": "Licencia",
+      "permit": "Permiso",
+      "health_certificate": "Certificado sanitario / de seguridad alimentaria",
+      "franchisee_document": "Documento del franquiciado"
+    },
+    "compliance": {
+      "title": "Documentos de cumplimiento",
+      "description": "Seguros, licencias, permisos y certificados sanitarios de cada local, con recordatorios de vencimiento.",
+      "tab": {
+        "matrix": "Matriz",
+        "documents": "Documentos",
+        "requirements": "Requisitos"
+      },
+      "upload": "Subir un documento",
+      "uploadFor": "Subir para este local",
+      "uploadSave": "Subir",
+      "category": "Tipo",
+      "compliant": "Cumple",
+      "companyOwned": "Propio",
+      "noRequirements": "Todavía no hay requisitos",
+      "noRequirementsBody": "La central define lo que debe tener cada local, p. ej. un seguro de responsabilidad civil por un importe mínimo.",
+      "noDocuments": "Todavía no hay documentos",
+      "superseded": "Sustituido",
+      "issuer": "Aseguradora o emisor",
+      "reference": "N.º de póliza o licencia",
+      "coverage": "Cobertura",
+      "coverageType": "Tipo de cobertura",
+      "amount": "Importe",
+      "amountInvalid": "Usa cifras, p. ej. 2000000",
+      "currency": "Moneda",
+      "expires": "Vence",
+      "issued": "Emitido",
+      "noExpiry": "Sin vencimiento",
+      "uploadedBy": "Subido por",
+      "reviewNote": "Nota de revisión",
+      "openFile": "Abrir archivo",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "filter": {
+        "pending": "Por revisar"
+      },
+      "requirement": "Requisito",
+      "ownDocument": "Otro documento (no es un requisito de la central)",
+      "docTitle": "Título",
+      "minimumHint": "La central exige al menos {amount}.",
+      "file": "Archivo",
+      "fileHint": "PDF o foto, hasta 10 MB.",
+      "autoApproved": "Como central, tu documento se aprueba al momento.",
+      "reviewedByHq": "La central revisa el documento. Recibirás recordatorios antes de que venza.",
+      "expiringTitle": "Documentos de cumplimiento: renovaciones y vencimientos",
+      "openMatrix": "Abrir la matriz de cumplimiento",
+      "nothingExpiring": "Nada vence en los próximos 60 días.",
+      "inDays": "En {days} días"
+    },
+    "requirements": {
+      "add": "Añadir un requisito",
+      "save": "Guardar requisito",
+      "name": "Requisito",
+      "nameHint": "p. ej. Seguro de responsabilidad civil",
+      "description": "Descripción",
+      "minimum": "Importe mínimo",
+      "where": "Jurisdicciones",
+      "whereHint": "Códigos de país o país-región, p. ej. US, CA-ON. Vacío = todos los locales.",
+      "everywhere": "Todos los locales",
+      "heldBy": "Lo tiene",
+      "per": {
+        "location": "Cada local",
+        "owner_group": "Cada grupo de propietarios"
+      },
+      "requiresExpiry": "Tiene fecha de vencimiento",
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "league": {
+      "title": "Clasificación",
+      "description": "Locales clasificados por ingresos, crecimiento, actividad, puntuación de auditoría y estado de royalties.",
+      "descriptionOwn": "Tus locales clasificados, comparados con los cuartiles anónimos de la red.",
+      "filters": "Filtros",
+      "period": "Periodo",
+      "preset": {
+        "last_month": "Mes pasado",
+        "this_month": "Este mes",
+        "last_quarter": "Últimos 3 meses",
+        "year": "Este año",
+        "custom": "Personalizado"
+      },
+      "from": "Desde",
+      "to": "Hasta",
+      "rankBy": "Clasificar por",
+      "metric": {
+        "revenue": "Ingresos",
+        "growth": "Crecimiento",
+        "occupancy": "Ocupación",
+        "auditScore": "Puntuación de auditoría",
+        "royaltyStatus": "Royalties",
+        "reviewRating": "Reseñas"
+      },
+      "activity": {
+        "class_bookings": "Reservas",
+        "registrations": "Inscripciones",
+        "appointments": "Citas",
+        "orders": "Pedidos",
+        "food_orders": "Pedidos",
+        "enquiries": "Consultas",
+        "room_nights": "Noches de habitación",
+        "default": "Actividad"
+      },
+      "royalty": {
+        "on_time": "Al día",
+        "overdue": "Vencido",
+        "none": "Sin facturas"
+      },
+      "quartile": {
+        "1": "25 % superior",
+        "2": "Sobre la mediana",
+        "3": "Bajo la mediana",
+        "4": "25 % inferior"
+      },
+      "col": {
+        "rank": "Puesto",
+        "quartile": "Red",
+        "network": "Posición"
+      },
+      "stars": "{rating} ★ ({count})",
+      "networkPosition": "N.º {position} de {of}",
+      "empty": "No hay locales que clasificar",
+      "perCurrency": "Los ingresos se clasifican dentro de cada moneda y nunca se suman: {currencies}.",
+      "benchmarksTitle": "Tú y la red",
+      "benchmarksNote": "Anónimo: {count} locales, sin nombres",
+      "revenueIn": "Ingresos ({currency})",
+      "quartiles": "Cuartil inferior {q1} · mediana {median} · cuartil superior {q3}",
+      "tooFew": "No hay suficientes locales para comparar de forma anónima.",
+      "quartilesOff": "La central no comparte comparativas de la red. Tus locales se clasifican entre sí.",
+      "onTimeNetwork": "El {pct} de los locales de la red paga los royalties a tiempo.",
+      "settingsTitle": "Qué ven los franquiciados",
+      "settingQuartiles": "Mostrar los cuartiles de la red a los franquiciados",
+      "settingQuartilesHint": "Ven sus locales frente a cuartiles anónimos y su posición, nunca los nombres ni las cifras de otros franquiciados."
+    }
+  }
+}

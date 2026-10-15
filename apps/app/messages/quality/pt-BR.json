@@ -1,0 +1,425 @@
+{
+  "nav": {
+    "audits": "Auditorias",
+    "compliance": "Documentos de conformidade",
+    "leagueTable": "Ranking"
+  },
+  "access": {
+    "modules": {
+      "operations": {
+        "audits": {
+          "name": "Auditorias",
+          "description": "Visitas de campo e auditorias: modelos de checklist, auditorias agendadas com fotos e notas, ações corretivas e reauditorias para as unidades do escopo."
+        }
+      },
+      "legal": {
+        "compliance_documents": {
+          "name": "Documentos de conformidade",
+          "description": "Certificados de seguro, licenças, alvarás e certificados sanitários por unidade ou grupo de proprietários, com lembretes de vencimento."
+        }
+      },
+      "network": {
+        "league_table": {
+          "name": "Ranking",
+          "description": "Unidades do escopo classificadas por receita, crescimento, reservas ou pedidos, nota de auditoria e situação dos royalties. Franqueados veem suas unidades em relação aos quartis anônimos da rede."
+        }
+      }
+    }
+  },
+  "quality": {
+    "common": {
+      "all": "Todos",
+      "choose": "Escolher…",
+      "exportCsv": "Exportar CSV",
+      "ownerGroup": "Grupo de proprietários",
+      "region": "Região"
+    },
+    "col": {
+      "location": "Unidade",
+      "latestScore": "Última nota",
+      "trend": "Últimos 6 meses",
+      "actions": "Ações corretivas",
+      "nextDue": "Próxima auditoria",
+      "due": "Prazo",
+      "auditor": "Auditor",
+      "status": "Status",
+      "score": "Nota",
+      "checklist": "Checklist",
+      "item": "Item"
+    },
+    "auditStatus": {
+      "scheduled": "Agendada",
+      "in_progress": "Em andamento",
+      "completed": "Concluída",
+      "cancelled": "Cancelada"
+    },
+    "actionStatus": {
+      "open": "A corrigir",
+      "submitted": "Aguardando verificação",
+      "verified": "Verificada"
+    },
+    "purpose": {
+      "routine": "Rotina",
+      "pre_opening": "Pré-inauguração",
+      "reaudit": "Reauditoria"
+    },
+    "qtype": {
+      "yes_no": "Sim / não",
+      "scale": "Escala 1–5",
+      "number": "Número",
+      "text": "Texto",
+      "photo": "Foto"
+    },
+    "reason": {
+      "no": "Resposta não",
+      "low_score": "Nota 2 ou menor",
+      "out_of_range": "Fora da faixa permitida",
+      "photo_missing": "Falta a foto",
+      "unanswered": "Sem resposta"
+    },
+    "answer": {
+      "yes": "Sim",
+      "no": "Não",
+      "na": "N/A",
+      "scaleN": "{n} de 5",
+      "scaleOf": "{n} / 5",
+      "range": "Aprovado: de {min} a {max}",
+      "atLeast": "Aprovado: no mínimo {min}",
+      "atMost": "Aprovado: no máximo {max}",
+      "photoTaken": "Foto tirada"
+    },
+    "audits": {
+      "title": "Auditorias",
+      "description": "Visitas de campo e auditorias de padrões da marca: notas por unidade, ações corretivas e reauditorias.",
+      "tab": {
+        "overview": "Visão geral",
+        "audits": "Auditorias",
+        "actions": "Ações corretivas",
+        "templates": "Checklists"
+      },
+      "filter": {
+        "open": "Abertas",
+        "completed": "Concluídas",
+        "all": "Todas"
+      },
+      "schedule": "Agendar uma auditoria",
+      "scheduleSave": "Agendar",
+      "auditorHint": "Pessoas com Auditorias (editar) nesta unidade.",
+      "empty": "Ainda não há auditorias",
+      "emptyBody": "Auditorias agendadas e relatórios concluídos aparecem aqui."
+    },
+    "dashboard": {
+      "averageScore": "Nota média",
+      "lastMonths": "Últimos {count} meses",
+      "completed": "Auditorias concluídas",
+      "passed": "{count} aprovadas",
+      "openActions": "Ações corretivas abertas",
+      "overdueActions": "Ações corretivas atrasadas",
+      "overdueAudits": "Auditorias atrasadas",
+      "byLocation": "Notas por unidade",
+      "network": "Média da rede",
+      "noAudit": "Ainda sem auditoria",
+      "open": "{count} abertas",
+      "overdue": "{count} atrasadas",
+      "noLocations": "Nenhuma unidade no seu escopo",
+      "overdueActionsTitle": "Ações corretivas atrasadas",
+      "dueOn": "Prazo {date}",
+      "noOverdueActions": "Nada atrasado.",
+      "upcomingTitle": "Auditorias atrasadas e próximas",
+      "noUpcoming": "Nenhuma auditoria agendada."
+    },
+    "audit": {
+      "pageTitle": "Auditoria",
+      "back": "Todas as auditorias",
+      "critical": "Crítico",
+      "criticalFail": "Item crítico reprovado",
+      "noAuditor": "Ainda sem auditor",
+      "photoRequired": "Foto obrigatória",
+      "photoOf": "Foto de {item}"
+    },
+    "conduct": {
+      "description": "Prazo {date}. As respostas são salvas enquanto você avança, mesmo se a conexão cair.",
+      "progress": "{done} de {total} respondidas",
+      "liveScore": "Nota",
+      "saving": "Salvando…",
+      "saved": "Tudo salvo",
+      "offline": "Sem conexão: as respostas ficam neste dispositivo e são salvas quando você voltar a ficar online",
+      "saveError": "Não salvo. Vamos tentar de novo.",
+      "autosave": "Salva automaticamente",
+      "sectionProgress": "{done}/{total}",
+      "addPhoto": "Adicionar foto",
+      "uploading": "Enviando…",
+      "photoOffline": "Na web, fotos precisam de conexão. Use o app para tirar fotos sem conexão.",
+      "removePhoto": "Remover foto",
+      "addNote": "Adicionar observação",
+      "note": "Observação",
+      "notePlaceholder": "O que você viu?",
+      "willCreateAction": "vira uma ação corretiva",
+      "finish": "Concluir a auditoria",
+      "passMark": "Nota mínima {pct}%",
+      "failedItems": "Itens reprovados",
+      "becomeActions": "Cada um vira uma ação corretiva para a unidade",
+      "unanswered": "Falta responder",
+      "criticalBanner": "Um item crítico foi reprovado: a auditoria é reprovada qualquer que seja a nota.",
+      "summary": "Resumo para a unidade",
+      "complete": "Concluir auditoria",
+      "answerAll": "Responda a todas as perguntas (ou marque N/A) para concluir a auditoria."
+    },
+    "report": {
+      "completedOn": "Concluída em {date} por {auditor}",
+      "scheduledFor": "Agendada para {date}",
+      "notYet": "O relatório aparece aqui quando {auditor} concluir a auditoria.",
+      "passed": "Aprovada",
+      "failed": "Reprovada",
+      "previous": "Auditoria anterior: {score}",
+      "bySection": "Nota por seção",
+      "reaudit": "Reauditoria prevista para {date}",
+      "actions": "Ações corretivas ({count})",
+      "noActions": "Nenhuma ação corretiva: todos os itens foram aprovados."
+    },
+    "actions": {
+      "filter": {
+        "active": "Pendentes",
+        "overdue": "Atrasadas",
+        "verified": "Verificadas"
+      },
+      "empty": "Nenhuma ação corretiva",
+      "overdue": "Atrasada",
+      "due": "Prazo {date}",
+      "auditorNote": "Auditor:",
+      "reopened": "Reaberta: {note}",
+      "fix": "Correção:",
+      "evidenceOf": "Evidência de {item}",
+      "verifiedBy": "Verificada por {name} em {date}",
+      "whatFixed": "O que você corrigiu?",
+      "addEvidence": "Adicionar foto de evidência",
+      "markDone": "Marcar como corrigida",
+      "evidenceNeeded": "Adicione primeiro uma foto da correção.",
+      "reviewNote": "Observação para a unidade",
+      "reopen": "Reabrir",
+      "verify": "Verificar"
+    },
+    "templates": {
+      "active": "Ativas",
+      "archived": "Arquivadas",
+      "fromStarter": "Começar de um modelo",
+      "new": "Novo checklist",
+      "untitled": "Checklist sem título",
+      "empty": "Ainda não há checklists",
+      "emptyBody": "Comece com um checklist pronto para o seu setor ou crie o seu.",
+      "questions": "{count, plural, one {# pergunta} other {# perguntas}}",
+      "critical": "{count} críticas",
+      "passMark": "Aprovação {pct}%",
+      "version": "v{n}",
+      "starterHint": "Pontos de partida sensatos. Copie um e adapte aos padrões da sua marca.",
+      "preOpening": "Pré-inauguração",
+      "added": "Adicionado",
+      "useStarter": "Usar este checklist"
+    },
+    "editor": {
+      "pageTitle": "Checklist",
+      "description": "Seções e perguntas, com pesos, itens críticos e fotos obrigatórias.",
+      "back": "Checklists",
+      "archive": "Arquivar",
+      "restore": "Restaurar",
+      "save": "Salvar checklist",
+      "saved": "Salvo como versão {version}. Auditorias ainda não iniciadas passam a usá-la.",
+      "archivedNote": "Este checklist está arquivado: não pode ser usado em novas auditorias.",
+      "name": "Nome",
+      "descriptionLabel": "Descrição",
+      "passMark": "Nota mínima (%)",
+      "passMarkHint": "Um item crítico reprovado reprova a auditoria de qualquer forma.",
+      "correctiveDays": "Dias para corrigir",
+      "correctiveDaysHint": "Itens críticos têm a metade.",
+      "reauditDays": "Reauditoria após (dias)",
+      "reauditDaysHint": "Definida quando uma auditoria é reprovada.",
+      "photoCount": "{count} com foto",
+      "totalWeight": "Peso total {n}",
+      "section": "Seção {n}",
+      "sectionPlaceholder": "ex.: Fachada",
+      "question": "Pergunta {n}",
+      "type": "Tipo de resposta",
+      "weight": "Peso",
+      "min": "Aprovado a partir de",
+      "max": "Aprovado até",
+      "unit": "Unidade de medida",
+      "guidance": "Orientações para o auditor",
+      "critical": "Item crítico",
+      "criticalHint": "Se este item for reprovado, toda a auditoria é reprovada.",
+      "photoRequired": "Foto obrigatória",
+      "moveUp": "Subir",
+      "moveDown": "Descer",
+      "removeQuestion": "Remover pergunta",
+      "removeSection": "Remover seção",
+      "addQuestion": "Adicionar pergunta",
+      "addSection": "Adicionar seção"
+    },
+    "preOpening": {
+      "title": "Auditoria de pré-inauguração",
+      "passed": "Aprovada",
+      "required": "Obrigatória antes da inauguração",
+      "explain": "A inauguração pode ser solicitada assim que uma auditoria “{name}” for aprovada.",
+      "none": "Use um checklist de auditoria nas verificações de pré-inauguração: a franqueadora só aprova a inauguração depois da aprovação.",
+      "checklist": "Checklist",
+      "noChecklist": "Sem auditoria",
+      "latestDone": "Última auditoria de pré-inauguração",
+      "latestDue": "Auditoria de pré-inauguração prevista para {date}",
+      "schedule": "Agendar a auditoria de pré-inauguração",
+      "afterProvision": "Agende depois que a unidade for criada."
+    },
+    "state": {
+      "valid": "Válido",
+      "expiring": "Vence em 30 dias",
+      "expired": "Vencido",
+      "missing": "Faltando",
+      "pending": "Aguardando revisão",
+      "below_minimum": "Abaixo do mínimo",
+      "not_applicable": "Não exigido"
+    },
+    "docStatus": {
+      "pending": "Aguardando revisão",
+      "approved": "Aprovado",
+      "rejected": "Recusado"
+    },
+    "category": {
+      "insurance": "Certificado de seguro",
+      "licence": "Licença",
+      "permit": "Alvará",
+      "health_certificate": "Certificado sanitário / de segurança alimentar",
+      "franchisee_document": "Documento do franqueado"
+    },
+    "compliance": {
+      "title": "Documentos de conformidade",
+      "description": "Seguros, licenças, alvarás e certificados sanitários de cada unidade, com lembretes de vencimento.",
+      "tab": {
+        "matrix": "Matriz",
+        "documents": "Documentos",
+        "requirements": "Exigências"
+      },
+      "upload": "Enviar um documento",
+      "uploadFor": "Enviar para esta unidade",
+      "uploadSave": "Enviar",
+      "category": "Tipo",
+      "compliant": "Em conformidade",
+      "companyOwned": "Unidade própria",
+      "noRequirements": "Ainda não há exigências",
+      "noRequirementsBody": "A franqueadora define o que cada unidade precisa ter, ex.: seguro de responsabilidade civil com valor mínimo.",
+      "noDocuments": "Ainda não há documentos",
+      "superseded": "Substituído",
+      "issuer": "Seguradora ou emissor",
+      "reference": "Nº da apólice ou licença",
+      "coverage": "Cobertura",
+      "coverageType": "Tipo de cobertura",
+      "amount": "Valor",
+      "amountInvalid": "Use números, ex.: 2000000",
+      "currency": "Moeda",
+      "expires": "Vence em",
+      "issued": "Emitido em",
+      "noExpiry": "Sem vencimento",
+      "uploadedBy": "Enviado por",
+      "reviewNote": "Observação da revisão",
+      "openFile": "Abrir arquivo",
+      "approve": "Aprovar",
+      "reject": "Recusar",
+      "filter": {
+        "pending": "A revisar"
+      },
+      "requirement": "Exigência",
+      "ownDocument": "Outro documento (não é exigência da franqueadora)",
+      "docTitle": "Título",
+      "minimumHint": "A franqueadora exige no mínimo {amount}.",
+      "file": "Arquivo",
+      "fileHint": "PDF ou foto, até 10 MB.",
+      "autoApproved": "Como franqueadora, seu envio é aprovado na hora.",
+      "reviewedByHq": "A franqueadora revisa o documento. Você receberá lembretes antes do vencimento.",
+      "expiringTitle": "Documentos de conformidade: renovações e vencimentos",
+      "openMatrix": "Abrir a matriz de conformidade",
+      "nothingExpiring": "Nada vence nos próximos 60 dias.",
+      "inDays": "Em {days} dias"
+    },
+    "requirements": {
+      "add": "Adicionar exigência",
+      "save": "Salvar exigência",
+      "name": "Exigência",
+      "nameHint": "ex.: Seguro de responsabilidade civil",
+      "description": "Descrição",
+      "minimum": "Valor mínimo",
+      "where": "Jurisdições",
+      "whereHint": "Códigos de país ou país-região, ex.: US, CA-ON. Vazio = todas as unidades.",
+      "everywhere": "Todas as unidades",
+      "heldBy": "Quem precisa ter",
+      "per": {
+        "location": "Cada unidade",
+        "owner_group": "Cada grupo de proprietários"
+      },
+      "requiresExpiry": "Tem data de vencimento",
+      "active": "Ativa",
+      "inactive": "Inativa"
+    },
+    "league": {
+      "title": "Ranking",
+      "description": "Unidades classificadas por receita, crescimento, atividade, nota de auditoria e situação dos royalties.",
+      "descriptionOwn": "Suas unidades classificadas, comparadas com os quartis anônimos da rede.",
+      "filters": "Filtros",
+      "period": "Período",
+      "preset": {
+        "last_month": "Mês passado",
+        "this_month": "Este mês",
+        "last_quarter": "Últimos 3 meses",
+        "year": "Este ano",
+        "custom": "Personalizado"
+      },
+      "from": "De",
+      "to": "Até",
+      "rankBy": "Classificar por",
+      "metric": {
+        "revenue": "Receita",
+        "growth": "Crescimento",
+        "occupancy": "Ocupação",
+        "auditScore": "Nota de auditoria",
+        "royaltyStatus": "Royalties",
+        "reviewRating": "Avaliações"
+      },
+      "activity": {
+        "class_bookings": "Reservas",
+        "registrations": "Inscrições",
+        "appointments": "Agendamentos",
+        "orders": "Pedidos",
+        "food_orders": "Pedidos",
+        "enquiries": "Contatos",
+        "room_nights": "Diárias",
+        "default": "Atividade"
+      },
+      "royalty": {
+        "on_time": "Em dia",
+        "overdue": "Atrasado",
+        "none": "Sem faturas"
+      },
+      "quartile": {
+        "1": "25% melhores",
+        "2": "Acima da mediana",
+        "3": "Abaixo da mediana",
+        "4": "25% piores"
+      },
+      "col": {
+        "rank": "Posição",
+        "quartile": "Rede",
+        "network": "Na rede"
+      },
+      "stars": "{rating} ★ ({count})",
+      "networkPosition": "{position}º de {of}",
+      "empty": "Nenhuma unidade para classificar",
+      "perCurrency": "A receita é classificada dentro de cada moeda e nunca somada: {currencies}.",
+      "benchmarksTitle": "Você e a rede",
+      "benchmarksNote": "Anônimo: {count} unidades, sem nomes",
+      "revenueIn": "Receita ({currency})",
+      "quartiles": "Quartil inferior {q1} · mediana {median} · quartil superior {q3}",
+      "tooFew": "Não há unidades suficientes para comparar de forma anônima.",
+      "quartilesOff": "A franqueadora não compartilha comparações da rede. Suas unidades são classificadas entre si.",
+      "onTimeNetwork": "{pct} das unidades da rede pagam royalties em dia.",
+      "settingsTitle": "O que os franqueados veem",
+      "settingQuartiles": "Mostrar os quartis da rede aos franqueados",
+      "settingQuartilesHint": "Eles veem as próprias unidades em relação a quartis anônimos e sua posição, nunca nomes ou números de outros franqueados."
+    }
+  }
+}
