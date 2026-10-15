@@ -61,7 +61,7 @@ const sets = [
 ];
 
 // Feature string modules export STRINGS = { en, fr, es, de, 'pt-BR' }.
-for (const mod of ['commerce/strings.ts', 'realty/strings.ts', 'wellness/strings.ts']) {
+for (const mod of ['commerce/strings.ts', 'realty/strings.ts', 'wellness/strings.ts', 'network/strings.ts']) {
   const tables = load(path.join(src, 'features', mod)).STRINGS;
   if (!tables) {
     console.error(`✗ features/${mod} does not export STRINGS`);
