@@ -2,7 +2,7 @@ import { and, count, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import {
   createOrganizationSchema, onboardingStepUpdateSchema, ONBOARDING_STEPS, apiError, DATA_REGIONS, currency, locale, timeZone, isValidTimeZone,
-  firstLocationSchema, soloPrice, currencyForCountry, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel,
+  firstLocationSchema, soloPrice, priceListForCountry, priceListCurrency, listPriceMinor, NETWORK_INCLUDED_LOCATIONS, upgradeToNetworkSchema, UPGRADE_CONSEQUENCES, WEBSITE_APPROVAL_MODES, asBusinessModel,
 } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { locations, organizations, ownerGroups, regions, roleAssignments, subscriptions, users } from '../db/schema/index.ts';
@@ -13,6 +13,7 @@ import { actor, audit } from '../services/audit.ts';
 import { requireMember, requirePerm, permissionsAt } from '../services/authz.ts';
 import { onboardingState } from '../services/onboarding.ts';
 import { activeLocations, businessModeView, isIndependent, loadOrg, networkPrice, planView, requireNetwork, upgradeToNetwork } from '../services/businessMode.ts';
+import { hqTotal, locationBilling, quoteFor, subPlan, subPriceList } from '../services/billing.ts';
 import { CUSTOMER_DATA_SHARING } from '../services/orgSettings.ts';
 import { serializeLocation, serializeOrg } from '../services/serializers.ts';
 import { orgParams, secured } from './_common.ts';
@@ -39,10 +40,10 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     if (fl?.timeZone && !isValidTimeZone(fl.timeZone)) throw validationError('Unknown timezone', { 'firstLocation.timeZone': 'Use an IANA timezone such as Europe/Lisbon' });
     const geo = fl ? await s.geocoder.geocode(`${fl.address.line1}, ${fl.address.city}, ${fl.address.country}`) : null;
     const independent = b.model === 'independent';
-    // The plan is billed in the currency of the billing country (the organisation's country) from the shared price
-    // book — never in a currency the client picks — so a cheaper market can't be chosen (docs/PRICING.md).
-    const billingCurrency = currencyForCountry(b.country);
-    const solo = independent ? soloPrice(billingCurrency) : null;
+    // The plan is billed in the currency and price list of the billing country (provisionally the organisation's
+    // country; locked at checkout against the card) from the shared price book — never a currency the client picks.
+    const priceList = priceListForCountry(b.country);
+    const solo = independent ? soloPrice(priceList.key) : null;
     const { org, location } = await s.db.transaction(async (tx) => {
       let slug = slugify(b.name);
       const [{ c } = { c: 0 }] = await tx.select({ c: count() }).from(organizations).where(eq(organizations.slug, slug));
@@ -58,10 +59,12 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         },
       }).returning();
       await tx.insert(roleAssignments).values({ organizationId: org!.id, userId: me.id, role: 'org_owner', scopeKind: 'organization', scopeId: org!.id, createdBy: me.id });
-      // Independent businesses are on Solo (one location, flat price) from the start; the trial runs first.
+      // No free plan and no free trial: the subscription waits for the paid 14-day trial checkout (Settings → Billing).
+      // Independent businesses are on Solo (one location, flat price); networks on the Network plan by default.
       await tx.insert(subscriptions).values({
-        organizationId: org!.id, currency: billingCurrency, plan: independent ? 'solo' : 'trial', status: 'trialing',
-        pricePerLocationMinor: solo?.amount ?? null, billedLocationCount: 0, currentPeriodEnd: new Date(Date.now() + 14 * 86400_000),
+        organizationId: org!.id, currency: priceList.currency, priceList: priceList.key, billingCountry: b.country.toUpperCase(),
+        plan: independent ? 'solo' : 'network', status: 'checkout_required',
+        pricePerLocationMinor: solo?.amount ?? null, billedLocationCount: 0, currentPeriodEnd: null,
       });
       await audit(tx, { organizationId: org!.id, ...actor(req), action: 'org.created', scopeKind: 'organization', scopeId: org!.id, targetType: 'organization', targetId: org!.id, metadata: { model: b.model, withFirstLocation: !!fl } });
       let location: typeof locations.$inferSelect | null = null;
@@ -195,8 +198,6 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     const [{ c } = { c: 0 }] = await s.db.select({ c: count() }).from(locations).where(and(eq(locations.organizationId, orgId)));
     if (!sub) throw notFound('Subscription');
     const locs = await s.db.select({ id: locations.id, name: locations.name, status: locations.status, archivedAt: locations.archivedAt }).from(locations).where(eq(locations.organizationId, orgId));
-    // Operating and opening locations are billed; drafts, paused/closed and archived locations are not.
-    const billable = locs.filter((l) => !l.archivedAt && ['operating', 'opening_soon', 'onboarding'].includes(l.status));
     const org = await loadOrg(s.db, orgId);
     const model = asBusinessModel(org?.model);
     const plan = planView(sub, model);
@@ -211,14 +212,18 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
         upgrade: { available: true, path: `/v1/orgs/${orgId}/upgrade-to-network`, note: 'Adding a second location moves you to per-location network pricing.' },
       };
     }
-    const price = sub.pricePerLocationMinor;
+    // Network: the HQ platform fee (includes 3 locations) + the per-location fee beyond; other plans per location.
+    const rows = await locationBilling(s.db, orgId, sub, model);
+    const quote = quoteFor(sub, subPlan(sub, model), sub.billingInterval === 'year' ? 'year' : 'month', rows.length);
+    const perLoc = plan.price;
     return {
       ...sub, businessModel: model, planDetails: plan, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox',
-      pricePerLocation: price != null ? { amount: price, currency: sub.currency, interval: sub.billingInterval } : null,
-      estimatedTotal: price != null ? { amount: price * sub.billedLocationCount, currency: sub.currency, interval: sub.billingInterval } : null,
+      pricePerLocation: perLoc,
+      platformFee: plan.platformFee,
+      estimatedTotal: { amount: hqTotal(quote, rows), currency: quote.currency, interval: quote.interval },
       locations: locs.map((l) => {
-        const billed = billable.some((b) => b.id === l.id);
-        return { id: l.id, name: l.name, status: l.status, billed, price: billed && price != null ? { amount: price, currency: sub.currency, interval: sub.billingInterval } : null };
+        const r = rows.find((x) => x.id === l.id);
+        return { id: l.id, name: l.name, status: l.status, billed: !!r && !r.included, included: !!r?.included, payer: r?.payer ?? null, price: r && !r.included && perLoc ? perLoc : null };
       }),
     };
   });
@@ -238,11 +243,15 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!org) throw notFound('Organisation');
     const [sub] = await s.db.select().from(subscriptions).where(eq(subscriptions.organizationId, orgId));
     const locs = await activeLocations(s.db, orgId);
-    const per = networkPrice(org.defaultCurrency);
+    const list = sub ? subPriceList(sub) : priceListForCountry(org.country).key;
+    const per = networkPrice(list);
     return {
       model: org.model, canUpgrade: isIndependent(org), consequences: UPGRADE_CONSEQUENCES, locationCount: locs.length,
       currentPlan: sub ? planView(sub, asBusinessModel(org.model)) : null,
-      nextPlan: { key: 'network', name: 'Network', pricing: 'per_location', price: per != null ? { amount: per, currency: org.defaultCurrency, interval: 'month' } : null },
+      nextPlan: {
+        key: 'network', name: 'Network', pricing: 'per_location', price: per != null ? { amount: per, currency: priceListCurrency(list), interval: 'month' } : null,
+        platformFee: { amount: listPriceMinor(list, 'platform'), currency: priceListCurrency(list), interval: 'month', includedLocations: NETWORK_INCLUDED_LOCATIONS },
+      },
       keeps: ['locations', 'customers', 'websites', 'pages', 'team', 'payments', 'bookings', 'orders', 'reports'],
     };
   });

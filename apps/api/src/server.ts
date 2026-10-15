@@ -32,6 +32,13 @@ const enqueueDunning = () => void (async () => {
 const dunningStart = setTimeout(enqueueDunning, 60_000);
 const dunningSweep = setInterval(enqueueDunning, 24 * 3600_000);
 
+// BranchHarbor billing: trial reminders 3 days and 1 day before the plan starts; in sandbox also trial conversions,
+// renewals and billing-country changes; expired data exports are purged.
+const billingSweep = setInterval(() => void (async () => {
+  await (await import('./services/billing.ts')).runBillingSweep(app.ctx);
+  await (await import('./services/data-export.ts')).purgeExpiredExports(app.ctx);
+})().catch((err) => app.log.warn({ err }, 'billing sweep failed')), cfg.BILLING_SWEEP_MINUTES * 60_000);
+
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
   clearInterval(sweep);
@@ -42,6 +49,7 @@ const shutdown = async (signal: string) => {
   clearInterval(marketingSweep);
   clearTimeout(dunningStart);
   clearInterval(dunningSweep);
+  clearInterval(billingSweep);
   await app.close();
   process.exit(0);
 };

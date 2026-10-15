@@ -13,6 +13,7 @@ import { createPushProvider, type PushProvider } from './integrations/push.ts';
 import type { FetchLike } from './integrations/partners/http.ts';
 import { mtlsFetch } from './integrations/partners/rightmove.ts';
 import { createAssetStore, type AssetStore } from './integrations/asset-storage.ts';
+import { createPlatformBilling, type PlatformBilling } from './integrations/platform-billing.ts';
 
 /** Dependency container shared by routes, services and jobs. Tests override individual members. */
 export interface Services {
@@ -24,6 +25,8 @@ export interface Services {
   messaging: Messaging;
   jobs: JobQueue;
   payments: PaymentsProvider;
+  /** BranchHarbor's own plan billing on the platform Stripe account (paid trial, subscription, invoices). */
+  billing: PlatformBilling;
   domains: DomainProvider;
   dns: DnsChecker;
   connectors: Record<ConnectorProvider, ConnectorAdapter>;
@@ -44,6 +47,7 @@ export interface Services {
 
 export async function createServices(cfg: Config, dbHandle: DbHandle, log: FastifyBaseLogger, overrides: Partial<Services> = {}): Promise<Services> {
   const domainProvider = overrides.domains ?? createDomainProvider(cfg, log);
+  const payments = overrides.payments ?? createPaymentsProvider(cfg, log);
   return {
     cfg,
     db: dbHandle.db,
@@ -52,7 +56,8 @@ export async function createServices(cfg: Config, dbHandle: DbHandle, log: Fasti
     mailer: overrides.mailer ?? createMailer(cfg, log),
     messaging: overrides.messaging ?? createMessaging(cfg, log),
     jobs: overrides.jobs ?? (await createJobQueue(cfg, log)),
-    payments: overrides.payments ?? createPaymentsProvider(cfg, log),
+    payments,
+    billing: overrides.billing ?? createPlatformBilling(cfg, payments, log),
     domains: domainProvider,
     dns: overrides.dns ?? (domainProvider.mode === 'sandbox' && cfg.DOMAINS_SANDBOX_AUTO_VERIFY ? autoPassDnsChecker : systemDnsChecker),
     connectors: overrides.connectors ?? createConnectors(cfg, log),

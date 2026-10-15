@@ -32,7 +32,7 @@ describe.skipIf(!hasDb)('organisation policies and per-location billing (DB)', (
 
   it('shows the per-location plan price from the subscription and which locations are billed', async () => {
     await createLocation(app, owner.token, orgId, { name: 'Draft spot', status: 'draft' });
-    await app.ctx.db.update(subscriptions).set({ plan: 'network', status: 'active', pricePerLocationMinor: 7900, billedLocationCount: 1 }).where(eq(subscriptions.organizationId, orgId));
+    await app.ctx.db.update(subscriptions).set({ plan: 'hosted', status: 'active', pricePerLocationMinor: 7900, billedLocationCount: 1 }).where(eq(subscriptions.organizationId, orgId));
     const sub = await call(app, 'GET', `/v1/orgs/${orgId}/subscription`, { token: owner.token });
     expect(sub.body).toMatchObject({ pricePerLocation: { amount: 7900, currency: 'CAD', interval: 'month' }, estimatedTotal: { amount: 7900, currency: 'CAD' } });
     expect(sub.body.locations.find((l: any) => l.name === 'Draft spot')).toMatchObject({ billed: false, price: null });
