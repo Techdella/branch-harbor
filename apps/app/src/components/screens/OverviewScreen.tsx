@@ -30,7 +30,7 @@ export function OverviewScreen() {
                 <MetricCard key={m.key} m={m} />
               ))}
             </section>
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))]">
               <SectionCard title={ov.upcomingTitle} aside={<span className="text-xs text-stone">{t('localTimes')}</span>}>
                 {ov.upcoming.length === 0 ? (
                   <p className="rounded-md bg-canvas p-4 text-sm text-stone">{t('nothingUpcoming')}</p>

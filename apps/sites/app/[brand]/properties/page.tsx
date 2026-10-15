@@ -81,13 +81,13 @@ export default async function Properties({ params, searchParams }: Props) {
           <select id="office" name="office" defaultValue={sp.office ?? ''} className="field"><option value="">{t('search.allOffices')}</option>{(facets?.offices ?? data.locations.map((l) => ({ slug: l.slug, name: l.name }))).map((o) => <option key={o.slug} value={o.slug}>{o.name}</option>)}</select></div>
         <div><label htmlFor="city" className="mb-1 block text-sm font-semibold">{t('search.city')}</label>
           <input id="city" name="city" list="cities" defaultValue={sp.city ?? ''} className="field" /><datalist id="cities">{facets?.cities.map((c) => <option key={c} value={c} />)}</datalist></div>
-        <fieldset className="grid grid-cols-3 gap-2 sm:col-span-2">
+        <fieldset className="grid grid-cols-2 gap-2 sm:col-span-2 sm:grid-cols-3">
           <legend className="mb-1 text-sm font-semibold">{t('search.price')}</legend>
-          <div><label htmlFor="currency" className="sr-only">{t('search.currency')}</label>
+          <div className="col-span-2 sm:col-span-1"><label htmlFor="currency" className="sr-only">{t('search.currency')}</label>
             <select id="currency" name="currency" defaultValue={currency} className="field" aria-invalid={priceWithoutCurrency || undefined}><option value="">{t('search.currency')}</option>{(facets?.currencies ?? []).map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
           <div><label htmlFor="minPrice" className="sr-only">{t('search.min')}</label><input id="minPrice" name="minPrice" inputMode="decimal" placeholder={t('search.min')} defaultValue={sp.minPrice ?? ''} className="field" /></div>
           <div><label htmlFor="maxPrice" className="sr-only">{t('search.max')}</label><input id="maxPrice" name="maxPrice" inputMode="decimal" placeholder={t('search.max')} defaultValue={sp.maxPrice ?? ''} className="field" /></div>
-          {priceWithoutCurrency && <p className="col-span-3 text-sm font-semibold text-danger">{t('search.needCurrency')}</p>}
+          {priceWithoutCurrency && <p className="col-span-2 text-sm font-semibold text-danger sm:col-span-3">{t('search.needCurrency')}</p>}
         </fieldset>
         <div className="grid grid-cols-2 gap-2">
           <div><label htmlFor="minBeds" className="mb-1 block text-sm font-semibold">{t('search.beds')}</label>
@@ -95,11 +95,11 @@ export default async function Properties({ params, searchParams }: Props) {
           <div><label htmlFor="minBaths" className="mb-1 block text-sm font-semibold">{t('search.baths')}</label>
             <select id="minBaths" name="minBaths" defaultValue={sp.minBaths ?? ''} className="field"><option value="">{t('search.any')}</option>{[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}+</option>)}</select></div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2 min-[440px]:grid-cols-2">
           <div><label htmlFor="minArea" className="mb-1 block text-sm font-semibold">{t('search.minArea')}</label><input id="minArea" name="minArea" inputMode="decimal" defaultValue={sp.minArea ?? ''} className="field" /></div>
           <div><label htmlFor="areaUnit" className="mb-1 block text-sm font-semibold">{t('search.unit')}</label>
             <select id="areaUnit" name="areaUnit" defaultValue={areaUnit} className="field" aria-invalid={areaWithoutUnit || undefined}><option value="">{t('search.officeUnit')}</option><option value="sqm">m²</option><option value="sqft">{t('search.sqft')}</option></select></div>
-          {areaWithoutUnit && <p className="col-span-2 text-sm font-semibold text-danger">{t('search.needUnit')}</p>}
+          {areaWithoutUnit && <p className="text-sm min-[440px]:col-span-2 font-semibold text-danger">{t('search.needUnit')}</p>}
         </div>
         <div className="flex flex-wrap items-end gap-2 sm:col-span-2 lg:col-span-4">
           <div><label htmlFor="sort" className="mb-1 block text-sm font-semibold">{t('search.sort')}</label>
