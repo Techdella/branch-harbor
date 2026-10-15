@@ -152,7 +152,7 @@ export function PersonBadge({ badge }: { badge: string }) {
   return <Badge tone={tone as 'info'}>{t(badge as 'hq')}</Badge>;
 }
 
-const ROLE_KEYS = ['franchise_owner', 'location_manager', 'staff', 'regional_manager', 'instructor_trainer', 'hq_admin', 'marketing_contributor', 'finance'] as const;
+const ROLE_KEYS = ['franchise_owner', 'multi_unit_operator', 'master_franchisee', 'area_developer', 'location_manager', 'staff', 'field_consultant', 'trainer', 'hq_admin', 'content_social', 'finance_lead'] as const;
 
 /** Who should see / get this: the whole network, or some regions, owner groups, locations and roles. */
 export function AudiencePicker({ value, onChange, directory, allowEveryone = true }: { value: Audience; onChange: (a: Audience) => void; directory: Directory | null; allowEveryone?: boolean }) {

@@ -8,7 +8,7 @@
  * Where the API has no endpoint for something the UI shows, the client derives it honestly from data the
  * API does return (notifications, search, publish plan) or reports it as unavailable — it never invents data.
  */
-import { type Currency, type Money, type Permission, type Role } from '@bh/shared';
+import { ROLE_TEMPLATES, type Currency, type Money, type Permission, type Role } from '@bh/shared';
 import { permissionsOf } from '../access';
 import type { IconName } from '@bh/icons';
 import type { Tone } from '@bh/ui';
@@ -77,12 +77,11 @@ async function maybe<T>(p: Promise<T>, fallback: T): Promise<T> {
   }
 }
 
-const ROLE_LABEL: Record<string, string> = {
-  org_owner: 'Organisation owner', hq_admin: 'HQ admin', regional_manager: 'Regional manager', franchise_owner: 'Franchise owner',
-  location_manager: 'Location manager', staff: 'Staff', marketing_contributor: 'Marketing contributor', finance: 'Finance user', customer: 'Customer',
-  vp_franchise: 'VP Franchise', cmo: 'CMO', brand_lead: 'Brand lead', digital_marketer: 'Digital marketer', instructor_trainer: 'Instructor-trainer',
-  operations_manager: 'Operations manager', legal: 'Legal',
-};
+/** English fallbacks for role keys (the screens translate them through the access catalogue). */
+const ROLE_LABEL: Record<string, string> = Object.fromEntries([
+  ...Object.values(ROLE_TEMPLATES).map((t) => [t.key, t.name] as const),
+  ['customer', 'Customer'],
+]);
 
 /** Scope label plus its catalogue key (data `scope.*`); location scopes are just the location name. */
 function scopeMsg(scope: { kind: string; id: string; name?: string | null }): { scopeLabel: string; scopeKey?: string; scopeParams?: MsgParams } {
@@ -91,6 +90,7 @@ function scopeMsg(scope: { kind: string; id: string; name?: string | null }): { 
   if (scope.kind === 'organization') return { scopeLabel: label, scopeKey: 'scope.organization' };
   if (scope.kind === 'region') return { scopeLabel: label, scopeKey: 'scope.region', scopeParams: { name: scope.name ?? w?.regions.find((r) => r.id === scope.id)?.name ?? '—' } };
   if (scope.kind === 'owner_group') return { scopeLabel: label, scopeKey: 'scope.ownerGroup', scopeParams: { name: scope.name ?? w?.ownerGroups.find((g) => g.id === scope.id)?.name ?? '—' } };
+  if (scope.kind === 'territory' || scope.kind === 'portfolio' || scope.kind === 'brand') return { scopeLabel: label, scopeKey: `scope.${scope.kind}`, scopeParams: { name: scope.name ?? '—' } };
   return { scopeLabel: label };
 }
 const roleOf = (role: string) => ({ role: ROLE_LABEL[role] ?? humanise(role), roleKey: role });
@@ -100,6 +100,9 @@ function scopeLabel(scope: { kind: string; id: string; name?: string | null }): 
   if (scope.kind === 'organization') return 'Organisation';
   if (scope.kind === 'region') return `Region: ${scope.name ?? w?.regions.find((r) => r.id === scope.id)?.name ?? 'Unknown'}`;
   if (scope.kind === 'owner_group') return `Owner group: ${scope.name ?? w?.ownerGroups.find((g) => g.id === scope.id)?.name ?? 'Unknown'}`;
+  if (scope.kind === 'territory') return `Territory: ${scope.name ?? 'Unknown'}`;
+  if (scope.kind === 'portfolio') return `Portfolio: ${scope.name ?? 'Unknown'}`;
+  if (scope.kind === 'brand') return `Brand: ${scope.name ?? 'Unknown'}`;
   return scope.name ?? nameOfLoc(scope.id);
 }
 
@@ -107,6 +110,7 @@ function scopeLabel(scope: { kind: string; id: string; name?: string | null }): 
 
 interface ApiMember {
   user: { id: string; name: string; email: string };
+  jobTitle?: string | null;
   assignments: { id: string; role: string; roleName?: string; customRoleId?: string | null; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string }[];
 }
 let memberCache: { org: string; at: number; list: ApiMember[] } | null = null;
@@ -1519,7 +1523,9 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
       const [list, invites] = await Promise.all([members(), maybe(http.get<{ items: { id: string; email: string; role: string; scope?: { kind: string; id: string }; scopeKind?: string; scopeId?: string; createdAt: string; expiresAt?: string; status?: string }[] }>(o('/invitations')).then(items), [])]);
       const out: Member[] = list.map((x) => ({
         id: x.user.id, name: x.user.name, email: x.user.email,
-        assignments: x.assignments.map((a) => ({ ...(a.role === 'custom' ? { role: a.roleName ?? 'Custom role' } : roleOf(a.role)), ...scopeMsg(a.scope) })),
+        jobTitle: x.jobTitle ?? null,
+        // A system role the business renamed keeps its own name (`roleName` differs from the template's).
+        assignments: x.assignments.map((a) => ({ ...(a.role === 'custom' ? { role: a.roleName ?? 'Custom role' } : roleOf(a.role)), ...(a.role !== 'custom' && a.roleName && a.roleName !== ROLE_LABEL[a.role] ? { renamed: a.roleName } : {}), ...scopeMsg(a.scope) })),
         lastActive: `Member since ${fmtDate(x.assignments[0]?.createdAt)}`,
         ...(x.assignments[0]?.createdAt ? { lastActiveKey: 'member.since', lastActiveParams: { date: dateArg(x.assignments[0].createdAt) } } : {}),
         status: 'active',

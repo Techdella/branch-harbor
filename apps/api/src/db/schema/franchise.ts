@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { JurisdictionRule } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations, ownerGroups } from './core.ts';
+import { locations, organizations, ownerGroups, territories } from './core.ts';
 
 /**
  * Jurisdiction rules. Platform rows (organization_id null) ship with BranchHarbor; an organisation can add its own
@@ -57,6 +57,8 @@ export const franchiseTerritories = pgTable('franchise_territories', {
   ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'set null' }),
   /** Public on the brand site's "Own a franchise" form. */
   showOnSite: boolean('show_on_site').notNull().default(true),
+  /** Sub-network (access scope territory) this sales territory belongs to. */
+  scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [index('franchise_territories_org_idx').on(t.organizationId)]);
@@ -72,6 +74,8 @@ export const franchiseProspects = pgTable('franchise_prospects', {
   region: text('region'),
   city: text('city'),
   territoryId: uuid('territory_id').references(() => franchiseTerritories.id, { onDelete: 'set null' }),
+  /** Sub-network (access scope territory) whose pipeline this prospect is in: a master franchisee or area developer works it. */
+  scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
   desiredTerritory: text('desired_territory'),
   /** Self-declared, minor units in `currency`. Never verified by BranchHarbor. */
   liquidCapitalMinor: minor('liquid_capital_minor'),

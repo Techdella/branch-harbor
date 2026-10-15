@@ -18,7 +18,7 @@ import { AppError, conflict, forbidden, notFound, validationError } from '../lib
 import { localDateParts } from '../lib/tz.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, requireLocationPerm, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, financeVisible, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { findOrCreateCustomer } from '../services/customers.ts';
 import { draftAppointmentSummary, draftPolicyReply, draftServiceCopy, serializeDraft } from '../services/wellness-ai.ts';
 import {
@@ -739,7 +739,12 @@ export const wellnessExtRoutes: FastifyPluginAsyncZod = async (app) => {
     priv.get('/orgs/:orgId/wellness/reports', { schema: { tags: ['wellness'], security: secured, params: orgParams, querystring: reportQuery, summary: 'Utilisation per practitioner/room, cancellations, revenue per currency, package and voucher liability' } }, async (req) => {
       if (req.query.to < req.query.from) throw validationError('`to` must not be before `from`', { to: 'Before from' });
       const ids = await reportLocations(req, req.params.orgId, req.query.locationId);
-      return wellnessReport(s.db, { organizationId: req.params.orgId, locationIds: ids, from: req.query.from, to: req.query.to, viewer: await viewerFor(req, req.params.orgId) });
+      const r = await wellnessReport(s.db, { organizationId: req.params.orgId, locationIds: ids, from: req.query.from, to: req.query.to, viewer: await viewerFor(req, req.params.orgId) });
+      // Revenue is the owner's financial data: only for locations where the person holds Payments (view).
+      const fin = await financeVisible(req, s.db, req.params.orgId, ids);
+      if (fin.all) return { ...r, revenueRestricted: false };
+      const rev = fin.ids.length ? (await wellnessReport(s.db, { organizationId: req.params.orgId, locationIds: fin.ids, from: req.query.from, to: req.query.to, viewer: await viewerFor(req, req.params.orgId) })).revenue : [];
+      return { ...r, revenue: rev, revenueRestricted: true };
     });
 
     priv.get('/orgs/:orgId/wellness/utilisation', { schema: { tags: ['wellness'], security: secured, params: orgParams, querystring: reportQuery } }, async (req) => {

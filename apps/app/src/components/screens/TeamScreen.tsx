@@ -8,7 +8,8 @@ import type { Member, ShiftView } from '@/lib/types';
 import { addDays, dateInZone, fmtTime, fmtYmd, weekStart, zoneLabel } from '@/lib/format';
 import { useApi, useMutation } from '@/lib/useApi';
 import { accessApi, useAccess } from '@/lib/http/access';
-import { MemberAccessPanel, RolesTab, useRoleName } from './team/AccessEditor';
+import { MemberAccessPanel, RoleOptions, RolesTab, labelsOf, scopeChoices, useRoleName } from './team/AccessEditor';
+import { CoverageCard, TeamShapeTab } from './team/TeamShape';
 import { useApp } from '../shell/AppContext';
 import { useBusinessMode } from '@/lib/useBusinessMode';
 import { PageHeader } from '../shell/PageHeader';
@@ -20,9 +21,11 @@ export function TeamScreen() {
   const t = useTranslations('team');
   const ta = useTranslations('access');
   const app = useApp();
-  const [tab, setTab] = useState<'members' | 'roles'>('members');
+  const [tab, setTab] = useState<'members' | 'roles' | 'shape'>('members');
   if (!app.hasModule('settings.team')) return <DeniedState />;
   const canEdit = app.capabilities.has('settings.team:edit');
+  // Team shape and scopes are business-wide: for people who manage the team of the whole business.
+  const orgAdmin = canEdit && app.session.assignments.some((a) => a.scope.kind === 'organization');
   return (
     <>
       <PageHeader icon="user" title={t('title')} description={t('description')} />
@@ -31,12 +34,13 @@ export function TeamScreen() {
           items={[
             { key: 'members' as const, label: t('tab.members') },
             { key: 'roles' as const, label: ta('roleAdmin.tab') },
+            ...(orgAdmin && app.org.model !== 'independent' ? [{ key: 'shape' as const, label: ta('shape.tab') }] : []),
           ]}
           value={tab}
           onChange={setTab}
         />
       )}
-      {tab === 'roles' && canEdit ? <RolesTab /> : <MembersTab />}
+      {tab === 'roles' && canEdit ? <RolesTab /> : tab === 'shape' && orgAdmin ? <TeamShapeTab /> : <MembersTab />}
     </>
   );
 }
@@ -47,10 +51,12 @@ function MembersTab() {
   const ts = useTranslations('single.team');
   const app = useApp();
   const mode = useBusinessMode();
-  const roleName = useRoleName();
   const canEdit = app.capabilities.has('settings.team:edit');
   const res = useApi((api) => api.team.members(app.ctx), [app.industry, app.org.id]);
   const roles = useAccess(() => accessApi.roles(), [app.org.id], canEdit);
+  const scopes = useAccess(() => accessApi.scopes(), [app.org.id], canEdit && !mode.isIndependent);
+  const roleName = useRoleName(labelsOf(roles.data));
+  const orgWide = app.session.assignments.some((a) => a.scope.kind === 'organization');
   const [inviting, setInviting] = useState(false);
   const [access, setAccess] = useState<string | null>(null);
   const [email, setEmail] = useState('');
@@ -65,7 +71,9 @@ function MembersTab() {
   const dt = useDataText();
   /** Assignment role: independent businesses use their own role names; otherwise the access catalogue, else the API label. */
   const assignmentRole = (a: Member['assignments'][number]) =>
-    a.roleKey && mode.isIndependent && ts.has(`role.${a.roleKey}`) ? ts(`role.${a.roleKey}`) : a.roleKey ? roleName(a.roleKey) : dt(undefined, undefined, a.role);
+    a.renamed ? a.renamed : a.roleKey && mode.isIndependent && ts.has(`role.${a.roleKey}`) ? ts(`role.${a.roleKey}`) : a.roleKey ? roleName(a.roleKey) : dt(undefined, undefined, a.role);
+  // Brands, territories and portfolios join the location scopes when inviting (the API resolves them).
+  const extraScopes = scopeChoices(scopes.data ?? null, app.org.id).filter((c) => c.kind === 'territory' || c.kind === 'portfolio' || c.kind === 'brand');
   const invite = useMutation((api) =>
     mode.isIndependent
       ? api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId: independentScope, scopeLabel: mode.businessName })
@@ -90,18 +98,7 @@ function MembersTab() {
             <Field label={t('roleLabel')}>
               {(p) => (
                 <Select id={p.id} value={role} onChange={(e) => setRole(e.target.value)} data-testid="invite-role">
-                  {(roles.data?.templates ?? []).filter((r) => r.key !== 'org_owner').map((r) => (
-                    <option key={r.key} value={r.key}>
-                      {roleLabel(r.key)}
-                    </option>
-                  ))}
-                  {(roles.data?.custom.length ?? 0) > 0 && (
-                    <optgroup label={ta('editor.customRoles')}>
-                      {roles.data!.custom.map((c) => (
-                        <option key={c.id} value={`custom:${c.id}`}>{c.name}</option>
-                      ))}
-                    </optgroup>
-                  )}
+                  {roles.data && <RoleOptions roles={roles.data} />}
                 </Select>
               )}
             </Field>
@@ -114,6 +111,11 @@ function MembersTab() {
                       {s.kind === 'all' ? t('wholeOrg') : s.label}
                     </option>
                   ))}
+                  {extraScopes.length > 0 && (
+                    <optgroup label={ta('scopes.title')}>
+                      {extraScopes.map((c) => <option key={c.value} value={c.value}>{`${ta(`scopeKind.${c.kind}`)}: ${c.name ?? ''}`}</option>)}
+                    </optgroup>
+                  )}
                 </Select>
               )}
             </Field>
@@ -141,6 +143,9 @@ function MembersTab() {
           </div>
         </section>
       )}
+      {canEdit && orgWide && !mode.isIndependent && res.data && (
+        <CoverageCard people={res.data.filter((m) => m.status === 'active').map((m) => ({ id: m.id, name: m.name }))} />
+      )}
       {access && <MemberAccessPanel userId={access} onClose={() => setAccess(null)} onSaved={() => res.reload()} />}
       <Async res={res} loading={<LoadingBlock variant="table" />}>
         {(members) => (
@@ -149,7 +154,7 @@ function MembersTab() {
               rows={members}
               rowKey={(m) => m.id}
               columns={[
-                { key: 'person', header: t('col.person'), render: (m) => <span className="flex items-center gap-2.5"><Avatar name={m.name} size={32} pastel={m.status === 'support' ? '#F7EDA8' : '#E2F5A6'} /><span><strong>{m.name}</strong><span className="block text-xs text-stone">{m.email}</span></span></span> },
+                { key: 'person', header: t('col.person'), render: (m) => <span className="flex items-center gap-2.5"><Avatar name={m.name} size={32} pastel={m.status === 'support' ? '#F7EDA8' : '#E2F5A6'} /><span><strong>{m.name}</strong>{m.jobTitle && <span className="block text-xs font-semibold" data-testid="job-title-cell">{m.jobTitle}</span>}<span className="block text-xs text-stone">{m.email}</span></span></span> },
                 { key: 'roles', header: t('col.assignments'), render: (m) => <ul className="flex flex-col gap-0.5">{m.assignments.map((a, i) => <li key={i}><strong>{assignmentRole(a)}</strong> <span className="text-stone">· {dt(a.scopeKey, a.scopeParams, a.scopeLabel)}</span></li>)}</ul> },
                 { key: 'last', header: t('col.lastActive'), render: (m) => dt(m.lastActiveKey, m.lastActiveParams, m.lastActive) },
                 { key: 'status', header: t('col.status'), render: (m) => <Badge tone={m.status === 'active' ? 'success' : m.status === 'invited' ? 'info' : 'warning'} icon={m.status === 'support' ? 'shield' : undefined}>{t(`status.${m.status}`)}</Badge> },

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { INDUSTRIES } from './industries.ts';
 import { SUPPORTED_CURRENCIES } from './money.ts';
 import { SUPPORTED_LOCALES, DATA_REGIONS } from './locale.ts';
-import { ROLES } from './permissions.ts';
+import { ROLES, SCOPE_KINDS, SENSITIVE_CLASSES } from './permissions.ts';
 import { WORKSPACES } from './access.ts';
 
 /** API contracts shared by the web app, mobile app and backend. */
@@ -74,7 +74,7 @@ export const createLocationSchema = z.object({
   templateId: id.optional(),
 });
 
-export const scopeSchema = z.object({ kind: z.enum(['organization', 'region', 'owner_group', 'location']), id });
+export const scopeSchema = z.object({ kind: z.enum(SCOPE_KINDS), id });
 
 /** Invite with a system role, or with `role: 'custom'` + `customRoleId` (a role the organisation created). */
 export const inviteMemberSchema = z.object({
@@ -100,6 +100,34 @@ export const assignmentAccessSchema = z.object({
   grants: z.array(z.string().max(80)).max(400).default([]),
   revokes: z.array(z.string().max(80)).max(400).default([]),
 });
+
+/** A person in one business: a free-text job title (separate from their roles) and sensitive classes denied to them. */
+export const memberProfileSchema = z.object({
+  jobTitle: z.string().trim().max(80).nullable().optional(),
+  deniedClasses: z.array(z.enum(SENSITIVE_CLASSES)).max(3).optional(),
+});
+
+/** The business's own name for a system role (null restores the template name). */
+export const roleLabelSchema = z.object({ name: z.string().trim().min(1).max(80).nullable() });
+
+/** A portfolio: any named set of locations (for field consultants and area representatives). */
+export const portfolioSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  description: z.string().trim().max(500).nullable().optional(),
+  locationIds: z.array(id).max(500).default([]),
+});
+
+/** A territory: a sub-network (a country for a master franchisee, a development area for an area developer). */
+export const territoryScopeSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  kind: z.enum(['master', 'development', 'support']).default('master'),
+  country: z.string().length(2).transform((s) => s.toUpperCase()).nullable().optional(),
+  brandId: id.nullable().optional(),
+  locationIds: z.array(id).max(500).optional(),
+});
+
+/** A brand (single-brand today; modelled for multi-brand networks). */
+export const brandSchema = z.object({ name: z.string().trim().min(1).max(120) });
 
 export const paymentStates = ['created', 'requires_action', 'processing', 'succeeded', 'failed', 'cancelled'] as const;
 export const refundStates = ['requested', 'pending', 'partial', 'complete', 'failed'] as const;

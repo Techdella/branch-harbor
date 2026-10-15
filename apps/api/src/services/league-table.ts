@@ -16,11 +16,11 @@ import type { FastifyRequest } from 'fastify';
 import { growthPct, quartileOf, quartiles, type Quartiles } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
 import {
-  appointments, classBookings, classOccurrences, financeInvoices, foodOrders, franchiseTerritories, hospReservationRooms, hospReservations, hospRooms, locations, orders, organizations, ownerGroups, paymentReferences,
+  appointments, portfolios, territories, classBookings, classOccurrences, financeInvoices, foodOrders, franchiseTerritories, hospReservationRooms, hospReservations, hospRooms, locations, orders, organizations, ownerGroups, paymentReferences,
   realtyEnquiries, regions, registrations,
 } from '../db/schema/index.ts';
 import { localDateParts } from '../lib/tz.ts';
-import { capabilityLocations, hasCapability } from './authz.ts';
+import { capabilityLocations, hasCapability, locationsInScope } from './authz.ts';
 import { latestScores } from './audits.ts';
 
 export const LEAGUE_MODULE = 'network.league_table';
@@ -56,7 +56,7 @@ export function leagueSettings(org: { settings: Record<string, unknown> }): Leag
 export type ActivityKind = 'class_bookings' | 'registrations' | 'appointments' | 'orders' | 'food_orders' | 'enquiries' | 'room_nights';
 const ACTIVITY: Record<string, ActivityKind> = { studios: 'class_bookings', sports: 'registrations', wellness: 'appointments', commerce: 'orders', foods: 'food_orders', realty: 'enquiries', hospitality: 'room_nights' };
 
-export interface LeagueQuery { from: string; to: string; regionId?: string; ownerGroupId?: string; territoryId?: string; sort: 'revenue' | 'growth' | 'activity' | 'occupancy' | 'auditScore' | 'royaltyStatus' | 'reviewRating' }
+export interface LeagueQuery { from: string; to: string; regionId?: string; ownerGroupId?: string; territoryId?: string; portfolioId?: string; sort: 'revenue' | 'growth' | 'activity' | 'occupancy' | 'auditScore' | 'royaltyStatus' | 'reviewRating' }
 
 const DAY = 86_400_000;
 const dayStart = (ymd: string) => new Date(`${ymd}T00:00:00Z`);
@@ -161,15 +161,30 @@ export async function leagueTable(req: FastifyRequest, db: Exec, organizationId:
   const months = (to.getUTCFullYear() - from.getUTCFullYear()) * 12 + to.getUTCMonth() - from.getUTCMonth();
   const prevFrom = wholeMonths ? new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth() - months, 1)) : new Date(from.getTime() - span);
 
+  // Territory: an access-scope territory (a sub-network: its locations), or a franchise pipeline territory (the owner
+  // group that bought it). Portfolio: the locations in it (access scopes, services/authz.ts).
   let territoryGroup: string | null | undefined;
+  let scopeIds: Set<string> | undefined;
   if (q.territoryId) {
-    const [t] = await db.select({ g: franchiseTerritories.ownerGroupId }).from(franchiseTerritories).where(and(eq(franchiseTerritories.id, q.territoryId), eq(franchiseTerritories.organizationId, organizationId)));
-    territoryGroup = t?.g ?? null;
+    const [sub] = await db.select({ id: territories.id }).from(territories).where(and(eq(territories.id, q.territoryId), eq(territories.organizationId, organizationId)));
+    if (sub) {
+      const inScope = await locationsInScope(db, organizationId, 'territory', sub.id);
+      scopeIds = inScope === 'all' ? undefined : inScope;
+    } else {
+      const [t] = await db.select({ g: franchiseTerritories.ownerGroupId }).from(franchiseTerritories).where(and(eq(franchiseTerritories.id, q.territoryId), eq(franchiseTerritories.organizationId, organizationId)));
+      territoryGroup = t?.g ?? null;
+    }
+  }
+  if (q.portfolioId) {
+    const [pf] = await db.select({ id: portfolios.id }).from(portfolios).where(and(eq(portfolios.id, q.portfolioId), eq(portfolios.organizationId, organizationId)));
+    const inPortfolio = pf ? await locationsInScope(db, organizationId, 'portfolio', pf.id) : new Set<string>();
+    const ids = inPortfolio === 'all' ? null : inPortfolio;
+    if (ids) scopeIds = scopeIds ? new Set([...scopeIds].filter((x) => ids.has(x))) : ids;
   }
   // Every operating location (for network quartiles), then the viewer's rows after filters.
   const network = (await db.select({ id: locations.id, name: locations.name, code: locations.code, currency: locations.currency, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId, status: locations.status, archivedAt: locations.archivedAt })
     .from(locations).where(eq(locations.organizationId, organizationId))).filter((l) => !l.archivedAt && (l.status === 'operating' || l.status === 'paused'));
-  const filtered = network.filter((l) => (!q.regionId || l.regionId === q.regionId) && (!q.ownerGroupId || l.ownerGroupId === q.ownerGroupId) && (territoryGroup === undefined || (!!territoryGroup && l.ownerGroupId === territoryGroup)));
+  const filtered = network.filter((l) => (!q.regionId || l.regionId === q.regionId) && (!q.ownerGroupId || l.ownerGroupId === q.ownerGroupId) && (territoryGroup === undefined || (!!territoryGroup && l.ownerGroupId === territoryGroup)) && (!scopeIds || scopeIds.has(l.id)));
   const mine = filtered.filter((l) => has(allowed, l.id));
   const computeFor = hq || settings.franchiseeQuartiles ? network : mine;
   const ids = computeFor.map((l) => l.id);

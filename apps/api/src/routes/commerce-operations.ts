@@ -10,7 +10,7 @@ import {
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, locationAllowed, requireLocationPerm, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, financeVisible, locationAllowed, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { serializePayment } from '../services/payments.ts';
 import {
   advanceFulfilment, allocateBackorders, expireOrder, expireReservations, fulfilmentNext, locationMap, orderTransfer, pickLines, resolveStockConflict, serializeOrder, startFulfilment,
@@ -64,6 +64,7 @@ export const commerceOperationsRoutes: FastifyPluginAsyncZod = async (app) => {
     const locs = (await s.db.select().from(locations).where(eq(locations.organizationId, orgId))).filter((l) => allowed === 'all' || allowed.has(l.id));
     const ids = locs.map((l) => l.id);
     const canReports = await authorisedLocations(req, s.db, orgId, 'reports.read');
+    const revenueVisible = (await financeVisible(req, s.db, orgId, ids)).all;
     const since7 = new Date(Date.now() - 7 * 86400_000);
     const recent = ids.length ? await s.db.select().from(orders).where(and(inArray(orders.locationId, ids), gte(orders.createdAt, since7))) : [];
     const open = ids.length ? await s.db.select().from(orders).where(and(or(inArray(orders.locationId, ids), inArray(orders.fulfilmentLocationId, ids)), inArray(orders.paymentStatus, ['paid', 'external', 'not_required', 'partially_refunded']), sql`${orders.fulfilmentStatus} not in ('fulfilled','cancelled')`)) : [];
@@ -102,7 +103,9 @@ export const commerceOperationsRoutes: FastifyPluginAsyncZod = async (app) => {
       },
       sales: canReports === 'all' || (canReports instanceof Set && canReports.size) ? sales : null,
       salesUnavailableReason: canReports === 'all' || (canReports instanceof Set && canReports.size) ? null : 'Requires report access',
-      revenueByCurrency: [...byCurrency.values()].map((x) => ({ currency: x.currency, today: { amount: x.today, currency: x.currency }, last7Days: { amount: x.last7Days, currency: x.currency }, orders7: x.orders7 })),
+      // Revenue is the owner's financial data: shown only when the person holds Payments (view) at every location in view.
+      revenueByCurrency: revenueVisible ? [...byCurrency.values()].map((x) => ({ currency: x.currency, today: { amount: x.today, currency: x.currency }, last7Days: { amount: x.last7Days, currency: x.currency }, orders7: x.orders7 })) : [],
+      revenueRestricted: !revenueVisible,
       combinedRevenue: null, combinedRevenueReason: 'Different currencies are never added together.',
       stock: { low: alerts.filter((a) => a.severity === 'low').length, out: alerts.filter((a) => a.severity === 'out').length, top: alerts.slice(0, 5) },
       transfers: { requested: transfers.filter((t) => t.status === 'requested').length, toShip: transfers.filter((t) => t.status === 'approved').length, inTransit: transfers.filter((t) => t.status === 'in_transit').length },

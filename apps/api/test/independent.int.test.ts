@@ -39,7 +39,7 @@ describe.skipIf(!hasDb)('independent businesses (DB)', () => {
     expect(n.features.scopeSelector).toBe(true);
     expect(i).toMatchObject({ model: 'independent', isSingleLocation: true, primaryLocationId: indep.firstLocation.id, websiteApprovals: 'off' });
     expect(i.features).toMatchObject({ scopeSelector: false, regions: false, ownerGroups: false, groupPublish: false, locationsDirectory: false });
-    expect(i.availableRoles).toEqual(['org_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance']);
+    expect(i.availableRoles).toEqual(['org_owner', 'location_manager', 'staff', 'content_social', 'finance_lead', 'accountant', 'sales_rep']);
     expect(n.availableRoles).toContain('franchise_owner');
 
     const g = await call(app, 'GET', `/v1/orgs/${indep.id}`, { token: owner.token });
@@ -93,12 +93,12 @@ describe.skipIf(!hasDb)('independent businesses (DB)', () => {
     const owner = await verifiedUser(app, 'Owner');
     const org = await independentOrg(owner.token);
     const loc = org.firstLocation.id;
-    for (const role of ['hq_admin', 'regional_manager', 'franchise_owner']) {
+    for (const role of ['hq_admin', 'field_consultant', 'franchise_owner', 'master_franchisee']) {
       const r = await call(app, 'POST', `/v1/orgs/${org.id}/invitations`, { token: owner.token, body: { email: `x-${uid()}@example.com`, role, scope: { kind: 'organization', id: org.id } } });
       expect(r.status, role).toBe(400);
       expect(r.body.error.code).toBe('role_not_available');
     }
-    for (const role of ['location_manager', 'staff', 'marketing_contributor', 'finance']) {
+    for (const role of ['location_manager', 'staff', 'content_social', 'finance_lead']) {
       const r = await call(app, 'POST', `/v1/orgs/${org.id}/invitations`, { token: owner.token, body: { email: `x-${uid()}@example.com`, role, scope: { kind: 'location', id: loc } } });
       expect(r.status, role).toBe(201);
     }
@@ -195,7 +195,7 @@ describe.skipIf(!hasDb)('independent businesses (DB)', () => {
     expect(view.body.fields.every((f: any) => f.editableLocally && !f.requiresApproval && f.origin === 'local')).toBe(true);
 
     const mgr = await memberWithRole(app, owner.token, org.id, 'location_manager', { kind: 'location', id: loc.id });
-    const mkt = await memberWithRole(app, owner.token, org.id, 'marketing_contributor', { kind: 'location', id: loc.id });
+    const mkt = await memberWithRole(app, owner.token, org.id, 'content_social', { kind: 'location', id: loc.id });
 
     // Approvals off (default): edits apply, the manager publishes directly.
     const ed = await call(app, 'PATCH', `/v1/orgs/${org.id}/pages/${pageId}/fields`, { token: mkt.token, body: { fields: { hero_title: 'Pastéis every morning', about: 'Family café since 1998' } } });

@@ -1,11 +1,13 @@
+import { SCOPE_KINDS } from '@bh/shared';
 import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { auditEvents, campaigns, consentRecords, customers, guardianRelationships, leads } from '../db/schema/index.ts';
-import { notFound } from '../lib/errors.ts';
+import { forbidden, notFound } from '../lib/errors.ts';
+import { toCsv } from '../services/finance/exports.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, requireLocationPerm, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, capabilityLocations, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 export const crmRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -28,6 +30,25 @@ export const crmRoutes: FastifyPluginAsyncZod = async (app) => {
     if (req.query.locationId) conds.push(eq(customers.locationId, req.query.locationId));
     if (req.query.q) conds.push(sql`(${customers.name} ilike ${'%' + req.query.q + '%'} or ${customers.email} ilike ${'%' + req.query.q + '%'})`);
     return { items: await s.db.select().from(customers).where(and(...conds)).orderBy(desc(customers.createdAt)).limit(req.query.limit) };
+  });
+
+  app.get('/orgs/:orgId/customers/export', {
+    schema: {
+      tags: ['orgs'], security: secured, params: orgParams, querystring: z.object({ locationId: z.uuid().optional() }),
+      summary: 'Export customers (personal data) as CSV: only locations where you hold Customers (export). Seeing a location never implies it. Audited.',
+    },
+  }, async (req, reply) => {
+    const { orgId } = req.params;
+    const allowed = await capabilityLocations(req, s.db, orgId, 'sales.customers', 'export');
+    if (allowed !== 'all' && !allowed.size) throw forbidden('You don’t have export access to customers');
+    if (req.query.locationId && allowed !== 'all' && !allowed.has(req.query.locationId)) throw forbidden('You don’t have export access to customers at this location');
+    const conds = [eq(customers.organizationId, orgId), isNull(customers.erasedAt)];
+    if (allowed !== 'all') conds.push(inArray(customers.locationId, [...allowed]));
+    if (req.query.locationId) conds.push(eq(customers.locationId, req.query.locationId));
+    const rows = await s.db.select().from(customers).where(and(...conds)).orderBy(desc(customers.createdAt)).limit(10_000);
+    await audit(s.db, { organizationId: orgId, ...actor(req), action: 'customers.exported', scopeKind: req.query.locationId ? 'location' : 'organization', scopeId: req.query.locationId ?? orgId, metadata: { count: rows.length } });
+    const csv = toCsv(['id', 'name', 'email', 'phone', 'location_id', 'created_at'], rows.map((c) => [c.id, c.name, c.email ?? '', c.phone ?? '', c.locationId ?? '', c.createdAt.toISOString()]));
+    return reply.header('Content-Disposition', 'attachment; filename="customers.csv"').type('text/csv; charset=utf-8').send(csv);
   });
 
   app.get('/orgs/:orgId/customers/:id', { schema: { tags: ['orgs'], security: secured, params: idParams } }, async (req) => {
@@ -84,7 +105,7 @@ export const crmRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post('/orgs/:orgId/campaigns', {
     schema: {
       tags: ['orgs'], security: secured, params: orgParams,
-      body: z.object({ name: z.string().min(1), channel: z.enum(['email', 'sms', 'social', 'ads', 'web']).default('email'), scope: z.object({ kind: z.enum(['organization', 'region', 'owner_group', 'location']), id: z.uuid() }), content: z.record(z.string(), z.unknown()).default({}) }),
+      body: z.object({ name: z.string().min(1), channel: z.enum(['email', 'sms', 'social', 'ads', 'web']).default('email'), scope: z.object({ kind: z.enum(SCOPE_KINDS), id: z.uuid() }), content: z.record(z.string(), z.unknown()).default({}) }),
     },
   }, async (req, reply) => {
     const { orgId } = req.params;

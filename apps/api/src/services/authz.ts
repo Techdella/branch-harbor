@@ -1,12 +1,15 @@
 import { and, eq, inArray, isNull, or, gt } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { ROLE_TEMPLATES, accessSummary, type AccessAction, type AccessSummary, type Permission, type Role, type ScopeKind, type WorkspaceKey } from '@bh/shared';
+import { ROLE_TEMPLATES, SCOPE_ORDER, accessSummary, canonicalRole, type AccessAction, type AccessSummary, type Permission, type Role, type ScopeKind, type WorkspaceKey } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
-import { customRoles, locations, memberAccessOverrides, organizations, ownerGroups, regions, roleAssignments, roleCapabilities } from '../db/schema/index.ts';
 import {
-  authorisedLocationIds, capabilitiesAnywhere, capabilitiesInScope, capabilityLocationIds, hasCapabilityInScope, hasPermissionInScope, permissionsInScope, withAccess,
-  type Assignment, type ScopeChain,
+  brands, customRoles, locations, memberAccessOverrides, memberProfiles, organizations, ownerGroups, portfolioLocations, portfolios, regions, roleAssignments, roleCapabilities, territories,
+} from '../db/schema/index.ts';
+import {
+  authorisedLocationIds, capabilitiesAnywhere, capabilitiesInScope, capabilityLocationIds, capabilityTerritoryIds, coversLocation, hasCapabilityInScope, hasPermissionInScope, permissionsInScope, withAccess,
+  type Assignment, type LocationRef, type ScopeChain,
 } from '../domain/scope.ts';
+import { opsModuleFor } from './module-guard.ts';
 import { forbidden, notFound } from '../lib/errors.ts';
 import { requireUser } from '../plugins/auth.ts';
 
@@ -29,14 +32,20 @@ export async function withEffectiveAccess(db: Exec, organizationId: string, rows
   const customIds = [...new Set(rows.map((r) => r.customRoleId).filter((x): x is string => !!x))];
   const caps = customIds.length ? await db.select().from(roleCapabilities).where(inArray(roleCapabilities.roleId, customIds)) : [];
   const overrides = await db.select().from(memberAccessOverrides).where(inArray(memberAccessOverrides.assignmentId, rows.map((r) => r.id)));
+  // Person-level denies of sensitive classes apply to every role the person holds.
+  const userIds = [...new Set(rows.map((r) => r.userId))];
+  const profiles = await db.select({ userId: memberProfiles.userId, denied: memberProfiles.deniedClasses }).from(memberProfiles)
+    .where(and(eq(memberProfiles.organizationId, organizationId), inArray(memberProfiles.userId, userIds)));
+  const denied = new Map(profiles.map((p) => [p.userId, p.denied]));
   return rows.map((r) =>
     withAccess(
-      { id: r.id, role: r.role as Role | 'custom', scopeKind: r.scopeKind as ScopeKind, scopeId: r.scopeId, expiresAt: r.expiresAt, customRoleId: r.customRoleId },
+      { id: r.id, role: canonicalRole(r.role) as Role | 'custom', scopeKind: r.scopeKind as ScopeKind, scopeId: r.scopeId, expiresAt: r.expiresAt, customRoleId: r.customRoleId },
       ind,
       {
         customCapabilities: r.customRoleId ? caps.filter((c) => c.roleId === r.customRoleId).map((c) => c.capability) : null,
         grants: overrides.filter((o) => o.assignmentId === r.id && o.effect === 'grant').map((o) => o.capability),
         revokes: overrides.filter((o) => o.assignmentId === r.id && o.effect === 'revoke').map((o) => o.capability),
+        deniedClasses: denied.get(r.userId) ?? [],
       },
     ),
   );
@@ -63,9 +72,8 @@ async function primaryHints(db: Exec, assignments: Assignment[]): Promise<{ role
   const ids = [...new Set(assignments.map((a) => a.customRoleId).filter((x): x is string => !!x))];
   const custom = ids.length ? await db.select({ id: customRoles.id, primaryWorkspace: customRoles.primaryWorkspace }).from(customRoles).where(inArray(customRoles.id, ids)) : [];
   // Widest scope first: an organisation-wide role decides where someone lands.
-  const order: ScopeKind[] = ['organization', 'region', 'owner_group', 'location'];
   return [...assignments]
-    .sort((a, b) => order.indexOf(a.scopeKind) - order.indexOf(b.scopeKind))
+    .sort((a, b) => SCOPE_ORDER.indexOf(a.scopeKind) - SCOPE_ORDER.indexOf(b.scopeKind))
     .map((a) => ({ role: a.role, primaryWorkspace: (custom.find((c) => c.id === a.customRoleId)?.primaryWorkspace as WorkspaceKey | null | undefined) ?? ROLE_TEMPLATES[a.role as Role]?.primaryWorkspace ?? null }));
 }
 
@@ -74,12 +82,59 @@ export async function accessSummaryFor(db: Exec, assignments: Assignment[], indu
   return accessSummary(capabilitiesAnywhere(assignments), industry, await primaryHints(db, assignments));
 }
 
+/** The business's default brand id (single-brand today: locations without a brand belong to it). */
+export async function defaultBrandId(db: Exec, organizationId: string): Promise<string | null> {
+  const find = async () => (await db.select({ id: brands.id }).from(brands).where(and(eq(brands.organizationId, organizationId), eq(brands.isDefault, true))))[0]?.id ?? null;
+  const found = await find();
+  if (found) return found;
+  // Every business has a default brand (created on first use for businesses made after the brands migration).
+  const [o] = await db.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, organizationId));
+  if (!o) return null;
+  await db.insert(brands).values({ organizationId, name: o.name, isDefault: true }).onConflictDoNothing();
+  return find();
+}
+
+/**
+ * Every location of the organisation with all the scopes it belongs to (region, owner group, territory, brand and
+ * portfolios). Used wherever access is resolved to a set of locations.
+ */
+export async function scopedLocations(db: Exec, organizationId: string): Promise<LocationRef[]> {
+  const [locs, members, brand] = await Promise.all([
+    db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId, territoryId: locations.territoryId, brandId: locations.brandId }).from(locations).where(eq(locations.organizationId, organizationId)),
+    db.select({ portfolioId: portfolioLocations.portfolioId, locationId: portfolioLocations.locationId }).from(portfolioLocations).where(eq(portfolioLocations.organizationId, organizationId)),
+    defaultBrandId(db, organizationId),
+  ]);
+  return locs.map((l) => ({ ...l, brandId: l.brandId ?? brand, portfolioIds: members.filter((m) => m.locationId === l.id).map((m) => m.portfolioId) }));
+}
+
+/** Location ids a scope (of any kind) holds, or 'all' for the organisation. */
+export async function locationsInScope(db: Exec, organizationId: string, kind: string, id: string): Promise<'all' | Set<string>> {
+  if (kind === 'organization') return 'all';
+  const probe = { scopeKind: kind as ScopeKind, scopeId: id, role: 'custom' as const };
+  return new Set((await scopedLocations(db, organizationId)).filter((l) => coversLocation(probe, organizationId, l)).map((l) => l.id));
+}
+
 /** Resolve a target scope to its full ancestry, verifying it belongs to the organisation (tenant boundary). */
 export async function resolveScopeChain(db: Exec, t: ScopeTarget): Promise<ScopeChain> {
   switch (t.kind) {
     case 'organization':
       if (t.id !== t.organizationId) throw notFound('Scope');
       return { organizationId: t.organizationId, kind: 'organization' };
+    case 'brand': {
+      const [b] = await db.select({ id: brands.id }).from(brands).where(and(eq(brands.id, t.id), eq(brands.organizationId, t.organizationId)));
+      if (!b) throw notFound('Brand');
+      return { organizationId: t.organizationId, kind: 'brand', brandId: b.id };
+    }
+    case 'territory': {
+      const [tr] = await db.select({ id: territories.id, brandId: territories.brandId }).from(territories).where(and(eq(territories.id, t.id), eq(territories.organizationId, t.organizationId)));
+      if (!tr) throw notFound('Territory');
+      return { organizationId: t.organizationId, kind: 'territory', territoryId: tr.id, brandId: tr.brandId ?? (await defaultBrandId(db, t.organizationId)) };
+    }
+    case 'portfolio': {
+      const [p] = await db.select({ id: portfolios.id }).from(portfolios).where(and(eq(portfolios.id, t.id), eq(portfolios.organizationId, t.organizationId)));
+      if (!p) throw notFound('Portfolio');
+      return { organizationId: t.organizationId, kind: 'portfolio', portfolioId: p.id };
+    }
     case 'region': {
       const [r] = await db.select({ id: regions.id }).from(regions).where(and(eq(regions.id, t.id), eq(regions.organizationId, t.organizationId)));
       if (!r) throw notFound('Region');
@@ -92,13 +147,28 @@ export async function resolveScopeChain(db: Exec, t: ScopeTarget): Promise<Scope
     }
     case 'location': {
       const [l] = await db
-        .select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId })
+        .select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId, territoryId: locations.territoryId, brandId: locations.brandId })
         .from(locations)
         .where(and(eq(locations.id, t.id), eq(locations.organizationId, t.organizationId)));
       if (!l) throw notFound('Location');
-      return { organizationId: t.organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
+      const inPortfolios = await db.select({ id: portfolioLocations.portfolioId }).from(portfolioLocations).where(eq(portfolioLocations.locationId, l.id));
+      return {
+        organizationId: t.organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId, territoryId: l.territoryId,
+        brandId: l.brandId ?? (await defaultBrandId(db, t.organizationId)), portfolioIds: inPortfolios.map((p) => p.id),
+      };
     }
   }
+}
+
+/**
+ * Operations routes check their own module (access model): on a route that belongs to one Operations module (e.g.
+ * `/studios/memberships` → Members & pricing), the generic `operations.read` / `operations.write` permissions mean
+ * view / edit of that module, so holding another Operations module is not enough — at the guard and at every location.
+ */
+function opsCapabilityFor(req: FastifyRequest, permission: Permission, assignments: Assignment[]): { module: string; action: AccessAction } | null {
+  if (permission !== 'operations.read' && permission !== 'operations.write') return null;
+  const module = opsModuleFor(req.routeOptions?.url, capabilitiesAnywhere(assignments));
+  return module ? { module, action: permission === 'operations.read' ? 'view' : 'edit' } : null;
 }
 
 export async function assignmentsFor(req: FastifyRequest, db: Exec, organizationId: string): Promise<Assignment[]> {
@@ -121,7 +191,9 @@ export async function requireMember(req: FastifyRequest, db: Exec, organizationI
 export async function requirePerm(req: FastifyRequest, db: Exec, permission: Permission, target: ScopeTarget): Promise<ScopeChain> {
   const assignments = await requireMember(req, db, target.organizationId);
   const chain = await resolveScopeChain(db, target);
-  if (!hasPermissionInScope(assignments, permission, chain)) throw forbidden(`Missing permission ${permission} for this ${target.kind}`);
+  const ops = opsCapabilityFor(req, permission, assignments);
+  const ok = ops ? hasCapabilityInScope(assignments, ops.module, ops.action, chain) : hasPermissionInScope(assignments, permission, chain);
+  if (!ok) throw forbidden(`Missing permission ${permission} for this ${target.kind}`);
   return chain;
 }
 
@@ -129,13 +201,20 @@ export async function hasPerm(req: FastifyRequest, db: Exec, permission: Permiss
   const assignments = await assignmentsFor(req, db, target.organizationId);
   if (!assignments.length) return false;
   const chain = await resolveScopeChain(db, target).catch(() => null);
-  return !!chain && hasPermissionInScope(assignments, permission, chain);
+  if (!chain) return false;
+  const ops = opsCapabilityFor(req, permission, assignments);
+  return ops ? hasCapabilityInScope(assignments, ops.module, ops.action, chain) : hasPermissionInScope(assignments, permission, chain);
 }
 
 export async function permissionsAt(req: FastifyRequest, db: Exec, target: ScopeTarget) {
   const assignments = await assignmentsFor(req, db, target.organizationId);
   const chain = await resolveScopeChain(db, target);
-  return [...permissionsInScope(assignments, chain)];
+  const perms = permissionsInScope(assignments, chain);
+  for (const p of ['operations.read', 'operations.write'] as const) {
+    const ops = opsCapabilityFor(req, p, assignments);
+    if (ops && !hasCapabilityInScope(assignments, ops.module, ops.action, chain)) perms.delete(p);
+  }
+  return [...perms];
 }
 
 /**
@@ -180,15 +259,31 @@ export function requireCapabilityHook(module: string, action: AccessAction, reso
 /** Location ids where the user holds a module action ('all' for organisation-wide grants). */
 export async function capabilityLocations(req: FastifyRequest, db: Exec, organizationId: string, module: string, action: AccessAction): Promise<'all' | Set<string>> {
   const assignments = await requireMember(req, db, organizationId);
-  const locs = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.organizationId, organizationId));
-  return capabilityLocationIds(assignments, module, action, organizationId, locs);
+  return capabilityLocationIds(assignments, module, action, organizationId, await scopedLocations(db, organizationId));
+}
+
+/** Territories (sub-networks) where the user holds a module action ('all' for organisation-wide grants). */
+export async function capabilityTerritories(req: FastifyRequest, db: Exec, organizationId: string, module: string, action: AccessAction): Promise<'all' | Set<string>> {
+  return capabilityTerritoryIds(await requireMember(req, db, organizationId), module, action, organizationId);
 }
 
 /** The set of location ids in the organisation where the user holds `permission`. */
 export async function authorisedLocations(req: FastifyRequest, db: Exec, organizationId: string, permission: Permission): Promise<'all' | Set<string>> {
   const assignments = await requireMember(req, db, organizationId);
-  const locs = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.organizationId, organizationId));
-  return authorisedLocationIds(assignments, permission, organizationId, locs);
+  const locs = await scopedLocations(db, organizationId);
+  const ops = opsCapabilityFor(req, permission, assignments);
+  return ops ? capabilityLocationIds(assignments, ops.module, ops.action, organizationId, locs) : authorisedLocationIds(assignments, permission, organizationId, locs);
+}
+
+/**
+ * Ownership vs support: of these locations, the ones whose finances (revenue, payments) the user may see. Seeing a
+ * location — its schedule, bookings or reports — never implies seeing its owner's money: that needs Payments (view)
+ * there. `all` is true when every location qualifies.
+ */
+export async function financeVisible(req: FastifyRequest, db: Exec, organizationId: string, ids: readonly string[]): Promise<{ all: boolean; ids: string[] }> {
+  const fin = await capabilityLocations(req, db, organizationId, 'finance.payments', 'view');
+  const visible = fin === 'all' ? [...ids] : ids.filter((id) => fin.has(id));
+  return { all: visible.length === ids.length, ids: visible };
 }
 
 export function locationAllowed(allowed: 'all' | Set<string>, locationId: string | null | undefined): boolean {

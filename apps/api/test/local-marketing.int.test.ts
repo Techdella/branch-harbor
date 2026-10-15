@@ -65,7 +65,7 @@ describe.skipIf(!hasDb)('local marketing (DB)', () => {
     tor = { id: t.id, slug: t.slug };
     van = { id: v.id, slug: v.slug };
     await call(app, 'PATCH', o(`/locations/${tor.id}`), { token: owner.token, body: { publiclyVisible: true } });
-    cmo = await memberWithRole(app, owner.token, orgId, 'cmo', { kind: 'organization', id: orgId }, 'HQ Marketing');
+    cmo = await memberWithRole(app, owner.token, orgId, 'marketing_lead', { kind: 'organization', id: orgId }, 'HQ Marketing');
     foA = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: gA }, 'North Owner');
     foB = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: gB }, 'West Owner');
     lmA = await memberWithRole(app, owner.token, orgId, 'location_manager', { kind: 'location', id: tor.id }, 'Toronto Manager');
