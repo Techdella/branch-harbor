@@ -293,9 +293,9 @@ business, sporadic), Bacs `bacs_debit` (GBP, UK accounts), SEPA `sepa_debit` (EU
   date, and retries follow the dunning policy. `setup_intent.requires_action` with `verify_with_microdeposits` moves the
   method to `verifying` (with Stripe's hosted verification link); `mandate.updated` with `status: inactive` revokes it.
   Add `setup_intent.requires_action` and `mandate.updated` to the Connect webhook endpoint's events.
-- **Collection fee:** a flat BranchHarbor fee per collection attempt that is not failed — USD 1.00, at most 5 per
-  location per calendar month, in the price-book currency (`royaltyCollectionFee` in `packages/shared/src/fees.ts`,
-  scaled by the price book's market ratio; currencies outside the price book: no fee). It is NOT a percentage of
+- **Collection fee:** a flat BranchHarbor fee per collection attempt that is not failed — USD 1.00, at most USD 10 per
+  location per calendar month, in the price-book currency (the `collection` and `collectionCap` rows in
+  `packages/shared/src/pricing.ts`, exposed by `fees.ts`; currencies outside the price book: no fee). It is NOT a percentage of
   royalties. It is taken as `application_fee_amount` on the direct charge on the franchisor's collection account (HQ
   pays it), recorded on the attempt (`platform_fee_minor`) and shown on statements for transparency; a debit that later
   fails has its fee reset to 0.

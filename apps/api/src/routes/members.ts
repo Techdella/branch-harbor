@@ -1,6 +1,6 @@
 import { and, eq, gt } from 'drizzle-orm';
 import { z } from 'zod';
-import { inviteMemberSchema, type Role, type ScopeKind } from '@bh/shared';
+import { canonicalRole, inviteMemberSchema, type Role, type ScopeKind } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { customRoles, invitations, locations, organizations, roleAssignments, users } from '../db/schema/index.ts';
 import { assignmentCovers, canGrantCapabilities, canGrantRole, hasCapabilityInScope, type ScopeChain } from '../domain/scope.ts';
@@ -9,7 +9,7 @@ import { AppError, badRequest, conflict, forbidden, notFound } from '../lib/erro
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { requireMember, resolveScopeChain, withEffectiveAccess } from '../services/authz.ts';
-import { assignmentCaps, loadCustomRole, roleName } from '../services/access.ts';
+import { assignmentCaps, loadCustomRole, loadRoleLabels, memberProfilesFor, roleName, scopeNames } from '../services/access.ts';
 import { assertRoleForModel } from '../services/businessMode.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
 
@@ -30,22 +30,24 @@ export const memberRoutes: FastifyPluginAsyncZod = async (app) => {
       .where(eq(roleAssignments.organizationId, orgId));
     const locs = await s.db.select().from(locations).where(eq(locations.organizationId, orgId));
     const locById = new Map(locs.map((l) => [l.id, l]));
-    const visible = rows.filter((r) => {
-      if (r.u.id === req.user!.id) return true;
-      const l = r.a.scopeKind === 'location' ? locById.get(r.a.scopeId) : undefined;
-      const chain: ScopeChain = {
-        organizationId: orgId, kind: r.a.scopeKind as ScopeKind,
-        regionId: r.a.scopeKind === 'region' ? r.a.scopeId : l?.regionId,
-        ownerGroupId: r.a.scopeKind === 'owner_group' ? r.a.scopeId : l?.ownerGroupId,
-        locationId: r.a.scopeKind === 'location' ? r.a.scopeId : undefined,
-      };
-      return hasCapabilityInScope(mine, 'settings.team', 'view', chain);
-    });
+    const chains = new Map<string, ScopeChain | null>();
+    const chainOf = async (kind: string, id: string) => {
+      const k = `${kind}:${id}`;
+      if (!chains.has(k)) chains.set(k, await chainFor(orgId, kind, id).catch(() => null));
+      return chains.get(k)!;
+    };
+    const visible = [];
+    for (const r of rows) {
+      if (r.u.id === req.user!.id) { visible.push(r); continue; }
+      const chain = await chainOf(r.a.scopeKind, r.a.scopeId);
+      if (chain && hasCapabilityInScope(mine, 'settings.team', 'view', chain)) visible.push(r);
+    }
     const custom = await s.db.select({ id: customRoles.id, name: customRoles.name }).from(customRoles).where(eq(customRoles.organizationId, orgId));
-    const byUser = new Map<string, { user: { id: string; name: string; email: string }; assignments: Array<{ id: string; role: string; roleName: string; customRoleId: string | null; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string | null }> }>();
+    const [labels, names, profiles] = await Promise.all([loadRoleLabels(s.db, orgId), scopeNames(s.db, orgId), memberProfilesFor(s.db, orgId)]);
+    const byUser = new Map<string, { user: { id: string; name: string; email: string }; jobTitle: string | null; assignments: Array<{ id: string; role: string; roleName: string; customRoleId: string | null; scope: { kind: string; id: string; name: string | null }; expiresAt: string | null; createdAt: string | null }> }>();
     for (const r of visible) {
-      const entry = byUser.get(r.u.id) ?? { user: r.u, assignments: [] };
-      entry.assignments.push({ id: r.a.id, role: r.a.role, roleName: roleName(r.a.role, custom.find((c) => c.id === r.a.customRoleId)), customRoleId: r.a.customRoleId, scope: { kind: r.a.scopeKind, id: r.a.scopeId, name: r.a.scopeKind === 'location' ? locById.get(r.a.scopeId)?.name ?? null : null }, expiresAt: iso(r.a.expiresAt), createdAt: iso(r.a.createdAt) });
+      const entry = byUser.get(r.u.id) ?? { user: r.u, jobTitle: profiles.get(r.u.id)?.jobTitle ?? null, assignments: [] };
+      entry.assignments.push({ id: r.a.id, role: canonicalRole(r.a.role), roleName: roleName(r.a.role, custom.find((c) => c.id === r.a.customRoleId), labels), customRoleId: r.a.customRoleId, scope: { kind: r.a.scopeKind, id: r.a.scopeId, name: names.get(`${r.a.scopeKind}:${r.a.scopeId}`) ?? locById.get(r.a.scopeId)?.name ?? null }, expiresAt: iso(r.a.expiresAt), createdAt: iso(r.a.createdAt) });
       byUser.set(r.u.id, entry);
     }
     return { items: [...byUser.values()] };

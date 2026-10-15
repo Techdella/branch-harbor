@@ -4,8 +4,8 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
   TERRITORY_EXCLUSIVITY, TERRITORY_STATUSES, findOverlaps, parsePostcodeList, territoryGeometrySchema, type TerritoryExclusivity, type TerritoryGeometry,
 } from '@bh/shared';
-import { franchiseTerritories, locations, organizations, ownerGroups } from '../db/schema/index.ts';
-import { validationError } from '../lib/errors.ts';
+import { franchiseTerritories, locations, organizations, ownerGroups, territories as scopeTerritories } from '../db/schema/index.ts';
+import { notFound, validationError } from '../lib/errors.ts';
 import { renderPdf, type PdfPage } from '../lib/pdf.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { audit } from '../services/audit.ts';
@@ -14,7 +14,7 @@ import {
   ITEM12_DISCLAIMER, assertNoConflict, canTerritories, derivedStatus, geometryFields, item12Lines, loadTerritory, mapConfig, orgTerritories, refreshDemographics, requireTerritories,
   serializeTerritory, shapeOf, territoryLinks, territorySettings, type Territory,
 } from '../services/franchise-dev/territories.ts';
-import { idParams, orgParams, secured } from './_common.ts';
+import { idParams, orgParams, patchOf, secured } from './_common.ts';
 
 const tags = ['territories'];
 const country = z.string().length(2).transform((s) => s.toUpperCase());
@@ -48,6 +48,13 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
   const db = s.db;
   app.addHook('preHandler', authenticate);
 
+  /** Map territories link to an access-model territory (sub-network) of the same organisation, never another one. */
+  const assertScopeTerritory = async (orgId: string, id: string | null | undefined) => {
+    if (!id) return;
+    const [x] = await db.select({ id: scopeTerritories.id }).from(scopeTerritories).where(and(eq(scopeTerritories.id, id), eq(scopeTerritories.organizationId, orgId)));
+    if (!x) throw notFound('Territory scope');
+  };
+
   const listOut = async (orgId: string, rows: Territory[]) => {
     const links = await territoryLinks(db, orgId, rows.map((r) => r.id));
     const groups = await db.select({ id: ownerGroups.id, name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.organizationId, orgId));
@@ -63,6 +70,8 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     const locs = await db.select({ id: locations.id, name: locations.name, geo: locations.geo, status: locations.status }).from(locations).where(and(eq(locations.organizationId, orgId), isNull(locations.archivedAt)));
     return {
       items: await listOut(orgId, rows), settings: territorySettings(org!), map: mapConfig(s.cfg), brandSlug: org!.slug, homeCountry: org!.country,
+      // Access-model territories (sub-networks) a map territory can belong to.
+      scopeTerritories: await db.select({ id: scopeTerritories.id, name: scopeTerritories.name, kind: scopeTerritories.kind, country: scopeTerritories.country }).from(scopeTerritories).where(eq(scopeTerritories.organizationId, orgId)).orderBy(asc(scopeTerritories.name)),
       locations: locs.filter((l) => l.geo).map((l) => ({ id: l.id, name: l.name, status: l.status, lat: l.geo!.lat, lng: l.geo!.lng })),
       demographics: { census: !!s.cfg.CENSUS_API_KEY },
       can: { edit: await canTerritories(req, db, orgId, 'edit'), publish: await canTerritories(req, db, orgId, 'publish'), export: await canTerritories(req, db, orgId, 'export') },
@@ -85,6 +94,7 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     const { orgId } = req.params;
     await requireTerritories(req, db, orgId, 'edit');
     const b = req.body;
+    await assertScopeTerritory(orgId, b.scopeTerritoryId);
     const postcodes = postcodesOf(b) ?? [];
     const all = await orgTerritories(db, orgId);
     assertNoConflict({ id: 'new', name: b.name, status: b.status, exclusivity: b.exclusivity, geometry: (b.geometry ?? null) as TerritoryGeometry | null, postcodes }, all);
@@ -103,11 +113,12 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     return (await listOut(orgId, await orgTerritories(db, orgId))).find((x) => x.id === id)!;
   });
 
-  app.patch('/orgs/:orgId/territories/:id', { schema: { tags, security: secured, params: idParams, body: body.partial(), summary: 'Change a territory. Exclusivity rules apply to the new shape and status.' } }, async (req) => {
+  app.patch('/orgs/:orgId/territories/:id', { schema: { tags, security: secured, params: idParams, body: patchOf(body), summary: 'Change a territory. Exclusivity rules apply to the new shape and status.' } }, async (req) => {
     const { orgId, id } = req.params;
     await requireTerritories(req, db, orgId, 'edit');
     const cur = await loadTerritory(db, orgId, id);
     const b = req.body;
+    await assertScopeTerritory(orgId, b.scopeTerritoryId);
     const postcodes = postcodesOf(b);
     const all = await orgTerritories(db, orgId);
     const next = { ...shapeOf(cur), ...(b.status ? { status: b.status } : {}), ...(b.exclusivity ? { exclusivity: b.exclusivity } : {}), ...(b.geometry !== undefined ? { geometry: (b.geometry ?? null) as TerritoryGeometry | null } : {}), ...(postcodes ? { postcodes } : {}) };

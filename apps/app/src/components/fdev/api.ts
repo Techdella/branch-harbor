@@ -20,12 +20,12 @@ export interface Overlap { id: string; name: string; status: string; by: Array<'
 export interface TerritoryVM {
   id: string; name: string; country: string; region: string | null; jurisdiction: string; description: string | null; status: string; derivedStatus: string; exclusivity: 'exclusive' | 'protected' | 'non_exclusive';
   showOnSite: boolean; geometry: TerritoryGeometry | null; postcodes: string[]; areaKm2: number | null; centroid: { lat: number; lng: number } | null; demographics: Demographics | null; score: number | null; scoreParts: ScorePart[] | null;
-  ownerGroupId: string | null; ownerGroupName: string | null; agreementId: string | null; masterAgreementId: string | null; statusChangedAt: string | null; updatedAt: string; overlaps: Overlap[];
+  ownerGroupId: string | null; ownerGroupName: string | null; agreementId: string | null; masterAgreementId: string | null; scopeTerritoryId: string | null; statusChangedAt: string | null; updatedAt: string; overlaps: Overlap[];
   links: { prospects: Array<{ id: string; name: string; stage: string }>; agreement: { id: string; ownerGroupName: string | null; startDate: string; endDate: string } | null; project: { id: string; status: string; targetOpenDate: string | null } | null; openLocations: Array<{ id: string; name: string }> } | null;
 }
 export interface TerritorySettingsVM { publicMap: boolean; showTaken: boolean; targets: { population: number; households: number; incomeMinor: number } }
-export interface TerritoryListVM { items: TerritoryVM[]; settings: TerritorySettingsVM; map: MapConfig; brandSlug: string; homeCountry: string; locations: Array<{ id: string; name: string; status: string; lat: number; lng: number }>; demographics: { census: boolean }; can: { edit: boolean; publish: boolean; export: boolean } }
-export interface TerritoryInput { name: string; country: string; region?: string | null; description?: string | null; status?: string; exclusivity?: string; showOnSite?: boolean; geometry?: TerritoryGeometry | null; postcodesText?: string }
+export interface TerritoryListVM { items: TerritoryVM[]; settings: TerritorySettingsVM; map: MapConfig; brandSlug: string; homeCountry: string; scopeTerritories: Array<{ id: string; name: string; kind: string; country: string | null }>; locations: Array<{ id: string; name: string; status: string; lat: number; lng: number }>; demographics: { census: boolean }; can: { edit: boolean; publish: boolean; export: boolean } }
+export interface TerritoryInput { name: string; country: string; region?: string | null; description?: string | null; status?: string; exclusivity?: string; showOnSite?: boolean; geometry?: TerritoryGeometry | null; postcodesText?: string; scopeTerritoryId?: string | null }
 
 /* -------------------------------- surveys ------------------------------- */
 

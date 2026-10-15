@@ -123,11 +123,11 @@ export async function managersFor(db: Exec, v: Viewer) {
 /** The franchisee side of a coaching relationship: their owner group if they have one, else their location. */
 export function franchiseeScopes(v: Viewer): Array<{ kind: 'owner_group' | 'location'; id: string }> {
   if (v.hq) return [];
-  const isOwnerSide = v.roles.has('franchise_owner') || v.roles.has('location_manager');
+  const isOwnerSide = v.roles.has('franchise_owner') || v.roles.has('multi_unit_operator') || v.roles.has('location_manager');
   if (!isOwnerSide) return [];
   const out: Array<{ kind: 'owner_group' | 'location'; id: string }> = [];
   for (const a of v.assignments) {
-    if (a.role !== 'franchise_owner' && a.role !== 'location_manager') continue;
+    if (a.role !== 'franchise_owner' && a.role !== 'multi_unit_operator' && a.role !== 'location_manager') continue;
     if (a.scopeKind === 'owner_group') out.push({ kind: 'owner_group', id: a.scopeId });
     if (a.scopeKind === 'location') out.push({ kind: 'location', id: a.scopeId });
   }

@@ -30,7 +30,7 @@ describe.skipIf(!hasDb)('approvals inbox: refunds over the org threshold, local 
     loc = await createLocation(app, owner.token, orgId, { name: 'Queen West' });
     await enablePublicAndPayments(app, owner.token, orgId, loc.id);
     manager = await memberWithRole(app, owner.token, orgId, 'location_manager', { kind: 'location', id: loc.id }, 'Maya Rao');
-    finance = await memberWithRole(app, owner.token, orgId, 'finance', { kind: 'location', id: loc.id }, 'Fin Lee');
+    finance = await memberWithRole(app, owner.token, orgId, 'finance_lead', { kind: 'location', id: loc.id }, 'Fin Lee');
     staff = await memberWithRole(app, owner.token, orgId, 'staff', { kind: 'location', id: loc.id }, 'Sam Staff');
     const patch = await call(app, 'PATCH', `/v1/orgs/${orgId}`, { token: owner.token, body: { refundApprovalThresholds: { CAD: 2000 } } });
     expect(patch.body.policies.refundApprovalThresholds).toEqual({ CAD: 2000 });

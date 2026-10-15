@@ -508,7 +508,9 @@ export interface Member {
   name: string;
   email: string;
   /** `roleKey` is the role code (org_owner, staff, …) translated via data `role.*`; `scopeKey` is a data key for scope labels that aren't names. */
-  assignments: { role: string; roleKey?: string; scopeLabel: string; scopeKey?: string; scopeParams?: MsgParams }[];
+  assignments: { role: string; roleKey?: string; renamed?: string; scopeLabel: string; scopeKey?: string; scopeParams?: MsgParams }[];
+  /** Free-text job title in this business (separate from roles). */
+  jobTitle?: string | null;
   lastActive: string;
   lastActiveKey?: string;
   lastActiveParams?: MsgParams;

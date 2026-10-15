@@ -68,7 +68,13 @@
       "navLabel": "Inicio de {workspace}",
       "modules": "En este espacio",
       "emptyTitle": "Aún no hay nada que mostrar",
-      "emptyBody": "Tu acceso en {business} aún no incluye ninguna pantalla. Pide a un propietario o administrador que te dé los módulos que necesitas."
+      "emptyBody": "Tu acceso en {business} aún no incluye ninguna pantalla. Pide a un propietario o administrador que te dé los módulos que necesitas.",
+      "linkDescriptions": {
+        "websites": "Dominios, publicación y estado del sitio de cada ubicación.",
+        "territories": "Territorios de franquicia: disponibles, reservados o vendidos.",
+        "financeReports": "Informes de regalías, del fondo y de liquidaciones para descargar.",
+        "rules": "Reglas por jurisdicción: divulgación, plazos de espera y de desistimiento."
+      }
     },
     "actions": {
       "view": {
@@ -91,7 +97,10 @@
     "scope": {
       "region": "Región",
       "owner_group": "Grupo de propietarios",
-      "location": "Ubicación"
+      "location": "Ubicación",
+      "territory": "Territorio",
+      "portfolio": "Cartera",
+      "brand": "Marca"
     },
     "modules": {
       "network": {
@@ -329,17 +338,29 @@
       },
       "hq_admin": {
         "name": "Administrador de la sede",
-        "description": "Gestiona la red: ubicaciones, plantillas de marca, sitios web, marketing, aprobaciones, informes, equipo y conexiones. Sin fichas de clientes ni pagos."
+        "description": "Dirige la red: ubicaciones, plantillas de marca, sitios web, marketing, aprobaciones, informes, equipo y conexiones. Sin fichas de clientes ni pagos."
       },
-      "vp_franchise": {
-        "name": "VP de Franquicias",
-        "description": "Desarrollo de la franquicia: el pipeline, documentos informativos y contratos, nuevas ubicaciones y formación de franquiciados."
+      "development_lead": {
+        "name": "Responsable de desarrollo",
+        "description": "Desarrollo de la franquicia: el pipeline y los territorios, la divulgación y los contratos, y las nuevas ubicaciones. Sin ventas a clientes."
       },
-      "cmo": {
-        "name": "Director de marketing",
-        "description": "Todo el marketing de la red, plantillas de marca, informes de marketing y acompañamiento a franquiciados en marketing local."
+      "development_rep": {
+        "name": "Ejecutivo de desarrollo",
+        "description": "Avanza las consultas de franquicia por el pipeline y envía la divulgación. Los contratos y las aprobaciones siguen con el responsable."
       },
-      "brand_lead": {
+      "sales_lead": {
+        "name": "Responsable de ventas",
+        "description": "Ventas a clientes: oportunidades y negocios, reglas de asignación, clientes, membresías y paquetes, y oportunidades de cursos."
+      },
+      "sales_rep": {
+        "name": "Comercial",
+        "description": "Trabaja oportunidades y negocios, hace seguimiento de clientes y oportunidades de cursos, y vende membresías y paquetes."
+      },
+      "marketing_lead": {
+        "name": "Responsable de marketing",
+        "description": "Todo el marketing de la red, plantillas de marca, anuncios, informes de marketing y el informe del fondo de marketing."
+      },
+      "brand_manager": {
         "name": "Responsable de marca",
         "description": "Recursos de marca, plantillas y campos bloqueados, sitios web y contenido social."
       },
@@ -347,25 +368,53 @@
         "name": "Especialista en marketing digital",
         "description": "Sitios web, redes sociales, anuncios, correo y campañas de red. Sin operaciones, clientes ni finanzas."
       },
-      "instructor_trainer": {
-        "name": "Formador de instructores",
-        "description": "Cursos de formación de profesores y prospectos de cursos, más operaciones de solo lectura para ver las clases."
+      "content_social": {
+        "name": "Contenido y redes sociales",
+        "description": "Redacta publicaciones, correos, páginas y campañas; publicar requiere a alguien con permiso."
       },
-      "operations_manager": {
+      "operations_lead": {
         "name": "Responsable de operaciones",
-        "description": "Pagos y finanzas, sitios web, conexiones, clientes y operaciones diarias."
+        "description": "Las operaciones diarias de la red: ubicaciones, aprobaciones, aperturas, auditorías, acompañamiento y soporte. Sin finanzas."
       },
-      "finance": {
-        "name": "Finanzas",
-        "description": "Pagos, reembolsos, conciliación e informes financieros. Regalías y liquidaciones a nivel de sede."
+      "field_consultant": {
+        "name": "Consultor de campo",
+        "description": "Asesor de una cartera de ubicaciones: las consulta y acompaña, realiza auditorías y coaching. Sin finanzas de los propietarios ni datos de clientes."
       },
-      "legal": {
-        "name": "Legal",
-        "description": "Contratos de franquicia, documentos informativos y cumplimiento en toda la red."
+      "finance_lead": {
+        "name": "Responsable financiero",
+        "description": "Pagos, reembolsos, conciliación, regalías, facturas, el fondo de marketing, liquidaciones e informes financieros."
       },
-      "regional_manager": {
-        "name": "Responsable regional",
-        "description": "Supervisión de las ubicaciones de una región: operaciones, informes, aprobaciones de sitios y borradores de campañas."
+      "accountant": {
+        "name": "Contable",
+        "description": "Consulta y exporta pagos, estados, regalías, liquidaciones e informes del fondo para la contabilidad. No cambia nada."
+      },
+      "legal_lead": {
+        "name": "Responsable legal",
+        "description": "Contratos de franquicia, divulgación, registros y reglas por jurisdicción en toda la red."
+      },
+      "training_lead": {
+        "name": "Responsable de formación",
+        "description": "La academia: todos los cursos, rutas y certificados, las asignaciones y los informes de formación."
+      },
+      "trainer": {
+        "name": "Formador",
+        "description": "Escribe e imparte cursos, los asigna y sigue el progreso de los alumnos."
+      },
+      "master_franchisee": {
+        "name": "Máster franquiciado",
+        "description": "Dirige un territorio (por ejemplo, un país) como la sede: sus ubicaciones, pipeline de franquicia, aperturas, comunidad, formación, equipo y finanzas."
+      },
+      "area_developer": {
+        "name": "Desarrollador de área",
+        "description": "Es dueño de las unidades de un calendario de desarrollo: el panel completo de sus unidades y el pipeline de franquicia de su territorio."
+      },
+      "area_representative": {
+        "name": "Representante de área",
+        "description": "Apoya a los franquiciados de un territorio que no posee: consulta, acompaña y audita sus ubicaciones. Sin finanzas de los propietarios salvo permiso."
+      },
+      "multi_unit_operator": {
+        "name": "Operador multiunidad",
+        "description": "Dirige un grupo propietario con varias unidades: el panel completo de cada unidad del grupo, su equipo y sus finanzas."
       },
       "franchise_owner": {
         "name": "Franquiciado",
@@ -373,15 +422,15 @@
       },
       "location_manager": {
         "name": "Gerente de ubicación",
-        "description": "Lleva una ubicación en el día a día: operaciones, clientes, el sitio local y borradores de campañas."
+        "description": "Dirige una ubicación en el día a día: operaciones, clientes, el sitio local y borradores de campañas."
       },
       "staff": {
         "name": "Personal",
-        "description": "Su trabajo asignado: horarios, asistencia y pedidos en su ubicación."
+        "description": "Sus propios turnos, clases y citas, solicitudes de sustitución y registro de asistencia en su ubicación, además de la comunidad y la formación."
       },
-      "marketing_contributor": {
-        "name": "Colaborador de marketing",
-        "description": "Redacta cambios en el sitio y en campañas; publicar requiere a alguien con permiso."
+      "auditor": {
+        "name": "Auditor",
+        "description": "Consulta de ubicaciones y operaciones, y realización de auditorías. Sin finanzas, documentos legales ni datos de clientes."
       },
       "customer": {
         "name": "Cliente",
@@ -390,7 +439,7 @@
     },
     "roleAdmin": {
       "tab": "Roles",
-      "intro": "Parte de una plantilla de rol o crea el tuyo marcando módulos y acciones. Cada persona solo ve lo que su rol le da.",
+      "intro": "Parte de una plantilla de rol o crea tu propio rol marcando módulos y acciones. Cada persona solo ve lo que le dan sus roles.",
       "create": "Crear un rol",
       "createTitle": "Nuevo rol",
       "editTitle": "Editar {name}",
@@ -406,7 +455,15 @@
       "appliesNow": "{count, plural, one {Al guardar cambia el acceso de # persona de inmediato.} other {Al guardar cambia el acceso de # personas de inmediato.}}",
       "save": "Guardar rol",
       "delete": "Eliminar rol",
-      "scopeNote": "Dónde se aplica un rol (toda la empresa, una región, un grupo de propietarios o una ubicación) se elige al asignarlo. Los módulos exclusivos de la sede solo funcionan con roles para toda la empresa."
+      "scopeNote": "Dónde se aplica un rol (toda la empresa, marca, territorio, región, cartera, grupo propietario o ubicación) se elige al asignarlo. Los módulos exclusivos de la sede solo funcionan con roles de toda la empresa; un territorio también gestiona su propio pipeline de franquicia.",
+      "templatesIntro": "Las plantillas son puntos de partida, no un organigrama. Renómbralas según tus cargos, da varios roles a una persona o crea los tuyos.",
+      "templateWas": "Plantilla: {name}",
+      "rename": "Renombrar",
+      "renameLabel": "Nombre en tu empresa",
+      "renameSave": "Guardar nombre",
+      "renameReset": "Usar el nombre de la plantilla",
+      "usualScope": "Normalmente: {scope}",
+      "emptyStart": "Los roles nuevos empiezan vacíos: marca solo lo que necesita este rol."
     },
     "editor": {
       "column": "Acceso",
@@ -431,7 +488,166 @@
       "previewTitle": "Lo que verá",
       "previewSwitcher": "Un selector con {count} espacios de trabajo.",
       "previewSingle": "Un solo espacio de trabajo, sin selector.",
-      "previewNothing": "Nada todavía: marca al menos un módulo."
+      "previewNothing": "Nada todavía: marca al menos un módulo.",
+      "unionNote": "Esta persona tiene varios roles. Obtiene todo lo que da cualquiera de ellos (la unión); los límites de «No mostrar nunca» se aplican a todos.",
+      "reaches": "{count, plural, =0 {Aún no hay ubicaciones} one {Alcanza # ubicación: {names}} other {Alcanza # ubicaciones: {names}…}}",
+      "review": "Revisar y guardar",
+      "confirmSave": "Confirmar y guardar",
+      "backToEdit": "Volver a editar",
+      "saveAsTemplate": "Guardar como plantilla",
+      "templateName": "Nombre de la plantilla",
+      "templateSave": "Guardar plantilla",
+      "templateSaved": "Guardado como el rol «{name}». Lo encontrarás en Roles.",
+      "addRole": "Añadir otro rol",
+      "addRoleTitle": "Añadir otro rol",
+      "addRoleSave": "Añadir rol",
+      "removeRole": "Quitar este rol"
+    },
+    "teams": {
+      "leadership": "Dirección",
+      "development": "Desarrollo de franquicias",
+      "sales": "Ventas",
+      "marketing": "Marketing",
+      "operations": "Operaciones",
+      "finance": "Finanzas",
+      "legal": "Legal y cumplimiento",
+      "training": "Formación",
+      "partners": "Socios de franquicia",
+      "locations": "Ubicaciones",
+      "other": "Otros"
+    },
+    "scopeKind": {
+      "organization": "Toda la empresa",
+      "brand": "Marca",
+      "territory": "Territorio",
+      "region": "Región",
+      "portfolio": "Cartera",
+      "owner_group": "Grupo propietario",
+      "location": "Ubicación"
+    },
+    "sensitive": {
+      "finance": "Finanzas",
+      "legal": "Documentos legales",
+      "personal_data": "Datos personales de clientes"
+    },
+    "roleTags": {
+      "support": "Rol de apoyo"
+    },
+    "preview": {
+      "title": "Acceso efectivo",
+      "intro": "Exactamente lo que esta persona obtendrá al guardar, tal como lo calcula el servidor. Lo que no aparece queda oculto.",
+      "workspaces": "Espacios, módulos y acciones",
+      "locations": "Ubicaciones",
+      "allLocations": "Todas las ubicaciones de la empresa",
+      "noLocations": "Aún no hay ubicaciones",
+      "sensitiveTitle": "Datos sensibles",
+      "sensitiveNone": "Ninguno: ni finanzas, ni documentos legales, ni datos personales de clientes.",
+      "hidden": "Oculto para esta persona",
+      "hiddenNone": "Nada: ve todos los módulos."
+    },
+    "profile": {
+      "jobTitle": "Cargo",
+      "jobTitleHint": "Texto libre que aparece junto a su nombre. No cambia lo que puede ver.",
+      "denyTitle": "No mostrar nunca",
+      "denyHint": "Quita este tipo de datos de todos los roles de la persona, aunque un rol lo incluya.",
+      "deny": "Sin {kind}",
+      "save": "Guardar cargo y límites",
+      "saved": "Guardado. Se aplica desde su próximo clic."
+    },
+    "shape": {
+      "tab": "Forma del equipo",
+      "title": "Forma del equipo",
+      "intro": "Cómo está organizado el equipo de la sede. Solo sugiere roles para empezar; puedes cambiarla cuando quieras.",
+      "onboardingTitle": "¿Cómo está organizado tu equipo?",
+      "onboardingIntro": "Te sugeriremos roles a medida. Las plantillas de rol son puntos de partida, no un organigrama: cámbiales el nombre, combínalas o modifícalas después en Equipo y acceso.",
+      "smallNote": "Crearemos roles combinados como «Marketing y ventas» y «Operaciones y finanzas» para quienes cubren varias áreas.",
+      "current": "Forma actual: {shape}",
+      "suggested": "Roles sugeridos",
+      "templates": "Plantillas para invitar a personas: {roles}",
+      "created": "Creado",
+      "willCreate": "Se creará",
+      "nothingLocked": "Nada queda fijo: cambiar la forma nunca quita roles ni accesos.",
+      "save": "Usar esta forma",
+      "saved": "Forma del equipo guardada.",
+      "options": {
+        "full": {
+          "title": "Equipo completo",
+          "body": "Equipos separados de ventas, marketing, operaciones, finanzas y desarrollo."
+        },
+        "small": {
+          "title": "Equipo pequeño",
+          "body": "Cada persona cubre varias áreas: roles combinados como «Marketing y ventas»."
+        },
+        "solo": {
+          "title": "Solo yo por ahora",
+          "body": "Tú lo llevas todo. Añade personas cuando estés listo."
+        },
+        "custom": {
+          "title": "Personalizado",
+          "body": "Crea tus propios roles a partir de módulos y acciones."
+        }
+      },
+      "combined": {
+        "marketing_sales": {
+          "name": "Marketing y ventas",
+          "description": "El marketing de la red y las ventas a clientes: oportunidades, negocios y membresías."
+        },
+        "operations_finance": {
+          "name": "Operaciones y finanzas",
+          "description": "Las operaciones diarias más pagos, regalías, facturas y liquidaciones."
+        },
+        "development_training": {
+          "name": "Desarrollo de franquicias y formación",
+          "description": "El pipeline de franquicia, la divulgación, los contratos y las aperturas, más la academia."
+        }
+      }
+    },
+    "coverage": {
+      "title": "Áreas sin cubrir",
+      "countOpen": "{count, plural, one {# área no tiene a nadie todavía} other {# áreas no tienen a nadie todavía}}",
+      "allCovered": "Todas las áreas tienen a alguien.",
+      "fallback": "Hasta que alguien se encargue, las aprobaciones y notificaciones de estas áreas van al propietario.",
+      "nobody": "Nadie se encarga todavía de {area}",
+      "assignTo": "Asignar a…",
+      "choose": "Elige una persona",
+      "assign": "Asignar",
+      "cancel": "Cancelar",
+      "assigned": "{name} ahora se encarga de {area}.",
+      "areas": {
+        "franchise_pipeline": "el pipeline de franquicia",
+        "customer_sales": "las ventas a clientes",
+        "marketing": "las campañas de marketing",
+        "websites": "la publicación de sitios web",
+        "approvals": "las aprobaciones",
+        "new_locations": "las nuevas ubicaciones",
+        "help_desk": "el soporte",
+        "payments": "los pagos y reembolsos",
+        "royalties": "las regalías",
+        "agreements": "los contratos de franquicia",
+        "disclosure": "la divulgación",
+        "training": "la formación"
+      }
+    },
+    "scopes": {
+      "title": "Carteras y territorios",
+      "intro": "Ámbitos más allá de regiones y grupos propietarios. Una cartera es cualquier conjunto de ubicaciones (para un consultor de campo). Un territorio es una subred, como un país dirigido por un máster franquiciado, con sus ubicaciones y su pipeline de franquicia.",
+      "territories": "Territorios",
+      "portfolios": "Carteras",
+      "noTerritories": "Aún no hay territorios.",
+      "noPortfolios": "Aún no hay carteras.",
+      "noLocations": "sin ubicaciones",
+      "newPortfolio": "Nueva cartera",
+      "newTerritory": "Nuevo territorio",
+      "portfolioName": "Nombre de la cartera",
+      "territoryName": "Nombre del territorio",
+      "locations": "Ubicaciones",
+      "create": "Crear",
+      "cancel": "Cancelar",
+      "kinds": {
+        "master": "Máster franquicia",
+        "development": "Área de desarrollo",
+        "support": "Área de apoyo"
+      }
     }
   },
   "demo": {

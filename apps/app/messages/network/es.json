@@ -19,13 +19,16 @@
     },
     "roles": {
       "franchise_owner": "Franquiciados",
-      "location_manager": "Responsables de local",
-      "staff": "Equipo",
-      "regional_manager": "Responsables regionales",
-      "instructor_trainer": "Formadores",
-      "hq_admin": "Equipo central",
-      "marketing_contributor": "Marketing",
-      "finance": "Finanzas"
+      "multi_unit_operator": "Operadores multiunidad",
+      "master_franchisee": "Máster franquiciados",
+      "area_developer": "Desarrolladores de área",
+      "location_manager": "Gerentes de ubicación",
+      "staff": "Personal",
+      "field_consultant": "Consultores de campo",
+      "trainer": "Formadores",
+      "hq_admin": "Equipo de la sede",
+      "content_social": "Marketing",
+      "finance_lead": "Finanzas"
     },
     "audience": {
       "label": "Destinatarios",

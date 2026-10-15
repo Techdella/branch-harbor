@@ -135,7 +135,10 @@ describe.skipIf(!hasDb)('wellness intake forms: versioned questions + consent, r
 
   it('staff without customer access cannot read responses', async () => {
     const staff = await memberWithRole(app, token, orgId, 'staff', { kind: 'location', id: loc.id });
-    expect((await call(app, 'GET', `/v1/orgs/${orgId}/wellness/intake-forms/${form.id}/responses`, { token: staff.token })).body.items).toEqual([]);
+    // Staff don't hold Services & packages (intake forms live there): the area is not part of their access at all.
+    const resp = await call(app, 'GET', `/v1/orgs/${orgId}/wellness/intake-forms/${form.id}/responses`, { token: staff.token });
+    expect(resp.status).toBe(403);
+    expect(resp.body.error.code).toBe('module_not_available');
     expect((await call(app, 'POST', `/v1/orgs/${orgId}/wellness/intake-forms`, { token: staff.token, body: { name: 'x', questions: [{ id: 'a', label: 'a', type: 'text' }], consentVersion: '1', consentText: 'xxxxxxxxxxxx' } })).status).toBe(403);
   });
 });

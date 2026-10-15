@@ -3,7 +3,11 @@
   "personaNetwork": "Network demo",
   "personaIndependent": "Independent business demo",
   "personaOwner": "Owner · one location",
-  "roles": { "hq": "Owner", "local": "Manager", "staff": "Staff" },
+  "roles": {
+    "hq": "Owner",
+    "local": "Manager",
+    "staff": "Staff"
+  },
   "location": {
     "title": "Business & location",
     "hint": "Your address, time zone, currency and hours appear on your website.",
@@ -28,7 +32,10 @@
   "billing": {
     "title": "Plan",
     "separate": "Separate from customer payments",
-    "status": { "trialing": "Trial", "active": "Active" },
+    "status": {
+      "trialing": "Trial",
+      "active": "Active"
+    },
     "soloBody": "One location, hosted website and dashboard, all workflows for your industry.",
     "perLocationBody": "Billed per operating location.",
     "perMonth": "{price} / month",
@@ -54,7 +61,7 @@
       "Your existing location, customers, website, team and payment history stay exactly as they are.",
       "The scope selector, Locations directory, regions and owner groups become available.",
       "Website templates can lock fields or require approval, and pages can be published to several locations at once.",
-      "Headquarters, regional manager and franchise owner roles can be invited.",
+      "Headquarters, field consultant, franchise partner and franchise owner roles can be invited.",
       "Billing moves from the Solo plan to per-location pricing once a second location is operating.",
       "Your customer website gets a location finder at your current address, and each location gets its own page."
     ],
@@ -77,12 +84,18 @@
     "doneBody": "Your locations, regions, templates and group publishing are now available. Your existing data is unchanged.",
     "goLocations": "Go to Locations",
     "goOverview": "Back to overview",
-    "errors": { "name": "Enter a name for the new location.", "line1": "Enter the street address.", "city": "Enter the city." }
+    "errors": {
+      "name": "Enter a name for the new location.",
+      "line1": "Enter the street address.",
+      "city": "Enter the city."
+    }
   },
   "website": {
     "title": "Website",
     "description": "Edit your website and publish when you’re ready. Changes stay in draft until you publish.",
-    "tab": { "content": "Content" },
+    "tab": {
+      "content": "Content"
+    },
     "yourSite": "Your website",
     "live": "Live · version {version}",
     "notLive": "Not live yet",
@@ -124,15 +137,19 @@
       "org_owner": "Owner",
       "location_manager": "Manager",
       "staff": "Staff / instructor / coach",
-      "marketing_contributor": "Marketing contributor",
-      "finance": "Finance"
+      "content_social": "Content & social",
+      "finance_lead": "Finance",
+      "accountant": "Accountant",
+      "sales_rep": "Sales"
     },
     "roleHelp": {
       "org_owner": "Full access, including billing, team and business settings.",
       "location_manager": "Runs the day: schedules, customers, orders and publishing the website.",
       "staff": "Their own schedule, attendance or orders only.",
-      "marketing_contributor": "Drafts website and marketing content; publishes only if you allow it.",
-      "finance": "Payments, reconciliation and permitted refunds."
+      "content_social": "Drafts website and marketing content; publishes only if you allow it.",
+      "finance_lead": "Payments, reconciliation and permitted refunds.",
+      "accountant": "Reads and exports payments for the books.",
+      "sales_rep": "Leads, customers and memberships."
     }
   },
   "payments": {
@@ -155,6 +172,9 @@
     "addressNote": "You can change these later in Settings → Business & location. Opening another location later? You can upgrade to a network at any time.",
     "checkBusiness": "Business address and time zone",
     "blockerBusiness": "Add your business address",
-    "errors": { "line1": "Enter your street address.", "city": "Enter your city." }
+    "errors": {
+      "line1": "Enter your street address.",
+      "city": "Enter your city."
+    }
   }
 }

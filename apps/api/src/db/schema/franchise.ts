@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { Demographics, JurisdictionRule, ScorePart, TerritoryGeometry } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations, ownerGroups } from './core.ts';
+import { locations, organizations, ownerGroups, territories } from './core.ts';
 
 /**
  * Jurisdiction rules. Platform rows (organization_id null) ship with BranchHarbor; an organisation can add its own
@@ -57,6 +57,8 @@ export const franchiseTerritories = pgTable('franchise_territories', {
   ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'set null' }),
   /** Public on the brand site's "Own a franchise" form. */
   showOnSite: boolean('show_on_site').notNull().default(true),
+  /** Sub-network (access scope territory) this sales territory belongs to. */
+  scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
   // Territory map (franchise-dev): drawn area and/or postcode list, exclusivity, demographics and score.
   /** GeoJSON Polygon / MultiPolygon (WGS84 lng/lat). */
   geometry: jsonb('geometry').$type<TerritoryGeometry>(),
@@ -72,8 +74,6 @@ export const franchiseTerritories = pgTable('franchise_territories', {
   agreementId: uuid('agreement_id'),
   /** Master franchise agreement whose master develops this territory. */
   masterAgreementId: uuid('master_agreement_id'),
-  /** Link to the access-model territory scope (sub-network) once it exists; not an access scope itself. */
-  scopeTerritoryId: uuid('scope_territory_id'),
   statusChangedAt: ts('status_changed_at'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -90,6 +90,8 @@ export const franchiseProspects = pgTable('franchise_prospects', {
   region: text('region'),
   city: text('city'),
   territoryId: uuid('territory_id').references(() => franchiseTerritories.id, { onDelete: 'set null' }),
+  /** Sub-network (access scope territory) whose pipeline this prospect is in: a master franchisee or area developer works it. */
+  scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
   desiredTerritory: text('desired_territory'),
   /** Self-declared, minor units in `currency`. Never verified by BranchHarbor. */
   liquidCapitalMinor: minor('liquid_capital_minor'),

@@ -1,9 +1,9 @@
 import { and, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { INDUSTRIES, INDUSTRY_META, ROLE_TEMPLATES, TEAM_ROLE_ORDER, type Role } from '@bh/shared';
+import { INDUSTRIES, INDUSTRY_META, ROLE_TEMPLATES, TEAM_ROLE_ORDER, canonicalRole, type Role } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
-import { customRoles, locations, organizations, ownerGroups, regions, roleAssignments, users } from '../db/schema/index.ts';
+import { brands, customRoles, locations, organizations, ownerGroups, portfolios, regions, roleAssignments, territories, users } from '../db/schema/index.ts';
 import { AppError, forbidden, notFound } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
@@ -74,7 +74,7 @@ export const demoRoutes: FastifyPluginAsyncZod = async (app) => {
     const scopeIds = [...new Set(rows.map((r) => r.a.scopeId))];
     const names = new Map<string, string>();
     if (scopeIds.length) {
-      for (const t of [regions, ownerGroups, locations] as const) for (const x of await s.db.select({ id: t.id, name: t.name }).from(t).where(inArray(t.id, scopeIds))) names.set(x.id, x.name);
+      for (const t of [regions, ownerGroups, locations, territories, portfolios, brands] as const) for (const x of await s.db.select({ id: t.id, name: t.name }).from(t).where(inArray(t.id, scopeIds))) names.set(x.id, x.name);
     }
     const customIds = rows.map((r) => r.a.customRoleId).filter((x): x is string => !!x);
     const custom = customIds.length ? await s.db.select({ id: customRoles.id, name: customRoles.name }).from(customRoles).where(inArray(customRoles.id, customIds)) : [];
@@ -83,8 +83,8 @@ export const demoRoutes: FastifyPluginAsyncZod = async (app) => {
       const o = byOrg.get(r.o.id) ?? { ...r.o, accounts: new Map() };
       const acc = o.accounts.get(r.u.id) ?? { email: r.u.email, name: r.u.name, roles: [] };
       acc.roles.push({
-        role: r.a.role,
-        roleName: r.a.role === 'custom' ? (custom.find((c) => c.id === r.a.customRoleId)?.name ?? 'Custom role') : (ROLE_TEMPLATES[r.a.role as Role]?.name ?? r.a.role),
+        role: canonicalRole(r.a.role),
+        roleName: r.a.role === 'custom' ? (custom.find((c) => c.id === r.a.customRoleId)?.name ?? 'Custom role') : (ROLE_TEMPLATES[canonicalRole(r.a.role) as Role]?.name ?? r.a.role),
         scope: r.a.scopeKind === 'organization' ? null : (names.get(r.a.scopeId) ?? null),
       });
       o.accounts.set(r.u.id, acc);

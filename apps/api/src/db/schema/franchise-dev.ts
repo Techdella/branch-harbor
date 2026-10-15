@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { SplitRule, SurveyAnswer, SurveyQuestion } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations, ownerGroups, regions, users } from './core.ts';
+import { locations, organizations, ownerGroups, regions, territories, users } from './core.ts';
 import { franchiseAgreements, franchiseProspects } from './franchise.ts';
 import { royaltyPeriods } from './finance.ts';
 
@@ -257,6 +257,8 @@ export const developmentAgreements = pgTable('development_agreements', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   ownerGroupId: uuid('owner_group_id').notNull().references(() => ownerGroups.id, { onDelete: 'cascade' }),
+  /** The access-model territory of the area developer (people with a territory-scope role there see this schedule). */
+  scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
   /** The signed development agreement in the register, if any. */
   agreementId: uuid('agreement_id').references(() => franchiseAgreements.id, { onDelete: 'set null' }),
   name: text('name').notNull(),
@@ -303,6 +305,8 @@ export const masterAgreements = pgTable('master_agreements', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   ownerGroupId: uuid('owner_group_id').notNull().references(() => ownerGroups.id, { onDelete: 'cascade' }),
+  /** The access-model territory (sub-network) the master runs: territory-scope roles there reach this agreement. */
+  scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
   /** master_franchisee | area_representative */
   kind: text('kind').notNull().default('master_franchisee'),
   name: text('name').notNull(),

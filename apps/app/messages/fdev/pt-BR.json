@@ -2,17 +2,32 @@
   "access": {
     "modules": {
       "sales": {
-        "territories": { "name": "Mapa de territórios", "description": "Territórios desenhados no mapa ou criados a partir de CEPs, seu status no funil, exclusividade e sobreposições, dados demográficos e pontuações, exportações e o mapa público de territórios disponíveis." },
-        "master_franchise": { "name": "Master franquia", "description": "Contratos de master franquia e de representante de área. Um master franqueado conduz o funil, os territórios e a divulgação dos seus próprios países." }
+        "territories": {
+          "name": "Mapa de territórios",
+          "description": "Territórios desenhados no mapa ou criados a partir de CEPs, seu status no funil, exclusividade e sobreposições, dados demográficos e pontuações, exportações e o mapa público de territórios disponíveis."
+        },
+        "master_franchise": {
+          "name": "Master franquia",
+          "description": "Contratos de master franquia e de representante de área. Um master franqueado conduz o funil, os territórios e a divulgação dos seus próprios países."
+        }
       },
       "community": {
-        "surveys": { "name": "Pesquisas e validação", "description": "Pesquisas de satisfação dos franqueados com resultados anônimos por região e grupo proprietário, tendências e planos de ação, e ligações de validação com futuros franqueados." }
+        "surveys": {
+          "name": "Pesquisas e validação",
+          "description": "Pesquisas de satisfação dos franqueados com resultados anônimos por região e grupo proprietário, tendências e planos de ação, e ligações de validação com futuros franqueados."
+        }
       },
       "legal": {
-        "lifecycle": { "name": "Ciclo de vida dos contratos", "description": "Transferências entre proprietários, notificações de inadimplemento e prazos de saneamento, rescisões, aditivos, renovações com janelas de opção e cronogramas de desenvolvimento multiunidade." }
+        "lifecycle": {
+          "name": "Ciclo de vida dos contratos",
+          "description": "Transferências entre proprietários, notificações de inadimplemento e prazos de saneamento, rescisões, aditivos, renovações com janelas de opção e cronogramas de desenvolvimento multiunidade."
+        }
       },
       "finance": {
-        "royalty_splits": { "name": "Divisão de royalties", "description": "Parcelas dos royalties e do fundo de marketing pagas a master franqueados e representantes de área, com extratos de divisão por período e moeda e seus repasses." }
+        "royalty_splits": {
+          "name": "Divisão de royalties",
+          "description": "Parcelas dos royalties e do fundo de marketing pagas a master franqueados e representantes de área, com extratos de divisão por período e moeda e seus repasses."
+        }
       }
     }
   },
@@ -35,22 +50,79 @@
       "master": "Master franquia",
       "royaltySplits": "Divisão de royalties"
     },
-    "common": { "cancel": "Cancelar", "save": "Salvar", "exportCsv": "Exportar CSV" },
-    "territoryStatus": { "available": "Disponível", "reserved": "Reservado", "sold": "Vendido", "under_development": "Em desenvolvimento", "open": "Aberto", "unavailable": "Indisponível" },
-    "exclusivity": { "exclusive": "Exclusivo", "protected": "Protegido", "non_exclusive": "Não exclusivo" },
+    "common": {
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "exportCsv": "Exportar CSV"
+    },
+    "territoryStatus": {
+      "available": "Disponível",
+      "reserved": "Reservado",
+      "sold": "Vendido",
+      "under_development": "Em desenvolvimento",
+      "open": "Aberto",
+      "unavailable": "Indisponível"
+    },
+    "exclusivity": {
+      "exclusive": "Exclusivo",
+      "protected": "Protegido",
+      "non_exclusive": "Não exclusivo"
+    },
     "exclusivityHint": {
       "exclusive": "Nenhuma outra unidade pode abrir aqui, e ele não pode sobrepor um território ocupado.",
       "protected": "Nenhuma outra unidade pode abrir aqui; outros canais ainda podem vender. Dois territórios protegidos não podem se sobrepor depois de ocupados.",
       "non_exclusive": "Pode sobrepor outros territórios."
     },
-    "stage": { "enquiry": "Contato", "qualified": "Qualificado", "discovery_call": "Ligação de descoberta", "disclosure_sent": "Divulgação enviada", "disclosure_receipt_signed": "Recibo assinado", "waiting_period": "Período de espera", "agreement_sent": "Contrato enviado", "signed": "Assinado", "onboarding": "Implantação", "opened": "Inaugurado", "lost": "Perdido" },
+    "stage": {
+      "enquiry": "Contato",
+      "qualified": "Qualificado",
+      "discovery_call": "Ligação de descoberta",
+      "disclosure_sent": "Divulgação enviada",
+      "disclosure_receipt_signed": "Recibo assinado",
+      "waiting_period": "Período de espera",
+      "agreement_sent": "Contrato enviado",
+      "signed": "Assinado",
+      "onboarding": "Implantação",
+      "opened": "Inaugurado",
+      "lost": "Perdido"
+    },
     "status": {
-      "draft": "Rascunho", "in_review": "Em análise", "approved": "Aprovado", "completed": "Concluído", "rejected": "Recusado", "cancelled": "Cancelado",
-      "issued": "Emitida", "cured": "Sanado", "escalated": "Escalado", "terminated": "Rescindido", "withdrawn": "Retirada",
-      "signed": "Assinado", "pending": "Pendente", "opened": "Inaugurado", "missed": "Perdido", "waived": "Dispensado",
-      "upcoming": "Próximo", "window_open": "Janela aberta", "notice_received": "Aviso recebido", "declined": "Recusado", "renewed": "Renovado", "lapsed": "Caducado",
-      "requested": "Solicitado", "scheduled": "Agendado", "no_show": "Não compareceu", "paid": "Pago", "invoiced": "Faturado", "active": "Ativo", "archived": "Arquivado", "open": "Aberto", "closed": "Encerrado", "in_progress": "Em andamento", "done": "Feito",
-      "go_live_requested": "Inauguração solicitada", "suspended": "Suspenso", "expired": "Expirado"
+      "draft": "Rascunho",
+      "in_review": "Em análise",
+      "approved": "Aprovado",
+      "completed": "Concluído",
+      "rejected": "Recusado",
+      "cancelled": "Cancelado",
+      "issued": "Emitida",
+      "cured": "Sanado",
+      "escalated": "Escalado",
+      "terminated": "Rescindido",
+      "withdrawn": "Retirada",
+      "signed": "Assinado",
+      "pending": "Pendente",
+      "opened": "Inaugurado",
+      "missed": "Perdido",
+      "waived": "Dispensado",
+      "upcoming": "Próximo",
+      "window_open": "Janela aberta",
+      "notice_received": "Aviso recebido",
+      "declined": "Recusado",
+      "renewed": "Renovado",
+      "lapsed": "Caducado",
+      "requested": "Solicitado",
+      "scheduled": "Agendado",
+      "no_show": "Não compareceu",
+      "paid": "Pago",
+      "invoiced": "Faturado",
+      "active": "Ativo",
+      "archived": "Arquivado",
+      "open": "Aberto",
+      "closed": "Encerrado",
+      "in_progress": "Em andamento",
+      "done": "Feito",
+      "go_live_requested": "Inauguração solicitada",
+      "suspended": "Suspenso",
+      "expired": "Expirado"
     },
     "territories": {
       "title": "Territórios",
@@ -75,9 +147,15 @@
       "legendHint": "O status acompanha o funil: um prospect reserva, um contrato assinado vende, o projeto de implantação desenvolve e a inauguração deixa aberto.",
       "demographicsSandbox": "Os dados demográficos são de exemplo até um provedor ser conectado (US Census para CEPs dos EUA).",
       "noOverlaps": "Sem sobreposições.",
-      "overlapBy": { "area": "Área em comum", "postcodes": "CEPs em comum" },
+      "overlapBy": {
+        "area": "Área em comum",
+        "postcodes": "CEPs em comum"
+      },
       "conflictRule": "Não permitido: este território está ocupado e é exclusivo.",
-      "mode": { "draw": "Desenhar", "postcodes": "CEPs" },
+      "mode": {
+        "draw": "Desenhar",
+        "postcodes": "CEPs"
+      },
       "name": "Território",
       "country": "País",
       "region": "Estado / província",
@@ -108,13 +186,21 @@
       "noDeals": "Ainda sem prospect, contrato ou unidade.",
       "demographics": "Demografia",
       "sample": "Dados de exemplo",
-      "source": { "us_census_acs5": "US Census ACS", "sandbox": "Dados de exemplo" },
+      "source": {
+        "us_census_acs5": "US Census ACS",
+        "sandbox": "Dados de exemplo"
+      },
       "population": "População",
       "households": "Domicílios",
       "income": "Renda mediana por domicílio",
       "noDemographics": "Ainda não obtidos.",
       "score": "Pontuação",
-      "part": { "population": "População", "income": "Renda", "households": "Domicílios", "performance": "Unidades próximas" },
+      "part": {
+        "population": "População",
+        "income": "Renda",
+        "households": "Domicílios",
+        "performance": "Unidades próximas"
+      },
       "noData": "Sem dados",
       "refresh": "Atualizar demografia",
       "fetch": "Obter demografia",
@@ -130,7 +216,10 @@
       "empty": "Ainda não há territórios",
       "emptyBody": "Desenhe seu primeiro território ou importe um arquivo GeoJSON.",
       "postcodeCount": "{count, plural, one {# CEP} other {# CEPs}}",
-      "overlapCount": "{count, plural, one {# sobreposição} other {# sobreposições}}"
+      "overlapCount": "{count, plural, one {# sobreposição} other {# sobreposições}}",
+      "subNetwork": "Sub-rede",
+      "subNetworkHint": "O território de acesso (por exemplo, o país de um master franqueado) ao qual este território pertence.",
+      "noSubNetwork": "Nenhuma"
     },
     "surveys": {
       "title": "Pesquisas",
@@ -210,10 +299,28 @@
       "scaleHigh": "Muito satisfeito",
       "submit": "Enviar respostas"
     },
-    "audience": { "franchise_owners": "Franqueados", "owners_and_managers": "Franqueados e gerentes de unidade" },
-    "recurrence": { "once": "Uma vez", "quarterly": "A cada trimestre", "semiannual": "A cada seis meses", "annual": "Todo ano" },
-    "questionType": { "nps": "Recomendação 0–10", "scale": "Escala 1–5", "choice": "Escolha", "text": "Comentário" },
-    "theme": { "support": "Suporte da franqueadora", "marketing": "Marketing", "training": "Treinamento", "value": "Valor das taxas" },
+    "audience": {
+      "franchise_owners": "Franqueados",
+      "owners_and_managers": "Franqueados e gerentes de unidade"
+    },
+    "recurrence": {
+      "once": "Uma vez",
+      "quarterly": "A cada trimestre",
+      "semiannual": "A cada seis meses",
+      "annual": "Todo ano"
+    },
+    "questionType": {
+      "nps": "Recomendação 0–10",
+      "scale": "Escala 1–5",
+      "choice": "Escolha",
+      "text": "Comentário"
+    },
+    "theme": {
+      "support": "Suporte da franqueadora",
+      "marketing": "Marketing",
+      "training": "Treinamento",
+      "value": "Valor das taxas"
+    },
     "validation": {
       "title": "Ligações de validação",
       "description": "Os candidatos conversam com franqueados antes de assinar. Atribua validadores em rodízio e registre como foram as ligações.",
@@ -265,15 +372,31 @@
       "inviteCta": "Quero ajudar",
       "inviteManage": "Suas ligações"
     },
-    "sentiment": { "positive": "Positiva", "neutral": "Neutra", "negative": "Negativa" },
+    "sentiment": {
+      "positive": "Positiva",
+      "neutral": "Neutra",
+      "negative": "Negativa"
+    },
     "lifecycle": {
       "title": "Ciclo de vida dos contratos",
       "description": "Transferências, notificações de inadimplemento e prazos de saneamento, aditivos e renovações.",
       "counselTitle": "Revisar com advogado",
       "counselBody": "Os modelos são um ponto de partida, não aconselhamento jurídico. Notificações só podem ser emitidas depois de registrada a revisão do advogado; confira o contrato e a lei local quanto a exigências de notificação e saneamento.",
       "agreement": "Contrato",
-      "tile": { "transfers": "Transferências em andamento", "notices": "Notificações abertas", "ending": "{count} prazos terminam esta semana", "overdue": "Prazos de saneamento vencidos", "renewals": "Janelas de renovação abertas", "behind": "Desenvolvedores atrasados" },
-      "tab": { "transfers": "Transferências", "notices": "Notificações", "amendments": "Aditivos", "renewals": "Renovações" }
+      "tile": {
+        "transfers": "Transferências em andamento",
+        "notices": "Notificações abertas",
+        "ending": "{count} prazos terminam esta semana",
+        "overdue": "Prazos de saneamento vencidos",
+        "renewals": "Janelas de renovação abertas",
+        "behind": "Desenvolvedores atrasados"
+      },
+      "tab": {
+        "transfers": "Transferências",
+        "notices": "Notificações",
+        "amendments": "Aditivos",
+        "renewals": "Renovações"
+      }
     },
     "transfers": {
       "start": "Iniciar uma transferência",
@@ -340,8 +463,20 @@
       "pdf": "PDF",
       "history": "Histórico"
     },
-    "noticeKind": { "default": "Notificação de inadimplemento", "cure_reminder": "Lembrete de saneamento", "termination": "Rescisão", "withdrawal": "Retirada" },
-    "noticeReason": { "non_payment": "Falta de pagamento", "brand_standards": "Padrões da marca", "insurance": "Seguro", "reporting": "Relatórios", "unauthorized_transfer": "Transferência não autorizada", "other": "Outro" },
+    "noticeKind": {
+      "default": "Notificação de inadimplemento",
+      "cure_reminder": "Lembrete de saneamento",
+      "termination": "Rescisão",
+      "withdrawal": "Retirada"
+    },
+    "noticeReason": {
+      "non_payment": "Falta de pagamento",
+      "brand_standards": "Padrões da marca",
+      "insurance": "Seguro",
+      "reporting": "Relatórios",
+      "unauthorized_transfer": "Transferência não autorizada",
+      "other": "Outro"
+    },
     "amendments": {
       "new": "Novo aditivo",
       "titleField": "Título",
@@ -354,19 +489,38 @@
       "sign": "Assinado: aplicar",
       "signHint": "Aplicar um aditivo assinado atualiza o registro de contratos; os valores anteriores ficam guardados no aditivo."
     },
-    "amendmentField": { "royaltyBps": "Royalty", "marketingFundBps": "Fundo de marketing", "endDate": "Data de término", "territory": "Território", "renewalOption": "Opção de renovação" },
+    "amendmentField": {
+      "royaltyBps": "Royalty",
+      "marketingFundBps": "Fundo de marketing",
+      "endDate": "Data de término",
+      "territory": "Território",
+      "renewalOption": "Opção de renovação"
+    },
     "renewals": {
       "empty": "Nenhum contrato termina nos próximos dois anos",
       "ends": "Termina em {date}",
       "window": "Janela de opção de {from} a {to}",
-      "phase": { "upcoming": "A janela de opção ainda não abriu.", "window_open": "Janela de opção aberta: faltam {days} dias para notificar.", "window_closed": "A janela de opção fechou.", "expired": "O contrato terminou." },
+      "phase": {
+        "upcoming": "A janela de opção ainda não abriu.",
+        "window_open": "Janela de opção aberta: faltam {days} dias para notificar.",
+        "window_closed": "A janela de opção fechou.",
+        "expired": "O contrato terminou."
+      },
       "noticeOn": "Aviso recebido em",
       "recordNotice": "Registrar aviso",
       "approve": "Aprovar renovação",
       "decline": "Recusar",
       "renew": "Renovar contrato"
     },
-    "renewalCondition": { "notice_given": "Aviso dado", "no_open_defaults": "Sem inadimplementos abertos", "refurbishment": "Reforma feita", "training_current": "Treinamento em dia", "general_release": "Quitação geral", "renewal_fee_paid": "Taxa de renovação paga", "new_agreement_signed": "Novo contrato assinado" },
+    "renewalCondition": {
+      "notice_given": "Aviso dado",
+      "no_open_defaults": "Sem inadimplementos abertos",
+      "refurbishment": "Reforma feita",
+      "training_current": "Treinamento em dia",
+      "general_release": "Quitação geral",
+      "renewal_fee_paid": "Taxa de renovação paga",
+      "new_agreement_signed": "Novo contrato assinado"
+    },
     "development": {
       "title": "Cronogramas de desenvolvimento",
       "description": "Contratos de desenvolvimento multiunidade: quantas unidades cada desenvolvedor de área deve assinar e inaugurar, e até quando.",
@@ -400,7 +554,11 @@
       "splitsTitle": "Divisão de royalties",
       "description": "Master franqueados e representantes de área: seus países, sua parte dos royalties e do fundo e seus extratos de divisão.",
       "descriptionMaster": "Sua master franquia: seu funil e sua divulgação para seus países, e sua parte dos royalties.",
-      "tab": { "agreements": "Contratos", "pipeline": "Funil", "statements": "Extratos de divisão" },
+      "tab": {
+        "agreements": "Contratos",
+        "pipeline": "Funil",
+        "statements": "Extratos de divisão"
+      },
       "agreement": "Contrato master",
       "anyCurrency": "Qualquer moeda",
       "split": "{currency}: royalties {royalty}%, fundo {fund}%",
@@ -463,7 +621,13 @@
       "fund": "Fundo",
       "collected": "Recebido"
     },
-    "masterKind": { "master_franchisee": "Master franqueado", "area_representative": "Representante de área" },
-    "payoutMethod": { "manual": "Transferência bancária (registrada)", "stripe_transfer": "Transferência Stripe Connect" }
+    "masterKind": {
+      "master_franchisee": "Master franqueado",
+      "area_representative": "Representante de área"
+    },
+    "payoutMethod": {
+      "manual": "Transferência bancária (registrada)",
+      "stripe_transfer": "Transferência Stripe Connect"
+    }
   }
 }

@@ -5,7 +5,7 @@ import type { FastifyRequest } from 'fastify';
 import { MANUAL_STAGES, PROSPECT_SOURCES, currency, evaluateFranchiseCompliance, jurisdictionCode, ruleFor, splitAmounts, splitRuleSchema, type AccessAction, type FranchiseStage } from '@bh/shared';
 import {
   financeInvoices, franchiseDocuments, franchiseProspects, franchiseRegistrations, franchiseTerritories, locations, masterAgreements, masterSplitStatements, organizations, ownerGroups, royaltyPeriods,
-  royaltyStatements, type SplitStatementLine,
+  royaltyStatements, territories, type SplitStatementLine,
 } from '../db/schema/index.ts';
 import { transferToMaster } from '../integrations/master-payouts.ts';
 import { mapConfig } from '../services/franchise-dev/territories.ts';
@@ -16,7 +16,7 @@ import { audit } from '../services/audit.ts';
 import { hasCapability, requireMember } from '../services/authz.ts';
 import { major, toCsv } from '../services/finance/exports.ts';
 import { addActivity, generateCadenceTasks, getProspect, loadRules, sendDisclosure, serializeProspect, setStage } from '../services/franchise.ts';
-import { idParams, iso, orgParams, secured } from './_common.ts';
+import { idParams, iso, orgParams, patchOf, secured } from './_common.ts';
 
 const tags = ['master-franchise'];
 const PIPE = 'sales.master_franchise';
@@ -26,18 +26,24 @@ type Statement = typeof masterSplitStatements.$inferSelect;
 const country = z.string().length(2).transform((s) => s.toUpperCase());
 
 /**
- * Who sees what: organisation-wide holders of the module see every master agreement ('all'); a master franchisee
- * (owner-group scope) sees the agreements of their own owner groups. Returns null when the person holds neither.
+ * Who sees what: organisation-wide holders of the module see every master agreement ('all'); a master franchisee sees
+ * the agreements of their own owner groups (owner-group scope) or of their access-model territory (territory scope,
+ * through `master_agreements.scope_territory_id`). Returns null when the person holds neither.
  */
-async function reach(req: FastifyRequest, organizationId: string, module: string, action: AccessAction): Promise<'all' | Set<string> | null> {
+async function reach(req: FastifyRequest, organizationId: string, module: string, action: AccessAction): Promise<Reach> {
   const mine = await requireMember(req, req.server.ctx.db, organizationId);
   if (await hasCapability(req, req.server.ctx.db, module, action, { organizationId, kind: 'organization', id: organizationId })) return 'all';
-  const groups = mine.filter((a) => a.scopeKind === 'owner_group' && a.capabilities?.has(`${module}:${action}` as never)).map((a) => a.scopeId);
-  return groups.length ? new Set(groups) : null;
+  const holds = mine.filter((a) => a.capabilities?.has(`${module}:${action}` as never));
+  const groups = new Set(holds.filter((a) => a.scopeKind === 'owner_group').map((a) => a.scopeId));
+  const territories = new Set(holds.filter((a) => a.scopeKind === 'territory').map((a) => a.scopeId));
+  return groups.size || territories.size ? { groups, territories } : null;
 }
-const sees = (r: 'all' | Set<string> | null, m: Pick<Master, 'ownerGroupId'>) => r === 'all' || (!!r && r.has(m.ownerGroupId));
+type Reach = 'all' | { groups: Set<string>; territories: Set<string> } | null;
+const sees = (r: Reach, m: Pick<Master, 'ownerGroupId' | 'scopeTerritoryId'>) => r === 'all' || (!!r && (r.groups.has(m.ownerGroupId) || (!!m.scopeTerritoryId && r.territories.has(m.scopeTerritoryId))));
 
-const inMaster = (m: Master, l: { country: string; address: { region?: string } }) => m.countries.includes(l.country) && (!m.regions.length || (!!l.address.region && m.regions.includes(l.address.region.toUpperCase())));
+/** A unit belongs to a master when it is in the master's access territory, or in its countries (and regions). */
+const inMaster = (m: Master, l: { country: string; address: { region?: string }; territoryId?: string | null }) => (!!m.scopeTerritoryId && l.territoryId === m.scopeTerritoryId)
+  || (m.countries.includes(l.country) && (!m.regions.length || (!!l.address.region && m.regions.includes(l.address.region.toUpperCase()))));
 
 /**
  * Master franchise (`/v1/orgs/:orgId/master`): master agreements and the master franchisee's own pipeline,
@@ -51,7 +57,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
 
   const masterOut = (m: Master, groupName: string | null) => ({
     id: m.id, ownerGroupId: m.ownerGroupId, ownerGroupName: groupName, kind: m.kind, name: m.name, countries: m.countries, regions: m.regions, homeCountry: m.homeCountry, homeRegion: m.homeRegion,
-    startDate: m.startDate, endDate: m.endDate, status: m.status, splits: m.splits, payoutMethod: m.payoutMethod, stripeAccountConnected: !!m.stripeAccountId, agreementId: m.agreementId, createdAt: m.createdAt.toISOString(),
+    scopeTerritoryId: m.scopeTerritoryId, startDate: m.startDate, endDate: m.endDate, status: m.status, splits: m.splits, payoutMethod: m.payoutMethod, stripeAccountConnected: !!m.stripeAccountId, agreementId: m.agreementId, createdAt: m.createdAt.toISOString(),
   });
 
   async function loadMaster(req: FastifyRequest, orgId: string, id: string, module: string, action: AccessAction) {
@@ -73,7 +79,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
     const rows = await db.select({ m: masterAgreements, g: ownerGroups.name }).from(masterAgreements).innerJoin(ownerGroups, eq(ownerGroups.id, masterAgreements.ownerGroupId)).where(eq(masterAgreements.organizationId, orgId)).orderBy(asc(masterAgreements.name));
     const items = rows.filter(({ m }) => sees(r, m));
     const counts = items.length ? await db.select({ id: franchiseProspects.masterAgreementId, n: sql<number>`count(*)::int` }).from(franchiseProspects).where(and(inArray(franchiseProspects.masterAgreementId, items.map((x) => x.m.id)), sql`${franchiseProspects.stage} not in ('lost','opened')`)).groupBy(franchiseProspects.masterAgreementId) : [];
-    const locs = await db.select({ id: locations.id, country: locations.country, address: locations.address, status: locations.status }).from(locations).where(eq(locations.organizationId, orgId));
+    const locs = await db.select({ id: locations.id, country: locations.country, address: locations.address, status: locations.status, territoryId: locations.territoryId }).from(locations).where(eq(locations.organizationId, orgId));
     return {
       view: r === 'all' ? 'hq' : 'master',
       items: items.map(({ m, g }) => ({ ...masterOut(m, g), activeProspects: counts.find((c) => c.id === m.id)?.n ?? 0, units: locs.filter((l) => inMaster(m, l) && l.status === 'operating').length })),
@@ -86,7 +92,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
     countries: z.array(country).min(1).max(30), regions: z.array(z.string().trim().min(1).max(10).transform((x) => x.toUpperCase())).max(100).default([]), homeCountry: country, homeRegion: z.string().max(10).nullable().optional(),
     startDate: z.iso.date(), endDate: z.iso.date().nullable().optional(), status: z.enum(['active', 'suspended', 'terminated', 'expired']).default('active'),
     splits: z.array(splitRuleSchema).max(20).default([]).refine((x) => new Set(x.map((r) => r.currency)).size === x.length, 'One split per currency'),
-    payoutMethod: z.enum(['stripe_transfer', 'manual']).default('manual'), stripeAccountId: z.string().regex(/^acct_[A-Za-z0-9_]+$/).nullable().optional(), agreementId: z.uuid().nullable().optional(),
+    scopeTerritoryId: z.uuid().nullable().optional(), payoutMethod: z.enum(['stripe_transfer', 'manual']).default('manual'), stripeAccountId: z.string().regex(/^acct_[A-Za-z0-9_]+$/).nullable().optional(), agreementId: z.uuid().nullable().optional(),
   });
 
   app.post('/orgs/:orgId/master/agreements', { schema: { tags, security: secured, params: orgParams, body: masterBody, summary: 'Add a master franchise or area representative agreement (HQ, master franchise edit)' } }, async (req, reply) => {
@@ -99,12 +105,13 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
     const others = await db.select().from(masterAgreements).where(and(eq(masterAgreements.organizationId, orgId), eq(masterAgreements.status, 'active')));
     const clash = others.find((o) => o.countries.some((c) => b.countries.includes(c)) && (!o.regions.length || !b.regions.length || o.regions.some((r) => b.regions.includes(r))));
     if (clash && b.status === 'active') throw conflict('master_overlap', `${clash.name} already covers ${clash.countries.filter((c) => b.countries.includes(c)).join(', ')}`);
+    if (b.scopeTerritoryId) { const [tt] = await db.select({ id: territories.id }).from(territories).where(and(eq(territories.id, b.scopeTerritoryId), eq(territories.organizationId, orgId))); if (!tt) throw notFound('Territory'); }
     const [m] = await db.insert(masterAgreements).values({ organizationId: orgId, ...b, homeRegion: b.homeRegion ?? null, endDate: b.endDate ?? null, stripeAccountId: b.stripeAccountId ?? null, agreementId: b.agreementId ?? null, createdBy: req.user!.id }).returning();
     await audit(db, { organizationId: orgId, actorUserId: req.user!.id, action: 'master.agreement_added', targetType: 'master_agreement', targetId: m!.id, metadata: { countries: b.countries }, ip: req.ip });
     return reply.code(201).send(masterOut(m!, g.name));
   });
 
-  app.patch('/orgs/:orgId/master/agreements/:id', { schema: { tags, security: secured, params: idParams, body: masterBody.partial() } }, async (req) => {
+  app.patch('/orgs/:orgId/master/agreements/:id', { schema: { tags, security: secured, params: idParams, body: patchOf(masterBody) } }, async (req) => {
     const { orgId, id } = req.params;
     const needSplits = req.body.splits !== undefined || req.body.payoutMethod !== undefined || req.body.stripeAccountId !== undefined;
     if ((await reach(req, orgId, needSplits ? SPLITS : PIPE, 'edit')) !== 'all') throw forbidden('Only HQ can change master agreements');

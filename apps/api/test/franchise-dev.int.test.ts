@@ -46,7 +46,7 @@ describe.skipIf(!hasDb)('franchise development (DB)', () => {
     aus = (await createLocation(app, owner.token, orgId, { name: 'Austin Downtown', ownerGroupId: g1, timeZone: 'America/Chicago', currency: 'USD', address: { line1: '1 Congress Ave', city: 'Austin', region: 'TX', postalCode: '78701', country: 'US' } })).id;
     await createLocation(app, owner.token, orgId, { name: 'San Antonio', ownerGroupId: g3, timeZone: 'America/Chicago', currency: 'USD', address: { line1: '1 Alamo', city: 'San Antonio', region: 'TX', postalCode: '78205', country: 'US' } });
     lon = (await createLocation(app, owner.token, orgId, { name: 'London Hackney', ownerGroupId: g2, timeZone: 'Europe/London', currency: 'GBP', address: { line1: '1 Mare St', city: 'London', postalCode: 'E8 3RD', country: 'GB' } })).id;
-    vp = await memberWithRole(app, owner.token, orgId, 'vp_franchise', { kind: 'organization', id: orgId }, 'VP Franchise');
+    vp = await memberWithRole(app, owner.token, orgId, 'development_lead', { kind: 'organization', id: orgId }, 'Development Lead');
     fo1 = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: g1 }, 'Owner Lone Star');
     fo2 = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: g2 }, 'Owner Thames');
     fo3 = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: g3 }, 'Owner Hill Country');
@@ -322,6 +322,18 @@ describe.skipIf(!hasDb)('franchise development (DB)', () => {
     expect(list.body.items.map((x: any) => x.id)).toEqual([masterId]);
     expect(list.body.items[0].units).toBe(1);
     expect((await call(app, 'GET', O('/master/agreements'), { token: fo1.token })).status).toBe(403);
+    // Access v2: a master franchisee template on the access territory linked to the agreement reaches it too.
+    const terr = await call(app, 'POST', O('/access/territories'), { token: owner.token, body: { name: 'UK & Ireland', kind: 'master', country: 'GB', locationIds: [lon] } });
+    expect(terr.status).toBe(201);
+    expect((await call(app, 'PATCH', O(`/master/agreements/${masterId}`), { token: owner.token, body: { scopeTerritoryId: terr.body.id } })).status).toBe(200);
+    const mt = await memberWithRole(app, owner.token, orgId, 'master_franchisee', { kind: 'territory', id: terr.body.id }, 'Master via territory');
+    const viaTerr = await call(app, 'GET', O('/master/agreements'), { token: mt.token });
+    expect(viaTerr.body.items.map((x: any) => x.id)).toEqual([masterId]);
+    expect((await call(app, 'GET', O(`/master/agreements/${masterId}/pipeline`), { token: mt.token })).body.can.edit).toBe(true);
+    // Map territories link to the same access territory instead of duplicating it.
+    const hk = (await call(app, 'GET', O('/territories'), { token: vp.token })).body.items.find((x: any) => x.name === 'Hackney');
+    expect((await call(app, 'PATCH', O(`/territories/${hk.id}`), { token: vp.token, body: { scopeTerritoryId: terr.body.id } })).body.scopeTerritoryId).toBe(terr.body.id);
+    expect((await call(app, 'PATCH', O(`/territories/${hk.id}`), { token: vp.token, body: { scopeTerritoryId: '00000000-0000-4000-8000-000000000000' } })).status).toBe(404);
     expect((await call(app, 'POST', O(`/master/agreements/${masterId}/prospects`), { token: master.token, body: { name: 'Texan', email: 'tex@example.com', country: 'US' } })).status).toBe(400);
     const p = await call(app, 'POST', O(`/master/agreements/${masterId}/prospects`), { token: master.token, body: { name: 'Aoife Byrne', email: `aoife-${uid()}@example.com`, country: 'IE', city: 'Cork', source: 'website' } });
     expect(p.status).toBe(201);
@@ -353,7 +365,7 @@ describe.skipIf(!hasDb)('franchise development (DB)', () => {
     expect(gen.status).toBe(200);
     const gbp = gen.body.items.find((x: any) => x.currency === 'GBP');
     const eur = gen.body.items.find((x: any) => x.currency === 'EUR');
-    expect(gen.body.items).toHaveLength(2);
+    expect(gen.body.items, JSON.stringify(gen.body)).toHaveLength(2);
     expect(gbp).toMatchObject({ royaltyMinor: 300_001, masterRoyaltyMinor: 120_000, hqRoyaltyMinor: 180_001, masterFundMinor: 25_000, hqFundMinor: 75_000, payableMinor: 145_000, status: 'draft' });
     expect(eur).toMatchObject({ royaltyShareBps: 5000, masterRoyaltyMinor: 100_000, masterFundMinor: 0, payableMinor: 0 });
     expect((await call(app, 'POST', O(`/master/statements/${gbp.id}/pay`), { token: owner.token })).body.error.code).toBe('statement_not_approved');

@@ -12,7 +12,7 @@ import {
   SURVEY_MODULE, inAudience, loadSurvey, openRound, orgToday, respondentKey, respondentSlice, resultScope, roundsOf, serializeSurvey, surveyResults, surveyTrend,
 } from '../services/franchise-dev/surveys.ts';
 import { userNames } from '../services/network-access.ts';
-import { idParams, orgParams, secured } from './_common.ts';
+import { idParams, orgParams, patchOf, secured } from './_common.ts';
 
 const tags = ['surveys'];
 const org = (organizationId: string) => ({ organizationId, kind: 'organization' as const, id: organizationId });
@@ -181,7 +181,7 @@ export const surveyRoutes: FastifyPluginAsyncZod = async (app) => {
     return reply.code(201).send({ id: a!.id, status: a!.status });
   });
 
-  app.patch('/orgs/:orgId/surveys/:id/actions/:actionId', { schema: { tags, security: secured, params: idParams.extend({ actionId: z.uuid() }), body: actionBody.partial() } }, async (req) => {
+  app.patch('/orgs/:orgId/surveys/:id/actions/:actionId', { schema: { tags, security: secured, params: idParams.extend({ actionId: z.uuid() }), body: patchOf(actionBody) } }, async (req) => {
     const { orgId, id, actionId } = req.params;
     await requireMember(req, db, orgId);
     if (!(await hasCapability(req, db, SURVEY_MODULE, 'edit', org(orgId)))) throw forbidden('Missing access to action plans');

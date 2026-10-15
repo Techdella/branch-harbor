@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, lte, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, lte, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import {
@@ -8,7 +8,7 @@ import {
 import type { Services } from '../context.ts';
 import {
   agreementAmendments, agreementNotices, agreementRenewals, agreementTransfers, developmentAgreements, developmentScheduleItems, franchiseAgreements, franchiseProspects, franchiseTerritories,
-  locations, organizations, ownerGroups, type TransferStepState,
+  locations, organizations, ownerGroups, territories, type TransferStepState,
 } from '../db/schema/index.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { renderPdf } from '../lib/pdf.ts';
@@ -474,7 +474,7 @@ export const lifecycleRoutes: FastifyPluginAsyncZod = async (app) => {
     return rows.map((d) => {
       const mine = items.filter((i) => i.developmentAgreementId === d.id);
       return {
-        id: d.id, ownerGroupId: d.ownerGroupId, ownerGroupName: names.get(d.ownerGroupId) ?? null, agreementId: d.agreementId, name: d.name, unitsTotal: d.unitsTotal, startDate: d.startDate, status: d.status,
+        id: d.id, ownerGroupId: d.ownerGroupId, scopeTerritoryId: d.scopeTerritoryId, ownerGroupName: names.get(d.ownerGroupId) ?? null, agreementId: d.agreementId, name: d.name, unitsTotal: d.unitsTotal, startDate: d.startDate, status: d.status,
         territories: d.territoryIds.map((tid) => ({ id: tid, name: terr.find((t) => t.id === tid)?.name ?? null })), developmentFee: { amountMinor: d.developmentFeeMinor, currency: d.currency }, notes: d.notes,
         progress: scheduleProgress(mine, today),
         items: mine.map((i) => ({ id: i.id, sequence: i.sequence, label: i.label, territoryId: i.territoryId, territoryName: terr.find((t) => t.id === i.territoryId)?.name ?? null, signByDate: i.signByDate, openByDate: i.openByDate, status: i.status, locationId: i.locationId, locationName: locs.find((l) => l.id === i.locationId)?.name ?? null, unitAgreementId: i.unitAgreementId, signedOn: i.signedOn, openedOn: i.openedOn, note: i.note, overdue: i.status !== 'opened' && i.status !== 'waived' && (i.openByDate < today || (i.status === 'pending' && !!i.signByDate && i.signByDate < today)) })),
@@ -491,18 +491,19 @@ export const lifecycleRoutes: FastifyPluginAsyncZod = async (app) => {
 
   const item = z.object({ label: z.string().trim().min(1).max(120), territoryId: z.uuid().nullable().optional(), signByDate: z.iso.date().nullable().optional(), openByDate: z.iso.date() });
   app.post('/orgs/:orgId/lifecycle/development', {
-    schema: { tags, security: secured, params: orgParams, body: z.object({ ownerGroupId: z.uuid(), agreementId: z.uuid().nullable().optional(), name: z.string().trim().min(1).max(200), unitsTotal: z.number().int().min(1).max(200), startDate: z.iso.date(), territoryIds: z.array(z.uuid()).max(50).default([]), developmentFeeMinor: z.number().int().min(0).default(0), currency: currency.optional(), notes: z.string().max(4000).nullable().optional(), schedule: z.array(item).max(200).optional(), intervalMonths: z.number().int().min(1).max(60).default(12) }), summary: 'Create a development agreement with N units: an explicit schedule, or one unit every `intervalMonths` (sign 6 months before opening)' },
+    schema: { tags, security: secured, params: orgParams, body: z.object({ ownerGroupId: z.uuid(), scopeTerritoryId: z.uuid().nullable().optional(), agreementId: z.uuid().nullable().optional(), name: z.string().trim().min(1).max(200), unitsTotal: z.number().int().min(1).max(200), startDate: z.iso.date(), territoryIds: z.array(z.uuid()).max(50).default([]), developmentFeeMinor: z.number().int().min(0).default(0), currency: currency.optional(), notes: z.string().max(4000).nullable().optional(), schedule: z.array(item).max(200).optional(), intervalMonths: z.number().int().min(1).max(60).default(12) }), summary: 'Create a development agreement with N units: an explicit schedule, or one unit every `intervalMonths` (sign 6 months before opening)' },
   }, async (req, reply) => {
     const { orgId } = req.params;
     await need(req, orgId, 'edit');
     const b = req.body;
     const [g] = await db.select().from(ownerGroups).where(and(eq(ownerGroups.id, b.ownerGroupId), eq(ownerGroups.organizationId, orgId)));
     if (!g) throw notFound('Owner group');
+    if (b.scopeTerritoryId) { const [tt] = await db.select({ id: territories.id }).from(territories).where(and(eq(territories.id, b.scopeTerritoryId), eq(territories.organizationId, orgId))); if (!tt) throw notFound('Territory'); }
     if (b.schedule && b.schedule.length !== b.unitsTotal) throw validationError('The schedule needs one line per unit', { schedule: `${b.unitsTotal} lines` });
     const [o] = await db.select({ c: organizations.defaultCurrency }).from(organizations).where(eq(organizations.id, orgId));
     const schedule = b.schedule ?? Array.from({ length: b.unitsTotal }, (_, i) => { const open = addMonthsYmd(b.startDate, b.intervalMonths * (i + 1)); return { label: `Unit ${i + 1}`, territoryId: b.territoryIds[i] ?? null, signByDate: addMonthsYmd(open, -6), openByDate: open }; });
     const d = await db.transaction(async (tx) => {
-      const [d] = await tx.insert(developmentAgreements).values({ organizationId: orgId, ownerGroupId: g.id, agreementId: b.agreementId ?? null, name: b.name, unitsTotal: b.unitsTotal, startDate: b.startDate, territoryIds: b.territoryIds, developmentFeeMinor: b.developmentFeeMinor, currency: b.currency ?? o!.c, notes: b.notes ?? null, createdBy: req.user!.id }).returning();
+      const [d] = await tx.insert(developmentAgreements).values({ organizationId: orgId, ownerGroupId: g.id, scopeTerritoryId: b.scopeTerritoryId ?? null, agreementId: b.agreementId ?? null, name: b.name, unitsTotal: b.unitsTotal, startDate: b.startDate, territoryIds: b.territoryIds, developmentFeeMinor: b.developmentFeeMinor, currency: b.currency ?? o!.c, notes: b.notes ?? null, createdBy: req.user!.id }).returning();
       await tx.insert(developmentScheduleItems).values(schedule.map((x, i) => ({ organizationId: orgId, developmentAgreementId: d!.id, sequence: i + 1, label: x.label, territoryId: x.territoryId ?? null, signByDate: x.signByDate ?? null, openByDate: x.openByDate })));
       await audit(tx, { organizationId: orgId, actorUserId: req.user!.id, action: 'lifecycle.development_created', targetType: 'development_agreement', targetId: d!.id, metadata: { units: b.unitsTotal }, ip: req.ip });
       return d!;
@@ -530,13 +531,17 @@ export const lifecycleRoutes: FastifyPluginAsyncZod = async (app) => {
     const { orgId } = req.params;
     const mine = await requireMember(req, db, orgId);
     const groups = mine.filter((a) => a.scopeKind === 'owner_group' && a.capabilities?.has('network.onboarding:view')).map((a) => a.scopeId);
-    if (!groups.length) throw forbidden('No franchise agreements in your access');
+    // Area developers hold a territory-scope role: they see the development schedules of their territory.
+    const terrs = mine.filter((a) => a.scopeKind === 'territory' && a.capabilities?.has('network.onboarding:view')).map((a) => a.scopeId);
+    if (!groups.length && !terrs.length) throw forbidden('No franchise agreements in your access');
     const today = await orgToday(db, orgId);
     const names = await groupNames(orgId);
-    const ags = await db.select().from(franchiseAgreements).where(and(eq(franchiseAgreements.organizationId, orgId), inArray(franchiseAgreements.ownerGroupId, groups)));
+    const ags = groups.length ? await db.select().from(franchiseAgreements).where(and(eq(franchiseAgreements.organizationId, orgId), inArray(franchiseAgreements.ownerGroupId, groups))) : [];
     const notices = ags.length ? await db.select().from(agreementNotices).where(and(inArray(agreementNotices.agreementId, ags.map((a) => a.id)), sql`${agreementNotices.issuedAt} is not null`)).orderBy(desc(agreementNotices.issuedAt)) : [];
     const renewals = ags.length ? await db.select().from(agreementRenewals).where(inArray(agreementRenewals.agreementId, ags.map((a) => a.id))) : [];
-    const devs = await db.select().from(developmentAgreements).where(and(eq(developmentAgreements.organizationId, orgId), inArray(developmentAgreements.ownerGroupId, groups)));
+    const devs = await db.select().from(developmentAgreements).where(and(eq(developmentAgreements.organizationId, orgId), or(
+      ...(groups.length ? [inArray(developmentAgreements.ownerGroupId, groups)] : []), ...(terrs.length ? [inArray(developmentAgreements.scopeTerritoryId, terrs)] : []),
+    )));
     return {
       notices: notices.map((n) => noticeOut(n, today, names)),
       renewals: renewals.map((r) => renewalOut(r, ags.find((a) => a.id === r.agreementId)!, today, names)),

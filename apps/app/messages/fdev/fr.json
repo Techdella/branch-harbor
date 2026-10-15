@@ -2,17 +2,32 @@
   "access": {
     "modules": {
       "sales": {
-        "territories": { "name": "Carte des territoires", "description": "Territoires dessinés sur une carte ou construits à partir de codes postaux, leur statut dans le pipeline, exclusivité et chevauchements, données démographiques et scores, exports et carte publique des territoires disponibles." },
-        "master_franchise": { "name": "Master franchise", "description": "Contrats de master franchise et de représentant de zone. Un master franchisé gère le pipeline, les territoires et la divulgation pour ses propres pays." }
+        "territories": {
+          "name": "Carte des territoires",
+          "description": "Territoires dessinés sur une carte ou construits à partir de codes postaux, leur statut dans le pipeline, exclusivité et chevauchements, données démographiques et scores, exports et carte publique des territoires disponibles."
+        },
+        "master_franchise": {
+          "name": "Master franchise",
+          "description": "Contrats de master franchise et de représentant de zone. Un master franchisé gère le pipeline, les territoires et la divulgation pour ses propres pays."
+        }
       },
       "community": {
-        "surveys": { "name": "Enquêtes et validation", "description": "Enquêtes de satisfaction des franchisés avec résultats anonymes par région et groupe de propriétaires, tendances et plans d’action, et appels de validation avec les futurs franchisés." }
+        "surveys": {
+          "name": "Enquêtes et validation",
+          "description": "Enquêtes de satisfaction des franchisés avec résultats anonymes par région et groupe de propriétaires, tendances et plans d’action, et appels de validation avec les futurs franchisés."
+        }
       },
       "legal": {
-        "lifecycle": { "name": "Cycle de vie des contrats", "description": "Cessions entre propriétaires, mises en demeure et délais de régularisation, résiliations, avenants, renouvellements avec fenêtres d’option et calendriers de développement multi-unités." }
+        "lifecycle": {
+          "name": "Cycle de vie des contrats",
+          "description": "Cessions entre propriétaires, mises en demeure et délais de régularisation, résiliations, avenants, renouvellements avec fenêtres d’option et calendriers de développement multi-unités."
+        }
       },
       "finance": {
-        "royalty_splits": { "name": "Partage des redevances", "description": "Parts des redevances et du fonds marketing versées aux master franchisés et représentants de zone, avec relevés de partage par période et devise et leurs versements." }
+        "royalty_splits": {
+          "name": "Partage des redevances",
+          "description": "Parts des redevances et du fonds marketing versées aux master franchisés et représentants de zone, avec relevés de partage par période et devise et leurs versements."
+        }
       }
     }
   },
@@ -35,22 +50,79 @@
       "master": "Master franchise",
       "royaltySplits": "Partage des redevances"
     },
-    "common": { "cancel": "Annuler", "save": "Enregistrer", "exportCsv": "Exporter en CSV" },
-    "territoryStatus": { "available": "Disponible", "reserved": "Réservé", "sold": "Vendu", "under_development": "En développement", "open": "Ouvert", "unavailable": "Indisponible" },
-    "exclusivity": { "exclusive": "Exclusif", "protected": "Protégé", "non_exclusive": "Non exclusif" },
+    "common": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "exportCsv": "Exporter en CSV"
+    },
+    "territoryStatus": {
+      "available": "Disponible",
+      "reserved": "Réservé",
+      "sold": "Vendu",
+      "under_development": "En développement",
+      "open": "Ouvert",
+      "unavailable": "Indisponible"
+    },
+    "exclusivity": {
+      "exclusive": "Exclusif",
+      "protected": "Protégé",
+      "non_exclusive": "Non exclusif"
+    },
     "exclusivityHint": {
       "exclusive": "Aucune autre unité ne peut ouvrir ici, et il ne peut pas chevaucher un territoire pris.",
       "protected": "Aucune autre unité ne peut ouvrir ici ; d’autres canaux peuvent encore vendre. Deux territoires protégés ne peuvent pas se chevaucher une fois pris.",
       "non_exclusive": "Peut chevaucher d’autres territoires."
     },
-    "stage": { "enquiry": "Demande", "qualified": "Qualifié", "discovery_call": "Appel découverte", "disclosure_sent": "Divulgation envoyée", "disclosure_receipt_signed": "Accusé signé", "waiting_period": "Délai d’attente", "agreement_sent": "Contrat envoyé", "signed": "Signé", "onboarding": "Intégration", "opened": "Ouvert", "lost": "Perdu" },
+    "stage": {
+      "enquiry": "Demande",
+      "qualified": "Qualifié",
+      "discovery_call": "Appel découverte",
+      "disclosure_sent": "Divulgation envoyée",
+      "disclosure_receipt_signed": "Accusé signé",
+      "waiting_period": "Délai d’attente",
+      "agreement_sent": "Contrat envoyé",
+      "signed": "Signé",
+      "onboarding": "Intégration",
+      "opened": "Ouvert",
+      "lost": "Perdu"
+    },
     "status": {
-      "draft": "Brouillon", "in_review": "En examen", "approved": "Approuvé", "completed": "Terminé", "rejected": "Refusé", "cancelled": "Annulé",
-      "issued": "Émis", "cured": "Régularisé", "escalated": "Escaladé", "terminated": "Résilié", "withdrawn": "Retiré",
-      "signed": "Signé", "pending": "En attente", "opened": "Ouvert", "missed": "Manqué", "waived": "Levé",
-      "upcoming": "À venir", "window_open": "Fenêtre ouverte", "notice_received": "Avis reçu", "declined": "Refusé", "renewed": "Renouvelé", "lapsed": "Expiré",
-      "requested": "Demandé", "scheduled": "Planifié", "no_show": "Absent", "paid": "Payé", "invoiced": "Facturé", "active": "Actif", "archived": "Archivé", "open": "Ouvert", "closed": "Fermé", "in_progress": "En cours", "done": "Fait",
-      "go_live_requested": "Ouverture demandée", "suspended": "Suspendu", "expired": "Expiré"
+      "draft": "Brouillon",
+      "in_review": "En examen",
+      "approved": "Approuvé",
+      "completed": "Terminé",
+      "rejected": "Refusé",
+      "cancelled": "Annulé",
+      "issued": "Émis",
+      "cured": "Régularisé",
+      "escalated": "Escaladé",
+      "terminated": "Résilié",
+      "withdrawn": "Retiré",
+      "signed": "Signé",
+      "pending": "En attente",
+      "opened": "Ouvert",
+      "missed": "Manqué",
+      "waived": "Levé",
+      "upcoming": "À venir",
+      "window_open": "Fenêtre ouverte",
+      "notice_received": "Avis reçu",
+      "declined": "Refusé",
+      "renewed": "Renouvelé",
+      "lapsed": "Expiré",
+      "requested": "Demandé",
+      "scheduled": "Planifié",
+      "no_show": "Absent",
+      "paid": "Payé",
+      "invoiced": "Facturé",
+      "active": "Actif",
+      "archived": "Archivé",
+      "open": "Ouvert",
+      "closed": "Fermé",
+      "in_progress": "En cours",
+      "done": "Fait",
+      "go_live_requested": "Ouverture demandée",
+      "suspended": "Suspendu",
+      "expired": "Expiré"
     },
     "territories": {
       "title": "Territoires",
@@ -75,9 +147,15 @@
       "legendHint": "Le statut suit le pipeline : un prospect réserve, un contrat signé vend, le projet d’intégration développe et l’ouverture rend le territoire ouvert.",
       "demographicsSandbox": "Les données démographiques sont des exemples tant qu’aucun fournisseur n’est connecté (US Census pour les codes ZIP américains).",
       "noOverlaps": "Aucun chevauchement.",
-      "overlapBy": { "area": "Zone commune", "postcodes": "Codes postaux communs" },
+      "overlapBy": {
+        "area": "Zone commune",
+        "postcodes": "Codes postaux communs"
+      },
       "conflictRule": "Interdit : ce territoire est pris et exclusif.",
-      "mode": { "draw": "Dessiner", "postcodes": "Codes postaux" },
+      "mode": {
+        "draw": "Dessiner",
+        "postcodes": "Codes postaux"
+      },
       "name": "Territoire",
       "country": "Pays",
       "region": "État / province",
@@ -108,13 +186,21 @@
       "noDeals": "Pas encore de prospect, de contrat ni de site.",
       "demographics": "Démographie",
       "sample": "Données d’exemple",
-      "source": { "us_census_acs5": "US Census ACS", "sandbox": "Données d’exemple" },
+      "source": {
+        "us_census_acs5": "US Census ACS",
+        "sandbox": "Données d’exemple"
+      },
       "population": "Population",
       "households": "Ménages",
       "income": "Revenu médian des ménages",
       "noDemographics": "Pas encore récupérées.",
       "score": "Score",
-      "part": { "population": "Population", "income": "Revenu", "households": "Ménages", "performance": "Sites proches" },
+      "part": {
+        "population": "Population",
+        "income": "Revenu",
+        "households": "Ménages",
+        "performance": "Sites proches"
+      },
       "noData": "Pas de données",
       "refresh": "Actualiser la démographie",
       "fetch": "Récupérer la démographie",
@@ -130,7 +216,10 @@
       "empty": "Aucun territoire",
       "emptyBody": "Dessinez votre premier territoire ou importez un fichier GeoJSON.",
       "postcodeCount": "{count, plural, one {# code postal} other {# codes postaux}}",
-      "overlapCount": "{count, plural, one {# chevauchement} other {# chevauchements}}"
+      "overlapCount": "{count, plural, one {# chevauchement} other {# chevauchements}}",
+      "subNetwork": "Sous-réseau",
+      "subNetworkHint": "Le territoire d’accès (par exemple le pays d’un master franchisé) auquel appartient ce territoire.",
+      "noSubNetwork": "Aucun"
     },
     "surveys": {
       "title": "Enquêtes",
@@ -210,10 +299,28 @@
       "scaleHigh": "Très satisfait",
       "submit": "Envoyer mes réponses"
     },
-    "audience": { "franchise_owners": "Franchisés", "owners_and_managers": "Franchisés et responsables de site" },
-    "recurrence": { "once": "Une fois", "quarterly": "Chaque trimestre", "semiannual": "Tous les six mois", "annual": "Chaque année" },
-    "questionType": { "nps": "Recommandation 0–10", "scale": "Échelle 1–5", "choice": "Choix", "text": "Commentaire" },
-    "theme": { "support": "Soutien du siège", "marketing": "Marketing", "training": "Formation", "value": "Rapport qualité-prix des redevances" },
+    "audience": {
+      "franchise_owners": "Franchisés",
+      "owners_and_managers": "Franchisés et responsables de site"
+    },
+    "recurrence": {
+      "once": "Une fois",
+      "quarterly": "Chaque trimestre",
+      "semiannual": "Tous les six mois",
+      "annual": "Chaque année"
+    },
+    "questionType": {
+      "nps": "Recommandation 0–10",
+      "scale": "Échelle 1–5",
+      "choice": "Choix",
+      "text": "Commentaire"
+    },
+    "theme": {
+      "support": "Soutien du siège",
+      "marketing": "Marketing",
+      "training": "Formation",
+      "value": "Rapport qualité-prix des redevances"
+    },
     "validation": {
       "title": "Appels de validation",
       "description": "Les candidats parlent à des franchisés avant de signer. Attribuez des validateurs par rotation et notez le déroulement des appels.",
@@ -265,15 +372,31 @@
       "inviteCta": "Me porter volontaire",
       "inviteManage": "Vos appels"
     },
-    "sentiment": { "positive": "Positif", "neutral": "Neutre", "negative": "Négatif" },
+    "sentiment": {
+      "positive": "Positif",
+      "neutral": "Neutre",
+      "negative": "Négatif"
+    },
     "lifecycle": {
       "title": "Cycle de vie des contrats",
       "description": "Cessions, mises en demeure et délais de régularisation, avenants et renouvellements.",
       "counselTitle": "À relire avec un avocat",
       "counselBody": "Les modèles sont un point de départ, pas un conseil juridique. Un avis ne peut être émis qu’une fois la relecture de l’avocat enregistrée ; vérifiez le contrat et le droit local pour les exigences de notification et de régularisation.",
       "agreement": "Contrat",
-      "tile": { "transfers": "Cessions en cours", "notices": "Avis ouverts", "ending": "{count} délais se terminent cette semaine", "overdue": "Délais de régularisation échus", "renewals": "Fenêtres de renouvellement ouvertes", "behind": "Développeurs en retard" },
-      "tab": { "transfers": "Cessions", "notices": "Avis", "amendments": "Avenants", "renewals": "Renouvellements" }
+      "tile": {
+        "transfers": "Cessions en cours",
+        "notices": "Avis ouverts",
+        "ending": "{count} délais se terminent cette semaine",
+        "overdue": "Délais de régularisation échus",
+        "renewals": "Fenêtres de renouvellement ouvertes",
+        "behind": "Développeurs en retard"
+      },
+      "tab": {
+        "transfers": "Cessions",
+        "notices": "Avis",
+        "amendments": "Avenants",
+        "renewals": "Renouvellements"
+      }
     },
     "transfers": {
       "start": "Démarrer une cession",
@@ -340,8 +463,20 @@
       "pdf": "PDF",
       "history": "Historique"
     },
-    "noticeKind": { "default": "Mise en demeure", "cure_reminder": "Relance de régularisation", "termination": "Résiliation", "withdrawal": "Retrait" },
-    "noticeReason": { "non_payment": "Impayé", "brand_standards": "Normes de la marque", "insurance": "Assurance", "reporting": "Reporting", "unauthorized_transfer": "Cession non autorisée", "other": "Autre" },
+    "noticeKind": {
+      "default": "Mise en demeure",
+      "cure_reminder": "Relance de régularisation",
+      "termination": "Résiliation",
+      "withdrawal": "Retrait"
+    },
+    "noticeReason": {
+      "non_payment": "Impayé",
+      "brand_standards": "Normes de la marque",
+      "insurance": "Assurance",
+      "reporting": "Reporting",
+      "unauthorized_transfer": "Cession non autorisée",
+      "other": "Autre"
+    },
     "amendments": {
       "new": "Nouvel avenant",
       "titleField": "Titre",
@@ -354,19 +489,38 @@
       "sign": "Signé : appliquer",
       "signHint": "Appliquer un avenant signé met à jour le registre des contrats ; les anciennes valeurs restent sur l’avenant."
     },
-    "amendmentField": { "royaltyBps": "Redevance", "marketingFundBps": "Fonds marketing", "endDate": "Date de fin", "territory": "Territoire", "renewalOption": "Option de renouvellement" },
+    "amendmentField": {
+      "royaltyBps": "Redevance",
+      "marketingFundBps": "Fonds marketing",
+      "endDate": "Date de fin",
+      "territory": "Territoire",
+      "renewalOption": "Option de renouvellement"
+    },
     "renewals": {
       "empty": "Aucun contrat ne se termine dans les deux prochaines années",
       "ends": "Se termine le {date}",
       "window": "Fenêtre d’option du {from} au {to}",
-      "phase": { "upcoming": "La fenêtre d’option n’est pas encore ouverte.", "window_open": "Fenêtre d’option ouverte : {days} jours restants pour notifier.", "window_closed": "La fenêtre d’option est fermée.", "expired": "Le contrat est terminé." },
+      "phase": {
+        "upcoming": "La fenêtre d’option n’est pas encore ouverte.",
+        "window_open": "Fenêtre d’option ouverte : {days} jours restants pour notifier.",
+        "window_closed": "La fenêtre d’option est fermée.",
+        "expired": "Le contrat est terminé."
+      },
       "noticeOn": "Avis reçu le",
       "recordNotice": "Enregistrer l’avis",
       "approve": "Approuver le renouvellement",
       "decline": "Refuser",
       "renew": "Renouveler le contrat"
     },
-    "renewalCondition": { "notice_given": "Avis donné", "no_open_defaults": "Aucun manquement en cours", "refurbishment": "Rénovation faite", "training_current": "Formation à jour", "general_release": "Décharge générale", "renewal_fee_paid": "Frais de renouvellement payés", "new_agreement_signed": "Nouveau contrat signé" },
+    "renewalCondition": {
+      "notice_given": "Avis donné",
+      "no_open_defaults": "Aucun manquement en cours",
+      "refurbishment": "Rénovation faite",
+      "training_current": "Formation à jour",
+      "general_release": "Décharge générale",
+      "renewal_fee_paid": "Frais de renouvellement payés",
+      "new_agreement_signed": "Nouveau contrat signé"
+    },
     "development": {
       "title": "Calendriers de développement",
       "description": "Contrats de développement multi-unités : combien d’unités chaque développeur de zone doit signer et ouvrir, et à quelle date.",
@@ -400,7 +554,11 @@
       "splitsTitle": "Partage des redevances",
       "description": "Master franchisés et représentants de zone : leurs pays, leur part des redevances et du fonds, et leurs relevés de partage.",
       "descriptionMaster": "Votre master franchise : votre pipeline et votre divulgation pour vos pays, et votre part des redevances.",
-      "tab": { "agreements": "Contrats", "pipeline": "Pipeline", "statements": "Relevés de partage" },
+      "tab": {
+        "agreements": "Contrats",
+        "pipeline": "Pipeline",
+        "statements": "Relevés de partage"
+      },
       "agreement": "Contrat de master franchise",
       "anyCurrency": "Toute devise",
       "split": "{currency} : redevances {royalty} %, fonds {fund} %",
@@ -463,7 +621,13 @@
       "fund": "Fonds",
       "collected": "Encaissé"
     },
-    "masterKind": { "master_franchisee": "Master franchisé", "area_representative": "Représentant de zone" },
-    "payoutMethod": { "manual": "Virement bancaire (enregistré)", "stripe_transfer": "Virement Stripe Connect" }
+    "masterKind": {
+      "master_franchisee": "Master franchisé",
+      "area_representative": "Représentant de zone"
+    },
+    "payoutMethod": {
+      "manual": "Virement bancaire (enregistré)",
+      "stripe_transfer": "Virement Stripe Connect"
+    }
   }
 }

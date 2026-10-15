@@ -46,8 +46,8 @@ export async function seedCommunity(c: CommunitySeedCtx) {
 
   await db.insert(t.roleAssignments).values([
     { organizationId: swId, userId: jamie.id, role: 'hq_admin', scopeKind: 'organization', scopeId: swId },
-    { organizationId: swId, userId: elena.id, role: 'cmo', scopeKind: 'organization', scopeId: swId },
-    { organizationId: swId, userId: lena.id, role: 'instructor_trainer', scopeKind: 'location', scopeId: loc('TOR-QW').id },
+    { organizationId: swId, userId: elena.id, role: 'marketing_lead', scopeKind: 'organization', scopeId: swId },
+    { organizationId: swId, userId: lena.id, role: 'trainer', scopeKind: 'location', scopeId: loc('TOR-QW').id },
     { organizationId: swId, userId: aisha.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: group('Lakeshore Holdings').id },
     { organizationId: swId, userId: tom.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: group('Spree Studios GmbH').id },
   ]).onConflictDoNothing();
@@ -84,7 +84,7 @@ export async function seedCommunity(c: CommunitySeedCtx) {
     { organizationId: swId, slug: 'marketing', name: 'Marketing', description: 'Campaign questions and local ideas.', icon: 'share', position: 3 },
     { organizationId: swId, slug: 'operations-help', name: 'Operations help', description: 'Ask HQ operations. Questions are marked answered.', icon: 'help', kind: 'qa', position: 4 },
     { organizationId: swId, slug: 'region-north-america', name: 'Region: North America', description: 'Studios in North America.', icon: 'pin', audience: { regionIds: [region('North America').id] }, position: 5 },
-    { organizationId: swId, slug: 'teacher-trainers', name: 'Teacher trainers', description: 'Lead trainers planning cohorts and assessments.', icon: 'book', audience: { roles: ['instructor_trainer'] }, position: 6 },
+    { organizationId: swId, slug: 'teacher-trainers', name: 'Teacher trainers', description: 'Lead trainers planning cohorts and assessments.', icon: 'book', audience: { roles: ['trainer'] }, position: 6 },
     { organizationId: swId, slug: 'hq-team', name: 'HQ team', description: 'HQ only.', icon: 'building', audience: { hqOnly: true }, position: 7 },
   ]).returning();
   const sp = (slug: string) => spaces.find((s) => s.slug === slug)!;
@@ -111,7 +111,7 @@ export async function seedCommunity(c: CommunitySeedCtx) {
   const folders = await db.insert(t.libraryFolders).values([
     { organizationId: swId, name: 'Brand', position: 1 },
     { organizationId: swId, name: 'Operations SOPs', position: 2 },
-    { organizationId: swId, name: 'Owner playbooks', position: 3, audience: { roles: ['franchise_owner', 'location_manager', 'regional_manager'] } },
+    { organizationId: swId, name: 'Owner playbooks', position: 3, audience: { roles: ['franchise_owner', 'location_manager', 'field_consultant'] } },
     { organizationId: swId, name: 'Marketing', position: 4 },
     { organizationId: swId, name: 'Help articles', position: 5 },
   ]).returning();
@@ -134,7 +134,7 @@ export async function seedCommunity(c: CommunitySeedCtx) {
   const nextThu = (() => { const d = new Date(); d.setUTCDate(d.getUTCDate() + ((4 - d.getUTCDay() + 7) % 7 || 7)); d.setUTCHours(17, 0, 0, 0); return d; })();
   const events = await db.insert(t.communityEvents).values([
     { organizationId: swId, title: 'Network call: Q4 intro offers', kind: 'network_call', startsAt: nextThu, endsAt: new Date(nextThu.getTime() + H), timeZone: 'America/Toronto', joinUrl: 'https://meet.example.com/stillwater-network', description: 'Results by studio, January plan, Q&A.', createdBy: jamie.id },
-    { organizationId: swId, title: 'Trainer workshop: assessing practice teaching', kind: 'training', startsAt: new Date(nextThu.getTime() + 7 * D), endsAt: new Date(nextThu.getTime() + 7 * D + 2 * H), timeZone: 'America/Toronto', joinUrl: 'https://meet.example.com/stillwater-trainers', audience: { roles: ['instructor_trainer', 'location_manager'] }, createdBy: lena.id },
+    { organizationId: swId, title: 'Trainer workshop: assessing practice teaching', kind: 'training', startsAt: new Date(nextThu.getTime() + 7 * D), endsAt: new Date(nextThu.getTime() + 7 * D + 2 * H), timeZone: 'America/Toronto', joinUrl: 'https://meet.example.com/stillwater-trainers', audience: { roles: ['trainer', 'location_manager'] }, createdBy: lena.id },
     { organizationId: swId, title: 'Europe owners’ breakfast (Berlin)', kind: 'in_person', startsAt: new Date(nextThu.getTime() + 14 * D - 9 * H), endsAt: new Date(nextThu.getTime() + 14 * D - 7 * H), timeZone: 'Europe/Berlin', place: 'Spree Studios, Torstraße 118', capacity: 20, audience: { regionIds: [region('Europe').id] }, createdBy: elena.id },
   ]).returning();
   await db.insert(t.communityEventRsvps).values([{ organizationId: swId, eventId: events[0]!.id, userId: aisha.id, status: 'going' }, { organizationId: swId, eventId: events[0]!.id, userId: tom.id, status: 'maybe' }, { organizationId: swId, eventId: events[2]!.id, userId: tom.id, status: 'going' }]);

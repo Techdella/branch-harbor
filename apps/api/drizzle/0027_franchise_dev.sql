@@ -94,6 +94,7 @@ CREATE TABLE "development_agreements" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" uuid NOT NULL,
 	"owner_group_id" uuid NOT NULL,
+	"scope_territory_id" uuid,
 	"agreement_id" uuid,
 	"name" text NOT NULL,
 	"territory_ids" uuid[] DEFAULT '{}'::uuid[] NOT NULL,
@@ -236,6 +237,7 @@ CREATE TABLE "master_agreements" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" uuid NOT NULL,
 	"owner_group_id" uuid NOT NULL,
+	"scope_territory_id" uuid,
 	"kind" text DEFAULT 'master_franchisee' NOT NULL,
 	"name" text NOT NULL,
 	"countries" text[] NOT NULL,
@@ -294,7 +296,6 @@ ALTER TABLE "franchise_territories" ADD COLUMN "score" integer;--> statement-bre
 ALTER TABLE "franchise_territories" ADD COLUMN "score_parts" jsonb;--> statement-breakpoint
 ALTER TABLE "franchise_territories" ADD COLUMN "agreement_id" uuid;--> statement-breakpoint
 ALTER TABLE "franchise_territories" ADD COLUMN "master_agreement_id" uuid;--> statement-breakpoint
-ALTER TABLE "franchise_territories" ADD COLUMN "scope_territory_id" uuid;--> statement-breakpoint
 ALTER TABLE "franchise_territories" ADD COLUMN "status_changed_at" timestamp with time zone;--> statement-breakpoint
 ALTER TABLE "agreement_amendments" ADD CONSTRAINT "agreement_amendments_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "agreement_amendments" ADD CONSTRAINT "agreement_amendments_agreement_id_franchise_agreements_id_fk" FOREIGN KEY ("agreement_id") REFERENCES "public"."franchise_agreements"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -310,6 +311,7 @@ ALTER TABLE "agreement_transfers" ADD CONSTRAINT "agreement_transfers_to_owner_g
 ALTER TABLE "agreement_transfers" ADD CONSTRAINT "agreement_transfers_to_prospect_id_franchise_prospects_id_fk" FOREIGN KEY ("to_prospect_id") REFERENCES "public"."franchise_prospects"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "development_agreements" ADD CONSTRAINT "development_agreements_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "development_agreements" ADD CONSTRAINT "development_agreements_owner_group_id_owner_groups_id_fk" FOREIGN KEY ("owner_group_id") REFERENCES "public"."owner_groups"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "development_agreements" ADD CONSTRAINT "development_agreements_scope_territory_id_territories_id_fk" FOREIGN KEY ("scope_territory_id") REFERENCES "public"."territories"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "development_agreements" ADD CONSTRAINT "development_agreements_agreement_id_franchise_agreements_id_fk" FOREIGN KEY ("agreement_id") REFERENCES "public"."franchise_agreements"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "development_schedule_items" ADD CONSTRAINT "development_schedule_items_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "development_schedule_items" ADD CONSTRAINT "development_schedule_items_development_agreement_id_development_agreements_id_fk" FOREIGN KEY ("development_agreement_id") REFERENCES "public"."development_agreements"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -336,6 +338,7 @@ ALTER TABLE "franchise_validators" ADD CONSTRAINT "franchise_validators_owner_gr
 ALTER TABLE "franchise_validators" ADD CONSTRAINT "franchise_validators_location_id_locations_id_fk" FOREIGN KEY ("location_id") REFERENCES "public"."locations"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "master_agreements" ADD CONSTRAINT "master_agreements_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "master_agreements" ADD CONSTRAINT "master_agreements_owner_group_id_owner_groups_id_fk" FOREIGN KEY ("owner_group_id") REFERENCES "public"."owner_groups"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "master_agreements" ADD CONSTRAINT "master_agreements_scope_territory_id_territories_id_fk" FOREIGN KEY ("scope_territory_id") REFERENCES "public"."territories"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "master_split_statements" ADD CONSTRAINT "master_split_statements_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "master_split_statements" ADD CONSTRAINT "master_split_statements_master_agreement_id_master_agreements_id_fk" FOREIGN KEY ("master_agreement_id") REFERENCES "public"."master_agreements"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "master_split_statements" ADD CONSTRAINT "master_split_statements_period_id_royalty_periods_id_fk" FOREIGN KEY ("period_id") REFERENCES "public"."royalty_periods"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

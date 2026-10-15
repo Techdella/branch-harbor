@@ -102,11 +102,11 @@ test('royalty splits per currency always add up', () => {
 });
 
 test('access: the new modules are HQ-private where they should be', () => {
-  const vp = templateCapabilities('vp_franchise', 'studios');
+  const vp = templateCapabilities('development_lead', 'studios');
   assert.ok(vp.has('sales.territories:publish') && vp.has('legal.lifecycle:edit') && vp.has('sales.master_franchise:edit'));
   const fo = effectiveCapabilities({ role: 'franchise_owner', scopeKind: 'owner_group', grants: ['sales.territories:view', 'legal.lifecycle:view', 'sales.master_franchise:view', 'finance.royalty_splits:view'] }, 'studios');
   assert.ok(!fo.has('sales.territories:view') && !fo.has('legal.lifecycle:view'));
   assert.ok(fo.has('sales.master_franchise:view') && fo.has('finance.royalty_splits:view'));
   assert.ok(fo.has('community.surveys:view'), 'every member can answer surveys');
-  assert.ok(templateCapabilities('finance', 'studios').has('finance.royalty_splits:publish'));
+  assert.ok(templateCapabilities('finance_lead', 'studios').has('finance.royalty_splits:publish'));
 });

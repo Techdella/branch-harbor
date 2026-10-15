@@ -2,17 +2,32 @@
   "access": {
     "modules": {
       "sales": {
-        "territories": { "name": "Gebietskarte", "description": "Auf einer Karte gezeichnete oder aus Postleitzahlen erstellte Gebiete, ihr Status in der Pipeline, Exklusivität und Überschneidungen, Demografie und Bewertungen, Exporte und die öffentliche Karte verfügbarer Gebiete." },
-        "master_franchise": { "name": "Master-Franchise", "description": "Master-Franchise- und Gebietsvertreterverträge. Ein Master-Franchisenehmer führt Pipeline, Gebiete und Offenlegung für seine eigenen Länder." }
+        "territories": {
+          "name": "Gebietskarte",
+          "description": "Auf einer Karte gezeichnete oder aus Postleitzahlen erstellte Gebiete, ihr Status in der Pipeline, Exklusivität und Überschneidungen, Demografie und Bewertungen, Exporte und die öffentliche Karte verfügbarer Gebiete."
+        },
+        "master_franchise": {
+          "name": "Master-Franchise",
+          "description": "Master-Franchise- und Gebietsvertreterverträge. Ein Master-Franchisenehmer führt Pipeline, Gebiete und Offenlegung für seine eigenen Länder."
+        }
       },
       "community": {
-        "surveys": { "name": "Umfragen & Validierung", "description": "Zufriedenheitsumfragen unter Franchisenehmern mit anonymen Ergebnissen nach Region und Inhabergruppe, Trends und Maßnahmenplänen sowie Validierungsgespräche mit künftigen Franchisenehmern." }
+        "surveys": {
+          "name": "Umfragen & Validierung",
+          "description": "Zufriedenheitsumfragen unter Franchisenehmern mit anonymen Ergebnissen nach Region und Inhabergruppe, Trends und Maßnahmenplänen sowie Validierungsgespräche mit künftigen Franchisenehmern."
+        }
       },
       "legal": {
-        "lifecycle": { "name": "Vertragslebenszyklus", "description": "Übertragungen zwischen Inhabern, Abmahnungen und Abhilfefristen, Kündigungen, Nachträge, Verlängerungen mit Optionsfenstern und Entwicklungspläne für mehrere Einheiten." }
+        "lifecycle": {
+          "name": "Vertragslebenszyklus",
+          "description": "Übertragungen zwischen Inhabern, Abmahnungen und Abhilfefristen, Kündigungen, Nachträge, Verlängerungen mit Optionsfenstern und Entwicklungspläne für mehrere Einheiten."
+        }
       },
       "finance": {
-        "royalty_splits": { "name": "Gebührenaufteilung", "description": "Anteile an Lizenzgebühren und Marketingfonds für Master-Franchisenehmer und Gebietsvertreter, mit Aufteilungsabrechnungen pro Zeitraum und Währung und deren Auszahlung." }
+        "royalty_splits": {
+          "name": "Gebührenaufteilung",
+          "description": "Anteile an Lizenzgebühren und Marketingfonds für Master-Franchisenehmer und Gebietsvertreter, mit Aufteilungsabrechnungen pro Zeitraum und Währung und deren Auszahlung."
+        }
       }
     }
   },
@@ -35,22 +50,79 @@
       "master": "Master-Franchise",
       "royaltySplits": "Gebührenaufteilung"
     },
-    "common": { "cancel": "Abbrechen", "save": "Speichern", "exportCsv": "CSV exportieren" },
-    "territoryStatus": { "available": "Frei", "reserved": "Reserviert", "sold": "Verkauft", "under_development": "In Entwicklung", "open": "Eröffnet", "unavailable": "Nicht verfügbar" },
-    "exclusivity": { "exclusive": "Exklusiv", "protected": "Geschützt", "non_exclusive": "Nicht exklusiv" },
+    "common": {
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "exportCsv": "CSV exportieren"
+    },
+    "territoryStatus": {
+      "available": "Frei",
+      "reserved": "Reserviert",
+      "sold": "Verkauft",
+      "under_development": "In Entwicklung",
+      "open": "Eröffnet",
+      "unavailable": "Nicht verfügbar"
+    },
+    "exclusivity": {
+      "exclusive": "Exklusiv",
+      "protected": "Geschützt",
+      "non_exclusive": "Nicht exklusiv"
+    },
     "exclusivityHint": {
       "exclusive": "Hier darf keine andere Einheit eröffnen, und es darf kein vergebenes Gebiet überschneiden.",
       "protected": "Hier darf keine andere Einheit eröffnen; andere Kanäle dürfen weiter verkaufen. Zwei geschützte Gebiete dürfen sich nach Vergabe nicht überschneiden.",
       "non_exclusive": "Darf andere Gebiete überschneiden."
     },
-    "stage": { "enquiry": "Anfrage", "qualified": "Qualifiziert", "discovery_call": "Kennenlerngespräch", "disclosure_sent": "Offenlegung gesendet", "disclosure_receipt_signed": "Empfang bestätigt", "waiting_period": "Wartefrist", "agreement_sent": "Vertrag gesendet", "signed": "Unterschrieben", "onboarding": "Onboarding", "opened": "Eröffnet", "lost": "Verloren" },
+    "stage": {
+      "enquiry": "Anfrage",
+      "qualified": "Qualifiziert",
+      "discovery_call": "Kennenlerngespräch",
+      "disclosure_sent": "Offenlegung gesendet",
+      "disclosure_receipt_signed": "Empfang bestätigt",
+      "waiting_period": "Wartefrist",
+      "agreement_sent": "Vertrag gesendet",
+      "signed": "Unterschrieben",
+      "onboarding": "Onboarding",
+      "opened": "Eröffnet",
+      "lost": "Verloren"
+    },
     "status": {
-      "draft": "Entwurf", "in_review": "In Prüfung", "approved": "Genehmigt", "completed": "Abgeschlossen", "rejected": "Abgelehnt", "cancelled": "Abgebrochen",
-      "issued": "Zugestellt", "cured": "Behoben", "escalated": "Eskaliert", "terminated": "Gekündigt", "withdrawn": "Zurückgezogen",
-      "signed": "Unterschrieben", "pending": "Ausstehend", "opened": "Eröffnet", "missed": "Verpasst", "waived": "Erlassen",
-      "upcoming": "Bevorstehend", "window_open": "Fenster offen", "notice_received": "Mitteilung erhalten", "declined": "Abgelehnt", "renewed": "Verlängert", "lapsed": "Verfallen",
-      "requested": "Angefragt", "scheduled": "Geplant", "no_show": "Nicht erschienen", "paid": "Bezahlt", "invoiced": "In Rechnung gestellt", "active": "Aktiv", "archived": "Archiviert", "open": "Offen", "closed": "Geschlossen", "in_progress": "In Arbeit", "done": "Erledigt",
-      "go_live_requested": "Eröffnung beantragt", "suspended": "Ausgesetzt", "expired": "Abgelaufen"
+      "draft": "Entwurf",
+      "in_review": "In Prüfung",
+      "approved": "Genehmigt",
+      "completed": "Abgeschlossen",
+      "rejected": "Abgelehnt",
+      "cancelled": "Abgebrochen",
+      "issued": "Zugestellt",
+      "cured": "Behoben",
+      "escalated": "Eskaliert",
+      "terminated": "Gekündigt",
+      "withdrawn": "Zurückgezogen",
+      "signed": "Unterschrieben",
+      "pending": "Ausstehend",
+      "opened": "Eröffnet",
+      "missed": "Verpasst",
+      "waived": "Erlassen",
+      "upcoming": "Bevorstehend",
+      "window_open": "Fenster offen",
+      "notice_received": "Mitteilung erhalten",
+      "declined": "Abgelehnt",
+      "renewed": "Verlängert",
+      "lapsed": "Verfallen",
+      "requested": "Angefragt",
+      "scheduled": "Geplant",
+      "no_show": "Nicht erschienen",
+      "paid": "Bezahlt",
+      "invoiced": "In Rechnung gestellt",
+      "active": "Aktiv",
+      "archived": "Archiviert",
+      "open": "Offen",
+      "closed": "Geschlossen",
+      "in_progress": "In Arbeit",
+      "done": "Erledigt",
+      "go_live_requested": "Eröffnung beantragt",
+      "suspended": "Ausgesetzt",
+      "expired": "Abgelaufen"
     },
     "territories": {
       "title": "Gebiete",
@@ -75,9 +147,15 @@
       "legendHint": "Der Status folgt der Pipeline: ein Interessent reserviert, ein unterschriebener Vertrag verkauft, das Onboarding-Projekt entwickelt und die Eröffnung macht es eröffnet.",
       "demographicsSandbox": "Demografische Daten sind Beispielwerte, bis ein Anbieter verbunden ist (US Census für US-ZIP-Codes).",
       "noOverlaps": "Keine Überschneidungen.",
-      "overlapBy": { "area": "Gemeinsame Fläche", "postcodes": "Gemeinsame Postleitzahlen" },
+      "overlapBy": {
+        "area": "Gemeinsame Fläche",
+        "postcodes": "Gemeinsame Postleitzahlen"
+      },
       "conflictRule": "Nicht erlaubt: Dieses Gebiet ist vergeben und exklusiv.",
-      "mode": { "draw": "Zeichnen", "postcodes": "Postleitzahlen" },
+      "mode": {
+        "draw": "Zeichnen",
+        "postcodes": "Postleitzahlen"
+      },
       "name": "Gebiet",
       "country": "Land",
       "region": "Bundesstaat / Provinz",
@@ -108,13 +186,21 @@
       "noDeals": "Noch kein Interessent, Vertrag oder Standort.",
       "demographics": "Demografie",
       "sample": "Beispielwerte",
-      "source": { "us_census_acs5": "US Census ACS", "sandbox": "Beispielwerte" },
+      "source": {
+        "us_census_acs5": "US Census ACS",
+        "sandbox": "Beispielwerte"
+      },
       "population": "Bevölkerung",
       "households": "Haushalte",
       "income": "Medianes Haushaltseinkommen",
       "noDemographics": "Noch nicht abgerufen.",
       "score": "Bewertung",
-      "part": { "population": "Bevölkerung", "income": "Einkommen", "households": "Haushalte", "performance": "Standorte in der Nähe" },
+      "part": {
+        "population": "Bevölkerung",
+        "income": "Einkommen",
+        "households": "Haushalte",
+        "performance": "Standorte in der Nähe"
+      },
       "noData": "Keine Daten",
       "refresh": "Demografie aktualisieren",
       "fetch": "Demografie abrufen",
@@ -130,7 +216,10 @@
       "empty": "Noch keine Gebiete",
       "emptyBody": "Zeichnen Sie Ihr erstes Gebiet oder importieren Sie eine GeoJSON-Datei.",
       "postcodeCount": "{count, plural, one {# Postleitzahl} other {# Postleitzahlen}}",
-      "overlapCount": "{count, plural, one {# Überschneidung} other {# Überschneidungen}}"
+      "overlapCount": "{count, plural, one {# Überschneidung} other {# Überschneidungen}}",
+      "subNetwork": "Teilnetz",
+      "subNetworkHint": "Das Zugriffsgebiet (zum Beispiel das Land eines Master-Franchisenehmers), zu dem dieses Gebiet gehört.",
+      "noSubNetwork": "Keines"
     },
     "surveys": {
       "title": "Umfragen",
@@ -210,10 +299,28 @@
       "scaleHigh": "Sehr zufrieden",
       "submit": "Antworten senden"
     },
-    "audience": { "franchise_owners": "Franchisenehmer", "owners_and_managers": "Franchisenehmer und Standortleitungen" },
-    "recurrence": { "once": "Einmal", "quarterly": "Jedes Quartal", "semiannual": "Alle sechs Monate", "annual": "Jedes Jahr" },
-    "questionType": { "nps": "Empfehlung 0–10", "scale": "Skala 1–5", "choice": "Auswahl", "text": "Kommentar" },
-    "theme": { "support": "Unterstützung der Zentrale", "marketing": "Marketing", "training": "Schulung", "value": "Gegenwert der Gebühren" },
+    "audience": {
+      "franchise_owners": "Franchisenehmer",
+      "owners_and_managers": "Franchisenehmer und Standortleitungen"
+    },
+    "recurrence": {
+      "once": "Einmal",
+      "quarterly": "Jedes Quartal",
+      "semiannual": "Alle sechs Monate",
+      "annual": "Jedes Jahr"
+    },
+    "questionType": {
+      "nps": "Empfehlung 0–10",
+      "scale": "Skala 1–5",
+      "choice": "Auswahl",
+      "text": "Kommentar"
+    },
+    "theme": {
+      "support": "Unterstützung der Zentrale",
+      "marketing": "Marketing",
+      "training": "Schulung",
+      "value": "Gegenwert der Gebühren"
+    },
     "validation": {
       "title": "Validierungsgespräche",
       "description": "Bewerber sprechen vor der Unterschrift mit Franchisenehmern. Weisen Sie Validierer reihum zu und halten Sie fest, wie die Gespräche liefen.",
@@ -265,15 +372,31 @@
       "inviteCta": "Mitmachen",
       "inviteManage": "Ihre Gespräche"
     },
-    "sentiment": { "positive": "Positiv", "neutral": "Neutral", "negative": "Negativ" },
+    "sentiment": {
+      "positive": "Positiv",
+      "neutral": "Neutral",
+      "negative": "Negativ"
+    },
     "lifecycle": {
       "title": "Vertragslebenszyklus",
       "description": "Übertragungen, Abmahnungen und Abhilfefristen, Nachträge und Verlängerungen.",
       "counselTitle": "Mit Anwalt prüfen",
       "counselBody": "Vorlagen sind ein Ausgangspunkt, keine Rechtsberatung. Mitteilungen können erst zugestellt werden, wenn die Prüfung durch den Anwalt erfasst ist; prüfen Sie Vertrag und lokales Recht auf Mitteilungs- und Abhilfepflichten.",
       "agreement": "Vertrag",
-      "tile": { "transfers": "Laufende Übertragungen", "notices": "Offene Mitteilungen", "ending": "{count} Fristen enden diese Woche", "overdue": "Abgelaufene Abhilfefristen", "renewals": "Offene Verlängerungsfenster", "behind": "Entwickler im Verzug" },
-      "tab": { "transfers": "Übertragungen", "notices": "Mitteilungen", "amendments": "Nachträge", "renewals": "Verlängerungen" }
+      "tile": {
+        "transfers": "Laufende Übertragungen",
+        "notices": "Offene Mitteilungen",
+        "ending": "{count} Fristen enden diese Woche",
+        "overdue": "Abgelaufene Abhilfefristen",
+        "renewals": "Offene Verlängerungsfenster",
+        "behind": "Entwickler im Verzug"
+      },
+      "tab": {
+        "transfers": "Übertragungen",
+        "notices": "Mitteilungen",
+        "amendments": "Nachträge",
+        "renewals": "Verlängerungen"
+      }
     },
     "transfers": {
       "start": "Übertragung starten",
@@ -340,8 +463,20 @@
       "pdf": "PDF",
       "history": "Verlauf"
     },
-    "noticeKind": { "default": "Abmahnung", "cure_reminder": "Erinnerung an die Abhilfe", "termination": "Kündigung", "withdrawal": "Rücknahme" },
-    "noticeReason": { "non_payment": "Zahlungsverzug", "brand_standards": "Markenstandards", "insurance": "Versicherung", "reporting": "Berichtspflichten", "unauthorized_transfer": "Unerlaubte Übertragung", "other": "Sonstiges" },
+    "noticeKind": {
+      "default": "Abmahnung",
+      "cure_reminder": "Erinnerung an die Abhilfe",
+      "termination": "Kündigung",
+      "withdrawal": "Rücknahme"
+    },
+    "noticeReason": {
+      "non_payment": "Zahlungsverzug",
+      "brand_standards": "Markenstandards",
+      "insurance": "Versicherung",
+      "reporting": "Berichtspflichten",
+      "unauthorized_transfer": "Unerlaubte Übertragung",
+      "other": "Sonstiges"
+    },
     "amendments": {
       "new": "Neuer Nachtrag",
       "titleField": "Titel",
@@ -354,19 +489,38 @@
       "sign": "Unterschrieben: übernehmen",
       "signHint": "Ein unterschriebener Nachtrag aktualisiert das Vertragsregister; die früheren Werte bleiben am Nachtrag gespeichert."
     },
-    "amendmentField": { "royaltyBps": "Lizenzgebühr", "marketingFundBps": "Marketingfonds", "endDate": "Enddatum", "territory": "Gebiet", "renewalOption": "Verlängerungsoption" },
+    "amendmentField": {
+      "royaltyBps": "Lizenzgebühr",
+      "marketingFundBps": "Marketingfonds",
+      "endDate": "Enddatum",
+      "territory": "Gebiet",
+      "renewalOption": "Verlängerungsoption"
+    },
     "renewals": {
       "empty": "In den nächsten zwei Jahren endet kein Vertrag",
       "ends": "Endet am {date}",
       "window": "Optionsfenster vom {from} bis {to}",
-      "phase": { "upcoming": "Das Optionsfenster ist noch nicht offen.", "window_open": "Optionsfenster offen: noch {days} Tage für die Mitteilung.", "window_closed": "Das Optionsfenster ist geschlossen.", "expired": "Der Vertrag ist beendet." },
+      "phase": {
+        "upcoming": "Das Optionsfenster ist noch nicht offen.",
+        "window_open": "Optionsfenster offen: noch {days} Tage für die Mitteilung.",
+        "window_closed": "Das Optionsfenster ist geschlossen.",
+        "expired": "Der Vertrag ist beendet."
+      },
       "noticeOn": "Mitteilung erhalten am",
       "recordNotice": "Mitteilung erfassen",
       "approve": "Verlängerung genehmigen",
       "decline": "Ablehnen",
       "renew": "Vertrag verlängern"
     },
-    "renewalCondition": { "notice_given": "Mitteilung erfolgt", "no_open_defaults": "Keine offenen Verstöße", "refurbishment": "Renovierung erledigt", "training_current": "Schulungen aktuell", "general_release": "Generalverzicht", "renewal_fee_paid": "Verlängerungsgebühr bezahlt", "new_agreement_signed": "Neuer Vertrag unterschrieben" },
+    "renewalCondition": {
+      "notice_given": "Mitteilung erfolgt",
+      "no_open_defaults": "Keine offenen Verstöße",
+      "refurbishment": "Renovierung erledigt",
+      "training_current": "Schulungen aktuell",
+      "general_release": "Generalverzicht",
+      "renewal_fee_paid": "Verlängerungsgebühr bezahlt",
+      "new_agreement_signed": "Neuer Vertrag unterschrieben"
+    },
     "development": {
       "title": "Entwicklungspläne",
       "description": "Entwicklungsverträge für mehrere Einheiten: wie viele Einheiten jeder Gebietsentwickler bis wann unterschreiben und eröffnen muss.",
@@ -400,7 +554,11 @@
       "splitsTitle": "Gebührenaufteilung",
       "description": "Master-Franchisenehmer und Gebietsvertreter: ihre Länder, ihr Anteil an Lizenzgebühren und Fonds und ihre Aufteilungsabrechnungen.",
       "descriptionMaster": "Ihre Master-Franchise: Ihre Pipeline und Offenlegung für Ihre Länder und Ihr Anteil an den Lizenzgebühren.",
-      "tab": { "agreements": "Verträge", "pipeline": "Pipeline", "statements": "Aufteilungsabrechnungen" },
+      "tab": {
+        "agreements": "Verträge",
+        "pipeline": "Pipeline",
+        "statements": "Aufteilungsabrechnungen"
+      },
       "agreement": "Master-Vertrag",
       "anyCurrency": "Jede Währung",
       "split": "{currency}: Lizenzgebühren {royalty} %, Fonds {fund} %",
@@ -463,7 +621,13 @@
       "fund": "Fonds",
       "collected": "Eingegangen"
     },
-    "masterKind": { "master_franchisee": "Master-Franchisenehmer", "area_representative": "Gebietsvertreter" },
-    "payoutMethod": { "manual": "Banküberweisung (erfasst)", "stripe_transfer": "Stripe-Connect-Überweisung" }
+    "masterKind": {
+      "master_franchisee": "Master-Franchisenehmer",
+      "area_representative": "Gebietsvertreter"
+    },
+    "payoutMethod": {
+      "manual": "Banküberweisung (erfasst)",
+      "stripe_transfer": "Stripe-Connect-Überweisung"
+    }
   }
 }

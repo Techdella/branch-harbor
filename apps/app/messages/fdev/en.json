@@ -2,17 +2,32 @@
   "access": {
     "modules": {
       "sales": {
-        "territories": { "name": "Territory map", "description": "Territories drawn on a map or built from postcodes, their status in the pipeline, exclusivity and overlaps, demographics and scores, exports and the public map of available territories." },
-        "master_franchise": { "name": "Master franchise", "description": "Master franchise and area representative agreements. A master franchisee runs the pipeline, territories and disclosure for their own countries." }
+        "territories": {
+          "name": "Territory map",
+          "description": "Territories drawn on a map or built from postcodes, their status in the pipeline, exclusivity and overlaps, demographics and scores, exports and the public map of available territories."
+        },
+        "master_franchise": {
+          "name": "Master franchise",
+          "description": "Master franchise and area representative agreements. A master franchisee runs the pipeline, territories and disclosure for their own countries."
+        }
       },
       "community": {
-        "surveys": { "name": "Surveys & validation", "description": "Franchisee satisfaction surveys with anonymous results by region and owner group, trends and action plans, and validation calls with prospective franchisees." }
+        "surveys": {
+          "name": "Surveys & validation",
+          "description": "Franchisee satisfaction surveys with anonymous results by region and owner group, trends and action plans, and validation calls with prospective franchisees."
+        }
       },
       "legal": {
-        "lifecycle": { "name": "Agreement lifecycle", "description": "Transfers between owners, notices of default and cure periods, terminations, amendments, renewals with option windows and multi-unit development schedules." }
+        "lifecycle": {
+          "name": "Agreement lifecycle",
+          "description": "Transfers between owners, notices of default and cure periods, terminations, amendments, renewals with option windows and multi-unit development schedules."
+        }
       },
       "finance": {
-        "royalty_splits": { "name": "Royalty splits", "description": "Shares of royalties and marketing fund paid to master franchisees and area representatives, with split statements per period and currency and their payouts." }
+        "royalty_splits": {
+          "name": "Royalty splits",
+          "description": "Shares of royalties and marketing fund paid to master franchisees and area representatives, with split statements per period and currency and their payouts."
+        }
       }
     }
   },
@@ -35,22 +50,79 @@
       "master": "Master franchise",
       "royaltySplits": "Royalty splits"
     },
-    "common": { "cancel": "Cancel", "save": "Save", "exportCsv": "Export CSV" },
-    "territoryStatus": { "available": "Available", "reserved": "Reserved", "sold": "Sold", "under_development": "Under development", "open": "Open", "unavailable": "Unavailable" },
-    "exclusivity": { "exclusive": "Exclusive", "protected": "Protected", "non_exclusive": "Non-exclusive" },
+    "common": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "exportCsv": "Export CSV"
+    },
+    "territoryStatus": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "under_development": "Under development",
+      "open": "Open",
+      "unavailable": "Unavailable"
+    },
+    "exclusivity": {
+      "exclusive": "Exclusive",
+      "protected": "Protected",
+      "non_exclusive": "Non-exclusive"
+    },
     "exclusivityHint": {
       "exclusive": "No other unit may open here, and it may not overlap a taken territory.",
       "protected": "No other unit may open here; other channels may still sell. Two protected territories may not overlap once taken.",
       "non_exclusive": "May overlap other territories."
     },
-    "stage": { "enquiry": "Enquiry", "qualified": "Qualified", "discovery_call": "Discovery call", "disclosure_sent": "Disclosure sent", "disclosure_receipt_signed": "Receipt signed", "waiting_period": "Waiting period", "agreement_sent": "Agreement sent", "signed": "Signed", "onboarding": "Onboarding", "opened": "Opened", "lost": "Lost" },
+    "stage": {
+      "enquiry": "Enquiry",
+      "qualified": "Qualified",
+      "discovery_call": "Discovery call",
+      "disclosure_sent": "Disclosure sent",
+      "disclosure_receipt_signed": "Receipt signed",
+      "waiting_period": "Waiting period",
+      "agreement_sent": "Agreement sent",
+      "signed": "Signed",
+      "onboarding": "Onboarding",
+      "opened": "Opened",
+      "lost": "Lost"
+    },
     "status": {
-      "draft": "Draft", "in_review": "In review", "approved": "Approved", "completed": "Completed", "rejected": "Rejected", "cancelled": "Cancelled",
-      "issued": "Issued", "cured": "Cured", "escalated": "Escalated", "terminated": "Terminated", "withdrawn": "Withdrawn",
-      "signed": "Signed", "pending": "Pending", "opened": "Opened", "missed": "Missed", "waived": "Waived",
-      "upcoming": "Upcoming", "window_open": "Window open", "notice_received": "Notice received", "declined": "Declined", "renewed": "Renewed", "lapsed": "Lapsed",
-      "requested": "Requested", "scheduled": "Scheduled", "no_show": "No-show", "paid": "Paid", "invoiced": "Invoiced", "active": "Active", "archived": "Archived", "open": "Open", "closed": "Closed", "in_progress": "In progress", "done": "Done",
-      "go_live_requested": "Opening requested", "suspended": "Suspended", "expired": "Expired"
+      "draft": "Draft",
+      "in_review": "In review",
+      "approved": "Approved",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "issued": "Issued",
+      "cured": "Cured",
+      "escalated": "Escalated",
+      "terminated": "Terminated",
+      "withdrawn": "Withdrawn",
+      "signed": "Signed",
+      "pending": "Pending",
+      "opened": "Opened",
+      "missed": "Missed",
+      "waived": "Waived",
+      "upcoming": "Upcoming",
+      "window_open": "Window open",
+      "notice_received": "Notice received",
+      "declined": "Declined",
+      "renewed": "Renewed",
+      "lapsed": "Lapsed",
+      "requested": "Requested",
+      "scheduled": "Scheduled",
+      "no_show": "No-show",
+      "paid": "Paid",
+      "invoiced": "Invoiced",
+      "active": "Active",
+      "archived": "Archived",
+      "open": "Open",
+      "closed": "Closed",
+      "in_progress": "In progress",
+      "done": "Done",
+      "go_live_requested": "Opening requested",
+      "suspended": "Suspended",
+      "expired": "Expired"
     },
     "territories": {
       "title": "Territories",
@@ -75,9 +147,15 @@
       "legendHint": "Status follows the pipeline: a prospect reserves, a signed agreement sells, the onboarding project develops, and the opening makes it open.",
       "demographicsSandbox": "Demographics are sample figures until a data provider is connected (US Census for US ZIP codes).",
       "noOverlaps": "No overlaps.",
-      "overlapBy": { "area": "Shared area", "postcodes": "Shared postcodes" },
+      "overlapBy": {
+        "area": "Shared area",
+        "postcodes": "Shared postcodes"
+      },
       "conflictRule": "Not allowed: this territory is taken and exclusive.",
-      "mode": { "draw": "Draw", "postcodes": "Postcodes" },
+      "mode": {
+        "draw": "Draw",
+        "postcodes": "Postcodes"
+      },
       "name": "Territory",
       "country": "Country",
       "region": "State / province",
@@ -108,13 +186,21 @@
       "noDeals": "No prospect, agreement or location yet.",
       "demographics": "Demographics",
       "sample": "Sample figures",
-      "source": { "us_census_acs5": "US Census ACS", "sandbox": "Sample figures" },
+      "source": {
+        "us_census_acs5": "US Census ACS",
+        "sandbox": "Sample figures"
+      },
       "population": "Population",
       "households": "Households",
       "income": "Median household income",
       "noDemographics": "Not fetched yet.",
       "score": "Score",
-      "part": { "population": "Population", "income": "Income", "households": "Households", "performance": "Nearby locations" },
+      "part": {
+        "population": "Population",
+        "income": "Income",
+        "households": "Households",
+        "performance": "Nearby locations"
+      },
       "noData": "No data",
       "refresh": "Refresh demographics",
       "fetch": "Fetch demographics",
@@ -130,7 +216,10 @@
       "empty": "No territories yet",
       "emptyBody": "Draw your first territory or import a GeoJSON file.",
       "postcodeCount": "{count, plural, one {# postcode} other {# postcodes}}",
-      "overlapCount": "{count, plural, one {# overlap} other {# overlaps}}"
+      "overlapCount": "{count, plural, one {# overlap} other {# overlaps}}",
+      "subNetwork": "Sub-network",
+      "subNetworkHint": "The access territory (for example a master franchisee's country) this territory belongs to.",
+      "noSubNetwork": "None"
     },
     "surveys": {
       "title": "Surveys",
@@ -210,10 +299,28 @@
       "scaleHigh": "Very satisfied",
       "submit": "Send answers"
     },
-    "audience": { "franchise_owners": "Franchise owners", "owners_and_managers": "Owners and location managers" },
-    "recurrence": { "once": "Once", "quarterly": "Every quarter", "semiannual": "Every six months", "annual": "Every year" },
-    "questionType": { "nps": "0–10 recommend", "scale": "1–5 scale", "choice": "Choice", "text": "Comment" },
-    "theme": { "support": "HQ support", "marketing": "Marketing", "training": "Training", "value": "Value for fees" },
+    "audience": {
+      "franchise_owners": "Franchise owners",
+      "owners_and_managers": "Owners and location managers"
+    },
+    "recurrence": {
+      "once": "Once",
+      "quarterly": "Every quarter",
+      "semiannual": "Every six months",
+      "annual": "Every year"
+    },
+    "questionType": {
+      "nps": "0–10 recommend",
+      "scale": "1–5 scale",
+      "choice": "Choice",
+      "text": "Comment"
+    },
+    "theme": {
+      "support": "HQ support",
+      "marketing": "Marketing",
+      "training": "Training",
+      "value": "Value for fees"
+    },
     "validation": {
       "title": "Validation calls",
       "description": "Candidates talk to franchisees before they sign. Assign validators by rotation and record how the calls went.",
@@ -265,15 +372,31 @@
       "inviteCta": "Volunteer",
       "inviteManage": "Your calls"
     },
-    "sentiment": { "positive": "Positive", "neutral": "Neutral", "negative": "Negative" },
+    "sentiment": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
     "lifecycle": {
       "title": "Agreement lifecycle",
       "description": "Transfers, notices of default and cure periods, amendments and renewals.",
       "counselTitle": "Review with counsel",
       "counselBody": "Templates are a starting point, not legal advice. Notices can only be issued once franchise counsel's review is recorded; check the agreement and local law for notice and cure requirements.",
       "agreement": "Agreement",
-      "tile": { "transfers": "Transfers in progress", "notices": "Open notices", "ending": "{count} cure periods end this week", "overdue": "Cure periods ended", "renewals": "Renewal windows open", "behind": "Developers behind schedule" },
-      "tab": { "transfers": "Transfers", "notices": "Notices", "amendments": "Amendments", "renewals": "Renewals" }
+      "tile": {
+        "transfers": "Transfers in progress",
+        "notices": "Open notices",
+        "ending": "{count} cure periods end this week",
+        "overdue": "Cure periods ended",
+        "renewals": "Renewal windows open",
+        "behind": "Developers behind schedule"
+      },
+      "tab": {
+        "transfers": "Transfers",
+        "notices": "Notices",
+        "amendments": "Amendments",
+        "renewals": "Renewals"
+      }
     },
     "transfers": {
       "start": "Start a transfer",
@@ -340,8 +463,20 @@
       "pdf": "PDF",
       "history": "History"
     },
-    "noticeKind": { "default": "Notice of default", "cure_reminder": "Cure reminder", "termination": "Termination", "withdrawal": "Withdrawal" },
-    "noticeReason": { "non_payment": "Non-payment", "brand_standards": "Brand standards", "insurance": "Insurance", "reporting": "Reporting", "unauthorized_transfer": "Unauthorised transfer", "other": "Other" },
+    "noticeKind": {
+      "default": "Notice of default",
+      "cure_reminder": "Cure reminder",
+      "termination": "Termination",
+      "withdrawal": "Withdrawal"
+    },
+    "noticeReason": {
+      "non_payment": "Non-payment",
+      "brand_standards": "Brand standards",
+      "insurance": "Insurance",
+      "reporting": "Reporting",
+      "unauthorized_transfer": "Unauthorised transfer",
+      "other": "Other"
+    },
     "amendments": {
       "new": "New amendment",
       "titleField": "Title",
@@ -354,19 +489,38 @@
       "sign": "Signed: apply",
       "signHint": "Applying a signed amendment updates the agreements register; the previous values are kept on the amendment."
     },
-    "amendmentField": { "royaltyBps": "Royalty", "marketingFundBps": "Marketing fund", "endDate": "End date", "territory": "Territory", "renewalOption": "Renewal option" },
+    "amendmentField": {
+      "royaltyBps": "Royalty",
+      "marketingFundBps": "Marketing fund",
+      "endDate": "End date",
+      "territory": "Territory",
+      "renewalOption": "Renewal option"
+    },
     "renewals": {
       "empty": "No agreements end in the next two years",
       "ends": "Ends {date}",
       "window": "Option window {from} to {to}",
-      "phase": { "upcoming": "The option window hasn't opened yet.", "window_open": "Option window open: {days} days left to give notice.", "window_closed": "The option window has closed.", "expired": "The agreement has ended." },
+      "phase": {
+        "upcoming": "The option window hasn't opened yet.",
+        "window_open": "Option window open: {days} days left to give notice.",
+        "window_closed": "The option window has closed.",
+        "expired": "The agreement has ended."
+      },
       "noticeOn": "Notice received on",
       "recordNotice": "Record notice",
       "approve": "Approve renewal",
       "decline": "Decline",
       "renew": "Renew agreement"
     },
-    "renewalCondition": { "notice_given": "Notice given", "no_open_defaults": "No open defaults", "refurbishment": "Refurbishment done", "training_current": "Training up to date", "general_release": "General release", "renewal_fee_paid": "Renewal fee paid", "new_agreement_signed": "New agreement signed" },
+    "renewalCondition": {
+      "notice_given": "Notice given",
+      "no_open_defaults": "No open defaults",
+      "refurbishment": "Refurbishment done",
+      "training_current": "Training up to date",
+      "general_release": "General release",
+      "renewal_fee_paid": "Renewal fee paid",
+      "new_agreement_signed": "New agreement signed"
+    },
     "development": {
       "title": "Development schedules",
       "description": "Multi-unit development agreements: how many units each area developer must sign and open, and by when.",
@@ -400,7 +554,11 @@
       "splitsTitle": "Royalty splits",
       "description": "Master franchisees and area representatives: their countries, their share of royalties and fund, and their split statements.",
       "descriptionMaster": "Your master franchise: your pipeline and disclosure for your countries, and your share of royalties.",
-      "tab": { "agreements": "Agreements", "pipeline": "Pipeline", "statements": "Split statements" },
+      "tab": {
+        "agreements": "Agreements",
+        "pipeline": "Pipeline",
+        "statements": "Split statements"
+      },
       "agreement": "Master agreement",
       "anyCurrency": "Any currency",
       "split": "{currency}: royalties {royalty}%, fund {fund}%",
@@ -463,7 +621,13 @@
       "fund": "Fund",
       "collected": "Collected"
     },
-    "masterKind": { "master_franchisee": "Master franchisee", "area_representative": "Area representative" },
-    "payoutMethod": { "manual": "Bank transfer (recorded)", "stripe_transfer": "Stripe Connect transfer" }
+    "masterKind": {
+      "master_franchisee": "Master franchisee",
+      "area_representative": "Area representative"
+    },
+    "payoutMethod": {
+      "manual": "Bank transfer (recorded)",
+      "stripe_transfer": "Stripe Connect transfer"
+    }
   }
 }

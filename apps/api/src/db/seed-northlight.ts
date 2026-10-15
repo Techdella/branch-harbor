@@ -6,7 +6,7 @@
  * Generic brand, sample data only. Called from seed-demo.ts.
  */
 import { randomBytes } from 'node:crypto';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { Db } from './client.ts';
 import * as t from './schema/index.ts';
 import { addDays, zonedToUtc } from '../lib/tz.ts';
@@ -32,10 +32,18 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
   }).returning();
   const orgId = org!.id;
   const [na, eu] = await db.insert(t.regions).values([{ organizationId: orgId, name: 'North America' }, { organizationId: orgId, name: 'Europe' }]).returning();
-  const [pacific, rose, thames] = await db.insert(t.ownerGroups).values([
+  const [pacific, rose, thames, atlantic, cascade] = await db.insert(t.ownerGroups).values([
     { organizationId: orgId, name: 'Pacific Heat Studios Inc.', legalName: 'Pacific Heat Studios Inc.' },
     { organizationId: orgId, name: 'Rose City Yoga LLC', legalName: 'Rose City Yoga LLC' },
     { organizationId: orgId, name: 'Thames Hot Yoga Ltd', legalName: 'Thames Hot Yoga Ltd' },
+    { organizationId: orgId, name: 'Atlantic Hot Yoga Ltd', legalName: 'Atlantic Hot Yoga Ltd' },
+    { organizationId: orgId, name: 'Cascade Development Group LLC', legalName: 'Cascade Development Group LLC' },
+  ]).returning();
+  // Scopes beyond regions and owner groups: the default brand, two territories (sub-networks) and a portfolio.
+  const [brand] = await db.insert(t.brands).values({ organizationId: orgId, name: 'Northlight Yoga', isDefault: true }).returning();
+  const [ireland, washington] = await db.insert(t.territories).values([
+    { organizationId: orgId, name: 'Northlight Ireland', kind: 'master', country: 'IE', brandId: brand!.id },
+    { organizationId: orgId, name: 'Washington State development area', kind: 'development', country: 'US', brandId: brand!.id },
   ]).returning();
   const locs = await db.insert(t.locations).values([
     { organizationId: orgId, regionId: na!.id, name: 'Toronto Annex', code: 'TOR-AX', slug: 'toronto-annex', address: { line1: '488 Bloor St W', city: 'Toronto', region: 'ON', postalCode: 'M5S 1Y2', country: 'CA' }, country: 'CA', timeZone: 'America/Toronto', currency: 'CAD', locale: 'en', phone: '+1 416 555 0190', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_annex', hours: { summary: 'Daily 6am–9:30pm' } },
@@ -43,10 +51,13 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     { organizationId: orgId, regionId: na!.id, ownerGroupId: pacific!.id, name: 'Kitsilano', code: 'YVR-KT', slug: 'kitsilano', address: { line1: '2190 W 4th Ave', city: 'Vancouver', region: 'BC', postalCode: 'V6K 1N6', country: 'CA' }, country: 'CA', timeZone: 'America/Vancouver', currency: 'CAD', locale: 'en', phone: '+1 604 555 0177', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_kits', hours: { summary: 'Daily 6:30am–9pm' } },
     { organizationId: orgId, regionId: na!.id, ownerGroupId: rose!.id, name: 'Portland Pearl', code: 'PDX-PR', slug: 'portland-pearl', address: { line1: '1122 NW Everett St', city: 'Portland', region: 'OR', postalCode: '97209', country: 'US' }, country: 'US', timeZone: 'America/Los_Angeles', currency: 'USD', locale: 'en', phone: '+1 503 555 0148', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_pearl', hours: { summary: 'Daily 6am–8:30pm' } },
     { organizationId: orgId, regionId: eu!.id, ownerGroupId: thames!.id, name: 'London Hackney', code: 'LON-HK', slug: 'london-hackney', address: { line1: '210 Mare St', city: 'London', postalCode: 'E8 3RD', country: 'GB' }, country: 'GB', timeZone: 'Europe/London', currency: 'GBP', locale: 'en-GB', phone: '+44 20 7946 0210', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_hackney', hours: { summary: 'Daily 6:30am–9pm' } },
-    { organizationId: orgId, regionId: eu!.id, ownerGroupId: thames!.id, name: 'Dublin Portobello', code: 'DUB-PB', slug: 'dublin-portobello', address: { line1: '14 South Richmond St', city: 'Dublin', postalCode: 'D02 YX80', country: 'IE' }, country: 'IE', timeZone: 'Europe/Dublin', currency: 'EUR', locale: 'en-GB', status: 'opening_soon', publiclyVisible: false },
+    { organizationId: orgId, regionId: eu!.id, ownerGroupId: thames!.id, name: 'Dublin Portobello', code: 'DUB-PB', slug: 'dublin-portobello', address: { line1: '14 South Richmond St', city: 'Dublin', postalCode: 'D02 YX80', country: 'IE' }, country: 'IE', timeZone: 'Europe/Dublin', currency: 'EUR', locale: 'en-GB', status: 'opening_soon', publiclyVisible: false, territoryId: ireland!.id },
+    { organizationId: orgId, regionId: eu!.id, ownerGroupId: atlantic!.id, territoryId: ireland!.id, name: 'Galway Docks', code: 'GWY-DK', slug: 'galway-docks', address: { line1: '3 Dock Road', city: 'Galway', postalCode: 'H91 TK33', country: 'IE' }, country: 'IE', timeZone: 'Europe/Dublin', currency: 'EUR', locale: 'en-GB', phone: '+353 91 555 0133', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_galway', hours: { summary: 'Daily 7am–9pm' } },
+    { organizationId: orgId, regionId: na!.id, ownerGroupId: cascade!.id, territoryId: washington!.id, name: 'Seattle Fremont', code: 'SEA-FR', slug: 'seattle-fremont', address: { line1: '3410 Fremont Ave N', city: 'Seattle', region: 'WA', postalCode: '98103', country: 'US' }, country: 'US', timeZone: 'America/Los_Angeles', currency: 'USD', locale: 'en', phone: '+1 206 555 0177', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_fremont', hours: { summary: 'Daily 6am–9pm' } },
+    { organizationId: orgId, regionId: na!.id, ownerGroupId: cascade!.id, territoryId: washington!.id, name: 'Tacoma Stadium District', code: 'TAC-SD', slug: 'tacoma-stadium-district', address: { line1: '602 Tacoma Ave N', city: 'Tacoma', region: 'WA', postalCode: '98403', country: 'US' }, country: 'US', timeZone: 'America/Los_Angeles', currency: 'USD', locale: 'en', status: 'opening_soon', publiclyVisible: false },
   ]).returning();
   const L = Object.fromEntries(locs.map((l) => [l.code, l])) as Record<string, (typeof locs)[number]>;
-  await db.insert(t.subscriptions).values({ organizationId: orgId, plan: 'network', status: 'active', billedLocationCount: 5, currency: 'CAD', pricePerLocationMinor: 11900 });
+  await db.insert(t.subscriptions).values({ organizationId: orgId, plan: 'network', status: 'active', billedLocationCount: 7, currency: 'CAD', pricePerLocationMinor: 11900 });
 
   // ── The team: jobs that don't match the org chart, each with a demo login ──
   const u = async (local: string, name: string, locale = 'en') => upsertUser(`${local}@${MAIL}`, name, locale);
@@ -68,18 +79,38 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     staffKits: await u('chloe.martin', 'Chloe Martin'),
     staffAnnex: await u('ethan.brown', 'Ethan Brown'),
     deskLead: await u('zara.ahmed', 'Zara Ahmed'),
+    // A full team: separate franchise development and customer sales, content, field and partner roles.
+    devRep: await u('kofi.mensah', 'Kofi Mensah'),
+    salesLead: await u('rafael.costa', 'Rafael Costa'),
+    salesRep: await u('jade.wilson', 'Jade Wilson'),
+    content: await u('lucy.zhang', 'Lucy Zhang'),
+    consultant: await u('isabel.reyes', 'Isabel Reyes'),
+    master: await u('siobhan.kelly', 'Siobhán Kelly', 'en-GB'),
+    areaDev: await u('ryan.mitchell', 'Ryan Mitchell'),
+    auditor: await u('nina.petrov', 'Nina Petrov'),
   };
+  // Field consultant's portfolio: three west-coast studios across two franchisees.
+  const [westCoast] = await db.insert(t.portfolios).values({ organizationId: orgId, name: 'West Coast studios', description: 'Vancouver and Portland franchisees coached by Isabel.', createdBy: team.ceo.id }).returning();
+  await db.insert(t.portfolioLocations).values(['YVR-MS', 'YVR-KT', 'PDX-PR'].map((code) => ({ portfolioId: westCoast!.id, locationId: L[code]!.id, organizationId: orgId })));
   const org_ = (userId: string, role: string) => ({ organizationId: orgId, userId, role, scopeKind: 'organization', scopeId: orgId });
   const assignments = await db.insert(t.roleAssignments).values([
     org_(team.ceo.id, 'org_owner'),
-    org_(team.vpFranchise.id, 'vp_franchise'),
-    org_(team.trainer1.id, 'instructor_trainer'),
-    org_(team.trainer2.id, 'instructor_trainer'),
-    org_(team.cmo.id, 'cmo'),
-    org_(team.brand.id, 'brand_lead'),
+    org_(team.vpFranchise.id, 'development_lead'),
+    org_(team.devRep.id, 'development_rep'),
+    org_(team.salesLead.id, 'sales_lead'),
+    org_(team.salesRep.id, 'sales_rep'),
+    org_(team.trainer1.id, 'training_lead'),
+    org_(team.trainer2.id, 'trainer'),
+    org_(team.cmo.id, 'marketing_lead'),
+    org_(team.brand.id, 'brand_manager'),
     org_(team.digital.id, 'digital_marketer'),
-    org_(team.ops.id, 'operations_manager'),
-    org_(team.legal.id, 'legal'),
+    org_(team.content.id, 'content_social'),
+    org_(team.ops.id, 'operations_lead'),
+    org_(team.legal.id, 'legal_lead'),
+    org_(team.auditor.id, 'auditor'),
+    { organizationId: orgId, userId: team.consultant.id, role: 'field_consultant', scopeKind: 'portfolio', scopeId: westCoast!.id },
+    { organizationId: orgId, userId: team.master.id, role: 'master_franchisee', scopeKind: 'territory', scopeId: ireland!.id },
+    { organizationId: orgId, userId: team.areaDev.id, role: 'area_developer', scopeKind: 'territory', scopeId: washington!.id },
     { organizationId: orgId, userId: team.foPacific.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: pacific!.id },
     { organizationId: orgId, userId: team.foRose.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: rose!.id },
     { organizationId: orgId, userId: team.foThames.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: thames!.id },
@@ -95,9 +126,18 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
   }).returning();
   await db.insert(t.roleCapabilities).values(['operations.classes:view', 'operations.classes:edit', 'operations.schedule:view', 'sales.customers:view', 'sales.customers:edit'].map((capability) => ({ roleId: deskRole!.id, organizationId: orgId, capability })));
   await db.insert(t.roleAssignments).values({ organizationId: orgId, userId: team.deskLead.id, role: 'custom', customRoleId: deskRole!.id, scopeKind: 'location', scopeId: L['TOR-AX']!.id, createdBy: team.ceo.id });
-  // A per-person override: the operations manager also gets brand templates, on top of the template.
+  // Per-person overrides: the operations lead also edits brand templates; Marcus (trainer) follows up course leads.
   const opsAssignment = assignments.find((a) => a.userId === team.ops.id)!;
-  await db.insert(t.memberAccessOverrides).values({ organizationId: orgId, assignmentId: opsAssignment.id, capability: 'network.templates:edit', effect: 'grant', createdBy: team.ceo.id });
+  const trainerAssignment = assignments.find((a) => a.userId === team.trainer2.id)!;
+  await db.insert(t.memberAccessOverrides).values([
+    { organizationId: orgId, assignmentId: opsAssignment.id, capability: 'network.templates:edit', effect: 'grant', createdBy: team.ceo.id },
+    ...['sales.course_leads:view', 'sales.course_leads:edit'].map((capability) => ({ organizationId: orgId, assignmentId: trainerAssignment.id, capability, effect: 'grant', createdBy: team.ceo.id })),
+  ]);
+  // Job titles are free text, separate from roles (the development lead's title is still VP Franchise).
+  await db.insert(t.memberProfiles).values([
+    [team.ceo, 'Founder & CEO'], [team.vpFranchise, 'VP Franchise Development'], [team.cmo, 'CMO'], [team.ops, 'Director of Operations'],
+    [team.consultant, 'Franchise business coach'], [team.master, 'Master franchisee, Ireland'], [team.areaDev, 'Area developer, Washington'], [team.trainer1, 'Lead teacher trainer'],
+  ].map(([u, jobTitle]) => ({ organizationId: orgId, userId: (u as User).id, jobTitle: jobTitle as string })));
 
   // ── Classes, customers, bookings and payments so every role lands on real numbers ──
   const types = await db.insert(t.classTypes).values([
@@ -175,6 +215,14 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     db, orgId, demo: team.ceo, lead: team.vpFranchise, brand: 'Northlight', collectLocationCode: 'TOR-AX',
     onboarding: { ownerGroupId: thames!.id, locationId: L['DUB-PB']!.id, prospect: { name: team.foThames.name, email: team.foThames.email, country: 'IE', city: 'Dublin', currency: 'EUR' } },
   });
+  // Territory pipelines: the master franchisee works Ireland, the area developer their development schedule.
+  await db.update(t.franchiseProspects).set({ scopeTerritoryId: ireland!.id }).where(and(eq(t.franchiseProspects.organizationId, orgId), eq(t.franchiseProspects.email, team.foThames.email)));
+  await db.insert(t.franchiseProspects).values([
+    { organizationId: orgId, name: 'Ciara Byrne', email: 'ciara.byrne@example.com', country: 'IE', city: 'Cork', currency: 'EUR', stage: 'qualified', source: 'website', scopeTerritoryId: ireland!.id, ownerUserId: team.master.id, message: 'Looking at a site near the English Market.' },
+    { organizationId: orgId, name: 'Declan Murphy', email: 'declan.murphy@example.com', country: 'IE', city: 'Limerick', currency: 'EUR', stage: 'enquiry', source: 'referral', scopeTerritoryId: ireland!.id, ownerUserId: team.master.id },
+    { organizationId: orgId, name: 'Tacoma Stadium District (unit 2 of 4)', email: 'ryan.mitchell+tacoma@example.com', country: 'US', region: 'WA', city: 'Tacoma', currency: 'USD', stage: 'signed', source: 'other', scopeTerritoryId: washington!.id, ownerUserId: team.areaDev.id, units: 1, message: 'Second unit of the Washington development schedule.' },
+    { organizationId: orgId, name: 'Spokane South Hill (unit 3 of 4)', email: 'ryan.mitchell+spokane@example.com', country: 'US', region: 'WA', city: 'Spokane', currency: 'USD', stage: 'enquiry', source: 'other', scopeTerritoryId: washington!.id, ownerUserId: team.areaDev.id, units: 1 },
+  ]);
 
   // ── Community, Training academy, course leads and help desk ──
   const network = await (await import('./seed-northlight-network.ts')).seedNorthlightNetwork({

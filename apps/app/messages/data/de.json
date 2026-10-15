@@ -1,13 +1,16 @@
 {
   "role": {
-    "org_owner": "Organisationsinhaber",
-    "hq_admin": "Admin der Zentrale",
-    "regional_manager": "Regionalleitung",
+    "org_owner": "Inhaber der Organisation",
+    "hq_admin": "Zentrale-Admin",
+    "field_consultant": "Field Consultant",
+    "master_franchisee": "Master-Franchisenehmer",
+    "area_developer": "Area Developer",
+    "multi_unit_operator": "Multi-Unit-Betreiber",
     "franchise_owner": "Franchisenehmer",
     "location_manager": "Standortleitung",
     "staff": "Mitarbeitende",
-    "marketing_contributor": "Marketing-Mitwirkende",
-    "finance": "Finanznutzer",
+    "content_social": "Content & Social Media",
+    "finance_lead": "Finanzleitung",
     "customer": "Kunde",
     "support": "Support-Zugriff"
   },
@@ -17,7 +20,10 @@
     "ownerGroup": "Eigentümergruppe: {name}",
     "allAuthorized": "Alle freigegebenen Standorte",
     "readOnlyOrg": "Nur lesen · Organisation",
-    "campaigns": "Kampagnen · {name}"
+    "campaigns": "Kampagnen · {name}",
+    "territory": "Gebiet: {name}",
+    "portfolio": "Portfolio: {name}",
+    "brand": "Marke: {name}"
   },
   "member": {
     "now": "Jetzt",

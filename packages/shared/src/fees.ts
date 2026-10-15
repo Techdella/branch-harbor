@@ -1,5 +1,4 @@
-import { minorUnitExponent } from './money.ts';
-import { PRICE_BOOK, isPricedCurrency, type PricedCurrency } from './pricing.ts';
+import { LIST_PRICES_MINOR, PRICE_BOOK, isPricedCurrency, type PricedCurrency } from './pricing.ts';
 
 /**
  * BranchHarbor fees outside the plan price (the price book in pricing.ts stays the single source of plan prices;
@@ -9,28 +8,18 @@ import { PRICE_BOOK, isPricedCurrency, type PricedCurrency } from './pricing.ts'
  * BranchHarbor runs for the franchisor, capped per location per calendar month. It is deliberately NOT a percentage
  * of royalties: the franchisor's royalty income is none of BranchHarbor's business, and a flat fee stays predictable.
  *
- * - Reference amount: USD 1.00 per collection, at most 5 charged collections per location per month.
- * - Other billing currencies follow the price book's market ratio (connector plan, per location), rounded to a
- *   natural amount — the same purchasing-power logic as plan prices, never a live exchange rate.
+ * - Amounts come from the price book (`collection` and `collectionCap` rows in pricing.ts): USD 1.00 per
+ *   collection, capped at USD 10 per location per month. Local amounts are set per currency there, never converted live.
  * - The fee is paid by the franchisor (taken as the platform fee on the collection on their account), and printed on
  *   franchisee statements for transparency only; it never increases what the franchisee owes.
  */
-export const ROYALTY_COLLECTION_FEE_USD_MINOR = 100;
-export const ROYALTY_COLLECTION_FEE_CAP_PER_LOCATION_PER_MONTH = 5;
+export const ROYALTY_COLLECTION_FEE_USD_MINOR = LIST_PRICES_MINOR.USD.collection;
+/** Charged collections per location per month before the cap (cap ÷ per-collection fee in the price book). */
+export const ROYALTY_COLLECTION_FEE_CAP_PER_LOCATION_PER_MONTH = Math.round(LIST_PRICES_MINOR.USD.collectionCap / LIST_PRICES_MINOR.USD.collection);
 
-function niceMajor(v: number): number {
-  if (v < 10) return Math.max(0.05, Math.round(v * 20) / 20);
-  if (v < 100) return Math.round(v);
-  const mag = 10 ** (Math.floor(Math.log10(v)) - 1);
-  return Math.round(v / mag) * mag;
-}
-
-/** Flat collection fee per price-book currency, in minor units. */
+/** Flat collection fee per price-book currency, in minor units (from the price book's `collection` row). */
 export const royaltyCollectionFee: Readonly<Record<PricedCurrency, number>> = Object.fromEntries(
-  (Object.keys(PRICE_BOOK) as PricedCurrency[]).map((c) => {
-    const major = c === 'USD' ? ROYALTY_COLLECTION_FEE_USD_MINOR / 100 : niceMajor((ROYALTY_COLLECTION_FEE_USD_MINOR / 100) * (PRICE_BOOK[c].connector / PRICE_BOOK.USD.connector));
-    return [c, Math.round(major * 10 ** minorUnitExponent(c))];
-  }),
+  (Object.keys(PRICE_BOOK) as PricedCurrency[]).map((c) => [c, LIST_PRICES_MINOR[c].collection]),
 ) as Record<PricedCurrency, number>;
 
 export interface CollectionFeeQuote {

@@ -293,6 +293,14 @@ function Detail({ x, d, onChanged, onDeleted }: { x: TerritoryVM; d: TerritoryLi
                 {TERRITORY_EXCLUSIVITY.map((k) => <option key={k} value={k}>{t(`exclusivity.${k}`)}</option>)}
               </Select>
             )}</Field>
+            {d.scopeTerritories.length > 0 && (
+              <div className="col-span-2"><Field label={t('territories.subNetwork')} hint={t('territories.subNetworkHint')}>{(fx) => (
+                <Select id={fx.id} value={x.scopeTerritoryId ?? ''} onChange={async (e) => { if (await act.run(() => fdevApi.updateTerritory(x.id, { scopeTerritoryId: e.target.value || null }))) onChanged(); }}>
+                  <option value="">{t('territories.noSubNetwork')}</option>
+                  {d.scopeTerritories.map((st) => <option key={st.id} value={st.id}>{st.name}</option>)}
+                </Select>
+              )}</Field></div>
+            )}
             <label className="col-span-2 flex items-center gap-2 text-[13px]"><Toggle checked={x.showOnSite} onChange={async (b) => { if (await act.run(() => fdevApi.updateTerritory(x.id, { showOnSite: b }))) onChanged(); }} label={t('territories.showOnSite')} /><span aria-hidden="true">{t('territories.showOnSite')}</span></label>
           </div>
         )}
