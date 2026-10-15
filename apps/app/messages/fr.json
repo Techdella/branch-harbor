@@ -2187,7 +2187,8 @@
       "shift_swap": "Échange de service",
       "field": "Modification du site",
       "page": "Page du site",
-      "location_go_live": "Ouverture d’un établissement"
+      "location_go_live": "Ouverture d’un établissement",
+      "section": "Modification de section du site"
     },
     "requested": "{location} · demandé par {name}",
     "waiting": "En attente de la décision d’une autre personne",

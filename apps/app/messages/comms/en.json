@@ -390,7 +390,9 @@
         "ad_campaign": "Ad campaign",
         "coming_soon": "Coming-soon campaign",
         "course_campaign": "Course campaign",
-        "import": "Imported"
+        "import": "Imported",
+        "form": "Website form",
+        "newsletter": "Newsletter sign-up"
       },
       "statusFilter": "Status",
       "setStatus": "Change status",

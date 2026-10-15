@@ -1,0 +1,48 @@
+{
+  "builder": {
+    "hours": "Orari di apertura",
+    "contact": "Vieni a trovarci",
+    "closed": "Chiuso",
+    "directions": "Indicazioni",
+    "call": "Chiama",
+    "email": "Email",
+    "map": "Mappa",
+    "livePreview": "Le informazioni aggiornate della tua attività compariranno qui sul sito pubblicato.",
+    "order": "Ordina ora",
+    "viewAll": "Vedi tutto",
+    "formUnavailable": "Questo modulo non è disponibile al momento.",
+    "highlighted": "Popolare",
+    "empty": {
+      "class_schedule": "Al momento non ci sono lezioni in programma. Torna presto.",
+      "programmes": "Al momento non ci sono programmi con iscrizioni aperte.",
+      "services": "I servizi saranno elencati qui a breve.",
+      "product_grid": "Al momento non ci sono prodotti disponibili in questa sede.",
+      "menu": "Il menu non è disponibile al momento.",
+      "listings": "Al momento non ci sono immobili in elenco.",
+      "rooms": "Le camere saranno elencate qui a breve."
+    },
+    "form": {
+      "submit": "Invia",
+      "sending": "Invio in corso…",
+      "success": "Grazie. Abbiamo ricevuto il tuo messaggio.",
+      "required": "Questo campo è obbligatorio",
+      "invalid": "Controlla questa risposta",
+      "fixErrors": "Controlla le risposte evidenziate.",
+      "tooFast": "Prenditi un momento per compilare il modulo, poi invialo di nuovo.",
+      "optional": "facoltativo",
+      "choose": "Scegli…",
+      "chooseLocation": "Scegli una sede",
+      "honeypot": "Lascia vuoto questo campo"
+    },
+    "newsletter": {
+      "email": "Indirizzo email",
+      "consent": "Sì, inviatemi novità e offerte via email. Posso annullare l’iscrizione in qualsiasi momento.",
+      "submit": "Iscriviti",
+      "sending": "Iscrizione in corso…",
+      "success": "Grazie! Sei iscritto.",
+      "consentRequired": "Spunta la casella per confermare che vuoi ricevere le nostre email.",
+      "invalidEmail": "Inserisci un indirizzo email valido",
+      "honeypot": "Lascia vuoto questo campo"
+    }
+  }
+}

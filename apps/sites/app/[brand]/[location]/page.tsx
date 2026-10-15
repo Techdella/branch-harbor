@@ -4,6 +4,7 @@ import { Icon } from '@bh/ui';
 import { Hours } from '@/components/Hours';
 import { OpenBadge } from '@/components/OpenBadge';
 import { PageContent } from '@/components/PageContent';
+import { LocationDocument } from '@/components/builder/SiteContent';
 import { apiGet } from '@/lib/api';
 import { dateTime, money, zone } from '@/lib/format';
 import { MODULE_ICON, MODULE_PATH, SCHEMA_TYPE, providerName } from '@/lib/modules';
@@ -25,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description: description.slice(0, 300),
     alternates: { canonical, languages: available.length > 1 ? Object.fromEntries(available.map((l) => [l, `${canonical}?lang=${l}`])) : undefined },
-    openGraph: { title, description: description.slice(0, 300), siteName: data.brand.name, type: 'website', url: canonical },
+    openGraph: { title, description: description.slice(0, 300), siteName: data.brand.name, type: 'website', url: canonical, ...(home?.seo.socialImage ? { images: [home.seo.socialImage] } : {}) },
+    ...(home?.seo.noindex ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -83,9 +85,20 @@ export default async function LocationHome({ params }: Props) {
     } catch { /* teaser only; the schedule page shows errors */ }
   }
 
+  const ld = <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(data, links.locationCanonical(location, data.site.primaryHost))).replace(/</g, '\\u003c') }} />;
+  // Website builder page: the published document rendered in the business's theme.
+  if (home?.document) {
+    return (
+      <main id="main">
+        {ld}
+        <LocationDocument doc={home.document} site={data} brandSlug={brand} locationSlug={location} href={(p) => links.location(location, p)} brandHref={(p) => links.brand(p)} pageUrl={links.locationCanonical(location, data.site.primaryHost)} />
+      </main>
+    );
+  }
+
   return (
     <main id="main">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(data, links.locationCanonical(location, data.site.primaryHost))).replace(/</g, '\\u003c') }} />
+      {ld}
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div>
           <p className="text-sm font-bold uppercase tracking-wider text-brand-ink">{data.brand.name} · {l.address.city}</p>

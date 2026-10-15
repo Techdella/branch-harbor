@@ -17,7 +17,8 @@
     },
     "nav": {
       "settings": "Settings",
-      "schedule": "Staff schedule"
+      "schedule": "Staff schedule",
+      "builder": "Website builder"
     },
     "account": {
       "title": "Business accounts",

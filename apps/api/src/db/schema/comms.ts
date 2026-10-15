@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import type { SegmentRules } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
 import { locations, organizations, users } from './core.ts';
 import { customers } from './crm.ts';
@@ -118,19 +119,8 @@ export const contactTags = pgTable('contact_tags', {
   createdAt: createdAt(),
 }, (t) => [uniqueIndex('contact_tags_uq').on(t.customerId, t.tag), index('contact_tags_org_tag_idx').on(t.organizationId, t.tag)]);
 
-export interface SegmentRules {
-  locationIds?: string[];
-  tagsAny?: string[];
-  tagsAll?: string[];
-  /** Booked / bought within the last N days. */
-  activeWithinDays?: number;
-  /** Lapsed: no activity for at least N days (but some activity before). */
-  lapsedForDays?: number;
-  /** Never booked or bought. */
-  neverActive?: boolean;
-  /** Only contacts who agreed to marketing on this channel. */
-  consentChannel?: 'email' | 'sms' | 'whatsapp';
-}
+/** Segment rules: one model shared with email campaigns and automations (@bh/shared segmentRulesSchema). */
+export type { SegmentRules };
 
 export const contactSegments = pgTable('contact_segments', {
   id: pk(),

@@ -10,6 +10,10 @@ export async function runMigrations(url: string) {
   const handle = createDb(url, { max: 1 });
   try {
     await migrate(handle.db, { migrationsFolder });
+    // Data migration (idempotent): classic field pages → website builder documents, so live sites keep rendering.
+    const { migrateSiteDocuments } = await import('../services/site-builder.ts');
+    const r = await migrateSiteDocuments(handle.db);
+    if (r.migratedPages || r.migratedVersions) console.log(`Website builder: migrated ${r.migratedPages} pages and ${r.migratedVersions} published versions`);
   } finally {
     await handle.close();
   }

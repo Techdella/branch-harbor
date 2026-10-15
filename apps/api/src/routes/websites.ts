@@ -10,6 +10,7 @@ import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, hasPerm, requireMember, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { executePublishJob, publishPage, serializeJob } from '../services/publish.ts';
+import { documentForRestore, draftDocument, saveDraft, syncLegacyFieldsToDocument } from '../services/site-builder.ts';
 import { isIndependent, websiteApprovalMode } from '../services/businessMode.ts';
 import { slugify } from '../lib/slug.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
@@ -224,6 +225,9 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
         }
       }
       if (results.some((r) => r.result === 'applied') && page.status === 'published') await tx.update(pages).set({ status: 'draft', updatedAt: new Date() }).where(eq(pages.id, id));
+      // Pages migrated to the website builder: keep the document in step with classic field edits.
+      const applied = Object.fromEntries(results.filter((r) => r.result === 'applied').map((r) => [r.key, req.body.fields[r.key]]));
+      if (Object.keys(applied).length) await syncLegacyFieldsToDocument(tx, id, applied);
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'page.fields_edited', scopeKind: scope.kind, scopeId: scope.id, targetType: 'page', targetId: id, metadata: { results } });
     });
     if (results.every((r) => r.result === 'rejected_locked' || r.result === 'unknown_field')) {
@@ -297,6 +301,13 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     await requirePerm(req, s.db, 'website.publish', pageScope(orgId, page.locationId));
     const [v] = await s.db.select().from(pageVersions).where(and(eq(pageVersions.id, req.body.versionId), eq(pageVersions.pageId, id)));
     if (!v) throw notFound('Version');
+    if (page.document && v.document) {
+      // Website builder page: restore the published document through governance (locked HQ content stays HQ's).
+      const scope = pageScope(orgId, page.locationId);
+      const canHq = await hasPerm(req, s.db, 'templates.write', { organizationId: orgId, kind: 'organization', id: orgId });
+      const mode = await websiteMode(orgId);
+      await saveDraft(s.db, page, documentForRestore(await draftDocument(s.db, page), v.document), { baseRevision: page.revision, userId: req.user!.id, canHq, canApprove: await hasPerm(req, s.db, 'website.approve', scope), independent: mode.independent });
+    }
     const ver = await s.db.transaction(async (tx) => {
       for (const [k, val] of Object.entries(v.content)) await tx.update(fieldOverrides).set({ value: val, updatedAt: new Date() }).where(and(eq(fieldOverrides.pageId, id), eq(fieldOverrides.fieldKey, k)));
       const nv = await publishPage(tx, id, req.user!.id);

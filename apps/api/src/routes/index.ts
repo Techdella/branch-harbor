@@ -81,4 +81,8 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./sales-pipeline.ts')).salesPipelineRoutes);
   await app.register((await import('./social.ts')).socialRoutes);
   await app.register((await import('./ad-campaigns.ts')).adCampaignRoutes);
+  // Marketing workspace (website builder, email, automations, forms, brand assets).
+  await app.register((await import('./marketing-sites.ts')).marketingSiteRoutes);
+  await app.register((await import('./marketing.ts')).marketingRoutes);
+  await app.register((await import('./marketing-public.ts')).marketingPublicRoutes);
 };

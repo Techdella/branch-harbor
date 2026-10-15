@@ -1,0 +1,48 @@
+{
+  "builder": {
+    "hours": "Horaires d’ouverture",
+    "contact": "Nous rendre visite",
+    "closed": "Fermé",
+    "directions": "Itinéraire",
+    "call": "Appeler",
+    "email": "E-mail",
+    "map": "Carte",
+    "livePreview": "Les informations en direct de votre établissement apparaîtront ici sur le site publié.",
+    "order": "Commander",
+    "viewAll": "Tout voir",
+    "formUnavailable": "Ce formulaire n’est pas disponible pour le moment.",
+    "highlighted": "Populaire",
+    "empty": {
+      "class_schedule": "Aucun cours n’est programmé pour le moment. Revenez bientôt.",
+      "programmes": "Aucun programme n’est ouvert aux inscriptions pour le moment.",
+      "services": "Les prestations seront bientôt affichées ici.",
+      "product_grid": "Aucun produit n’est disponible dans cet établissement pour le moment.",
+      "menu": "La carte n’est pas disponible pour le moment.",
+      "listings": "Aucun bien n’est proposé pour le moment.",
+      "rooms": "Les chambres seront bientôt affichées ici."
+    },
+    "form": {
+      "submit": "Envoyer",
+      "sending": "Envoi…",
+      "success": "Merci. Nous avons bien reçu votre message.",
+      "required": "Ce champ est obligatoire",
+      "invalid": "Vérifiez cette réponse",
+      "fixErrors": "Veuillez vérifier les réponses signalées.",
+      "tooFast": "Prenez un instant pour remplir le formulaire, puis renvoyez-le.",
+      "optional": "facultatif",
+      "choose": "Choisir…",
+      "chooseLocation": "Choisissez un établissement",
+      "honeypot": "Laissez ce champ vide"
+    },
+    "newsletter": {
+      "email": "Adresse e-mail",
+      "consent": "Oui, envoyez-moi des nouvelles et des offres par e-mail. Je peux me désabonner à tout moment.",
+      "submit": "S’abonner",
+      "sending": "Abonnement…",
+      "success": "Merci ! Vous êtes abonné.",
+      "consentRequired": "Cochez la case pour confirmer que vous souhaitez recevoir nos e-mails.",
+      "invalidEmail": "Saisissez une adresse e-mail valide",
+      "honeypot": "Laissez ce champ vide"
+    }
+  }
+}

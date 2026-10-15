@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, inArray, isNull, lt, or, sql, type SQL } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { CONVERSATION_STATUSES, INBOX_CHANNELS, marketingConsentPurpose, type InboxChannelKey } from '@bh/shared';
+import { CONVERSATION_STATUSES, INBOX_CHANNELS, marketingConsentPurpose, type InboxChannelKey, segmentRulesSchema } from '@bh/shared';
 import {
   commsCannedReplies, commsChannelAccounts, commsConversations, commsMessages, commsWhatsappTemplates, consentRecords, contactSegments, contactTags, customers, leads, locations, users,
 } from '../db/schema/index.ts';
@@ -17,15 +17,7 @@ import { idParams, orgParams, secured } from './_common.ts';
 
 const channel = z.enum(INBOX_CHANNELS);
 const M = 'marketing.inbox';
-const segmentRules = z.object({
-  locationIds: z.array(z.uuid()).max(500).optional(),
-  tagsAny: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
-  tagsAll: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
-  activeWithinDays: z.number().int().min(1).max(3650).optional(),
-  lapsedForDays: z.number().int().min(1).max(3650).optional(),
-  neverActive: z.boolean().optional(),
-  consentChannel: z.enum(['email', 'sms', 'whatsapp']).optional(),
-});
+const segmentRules = segmentRulesSchema;
 
 /**
  * Unified inbox (one per location, plus HQ), canned replies, WhatsApp templates, contacts with tags and per-channel
@@ -279,10 +271,12 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
   /* ── contacts, tags, consent ── */
 
   const contactScope = async (orgId: string, req: Parameters<typeof scopeFor>[0]) => {
+    // Contacts are visible with Customers, the Inbox or Email (segments feed broadcasts and email campaigns).
     const a = await scopeFor(req, s.db, orgId, 'sales.customers');
     const b = await scopeFor(req, s.db, orgId, M);
-    if (a.all || b.all) return null;
-    return [...new Set([...(a.locationIds ?? []), ...(b.locationIds ?? [])])];
+    const c = await scopeFor(req, s.db, orgId, 'marketing.email');
+    if (a.all || b.all || c.all) return null;
+    return [...new Set([...(a.locationIds ?? []), ...(b.locationIds ?? []), ...(c.locationIds ?? [])])];
   };
   const loadCustomer = async (orgId: string, id: string) => {
     const [c] = await s.db.select().from(customers).where(and(eq(customers.id, id), eq(customers.organizationId, orgId), isNull(customers.erasedAt)));
@@ -333,7 +327,7 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
   /* ── segments ── */
 
   const serializeSegment = (g: typeof contactSegments.$inferSelect) => ({ id: g.id, locationId: g.locationId, name: g.name, rules: g.rules, createdAt: g.createdAt.toISOString(), updatedAt: g.updatedAt.toISOString() });
-  const segmentEditors: Array<[string, 'edit']> = [[M, 'edit'], ['marketing.campaigns', 'edit'], ['sales.customer_pipeline', 'edit']];
+  const segmentEditors: Array<[string, 'edit']> = [[M, 'edit'], ['marketing.campaigns', 'edit'], ['marketing.email', 'edit'], ['sales.customer_pipeline', 'edit']];
 
   app.get('/orgs/:orgId/segments', { schema: { tags: ['inbox'], security: secured, params: orgParams } }, async (req) => {
     const { orgId } = req.params;

@@ -52,6 +52,8 @@ export const PERMISSIONS = [
   'training.learn', 'training.author', 'training.assign', 'training.manage',
   'courseleads.read', 'courseleads.edit',
   'helpdesk.raise', 'helpdesk.agent',
+  // Marketing workspace (website builder themes/master pages, email, automations, forms, brand assets).
+  'website.design', 'email.draft', 'email.send', 'automations.manage', 'forms.manage', 'assets.manage',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 

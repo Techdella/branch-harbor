@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray, isNotNull, isNull, ne, or } from 'drizzle-orm';
 import { z } from 'zod';
-import { SUPPORTED_LOCALES, locale as localeSchema, type Locale } from '@bh/shared';
+import { SITE_FONT_KEYS, SITE_THEMES, SUPPORTED_LOCALES, locale as localeSchema, resolveTheme, type Locale, type SiteFont } from '@bh/shared';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
 import {
   classBookings, classOccurrences, classTypes, connections, domains, locationVariants, locations, organizations,
@@ -29,7 +29,7 @@ import { orgParams, secured } from './_common.ts';
 // ───────── Site settings (brand theme) ─────────
 
 /** Fonts the site renderer can load; anything else is rejected so a theme can't break legibility. */
-export const SITE_FONTS = ['system', 'plus-jakarta-sans', 'inter', 'work-sans', 'source-serif-4', 'lora', 'merriweather'] as const;
+export const SITE_FONTS = SITE_FONT_KEYS as [SiteFont, ...SiteFont[]];
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Use a 6-digit hex colour like #2F6B3A');
 const httpsUrl = z.url().refine((u) => u.startsWith('https://'), 'Must be an https:// URL');
 
@@ -43,6 +43,12 @@ export const siteSettingsSchema = z.object({
   poweredBy: z.boolean().default(false),
   /** Languages the business offers on its site, in addition to each location's own locale. */
   enabledLocales: z.array(localeSchema).max(SUPPORTED_LOCALES.length).default([]),
+  // Website builder theme (Marketing workspace). Optional so older clients that PUT the settings keep the theme.
+  themeId: z.enum(SITE_THEMES.map((t) => t.id) as [string, ...string[]]).optional(),
+  colorMode: z.enum(['theme', 'brand']).optional(),
+  accentColor: hex.nullable().optional(),
+  headingFont: z.enum(SITE_FONTS).nullable().optional(),
+  bodyFont: z.enum(SITE_FONTS).nullable().optional(),
 });
 export type SiteSettings = z.infer<typeof siteSettingsSchema>;
 
@@ -81,6 +87,12 @@ export function themeFrom(settings: SiteSettings) {
     primary: buttonBg, brandColor: primary, onPrimary, primaryInk,
     primaryContrast: Math.round(contrast(buttonBg, onPrimary) * 100) / 100,
     font: settings.font, logoUrl: settings.logoUrl, heroImageUrl: settings.heroImageUrl,
+    /** Website builder theme (presentation only) with brand overrides applied. Sites without a theme keep the classic look in their brand colour. */
+    themeId: settings.themeId ?? 'classic',
+    site: resolveTheme(settings.themeId ?? 'classic', {
+      colorMode: settings.colorMode ?? (settings.themeId ? 'theme' : 'brand'), primaryColor: settings.primaryColor, accentColor: settings.accentColor ?? null,
+      headingFont: settings.headingFont ?? null, bodyFont: settings.bodyFont ?? (settings.font !== 'system' ? settings.font : null),
+    }),
   };
 }
 
@@ -172,10 +184,14 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     const rows = await s.db.select({ p: pages, v: pageVersions }).from(pages)
       .innerJoin(pageVersions, eq(pageVersions.id, pages.publishedVersionId))
       .where(and(eq(pages.websiteId, websiteId), isNotNull(pages.publishedVersionId), isNull(pages.archivedAt), ne(pages.status, 'archived')))
-      .orderBy(asc(pages.slug));
+      .orderBy(asc(pages.navOrder), asc(pages.slug));
     return rows.map(({ p, v }) => ({
-      slug: p.slug, title: p.title, seo: { title: p.seo.title ?? null, description: p.seo.description ?? null, canonicalOwner: p.seo.canonicalOwner ?? 'branchharbor' },
+      slug: p.slug, title: p.title,
+      seo: { title: p.seo.title ?? null, description: p.seo.description ?? null, canonicalOwner: p.seo.canonicalOwner ?? 'branchharbor', socialImage: p.seo.socialImage ?? null, noindex: p.seo.noindex === true },
       content: v.content, version: v.version, publishedAt: (p.publishedAt ?? v.createdAt).toISOString(),
+      /** Website builder document of the published version (null for classic field pages). */
+      document: v.document ?? null,
+      nav: { label: p.navLabel ?? p.title, show: p.showInNav, order: p.navOrder },
     }));
   }
 
@@ -312,6 +328,7 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
         primaryHost: await primaryHost(site?.id ?? null),
         brandPrimaryHost: await primaryHost(brandSite?.id ?? null),
         locationCount: others.length,
+        navLinks: site?.navLinks ?? [],
       },
     };
   });
@@ -410,7 +427,9 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
       await requirePerm(req, s.db, 'templates.write', { organizationId: orgId, kind: 'organization', id: orgId });
       const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
       if (!org) throw notFound('Organisation');
-      await s.db.update(organizations).set({ settings: { ...org.settings, site: req.body }, updatedAt: new Date() }).where(eq(organizations.id, orgId));
+      // Merge so the website builder theme (chosen elsewhere) survives a settings save from an older screen.
+      const site = { ...((org.settings.site ?? {}) as Record<string, unknown>), ...req.body };
+      await s.db.update(organizations).set({ settings: { ...org.settings, site }, updatedAt: new Date() }).where(eq(organizations.id, orgId));
       await audit(s.db, { organizationId: orgId, ...actor(req), action: 'site.settings_updated', scopeKind: 'organization', scopeId: orgId, targetType: 'organization', targetId: orgId });
       return { settings: req.body, theme: themeFrom(req.body) };
     });

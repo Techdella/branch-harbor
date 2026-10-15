@@ -501,14 +501,16 @@
       "shift_swap_in": "{role} · {count, plural, one {in # Tag} other {in # Tagen}}",
       "website_change": "Website-Änderung: {field}",
       "page_submitted": "Seite zur Freigabe eingereicht",
-      "location_go_live": "{location} eröffnen"
+      "location_go_live": "{location} eröffnen",
+      "website_section_change": "Website-Änderung: {page}"
     },
     "kind": {
       "refund": "Erstattung",
       "ad_spend": "Lokale Werbeausgaben",
       "shift_swap": "Schichttausch",
       "field": "Website-Änderung",
-      "page": "Website-Seite"
+      "page": "Website-Seite",
+      "section": "Änderung eines Website-Abschnitts"
     },
     "detail": {
       "threshold": "Über dem Schwellenwert",

@@ -3,6 +3,7 @@ import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import { connections, fieldOverrides, locations, pageVersions, pages, publishJobResults, publishJobs, websites } from '../db/schema/index.ts';
 import { audit } from './audit.ts';
+import { publishableDocument } from './site-builder.ts';
 
 export async function pageContent(db: Exec, pageId: string): Promise<Record<string, unknown>> {
   const fields = await db.select().from(fieldOverrides).where(eq(fieldOverrides.pageId, pageId));
@@ -12,10 +13,12 @@ export async function pageContent(db: Exec, pageId: string): Promise<Record<stri
 /** Snapshot the page's current content as a new version and mark it published. */
 export async function publishPage(db: Exec, pageId: string, actorUserId: string | null, publishJobId: string | null = null) {
   const content = await pageContent(db, pageId);
+  // Website builder pages: the published snapshot is the validated public document (no drafts, no pending changes).
+  const document = await publishableDocument(db, pageId);
   const [last] = await db.select({ v: pageVersions.version }).from(pageVersions).where(eq(pageVersions.pageId, pageId)).orderBy(desc(pageVersions.version)).limit(1);
   const [page] = await db.select().from(pages).where(eq(pages.id, pageId));
-  const [ver] = await db.insert(pageVersions).values({ organizationId: page!.organizationId, pageId, version: (last?.v ?? 0) + 1, content, createdBy: actorUserId, publishJobId }).returning();
-  await db.update(pages).set({ status: 'published', publishedVersionId: ver!.id, publishedAt: new Date(), updatedAt: new Date() }).where(eq(pages.id, pageId));
+  const [ver] = await db.insert(pageVersions).values({ organizationId: page!.organizationId, pageId, version: (last?.v ?? 0) + 1, content, document, createdBy: actorUserId, publishJobId }).returning();
+  await db.update(pages).set({ status: 'published', publishedVersionId: ver!.id, publishedAt: new Date(), scheduledPublishAt: null, updatedAt: new Date() }).where(eq(pages.id, pageId));
   return ver!;
 }
 
@@ -53,7 +56,8 @@ export async function executePublishJob(s: Services, jobId: string, opts: { only
       const ver = await s.db.transaction(async (tx) => publishPage(tx, page.id, opts.actorUserId, job.id));
       await s.db.update(publishJobResults).set({ status: 'succeeded', error: null, warnings, pageId: page.id, versionId: ver.id, attempts: r.attempts + 1, updatedAt: new Date() }).where(eq(publishJobResults.id, r.id));
     } catch (err) {
-      await fail(`Unexpected error: ${(err as Error).message}`);
+      const e = err as Error & { code?: string };
+      await fail(e.code === 'document_invalid' ? 'Some sections need attention before this page can go live' : `Unexpected error: ${e.message}`);
     }
   }
 

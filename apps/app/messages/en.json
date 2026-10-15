@@ -2187,7 +2187,8 @@
       "shift_swap": "Shift swap",
       "field": "Website change",
       "page": "Website page",
-      "location_go_live": "Location opening"
+      "location_go_live": "Location opening",
+      "section": "Website section change"
     },
     "requested": "{location} · requested by {name}",
     "waiting": "Waiting for someone else to decide",

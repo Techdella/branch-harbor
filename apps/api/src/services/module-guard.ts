@@ -21,7 +21,7 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   leads: ['sales.customers', 'sales.customer_pipeline', 'sales.course_leads'],
   sales: ['sales.customer_pipeline', 'sales.course_leads'],
   contacts: ['sales.customers', 'marketing.inbox'],
-  segments: ['marketing.inbox', 'marketing.campaigns', 'sales.customer_pipeline', 'sales.customers'],
+  segments: ['marketing.inbox', 'marketing.campaigns', 'marketing.email', 'sales.customer_pipeline', 'sales.customers'],
   // Marketing
   websites: ['marketing.website_builder', 'network.templates'],
   pages: ['marketing.website_builder', 'network.templates'],
@@ -31,6 +31,14 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   sites: ['marketing.website_builder'],
   campaigns: ['marketing.campaigns', 'marketing.*'],
   'ad-spend-requests': ['marketing.campaigns', 'marketing.ads'],
+  // Marketing workspace: website builder documents/themes, email, automations, forms, brand assets, settings and tasks.
+  builder: ['marketing.website_builder', 'network.templates'],
+  email: ['marketing.email'],
+  automations: ['marketing.automations'],
+  forms: ['marketing.forms'],
+  assets: ['marketing.brand_assets', 'marketing.website_builder', 'marketing.email'],
+  marketing: ['marketing.*'],
+  tags: ['sales.customers', 'marketing.*'],
   inbox: ['marketing.inbox'],
   social: ['marketing.social'],
   'ad-campaigns': ['marketing.ads', 'marketing.network_campaigns', 'finance.royalties'],

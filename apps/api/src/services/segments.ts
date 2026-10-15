@@ -26,6 +26,10 @@ export function segmentConditions(orgId: string, rules: SegmentRules, visible: s
   if (rules.activeWithinDays) conds.push(sql`${lastActivitySql} >= now() - make_interval(days => ${rules.activeWithinDays})`);
   if (rules.lapsedForDays) conds.push(sql`${lastActivitySql} < now() - make_interval(days => ${rules.lapsedForDays})`);
   if (rules.neverActive) conds.push(sql`${lastActivitySql} is null`);
+  if (rules.excludeTags?.length) conds.push(sql`not exists (select 1 from contact_tags t where t.customer_id = ${customers.id} and t.tag in ${rules.excludeTags})`);
+  if (rules.createdWithinDays) conds.push(sql`${customers.createdAt} >= now() - make_interval(days => ${rules.createdWithinDays})`);
+  if (rules.source === 'lead') conds.push(sql`exists (select 1 from leads l where l.customer_id = ${customers.id})`);
+  if (rules.source === 'customer') conds.push(sql`${lastActivitySql} is not null`);
   if (rules.consentChannel) conds.push(sql`${consentSql(rules.consentChannel)} is true`);
   return conds;
 }

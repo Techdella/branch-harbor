@@ -18,6 +18,8 @@ const hospitalitySweep = setInterval(() => void (async () => {
 })().catch((err) => app.log.warn({ err }, 'hospitality sweep failed')), 5 * 60_000);
 // Network workspaces: scheduled announcements, required-read reminders, help desk SLA alerts, re-certification, email digests.
 const networkSweep = setInterval(() => void import('./services/community.ts').then((m) => m.runNetworkHousekeeping(app.ctx)).catch((err) => app.log.error({ err }, 'network housekeeping failed')), 5 * 60_000);
+// Marketing: resume delayed automation runs, deliver scheduled campaigns and publish scheduled pages (works without Redis).
+const marketingSweep = setInterval(() => void app.ctx.jobs.enqueue('marketing.tick', {}, { jobId: `marketing-tick-${Math.floor(Date.now() / 30_000)}` }).catch(() => {}), 30_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
@@ -26,6 +28,7 @@ const shutdown = async (signal: string) => {
   clearInterval(franchiseSweep);
   clearInterval(hospitalitySweep);
   clearInterval(networkSweep);
+  clearInterval(marketingSweep);
   await app.close();
   process.exit(0);
 };

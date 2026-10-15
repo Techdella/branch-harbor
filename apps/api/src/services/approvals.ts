@@ -11,8 +11,9 @@ import { refundCommerceOrder } from './commerce.ts';
 import { notify, usersWithPermissionAt } from './notifications.ts';
 import { orgPolicies } from './orgSettings.ts';
 import { refundPayment, serializePayment } from './payments.ts';
+import { applySectionApproval, clearSectionApproval } from './site-builder.ts';
 
-export const APPROVAL_KINDS = ['page', 'field', 'refund', 'ad_spend', 'shift_swap', 'location_go_live'] as const;
+export const APPROVAL_KINDS = ['page', 'field', 'section', 'refund', 'ad_spend', 'shift_swap', 'location_go_live'] as const;
 export type ApprovalKind = (typeof APPROVAL_KINDS)[number];
 export type ApprovalRow = typeof approvals.$inferSelect;
 
@@ -23,6 +24,7 @@ export type ApprovalRow = typeof approvals.$inferSelect;
 export const DECIDER: Record<ApprovalKind, { perm: Permission; also?: Permission; label: string }> = {
   page: { perm: 'website.approve', label: 'Website page' },
   field: { perm: 'website.approve', label: 'Website change' },
+  section: { perm: 'website.approve', label: 'Website section change' },
   refund: { perm: 'payments.refund', label: 'Refund' },
   ad_spend: { perm: 'marketing.publish', label: 'Local ad spend' },
   shift_swap: { perm: 'operations.write', also: 'locations.read', label: 'Shift swap' },
@@ -73,12 +75,12 @@ export async function assertRefundWithinThreshold(req: FastifyRequest, db: Exec,
 
 /** Structured title: a stable code plus arguments, so apps can phrase it in the viewer's language. */
 export interface ApprovalTitle { code: ApprovalTitleCode; params: Record<string, string | number> }
-export type ApprovalTitleCode = 'refund_payment' | 'refund_order' | 'refund_pickup_order' | 'refund_return' | 'shift_swap' | 'website_change' | 'page_submitted' | 'location_go_live';
+export type ApprovalTitleCode = 'refund_payment' | 'refund_order' | 'refund_pickup_order' | 'refund_return' | 'shift_swap' | 'website_change' | 'page_submitted' | 'location_go_live' | 'website_section_change';
 
 export interface NewApproval {
   organizationId: string;
   locationId: string | null;
-  kind: Exclude<ApprovalKind, 'page' | 'field'>;
+  kind: Exclude<ApprovalKind, 'page' | 'field' | 'section'>;
   targetId: string;
   title: string;
   /** Stored in the payload as `titleI18n` and returned as `titleCode` / `titleParams` (titles typed by people have none). */
@@ -138,7 +140,7 @@ export async function decideApproval(s: Services, req: FastifyRequest, orgId: st
   }
   if (ap.status !== 'pending') throw conflict('already_decided', `This request was already ${ap.status}`);
   if (ap.requestedBy === me.id) throw forbidden('You cannot approve your own request');
-  if (decision === 'reject' && (kind === 'page' || kind === 'field') && !comment) throw validationError('Explain why the change was rejected', { comment: 'Required when rejecting' });
+  if (decision === 'reject' && (kind === 'page' || kind === 'field' || kind === 'section') && !comment) throw validationError('Explain why the change was rejected', { comment: 'Required when rejecting' });
   const scopeKind = ap.locationId ? 'location' : 'organization';
   const scopeId = ap.locationId ?? orgId;
 
@@ -148,6 +150,8 @@ export async function decideApproval(s: Services, req: FastifyRequest, orgId: st
       if (!claimed) throw conflict('already_decided', 'This request was already decided');
       if (kind === 'field') {
         await tx.update(fieldOverrides).set({ pendingValue: null, pendingApprovalId: null }).where(eq(fieldOverrides.id, ap.targetId));
+      } else if (kind === 'section') {
+        await clearSectionApproval(tx, ap);
       } else if (kind === 'page') {
         await tx.update(pages).set({ status: 'draft', updatedAt: new Date() }).where(eq(pages.id, ap.targetId));
       } else if (kind === 'ad_spend') {
@@ -192,6 +196,8 @@ async function execute(s: Services, ap: ApprovalRow, approverId: string, ip: str
       if (f) await s.db.update(fieldOverrides).set({ value: f.pendingValue, pendingValue: null, pendingApprovalId: null, updatedBy: ap.requestedBy, updatedAt: new Date() }).where(eq(fieldOverrides.id, f.id));
       return { applied: !!f };
     }
+    case 'section':
+      return applySectionApproval(s.db, ap, approverId);
     case 'page':
       await s.db.update(pages).set({ status: 'approved', updatedAt: new Date() }).where(eq(pages.id, ap.targetId));
       return { pageStatus: 'approved' };

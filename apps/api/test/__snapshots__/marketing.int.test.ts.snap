@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`email rendering (MJML) > renders email-safe HTML with a plain-text part, the postal address and an unsubscribe link 1`] = `
+"Stillwater Yoga
+
+[Studio]
+
+Hello <Ana>
+
+New classes at Queen West.
+
+Book now: https://example.com/book
+
+--
+
+You are receiving this email because you agreed to hear from Stillwater Yoga.
+
+Stillwater Yoga · 12 Queen St W, Toronto
+
+Unsubscribe: https://api.example/v1/public/email/unsubscribe/tok123"
+`;

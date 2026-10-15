@@ -390,7 +390,9 @@
         "ad_campaign": "Campaña de anuncios",
         "coming_soon": "Campaña de próxima apertura",
         "course_campaign": "Campaña de formación",
-        "import": "Importado"
+        "import": "Importado",
+        "form": "Formulario web",
+        "newsletter": "Suscripción al boletín"
       },
       "statusFilter": "Estado",
       "setStatus": "Cambiar estado",

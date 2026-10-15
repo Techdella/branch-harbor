@@ -108,12 +108,13 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'marketing.website_builder', area: 'marketing', name: 'Websites', description: 'Location websites: pages, approvals, publishing and domains.', actions: VEP, status: 'available' },
   { key: 'marketing.campaigns', area: 'marketing', name: 'Campaigns', description: 'Marketing campaigns and offers for the locations in scope.', actions: VEP, status: 'available' },
   { key: 'marketing.inbox', area: 'marketing', name: 'Inbox', description: 'One inbox per location for email, SMS, WhatsApp, Instagram and Messenger: replies, notes, assignment and contact segments.', actions: VEX, actionNotes: { edit: 'Reply, assign, add notes and manage segments.' }, status: 'available', sensitive: 'personal_data' },
-  { key: 'marketing.email', area: 'marketing', name: 'Email', description: 'Email campaigns and newsletters.', actions: VEP, status: 'planned' },
-  { key: 'marketing.automations', area: 'marketing', name: 'Automations', description: 'Automatic journeys: trigger, conditions and actions.', actions: VEP, status: 'planned' },
+  { key: 'marketing.email', area: 'marketing', name: 'Email', description: 'Email templates and campaigns built from blocks, sent to contact segments with consent.', actions: VEP, actionNotes: { publish: 'Send or schedule campaigns.' }, status: 'available' },
+  { key: 'marketing.automations', area: 'marketing', name: 'Automations', description: 'Automatic journeys: trigger, conditions and actions.', actions: VEP, actionNotes: { edit: 'Build, test and switch journeys on or off.' }, status: 'available' },
+  { key: 'marketing.forms', area: 'marketing', name: 'Forms & landing pages', description: 'Website forms and sign-ups that create leads (routed by the lead rules), record consent and start automations.', actions: VEP, status: 'available' },
   { key: 'marketing.social', area: 'marketing', name: 'Social', description: 'Social posts and scheduling on brand accounts.', actions: VEP, actionNotes: { publish: 'Approve local posts, connect accounts and hand over posting rights.' }, status: 'available' },
   { key: 'marketing.ads', area: 'marketing', name: 'Ads', description: 'Paid ad campaigns and budgets.', actions: ALL, status: 'available' },
   { key: 'marketing.network_campaigns', area: 'marketing', name: 'Network campaigns', description: 'Campaigns HQ runs for all locations, including coming-soon locations.', actions: ALL, status: 'available', hqOnly: true },
-  { key: 'marketing.brand_assets', area: 'marketing', name: 'Brand assets', description: 'Logos, photos and brand guidelines.', actions: VEP, status: 'planned' },
+  { key: 'marketing.brand_assets', area: 'marketing', name: 'Brand assets', description: 'Logos, photos, files and brand guidelines used by websites and emails.', actions: VEP, actionNotes: { edit: 'Upload and organise assets.' }, status: 'available' },
   // Finance
   { key: 'finance.payments', area: 'finance', name: 'Payments', description: 'Transactions, refunds, reconciliation and payment accounts (financial data).', actions: VEX, actionNotes: { edit: 'Issue refunds and fix reconciliation items.' }, status: 'available', sensitive: 'finance' },
   { key: 'finance.royalties', area: 'finance', name: 'Royalties', description: 'Royalty and marketing-fund invoices to franchisees.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'finance' },
@@ -309,6 +310,12 @@ export const PERMISSION_CAPABILITIES: Record<Permission, readonly string[]> = {
   'courseleads.edit': ['sales.course_leads:edit'],
   'helpdesk.raise': ['community.help_desk:view'],
   'helpdesk.agent': ['community.help_desk:edit'],
+  'website.design': ['network.templates:edit'],
+  'email.draft': ['marketing.email:edit'],
+  'email.send': ['marketing.email:publish'],
+  'automations.manage': ['marketing.automations:edit'],
+  'forms.manage': ['marketing.forms:edit'],
+  'assets.manage': ['marketing.brand_assets:edit'],
 };
 
 function holds(caps: ReadonlySet<string>, pattern: string): boolean {
@@ -381,7 +388,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'brand_lead', name: 'Brand lead', description: 'Brand assets, brand templates and locked fields, websites and social content.',
     primaryWorkspace: 'marketing', defaultScope: 'organization', networkOnly: true,
     grants: {
-      'marketing.brand_assets': VEP, 'network.templates': VEP, 'marketing.website_builder': VEP, 'marketing.social': VE, 'marketing.campaigns': V, 'network.locations': V,
+      'marketing.brand_assets': VEP, 'network.templates': VEP, 'marketing.website_builder': VEP, 'marketing.social': VE, 'marketing.campaigns': V, 'marketing.email': V, 'network.locations': V,
       ...everyone, 'settings.ai': V,
     },
   },
@@ -389,7 +396,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'digital_marketer', name: 'Digital marketer', description: 'Websites, social, ads, email and network campaigns. No operations, customers or finance.',
     primaryWorkspace: 'marketing', defaultScope: 'organization',
     grants: {
-      'marketing.website_builder': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.network_campaigns': ALL, 'marketing.email': VE, 'marketing.automations': VE, 'marketing.inbox': VE,
+      'marketing.website_builder': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.network_campaigns': ALL, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.inbox': VE,
+      'marketing.forms': VEP, 'marketing.brand_assets': V,
       'marketing.campaigns': VEP, 'network.locations': V, 'network.reports': V, ...everyone, 'settings.ai': V,
     },
   },
@@ -421,7 +429,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'regional_manager', name: 'Regional manager', description: 'Oversight of the locations in a region: operations, reports, website approvals and campaign drafts.',
     primaryWorkspace: 'network', defaultScope: 'region', networkOnly: true,
     grants: {
-      'network.locations': V, 'network.onboarding': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V,
+      'network.locations': V, 'network.onboarding': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V, 'marketing.email': VE,
       'operations.*': V, ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'training.assignments': VE, 'settings.ai': V,
     },
   },
@@ -430,7 +438,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'owner_group', networkOnly: true,
     grants: {
       'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
-      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': V, 'marketing.inbox': VEX,
+      'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': VE, 'marketing.inbox': VEX, 'marketing.forms': VEP,
       'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX,
       'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
     },
@@ -440,6 +448,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'operations', defaultScope: 'location',
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': V, 'marketing.website_builder': VEP, 'marketing.campaigns': VE, 'marketing.inbox': VE, 'marketing.social': VE,
+      'marketing.email': VE, 'marketing.forms': VE, 'marketing.brand_assets': VE,
       'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
     },
   },
@@ -451,7 +460,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   marketing_contributor: {
     key: 'marketing_contributor', name: 'Marketing contributor', description: 'Drafts website and campaign changes; publishing needs someone with publish rights.',
     primaryWorkspace: 'marketing', defaultScope: 'location',
-    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, ...everyone, 'settings.ai': V },
+    grants: { 'marketing.website_builder': VE, 'marketing.campaigns': VE, 'marketing.email': VE, 'marketing.social': VE, 'marketing.inbox': V, 'marketing.forms': VE, 'marketing.brand_assets': VE, ...everyone, 'settings.ai': V },
   },
   customer: {
     key: 'customer', name: 'Customer', description: 'Their own bookings, orders and preferences in the customer app.', primaryWorkspace: 'operations', defaultScope: 'location', hidden: true,

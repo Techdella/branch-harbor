@@ -173,7 +173,7 @@ function Routing({ kind }: { kind: 'customer' | 'course' }) {
       <SectionCard title={t('routing.testTitle')}>
         <div className="flex flex-col gap-3">
           <Field label={t('routing.postalLabel')} optional>{(f) => <Input id={f.id} value={postal} onChange={(e) => setPostal(e.target.value)} />}</Field>
-          <Field label={t('routing.sourceLabel')}>{(f) => <Select id={f.id} value={source} onChange={(e) => setSource(e.target.value)}>{['website', 'instagram', 'sms', 'whatsapp', 'email', 'ad_campaign', 'course_campaign'].map((s) => <option key={s} value={s}>{t(`source.${s}`)}</option>)}</Select>}</Field>
+          <Field label={t('routing.sourceLabel')}>{(f) => <Select id={f.id} value={source} onChange={(e) => setSource(e.target.value)}>{['website', 'form', 'newsletter', 'instagram', 'sms', 'whatsapp', 'email', 'ad_campaign', 'course_campaign'].map((s) => <option key={s} value={s}>{t(`source.${s}`)}</option>)}</Select>}</Field>
           <div><Button loading={test.pending} onClick={async () => { const r = await test.run(); if (r) setOutcome(r.ruleName ? t('routing.result', { rule: r.ruleName, target: r.assignedUserName ?? locName(r.locationId) }) : t('routing.noMatch')); }}>{t('routing.test')}</Button></div>
           {outcome && <Banner tone="info" live="polite">{outcome}</Banner>}
           {test.error && <Banner tone="danger">{test.error.message}</Banner>}

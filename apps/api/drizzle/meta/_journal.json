@@ -141,6 +141,13 @@
       "when": 1792074631764,
       "tag": "0019_drop_course_leads",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792075410728,
+      "tag": "0020_marketing_workspace",
+      "breakpoints": true
     }
   ]
 }

@@ -4,6 +4,7 @@ import foodsEn from '../messages/foods/en.json';
 import paymentsEn from '../messages/payments/en.json';
 import franchiseEn from '../messages/franchise/en.json';
 import coursesEn from '../messages/courses/en.json';
+import builderEn from '../messages/builder/en.json';
 import { resolveSiteLocale } from '../lib/site';
 
 type Messages = Record<string, unknown>;
@@ -40,6 +41,18 @@ const franchiseLoaders: Record<string, () => Promise<{ default: unknown }>> = {
   ar: () => import('../messages/franchise/ar.json'),
 };
 
+/** Website builder strings (namespace "builder", messages/builder/*.json). */
+const builderLoaders: Record<string, () => Promise<{ default: unknown }>> = {
+  'en-GB': () => import('../messages/builder/en-GB.json'),
+  fr: () => import('../messages/builder/fr.json'),
+  es: () => import('../messages/builder/es.json'),
+  de: () => import('../messages/builder/de.json'),
+  'pt-BR': () => import('../messages/builder/pt-BR.json'),
+  nl: () => import('../messages/builder/nl.json'),
+  it: () => import('../messages/builder/it.json'),
+  ar: () => import('../messages/builder/ar.json'),
+};
+
 const isObject = (v: unknown): v is Messages => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function mergeMessages(base: Messages, override: Messages): Messages {
@@ -54,12 +67,14 @@ export function mergeMessages(base: Messages, override: Messages): Messages {
 export async function messagesFor(locale: string): Promise<Messages> {
   const load = loaders[locale] ?? loaders[locale.split('-')[0]!];
   const franchise = franchiseLoaders[locale] ?? franchiseLoaders[locale.split('-')[0]!];
-  const base = mergeMessages(mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), franchiseEn as Messages), coursesEn as Messages);
+  const builder = builderLoaders[locale] ?? builderLoaders[locale.split('-')[0]!];
+  const base = mergeMessages(mergeMessages(mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), franchiseEn as Messages), coursesEn as Messages), builderEn as Messages);
   const local = load ? (await load()).default : {};
   // Public courses (Training academy): messages/courses/*.json.
   const courseLocale = loaders[locale] ? locale : locale.split('-')[0]!;
   const courses = loaders[courseLocale] ? ((await import(`../messages/courses/${courseLocale}.json`)).default as Messages) : {};
-  return mergeMessages(mergeMessages(base, franchise ? mergeMessages(local, (await franchise()).default as Messages) : local), courses);
+  const withBuilder = builder ? mergeMessages(base, (await builder()).default as Messages) : base;
+  return mergeMessages(mergeMessages(withBuilder, franchise ? mergeMessages(local, (await franchise()).default as Messages) : local), courses);
 }
 
 export default getRequestConfig(async () => {

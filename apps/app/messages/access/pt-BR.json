@@ -17,7 +17,8 @@
     },
     "nav": {
       "settings": "Configurações",
-      "schedule": "Escala da equipe"
+      "schedule": "Escala da equipe",
+      "builder": "Criador de sites"
     },
     "account": {
       "title": "Contas empresariais",

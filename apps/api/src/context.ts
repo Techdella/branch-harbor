@@ -12,6 +12,7 @@ import { createAi, type AiProvider } from './integrations/ai.ts';
 import { createPushProvider, type PushProvider } from './integrations/push.ts';
 import type { FetchLike } from './integrations/partners/http.ts';
 import { mtlsFetch } from './integrations/partners/rightmove.ts';
+import { createAssetStore, type AssetStore } from './integrations/asset-storage.ts';
 
 /** Dependency container shared by routes, services and jobs. Tests override individual members. */
 export interface Services {
@@ -30,6 +31,8 @@ export interface Services {
   geocoder: ReturnType<typeof createGeocoder>;
   analytics: ReturnType<typeof createAnalytics>;
   storage: ReturnType<typeof createStorage>;
+  /** Brand asset library storage (S3/R2 when configured, Postgres sandbox otherwise). */
+  assets: AssetStore;
   ai: AiProvider;
   push: PushProvider;
   botCheck: ReturnType<typeof createBotCheck>;
@@ -57,6 +60,7 @@ export async function createServices(cfg: Config, dbHandle: DbHandle, log: Fasti
     geocoder: overrides.geocoder ?? createGeocoder(cfg, log),
     analytics: overrides.analytics ?? createAnalytics(cfg),
     storage: overrides.storage ?? createStorage(cfg, log),
+    assets: overrides.assets ?? createAssetStore(cfg),
     ai: overrides.ai ?? createAi(cfg, log),
     push: overrides.push ?? createPushProvider(cfg, log),
     botCheck: overrides.botCheck ?? createBotCheck(cfg, log),

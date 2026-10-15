@@ -36,8 +36,16 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
     { key: 'pipeline', href: '/franchise/pipeline', icon: 'flag', msg: 'franchise.nav.pipeline' },
     { key: 'territories', href: '/franchise/territories', icon: 'map', msg: 'franchise.nav.territories' },
   ],
-  'marketing.website_builder': [{ key: 'websites', href: '/websites', icon: 'globe' }],
+  // Website builder (pages, themes, master pages) and the websites list (domains, publishing).
+  'marketing.website_builder': [
+    { key: 'builder', href: '/marketing/websites', icon: 'layers', msg: 'access.nav.builder' },
+    { key: 'websites', href: '/websites', icon: 'globe' },
+  ],
   'marketing.campaigns': [{ key: 'marketing', href: '/marketing', icon: 'megaphone' }],
+  'marketing.email': [{ key: 'email', href: '/marketing/email', icon: 'mail', msg: 'mkt.nav.email' }],
+  'marketing.automations': [{ key: 'automations', href: '/marketing/automations', icon: 'workflow', msg: 'mkt.nav.automations' }],
+  'marketing.forms': [{ key: 'forms', href: '/marketing/forms', icon: 'file', msg: 'mkt.nav.forms' }],
+  'marketing.brand_assets': [{ key: 'assets', href: '/marketing/assets', icon: 'image', msg: 'mkt.nav.assets' }],
   'marketing.inbox': [{ key: 'inbox', href: '/marketing/inbox', icon: 'message' }],
   'marketing.social': [{ key: 'social', href: '/marketing/social', icon: 'share' }],
   'marketing.ads': [{ key: 'campaigns', href: '/marketing/campaigns', icon: 'target' }],

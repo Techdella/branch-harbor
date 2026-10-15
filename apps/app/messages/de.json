@@ -2187,7 +2187,8 @@
       "shift_swap": "Schichttausch",
       "field": "Website-Änderung",
       "page": "Website-Seite",
-      "location_go_live": "Standorteröffnung"
+      "location_go_live": "Standorteröffnung",
+      "section": "Änderung eines Website-Abschnitts"
     },
     "requested": "{location} · angefragt von {name}",
     "waiting": "Wartet auf die Entscheidung einer anderen Person",

@@ -8,6 +8,7 @@ import { fontFor, fontVariables } from '@/lib/fonts';
 import { getRouting, resolveSiteLocale } from '@/lib/site';
 import { CookieBanner } from '@/components/CookieBanner';
 import { DemoRibbon } from '@/components/DemoRibbon';
+import '@bh/ui/site.css';
 import './globals.css';
 
 export const viewport: Viewport = {

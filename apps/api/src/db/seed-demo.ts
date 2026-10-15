@@ -256,6 +256,9 @@ async function main() {
   for (const l of northlight.logins) console.log(`                ${l}`);
   const comms = await (await import('./seed-comms.ts')).seedComms({ db, orgId: northlight.orgId });
   console.log(` Marketing & sales: Northlight inboxes (sandbox; SMS ${comms.smsAddress}, WhatsApp ${comms.waAddress}), ${comms.conversations} conversations, social accounts, network / coming-soon / course / local campaigns`);
+  // Website builder: seeded classic pages become builder documents (as `db:migrate` does for existing data).
+  const sites = await (await import('../services/site-builder.ts')).migrateSiteDocuments(db);
+  console.log(` Websites:      ${sites.migratedPages} pages converted to website builder documents`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

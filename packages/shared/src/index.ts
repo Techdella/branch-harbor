@@ -15,3 +15,8 @@ export * from './franchise-rules.ts';
 export * from './site-paths.ts';
 export * from './hospitality.ts';
 export * from './comms.ts';
+export * from './site-document.ts';
+export * from './site-themes.ts';
+export * from './email-document.ts';
+export * from './automation.ts';
+export * from './marketing-forms.ts';
