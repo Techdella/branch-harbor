@@ -68,7 +68,13 @@
       "navLabel": "{workspace} home",
       "modules": "In this workspace",
       "emptyTitle": "Nothing to show yet",
-      "emptyBody": "Your access in {business} doesn’t include any screens yet. Ask an owner or admin to give you the modules you need."
+      "emptyBody": "Your access in {business} doesn’t include any screens yet. Ask an owner or admin to give you the modules you need.",
+      "linkDescriptions": {
+        "websites": "Domains, publishing and the status of each location’s website.",
+        "territories": "Franchise territories: what’s available, reserved or sold.",
+        "financeReports": "Royalty, fund and payout reports to download.",
+        "rules": "Jurisdiction rules: disclosure, waiting and cooling-off periods."
+      }
     },
     "actions": {
       "view": {
@@ -91,7 +97,10 @@
     "scope": {
       "region": "Region",
       "owner_group": "Owner group",
-      "location": "Location"
+      "location": "Location",
+      "territory": "Territory",
+      "portfolio": "Portfolio",
+      "brand": "Brand"
     },
     "modules": {
       "network": {
@@ -331,41 +340,81 @@
         "name": "HQ admin",
         "description": "Runs the network: locations, brand templates, websites, marketing, approvals, reports, team and connections. No customer records or payments."
       },
-      "vp_franchise": {
-        "name": "VP Franchise",
-        "description": "Franchise development: the franchise pipeline, disclosure and agreements, new locations and franchisee training."
+      "development_lead": {
+        "name": "Development lead",
+        "description": "Franchise development: the franchise pipeline and territories, disclosure and agreements, and new locations. No customer sales."
       },
-      "cmo": {
-        "name": "CMO",
-        "description": "All marketing across the network, brand templates, marketing reports and coaching franchisees on local marketing."
+      "development_rep": {
+        "name": "Development rep",
+        "description": "Works franchise inquiries through the pipeline and sends disclosure. Agreements and approvals stay with the lead."
       },
-      "brand_lead": {
-        "name": "Brand lead",
+      "sales_lead": {
+        "name": "Sales lead",
+        "description": "Customer sales: leads and deals, routing rules, customers, memberships and packages, and course leads."
+      },
+      "sales_rep": {
+        "name": "Sales rep",
+        "description": "Works leads and deals, follows up customers and course leads, and sells memberships and packages."
+      },
+      "marketing_lead": {
+        "name": "Marketing lead",
+        "description": "All marketing across the network, brand templates, announcements, marketing reports and the marketing fund report."
+      },
+      "brand_manager": {
+        "name": "Brand manager",
         "description": "Brand assets, brand templates and locked fields, websites and social content."
       },
       "digital_marketer": {
         "name": "Digital marketer",
         "description": "Websites, social, ads, email and network campaigns. No operations, customers or finance."
       },
-      "instructor_trainer": {
-        "name": "Instructor-trainer",
-        "description": "Teacher training courses and course leads, plus read-only operations to see classes."
+      "content_social": {
+        "name": "Content & social",
+        "description": "Drafts posts, emails, website pages and campaigns; publishing needs someone with publish rights."
       },
-      "operations_manager": {
-        "name": "Operations manager",
-        "description": "Payments and finance, websites, connections, customers and day-to-day operations."
+      "operations_lead": {
+        "name": "Operations lead",
+        "description": "Day-to-day operations across the network: locations, approvals, new locations, audits, support and the help desk. No finance."
       },
-      "finance": {
-        "name": "Finance",
-        "description": "Payments, refunds, reconciliation and financial reports. Royalties and payouts at HQ level."
+      "field_consultant": {
+        "name": "Field consultant",
+        "description": "Business coach for a portfolio of locations: views and supports them, runs audits and coaching threads. No owner finances or customer data."
       },
-      "legal": {
-        "name": "Legal",
-        "description": "Franchise agreements, disclosure and compliance across the network."
+      "finance_lead": {
+        "name": "Finance lead",
+        "description": "Payments, refunds, reconciliation, royalties, invoices, the marketing fund, payouts and financial reports."
       },
-      "regional_manager": {
-        "name": "Regional manager",
-        "description": "Oversight of the locations in a region: operations, reports, website approvals and campaign drafts."
+      "accountant": {
+        "name": "Accountant",
+        "description": "Reads and exports payments, statements, royalties, payouts and fund reports for the books. Changes nothing."
+      },
+      "legal_lead": {
+        "name": "Legal lead",
+        "description": "Franchise agreements, disclosure, registrations and jurisdiction rules across the network."
+      },
+      "training_lead": {
+        "name": "Training lead",
+        "description": "The academy: every course, learning path and certificate, assignments and training reports."
+      },
+      "trainer": {
+        "name": "Trainer",
+        "description": "Writes and teaches courses, assigns them and follows learners’ progress."
+      },
+      "master_franchisee": {
+        "name": "Master franchisee",
+        "description": "Runs a territory (for example a country) like HQ: its locations, franchise pipeline, new locations, community, training, team and finances."
+      },
+      "area_developer": {
+        "name": "Area developer",
+        "description": "Owns the units of a development schedule: the full dashboard for their own units, plus the franchise pipeline of their territory."
+      },
+      "area_representative": {
+        "name": "Area representative",
+        "description": "Supports franchisees in a territory they don’t own: views, supports and audits their locations. No owner finances unless granted."
+      },
+      "multi_unit_operator": {
+        "name": "Multi-unit operator",
+        "description": "Runs an owner group with several units: the full dashboard for every unit of the group, its team and its finances."
       },
       "franchise_owner": {
         "name": "Franchise owner",
@@ -377,11 +426,11 @@
       },
       "staff": {
         "name": "Staff",
-        "description": "Their assigned work: schedules, attendance and orders at their location."
+        "description": "Their own shifts, classes and appointments, cover requests and check-in at their location, plus community and training."
       },
-      "marketing_contributor": {
-        "name": "Marketing contributor",
-        "description": "Drafts website and campaign changes; publishing needs someone with publish rights."
+      "auditor": {
+        "name": "Auditor",
+        "description": "Read-only view of locations and operations, and runs audits. No finance, legal files or customer data."
       },
       "customer": {
         "name": "Customer",
@@ -390,7 +439,7 @@
     },
     "roleAdmin": {
       "tab": "Roles",
-      "intro": "Start from a role template or build your own role by ticking modules and actions. People only see what their role gives them.",
+      "intro": "Start from a role template or build your own role by ticking modules and actions. People only see what their roles give them.",
       "create": "Create a role",
       "createTitle": "New role",
       "editTitle": "Edit {name}",
@@ -406,7 +455,15 @@
       "appliesNow": "{count, plural, one {Saving changes access for # person immediately.} other {Saving changes access for # people immediately.}}",
       "save": "Save role",
       "delete": "Delete role",
-      "scopeNote": "Where a role applies (whole business, region, owner group or location) is chosen when you give it to someone. HQ-only modules work only for business-wide roles."
+      "scopeNote": "Where a role applies (whole business, brand, territory, region, portfolio, owner group or location) is chosen when you give it to someone. HQ-only modules work only for business-wide roles; a territory also runs its own franchise pipeline.",
+      "templatesIntro": "Templates are starting points, not an org chart. Rename them to your job titles, give a person several roles, or build your own.",
+      "templateWas": "Template: {name}",
+      "rename": "Rename",
+      "renameLabel": "Name in your business",
+      "renameSave": "Save name",
+      "renameReset": "Use template name",
+      "usualScope": "Usually: {scope}",
+      "emptyStart": "New roles start empty: tick only what this role needs."
     },
     "editor": {
       "column": "Access",
@@ -431,7 +488,166 @@
       "previewTitle": "What they’ll see",
       "previewSwitcher": "A workspace switcher with {count} workspaces.",
       "previewSingle": "One workspace, no switcher.",
-      "previewNothing": "Nothing yet — tick at least one module."
+      "previewNothing": "Nothing yet — tick at least one module.",
+      "unionNote": "This person has several roles. They get everything any of their roles gives (the union); “Never show” limits apply to all of them.",
+      "reaches": "{count, plural, =0 {No locations yet} one {Reaches # location: {names}} other {Reaches # locations: {names}…}}",
+      "review": "Review and save",
+      "confirmSave": "Confirm and save",
+      "backToEdit": "Back to editing",
+      "saveAsTemplate": "Save as template",
+      "templateName": "Template name",
+      "templateSave": "Save template",
+      "templateSaved": "Saved as the role “{name}”. You’ll find it under Roles.",
+      "addRole": "Add another role",
+      "addRoleTitle": "Add another role",
+      "addRoleSave": "Add role",
+      "removeRole": "Remove this role"
+    },
+    "teams": {
+      "leadership": "Leadership",
+      "development": "Franchise development",
+      "sales": "Sales",
+      "marketing": "Marketing",
+      "operations": "Operations",
+      "finance": "Finance",
+      "legal": "Legal & compliance",
+      "training": "Training",
+      "partners": "Franchise partners",
+      "locations": "Locations",
+      "other": "Other"
+    },
+    "scopeKind": {
+      "organization": "Whole business",
+      "brand": "Brand",
+      "territory": "Territory",
+      "region": "Region",
+      "portfolio": "Portfolio",
+      "owner_group": "Owner group",
+      "location": "Location"
+    },
+    "sensitive": {
+      "finance": "Finance",
+      "legal": "Legal files",
+      "personal_data": "Customer personal data"
+    },
+    "roleTags": {
+      "support": "Support role"
+    },
+    "preview": {
+      "title": "Effective access",
+      "intro": "Exactly what this person will get when you save, as the server computes it. Anything not listed stays hidden.",
+      "workspaces": "Workspaces, modules and actions",
+      "locations": "Locations",
+      "allLocations": "Every location in the business",
+      "noLocations": "No locations yet",
+      "sensitiveTitle": "Sensitive data",
+      "sensitiveNone": "None: no finance, legal files or customer personal data.",
+      "hidden": "Hidden from them",
+      "hiddenNone": "Nothing: they see every module."
+    },
+    "profile": {
+      "jobTitle": "Job title",
+      "jobTitleHint": "Free text, shown next to their name. It doesn’t change what they can see.",
+      "denyTitle": "Never show",
+      "denyHint": "Removes this kind of data from every role the person holds, even if a role includes it.",
+      "deny": "No {kind}",
+      "save": "Save job title and limits",
+      "saved": "Saved. It applies from their next click."
+    },
+    "shape": {
+      "tab": "Team shape",
+      "title": "Team shape",
+      "intro": "How your HQ team is organized. It only suggests roles to start from; you can change it at any time.",
+      "onboardingTitle": "How is your team organized?",
+      "onboardingIntro": "We’ll suggest roles to match. Role templates are starting points, not an org chart: rename, combine or change them later in Team & access.",
+      "smallNote": "We’ll create combined roles such as “Marketing & sales” and “Operations & finance” for people who cover several areas.",
+      "current": "Current shape: {shape}",
+      "suggested": "Suggested roles",
+      "templates": "Templates to invite people with: {roles}",
+      "created": "Created",
+      "willCreate": "Will be created",
+      "nothingLocked": "Nothing is locked: changing the shape never removes roles or anyone’s access.",
+      "save": "Use this shape",
+      "saved": "Team shape saved.",
+      "options": {
+        "full": {
+          "title": "Full team",
+          "body": "Separate sales, marketing, operations, finance and development teams."
+        },
+        "small": {
+          "title": "Small team",
+          "body": "People cover several areas: combined roles like “Marketing & sales”."
+        },
+        "solo": {
+          "title": "Just me for now",
+          "body": "You run everything. Add people when you’re ready."
+        },
+        "custom": {
+          "title": "Custom",
+          "body": "Build your own roles from modules and actions."
+        }
+      },
+      "combined": {
+        "marketing_sales": {
+          "name": "Marketing & sales",
+          "description": "Marketing across the network plus customer sales: leads, deals and memberships."
+        },
+        "operations_finance": {
+          "name": "Operations & finance",
+          "description": "Day-to-day operations plus payments, royalties, invoices and payouts."
+        },
+        "development_training": {
+          "name": "Franchise development & training",
+          "description": "The franchise pipeline, disclosure, agreements and new locations, plus the academy."
+        }
+      }
+    },
+    "coverage": {
+      "title": "Uncovered areas",
+      "countOpen": "{count, plural, one {# area has nobody yet} other {# areas have nobody yet}}",
+      "allCovered": "Every area has someone.",
+      "fallback": "Until someone is assigned, approvals and notifications for these go to the owner.",
+      "nobody": "Nobody handles {area} yet",
+      "assignTo": "Assign to…",
+      "choose": "Choose a person",
+      "assign": "Assign",
+      "cancel": "Cancel",
+      "assigned": "{name} now handles {area}.",
+      "areas": {
+        "franchise_pipeline": "the franchise pipeline",
+        "customer_sales": "customer sales",
+        "marketing": "marketing campaigns",
+        "websites": "publishing websites",
+        "approvals": "approvals",
+        "new_locations": "new locations",
+        "help_desk": "the help desk",
+        "payments": "payments and refunds",
+        "royalties": "royalties",
+        "agreements": "franchise agreements",
+        "disclosure": "disclosure",
+        "training": "training"
+      }
+    },
+    "scopes": {
+      "title": "Portfolios and territories",
+      "intro": "Scopes beyond regions and owner groups. A portfolio is any set of locations (for a field consultant). A territory is a sub-network, such as a country run by a master franchisee, with its own locations and franchise pipeline.",
+      "territories": "Territories",
+      "portfolios": "Portfolios",
+      "noTerritories": "No territories yet.",
+      "noPortfolios": "No portfolios yet.",
+      "noLocations": "no locations",
+      "newPortfolio": "New portfolio",
+      "newTerritory": "New territory",
+      "portfolioName": "Portfolio name",
+      "territoryName": "Territory name",
+      "locations": "Locations",
+      "create": "Create",
+      "cancel": "Cancel",
+      "kinds": {
+        "master": "Master franchise",
+        "development": "Development area",
+        "support": "Support area"
+      }
     }
   },
   "demo": {

@@ -7,6 +7,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button, Field, Icon, Input, Logo, Select, Textarea, cx } from '@bh/ui';
 import { LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES } from '@bh/shared';
 import type { IconName } from '@bh/icons';
+import { TEAM_SHAPE_SUGGESTIONS } from '@bh/shared';
+import { accessApi } from '@/lib/http/access';
+import { useRoleName } from '../screens/team/AccessEditor';
+import { ShapeChoices, useCombinedNames } from '../screens/team/TeamShape';
 import { ONBOARDING_STEPS, type DomainStatus, type ImportRow, type IndustryKey, type OnboardingProgress, type OnboardingStep } from '@/lib/types';
 import { ApiError, getApi } from '@/lib/api';
 import { useErrorText, useFieldText } from '@/lib/useErrorText';
@@ -52,6 +56,8 @@ interface Data {
   conn: string;
   pay: 'not' | 'pending' | 'enabled';
   invites: { email: string; role: string; location: string }[];
+  /** HQ accounts: full team, small team (people cover several areas), just me, or custom. Changeable later. */
+  teamShape?: string | null;
   tested: boolean;
   published: boolean;
 }
@@ -70,6 +76,7 @@ const INITIAL: Data = {
   conn: '',
   pay: 'not',
   invites: [{ email: 'maya@stillwater.example', role: 'location_manager', location: 'Toronto – Queen West' }],
+  teamShape: null,
   tested: false,
   published: false,
 };
@@ -141,6 +148,7 @@ export function Onboarding() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const independent = data.model === 'independent';
+  const combined = useCombinedNames();
   const steps = stepsFor(data.model);
   const idx = Math.max(0, steps.indexOf(step));
   const nextStep = steps[Math.min(steps.length - 1, idx + 1)]!;
@@ -174,6 +182,12 @@ export function Onboarding() {
     setSkipped(ns);
     if (nextData !== data) setData(nextData);
     await persist({ done: nd, skipped: ns, current: nextStep, data: nextData });
+    // The team shape pre-creates suggested roles (a small team gets combined roles). Nothing is locked: it can be
+    // changed later in Team & access. Before the business exists there is nothing to create yet.
+    if (step === 'team' && !independent && data.teamShape) {
+      const keys = TEAM_SHAPE_SUGGESTIONS[data.teamShape as keyof typeof TEAM_SHAPE_SUGGESTIONS]?.combined ?? [];
+      await accessApi.setTeamShape(data.teamShape, combined.names([...keys]), combined.descriptions([...keys])).catch(() => undefined);
+    }
     if (step !== 'publish') go(nextStep);
   };
   const skip = async () => {
@@ -860,18 +874,32 @@ function ConnectStep({ data, set }: StepProps) {
 
 function TeamStep({ data, set }: StepProps) {
   const t = useTranslations('onboarding.teamStep');
-  const tr = useTranslations('team.role');
+  const ta = useTranslations('access.shape');
+  const roleName = useRoleName();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('location_manager');
   const [e, setE] = useState('');
+  const network = data.model !== 'independent';
+  // Suggested roles follow the team shape: separate teams, combined roles for a small team, or the basics.
+  const roles = data.teamShape === 'full'
+    ? ['hq_admin', 'development_lead', 'sales_lead', 'marketing_lead', 'operations_lead', 'field_consultant', 'finance_lead', 'location_manager', 'staff']
+    : ['hq_admin', 'location_manager', 'staff', 'content_social', 'sales_rep', 'finance_lead'];
   return (
     <div className="flex flex-col gap-4">
+      {network && (
+        <section className="flex flex-col gap-2" aria-labelledby="onboarding-shape">
+          <h3 id="onboarding-shape" className="text-sm font-bold">{ta('onboardingTitle')}</h3>
+          <p className="text-xs text-stone">{ta('onboardingIntro')}</p>
+          <ShapeChoices value={data.teamShape ?? null} onChange={(s) => set('teamShape', s)} name="onboarding-team-shape" />
+          {data.teamShape === 'small' && <p className="text-xs text-stone">{ta('smallNote')}</p>}
+        </section>
+      )}
       <ul className="flex flex-col gap-1.5">
         {data.invites.map((i, n) => (
           <li key={n} className="flex flex-wrap items-center gap-3 rounded-md bg-canvas-raised px-3.5 py-3 text-sm">
             <Icon name="mail" size={16} />
             <span className="flex-1 font-semibold">{i.email}</span>
-            <Badge tone="neutral" icon={null}>{tr(i.role)}</Badge>
+            <Badge tone="neutral" icon={null}>{roleName(i.role)}</Badge>
             <span className="text-xs text-stone">{i.location}</span>
             <button type="button" onClick={() => set('invites', data.invites.filter((_, j) => j !== n))} aria-label={t('remove', { email: i.email })} className="rounded-full p-1.5 hover:bg-canvas">
               <Icon name="x" size={14} />
@@ -884,9 +912,9 @@ function TeamStep({ data, set }: StepProps) {
         <Field label={t('role')}>
           {(p) => (
             <Select id={p.id} value={role} onChange={(ev) => setRole(ev.target.value)}>
-              {['hq_admin', 'location_manager', 'staff', 'marketing_contributor', 'finance'].map((r) => (
+              {roles.map((r) => (
                 <option key={r} value={r}>
-                  {tr(r)}
+                  {roleName(r)}
                 </option>
               ))}
             </Select>

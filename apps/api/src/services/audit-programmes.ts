@@ -2,8 +2,8 @@
  * Audits phase 2 (Operations → Audits and Operations → Self-checks):
  *
  * - Recurring schedules: a checklist for a set of locations every N weeks / months / quarters. A job creates each audit
- *   `leadDays` before it is due, assigned to the location's field consultant (its account manager with Audits edit
- *   there) or a named auditor. One audit per schedule, location and due date, so re-runs never duplicate.
+ *   `leadDays` before it is due, assigned to the location's field consultant: the person whose portfolio holds the
+ *   location (with Audits edit there), else its account manager, else a named auditor. One audit per schedule, location and due date, so re-runs never duplicate.
  * - Trend analytics: scores per location, region and checklist section by month, and the most-failed items.
  * - Retraining loop: a failed item whose question recommends an academy course records the course on the corrective
  *   action and, when set to auto-assign, assigns it to the location's team (finding → task → retraining → verified fix).
@@ -20,7 +20,7 @@ import {
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import {
-  accountManagers, auditActions, auditSchedules, auditTemplates, audits, courses, enrolments, locations, organizations, regions, selfCheckRuns, selfCheckSchedules, users,
+  accountManagers, auditActions, auditSchedules, auditTemplates, audits, courses, enrolments, locations, organizations, portfolioLocations, regions, roleAssignments, selfCheckRuns, selfCheckSchedules, users,
   type AuditChecklist,
 } from '../db/schema/index.ts';
 import { AppError, conflict, forbidden, notFound } from '../lib/errors.ts';
@@ -55,13 +55,24 @@ export async function loadSchedule(db: Exec, organizationId: string, id: string)
  * at the location. Null when there is none.
  */
 export async function fieldConsultantFor(db: Exec, organizationId: string, loc: Pick<LocRow, 'id' | 'regionId' | 'ownerGroupId'>, allowedCache?: Map<string, string[]>): Promise<string | null> {
-  const rows = await db.select().from(accountManagers).where(eq(accountManagers.organizationId, organizationId));
-  const rank = (r: typeof rows[number]) => (r.scopeKind === 'location' && r.scopeId === loc.id ? 0 : r.scopeKind === 'owner_group' && r.scopeId === loc.ownerGroupId ? 1 : r.scopeKind === 'region' && r.scopeId === loc.regionId ? 2 : 9);
-  const candidates = rows.filter((r) => rank(r) < 9).sort((a, b) => rank(a) - rank(b));
-  if (!candidates.length) return null;
   const allowed = allowedCache?.get(loc.id) ?? (await usersWithCapability(db, organizationId, loc.id, AUDITS, 'edit'));
   allowedCache?.set(loc.id, allowed);
-  return candidates.find((c) => allowed.includes(c.userId))?.userId ?? null;
+  if (!allowed.length) return null;
+  // 1. The field consultant whose portfolio holds the location (the `field_consultant` template first, then any other
+  //    portfolio assignment with Audits edit), oldest assignment first so the choice is stable.
+  const inPortfolios = (await db.select({ id: portfolioLocations.portfolioId }).from(portfolioLocations).where(eq(portfolioLocations.locationId, loc.id))).map((p) => p.id);
+  if (inPortfolios.length) {
+    const now = new Date();
+    const rows = (await db.select({ userId: roleAssignments.userId, role: roleAssignments.role, createdAt: roleAssignments.createdAt, expiresAt: roleAssignments.expiresAt }).from(roleAssignments)
+      .where(and(eq(roleAssignments.organizationId, organizationId), eq(roleAssignments.scopeKind, 'portfolio'), inArray(roleAssignments.scopeId, inPortfolios))))
+      .filter((r) => (!r.expiresAt || r.expiresAt > now) && allowed.includes(r.userId))
+      .sort((a, b) => Number(b.role === 'field_consultant') - Number(a.role === 'field_consultant') || a.createdAt.getTime() - b.createdAt.getTime());
+    if (rows[0]) return rows[0].userId;
+  }
+  // 2. Otherwise the location's account manager (location, then owner group, then region).
+  const rows = await db.select().from(accountManagers).where(eq(accountManagers.organizationId, organizationId));
+  const rank = (r: typeof rows[number]) => (r.scopeKind === 'location' && r.scopeId === loc.id ? 0 : r.scopeKind === 'owner_group' && r.scopeId === loc.ownerGroupId ? 1 : r.scopeKind === 'region' && r.scopeId === loc.regionId ? 2 : 9);
+  return rows.filter((r) => rank(r) < 9).sort((a, b) => rank(a) - rank(b)).find((c) => allowed.includes(c.userId))?.userId ?? null;
 }
 
 export function serializeSchedule(x: AuditSchedule, extra: { templateName?: string | null; auditorName?: string | null; locationCount?: number; nextDue?: string | null } = {}) {

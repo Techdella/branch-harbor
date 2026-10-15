@@ -36,7 +36,7 @@ export const dateArg = (at: string, tz?: string, style: DateParam['style'] = 'da
 export const moneyArg = (amount: number, currency: string): MoneyParam => ({ t: 'money', amount, currency });
 
 /** Role assignment keys shared by mock and live members. */
-export const ROLE_KEYS = ['org_owner', 'hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance', 'customer', 'support'] as const;
+export const ROLE_KEYS = ['org_owner', 'hq_admin', 'field_consultant', 'master_franchisee', 'area_developer', 'multi_unit_operator', 'franchise_owner', 'location_manager', 'staff', 'content_social', 'finance_lead', 'customer', 'support'] as const;
 
 /**
  * Text that is either plain (business data, shown as is) or a catalogue reference. Table cells, AI answers and search

@@ -473,7 +473,7 @@
       "lead": "Vorlauf (Tage)",
       "leadHint": "Das Audit erscheint so viele Tage vor der Fälligkeit.",
       "firstDue": "Erste Fälligkeit",
-      "auditorHint": "Ohne Außendienstberater (Kundenbetreuer mit Audits-Bearbeitung) bleibt das Audit unzugewiesen.",
+      "auditorHint": "Der Außendienstberater, dessen Portfolio den Standort enthält, sonst sein Kundenbetreuer. Ohne beide der benannte Auditor (falls vorhanden).",
       "active": "Aktiv",
       "save": "Speichern",
       "delete": "Löschen",

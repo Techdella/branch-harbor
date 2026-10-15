@@ -473,7 +473,7 @@
       "lead": "Créer à l’avance (jours)",
       "leadHint": "L’audit apparaît ce nombre de jours avant l’échéance.",
       "firstDue": "Première échéance",
-      "auditorHint": "Sans consultant terrain (responsable de compte avec Audits en modification), l’audit reste non attribué.",
+      "auditorHint": "Le consultant terrain dont le portefeuille contient l’établissement, sinon son responsable de compte. Sans eux, l’auditeur désigné (le cas échéant).",
       "active": "Actif",
       "save": "Enregistrer",
       "delete": "Supprimer",

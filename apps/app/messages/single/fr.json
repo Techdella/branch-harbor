@@ -61,7 +61,7 @@
       "Votre établissement, vos clients, votre site, votre équipe et votre historique de paiements restent tels quels.",
       "Le sélecteur de périmètre, l’annuaire des établissements, les régions et les groupes de propriétaires deviennent disponibles.",
       "Les modèles de site peuvent verrouiller des champs ou exiger une validation, et les pages peuvent être publiées sur plusieurs établissements à la fois.",
-      "Les rôles siège, responsable régional et franchisé peuvent être invités.",
+      "Les rôles du siège, de consultant terrain, de partenaire de franchise et de franchisé peuvent être invités.",
       "La facturation passe de la formule Solo au tarif par établissement dès qu’un deuxième établissement est en activité.",
       "Votre site client obtient un localisateur à votre adresse actuelle, et chaque établissement a sa propre page."
     ],
@@ -137,15 +137,19 @@
       "org_owner": "Propriétaire",
       "location_manager": "Responsable",
       "staff": "Personnel / instructeur / coach",
-      "marketing_contributor": "Contributeur marketing",
-      "finance": "Finance"
+      "content_social": "Contenus & réseaux sociaux",
+      "finance_lead": "Finance",
+      "accountant": "Comptable",
+      "sales_rep": "Ventes"
     },
     "roleHelp": {
       "org_owner": "Accès complet, y compris la facturation, l’équipe et les paramètres de l’entreprise.",
       "location_manager": "Gère le quotidien : plannings, clients, commandes et publication du site.",
       "staff": "Uniquement son planning, ses présences ou ses commandes.",
-      "marketing_contributor": "Rédige les contenus du site et du marketing ; publie seulement si vous l’autorisez.",
-      "finance": "Paiements, rapprochement et remboursements autorisés."
+      "content_social": "Rédige les contenus du site et du marketing ; publie seulement si vous l’autorisez.",
+      "finance_lead": "Paiements, rapprochement et remboursements autorisés.",
+      "accountant": "Consulte et exporte les paiements pour la comptabilité.",
+      "sales_rep": "Prospects, clients et abonnements."
     }
   },
   "payments": {

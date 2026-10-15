@@ -94,8 +94,11 @@ test('supplier access: franchise owners order and receive, only HQ manages suppl
   const staff = effectiveCapabilities({ role: 'staff', scopeKind: 'location' }, 'foods');
   assert.ok(staff.has('operations.self_checks:edit'), 'staff run self-checks through operations.*');
   assert.ok(!staff.has('operations.suppliers:view'), 'suppliers are granted by name only');
-  const ops = effectiveCapabilities({ role: 'operations_manager', scopeKind: 'organization' }, 'foods');
-  assert.ok(ops.has('operations.suppliers:publish') && ops.has('finance.supplier_rebates:edit'));
+  const ops = effectiveCapabilities({ role: 'operations_lead', scopeKind: 'organization' }, 'foods');
+  assert.ok(ops.has('operations.suppliers:publish') && !ops.has('finance.supplier_rebates:view'), 'operations: no finance');
+  assert.ok(effectiveCapabilities({ role: 'finance_lead', scopeKind: 'organization' }, 'foods').has('finance.supplier_rebates:edit'));
+  const fc = effectiveCapabilities({ role: 'field_consultant', scopeKind: 'portfolio' }, 'foods');
+  assert.ok(fc.has('operations.audits:edit') && fc.has('operations.self_checks:view') && !fc.has('operations.suppliers:edit'));
   // A rebate grant on a location assignment is dropped (HQ-only module).
   assert.ok(!effectiveCapabilities({ role: 'custom', scopeKind: 'location', customCapabilities: ['finance.supplier_rebates:view'] }, 'foods').size);
   // Suppliers never add legacy Operations permissions.

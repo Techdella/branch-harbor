@@ -5,7 +5,7 @@ import type { Exec } from '../db/client.ts';
 import { locations } from '../db/schema/index.ts';
 import { hasCapabilityInScope, type ScopeChain } from '../domain/scope.ts';
 import { forbidden } from '../lib/errors.ts';
-import { capabilityLocations, hasCapability, loadOrgAssignments, requireCapability } from './authz.ts';
+import { capabilityLocations, hasCapability, loadOrgAssignments, requireCapability, resolveScopeChain } from './authz.ts';
 
 /** Scope target for a record: the location, or the organisation (HQ) when it has none. */
 export const targetOf = (orgId: string, locationId: string | null | undefined) =>
@@ -40,11 +40,9 @@ export function inScope(scope: { all: boolean; locationIds: string[] | null }, l
 
 /** Users holding a module action at a location (or org-wide when locationId is null). */
 export async function usersWithCapabilityAt(db: Exec, orgId: string, locationId: string | null, module: string, action: AccessAction, opts: { excludeOwners?: boolean } = {}): Promise<string[]> {
-  let chain: ScopeChain = { organizationId: orgId, kind: 'organization' };
-  if (locationId) {
-    const [l] = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.id, locationId));
-    if (l) chain = { organizationId: orgId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
-  }
+  const chain: ScopeChain = locationId
+    ? await resolveScopeChain(db, { organizationId: orgId, kind: 'location', id: locationId }).catch(() => ({ organizationId: orgId, kind: 'organization' as const }))
+    : { organizationId: orgId, kind: 'organization' };
   const byUser = await loadOrgAssignments(db, orgId);
   return [...byUser.entries()]
     .filter(([, a]) => hasCapabilityInScope(a, module, action, chain) && !(opts.excludeOwners && a.some((x) => x.role === 'org_owner')))

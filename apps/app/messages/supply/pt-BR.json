@@ -473,7 +473,7 @@
       "lead": "Criar com antecedência (dias)",
       "leadHint": "A auditoria aparece esta quantidade de dias antes do vencimento.",
       "firstDue": "Primeiro vencimento",
-      "auditorHint": "Sem consultor de campo (gerente de conta com Auditorias em edição), a auditoria fica sem responsável.",
+      "auditorHint": "O consultor de campo cuja carteira inclui a unidade; senão, o gerente de conta. Sem nenhum, o auditor indicado (se houver).",
       "active": "Ativa",
       "save": "Salvar",
       "delete": "Excluir",

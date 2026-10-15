@@ -7,8 +7,9 @@
  *   an order waiting for HQ approval, one waiting for the supplier's confirmation (magic link printed), one confirmed
  *   and due tomorrow at Ballard (to receive on the phone), a partial delivery in London, off-contract purchases, two
  *   rebate programmes with a claim for last quarter, and a daily food-safety temperature log.
- * - Northlight Yoga (studios): the field consultant becomes the North America account manager; recurring brand visits
- *   and quarterly cleanliness audits create his visits (planned by distance); a failed item recommends a refresher
+ * - Northlight Yoga (studios): recurring brand visits and quarterly cleanliness audits are assigned through the field
+ *   consultant's portfolio (Isabel: the West Coast studios); Toronto, outside it, falls back to Jordan as the North
+ *   America account manager. Visits are planned by distance; a failed item recommends a refresher
  *   course; locations run opening and closing self-checks every day (two weeks of history with a few misses and fails).
  */
 import { createHash, randomBytes } from 'node:crypto';
@@ -291,7 +292,7 @@ export async function seedSupply({ db, today, appUrl }: SupplySeedInput) {
         }
       }
     }
-    out.logins.push('jordan.reyes@northlight.demo.branchharbor.com (visit planner)');
+    out.logins.push('isabel.reyes@northlight.demo.branchharbor.com (portfolio field consultant, visit planner)', 'jordan.reyes@northlight.demo.branchharbor.com (account manager fallback)');
   }
   return out;
 }

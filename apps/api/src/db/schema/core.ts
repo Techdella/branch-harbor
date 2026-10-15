@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { bigint, boolean, char, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { bigint, boolean, char, index, integer, jsonb, pgTable, primaryKey, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { createdAt, currencyCol, orgId, pk, ts, updatedAt } from './_shared.ts';
 
 export type OnboardingStepState = { status: 'not_started' | 'in_progress' | 'complete' | 'skipped'; data?: Record<string, unknown>; updatedAt?: string };
@@ -43,6 +43,46 @@ export const ownerGroups = pgTable('owner_groups', {
   createdAt: createdAt(),
 }, (t) => [index('owner_groups_org_idx').on(t.organizationId)]);
 
+/**
+ * Brands (access scope `brand`). Single-brand today: every business has one default brand and locations without a
+ * brand belong to it. Modelled so a multi-brand franchisor can scope people to one brand later.
+ */
+export const brands = pgTable('brands', {
+  id: pk(),
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  isDefault: boolean('is_default').notNull().default(false),
+  createdAt: createdAt(),
+}, (t) => [index('brands_org_idx').on(t.organizationId), uniqueIndex('brands_default_uq').on(t.organizationId).where(sql`${t.isDefault}`)]);
+
+/**
+ * Territories (access scope `territory`): a sub-network that holds locations and franchise pipeline entries — a
+ * country run by a master franchisee, or the development area of an area developer. Not the same as the franchise
+ * pipeline's sales territories (`franchise_territories`), which can sit inside one.
+ */
+export const territories = pgTable('territories', {
+  id: pk(),
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  /** master | development | support */
+  kind: text('kind').notNull().default('master'),
+  country: char('country', { length: 2 }),
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (t) => [index('territories_org_idx').on(t.organizationId)]);
+
+/** Portfolios (access scope `portfolio`): any named set of locations, across regions and owners (field consultants). */
+export const portfolios = pgTable('portfolios', {
+  id: pk(),
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  description: text('description'),
+  createdBy: uuid('created_by'),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (t) => [index('portfolios_org_idx').on(t.organizationId)]);
+
 export type Address = { line1: string; line2?: string; city: string; region?: string; postalCode?: string; country: string };
 
 export const locations = pgTable('locations', {
@@ -70,6 +110,10 @@ export const locations = pgTable('locations', {
   stripeAccountId: text('stripe_account_id'),
   paymentsEnabled: boolean('payments_enabled').notNull().default(false),
   geo: jsonb('geo').$type<{ lat: number; lng: number }>(),
+  /** Sub-network the location belongs to (access scope `territory`). */
+  territoryId: uuid('territory_id').references(() => territories.id, { onDelete: 'set null' }),
+  /** Brand (access scope `brand`); null = the business's default brand. */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
   archivedAt: ts('archived_at'),
@@ -78,7 +122,15 @@ export const locations = pgTable('locations', {
   uniqueIndex('locations_org_slug_uq').on(t.organizationId, t.slug),
   index('locations_region_idx').on(t.regionId),
   index('locations_owner_group_idx').on(t.ownerGroupId),
+  index('locations_territory_idx').on(t.territoryId),
 ]);
+
+/** Locations in a portfolio. */
+export const portfolioLocations = pgTable('portfolio_locations', {
+  portfolioId: uuid('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }),
+  locationId: uuid('location_id').notNull().references(() => locations.id, { onDelete: 'cascade' }),
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+}, (t) => [primaryKey({ columns: [t.portfolioId, t.locationId] }), index('portfolio_locations_location_idx').on(t.locationId)]);
 
 export const users = pgTable('users', {
   id: pk(),

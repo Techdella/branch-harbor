@@ -68,7 +68,13 @@
       "navLabel": "Início de {workspace}",
       "modules": "Neste espaço",
       "emptyTitle": "Nada para mostrar ainda",
-      "emptyBody": "Seu acesso em {business} ainda não inclui nenhuma tela. Peça a um proprietário ou administrador os módulos de que você precisa."
+      "emptyBody": "Seu acesso em {business} ainda não inclui nenhuma tela. Peça a um proprietário ou administrador os módulos de que você precisa.",
+      "linkDescriptions": {
+        "websites": "Domínios, publicação e situação do site de cada unidade.",
+        "territories": "Territórios da franquia: disponíveis, reservados ou vendidos.",
+        "financeReports": "Relatórios de royalties, do fundo e de repasses para baixar.",
+        "rules": "Regras por jurisdição: circular de oferta, prazos de espera e de desistência."
+      }
     },
     "actions": {
       "view": {
@@ -91,7 +97,10 @@
     "scope": {
       "region": "Região",
       "owner_group": "Grupo de proprietários",
-      "location": "Unidade"
+      "location": "Unidade",
+      "territory": "Território",
+      "portfolio": "Carteira",
+      "brand": "Marca"
     },
     "modules": {
       "network": {
@@ -325,63 +334,103 @@
       "custom": "Função personalizada",
       "org_owner": {
         "name": "Proprietário",
-        "description": "Tudo, incluindo cobrança, propriedade e quem tem acesso."
+        "description": "Tudo, inclusive faturamento, propriedade e quem tem acesso."
       },
       "hq_admin": {
         "name": "Administrador da sede",
-        "description": "Gerencia a rede: unidades, modelos de marca, sites, marketing, aprovações, relatórios, equipe e conexões. Sem cadastros de clientes nem pagamentos."
+        "description": "Comanda a rede: unidades, modelos da marca, sites, marketing, aprovações, relatórios, equipe e conexões. Sem cadastros de clientes nem pagamentos."
       },
-      "vp_franchise": {
-        "name": "VP de Franquias",
-        "description": "Expansão da franquia: pipeline, circulares de oferta e contratos, novas unidades e treinamento de franqueados."
+      "development_lead": {
+        "name": "Líder de expansão",
+        "description": "Expansão da franquia: o funil e os territórios, a circular de oferta e os contratos, e as novas unidades. Sem vendas a clientes."
       },
-      "cmo": {
-        "name": "Diretor de marketing",
-        "description": "Todo o marketing da rede, modelos de marca, relatórios de marketing e orientação aos franqueados no marketing local."
+      "development_rep": {
+        "name": "Consultor de expansão",
+        "description": "Conduz os interessados na franquia pelo funil e envia a circular de oferta. Contratos e aprovações ficam com o líder."
       },
-      "brand_lead": {
-        "name": "Líder de marca",
+      "sales_lead": {
+        "name": "Líder de vendas",
+        "description": "Vendas a clientes: leads e negócios, regras de distribuição, clientes, planos e pacotes, e leads de cursos."
+      },
+      "sales_rep": {
+        "name": "Vendedor",
+        "description": "Trabalha leads e negócios, acompanha clientes e leads de cursos, e vende planos e pacotes."
+      },
+      "marketing_lead": {
+        "name": "Líder de marketing",
+        "description": "Todo o marketing da rede, modelos da marca, comunicados, relatórios de marketing e o relatório do fundo de marketing."
+      },
+      "brand_manager": {
+        "name": "Gerente de marca",
         "description": "Materiais da marca, modelos e campos bloqueados, sites e conteúdo para redes sociais."
       },
       "digital_marketer": {
         "name": "Profissional de marketing digital",
-        "description": "Sites, redes sociais, anúncios, e-mail e campanhas da rede. Sem operações, clientes nem financeiro."
+        "description": "Sites, redes sociais, anúncios, e-mail e campanhas da rede. Sem operações, clientes ou finanças."
       },
-      "instructor_trainer": {
-        "name": "Formador de instrutores",
-        "description": "Cursos de formação de professores e leads de cursos, além de operações somente leitura para ver as aulas."
+      "content_social": {
+        "name": "Conteúdo e redes sociais",
+        "description": "Rascunha posts, e-mails, páginas e campanhas; publicar exige alguém com permissão."
       },
-      "operations_manager": {
-        "name": "Gerente de operações",
-        "description": "Pagamentos e financeiro, sites, conexões, clientes e operações do dia a dia."
+      "operations_lead": {
+        "name": "Líder de operações",
+        "description": "As operações do dia a dia da rede: unidades, aprovações, inaugurações, auditorias, suporte e central de ajuda. Sem finanças."
       },
-      "finance": {
-        "name": "Financeiro",
-        "description": "Pagamentos, reembolsos, conciliação e relatórios financeiros. Royalties e repasses no nível da sede."
+      "field_consultant": {
+        "name": "Consultor de campo",
+        "description": "Consultor de negócios de uma carteira de unidades: acompanha e apoia, faz auditorias e mentorias. Sem finanças dos franqueados nem dados de clientes."
       },
-      "legal": {
-        "name": "Jurídico",
-        "description": "Contratos de franquia, circulares de oferta e conformidade em toda a rede."
+      "finance_lead": {
+        "name": "Líder financeiro",
+        "description": "Pagamentos, reembolsos, conciliação, royalties, faturas, o fundo de marketing, repasses e relatórios financeiros."
       },
-      "regional_manager": {
-        "name": "Gerente regional",
-        "description": "Supervisão das unidades de uma região: operações, relatórios, aprovações de site e rascunhos de campanha."
+      "accountant": {
+        "name": "Contador",
+        "description": "Consulta e exporta pagamentos, extratos, royalties, repasses e relatórios do fundo para a contabilidade. Não altera nada."
+      },
+      "legal_lead": {
+        "name": "Líder jurídico",
+        "description": "Contratos de franquia, circular de oferta, registros e regras por jurisdição em toda a rede."
+      },
+      "training_lead": {
+        "name": "Líder de treinamento",
+        "description": "A academia: todos os cursos, trilhas e certificados, atribuições e relatórios de treinamento."
+      },
+      "trainer": {
+        "name": "Instrutor",
+        "description": "Escreve e ministra cursos, atribui e acompanha o progresso dos alunos."
+      },
+      "master_franchisee": {
+        "name": "Master franqueado",
+        "description": "Comanda um território (por exemplo, um país) como a sede: suas unidades, funil de franquia, inaugurações, comunidade, treinamento, equipe e finanças."
+      },
+      "area_developer": {
+        "name": "Desenvolvedor de área",
+        "description": "É dono das unidades de um cronograma de expansão: o painel completo das próprias unidades, mais o funil de franquia do seu território."
+      },
+      "area_representative": {
+        "name": "Representante de área",
+        "description": "Apoia franqueados de um território que não é seu: acompanha, apoia e audita as unidades. Sem finanças dos franqueados, salvo permissão."
+      },
+      "multi_unit_operator": {
+        "name": "Operador multiunidades",
+        "description": "Comanda um grupo franqueado com várias unidades: o painel completo de cada unidade do grupo, sua equipe e suas finanças."
       },
       "franchise_owner": {
         "name": "Franqueado",
-        "description": "O painel completo das próprias unidades: operações, marketing, clientes, pagamentos e equipe. Nada de outros franqueados nem de áreas privadas da sede."
+        "description": "O painel completo das próprias unidades: operações, marketing, clientes, pagamentos e equipe. Nada de outros franqueados nem das áreas privadas da sede."
       },
       "location_manager": {
         "name": "Gerente de unidade",
-        "description": "Toca uma unidade no dia a dia: operações, clientes, o site local e rascunhos de campanha."
+        "description": "Comanda uma unidade no dia a dia: operações, clientes, o site local e rascunhos de campanhas."
       },
       "staff": {
         "name": "Equipe",
-        "description": "O trabalho atribuído: escalas, presença e pedidos na sua unidade."
+        "description": "Os próprios turnos, aulas e atendimentos, pedidos de substituição e check-in na sua unidade, além da comunidade e do treinamento."
       },
-      "marketing_contributor": {
-        "name": "Colaborador de marketing",
-        "description": "Rascunha alterações no site e em campanhas; publicar exige alguém com permissão."
+      "auditor": {
+        "name": "Auditor",
+        "description": "Visualização de unidades e operações, e realização de auditorias. Sem finanças, documentos jurídicos ou dados de clientes."
       },
       "customer": {
         "name": "Cliente",
@@ -390,7 +439,7 @@
     },
     "roleAdmin": {
       "tab": "Funções",
-      "intro": "Comece de um modelo de função ou crie a sua marcando módulos e ações. Cada pessoa só vê o que a função dela permite.",
+      "intro": "Comece de um modelo de função ou monte a sua marcando módulos e ações. Cada pessoa só vê o que suas funções dão.",
       "create": "Criar função",
       "createTitle": "Nova função",
       "editTitle": "Editar {name}",
@@ -406,7 +455,15 @@
       "appliesNow": "{count, plural, one {Salvar altera o acesso de # pessoa imediatamente.} other {Salvar altera o acesso de # pessoas imediatamente.}}",
       "save": "Salvar função",
       "delete": "Excluir função",
-      "scopeNote": "Onde uma função vale (toda a empresa, uma região, um grupo de proprietários ou uma unidade) é definido ao atribuí-la. Módulos exclusivos da sede só funcionam com funções para toda a empresa."
+      "scopeNote": "Onde uma função vale (empresa inteira, marca, território, região, carteira, grupo franqueado ou unidade) é escolhido ao atribuí-la. Módulos exclusivos da sede só funcionam com funções da empresa inteira; um território também comanda o próprio funil de franquia.",
+      "templatesIntro": "Os modelos são pontos de partida, não um organograma. Renomeie com os seus cargos, dê várias funções a uma pessoa ou crie as suas.",
+      "templateWas": "Modelo: {name}",
+      "rename": "Renomear",
+      "renameLabel": "Nome na sua empresa",
+      "renameSave": "Salvar nome",
+      "renameReset": "Usar o nome do modelo",
+      "usualScope": "Normalmente: {scope}",
+      "emptyStart": "Funções novas começam vazias: marque só o que esta função precisa."
     },
     "editor": {
       "column": "Acesso",
@@ -431,7 +488,166 @@
       "previewTitle": "O que a pessoa verá",
       "previewSwitcher": "Um seletor com {count} espaços de trabalho.",
       "previewSingle": "Um único espaço de trabalho, sem seletor.",
-      "previewNothing": "Nada ainda: marque pelo menos um módulo."
+      "previewNothing": "Nada ainda: marque pelo menos um módulo.",
+      "unionNote": "Esta pessoa tem várias funções. Ela recebe tudo o que qualquer uma delas dá (a união); os limites de “Nunca mostrar” valem para todas.",
+      "reaches": "{count, plural, =0 {Nenhuma unidade ainda} one {Abrange # unidade: {names}} other {Abrange # unidades: {names}…}}",
+      "review": "Revisar e salvar",
+      "confirmSave": "Confirmar e salvar",
+      "backToEdit": "Voltar à edição",
+      "saveAsTemplate": "Salvar como modelo",
+      "templateName": "Nome do modelo",
+      "templateSave": "Salvar modelo",
+      "templateSaved": "Salvo como a função “{name}”. Ela está em Funções.",
+      "addRole": "Adicionar outra função",
+      "addRoleTitle": "Adicionar outra função",
+      "addRoleSave": "Adicionar função",
+      "removeRole": "Remover esta função"
+    },
+    "teams": {
+      "leadership": "Diretoria",
+      "development": "Expansão da franquia",
+      "sales": "Vendas",
+      "marketing": "Marketing",
+      "operations": "Operações",
+      "finance": "Finanças",
+      "legal": "Jurídico e compliance",
+      "training": "Treinamento",
+      "partners": "Parceiros da franquia",
+      "locations": "Unidades",
+      "other": "Outros"
+    },
+    "scopeKind": {
+      "organization": "Empresa inteira",
+      "brand": "Marca",
+      "territory": "Território",
+      "region": "Região",
+      "portfolio": "Carteira",
+      "owner_group": "Grupo franqueado",
+      "location": "Unidade"
+    },
+    "sensitive": {
+      "finance": "Finanças",
+      "legal": "Documentos jurídicos",
+      "personal_data": "Dados pessoais de clientes"
+    },
+    "roleTags": {
+      "support": "Função de apoio"
+    },
+    "preview": {
+      "title": "Acesso efetivo",
+      "intro": "Exatamente o que esta pessoa vai receber ao salvar, como o servidor calcula. O que não aparece fica oculto.",
+      "workspaces": "Áreas, módulos e ações",
+      "locations": "Unidades",
+      "allLocations": "Todas as unidades da empresa",
+      "noLocations": "Nenhuma unidade ainda",
+      "sensitiveTitle": "Dados sensíveis",
+      "sensitiveNone": "Nenhum: sem finanças, documentos jurídicos ou dados pessoais de clientes.",
+      "hidden": "Oculto para esta pessoa",
+      "hiddenNone": "Nada: ela vê todos os módulos."
+    },
+    "profile": {
+      "jobTitle": "Cargo",
+      "jobTitleHint": "Texto livre exibido ao lado do nome. Não muda o que a pessoa vê.",
+      "denyTitle": "Nunca mostrar",
+      "denyHint": "Remove este tipo de dado de todas as funções da pessoa, mesmo que uma função o inclua.",
+      "deny": "Sem {kind}",
+      "save": "Salvar cargo e limites",
+      "saved": "Salvo. Vale a partir do próximo clique."
+    },
+    "shape": {
+      "tab": "Formato da equipe",
+      "title": "Formato da equipe",
+      "intro": "Como a equipe da sede está organizada. Isso só sugere funções para começar; você pode mudar quando quiser.",
+      "onboardingTitle": "Como sua equipe está organizada?",
+      "onboardingIntro": "Vamos sugerir funções adequadas. Os modelos de função são pontos de partida, não um organograma: renomeie, combine ou altere depois em Equipe e acesso.",
+      "smallNote": "Vamos criar funções combinadas como “Marketing e vendas” e “Operações e finanças” para quem cobre várias áreas.",
+      "current": "Formato atual: {shape}",
+      "suggested": "Funções sugeridas",
+      "templates": "Modelos para convidar pessoas: {roles}",
+      "created": "Criada",
+      "willCreate": "Será criada",
+      "nothingLocked": "Nada fica travado: mudar o formato nunca remove funções nem acessos.",
+      "save": "Usar este formato",
+      "saved": "Formato da equipe salvo.",
+      "options": {
+        "full": {
+          "title": "Equipe completa",
+          "body": "Equipes separadas de vendas, marketing, operações, finanças e expansão."
+        },
+        "small": {
+          "title": "Equipe pequena",
+          "body": "Cada pessoa cobre várias áreas: funções combinadas como “Marketing e vendas”."
+        },
+        "solo": {
+          "title": "Só eu por enquanto",
+          "body": "Você cuida de tudo. Adicione pessoas quando estiver pronto."
+        },
+        "custom": {
+          "title": "Personalizado",
+          "body": "Monte suas próprias funções a partir de módulos e ações."
+        }
+      },
+      "combined": {
+        "marketing_sales": {
+          "name": "Marketing e vendas",
+          "description": "O marketing da rede e as vendas a clientes: leads, negócios e planos."
+        },
+        "operations_finance": {
+          "name": "Operações e finanças",
+          "description": "As operações do dia a dia, mais pagamentos, royalties, faturas e repasses."
+        },
+        "development_training": {
+          "name": "Expansão e treinamento",
+          "description": "O funil de franquia, a circular de oferta, os contratos e as novas unidades, mais a academia."
+        }
+      }
+    },
+    "coverage": {
+      "title": "Áreas sem responsável",
+      "countOpen": "{count, plural, one {# área ainda não tem ninguém} other {# áreas ainda não têm ninguém}}",
+      "allCovered": "Todas as áreas têm alguém.",
+      "fallback": "Até alguém ser designado, as aprovações e notificações dessas áreas vão para o proprietário.",
+      "nobody": "Ninguém cuida de {area} ainda",
+      "assignTo": "Atribuir a…",
+      "choose": "Escolha uma pessoa",
+      "assign": "Atribuir",
+      "cancel": "Cancelar",
+      "assigned": "{name} agora cuida de {area}.",
+      "areas": {
+        "franchise_pipeline": "o funil de franquia",
+        "customer_sales": "as vendas a clientes",
+        "marketing": "as campanhas de marketing",
+        "websites": "a publicação dos sites",
+        "approvals": "as aprovações",
+        "new_locations": "as novas unidades",
+        "help_desk": "a central de ajuda",
+        "payments": "os pagamentos e reembolsos",
+        "royalties": "os royalties",
+        "agreements": "os contratos de franquia",
+        "disclosure": "a circular de oferta",
+        "training": "o treinamento"
+      }
+    },
+    "scopes": {
+      "title": "Carteiras e territórios",
+      "intro": "Escopos além de regiões e grupos franqueados. Uma carteira é qualquer conjunto de unidades (para um consultor de campo). Um território é uma sub-rede, como um país comandado por um master franqueado, com suas unidades e seu funil de franquia.",
+      "territories": "Territórios",
+      "portfolios": "Carteiras",
+      "noTerritories": "Nenhum território ainda.",
+      "noPortfolios": "Nenhuma carteira ainda.",
+      "noLocations": "nenhuma unidade",
+      "newPortfolio": "Nova carteira",
+      "newTerritory": "Novo território",
+      "portfolioName": "Nome da carteira",
+      "territoryName": "Nome do território",
+      "locations": "Unidades",
+      "create": "Criar",
+      "cancel": "Cancelar",
+      "kinds": {
+        "master": "Master franquia",
+        "development": "Área de expansão",
+        "support": "Área de apoio"
+      }
     }
   },
   "demo": {

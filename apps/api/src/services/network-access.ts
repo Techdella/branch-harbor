@@ -3,10 +3,10 @@ import type { FastifyRequest } from 'fastify';
 import type { Permission } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
 import { locations, ownerGroups, regions, roleAssignments, users, type Audience } from '../db/schema/index.ts';
-import { permissionsOf, type Assignment } from '../domain/scope.ts';
+import { coversLocation, permissionsOf, type Assignment, type LocationRef } from '../domain/scope.ts';
 import { forbidden, notFound, validationError } from '../lib/errors.ts';
 import { requireUser } from '../plugins/auth.ts';
-import { assignmentsFor, withEffectiveAccess } from './authz.ts';
+import { assignmentsFor, scopedLocations, withEffectiveAccess } from './authz.ts';
 
 /**
  * Who is looking, from the network's point of view: HQ (an organisation-wide assignment) or a member of some
@@ -29,7 +29,7 @@ export interface Viewer {
   orgPerms: Set<Permission>;
 }
 
-type LocRow = { id: string; regionId: string | null; ownerGroupId: string | null };
+type LocRow = LocationRef;
 
 export function buildViewer(userId: string, organizationId: string, assignments: Assignment[], locs: LocRow[], now = new Date()): Viewer {
   const live = assignments.filter((a) => !(a.expiresAt && a.expiresAt <= now) && a.role !== 'customer');
@@ -58,13 +58,16 @@ export function buildViewer(userId: string, organizationId: string, assignments:
         if (l) { v.locationIds.add(l.id); if (l.regionId) v.regionIds.add(l.regionId); if (l.ownerGroupId) v.ownerGroupIds.add(l.ownerGroupId); }
         break;
       }
+      default:
+        // Brand, territory and portfolio: the locations they hold (content addressed to those locations reaches them).
+        for (const l of locs) if (coversLocation(a, organizationId, l, now)) v.locationIds.add(l.id);
     }
   }
   return v;
 }
 
-export const orgLocations = (db: Exec, organizationId: string) =>
-  db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.organizationId, organizationId));
+export const orgLocations = (db: Exec, organizationId: string): Promise<LocationRef[]> =>
+  scopedLocations(db, organizationId);
 
 /** The signed-in member's viewer. 404 when they are not a member (no tenant enumeration). */
 export async function viewerFor(req: FastifyRequest, db: Exec, organizationId: string): Promise<Viewer> {
@@ -164,9 +167,9 @@ export function roleBadge(v: Viewer | undefined, managerIds: Set<string>): 'hq' 
   if (!v) return 'member';
   if (managerIds.has(v.userId)) return 'account_manager';
   if (v.hq) return 'hq';
-  if (v.roles.has('franchise_owner')) return 'franchisee';
-  if (v.roles.has('regional_manager') || v.roles.has('location_manager')) return 'manager';
-  if (v.roles.has('instructor_trainer')) return 'trainer';
+  if (v.roles.has('franchise_owner') || v.roles.has('multi_unit_operator') || v.roles.has('area_developer') || v.roles.has('master_franchisee')) return 'franchisee';
+  if (v.roles.has('field_consultant') || v.roles.has('area_representative') || v.roles.has('location_manager')) return 'manager';
+  if (v.roles.has('trainer') || v.roles.has('training_lead')) return 'trainer';
   if (v.roles.has('staff')) return 'staff';
   return 'member';
 }

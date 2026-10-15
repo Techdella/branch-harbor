@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { and, eq } from 'drizzle-orm';
 import { STARTER_AUDIT_TEMPLATES, auditTemplateBodySchema, rebatePeriodOf } from '@bh/shared';
 import {
-  accountManagers, auditActions, audits, courses, enrolments, foodIngredientStock, foodIngredients, locations, marketingFundEntries, selfCheckRuns, supplyReceipts,
+  accountManagers, portfolioLocations, auditActions, audits, courses, enrolments, foodIngredientStock, foodIngredients, locations, marketingFundEntries, selfCheckRuns, supplyReceipts,
 } from '../src/db/schema/index.ts';
 import { runAuditSchedules, runSelfCheckJobs } from '../src/services/audit-programmes.ts';
 import { addDays } from '../src/lib/tz.ts';
@@ -23,6 +23,8 @@ describe.skipIf(!hasDb)('suppliers, rebates and audits phase 2 (DB)', () => {
   let staff: Awaited<ReturnType<typeof verifiedUser>>;
   let staff2: Awaited<ReturnType<typeof verifiedUser>>;
   let consultant: Awaited<ReturnType<typeof verifiedUser>>;
+  let am: Awaited<ReturnType<typeof verifiedUser>>;
+  let portfolioId: string;
   let orgId: string;
   let g1: string;
   let g2: string;
@@ -59,12 +61,15 @@ describe.skipIf(!hasDb)('suppliers, rebates and audits phase 2 (DB)', () => {
     fo2 = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: g2 }, 'Owner Thames');
     staff = await memberWithRole(app, owner.token, orgId, 'staff', { kind: 'location', id: sea }, 'Cook Seattle');
     staff2 = await memberWithRole(app, owner.token, orgId, 'staff', { kind: 'location', id: lon }, 'Cook London');
-    // A field consultant: HQ (organisation-wide) with Audits view + edit, account manager for the Pacific Northwest.
-    const role = await call(app, 'POST', `/v1/orgs/${orgId}/roles`, { token: owner.token, body: { name: 'Field consultant', capabilities: ['operations.audits:view', 'operations.audits:edit'] } });
-    consultant = await verifiedUser(app, 'Jordan Consultant');
-    const inv = await call(app, 'POST', `/v1/orgs/${orgId}/invitations`, { token: owner.token, body: { email: consultant.email, role: 'custom', customRoleId: role.body.id, scope: { kind: 'organization', id: orgId } } });
-    expect((await call(app, 'POST', '/v1/invitations/accept', { token: consultant.token, body: { token: inv.body.devInvitationToken } })).status).toBe(200);
-    await db().insert(accountManagers).values({ organizationId: orgId, userId: consultant.userId, scopeKind: 'region', scopeId: west, title: 'Field consultant' });
+    // The field consultant: the `field_consultant` template on a portfolio holding the two Pacific Northwest locations.
+    portfolioId = (await call(app, 'POST', `/v1/orgs/${orgId}/access/portfolios`, { token: owner.token, body: { name: 'Pacific Northwest visits', locationIds: [sea, van] } })).body.id;
+    consultant = await memberWithRole(app, owner.token, orgId, 'field_consultant', { kind: 'portfolio', id: portfolioId }, 'Jordan Consultant');
+    // A fallback: an HQ account manager for the region (organisation-wide Audits view + edit).
+    const role = await call(app, 'POST', `/v1/orgs/${orgId}/roles`, { token: owner.token, body: { name: 'Regional coach', capabilities: ['operations.audits:view', 'operations.audits:edit'] } });
+    am = await verifiedUser(app, 'Riley Account Manager');
+    const inv = await call(app, 'POST', `/v1/orgs/${orgId}/invitations`, { token: owner.token, body: { email: am.email, role: 'custom', customRoleId: role.body.id, scope: { kind: 'organization', id: orgId } } });
+    expect((await call(app, 'POST', '/v1/invitations/accept', { token: am.token, body: { token: inv.body.devInvitationToken } })).status).toBe(200);
+    await db().insert(accountManagers).values({ organizationId: orgId, userId: am.userId, scopeKind: 'region', scopeId: west, title: 'Regional coach' });
     const [ing] = await db().insert(foodIngredients).values({ organizationId: orgId, name: 'Olive oil', unit: 'ml' }).returning();
     ingredientId = ing!.id;
   });
@@ -254,6 +259,11 @@ describe.skipIf(!hasDb)('suppliers, rebates and audits phase 2 (DB)', () => {
     expect(sch.body.locationCount).toBe(2);
     const prev = await call(app, 'GET', `${A()}/schedules/${sch.body.id}/preview`, { token: owner.token });
     expect(prev.body.locations.every((l: any) => l.auditorUserId === consultant.userId && l.source === 'field_consultant')).toBe(true);
+    // Outside the consultant's portfolio, the location's account manager is the fallback.
+    await db().delete(portfolioLocations).where(and(eq(portfolioLocations.portfolioId, portfolioId), eq(portfolioLocations.locationId, van)));
+    const fallback = await call(app, 'GET', `${A()}/schedules/${sch.body.id}/preview`, { token: owner.token });
+    expect(fallback.body.locations.find((l: any) => l.locationId === van).auditorUserId).toBe(am.userId);
+    await db().insert(portfolioLocations).values({ portfolioId, locationId: van, organizationId: orgId });
     const run = await call(app, 'POST', `${A()}/schedules/${sch.body.id}/run`, { token: owner.token });
     expect(run.body.created).toBe(2);
     expect((await runAuditSchedules(app.ctx, new Date(), { organizationId: orgId })).created).toBe(0);

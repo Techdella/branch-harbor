@@ -68,7 +68,13 @@
       "navLabel": "Start: {workspace}",
       "modules": "In diesem Arbeitsbereich",
       "emptyTitle": "Noch nichts anzuzeigen",
-      "emptyBody": "Ihre Zugriffsrechte bei {business} umfassen noch keine Bildschirme. Bitten Sie einen Inhaber oder Admin um die Module, die Sie brauchen."
+      "emptyBody": "Ihre Zugriffsrechte bei {business} umfassen noch keine Bildschirme. Bitten Sie einen Inhaber oder Admin um die Module, die Sie brauchen.",
+      "linkDescriptions": {
+        "websites": "Domains, Veröffentlichung und Status der Website jedes Standorts.",
+        "territories": "Franchise-Gebiete: verfügbar, reserviert oder vergeben.",
+        "financeReports": "Berichte zu Lizenzgebühren, Fonds und Auszahlungen zum Herunterladen.",
+        "rules": "Regeln je Rechtsraum: Offenlegung, Warte- und Widerrufsfristen."
+      }
     },
     "actions": {
       "view": {
@@ -91,7 +97,10 @@
     "scope": {
       "region": "Region",
       "owner_group": "Inhabergruppe",
-      "location": "Standort"
+      "location": "Standort",
+      "territory": "Gebiet",
+      "portfolio": "Portfolio",
+      "brand": "Marke"
     },
     "modules": {
       "network": {
@@ -325,63 +334,103 @@
       "custom": "Eigene Rolle",
       "org_owner": {
         "name": "Inhaber",
-        "description": "Alles, einschließlich Abrechnung, Eigentum und Zugriffsverwaltung."
+        "description": "Alles, einschließlich Abrechnung, Eigentum und wer Zugriff hat."
       },
       "hq_admin": {
-        "name": "Admin der Zentrale",
-        "description": "Steuert das Netzwerk: Standorte, Markenvorlagen, Websites, Marketing, Freigaben, Berichte, Team und Verbindungen. Ohne Kundendaten oder Zahlungen."
+        "name": "Zentrale-Admin",
+        "description": "Führt das Netzwerk: Standorte, Markenvorlagen, Websites, Marketing, Freigaben, Berichte, Team und Verbindungen. Keine Kundendaten oder Zahlungen."
       },
-      "vp_franchise": {
-        "name": "VP Franchise",
-        "description": "Franchise-Entwicklung: Pipeline, Offenlegung und Verträge, neue Standorte und Schulung der Franchisenehmer."
+      "development_lead": {
+        "name": "Leitung Franchise-Entwicklung",
+        "description": "Franchise-Entwicklung: Pipeline und Gebiete, Offenlegung und Verträge sowie neue Standorte. Kein Kundenvertrieb."
       },
-      "cmo": {
+      "development_rep": {
+        "name": "Franchise-Entwickler",
+        "description": "Bringt Franchise-Anfragen durch die Pipeline und versendet die Offenlegung. Verträge und Freigaben bleiben bei der Leitung."
+      },
+      "sales_lead": {
+        "name": "Vertriebsleitung",
+        "description": "Kundenvertrieb: Leads und Deals, Zuweisungsregeln, Kunden, Mitgliedschaften und Pakete sowie Kurs-Leads."
+      },
+      "sales_rep": {
+        "name": "Vertriebsmitarbeiter",
+        "description": "Bearbeitet Leads und Deals, fasst bei Kunden und Kurs-Leads nach und verkauft Mitgliedschaften und Pakete."
+      },
+      "marketing_lead": {
         "name": "Marketingleitung",
-        "description": "Das gesamte Marketing im Netzwerk, Markenvorlagen, Marketingberichte und Coaching der Franchisenehmer im lokalen Marketing."
+        "description": "Das gesamte Marketing im Netzwerk, Markenvorlagen, Ankündigungen, Marketingberichte und den Bericht zum Marketingfonds."
       },
-      "brand_lead": {
-        "name": "Markenverantwortliche/r",
+      "brand_manager": {
+        "name": "Markenmanager",
         "description": "Markenmaterial, Markenvorlagen und gesperrte Felder, Websites und Social-Media-Inhalte."
       },
       "digital_marketer": {
-        "name": "Digital-Marketing",
-        "description": "Websites, Social Media, Anzeigen, E-Mail und Netzwerkkampagnen. Ohne Betrieb, Kunden oder Finanzen."
+        "name": "Digital Marketer",
+        "description": "Websites, Social Media, Anzeigen, E-Mail und Netzwerkkampagnen. Kein Betrieb, keine Kunden, keine Finanzen."
       },
-      "instructor_trainer": {
-        "name": "Ausbilder/in",
-        "description": "Lehrerausbildung und Kurs-Interessenten, dazu Betrieb nur lesend, um Kurse zu sehen."
+      "content_social": {
+        "name": "Content & Social Media",
+        "description": "Entwirft Beiträge, E-Mails, Webseiten und Kampagnen; veröffentlichen kann nur, wer das Recht dazu hat."
       },
-      "operations_manager": {
-        "name": "Betriebsleitung",
-        "description": "Zahlungen und Finanzen, Websites, Verbindungen, Kunden und Tagesgeschäft."
+      "operations_lead": {
+        "name": "Leitung Betrieb",
+        "description": "Der tägliche Betrieb im Netzwerk: Standorte, Freigaben, Eröffnungen, Audits, Betreuung und Helpdesk. Keine Finanzen."
       },
-      "finance": {
-        "name": "Finanzen",
-        "description": "Zahlungen, Erstattungen, Abgleich und Finanzberichte. Lizenzgebühren und Auszahlungen auf Ebene der Zentrale."
+      "field_consultant": {
+        "name": "Field Consultant",
+        "description": "Betreut ein Portfolio von Standorten: sieht und unterstützt sie, führt Audits und Coaching durch. Keine Finanzen der Inhaber, keine Kundendaten."
       },
-      "legal": {
-        "name": "Recht",
-        "description": "Franchiseverträge, Offenlegung und Compliance im ganzen Netzwerk."
+      "finance_lead": {
+        "name": "Finanzleitung",
+        "description": "Zahlungen, Erstattungen, Abgleich, Lizenzgebühren, Rechnungen, Marketingfonds, Auszahlungen und Finanzberichte."
       },
-      "regional_manager": {
-        "name": "Regionalleitung",
-        "description": "Aufsicht über die Standorte einer Region: Betrieb, Berichte, Website-Freigaben und Kampagnenentwürfe."
+      "accountant": {
+        "name": "Buchhaltung",
+        "description": "Sieht und exportiert Zahlungen, Abrechnungen, Lizenzgebühren, Auszahlungen und Fondsberichte für die Buchhaltung. Ändert nichts."
+      },
+      "legal_lead": {
+        "name": "Leitung Recht",
+        "description": "Franchiseverträge, Offenlegung, Registrierungen und Regeln je Rechtsraum im ganzen Netzwerk."
+      },
+      "training_lead": {
+        "name": "Leitung Schulung",
+        "description": "Die Akademie: alle Kurse, Lernpfade und Zertifikate, Zuweisungen und Schulungsberichte."
+      },
+      "trainer": {
+        "name": "Trainer",
+        "description": "Schreibt und hält Kurse, weist sie zu und verfolgt den Lernfortschritt."
+      },
+      "master_franchisee": {
+        "name": "Master-Franchisenehmer",
+        "description": "Führt ein Gebiet (zum Beispiel ein Land) wie die Zentrale: seine Standorte, die Franchise-Pipeline, Eröffnungen, Community, Schulung, Team und Finanzen."
+      },
+      "area_developer": {
+        "name": "Area Developer",
+        "description": "Besitzt die Einheiten eines Entwicklungsplans: das komplette Dashboard für die eigenen Einheiten plus die Franchise-Pipeline des Gebiets."
+      },
+      "area_representative": {
+        "name": "Gebietsvertreter",
+        "description": "Betreut Franchisenehmer in einem Gebiet, das ihm nicht gehört: sieht, unterstützt und auditiert ihre Standorte. Keine Finanzen der Inhaber ohne Freigabe."
+      },
+      "multi_unit_operator": {
+        "name": "Multi-Unit-Betreiber",
+        "description": "Führt eine Inhabergruppe mit mehreren Einheiten: das komplette Dashboard für jede Einheit der Gruppe, ihr Team und ihre Finanzen."
       },
       "franchise_owner": {
         "name": "Franchisenehmer",
-        "description": "Das komplette Dashboard für die eigenen Standorte: Betrieb, Marketing, Kunden, Zahlungen und Team. Nichts von anderen Franchisenehmern oder privaten Bereichen der Zentrale."
+        "description": "Das komplette Dashboard für die eigenen Standorte: Betrieb, Marketing, Kunden, Zahlungen und das eigene Team. Nichts von anderen Franchisenehmern oder privaten Bereichen der Zentrale."
       },
       "location_manager": {
         "name": "Standortleitung",
-        "description": "Führt einen Standort im Alltag: Betrieb, Kunden, lokale Website und Kampagnenentwürfe."
+        "description": "Führt einen Standort im Alltag: Betrieb, Kunden, die lokale Website und Kampagnenentwürfe."
       },
       "staff": {
         "name": "Mitarbeitende",
-        "description": "Die zugewiesene Arbeit: Pläne, Anwesenheit und Bestellungen am eigenen Standort."
+        "description": "Eigene Schichten, Kurse und Termine, Vertretungsanfragen und Check-in am eigenen Standort, dazu Community und Schulung."
       },
-      "marketing_contributor": {
-        "name": "Marketing-Mitarbeit",
-        "description": "Entwirft Website- und Kampagnenänderungen; Veröffentlichen braucht jemanden mit Freigaberecht."
+      "auditor": {
+        "name": "Auditor",
+        "description": "Lesezugriff auf Standorte und Betrieb, führt Audits durch. Keine Finanzen, keine Rechtsdokumente, keine Kundendaten."
       },
       "customer": {
         "name": "Kunde",
@@ -390,7 +439,7 @@
     },
     "roleAdmin": {
       "tab": "Rollen",
-      "intro": "Beginnen Sie mit einer Rollenvorlage oder erstellen Sie eine eigene Rolle, indem Sie Module und Aktionen ankreuzen. Jede Person sieht nur, was ihre Rolle erlaubt.",
+      "intro": "Starten Sie mit einer Rollenvorlage oder bauen Sie eine eigene Rolle, indem Sie Module und Aktionen ankreuzen. Jede Person sieht nur, was ihre Rollen ihr geben.",
       "create": "Rolle erstellen",
       "createTitle": "Neue Rolle",
       "editTitle": "{name} bearbeiten",
@@ -406,7 +455,15 @@
       "appliesNow": "{count, plural, one {Speichern ändert den Zugriff von # Person sofort.} other {Speichern ändert den Zugriff von # Personen sofort.}}",
       "save": "Rolle speichern",
       "delete": "Rolle löschen",
-      "scopeNote": "Wofür eine Rolle gilt (ganzes Unternehmen, Region, Inhabergruppe oder Standort), legen Sie bei der Vergabe fest. Module nur für die Zentrale funktionieren nur mit unternehmensweiten Rollen."
+      "scopeNote": "Wo eine Rolle gilt (gesamtes Unternehmen, Marke, Gebiet, Region, Portfolio, Inhabergruppe oder Standort), wählen Sie bei der Vergabe. Module nur für die Zentrale funktionieren nur mit unternehmensweiten Rollen; ein Gebiet führt zusätzlich seine eigene Franchise-Pipeline.",
+      "templatesIntro": "Vorlagen sind Ausgangspunkte, kein Organigramm. Benennen Sie sie nach Ihren Stellen, geben Sie einer Person mehrere Rollen oder bauen Sie eigene.",
+      "templateWas": "Vorlage: {name}",
+      "rename": "Umbenennen",
+      "renameLabel": "Name in Ihrem Unternehmen",
+      "renameSave": "Name speichern",
+      "renameReset": "Vorlagennamen verwenden",
+      "usualScope": "Üblich: {scope}",
+      "emptyStart": "Neue Rollen beginnen leer: Kreuzen Sie nur an, was diese Rolle braucht."
     },
     "editor": {
       "column": "Zugriff",
@@ -431,7 +488,166 @@
       "previewTitle": "Was die Person sieht",
       "previewSwitcher": "Ein Umschalter mit {count} Arbeitsbereichen.",
       "previewSingle": "Ein Arbeitsbereich, kein Umschalter.",
-      "previewNothing": "Noch nichts – kreuzen Sie mindestens ein Modul an."
+      "previewNothing": "Noch nichts – kreuzen Sie mindestens ein Modul an.",
+      "unionNote": "Diese Person hat mehrere Rollen. Sie erhält alles, was eine ihrer Rollen gibt (die Vereinigung); „Nie anzeigen“ gilt für alle.",
+      "reaches": "{count, plural, =0 {Noch keine Standorte} one {Umfasst # Standort: {names}} other {Umfasst # Standorte: {names}…}}",
+      "review": "Prüfen und speichern",
+      "confirmSave": "Bestätigen und speichern",
+      "backToEdit": "Zurück zur Bearbeitung",
+      "saveAsTemplate": "Als Vorlage speichern",
+      "templateName": "Name der Vorlage",
+      "templateSave": "Vorlage speichern",
+      "templateSaved": "Als Rolle „{name}“ gespeichert. Sie finden sie unter Rollen.",
+      "addRole": "Weitere Rolle hinzufügen",
+      "addRoleTitle": "Weitere Rolle hinzufügen",
+      "addRoleSave": "Rolle hinzufügen",
+      "removeRole": "Diese Rolle entfernen"
+    },
+    "teams": {
+      "leadership": "Leitung",
+      "development": "Franchise-Entwicklung",
+      "sales": "Vertrieb",
+      "marketing": "Marketing",
+      "operations": "Betrieb",
+      "finance": "Finanzen",
+      "legal": "Recht & Compliance",
+      "training": "Schulung",
+      "partners": "Franchise-Partner",
+      "locations": "Standorte",
+      "other": "Sonstige"
+    },
+    "scopeKind": {
+      "organization": "Gesamtes Unternehmen",
+      "brand": "Marke",
+      "territory": "Gebiet",
+      "region": "Region",
+      "portfolio": "Portfolio",
+      "owner_group": "Inhabergruppe",
+      "location": "Standort"
+    },
+    "sensitive": {
+      "finance": "Finanzen",
+      "legal": "Rechtsdokumente",
+      "personal_data": "Personenbezogene Kundendaten"
+    },
+    "roleTags": {
+      "support": "Betreuungsrolle"
+    },
+    "preview": {
+      "title": "Tatsächlicher Zugriff",
+      "intro": "Genau das, was diese Person beim Speichern erhält, wie der Server es berechnet. Alles Nichtgenannte bleibt verborgen.",
+      "workspaces": "Bereiche, Module und Aktionen",
+      "locations": "Standorte",
+      "allLocations": "Alle Standorte des Unternehmens",
+      "noLocations": "Noch keine Standorte",
+      "sensitiveTitle": "Sensible Daten",
+      "sensitiveNone": "Keine: keine Finanzen, keine Rechtsdokumente, keine personenbezogenen Kundendaten.",
+      "hidden": "Für diese Person verborgen",
+      "hiddenNone": "Nichts: sie sieht alle Module."
+    },
+    "profile": {
+      "jobTitle": "Berufsbezeichnung",
+      "jobTitleHint": "Freitext neben dem Namen. Ändert nicht, was die Person sieht.",
+      "denyTitle": "Nie anzeigen",
+      "denyHint": "Entfernt diese Art von Daten aus allen Rollen der Person, auch wenn eine Rolle sie enthält.",
+      "deny": "Keine {kind}",
+      "save": "Bezeichnung und Grenzen speichern",
+      "saved": "Gespeichert. Gilt ab dem nächsten Klick."
+    },
+    "shape": {
+      "tab": "Teamaufbau",
+      "title": "Teamaufbau",
+      "intro": "Wie Ihr Team in der Zentrale aufgebaut ist. Das schlägt nur Startrollen vor; Sie können es jederzeit ändern.",
+      "onboardingTitle": "Wie ist Ihr Team aufgebaut?",
+      "onboardingIntro": "Wir schlagen passende Rollen vor. Rollenvorlagen sind Ausgangspunkte, kein Organigramm: Sie können sie später unter Team & Zugriff umbenennen, kombinieren oder ändern.",
+      "smallNote": "Wir legen kombinierte Rollen wie „Marketing & Vertrieb“ und „Betrieb & Finanzen“ für Personen an, die mehrere Bereiche abdecken.",
+      "current": "Aktueller Aufbau: {shape}",
+      "suggested": "Vorgeschlagene Rollen",
+      "templates": "Vorlagen zum Einladen: {roles}",
+      "created": "Angelegt",
+      "willCreate": "Wird angelegt",
+      "nothingLocked": "Nichts ist festgeschrieben: Ein anderer Aufbau entfernt nie Rollen oder Zugriffe.",
+      "save": "Diesen Aufbau verwenden",
+      "saved": "Teamaufbau gespeichert.",
+      "options": {
+        "full": {
+          "title": "Vollständiges Team",
+          "body": "Eigene Teams für Vertrieb, Marketing, Betrieb, Finanzen und Entwicklung."
+        },
+        "small": {
+          "title": "Kleines Team",
+          "body": "Personen decken mehrere Bereiche ab: kombinierte Rollen wie „Marketing & Vertrieb“."
+        },
+        "solo": {
+          "title": "Vorerst nur ich",
+          "body": "Sie machen alles selbst. Laden Sie Personen ein, wenn Sie so weit sind."
+        },
+        "custom": {
+          "title": "Individuell",
+          "body": "Bauen Sie eigene Rollen aus Modulen und Aktionen."
+        }
+      },
+      "combined": {
+        "marketing_sales": {
+          "name": "Marketing & Vertrieb",
+          "description": "Marketing im Netzwerk plus Kundenvertrieb: Leads, Deals und Mitgliedschaften."
+        },
+        "operations_finance": {
+          "name": "Betrieb & Finanzen",
+          "description": "Der tägliche Betrieb plus Zahlungen, Lizenzgebühren, Rechnungen und Auszahlungen."
+        },
+        "development_training": {
+          "name": "Franchise-Entwicklung & Schulung",
+          "description": "Franchise-Pipeline, Offenlegung, Verträge und neue Standorte plus die Akademie."
+        }
+      }
+    },
+    "coverage": {
+      "title": "Nicht abgedeckte Bereiche",
+      "countOpen": "{count, plural, one {# Bereich hat noch niemanden} other {# Bereiche haben noch niemanden}}",
+      "allCovered": "Jeder Bereich hat jemanden.",
+      "fallback": "Bis jemand zugewiesen ist, gehen Freigaben und Benachrichtigungen dafür an den Inhaber.",
+      "nobody": "Noch niemand kümmert sich um {area}",
+      "assignTo": "Zuweisen an…",
+      "choose": "Person wählen",
+      "assign": "Zuweisen",
+      "cancel": "Abbrechen",
+      "assigned": "{name} kümmert sich jetzt um {area}.",
+      "areas": {
+        "franchise_pipeline": "die Franchise-Pipeline",
+        "customer_sales": "den Kundenvertrieb",
+        "marketing": "Marketingkampagnen",
+        "websites": "das Veröffentlichen von Websites",
+        "approvals": "Freigaben",
+        "new_locations": "neue Standorte",
+        "help_desk": "den Helpdesk",
+        "payments": "Zahlungen und Erstattungen",
+        "royalties": "Lizenzgebühren",
+        "agreements": "Franchiseverträge",
+        "disclosure": "die Offenlegung",
+        "training": "Schulungen"
+      }
+    },
+    "scopes": {
+      "title": "Portfolios und Gebiete",
+      "intro": "Geltungsbereiche über Regionen und Inhabergruppen hinaus. Ein Portfolio ist eine beliebige Auswahl von Standorten (für einen Field Consultant). Ein Gebiet ist ein Teilnetz, etwa ein Land unter einem Master-Franchisenehmer, mit eigenen Standorten und eigener Franchise-Pipeline.",
+      "territories": "Gebiete",
+      "portfolios": "Portfolios",
+      "noTerritories": "Noch keine Gebiete.",
+      "noPortfolios": "Noch keine Portfolios.",
+      "noLocations": "keine Standorte",
+      "newPortfolio": "Neues Portfolio",
+      "newTerritory": "Neues Gebiet",
+      "portfolioName": "Name des Portfolios",
+      "territoryName": "Name des Gebiets",
+      "locations": "Standorte",
+      "create": "Anlegen",
+      "cancel": "Abbrechen",
+      "kinds": {
+        "master": "Master-Franchise",
+        "development": "Entwicklungsgebiet",
+        "support": "Betreuungsgebiet"
+      }
     }
   },
   "demo": {

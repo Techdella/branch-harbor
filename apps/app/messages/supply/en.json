@@ -473,7 +473,7 @@
       "lead": "Create ahead (days)",
       "leadHint": "The audit appears this many days before it is due.",
       "firstDue": "First due date",
-      "auditorHint": "Without a field consultant (account manager with Audits edit), the audit is left unassigned.",
+      "auditorHint": "The field consultant whose portfolio holds the location, else its account manager. Without either, the named auditor (if any).",
       "active": "Active",
       "save": "Save",
       "delete": "Delete",

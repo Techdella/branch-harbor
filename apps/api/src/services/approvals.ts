@@ -8,7 +8,7 @@ import { AppError, conflict, forbidden, notFound, validationError } from '../lib
 import { audit } from './audit.ts';
 import { hasPerm } from './authz.ts';
 import { refundCommerceOrder } from './commerce.ts';
-import { notify, usersWithPermissionAt } from './notifications.ts';
+import { notify, responsibleUsersAt } from './notifications.ts';
 import { orgPolicies } from './orgSettings.ts';
 import { refundPayment, serializePayment } from './payments.ts';
 import { applySectionApproval, clearSectionApproval } from './site-builder.ts';
@@ -105,7 +105,8 @@ export async function insertApproval(tx: Exec, a: NewApproval, ip?: string) {
 /** Push "approval needed" to everyone who can decide it (never the requester). */
 export async function notifyApprovers(s: Services, ap: ApprovalRow) {
   const d = DECIDER[kindOf(ap)];
-  const userIds = (await usersWithPermissionAt(s.db, ap.organizationId, ORG_LEVEL_KINDS.has(kindOf(ap)) ? null : ap.locationId, d.perm, d.also)).filter((id) => id !== ap.requestedBy);
+  // The people whose role decides it; owners when that role is empty (coverage fallback).
+  const userIds = (await responsibleUsersAt(s.db, ap.organizationId, ORG_LEVEL_KINDS.has(kindOf(ap)) ? null : ap.locationId, d.perm, d.also)).userIds.filter((id) => id !== ap.requestedBy);
   const [loc] = ap.locationId ? await s.db.select({ name: locations.name }).from(locations).where(eq(locations.id, ap.locationId)) : [];
   const money = ap.amountMinor != null && ap.currency ? ` · ${formatMinor(ap.amountMinor, ap.currency)}` : '';
   await notify(s, {

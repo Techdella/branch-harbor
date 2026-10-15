@@ -21,7 +21,7 @@ import { auditActions, auditTemplates, audits, franchiseProjects, locations, org
 import { hasCapabilityInScope, type ScopeChain } from '../domain/scope.ts';
 import { addDays, localDateParts } from '../lib/tz.ts';
 import { AppError, conflict, forbidden, notFound } from '../lib/errors.ts';
-import { capabilityLocations, hasCapability, loadOrgAssignments, requireMember } from './authz.ts';
+import { capabilityLocations, hasCapability, loadOrgAssignments, requireMember, resolveScopeChain } from './authz.ts';
 import { filesById, signedFileUrl } from './ops-files.ts';
 
 export const MODULE = 'operations.audits';
@@ -66,10 +66,9 @@ export async function canConduct(req: FastifyRequest, db: Exec, a: Audit): Promi
 /** People who hold a capability at a location (or organisation-wide when `locationId` is null). */
 export async function usersWithCapability(db: Exec, organizationId: string, locationId: string | null, module: string, action: AccessAction): Promise<string[]> {
   let chain: ScopeChain = { organizationId, kind: 'organization' };
-  if (locationId) {
-    const [l] = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.id, locationId));
-    if (l) chain = { organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
-  }
+  // The location's full chain (region, owner group, territory, brand and portfolios), so portfolio-scoped field
+  // consultants and territory roles are found too.
+  if (locationId) chain = await resolveScopeChain(db, { organizationId, kind: 'location', id: locationId }).catch(() => chain);
   const byUser = await loadOrgAssignments(db, organizationId);
   return [...byUser.entries()].filter(([, a]) => hasCapabilityInScope(a, module, action, chain)).map(([id]) => id);
 }

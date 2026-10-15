@@ -4,13 +4,13 @@
  */
 import { and, asc, desc, eq, gte, inArray, isNull, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { OFFER_STATUSES, offerTransitionAllowed, OPEN_OFFER_STATUSES, type OfferStatus } from '@bh/shared';
+import { OFFER_STATUSES, offerTransitionAllowed, OPEN_OFFER_STATUSES, type OfferStatus, SCOPE_KINDS } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { locations, realtyAgents, realtyEnquiries, realtyListingAgents, realtyListings, realtyOfferEvents, realtyOffers, realtyOpenHouses, realtyViewings } from '../db/schema/index.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { localDateParts, zonedToUtc } from '../lib/tz.ts';
 import { actor, audit } from '../services/audit.ts';
-import { locationAllowed, requirePerm, type ScopeTarget } from '../services/authz.ts';
+import { locationAllowed, locationsInScope, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { canSeeOffer, isManagerAt, listingAgentRows, officeFor, realtyAccess, transitionListing, viewingView, type Offer, type RealtyAccess } from '../services/realty.ts';
 import { idParams, isoDateTime, orgParams, secured } from './_common.ts';
 
@@ -160,15 +160,16 @@ export const realtyDealRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: {
       tags: ['realty'], security: secured, params: orgParams,
       summary: 'Active listings, days on market, enquiry → viewing → offer funnel and sold/let volume per currency (never combined). Aggregates only — no client personal data.',
-      querystring: z.object({ scopeKind: z.enum(['organization', 'region', 'owner_group', 'location']).default('organization'), scopeId: z.uuid().optional(), from: isoDateTime.optional(), to: isoDateTime.optional() }),
+      querystring: z.object({ scopeKind: z.enum(SCOPE_KINDS).default('organization'), scopeId: z.uuid().optional(), from: isoDateTime.optional(), to: isoDateTime.optional() }),
     },
   }, async (req) => {
     const { orgId } = req.params;
     const scope: ScopeTarget = { organizationId: orgId, kind: req.query.scopeKind, id: req.query.scopeKind === 'organization' ? orgId : req.query.scopeId ?? '' };
     if (scope.kind !== 'organization' && !req.query.scopeId) throw validationError('scopeId is required', { scopeId: 'Required' });
     const a = await realtyAccess(req, s.db, orgId);
+    const inScope = await locationsInScope(s.db, orgId, scope.kind, scope.id);
     const locs = (await s.db.select().from(locations).where(and(eq(locations.organizationId, orgId), isNull(locations.archivedAt))))
-      .filter((l) => scope.kind === 'organization' || (scope.kind === 'region' && l.regionId === scope.id) || (scope.kind === 'owner_group' && l.ownerGroupId === scope.id) || (scope.kind === 'location' && l.id === scope.id))
+      .filter((l) => inScope === 'all' || inScope.has(l.id))
       .filter((l) => locationAllowed(a.reports, l.id));
     if (!locs.length) {
       await requirePerm(req, s.db, 'reports.read', scope);

@@ -16,7 +16,7 @@ import { AppError, conflict, notFound, unauthorized, validationError } from '../
 import { localDateParts, zonedToUtc } from '../lib/tz.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, financeVisible, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
 import { campaignDraft, menuCopy, productionNarrative } from '../services/foods-ai.ts';
 import { productionSummary, quoteEnquiry, serializeEnquiry, setEnquiryStatus } from '../services/foods-catering.ts';
 import { recordMovement, syncIngredientSoldOut } from '../services/foods-inventory.ts';
@@ -315,7 +315,12 @@ export const foodPlanRoutes: FastifyPluginAsyncZod = async (_app) => {
     const to = req.query.to ? new Date(req.query.to) : new Date();
     const from = req.query.from ? new Date(req.query.from) : new Date(to.getTime() - 30 * 86400_000);
     if (from >= to) throw validationError('The start must be before the end', { from: 'After end' });
-    return foodsReport(s.db, orgId, locs, from, to);
+    const r = await foodsReport(s.db, orgId, locs, from, to);
+    // Revenue is the owner's financial data: only for locations where the person holds Payments (view).
+    const fin = await financeVisible(req, s.db, orgId, locs);
+    if (fin.all) return { ...r, revenueRestricted: false };
+    const rev = fin.ids.length ? await foodsReport(s.db, orgId, fin.ids, from, to) : null;
+    return { ...r, revenueByCurrency: rev?.revenueByCurrency ?? [], ordersByChannel: r.ordersByChannel.map((c) => ({ ...c, revenue: rev?.ordersByChannel.find((x) => x.channel === c.channel)?.revenue ?? [] })), revenueRestricted: true };
   });
 
   // ───────── AI drafts (never change data) ─────────

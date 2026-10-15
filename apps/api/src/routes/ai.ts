@@ -1,3 +1,4 @@
+import { SCOPE_KINDS } from '@bh/shared';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
@@ -24,7 +25,7 @@ export const aiRoutes: FastifyPluginAsyncZod = async (app) => {
   }));
 
   app.post('/orgs/:orgId/ai/conversations', {
-    schema: { tags: ['ai'], security: secured, params: orgParams, summary: 'Start a conversation bound to an explicit scope', body: z.object({ scope: z.object({ kind: z.enum(['organization', 'region', 'owner_group', 'location']), id: z.uuid() }), title: z.string().max(120).optional() }) },
+    schema: { tags: ['ai'], security: secured, params: orgParams, summary: 'Start a conversation bound to an explicit scope', body: z.object({ scope: z.object({ kind: z.enum(SCOPE_KINDS), id: z.uuid() }), title: z.string().max(120).optional() }) },
   }, async (req, reply) => {
     const me = requireUser(req);
     await requirePerm(req, s.db, 'ai.use', { organizationId: req.params.orgId, ...req.body.scope });
