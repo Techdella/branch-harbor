@@ -123,6 +123,48 @@ export const QUALITY_MODULES: readonly ModuleDef[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Local marketing: listings, co-op fund, call tracking                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Local marketing modules (one block; reviews in the inbox and the local social calendar reuse `marketing.reviews`,
+ * `marketing.inbox` and `marketing.social`):
+ * - `marketing.listings`: one source of truth per location synced to Google, Apple and Bing, drift, HQ field locks,
+ *   bulk holiday hours, health score. Locations edit the fields HQ leaves open (publish = HQ).
+ * - `marketing.coop`: co-op / local marketing fund — allowances, pre-approval with the brand checklist, claims with
+ *   proof, reimbursement booked in the Finance fund ledger. Deciding (publish) only counts organisation-wide.
+ * - `marketing.call_tracking`: tracking numbers per campaign or location, forwarding, recording rules, call log.
+ * Role grants for these modules are merged into the role templates below (`LOCAL_MARKETING_GRANTS`).
+ */
+export const LOCAL_MARKETING_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'marketing.listings', area: 'marketing', name: 'Listings', description: 'One source of truth per location — name, address, phone, hours and holiday hours, categories, photos and links — synced to Google, Apple and Bing, with drift alerts and a health score.',
+    actions: VEP, actionNotes: { edit: 'Edit the listing fields HQ leaves open to locations (for example hours and photos); some changes wait for HQ approval.', publish: 'Lock fields, connect directories, push changes, resolve drift, set holiday hours across the network and approve location changes.' }, status: 'available',
+  },
+  {
+    key: 'marketing.coop', area: 'marketing', name: 'Co-op fund', description: 'Local marketing co-op: allowances per location, pre-approval requests with the brand checklist, claims with invoices and proof, reimbursements and budget burn-down.',
+    actions: ALL, actionNotes: { edit: 'Submit pre-approval requests and claims for the locations in scope.', publish: 'Set allowances, review requests against the brand checklist, approve claims and record reimbursements (organisation-wide only).', export: 'Download co-op reports.' },
+    networkOnly: true, status: 'available', sensitive: 'finance',
+  },
+  {
+    key: 'marketing.call_tracking', area: 'marketing', name: 'Call tracking', description: 'Tracking numbers per campaign or location that forward to the location, with the call log, missed-call leads and call attribution in campaign reports.',
+    actions: ALL, actionNotes: { edit: 'Follow up calls and add notes.', publish: 'Add and release tracking numbers, set forwarding and call recording rules.', export: 'Download the call log.' }, status: 'available', sensitive: 'personal_data',
+  },
+];
+
+/** Grants for the local marketing modules, merged into the role templates (roles with `marketing.*` already have them). */
+export const LOCAL_MARKETING_GRANTS: Partial<Record<Role, GrantSpec>> = {
+  brand_lead: { 'marketing.listings': ['view', 'edit', 'publish'], 'marketing.coop': ['view', 'publish'] },
+  digital_marketer: { 'marketing.listings': ['view', 'edit', 'publish'], 'marketing.call_tracking': ['view', 'edit', 'publish', 'export'], 'marketing.coop': ['view', 'export'] },
+  operations_manager: { 'marketing.listings': ['view', 'edit'] },
+  finance: { 'marketing.coop': ['view', 'publish', 'export'] },
+  regional_manager: { 'marketing.listings': ['view'], 'marketing.coop': ['view'], 'marketing.call_tracking': ['view'] },
+  franchise_owner: { 'marketing.listings': ['view', 'edit'], 'marketing.coop': ['view', 'edit', 'export'], 'marketing.call_tracking': ['view', 'edit', 'export'] },
+  location_manager: { 'marketing.listings': ['view', 'edit'], 'marketing.coop': ['view', 'edit'], 'marketing.call_tracking': ['view', 'edit'] },
+  marketing_contributor: { 'marketing.listings': ['view', 'edit'] },
+};
+
 /** Modules every business account has, whatever its industry. */
 export const CORE_MODULES: readonly ModuleDef[] = [
   // Network (HQ)
@@ -182,6 +224,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'settings.ai', area: 'settings', name: 'AI assistant', description: 'Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes.', actions: V, status: 'available' },
   // Field audits, compliance documents and the league table (see QUALITY_MODULES).
   ...QUALITY_MODULES,
+  // Listings, co-op fund and call tracking (see LOCAL_MARKETING_MODULES).
+  ...LOCAL_MARKETING_MODULES,
 ];
 
 const ops = (key: string, name: string, description: string, screens: readonly string[], status: ModuleDef['status'] = 'available'): ModuleDef => ({
@@ -523,6 +567,9 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {},
   },
 };
+
+// Local marketing grants (see LOCAL_MARKETING_GRANTS).
+for (const [role, spec] of Object.entries(LOCAL_MARKETING_GRANTS)) Object.assign(ROLE_TEMPLATES[role as Role].grants, spec);
 
 /** System roles offered when inviting, in display order. */
 export const TEAM_ROLE_ORDER: readonly Role[] = [
