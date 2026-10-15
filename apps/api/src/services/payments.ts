@@ -13,7 +13,7 @@ import { failStudioPayment, fulfilStudioPayment, processStudioBillingEvent, stud
 import { commerceOrderPaymentEnded, fulfilCommerceOrderPayment } from './commerce-orders.ts';
 
 export type PaymentRow = typeof paymentReferences.$inferSelect;
-export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration' | 'wellness_package' | 'wellness_voucher' | 'studio_purchase' | 'membership_invoice' | 'catering_deposit' | 'food_tab';
+export type TargetType = 'class_booking' | 'food_order' | 'order' | 'appointment' | 'registration' | 'wellness_package' | 'wellness_voucher' | 'studio_purchase' | 'membership_invoice' | 'catering_deposit' | 'food_tab' | 'course_enrolment';
 
 /**
  * Extension points for vertical modules that add payment targets or provider events without editing the

@@ -61,4 +61,9 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./commerce-ext.ts')).commerceExtRoutes);
   await app.register((await import('./foods-ext.ts')).foodsExtRoutes);
   await app.register((await import('./payments-customer.ts')).paymentCustomerRoutes);
+  // Network workspaces: Community (with the resource library), Training academy, Help desk.
+  await app.register((await import('./community.ts')).communityRoutes);
+  await app.register((await import('./resources.ts')).resourceRoutes);
+  await app.register((await import('./training.ts')).trainingRoutes);
+  await app.register((await import('./helpdesk.ts')).helpdeskRoutes);
 };

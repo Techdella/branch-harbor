@@ -8,11 +8,14 @@ const app = await buildApp();
 const sweep = setInterval(() => void app.ctx.jobs.enqueue('studios.expire-holds', {}).catch(() => {}), 60_000);
 // Real Estate: viewing reminders and consented saved-search alerts.
 const realtySweep = setInterval(() => void import('./services/realty-jobs.ts').then((m) => m.runRealtyHousekeeping(app.ctx)), 5 * 60_000);
+// Network workspaces: scheduled announcements, required-read reminders, help desk SLA alerts, re-certification, email digests.
+const networkSweep = setInterval(() => void import('./services/community.ts').then((m) => m.runNetworkHousekeeping(app.ctx)).catch((err) => app.log.error({ err }, 'network housekeeping failed')), 5 * 60_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
   clearInterval(sweep);
   clearInterval(realtySweep);
+  clearInterval(networkSweep);
   await app.close();
   process.exit(0);
 };
