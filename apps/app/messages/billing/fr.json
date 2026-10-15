@@ -1,0 +1,209 @@
+{
+  "billing": {
+    "title": "Offre et facturation",
+    "description": "Votre offre BranchHarbor, l’essai, les factures et qui paie chaque établissement. Distinct des paiements clients.",
+    "separate": "Distinct des paiements clients",
+    "status": {
+      "checkout_required": "Non démarré",
+      "trialing": "Essai",
+      "active": "Active",
+      "past_due": "Paiement en attente",
+      "canceled": "Terminée"
+    },
+    "plans": {
+      "solo": "Solo",
+      "connector": "Connecteur",
+      "hosted": "Hébergé",
+      "network": "Réseau"
+    },
+    "planFor": {
+      "solo": "Un établissement, prix mensuel fixe",
+      "connector": "Gardez votre site WordPress · par établissement",
+      "hosted": "Site hébergé par BranchHarbor · par établissement",
+      "network": "Frais de plateforme du siège + par établissement · utilisateurs illimités"
+    },
+    "interval": {
+      "month": "Mensuelle",
+      "year": "Annuelle · 2 mois offerts"
+    },
+    "per": {
+      "month": "/ mois",
+      "year": "/ an"
+    },
+    "common": {
+      "cancel": "Annuler"
+    },
+    "link": {
+      "trial": "Essai jusqu’au {date}. Gérez votre offre, vos factures et qui paie chaque établissement.",
+      "start": "Démarrez votre essai de {days} jours pour {fee}.",
+      "manage": "Gérez votre offre, vos factures et qui paie chaque établissement."
+    },
+    "checkout": {
+      "title": "Démarrer votre essai de {days} jours",
+      "restartTitle": "Reprendre votre offre",
+      "intro": "Il n’y a ni offre gratuite ni essai gratuit. Payez {fee} aujourd’hui, profitez de tout pendant {days} jours ; votre offre démarre ensuite automatiquement, sauf si vous résiliez.",
+      "plan": "Offre",
+      "interval": "Facturation",
+      "country": "Pays de facturation",
+      "countryHint": "Votre prix, votre devise et vos taxes dépendent de votre pays de facturation. La carte doit y être émise, ou ajoutez un identifiant fiscal d’entreprise de ce pays.",
+      "locations": "Établissements",
+      "today": "À payer aujourd’hui",
+      "todayTrial": "Frais uniques pour l’essai de {days} jours.",
+      "noTrial": "Un essai a déjà été utilisé pour cette entreprise, cette carte ou ce domaine e-mail : votre offre démarre donc aujourd’hui.",
+      "from": "À partir du {date}",
+      "then": "Ensuite",
+      "taxExclusive": "Prix hors taxes. La TVA ou la GST est ajoutée selon votre pays de facturation.",
+      "taxUs": "Prix hors sales tax, ajoutée lorsqu’elle s’applique.",
+      "terms": {
+        "autoStart": "Votre offre {plan} démarre automatiquement le {date}, sauf si vous résiliez avant.",
+        "reminders": "Nous vous écrivons 3 jours et 1 jour avant la fin de l’essai.",
+        "cancel": "Résiliez à tout moment dans Paramètres → Facturation. Aucuns frais de résiliation.",
+        "export": "Exportez toutes vos données gratuitement, à tout moment.",
+        "lock": "Votre prix est lié à votre pays de facturation et confirmé par votre carte."
+      },
+      "taxId": "Identifiant fiscal de l’entreprise",
+      "taxIdHint": "Uniquement si votre carte est émise dans un autre pays, par exemple un numéro de TVA.",
+      "agree": "J’accepte de payer {fee} aujourd’hui pour un essai de {days} jours. Le {date}, mon offre {plan} démarre à {amount} hors taxes, sauf si je résilie avant.",
+      "agreeNoTrial": "J’accepte de payer {amount} hors taxes à partir d’aujourd’hui, jusqu’à ma résiliation.",
+      "agreeRequired": "Cochez la case pour accepter les conditions de l’essai.",
+      "continue": "Continuer vers la carte",
+      "payTrial": "Payer {fee} et démarrer l’essai",
+      "payPlan": "Payer {amount} et démarrer l’offre",
+      "linePlatform": "Frais de plateforme ({count} établissements inclus)",
+      "linePlan": "Solo, un établissement",
+      "lineLocations": "{count, plural, one {# établissement} other {# établissements}} × {price}"
+    },
+    "card": {
+      "title": "Carte",
+      "sandbox": "Mode test",
+      "sandboxNote": "Aucun prélèvement réel : l’API fonctionne sans clés Stripe. Choisissez le pays d’émission de la carte simulée.",
+      "issuedIn": "Carte émise en/au",
+      "unavailable": "La saisie de carte est indisponible pour le moment. Réessayez plus tard.",
+      "failed": "La carte n’a pas pu être confirmée. Essayez une autre carte."
+    },
+    "current": {
+      "title": "Votre offre",
+      "canceling": "Résiliée",
+      "platformFee": "Frais de plateforme {amount}, {count} établissements inclus",
+      "taxNote": "Hors taxes",
+      "daysLeft": "{count, plural, one {# jour restant} other {# jours restants}}",
+      "trialCanceled": "Votre essai se termine le {date}. Rien d’autre ne sera prélevé.",
+      "startsOn": "Votre offre {plan} démarre le {date} à {amount}.",
+      "endsOn": "Votre offre se termine le {date}. Rien d’autre ne sera prélevé.",
+      "nextCharge": "Prochain prélèvement le {date} : {amount}.",
+      "pastDue": "Le dernier paiement n’a pas abouti. Mettez à jour votre carte pour conserver votre offre.",
+      "country": "Pays de facturation",
+      "evidence": {
+        "card": "confirmé par la carte",
+        "tax_id": "confirmé par l’identifiant fiscal"
+      },
+      "card": "Carte",
+      "cardValue": "{brand} •••• {last4}, émise : {country}",
+      "resume": "Ne pas résilier",
+      "cancelTitle": "Résilier votre offre ?",
+      "cancelTrialBody": "Votre essai se termine le {date} et rien d’autre n’est prélevé. Aucuns frais de résiliation.",
+      "cancelPlanBody": "Votre offre reste active jusqu’au {date}. Aucuns frais de résiliation.",
+      "confirmCancel": "Oui, résilier",
+      "keep": "Garder mon offre",
+      "cancelTrial": "Résilier l’essai",
+      "cancelPlan": "Résilier l’offre"
+    },
+    "country": {
+      "title": "Pays de facturation",
+      "body": "Votre entreprise change de pays ? Le nouveau pays de facturation exige une carte émise sur place (ou un identifiant fiscal d’entreprise de ce pays) et s’applique à la période de facturation suivante.",
+      "pending": "Passage à {country} ({currency}) le {date}.",
+      "keepCurrent": "Garder le pays actuel",
+      "change": "Changer de pays de facturation",
+      "newCountry": "Nouveau pays de facturation",
+      "continue": "Continuer",
+      "newPrice": "Nouveau prix : {amount}",
+      "confirm": "Confirmer le changement"
+    },
+    "payers": {
+      "title": "Qui paie chaque établissement",
+      "intro": "Vos frais de plateforme couvrent vos {count} premiers établissements. Pour chaque établissement supplémentaire, choisissez qui paie ses frais mensuels de {price} : le siège, le franchisé ou un partage.",
+      "included": "Inclus dans les frais de plateforme",
+      "hqPays": "Le siège paie {amount}",
+      "franchiseePays": "Le franchisé paie {amount} ({pct} %)",
+      "fromGroup": "selon le groupe de franchisés",
+      "payerFor": "Qui paie pour {name}",
+      "ownerGroups": "Groupes de franchisés",
+      "ownerGroupHint": "S’applique aux établissements du groupe, sauf réglage propre à un établissement.",
+      "totals": "Le siège paie {hq} · les franchisés paient {franchisee} par mois au total",
+      "inherit": "Par défaut",
+      "hq": "Siège",
+      "franchisee": "Franchisé",
+      "split": "Partage",
+      "share": "Part du franchisé (%)",
+      "save": "Enregistrer"
+    },
+    "invoices": {
+      "title": "Factures",
+      "empty": "Aucune facture pour le moment.",
+      "kinds": {
+        "trial_fee": "Essai de 14 jours",
+        "subscription": "Offre",
+        "franchisee_fee": "Frais d’établissement"
+      },
+      "statuses": {
+        "paid": "Payée",
+        "open": "Ouverte",
+        "void": "Annulée",
+        "uncollectible": "Impayée"
+      },
+      "view": "Voir"
+    },
+    "fees": {
+      "title": "Autres frais",
+      "collection": "Collecte des redevances et du fonds marketing : {fee} par prélèvement, plafonné à {cap} par établissement et par mois. Jamais un pourcentage des redevances.",
+      "payments": "Paiements clients en ligne : frais d’application de {percent} plus les frais du prestataire de paiement.",
+      "terms": "Engagement mensuel, facturation annuelle avec 2 mois offerts, aucuns frais de résiliation, export des données gratuit."
+    },
+    "banner": {
+      "trial": "Essai : {count, plural, one {# jour restant} other {# jours restants}}. Votre offre {plan} démarre le {date}.",
+      "trialCanceled": "Votre essai se termine le {date}. Rien d’autre ne sera prélevé.",
+      "required": "Démarrez votre essai de {days} jours pour {fee} afin de modifier vos données et de vous lancer.",
+      "canceled": "Votre offre est terminée. Reprenez-la pour faire des modifications ; vous pouvez toujours exporter vos données.",
+      "pastDue": "Le dernier paiement de votre offre n’a pas abouti.",
+      "start": "Démarrer l’essai",
+      "manage": "Gérer la facturation"
+    },
+    "export": {
+      "title": "Exporter vos données",
+      "body": "Téléchargez un ZIP de fichiers CSV avec les données essentielles de votre entreprise : établissements, équipe, clients, réservations, commandes, factures, prospects, etc. Gratuit, à tout moment. Nous vous envoyons aussi le lien par e-mail ; il est valable 7 jours.",
+      "requested": "Nous préparons votre export. Vous recevrez un e-mail quand il sera prêt.",
+      "request": "Exporter vos données",
+      "files": "{count, plural, one {# fichier} other {# fichiers}}",
+      "expires": "disponible jusqu’au {date}",
+      "status": {
+        "queued": "En préparation",
+        "running": "En préparation",
+        "ready": "Prêt",
+        "failed": "Échec",
+        "expired": "Expiré"
+      },
+      "download": "Télécharger"
+    },
+    "franchisee": {
+      "title": "Frais d’établissement",
+      "description": "Les frais BranchHarbor que le siège vous répercute pour vos établissements.",
+      "locations": "Vos établissements",
+      "intro": "Le siège vous répercute tout ou partie des frais de ces établissements. Vous payez depuis votre propre compte de facturation, dans la devise de votre pays de facturation.",
+      "none": "Le siège paie les frais de vos établissements. Vous n’avez rien à payer.",
+      "included": "Inclus dans les frais de plateforme du siège",
+      "hqPays": "Payé par le siège",
+      "share": "votre part {pct} %",
+      "perMonth": "/ mois",
+      "ownerGroupAccount": "Compte de facturation",
+      "locationAccount": "Compte de facturation de cet établissement",
+      "active": "Actif",
+      "needsCard": "Carte requise",
+      "cardOnFile": "{brand} •••• {last4} · facturé en {currency}",
+      "setup": "Configurer la facturation",
+      "saveCard": "Enregistrer la carte"
+    }
+  },
+  "shell": {
+    "locationFees": "Frais d’établissement"
+  }
+}

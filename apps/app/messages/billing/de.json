@@ -1,0 +1,209 @@
+{
+  "billing": {
+    "title": "Tarif & Abrechnung",
+    "description": "Ihr BranchHarbor-Tarif, der Test, Rechnungen und wer für welchen Standort zahlt. Getrennt von Kundenzahlungen.",
+    "separate": "Getrennt von Kundenzahlungen",
+    "status": {
+      "checkout_required": "Nicht gestartet",
+      "trialing": "Test",
+      "active": "Aktiv",
+      "past_due": "Zahlung offen",
+      "canceled": "Beendet"
+    },
+    "plans": {
+      "solo": "Solo",
+      "connector": "Connector",
+      "hosted": "Hosted",
+      "network": "Network"
+    },
+    "planFor": {
+      "solo": "Ein Standort, fester Monatspreis",
+      "connector": "Ihre WordPress-Website behalten · pro Standort",
+      "hosted": "Von BranchHarbor gehostete Website · pro Standort",
+      "network": "Plattformgebühr der Zentrale + pro Standort · unbegrenzte Nutzer"
+    },
+    "interval": {
+      "month": "Monatlich",
+      "year": "Jährlich · 2 Monate inklusive"
+    },
+    "per": {
+      "month": "/ Monat",
+      "year": "/ Jahr"
+    },
+    "common": {
+      "cancel": "Abbrechen"
+    },
+    "link": {
+      "trial": "Test bis {date}. Verwalten Sie Tarif, Rechnungen und wer für welchen Standort zahlt.",
+      "start": "Starten Sie Ihren {days}-Tage-Test für {fee}.",
+      "manage": "Verwalten Sie Tarif, Rechnungen und wer für welchen Standort zahlt."
+    },
+    "checkout": {
+      "title": "{days}-Tage-Test starten",
+      "restartTitle": "Tarif wieder aufnehmen",
+      "intro": "Es gibt keinen Gratis-Tarif und keinen kostenlosen Test. Zahlen Sie heute {fee}, nutzen Sie {days} Tage lang alles; danach startet Ihr Tarif automatisch, wenn Sie nicht kündigen.",
+      "plan": "Tarif",
+      "interval": "Abrechnung",
+      "country": "Rechnungsland",
+      "countryHint": "Preis, Währung und Steuern richten sich nach Ihrem Rechnungsland. Die Karte muss dort ausgestellt sein, oder Sie geben eine Steuernummer Ihres Unternehmens aus diesem Land an.",
+      "locations": "Standorte",
+      "today": "Heute fällig",
+      "todayTrial": "Einmalige Gebühr für den {days}-Tage-Test.",
+      "noTrial": "Für dieses Unternehmen, diese Karte oder diese E-Mail-Domain wurde bereits ein Test genutzt, daher startet Ihr Tarif heute.",
+      "from": "Ab {date}",
+      "then": "Danach",
+      "taxExclusive": "Preise zzgl. Steuern. Umsatzsteuer bzw. GST wird je nach Rechnungsland hinzugefügt.",
+      "taxUs": "Preise zzgl. Sales Tax, die hinzugefügt wird, wo sie anfällt.",
+      "terms": {
+        "autoStart": "Ihr {plan}-Tarif startet automatisch am {date}, wenn Sie nicht vorher kündigen.",
+        "reminders": "Wir schreiben Ihnen 3 Tage und 1 Tag vor Testende.",
+        "cancel": "Jederzeit kündbar unter Einstellungen → Abrechnung. Keine Kündigungsgebühr.",
+        "export": "Exportieren Sie alle Ihre Daten jederzeit kostenlos.",
+        "lock": "Ihr Preis ist an Ihr Rechnungsland gebunden und wird durch Ihre Karte bestätigt."
+      },
+      "taxId": "Steuernummer des Unternehmens",
+      "taxIdHint": "Nur nötig, wenn Ihre Karte in einem anderen Land ausgestellt ist, z. B. eine USt-IdNr.",
+      "agree": "Ich zahle heute {fee} für einen {days}-Tage-Test. Am {date} startet mein {plan}-Tarif zu {amount} zzgl. Steuern, wenn ich nicht vorher kündige.",
+      "agreeNoTrial": "Ich zahle ab heute {amount} zzgl. Steuern, bis ich kündige.",
+      "agreeRequired": "Setzen Sie das Häkchen, um die Testbedingungen zu akzeptieren.",
+      "continue": "Weiter zur Karte",
+      "payTrial": "{fee} zahlen und Test starten",
+      "payPlan": "{amount} zahlen und Tarif starten",
+      "linePlatform": "Plattformgebühr (enthält {count} Standorte)",
+      "linePlan": "Solo, ein Standort",
+      "lineLocations": "{count, plural, one {# Standort} other {# Standorte}} × {price}"
+    },
+    "card": {
+      "title": "Karte",
+      "sandbox": "Testmodus",
+      "sandboxNote": "Keine echte Belastung: Die API läuft ohne Stripe-Schlüssel. Wählen Sie das Ausstellungsland der simulierten Karte.",
+      "issuedIn": "Karte ausgestellt in",
+      "unavailable": "Die Karteneingabe ist gerade nicht verfügbar. Versuchen Sie es später erneut.",
+      "failed": "Die Karte konnte nicht bestätigt werden. Versuchen Sie eine andere Karte."
+    },
+    "current": {
+      "title": "Ihr Tarif",
+      "canceling": "Gekündigt",
+      "platformFee": "Plattformgebühr {amount}, enthält {count} Standorte",
+      "taxNote": "Zzgl. Steuern",
+      "daysLeft": "{count, plural, one {Noch # Tag} other {Noch # Tage}}",
+      "trialCanceled": "Ihr Test endet am {date}. Es wird nichts weiter belastet.",
+      "startsOn": "Ihr {plan}-Tarif startet am {date} zu {amount}.",
+      "endsOn": "Ihr Tarif endet am {date}. Es wird nichts weiter belastet.",
+      "nextCharge": "Nächste Belastung am {date}: {amount}.",
+      "pastDue": "Die letzte Zahlung ist fehlgeschlagen. Aktualisieren Sie Ihre Karte, um Ihren Tarif zu behalten.",
+      "country": "Rechnungsland",
+      "evidence": {
+        "card": "durch Karte bestätigt",
+        "tax_id": "durch Steuernummer bestätigt"
+      },
+      "card": "Karte",
+      "cardValue": "{brand} •••• {last4}, ausgestellt in {country}",
+      "resume": "Nicht kündigen",
+      "cancelTitle": "Tarif kündigen?",
+      "cancelTrialBody": "Ihr Test endet am {date}, und es wird nichts weiter belastet. Keine Kündigungsgebühr.",
+      "cancelPlanBody": "Ihr Tarif bleibt bis {date} aktiv. Keine Kündigungsgebühr.",
+      "confirmCancel": "Ja, kündigen",
+      "keep": "Tarif behalten",
+      "cancelTrial": "Test kündigen",
+      "cancelPlan": "Tarif kündigen"
+    },
+    "country": {
+      "title": "Rechnungsland",
+      "body": "Zieht Ihr Unternehmen in ein anderes Land? Das neue Rechnungsland braucht eine dort ausgestellte Karte (oder eine Steuernummer Ihres Unternehmens von dort) und gilt ab dem nächsten Abrechnungszeitraum.",
+      "pending": "Wechsel zu {country} ({currency}) am {date}.",
+      "keepCurrent": "Aktuelles Land behalten",
+      "change": "Rechnungsland ändern",
+      "newCountry": "Neues Rechnungsland",
+      "continue": "Weiter",
+      "newPrice": "Neuer Preis: {amount}",
+      "confirm": "Änderung bestätigen"
+    },
+    "payers": {
+      "title": "Wer zahlt für welchen Standort",
+      "intro": "Ihre Plattformgebühr deckt Ihre ersten {count} Standorte ab. Legen Sie für jeden weiteren Standort fest, wer die Monatsgebühr von {price} zahlt: die Zentrale, der Franchisenehmer oder eine Aufteilung.",
+      "included": "In der Plattformgebühr enthalten",
+      "hqPays": "Zentrale zahlt {amount}",
+      "franchiseePays": "Franchisenehmer zahlt {amount} ({pct} %)",
+      "fromGroup": "laut Inhabergruppe",
+      "payerFor": "Wer zahlt für {name}",
+      "ownerGroups": "Inhabergruppen",
+      "ownerGroupHint": "Gilt für die Standorte der Gruppe, sofern ein Standort keine eigene Einstellung hat.",
+      "totals": "Zentrale zahlt {hq} · Franchisenehmer zahlen insgesamt {franchisee} pro Monat",
+      "inherit": "Standard",
+      "hq": "Zentrale",
+      "franchisee": "Franchisenehmer",
+      "split": "Aufteilung",
+      "share": "Anteil Franchisenehmer (%)",
+      "save": "Speichern"
+    },
+    "invoices": {
+      "title": "Rechnungen",
+      "empty": "Noch keine Rechnungen.",
+      "kinds": {
+        "trial_fee": "14-Tage-Test",
+        "subscription": "Tarif",
+        "franchisee_fee": "Standortgebühren"
+      },
+      "statuses": {
+        "paid": "Bezahlt",
+        "open": "Offen",
+        "void": "Storniert",
+        "uncollectible": "Unbezahlt"
+      },
+      "view": "Ansehen"
+    },
+    "fees": {
+      "title": "Weitere Gebühren",
+      "collection": "Einzug von Lizenzgebühren und Marketingfonds: {fee} pro Einzug, höchstens {cap} pro Standort und Monat. Nie ein Prozentsatz der Lizenzgebühren.",
+      "payments": "Online-Zahlungen Ihrer Kunden: {percent} Anwendungsgebühr plus die Gebühr des Zahlungsanbieters.",
+      "terms": "Monatliche Laufzeit, jährliche Abrechnung mit 2 Monaten inklusive, keine Kündigungsgebühren, kostenloser Datenexport."
+    },
+    "banner": {
+      "trial": "Test: {count, plural, one {noch # Tag} other {noch # Tage}}. Ihr {plan}-Tarif startet am {date}.",
+      "trialCanceled": "Ihr Test endet am {date}. Es wird nichts weiter belastet.",
+      "required": "Starten Sie Ihren {days}-Tage-Test für {fee}, um Änderungen vorzunehmen und live zu gehen.",
+      "canceled": "Ihr Tarif ist beendet. Nehmen Sie ihn wieder auf, um Änderungen vorzunehmen; Ihre Daten können Sie weiterhin exportieren.",
+      "pastDue": "Die letzte Zahlung für Ihren Tarif ist fehlgeschlagen.",
+      "start": "Test starten",
+      "manage": "Abrechnung verwalten"
+    },
+    "export": {
+      "title": "Daten exportieren",
+      "body": "Laden Sie eine ZIP-Datei mit CSV-Dateien Ihrer wichtigsten Unternehmensdaten herunter: Standorte, Personen, Kunden, Buchungen, Bestellungen, Rechnungen, Leads und mehr. Kostenlos und jederzeit. Den Link senden wir Ihnen auch per E-Mail; er ist 7 Tage gültig.",
+      "requested": "Wir bereiten Ihren Export vor. Sie erhalten eine E-Mail, sobald er fertig ist.",
+      "request": "Daten exportieren",
+      "files": "{count, plural, one {# Datei} other {# Dateien}}",
+      "expires": "verfügbar bis {date}",
+      "status": {
+        "queued": "In Vorbereitung",
+        "running": "In Vorbereitung",
+        "ready": "Fertig",
+        "failed": "Fehlgeschlagen",
+        "expired": "Abgelaufen"
+      },
+      "download": "Herunterladen"
+    },
+    "franchisee": {
+      "title": "Standortgebühren",
+      "description": "Die BranchHarbor-Gebühren, die die Zentrale für Ihre Standorte an Sie weitergibt.",
+      "locations": "Ihre Standorte",
+      "intro": "Die Zentrale gibt die Gebühr für diese Standorte ganz oder teilweise an Sie weiter. Sie zahlen über Ihr eigenes Abrechnungskonto, in der Währung Ihres Rechnungslandes.",
+      "none": "Die Zentrale zahlt die Gebühren Ihrer Standorte. Sie müssen nichts zahlen.",
+      "included": "In der Plattformgebühr der Zentrale enthalten",
+      "hqPays": "Zahlt die Zentrale",
+      "share": "Ihr Anteil {pct} %",
+      "perMonth": "/ Monat",
+      "ownerGroupAccount": "Abrechnungskonto",
+      "locationAccount": "Abrechnungskonto für diesen Standort",
+      "active": "Aktiv",
+      "needsCard": "Karte erforderlich",
+      "cardOnFile": "{brand} •••• {last4} · Abrechnung in {currency}",
+      "setup": "Abrechnung einrichten",
+      "saveCard": "Karte speichern"
+    }
+  },
+  "shell": {
+    "locationFees": "Standortgebühren"
+  }
+}

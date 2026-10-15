@@ -10,6 +10,7 @@ import { LoadingBlock } from '../ui/States';
 import { AppProvider, useApp } from './AppContext';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { TrialBanner } from '../screens/billing/TrialBanner';
 import { AiPanel } from './AiPanel';
 
 function useIsWide(query: string) {
@@ -77,6 +78,7 @@ function Shell({ children }: { children: ReactNode }) {
         <div className="flex items-start gap-3">
           <main id="main" ref={mainRef} tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-3 outline-none">
             {/* No padlocks: a route outside the person's access shows "not available" and never loads its data. */}
+            <TrialBanner />
             {canSeeRoute(path, app.capabilities, app.industry) ? children : <NotAvailable />}
           </main>
           {app.aiOpen && xl && (

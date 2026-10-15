@@ -199,6 +199,12 @@ function ProfileMenu() {
             </div>
           </div>
           <LanguageSelect className="px-2 py-1" />
+          {app.org.model !== 'independent' && app.session.assignments.some((a) => a.scope.kind === 'owner_group' || a.scope.kind === 'location') && (
+            <Link href="/franchisee-billing" onClick={close} className="flex items-center gap-2 rounded-sm px-2 py-2 text-sm font-semibold hover:bg-canvas">
+              <Icon name="card" size={16} />
+              {t('locationFees')}
+            </Link>
+          )}
           {(app.hasModule('settings.business') || app.hasModule('settings.billing')) && (
             <Link href="/settings" onClick={close} className="flex items-center gap-2 rounded-sm px-2 py-2 text-sm font-semibold hover:bg-canvas">
               <Icon name="settings" size={16} />
