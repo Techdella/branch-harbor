@@ -276,6 +276,10 @@ async function main() {
   console.log(` Bank debit:    Thames Hot Yoga on SEPA Direct Debit (EUR); ${reviewsSeed.statements} monthly franchisee statements issued`);
   const quality = await (await import('./seed-quality.ts')).seedQuality({ db, today, upsertUser });
   console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
+  const supply = await (await import('./seed-supply.ts')).seedSupply({ db, today, upsertUser, appUrl: cfg.APP_URL });
+  console.log(` Suppliers:     Maple & Ember — ${supply.suppliers} approved suppliers, ${supply.orders} purchase orders (one waiting for HQ approval, one due at Ballard today), rebates with a claim, off-contract spend`);
+  console.log(`                supplier confirmation link (no login): ${supply.confirmLink}`);
+  console.log(` Audits ph. 2:  recurring schedules (${supply.visits} visits created), visit planner, retraining link, ${supply.selfChecks} self-check runs · ${supply.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }
