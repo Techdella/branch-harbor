@@ -58,6 +58,10 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   finance: ['finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts', 'finance.payments'],
   // Network
   reports: ['network.reports'],
+  // Field audits (Operations), compliance documents (Legal & compliance) and the league table (Network).
+  audits: ['operations.audits'],
+  compliance: ['legal.compliance_documents'],
+  'league-table': ['network.league_table'],
   // The inbox holds refunds (finance), local ad spend (marketing), shift swaps and website changes; each decision is
   // checked per kind.
   approvals: ['network.approvals', 'finance.payments', 'marketing.campaigns'],

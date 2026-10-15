@@ -86,4 +86,9 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./marketing.ts')).marketingRoutes);
   await app.register((await import('./marketing-public.ts')).marketingPublicRoutes);
   await app.register((await import('./finance.ts')).financeRoutes);
+  // Field audits, compliance documents, the league table, and signed links to their private files.
+  await app.register((await import('./audits.ts')).privateFileRoutes);
+  await app.register((await import('./audits.ts')).auditRoutes);
+  await app.register((await import('./compliance.ts')).complianceRoutes);
+  await app.register((await import('./league-table.ts')).leagueTableRoutes);
 };

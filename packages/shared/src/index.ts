@@ -21,3 +21,4 @@ export * from './site-themes.ts';
 export * from './email-document.ts';
 export * from './automation.ts';
 export * from './marketing-forms.ts';
+export * from './quality.ts';
