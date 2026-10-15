@@ -2,6 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import en from '../messages/en.json';
 import foodsEn from '../messages/foods/en.json';
 import paymentsEn from '../messages/payments/en.json';
+import coursesEn from '../messages/courses/en.json';
 import { resolveSiteLocale } from '../lib/site';
 
 type Messages = Record<string, unknown>;
@@ -39,7 +40,11 @@ export function mergeMessages(base: Messages, override: Messages): Messages {
 
 export async function messagesFor(locale: string): Promise<Messages> {
   const load = loaders[locale] ?? loaders[locale.split('-')[0]!];
-  return mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), load ? (await load()).default : {});
+  const base = mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), coursesEn as Messages);
+  // Public courses (Training academy): messages/courses/*.json.
+  const courseLocale = loaders[locale] ? locale : locale.split('-')[0]!;
+  const courses = loaders[courseLocale] ? ((await import(`../messages/courses/${courseLocale}.json`)).default as Messages) : {};
+  return mergeMessages(mergeMessages(base, load ? (await load()).default : {}), courses);
 }
 
 export default getRequestConfig(async () => {

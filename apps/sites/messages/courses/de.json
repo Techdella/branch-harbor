@@ -1,0 +1,38 @@
+{
+  "courses": {
+    "title": "Kurse & Ausbildungen",
+    "intro": "Ausbildungen und Kurse von {brand}, offen für alle.",
+    "none": "Derzeit sind keine Kurse buchbar.",
+    "starts": "Beginn {date}",
+    "seatsLeft": "{count, plural, one {Noch # Platz frei} other {Noch # Plätze frei}}",
+    "full": "Ausgebucht",
+    "all": "Alle Kurse",
+    "startsLabel": "Beginn",
+    "schedule": "Zeitplan",
+    "trainers": "Trainer",
+    "certificateLabel": "Zertifikat",
+    "certificate": "Zertifikat bei Abschluss",
+    "curriculum": "Das lernen Sie",
+    "enrolled": "Sie sind für {course} angemeldet. Die Details haben wir Ihnen per E-Mail geschickt.",
+    "enquired": "Danke! Eine Trainerin oder ein Trainer meldet sich bald.",
+    "payFor": "Bezahlen Sie, um Ihren Platz in {course} zu bestätigen.",
+    "payCta": "{amount} bezahlen",
+    "paymentFailed": "Die Zahlung hat nicht geklappt. Bitte versuchen Sie es erneut.",
+    "required": "Pflichtfeld",
+    "invalidEmail": "Gültige E-Mail-Adresse eingeben",
+    "acceptRequired": "Bitte akzeptieren Sie die Bedingungen",
+    "fixFields": "Bitte prüfen Sie die markierten Felder.",
+    "mode": {
+      "enrol": "Jetzt anmelden",
+      "enquire": "Frage stellen"
+    },
+    "name": "Ihr Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "message": "Ihre Frage",
+    "terms": "Ich akzeptiere die Kursbedingungen und die Stornoregeln.",
+    "consent": "Informieren Sie mich über künftige Kurse.",
+    "enrolCta": "Anmelden · {amount}",
+    "enquireCta": "Anfrage senden"
+  }
+}
