@@ -76,6 +76,8 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'network.league_table': [{ key: 'leagueTable', href: '/league-table', icon: 'trophy' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
+  // The AI assistant: briefing, insights, visit briefs and the content studio.
+  'ai.assistant': [{ key: 'marina', href: '/marina', icon: 'sparkles', msg: 'marina.navLabel' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],
   'settings.billing': [{ key: 'settings', href: '/settings', icon: 'settings' }],
 };

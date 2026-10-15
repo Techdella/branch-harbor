@@ -11,7 +11,9 @@ import { AppProvider, useApp } from './AppContext';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { TrialBanner } from '../screens/billing/TrialBanner';
-import { AiPanel } from './AiPanel';
+import { MarinaPanel } from '../marina/MarinaPanel';
+import { MarinaProvider } from '../marina/MarinaProvider';
+import { CommandBar } from '../marina/CommandBar';
 
 function useIsWide(query: string) {
   const [wide, setWide] = useState(false);
@@ -81,19 +83,19 @@ function Shell({ children }: { children: ReactNode }) {
             <TrialBanner />
             {canSeeRoute(path, app.capabilities, app.industry) ? children : <NotAvailable />}
           </main>
-          {app.aiOpen && xl && (
+          {app.aiOpen && xl && app.hasModule('ai.assistant') && (
             <div className="sticky top-3 w-[380px] shrink-0">
-              <AiPanel onClose={() => app.setAiOpen(false)} />
+              <MarinaPanel onClose={() => app.setAiOpen(false)} />
             </div>
           )}
         </div>
       </div>
 
-      {app.aiOpen && !xl && (
+      {app.aiOpen && !xl && app.hasModule('ai.assistant') && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 hidden bg-black/40 md:block" onClick={() => app.setAiOpen(false)} aria-hidden="true" />
           <div className="relative h-full w-full md:w-[420px]">
-            <AiPanel fullScreen onClose={() => app.setAiOpen(false)} />
+            <MarinaPanel fullScreen onClose={() => app.setAiOpen(false)} />
           </div>
         </div>
       )}
@@ -105,7 +107,13 @@ function Shell({ children }: { children: ReactNode }) {
 function Gate({ children }: { children: ReactNode }) {
   const t = useTranslations('access');
   const app = useApp();
-  if (app.ready) return <Shell>{children}</Shell>;
+  if (app.ready)
+    return (
+      <MarinaProvider>
+        <Shell>{children}</Shell>
+        <CommandBar />
+      </MarinaProvider>
+    );
   if (app.loadState === 'loading')
     return (
       <div className="mx-auto flex min-h-viewport w-full max-w-3xl flex-col justify-center gap-4 p-4" aria-busy="true">

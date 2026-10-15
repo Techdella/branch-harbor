@@ -16,6 +16,7 @@ import { COUNTRY_ZONES } from './LocationWizard';
 import { AddLocationCard, BusinessLocationCard, WebsiteApprovalsCard } from './independent/BusinessSettings';
 import { BillingLinkCard } from './billing/BillingLinkCard';
 import { DataExportCard } from './billing/DataExportCard';
+import { MarinaSettingsCard } from '../marina/MarinaSettings';
 
 export function SettingsScreen() {
   const t = useTranslations('settings');
@@ -40,6 +41,7 @@ export function SettingsScreen() {
           <LanguageSelect />
         </div>
       </SectionCard>
+      {app.hasModule('ai.assistant') && <MarinaSettingsCard />}
       {!app.can('org.manage') ? (
         <DeniedState permission="org.manage" detail={t('orgDenied')} />
       ) : (

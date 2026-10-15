@@ -109,7 +109,7 @@ interface Rule {
 
 /** Keyword rules, most specific first. Inputs are only taken from the question itself. */
 const RULES: Rule[] = [
-  { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|where do (we|i)|comment |cómo |wie |como )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
+  { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|what does (our|the) (manual|handbook|policy|guide)|where do (we|i)|comment |cómo |wie |como |que dit |qué dice |was sagt |o que diz )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
   { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q) }) },
   { test: /(create|add|new) (a )?(task|to-?do)|crée une tâche|crear tarea|aufgabe/, tool: 'create_task', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 120) }) },
   { test: /(draft|write|create|prepare).*(email|newsletter)|(email|newsletter).*(draft|campaign)|rédige.*e-?mail|redacta.*correo/, tool: 'create_email_campaign_draft', input: (_q, raw) => ({ name: quoted(raw) ?? raw.slice(0, 80), subject: quoted(raw) ?? raw.slice(0, 80) }) },
@@ -148,7 +148,7 @@ const RULES: Rule[] = [
 ];
 
 const NAV: Array<[RegExp, string]> = [
-  [/league/, '/league-table'], [/audit/, '/audits'], [/complian/, '/compliance'], [/review/, '/marketing/reviews'], [/inbox/, '/marketing/inbox'],
+  [/visit brief|visite|visita|besuch/, '/marina/visit-brief'], [/studio|content/, '/marina/studio'], [/league/, '/league-table'], [/audit/, '/audits'], [/complian/, '/compliance'], [/review/, '/marketing/reviews'], [/inbox/, '/marketing/inbox'],
   [/email/, '/marketing/email'], [/automation/, '/marketing/automations'], [/social/, '/marketing/social'], [/website/, '/marketing/websites'],
   [/royalt/, '/finance/royalties'], [/statement/, '/finance/statements'], [/fund/, '/finance/marketing-fund'], [/help|ticket/, '/help'],
   [/training|course/, '/training'], [/community|announcement/, '/community'], [/team|people/, '/team'], [/location/, '/locations'],
