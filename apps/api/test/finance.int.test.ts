@@ -55,7 +55,7 @@ describe.skipIf(!hasDb)('finance workspace (DB)', () => {
     lon = (await createLocation(app, owner.token, orgId, { name: 'London Hackney', ownerGroupId: g2, timeZone: 'Europe/London', currency: 'GBP', address: { line1: '1 Mare St', city: 'London', country: 'GB' } })).id;
     hqLoc = (await createLocation(app, owner.token, orgId, { name: 'HQ studio (company-owned)' })).id;
     await app.ctx.db.update(locations).set({ paymentsEnabled: true, stripeAccountId: 'acct_sandbox_test' }).where(eq(locations.organizationId, orgId));
-    finance = await memberWithRole(app, owner.token, orgId, 'finance', { kind: 'organization', id: orgId }, 'Finance Lead');
+    finance = await memberWithRole(app, owner.token, orgId, 'finance_lead', { kind: 'organization', id: orgId }, 'Finance Lead');
     fo1 = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: g1 }, 'Owner Pacific');
     fo2 = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: g2 }, 'Owner Thames');
     lm = await memberWithRole(app, owner.token, orgId, 'location_manager', { kind: 'location', id: tor }, 'Manager Toronto');

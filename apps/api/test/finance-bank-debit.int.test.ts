@@ -42,7 +42,7 @@ describe.skipIf(!hasDb)('finance: bank-debit collection and monthly statements (
     dub = (await createLocation(app, owner.token, orgId, { name: 'Dublin Docklands', ownerGroupId: gEu, timeZone: 'Europe/Dublin', currency: 'EUR', address: { line1: '1 Quay', city: 'Dublin', country: 'IE' } })).id;
     tor = (await createLocation(app, owner.token, orgId, { name: 'Toronto Lakeshore', ownerGroupId: gCa })).id;
     await app.ctx.db.update(locations).set({ paymentsEnabled: true, stripeAccountId: 'acct_sandbox_t' }).where(eq(locations.organizationId, orgId));
-    finance = await memberWithRole(app, owner.token, orgId, 'finance', { kind: 'organization', id: orgId }, 'Finance Lead');
+    finance = await memberWithRole(app, owner.token, orgId, 'finance_lead', { kind: 'organization', id: orgId }, 'Finance Lead');
     foEu = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: gEu }, 'Owner Liffey');
     foCa = await memberWithRole(app, owner.token, orgId, 'franchise_owner', { kind: 'owner_group', id: gCa }, 'Owner Lakeshore');
     const basis = { streams: ['bookings', 'memberships', 'retail', 'food', 'other'], netOfRefunds: true, excludeTax: true, excludeTips: true, includeExternalSales: true };

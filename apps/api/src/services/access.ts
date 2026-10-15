@@ -1,10 +1,12 @@
 import { and, count, eq, inArray } from 'drizzle-orm';
 import {
-  ACCESS_ACTIONS, ACTION_META, ROLE_TEMPLATES, TEAM_ROLE_ORDER, WORKSPACES, WORKSPACE_META, asBusinessModel, effectiveCapabilities, inviteRolesFor, modulesFor,
-  normalizeCapabilities, parseCapability, permissionsFromCapabilities, workspacesFor, settingsModulesFor, type Capability, type Role, type ScopeKind,
+  ACCESS_ACTIONS, ACTION_META, ROLE_TEMPLATES, ROLE_TEAMS, TEAM_ROLE_ORDER, WORKSPACES, WORKSPACE_META, asBusinessModel, canonicalRole, effectiveCapabilities, inviteRolesFor, modulesFor,
+  normalizeCapabilities, parseCapability, permissionsFromCapabilities, scopeKindsFor, sensitiveClassesIn, workspacesFor, settingsModulesFor, type Capability, type Role, type ScopeKind,
 } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
-import { customRoles, memberAccessOverrides, roleAssignments, roleCapabilities } from '../db/schema/index.ts';
+import {
+  brands, customRoles, locations, memberAccessOverrides, memberProfiles, ownerGroups, portfolios, regions, roleAssignments, roleCapabilities, roleLabels, territories,
+} from '../db/schema/index.ts';
 import { AppError, notFound } from '../lib/errors.ts';
 
 /** The capability catalogue for an industry: workspaces, modules (with status) and actions. */
@@ -17,18 +19,35 @@ export function catalogue(industry: string) {
   };
 }
 
-/** System role templates offered to an organisation (independent businesses get the simplified set). */
-export function templatesFor(industry: string, model: string) {
+/**
+ * System role templates offered to an organisation (independent businesses get the simplified set), grouped by team.
+ * `label` is the business's own name for the role, when it renamed it. Templates are starting points, not an org chart.
+ */
+export function templatesFor(industry: string, model: string, labels: ReadonlyMap<string, string> = new Map()) {
   const offered = new Set<Role>(inviteRolesFor(asBusinessModel(model)));
   return TEAM_ROLE_ORDER.filter((r) => offered.has(r)).map((r) => {
     const t = ROLE_TEMPLATES[r];
-    const caps = effectiveCapabilities({ role: r, scopeKind: 'organization' }, industry);
+    const caps = effectiveCapabilities({ role: r, scopeKind: t.defaultScope }, industry);
+    const orgCaps = effectiveCapabilities({ role: r, scopeKind: 'organization' }, industry);
     return {
-      key: t.key, name: t.name, description: t.description, primaryWorkspace: t.primaryWorkspace, defaultScope: t.defaultScope, networkOnly: !!t.networkOnly,
-      capabilities: [...caps].sort(),
+      key: t.key, name: t.name, label: labels.get(r) ?? null, team: t.team, description: t.description, primaryWorkspace: t.primaryWorkspace, defaultScope: t.defaultScope,
+      networkOnly: !!t.networkOnly, support: !!t.support,
+      capabilities: [...orgCaps].sort(),
+      sensitive: [...sensitiveClassesIn(caps, industry)].sort(),
       workspaces: workspacesFor(caps, industry).map((w) => w.key),
     };
   });
+}
+
+/** Team order for grouping templates, and the scope kinds this business can assign. */
+export function roleMeta(model: string) {
+  return { teams: [...ROLE_TEAMS], scopeKinds: scopeKindsFor(asBusinessModel(model)) };
+}
+
+/** The business's own names for system roles. */
+export async function loadRoleLabels(db: Exec, organizationId: string): Promise<Map<string, string>> {
+  const rows = await db.select({ role: roleLabels.role, name: roleLabels.name }).from(roleLabels).where(eq(roleLabels.organizationId, organizationId));
+  return new Map(rows.map((r) => [r.role, r.name]));
 }
 
 /**
@@ -92,19 +111,45 @@ export async function assignmentCaps(db: Exec, industry: string, a: { role: stri
   );
 }
 
-/** A preview of what a capability set shows: workspaces with their modules, settings, and the legacy permissions. */
+/**
+ * A preview of what a capability set shows: workspaces with their modules and actions, settings, the sensitive data
+ * classes it reaches, what stays hidden, and the legacy permissions.
+ */
 export function preview(caps: ReadonlySet<Capability>, industry: string) {
+  const mods = modulesFor(industry).filter((m) => m.status === 'available');
+  const actions = Object.fromEntries(mods.filter((m) => caps.has(`${m.key}:view`)).map((m) => [m.key, m.actions.filter((a) => caps.has(`${m.key}:${a}`))]));
   return {
     workspaces: workspacesFor(caps, industry),
     settings: settingsModulesFor(caps, industry),
+    actions,
+    hidden: mods.filter((m) => !caps.has(`${m.key}:view`)).map((m) => m.key),
+    sensitive: [...sensitiveClassesIn(caps, industry)].sort(),
     permissions: [...permissionsFromCapabilities(caps)].sort(),
   };
 }
 
-export function roleName(role: string, custom?: { name: string } | null) {
-  return role === 'custom' ? (custom?.name ?? 'Custom role') : (ROLE_TEMPLATES[role as Role]?.name ?? role);
+export function roleName(role: string, custom?: { name: string } | null, labels?: ReadonlyMap<string, string>) {
+  if (role === 'custom') return custom?.name ?? 'Custom role';
+  const key = canonicalRole(role);
+  return labels?.get(key) ?? ROLE_TEMPLATES[key as Role]?.name ?? role;
 }
 
 export function diff(before: ReadonlySet<string>, after: ReadonlySet<string>) {
   return { added: [...after].filter((c) => !before.has(c)).sort(), removed: [...before].filter((c) => !after.has(c)).sort() };
+}
+
+/** Names of every scope in the organisation, keyed `<kind>:<id>` (brands, territories, regions, portfolios, owner groups, locations). */
+export async function scopeNames(db: Exec, organizationId: string): Promise<Map<string, string>> {
+  const q = (table: typeof regions | typeof ownerGroups | typeof locations | typeof territories | typeof portfolios | typeof brands) =>
+    db.select({ id: table.id, name: table.name }).from(table).where(eq(table.organizationId, organizationId));
+  const [b, t, r, p, g, l] = await Promise.all([q(brands), q(territories), q(regions), q(portfolios), q(ownerGroups), q(locations)]);
+  const out = new Map<string, string>();
+  for (const [kind, rows] of [['brand', b], ['territory', t], ['region', r], ['portfolio', p], ['owner_group', g], ['location', l]] as const) for (const x of rows) out.set(`${kind}:${x.id}`, x.name);
+  return out;
+}
+
+/** Job titles and denied sensitive classes per person in the organisation. */
+export async function memberProfilesFor(db: Exec, organizationId: string): Promise<Map<string, { jobTitle: string | null; deniedClasses: string[] }>> {
+  const rows = await db.select().from(memberProfiles).where(eq(memberProfiles.organizationId, organizationId));
+  return new Map(rows.map((r) => [r.userId, { jobTitle: r.jobTitle, deniedClasses: r.deniedClasses }]));
 }

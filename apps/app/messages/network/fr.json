@@ -19,13 +19,16 @@
     },
     "roles": {
       "franchise_owner": "Franchisés",
+      "multi_unit_operator": "Opérateurs multi-unités",
+      "master_franchisee": "Master franchisés",
+      "area_developer": "Développeurs de zone",
       "location_manager": "Responsables d’établissement",
       "staff": "Équipe",
-      "regional_manager": "Responsables régionaux",
-      "instructor_trainer": "Formateurs",
+      "field_consultant": "Consultants terrain",
+      "trainer": "Formateurs",
       "hq_admin": "Équipe du siège",
-      "marketing_contributor": "Marketing",
-      "finance": "Finance"
+      "content_social": "Marketing",
+      "finance_lead": "Finance"
     },
     "audience": {
       "label": "Public",

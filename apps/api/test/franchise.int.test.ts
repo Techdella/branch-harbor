@@ -290,8 +290,8 @@ describe.skipIf(!hasDb)('franchise development, new-location flow and legal (DB)
     expect(list.body.items.find((x: any) => x.id === a.body.id).remindersSent.sort((x: number, y: number) => x - y)).toEqual([90, 180]);
   });
   it('role templates: VP Franchise runs the pipeline, Legal reviews rules, location roles see neither', async () => {
-    const vp = await memberWithRole(app, owner.token, O, 'vp_franchise', { kind: 'organization', id: O }, 'VP Franchise');
-    const legal = await memberWithRole(app, owner.token, O, 'legal', { kind: 'organization', id: O }, 'Counsel');
+    const vp = await memberWithRole(app, owner.token, O, 'development_lead', { kind: 'organization', id: O }, 'VP Franchise');
+    const legal = await memberWithRole(app, owner.token, O, 'legal_lead', { kind: 'organization', id: O }, 'Counsel');
     const lm = await memberWithRole(app, owner.token, O, 'location_manager', { kind: 'location', id: hqLocationId }, 'Location Manager');
     const rule = (await call(app, 'GET', `/v1/orgs/${O}/franchise/rules`, { token: vp.token })).body.items.find((x: any) => x.code === 'IT');
     expect((await call(app, 'GET', `/v1/orgs/${O}/franchise/prospects`, { token: vp.token })).status).toBe(200);

@@ -9,7 +9,7 @@ import type { AiMessageParam, AiTool } from '../integrations/ai.ts';
 import { revenueByCurrency } from '../domain/reports.ts';
 import { AppError, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
-import { authorisedLocations, hasPerm, permissionsAt, requirePerm, type ScopeTarget } from './authz.ts';
+import { authorisedLocations, hasPerm, locationsInScope, permissionsAt, requirePerm, type ScopeTarget } from './authz.ts';
 
 type Conversation = typeof aiConversations.$inferSelect;
 
@@ -40,8 +40,9 @@ const TOOLS: AiTool[] = [
 async function scopeLocationIds(s: Services, req: FastifyRequest, conv: Conversation, permission: Permission): Promise<string[]> {
   const allowed = await authorisedLocations(req, s.db, conv.organizationId, permission);
   const locs = await s.db.select().from(locations).where(and(eq(locations.organizationId, conv.organizationId), isNull(locations.archivedAt)));
+  const inScope = await locationsInScope(s.db, conv.organizationId, conv.scopeKind, conv.scopeId);
   return locs
-    .filter((l) => conv.scopeKind === 'organization' || (conv.scopeKind === 'region' && l.regionId === conv.scopeId) || (conv.scopeKind === 'owner_group' && l.ownerGroupId === conv.scopeId) || (conv.scopeKind === 'location' && l.id === conv.scopeId))
+    .filter((l) => inScope === 'all' || inScope.has(l.id))
     .filter((l) => allowed === 'all' || allowed.has(l.id))
     .map((l) => l.id);
 }

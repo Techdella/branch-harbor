@@ -86,5 +86,15 @@ export async function memberWithRole(app: FastifyInstance, ownerToken: string, o
   return u;
 }
 
+/** Adds per-person grants (module actions) to a member's first role assignment, through the access API. */
+export async function grantCaps(app: FastifyInstance, ownerToken: string, orgId: string, userId: string, caps: string[]) {
+  const acc = await call(app, 'GET', `/v1/orgs/${orgId}/members/${userId}/access`, { token: ownerToken });
+  if (acc.status !== 200) throw new Error(`access failed ${acc.status} ${JSON.stringify(acc.body)}`);
+  const a = acc.body.assignments[0];
+  const r = await call(app, 'PUT', `/v1/orgs/${orgId}/role-assignments/${a.id}/access`, { token: ownerToken, body: { role: a.role, customRoleId: a.customRoleId, grants: [...a.grants, ...caps], revokes: a.revokes } });
+  if (r.status !== 200) throw new Error(`grant failed ${r.status} ${JSON.stringify(r.body)}`);
+  return r.body;
+}
+
 /** ISO timestamp `minutes` from now. */
 export const inMinutes = (minutes: number) => new Date(Date.now() + minutes * 60_000).toISOString();

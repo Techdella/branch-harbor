@@ -176,6 +176,20 @@
       "when": 1792099144124,
       "tag": "0024_audits_compliance",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792099826441,
+      "tag": "0025_team_templates_scopes",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792099828745,
+      "tag": "0026_migrate_legacy_roles",
+      "breakpoints": true
     }
   ]
 }

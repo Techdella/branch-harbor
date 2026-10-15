@@ -18,7 +18,10 @@ const query = z.object({
   sort: z.enum(['revenue', 'growth', 'activity', 'occupancy', 'auditScore', 'royaltyStatus', 'reviewRating']).default('revenue'),
   regionId: z.uuid().optional(),
   ownerGroupId: z.uuid().optional(),
+  /** An access-scope territory (sub-network) or a franchise pipeline territory. */
   territoryId: z.uuid().optional(),
+  /** A portfolio (any named set of locations). */
+  portfolioId: z.uuid().optional(),
 });
 
 /** Last full month by default. */

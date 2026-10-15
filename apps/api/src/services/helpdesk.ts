@@ -50,7 +50,7 @@ export const isAgent = (v: Viewer) => v.orgPerms.has('helpdesk.agent');
 export function canSeeTicket(t: Ticket, v: Viewer) {
   if (isAgent(v)) return true;
   if (t.requesterId === v.userId) return true;
-  const manager = v.roles.has('franchise_owner') || v.roles.has('location_manager') || v.roles.has('regional_manager');
+  const manager = v.roles.has('franchise_owner') || v.roles.has('multi_unit_operator') || v.roles.has('location_manager') || v.roles.has('field_consultant') || v.roles.has('area_representative');
   return manager && !!t.locationId && v.locationIds.has(t.locationId);
 }
 
