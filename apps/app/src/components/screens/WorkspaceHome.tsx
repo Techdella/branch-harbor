@@ -10,6 +10,7 @@ import { useNavLabel } from '../shell/Sidebar';
 import { PageHeader } from '../shell/PageHeader';
 import { Empty } from '../ui/States';
 import { OverviewScreen } from './OverviewScreen';
+import { BenchmarksCard } from '../scale/BenchmarksScreen';
 
 /**
  * Home of the active workspace: what this person can do here (only modules they hold) and, for Network and
@@ -51,6 +52,8 @@ export function WorkspaceHome() {
           </Link>
         ))}
       </section>
+      {/* Network home: "you vs similar networks" (opt-in benchmarks, HQ only; renders nothing without the module). */}
+      {ws === 'network' && <BenchmarksCard />}
       {metrics && <OverviewScreen header={false} />}
     </>
   );
