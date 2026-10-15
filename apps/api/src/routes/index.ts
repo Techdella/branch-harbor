@@ -97,4 +97,11 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./audits.ts')).auditRoutes);
   await app.register((await import('./compliance.ts')).complianceRoutes);
   await app.register((await import('./league-table.ts')).leagueTableRoutes);
+  // Local marketing: listings, co-op fund, call tracking (with Twilio voice webhooks and DNI), settings, review reply
+  // templates and the local social content calendar.
+  await app.register((await import('./listings.ts')).listingRoutes);
+  await app.register((await import('./coop.ts')).coopRoutes);
+  await app.register((await import('./call-tracking.ts')).callTrackingWebhookRoutes);
+  await app.register((await import('./call-tracking.ts')).callTrackingRoutes);
+  await app.register((await import('./local-marketing.ts')).localMarketingRoutes);
 };

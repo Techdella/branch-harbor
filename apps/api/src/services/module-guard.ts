@@ -63,6 +63,11 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   audits: ['operations.audits'],
   compliance: ['legal.compliance_documents'],
   'league-table': ['network.league_table'],
+  // Local marketing: listings, co-op fund, call tracking and their shared settings.
+  listings: ['marketing.listings'],
+  coop: ['marketing.coop'],
+  'call-tracking': ['marketing.call_tracking'],
+  'local-marketing': ['marketing.*'],
   // The inbox holds refunds (finance), local ad spend (marketing), shift swaps and website changes; each decision is
   // checked per kind.
   approvals: ['network.approvals', 'finance.payments', 'marketing.campaigns'],

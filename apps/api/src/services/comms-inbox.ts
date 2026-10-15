@@ -132,6 +132,8 @@ export interface ReplyPolicy {
  *  - WhatsApp outside the 24-hour window needs an approved template; Messenger / Instagram can't be messaged.
  */
 export async function replyPolicy(db: Exec, conv: ConversationRow): Promise<ReplyPolicy> {
+  // Google reviews: the reply is public on Google and goes through the reviews service (approval policy applies).
+  if (conv.channel === 'review') return { optedOut: false, consent: null, window: { open: true, closesAt: null }, canReply: true, needsTemplate: false, blockedReason: null };
   const optedOut = await isOptedOut(db, conv.organizationId, conv.channel, conv.handle);
   const consent = await marketingConsent(db, conv.customerId, conv.channel);
   const window = windowState(conv.lastInboundAt);
@@ -145,6 +147,7 @@ export async function replyPolicy(db: Exec, conv: ConversationRow): Promise<Repl
 }
 
 export async function sendInConversation(s: Services, conv: ConversationRow, input: { body?: string; templateId?: string | null; authorUserId: string; ip?: string }) {
+  if (conv.channel === 'review') throw conflict('reply_via_reviews', 'Review replies are published through Reviews');
   const policy = await replyPolicy(s.db, conv);
   if (policy.blockedReason === 'contact_opted_out') throw conflict('contact_opted_out', 'This contact opted out of messages on this channel');
   if (policy.blockedReason === 'consent_required') throw conflict('consent_required', 'This contact has not agreed to receive messages on this channel');

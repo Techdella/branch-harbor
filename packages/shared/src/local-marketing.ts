@@ -37,9 +37,12 @@ export const DEFAULT_LISTING_POLICY: Record<ListingField, ListingFieldPolicy> = 
   description: 'location_approval', photos: 'location', websiteUrl: 'hq', bookingUrl: 'hq', attributes: 'location',
 };
 
-/** Fields each directory accepts from BranchHarbor (photos are uploaded separately by Google; Bing has no attributes). */
+/**
+ * Fields each directory accepts from BranchHarbor. Google: photos go through the separate Media API and booking links
+ * through Place Actions, neither of which BranchHarbor pushes yet; Bing has no attributes.
+ */
 export const PROVIDER_FIELDS: Record<ListingProvider, readonly ListingField[]> = {
-  google: ['name', 'address', 'phone', 'hours', 'specialHours', 'categories', 'description', 'websiteUrl', 'bookingUrl', 'attributes'],
+  google: ['name', 'address', 'phone', 'hours', 'specialHours', 'categories', 'description', 'websiteUrl'],
   apple: ['name', 'address', 'phone', 'hours', 'specialHours', 'categories', 'description', 'photos', 'websiteUrl', 'bookingUrl'],
   bing: ['name', 'address', 'phone', 'hours', 'specialHours', 'categories', 'description', 'photos', 'websiteUrl'],
 };
