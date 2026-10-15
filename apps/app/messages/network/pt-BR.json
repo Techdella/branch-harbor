@@ -1,0 +1,155 @@
+{
+  "nav": { "training": "Treinamento", "help": "Central de ajuda" },
+  "meta": { "training": "Academia de treinamento", "help": "Central de ajuda" },
+  "net": {
+    "liveOnlyTitle": "Conecte-se à sua organização",
+    "liveOnlyBody": "Comunidade, Treinamento e Central de ajuda funcionam apenas com a sua rede real. Entre em uma organização para usá-los.",
+    "badge": { "hq": "Matriz", "account_manager": "Gerente de conta", "franchisee": "Franqueado", "manager": "Gestor", "trainer": "Instrutor", "staff": "Equipe", "member": "Membro" },
+    "roles": { "franchise_owner": "Franqueados", "location_manager": "Gerentes de unidade", "staff": "Equipe", "regional_manager": "Gerentes regionais", "instructor_trainer": "Instrutores", "hq_admin": "Equipe da matriz", "marketing_contributor": "Marketing", "finance": "Financeiro" },
+    "audience": {
+      "label": "Público", "everyone": "Toda a rede", "selected": "Apenas as pessoas escolhidas abaixo", "regions": "Regiões", "ownerGroups": "Grupos de proprietários", "locations": "Unidades", "roles": "Funções",
+      "clear": "Enviar para todos", "hqOnly": "Somente a matriz", "oneRegion": "Uma região", "oneOwnerGroup": "Um grupo de proprietários", "oneLocation": "Uma unidade",
+      "people": "{count, plural, one {# pessoa} other {# pessoas}}"
+    }
+  },
+  "community": {
+    "title": "Comunidade",
+    "description": "Notícias da matriz, conversas com outros estúdios, a biblioteca de recursos e seu contato na matriz.",
+    "descriptionHq": "Fale com toda a rede: comunicados com confirmação de leitura, discussões, recursos, eventos e mentoria.",
+    "tabs": { "feed": "Comunicados", "discussions": "Discussões", "library": "Recursos", "events": "Eventos", "contact": "Contato na matriz", "inbox": "Notificações", "moderation": "Moderação" },
+    "ann": {
+      "filter": "Mostrar", "filters": { "all": "Todos", "required": "Leituras obrigatórias", "unread": "Não lidos", "sent": "Enviados e agendados" },
+      "new": "Novo comunicado", "empty": "Ainda não há comunicados para você.", "emptySent": "Você ainda não publicou nenhum comunicado.", "pinned": "Fixado", "confirmed": "Confirmado", "overdue": "Atrasado",
+      "required": "Leitura obrigatória", "scheduledFor": "Agendado para {when}", "draft": "Rascunho", "to": "Para {audience}", "due": "Confirmar até {date}", "read": "Ler",
+      "acknowledge": "Li e entendi", "statsRequired": "{done} de {total} confirmaram", "statsRead": "{done} de {total} abriram", "receipts": "Confirmações de leitura", "remind": "Lembrar os demais",
+      "pin": "Fixar", "unpin": "Desafixar", "composeTitle": "Novo comunicado", "composeKicker": "Da matriz", "schedule": "Agendar", "publish": "Publicar agora", "saveDraft": "Salvar rascunho",
+      "title": "Título", "body": "Mensagem", "audience": "Quem deve receber", "scopeHint": "Você só pode escrever para as regiões, grupos de proprietários ou unidades que acompanha.",
+      "requiredRead": "Leitura obrigatória (as pessoas confirmam que leram)", "dueAt": "Confirmar até", "pinToTop": "Fixar no topo do feed", "publishAt": "Publicar depois",
+      "publishAtHint": "Deixe em branco para publicar agora.", "attachmentName": "Nome do anexo", "attachmentUrl": "Link do anexo", "receiptsTitle": "Confirmações de leitura",
+      "receiptTotals": "Enviado para {targeted} · aberto por {read} · confirmado por {acknowledged}", "notYet": "Pendentes", "everyone": "Todos", "confirmedAt": "Confirmou {when}", "openedAt": "Abriu {when}", "notOpened": "Não abriu"
+    },
+    "disc": {
+      "spaces": "Espaços", "threadCount": "{count, plural, one {# tópico} other {# tópicos}}", "noSpaces": "Ainda não há espaços de discussão.", "ask": "Fazer uma pergunta", "newThread": "Criar tópico",
+      "readOnly": "Somente a matriz publica aqui. Você pode ler e reagir.", "search": "Pesquisar neste espaço", "filter": { "all": "Todos", "unanswered": "Sem resposta", "answered": "Respondidos" },
+      "pinned": "Fixado", "locked": "Bloqueado", "answered": "Respondido", "unanswered": "Aguardando resposta", "hidden": "Oculto",
+      "replies": "{count, plural, =0 {Nenhuma resposta} one {# resposta} other {# respostas}}", "noThreads": "Nada por aqui ainda. Comece a conversa.", "mention": "Mencionar alguém",
+      "question": "Sua pergunta", "threadTitle": "Título", "details": "Detalhes", "post": "Publicar", "cancel": "Cancelar", "react": "Reações",
+      "reaction": { "like": "Curtir", "love": "Amei", "celebrate": "Parabéns", "thanks": "Obrigado", "insight": "Útil" },
+      "hideReason": "Por que você está ocultando isto? (visível para moderadores)", "report": "Denunciar", "unhide": "Mostrar de novo", "hide": "Ocultar", "unlock": "Desbloquear", "lock": "Bloquear",
+      "unpin": "Desafixar", "pin": "Fixar", "back": "Voltar ao espaço", "hiddenBecause": "Oculto: {reason}", "acceptedAnswer": "Resposta aceita", "unaccept": "Remover resposta aceita",
+      "accept": "Aceitar resposta", "reported": "Obrigado. Os moderadores vão analisar.", "reportReason": "Qual é o problema com esta mensagem?", "sendReport": "Enviar denúncia",
+      "yourReply": "Sua resposta", "reply": "Responder", "lockedNote": "Este tópico está bloqueado. Não aceita novas respostas."
+    },
+    "lib": {
+      "folders": "Pastas", "allFolders": "Todos os recursos", "newFolder": "Nova pasta", "search": "Pesquisar documentos, manuais e procedimentos", "searchHelp": "Pesquisar artigos de ajuda",
+      "searchButton": "Pesquisar", "kind": "Tipo", "allKinds": "Todos os tipos",
+      "kinds": { "document": "Documento", "playbook": "Manual prático", "sop": "Procedimento", "kb_article": "Artigo de ajuda", "link": "Link", "video": "Vídeo" },
+      "newArticle": "Novo artigo", "newResource": "Adicionar recurso", "version": "Versão {version}", "noResults": "Nada encontrado para “{query}”.", "empty": "Ainda não há recursos aqui.",
+      "loading": "Carregando…", "open": "Abrir", "newVersion": "Enviar nova versão", "text": "Texto", "fileUrl": "Link do arquivo", "fileUrlHint": "Um link para o arquivo no seu armazenamento de documentos.",
+      "changeNote": "O que mudou", "saveVersion": "Salvar nova versão", "cancel": "Cancelar", "history": "Histórico de versões", "save": "Salvar", "titleLabel": "Título", "folder": "Pasta",
+      "noFolder": "Sem pasta", "summary": "Resumo curto", "tags": "Etiquetas", "tagsHint": "Separe as etiquetas com vírgulas.", "whoCanSee": "Quem pode ver", "folderName": "Nome da pasta", "hqOnly": "Somente a matriz"
+    },
+    "events": {
+      "new": "Novo evento", "kinds": { "network_call": "Reunião da rede", "training": "Treinamento", "webinar": "Webinar", "in_person": "Presencial", "social": "Confraternização" },
+      "cancelled": "Cancelado", "full": "Lotado", "going": "{count, plural, =0 {Ninguém confirmado ainda} one {# confirmado} other {# confirmados}}", "capacity": "{count} vagas", "join": "Link para entrar",
+      "rsvp": { "going": "Vou", "maybe": "Talvez", "declined": "Não posso" }, "empty": "Nenhum evento próximo.", "save": "Criar evento", "title": "Título", "kind": "Tipo",
+      "startsAt": "Início", "minutes": "Duração (minutos)", "joinUrl": "Link da videochamada", "place": "Local", "description": "Descrição"
+    },
+    "coach": {
+      "yourContact": "Seu contato na matriz", "bookCall": "Agendar uma conversa", "email": "E-mail", "noContact": "A matriz ainda não designou um gerente de conta para você.", "conversations": "Conversas privadas",
+      "you": "Você: ", "to": "Para", "startWith": "Escrever para {name}", "send": "Enviar", "pick": "Escolha uma conversa.", "private": "Somente você, seu contato na matriz e a liderança da matriz veem esta conversa.",
+      "message": "Escreva uma mensagem", "adminTitle": "Gerentes de conta", "bookingLink": "Link de agendamento", "remove": "Remover", "hqPerson": "Pessoa da matriz", "choose": "Escolher…",
+      "looksAfter": "Acompanha", "regionOption": "Região: {name}", "groupOption": "Grupo de proprietários: {name}", "locationOption": "Unidade: {name}", "jobTitle": "Cargo",
+      "bookingHint": "Calendly, Cal.com ou qualquer página de agendamento.", "assign": "Designar"
+    },
+    "inbox": {
+      "title": "Notificações", "markAll": "Marcar tudo como lido", "unread": "Não lida", "empty": "Você está em dia.",
+      "kinds": { "announcement": "Comunicados", "required_read_reminder": "Lembretes de leitura obrigatória", "mention": "Menções", "reply": "Respostas às minhas mensagens", "answer_accepted": "Respostas aceitas", "coaching": "Mensagens do meu contato na matriz", "event": "Eventos", "course_assigned": "Treinamentos atribuídos", "course_approval": "Cursos para revisar", "course_reviewed": "Revisões de cursos", "course_lead": "Interessados em cursos", "certificate_expiring": "Certificados", "ticket": "Novos chamados", "ticket_reply": "Atualizações de chamados", "ticket_assigned": "Chamados atribuídos a mim", "sla": "Alertas de prazo" },
+      "prefsTitle": "Como avisamos você", "push": "Notificações push no celular", "digest": "Resumo por e-mail", "digestOptions": { "off": "Desativado", "daily": "Diário", "weekly": "Semanal" },
+      "notifyMeAbout": "Avisar sobre", "alwaysOn": "Lembretes de leitura obrigatória e alertas de prazo são sempre enviados.", "saved": "Salvo"
+    },
+    "mod": { "title": "Mensagens denunciadas", "reportedBy": "Denunciado por {name} {when}", "reason": "Motivo", "hide": "Ocultar mensagem", "dismiss": "Descartar", "view": "Ver tópico", "empty": "Nenhuma denúncia pendente." }
+  },
+  "training": {
+    "title": "Academia de treinamento", "description": "Cursos, trilhas e certificados para toda a rede.",
+    "tabs": { "learning": "Meus treinamentos", "catalogue": "Catálogo", "authoring": "Criação", "assign": "Atribuir", "reports": "Conclusão", "leads": "Interessados" },
+    "home": {
+      "todo": "A fazer", "nothingDue": "Nada atribuído a você no momento.", "recertify": "Renovar", "overdue": "Atrasado", "due": "Prazo {date}", "progress": "Progresso",
+      "percent": "{pct}% concluído", "minutes": "{count} min", "paths": "Trilhas", "completed": "Concluídos", "completedOn": "Concluído em {date}", "certificates": "Meus certificados",
+      "noCertificates": "Os certificados aparecem aqui quando você conclui um curso.", "issued": "Emitido em {date}", "validUntil": "válido até {date}", "expired": "Expirado", "download": "Baixar PDF",
+      "needsPrerequisite": "Exige pré-requisito", "recertEvery": "Renovar a cada {months} meses", "catalogueEmpty": "Nenhum outro curso disponível."
+    },
+    "course": {
+      "back": "Voltar ao treinamento", "status": { "draft": "Rascunho", "pending_approval": "Aguardando aprovação da matriz", "published": "Publicado", "archived": "Arquivado" },
+      "public": "Vendido ao público", "trainers": "Instrutores: {names}", "prerequisites": "Conclua antes: {courses}", "module": "Módulo {n}: {title}", "score": "{score}%", "minutes": "{count} min",
+      "completedOn": "Concluído em {date}", "progress": "{pct}% concluído", "due": "Prazo {date}", "validUntil": "Certificado válido até {date}", "continue": "Continuar", "begin": "Começar",
+      "certificate": "Baixar certificado", "start": "Iniciar este curso", "passMark": "Nota mínima", "length": "Duração", "recert": "Renovação", "months": "{count} meses", "edit": "Editar curso"
+    },
+    "lesson": {
+      "kinds": { "text": "Leitura", "video": "Vídeo", "file": "Arquivo", "quiz": "Quiz" }, "done": "Concluída", "watch": "Assistir ao vídeo", "passMark": "Nota mínima {mark}%",
+      "attempts": "{count, plural, one {# tentativa} other {# tentativas}}", "question": "{n}. {prompt}", "chooseAll": "Escolha todas as corretas.", "correct": "Correto", "incorrect": "Não exatamente",
+      "passed": "Aprovado com {score}%", "failed": "Você fez {score}%. É preciso {mark}% para passar. Revise a lição e tente de novo.", "submit": "Enviar respostas",
+      "courseComplete": "Curso concluído — parabéns!", "certificate": "Baixar seu certificado", "previous": "Anterior", "completeNext": "Marcar como concluída e continuar", "complete": "Marcar como concluída", "next": "Próxima"
+    },
+    "author": {
+      "myCourses": "Cursos que posso editar", "newCourseTitle": "Título do novo curso", "create": "Criar",
+      "status": { "draft": "Rascunho", "pending_approval": "Aguardando aprovação", "published": "Publicado", "archived": "Arquivado" }, "public": "Público",
+      "changesRequested": "A matriz pediu alterações: {comment}", "none": "Você ainda não criou cursos.", "reviewQueue": "Aguardando sua aprovação", "by": "por {name}",
+      "comment": "Comentário para o autor", "approve": "Aprovar e publicar", "requestChanges": "Pedir alterações", "nothingToReview": "Nada para revisar.", "back": "Voltar à criação",
+      "details": "Dados do curso", "titleLabel": "Título", "summary": "Resumo", "description": "Descrição", "category": "Categoria", "passMark": "Nota mínima (%)",
+      "recertMonths": "Renovar após (meses)", "recertHint": "Deixe em branco se o certificado não expira.", "minutes": "Duração (minutos)", "prerequisites": "Pré-requisitos",
+      "certificate": "Emitir certificado ao concluir", "sellPublic": "Vender ao público no site da marca", "saleLocation": "Pago para",
+      "saleLocationHint": "A unidade cuja conta de pagamentos recebe o dinheiro.", "choose": "Escolher…", "price": "Preço", "currency": "Moeda", "seats": "Vagas", "startsOn": "Começa em",
+      "schedule": "Agenda", "save": "Salvar", "submitOrPublish": "Enviar para aprovação", "submit": "Enviar para a matriz", "publishNow": "Publicar agora", "saved": "Salvo",
+      "content": "Módulos e lições", "moduleTitle": "Título do novo módulo", "addModule": "Adicionar módulo", "questions": "{count, plural, one {# pergunta} other {# perguntas}}",
+      "editLesson": "Editar", "addLesson": "Adicionar lição", "lessonTitle": "Título da lição", "lessonKind": "Tipo", "kinds": { "text": "Leitura", "video": "Vídeo", "file": "Arquivo", "quiz": "Quiz" },
+      "videoUrl": "Link do vídeo", "videoHint": "Links do YouTube, Vimeo ou Loom tocam dentro da lição.", "lessonText": "Texto da lição", "fileName": "Nome do arquivo", "fileUrl": "Link do arquivo",
+      "quizPassMark": "Nota mínima do quiz (%)", "quizPassMarkHint": "Deixe em branco para usar a nota do curso.", "questionN": "Pergunta {n}", "prompt": "Pergunta", "markCorrect": "Resposta correta",
+      "option": "Resposta {n}", "addOption": "Adicionar resposta", "removeQuestion": "Remover pergunta", "addQuestion": "Adicionar pergunta", "saveLesson": "Salvar lição", "cancel": "Cancelar"
+    },
+    "assign": {
+      "new": "Atribuir treinamento", "assigned": "{count, plural, =0 {Todos já tinham.} one {Atribuído a # pessoa.} other {Atribuído a # pessoas.}}", "what": "Curso ou trilha",
+      "choose": "Escolher…", "paths": "Trilhas", "courses": "Cursos", "who": "Quem deve fazer", "dueInDays": "Prazo (dias)", "assign": "Atribuir", "current": "Atribuições atuais",
+      "type": { "course": "Curso", "path": "Trilha" }, "onboarding": "Integração", "dueAfter": "prazo de {days} dias", "remove": "Remover"
+    },
+    "reports": {
+      "course": "Curso", "allCourses": "Todos os cursos",
+      "cols": { "location": "Unidade", "people": "Pessoas", "completion": "Conclusão", "completed": "Concluídos", "inProgress": "Em andamento", "overdue": "Atrasados", "expired": "Expirados", "score": "Média nos quizzes" },
+      "empty": "Ainda não há treinamentos atribuídos às suas unidades.", "people": "Pessoas desta unidade", "done": "concluído"
+    },
+    "leads": {
+      "title": "Interessados em cursos", "status": "Status", "all": "Todos os status", "statuses": { "new": "Novo", "contacted": "Contatado", "enrolled": "Matriculado", "lost": "Perdido" },
+      "intro": "Pedidos vindos do site da marca e das campanhas de anúncios. Matrículas pagas marcam o interessado como matriculado automaticamente.",
+      "sources": { "website": "Site", "ad_campaign": "Campanha de anúncios", "manual": "Adicionado manualmente", "import": "Importado" }, "assignedTo": "Atribuído a {name}", "notes": "Anotações",
+      "saveNotes": "Salvar anotações", "empty": "Ainda não há interessados."
+    }
+  },
+  "helpdesk": {
+    "title": "Central de ajuda", "description": "Peça ajuda à matriz e acompanhe seus chamados.", "descriptionHq": "Chamados das suas unidades, com prazos de resposta.",
+    "tabs": { "queue": "Fila", "mine": "Meus chamados", "new": "Novo chamado", "kb": "Artigos de ajuda", "settings": "Configurações" },
+    "stats": { "open": "Chamados abertos", "breached": "Prazo estourado", "atRisk": "Perto do prazo", "csat": "Satisfação" },
+    "sla": { "first": "Primeira resposta", "resolution": "Resolução", "state": { "met": "Cumprido", "missed": "Perdido", "on_track": "No prazo", "at_risk": "Em risco", "breached": "Atrasado", "paused": "Pausado" }, "hours": "{count} h", "minutes": "{count} min", "left": "faltam {time}", "over": "{time} de atraso" },
+    "filters": { "active": "Abertos", "resolved": "Resolvidos", "all": "Todos" },
+    "assignee": { "any": "Qualquer pessoa", "me": "Atribuídos a mim", "unassigned": "Sem responsável" },
+    "priority": { "low": "Baixa", "normal": "Normal", "high": "Alta", "urgent": "Urgente" },
+    "status": { "open": "Aberto", "pending": "Aguardando você", "on_hold": "Em espera", "resolved": "Resolvido", "closed": "Fechado" },
+    "assignedTo": "Atribuído a {name}", "unassigned": "Sem responsável", "empty": "Nenhum chamado aqui.", "back": "Voltar aos chamados", "viaEmail": "Por e-mail", "hq": "Matriz", "internalNote": "Nota interna",
+    "canned": "Inserir resposta salva", "noteLabel": "Nota interna (somente a matriz)", "replyLabel": "Resposta", "addNote": "Adicionar nota", "send": "Enviar", "internalToggle": "Nota interna",
+    "closedNote": "Este chamado está fechado. Abra um novo se ainda precisar de ajuda.", "rateTitle": "Como foi o atendimento?", "stars": "{count, plural, one {# estrela} other {# estrelas}}",
+    "rateComment": "Algo a acrescentar? (opcional)", "rateSend": "Enviar avaliação", "rated": "Você deu {score} de 5. Obrigado!", "details": "Detalhes", "requester": "Aberto por",
+    "location": "Unidade", "opened": "Aberto em", "statusLabel": "Status", "priorityLabel": "Prioridade", "assigneeLabel": "Responsável", "categoryLabel": "Categoria", "noCategory": "Sem categoria",
+    "reopen": "Reabrir", "related": "Artigos de ajuda relacionados",
+    "form": {
+      "title": "Pedir ajuda à matriz", "subject": "Assunto", "category": "Categoria", "other": "Outro assunto", "priority": "Prioridade",
+      "priorities": { "low": "Baixa — quando puderem", "normal": "Normal", "high": "Alta — afeta clientes", "urgent": "Urgente — não conseguimos operar" },
+      "location": "Unidade", "noLocation": "Não é sobre uma unidade", "details": "O que está acontecendo?", "attachmentName": "Nome do print ou arquivo", "attachmentUrl": "Link do arquivo",
+      "submit": "Enviar para a matriz", "maybeHelpful": "Isto pode ajudar", "suggestHint": "Digite um assunto e sugerimos artigos de ajuda."
+    },
+    "settings": {
+      "emailIn": "Endereço de entrada por e-mail", "emailInHint": "E-mails enviados para este endereço por pessoas da sua rede viram chamados. Respostas com [#número] no assunto entram no chamado.",
+      "categories": "Categorias e prazos de resposta", "targets": "primeira resposta {first} min · resolução {resolve} min", "name": "Nome", "firstResponse": "Primeira resposta (min)", "resolution": "Resolução (min)",
+      "add": "Adicionar", "priorityNote": "Os prazos valem para prioridade normal. Urgente é quatro vezes mais rápido, alta duas vezes mais rápido e baixa duas vezes mais lento.",
+      "canned": "Respostas salvas", "delete": "Excluir", "cannedTitle": "Título", "cannedBody": "Texto da resposta"
+    }
+  }
+}
