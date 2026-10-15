@@ -85,4 +85,5 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./marketing-sites.ts')).marketingSiteRoutes);
   await app.register((await import('./marketing.ts')).marketingRoutes);
   await app.register((await import('./marketing-public.ts')).marketingPublicRoutes);
+  await app.register((await import('./finance.ts')).financeRoutes);
 };

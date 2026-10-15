@@ -64,6 +64,11 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'community.discussions': [{ key: 'community', href: '/community', icon: 'message' }],
   'community.library': [{ key: 'community', href: '/community', icon: 'message' }],
   'community.help_desk': [{ key: 'help', href: '/help', icon: 'help' }],
+  // Finance workspace (/finance/...): royalties and reports for HQ, statements & invoices for anyone with them in scope.
+  'finance.royalties': [{ key: 'financeRoyalties', href: '/finance/royalties', icon: 'receipt' }, { key: 'financeReports', href: '/finance/reports', icon: 'chart' }],
+  'finance.invoices': [{ key: 'financeStatements', href: '/finance/statements', icon: 'file' }],
+  'finance.marketing_fund': [{ key: 'financeFund', href: '/finance/marketing-fund', icon: 'megaphone' }],
+  'finance.payouts': [{ key: 'financePayouts', href: '/finance/payouts', icon: 'wallet' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],

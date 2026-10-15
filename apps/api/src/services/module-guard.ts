@@ -54,6 +54,8 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   // Finance
   payments: ['finance.payments'],
   'refund-requests': ['finance.payments'],
+  // Finance workspace (/finance/...): each endpoint then checks its own module action and scope.
+  finance: ['finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts', 'finance.payments'],
   // Network
   reports: ['network.reports'],
   // The inbox holds refunds (finance), local ad spend (marketing), shift swaps and website changes; each decision is

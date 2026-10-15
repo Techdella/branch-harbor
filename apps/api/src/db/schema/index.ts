@@ -19,3 +19,4 @@ export * from './hospitality-ext.ts';
 export * from './network.ts';
 export * from './comms.ts';
 export * from './marketing.ts';
+export * from './finance.ts';

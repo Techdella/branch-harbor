@@ -259,6 +259,18 @@ async function main() {
   // Website builder: seeded classic pages become builder documents (as `db:migrate` does for existing data).
   const sites = await (await import('../services/site-builder.ts')).migrateSiteDocuments(db);
   console.log(` Websites:      ${sites.migratedPages} pages converted to website builder documents`);
+  const financeSeed = await (await import('./seed-finance.ts')).seedFinance({ db, today, upsertUser });
+  {
+    // Marketing's network campaign spend (seed-comms) is booked into the fund ledger, on top of an opening balance
+    // carried over from the previous fund year so the demo fund isn't overdrawn.
+    const { consumePendingSpendEvents } = await import('../services/finance/fund.ts');
+    const pending = await db.select({ currency: t.marketingFundSpendEvents.currency, total: sql<number>`sum(${t.marketingFundSpendEvents.amountMinor})::int` })
+      .from(t.marketingFundSpendEvents).where(sql`${t.marketingFundSpendEvents.organizationId} = ${northlight.orgId} and ${t.marketingFundSpendEvents.consumedAt} is null`).groupBy(t.marketingFundSpendEvents.currency);
+    const year = Number(today.slice(0, 4));
+    if (pending.length) await db.insert(t.marketingFundEntries).values(pending.map((p) => ({ organizationId: northlight.orgId, kind: 'adjustment', currency: p.currency, amountMinor: Math.ceil((p.total * 1.5) / 100) * 100, occurredOn: `${year}-01-01`, description: 'Opening balance carried over from last year (sample)' })));
+    await consumePendingSpendEvents(db, northlight.orgId);
+  }
+  console.log(` Finance:       closed royalty periods, a disputed statement, an overdue invoice and fund spend with receipts (sandbox). Finance lead: ${financeSeed.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

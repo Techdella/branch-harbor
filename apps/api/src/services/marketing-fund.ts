@@ -1,7 +1,7 @@
 /**
  * Marketing fund link. Campaign spend paid from the network marketing fund (network, coming-soon and course
- * campaigns — not a location's own local ads) is published as a spend event. The fund ledger (built separately)
- * consumes them either:
+ * campaigns — not a location's own local ads) is published as a spend event. The Finance fund ledger
+ * (services/finance/fund.ts) books them as spend entries linked to the campaign, either:
  *  - in-process: `onMarketingFundSpend(listener)` is called after each event is stored, or
  *  - by polling: `GET /v1/orgs/:orgId/ad-campaigns/fund-events?pending=true`, then
  *    `POST /v1/orgs/:orgId/ad-campaigns/fund-events/consume` with the ids it booked.
@@ -21,7 +21,8 @@ export interface MarketingFundSpendEvent {
   occurredOn: string;
   source: string;
 }
-export type MarketingFundListener = (e: MarketingFundSpendEvent) => void | Promise<void>;
+/** Listeners get the same database handle (or transaction) the event was stored with. */
+export type MarketingFundListener = (e: MarketingFundSpendEvent, db: Exec) => void | Promise<void>;
 
 const listeners = new Set<MarketingFundListener>();
 export function onMarketingFundSpend(fn: MarketingFundListener) {
@@ -35,7 +36,7 @@ export async function recordFundSpend(db: Exec, e: Omit<MarketingFundSpendEvent,
   if (!e.amountMinor) return null;
   const [row] = await db.insert(marketingFundSpendEvents).values(e).returning();
   const out: MarketingFundSpendEvent = { id: row!.id, organizationId: e.organizationId, campaignId: e.campaignId, locationId: e.locationId, amountMinor: e.amountMinor, currency: e.currency, occurredOn: e.occurredOn, source: e.source };
-  for (const l of listeners) await Promise.resolve(l(out)).catch(() => {});
+  for (const l of listeners) await Promise.resolve(l(out, db)).catch(() => {});
   return out;
 }
 

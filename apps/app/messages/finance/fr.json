@@ -1,0 +1,519 @@
+{
+  "nav": {
+    "financeRoyalties": "Redevances",
+    "financeReports": "Rapports financiers",
+    "financeStatements": "Relevés et factures",
+    "financeFund": "Fonds marketing",
+    "financePayouts": "Virements"
+  },
+  "access": {
+    "modules": {
+      "finance": {
+        "royalties": {
+          "name": "Redevances",
+          "description": "Conditions de redevance, clôture des périodes, relevés, contestations, approbation, facturation et encaissement dans tout le réseau."
+        },
+        "invoices": {
+          "name": "Relevés et factures",
+          "description": "Relevés de redevances et factures des établissements concernés, avec contestations, déclarations de ventes externes et mandat de prélèvement."
+        },
+        "marketing_fund": {
+          "name": "Fonds marketing",
+          "description": "Contributions au fonds, dépenses pour les campagnes du réseau avec justificatifs, solde par devise et rapport de transparence."
+        },
+        "payouts": {
+          "name": "Virements",
+          "description": "Virements, frais, remboursements et rétrofacturations par établissement, rapprochement et exports comptables."
+        }
+      }
+    }
+  },
+  "finance": {
+    "common": {
+      "combined": "Toutes les devises",
+      "noConversion": "Non additionnés : {currencies} sont affichés séparément, jamais convertis.",
+      "sandbox": "Mode bac à sable : paiements, mandats et virements sont simulés. Aucun argent ne circule.",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "exportCsv": "Exporter en CSV",
+      "exportXero": "CSV Xero",
+      "exportQuickbooks": "CSV QuickBooks"
+    },
+    "frequency": {
+      "monthly": "Mensuelle",
+      "weekly": "Hebdomadaire"
+    },
+    "weekday": {
+      "1": "Lundi",
+      "2": "Mardi",
+      "3": "Mercredi",
+      "4": "Jeudi",
+      "5": "Vendredi",
+      "6": "Samedi",
+      "7": "Dimanche"
+    },
+    "statementStatus": {
+      "draft": "Brouillon",
+      "disputed": "Contesté",
+      "approved": "Approuvé",
+      "invoiced": "Facturé",
+      "void": "Annulé"
+    },
+    "invoiceState": {
+      "open": "Ouverte",
+      "processing": "En cours",
+      "paid": "Payée",
+      "overdue": "En retard",
+      "void": "Annulée"
+    },
+    "stream": {
+      "bookings": "Réservations",
+      "memberships": "Abonnements et forfaits",
+      "retail": "Boutique",
+      "food": "Restauration",
+      "gift_vouchers": "Bons cadeaux",
+      "other": "Autres ventes",
+      "external": "Ventes externes"
+    },
+    "line": {
+      "sales": "Ventes : {stream}",
+      "excluded": "Hors assiette de redevance : {stream}",
+      "refunds": "Moins les remboursements",
+      "tax": "Moins les taxes",
+      "tips": "Moins les pourboires",
+      "external_sales": "Ventes déclarées depuis une caisse externe",
+      "basis": "Ventes nettes (assiette de redevance)",
+      "royalty": "Redevance",
+      "royaltyTier": "Redevance sur les ventes de {from} à {to}",
+      "royaltyTierAbove": "Redevance sur les ventes au-delà de {from}",
+      "royalty_minimum": "Complément jusqu’à la redevance minimale",
+      "marketing_fund": "Fonds marketing",
+      "technology_fee": "Frais technologiques",
+      "adjustment": "Ajustement",
+      "disputeAdjustment": "Ajustement suite à contestation : {text}"
+    },
+    "invoiceLine": {
+      "royalty": "Redevance",
+      "marketing_fund": "Fonds marketing",
+      "technology_fee": "Frais technologiques",
+      "adjustment": "Ajustement",
+      "late_fee": "Pénalité de retard"
+    },
+    "warning": {
+      "no_terms": "Aucune condition de redevance ne s’applique à cet établissement et à cette devise. Ajoutez des conditions, puis recalculez.",
+      "external_sales_pending_review": "Une déclaration de ventes externes pour cette période attend d’être examinée.",
+      "external_sales_excluded": "Les ventes externes ne font pas partie de l’assiette de redevance de cet établissement.",
+      "foreign": "Les paiements dans une autre devise ({amount}) ne sont pas inclus : un relevé ne mélange jamais les devises."
+    },
+    "col": {
+      "location": "Établissement",
+      "franchisee": "Franchisé",
+      "period": "Période",
+      "grossSales": "Ventes brutes",
+      "basis": "Ventes nettes",
+      "royalty": "Redevance",
+      "fund": "Fonds",
+      "techFee": "Frais technologiques",
+      "minimum": "Minimum",
+      "total": "Total",
+      "status": "Statut",
+      "invoice": "Facture",
+      "due": "Échéance",
+      "outstanding": "Restant dû",
+      "refunds": "Remboursements",
+      "tax": "Taxes",
+      "evidence": "Justificatif",
+      "date": "Date",
+      "kind": "Type",
+      "description": "Description",
+      "amount": "Montant",
+      "receipt": "Reçu"
+    },
+    "royalties": {
+      "title": "Redevances",
+      "description": "Clôturez les périodes, vérifiez et approuvez les relevés, facturez les franchisés et encaissez, dans la devise de chaque établissement.",
+      "tab": {
+        "statements": "Relevés",
+        "invoices": "Factures et encaissement",
+        "sales": "Déclarations de ventes",
+        "terms": "Conditions",
+        "settings": "Paramètres"
+      },
+      "closeTitle": "Clôturer une période",
+      "closeHint": "Période : {frequency}. Chaque période se termine à minuit dans le fuseau horaire de chaque établissement. La clôture crée un relevé pour chaque établissement franchisé.",
+      "periodStart": "Début de période",
+      "closePeriod": "Clôturer la période",
+      "closed": "Période clôturée : {count, plural, one {# relevé} other {# relevés}} à vérifier.",
+      "closedMissing": "Période clôturée : {count, plural, one {# relevé} other {# relevés}}. {missing, plural, one {# établissement n’a} other {# établissements n’ont}} pas encore de conditions.",
+      "period": "Période",
+      "noPeriods": "Aucune période clôturée",
+      "noPeriodsBody": "Clôturez la dernière période pour produire les relevés de redevances.",
+      "noStatements": "Aucun relevé pour cette période",
+      "invoiceApproved": "Facturer tous les relevés approuvés",
+      "invoicedAll": "{count, plural, =0 {Aucune facture émise} one {# facture émise} other {# factures émises}}.",
+      "dueIn": "Dû en {currency}",
+      "statementCount": "{count, plural, one {# relevé} other {# relevés}}",
+      "warnings": "{count, plural, one {# avertissement} other {# avertissements}}",
+      "receivable": "À recevoir en {currency}",
+      "overdueSub": "{count, plural, one {# facture en retard} other {# factures en retard}} · {amount}",
+      "noneOverdue": "Rien en retard",
+      "runDunning": "Lancer les relances",
+      "dunningDone": "Relances effectuées : {reminders} rappels, {lateFees} pénalités, {retries} nouvelles tentatives, {notices} mises en demeure."
+    },
+    "statement": {
+      "kicker": "Relevé de redevances",
+      "timeZone": "Période en {zone}",
+      "line": "Ligne",
+      "rate": "Taux",
+      "amount": "Montant",
+      "manual": "manuel",
+      "totalDue": "Total dû",
+      "adjustTitle": "Ajuster ce relevé",
+      "adjustAmount": "Montant en {currency}",
+      "adjustHint": "Négatif pour un avoir, par ex. -50.00",
+      "adjustReason": "Motif",
+      "adjust": "Ajouter l’ajustement",
+      "adjusted": "Ajustement ajouté.",
+      "recalculate": "Recalculer",
+      "recalculated": "Relevé recalculé à partir des dernières ventes.",
+      "approve": "Approuver",
+      "approved": "Relevé approuvé. Il peut maintenant être facturé.",
+      "issueInvoice": "Émettre la facture",
+      "invoiced": "Facture émise."
+    },
+    "dispute": {
+      "title": "Contestations",
+      "status": {
+        "open": "Ouverte",
+        "accepted": "Acceptée",
+        "rejected": "Rejetée"
+      },
+      "resolution": "Siège : {text}",
+      "resolveTitle": "Traiter la contestation",
+      "resolutionLabel": "Décision (partagée avec le franchisé)",
+      "adjustmentLabel": "Ajustement en {currency}",
+      "adjustmentHint": "Facultatif. Négatif pour un avoir.",
+      "accept": "Accepter",
+      "reject": "Rejeter",
+      "resolved": "Contestation traitée.",
+      "raiseTitle": "Contester ce relevé",
+      "raiseHint": "La finance du siège l’examine avant la facturation du relevé.",
+      "lineLabel": "Ligne",
+      "wholeStatement": "Le relevé entier",
+      "reasonLabel": "Qu’est-ce qui ne va pas ?",
+      "raise": "Envoyer la contestation",
+      "raised": "Contestation envoyée à la finance du siège."
+    },
+    "invoice": {
+      "kicker": "Facture",
+      "number": "Facture {number}",
+      "due": "Échéance {date}",
+      "pdf": "PDF",
+      "issued": "Émise le",
+      "dueDate": "Échéance",
+      "daysOverdue": "{count, plural, one {# jour de retard} other {# jours de retard}}",
+      "tax": "{name} ({rate})",
+      "noTax": "Taxes : aucune configurée",
+      "total": "Total",
+      "paid": "Payé",
+      "outstanding": "Restant dû",
+      "mandate": "Prélevé par {method} se terminant par {last4}.",
+      "noMandate": "Aucun moyen de paiement enregistré : le franchisé doit configurer un prélèvement ou une carte.",
+      "collect": "Encaisser maintenant",
+      "collectStarted": "Encaissement lancé.",
+      "collectFailed": "Le paiement a échoué ({code}). Les relances feront une nouvelle tentative.",
+      "payNow": "Payer {amount} maintenant",
+      "payStarted": "Paiement lancé.",
+      "sandboxSettle": "Régler le prélèvement (bac à sable)",
+      "sandboxFail": "Faire échouer le prélèvement (bac à sable)",
+      "settled": "Prélèvement réglé.",
+      "settleFailed": "Prélèvement marqué comme échoué.",
+      "recordTitle": "Enregistrer un paiement reçu hors de BranchHarbor",
+      "recordAmount": "Montant en {currency}",
+      "recordReference": "Référence",
+      "recordDate": "Reçu le",
+      "record": "Enregistrer le paiement",
+      "recorded": "Paiement enregistré.",
+      "history": "Historique des paiements",
+      "attempt": "Tentative {n} · {method}"
+    },
+    "attemptMethod": {
+      "debit": "prélèvement",
+      "manual": "enregistré par le siège"
+    },
+    "attemptStatus": {
+      "processing": "En cours",
+      "succeeded": "Payé",
+      "failed": "Échoué",
+      "requires_action": "Action requise"
+    },
+    "dunning": {
+      "reminder": "Rappel envoyé avant l’échéance",
+      "retry": "Nouvelle tentative d’encaissement",
+      "late_fee": "Pénalité de retard ajoutée",
+      "final_notice": "Mise en demeure envoyée"
+    },
+    "invoices": {
+      "empty": "Aucune facture pour l’instant"
+    },
+    "sales": {
+      "hqHint": "Les établissements équipés d’une caisse externe déclarent leurs ventes avec un justificatif. Seules les déclarations acceptées comptent pour les redevances.",
+      "empty": "Aucune déclaration de ventes",
+      "evidence": "Justificatif",
+      "accept": "Accepter",
+      "reject": "Rejeter",
+      "status": {
+        "submitted": "En attente d’examen",
+        "accepted": "Acceptée",
+        "rejected": "Rejetée"
+      },
+      "submitTitle": "Déclarer les ventes d’une caisse externe",
+      "submitHint": "Pour les ventes qui ne passent pas par BranchHarbor. Joignez le rapport de caisse (PDF, image, CSV ou tableur, 5 Mo max).",
+      "gross": "Ventes brutes en {currency}",
+      "refunds": "Remboursements en {currency}",
+      "tax": "Taxes incluses en {currency}",
+      "evidenceFile": "Justificatif",
+      "evidenceHint": "PDF, image, CSV ou tableur, 5 Mo max.",
+      "note": "Note pour le siège",
+      "submit": "Envoyer la déclaration",
+      "submitted": "Déclaration envoyée. La finance du siège va l’examiner.",
+      "reviewNote": "Note du siège"
+    },
+    "terms": {
+      "hint": "Les conditions se définissent par franchisé (groupe propriétaire) ou par défaut pour le réseau, par devise, avec des dates d’effet. Les taux d’un contrat de franchise priment lorsqu’il existe.",
+      "add": "Ajouter des conditions",
+      "addTitle": "Nouvelles conditions de redevance",
+      "editTitle": "Modifier les conditions de redevance",
+      "appliesTo": "S’applique à",
+      "orgDefault": "Par défaut (réseau)",
+      "currency": "Devise",
+      "effectiveFrom": "En vigueur à partir du",
+      "effectiveTo": "En vigueur jusqu’au",
+      "effective": "En vigueur",
+      "open": "sans fin",
+      "royaltyPct": "Redevance (% des ventes nettes)",
+      "fundPct": "Fonds marketing (% des ventes nettes)",
+      "techFee": "Frais technologiques par établissement et par période ({currency})",
+      "techFeeHint": "Montant fixe, 0 si aucun.",
+      "minimum": "Redevance minimale par période ({currency})",
+      "minimumHint": "0 si aucun minimum.",
+      "tierMode": "Paliers",
+      "tierMarginal": "Chaque tranche à son propre taux",
+      "tierWhole": "Toutes les ventes au taux du palier atteint",
+      "tiers": "Taux par paliers (facultatif)",
+      "tierFrom": "À partir de ventes de ({currency})",
+      "tierRate": "Taux (%)",
+      "addTier": "Ajouter un palier",
+      "removeTier": "Supprimer",
+      "tiered": "{count, plural, one {# palier} other {# paliers}}",
+      "basis": "Revenus pris en compte",
+      "netOfRefunds": "Nets des remboursements",
+      "excludeTax": "Hors taxes",
+      "excludeTips": "Hors pourboires",
+      "includeExternal": "Inclure les ventes externes déclarées",
+      "lateFee": "Pénalité de retard",
+      "lateFeeNone": "Aucune",
+      "lateFeeFlat": "Montant fixe",
+      "lateFeePercent": "Pourcentage du montant en retard",
+      "lateFeeAmount": "Pénalité de retard ({currency})",
+      "lateFeeRate": "Pénalité de retard (%)",
+      "graceDays": "Jours de grâce après l’échéance",
+      "empty": "Aucune condition pour l’instant",
+      "emptyBody": "Ajoutez les conditions par défaut du réseau pour chaque devise utilisée par vos établissements."
+    },
+    "settings": {
+      "collectionTitle": "Compte qui reçoit les redevances",
+      "collectionBody": "Les franchisés paient sur le compte Stripe propre au siège, par carte ou prélèvement bancaire, avec un mandat accepté dans BranchHarbor. L’argent ne transite jamais par BranchHarbor.",
+      "collectionConnected": "Connecté : {account}",
+      "collectionMissing": "Pas encore connecté.",
+      "sandboxMode": "bac à sable",
+      "connect": "Connecter le compte",
+      "periodsTitle": "Périodes et factures",
+      "frequency": "Période",
+      "weekStartsOn": "Les semaines commencent le",
+      "invoicePrefix": "Préfixe des numéros de facture",
+      "nextNumber": "Prochaine facture : {number}",
+      "paymentTerms": "Délai de paiement (jours)",
+      "autoCollect": "Encaisser automatiquement à l’émission d’une facture",
+      "dunningTitle": "Relances",
+      "retryDays": "Nouvelle tentative d’encaissement X jours après l’échéance",
+      "retryDaysHint": "Par exemple : 3, 7",
+      "reminderDays": "Rappel X jours avant l’échéance",
+      "finalNotice": "Mise en demeure après (jours de retard)",
+      "taxTitle": "Taxes sur les factures",
+      "taxBody": "BranchHarbor n’ajoute aucune taxe de lui-même. N’ajoutez que les lignes de taxe confirmées par votre comptable, par pays.",
+      "taxName": "Nom",
+      "taxRate": "Taux (%)",
+      "taxCountry": "Pays (2 lettres)",
+      "taxAppliesTo": "S’applique à",
+      "addTax": "Ajouter une ligne de taxe",
+      "removeTax": "Supprimer",
+      "issuerTitle": "Informations imprimées sur les factures",
+      "issuer": {
+        "legalName": "Raison sociale",
+        "address": "Adresse",
+        "taxNumber": "Numéro fiscal",
+        "email": "E-mail de facturation"
+      },
+      "saved": "Paramètres financiers enregistrés."
+    },
+    "mine": {
+      "title": "Relevés et factures",
+      "description": "Vos relevés de redevances, factures, moyen de paiement et déclarations de ventes, pour vos établissements uniquement.",
+      "tab": {
+        "statements": "Relevés",
+        "invoices": "Factures",
+        "method": "Moyen de paiement",
+        "sales": "Déclarations de ventes"
+      },
+      "noStatements": "Aucun relevé pour l’instant",
+      "noStatementsBody": "Les relevés apparaissent ici quand le siège clôture une période.",
+      "toPay": "À payer en {currency}"
+    },
+    "method": {
+      "intro": "Les factures sont prélevées sur le moyen enregistré ici à leur échéance. Vous pouvez le remplacer ou le révoquer à tout moment.",
+      "noGroups": "Aucune franchise dans votre accès",
+      "active": "Actif",
+      "none": "Non configuré",
+      "saved": "{method} se terminant par {last4}",
+      "revoke": "Révoquer",
+      "revoked": "Moyen de paiement révoqué.",
+      "pending": "{method} : en attente de confirmation.",
+      "sandboxConfirm": "Confirmer (bac à sable)",
+      "sandboxDecline": "Confirmer un moyen qui échoue (bac à sable)",
+      "confirmed": "Moyen de paiement enregistré.",
+      "check": "Vérifier l’état",
+      "checked": "État mis à jour.",
+      "type": "Moyen",
+      "authorise": "J’autorise le siège à prélever sur ce moyen les factures de redevances, de fonds marketing et de frais de {group} en {currency}, à partir de chaque échéance, jusqu’à révocation.",
+      "setUp": "Configurer",
+      "replace": "Remplacer",
+      "started": "Autorisation enregistrée. Confirmez le moyen pour terminer.",
+      "card": "Carte",
+      "us_bank_account": "Compte bancaire américain (ACH)",
+      "acss_debit": "Débit préautorisé canadien",
+      "bacs_debit": "Prélèvement Bacs",
+      "sepa_debit": "Prélèvement SEPA",
+      "au_becs_debit": "Prélèvement BECS"
+    },
+    "fund": {
+      "title": "Fonds marketing",
+      "description": "D’où vient le fonds marketing du réseau et ce qu’il finance, par devise.",
+      "tab": {
+        "report": "Rapport de transparence",
+        "ledger": "Grand livre",
+        "spend": "Enregistrer une dépense"
+      },
+      "year": "Année",
+      "annualStatement": "Relevé annuel (CSV)",
+      "empty": "Aucune activité du fonds pour l’instant",
+      "reportTitle": "{currency} · {year}",
+      "opening": "Solde d’ouverture",
+      "contributions": "Contributions ({count, plural, one {# franchisé} other {# franchisés}})",
+      "spend": "Dépensé en campagnes",
+      "adjustments": "Ajustements",
+      "closing": "Solde de clôture",
+      "yours": "Vos contributions",
+      "byCampaign": "Dépenses par campagne",
+      "unallocated": "Non affecté",
+      "balanceIn": "Solde du fonds en {currency}",
+      "kind": {
+        "contribution": "Contribution",
+        "spend": "Dépense",
+        "adjustment": "Ajustement"
+      },
+      "contributionFrom": "Contribution de {who}",
+      "receipt": "Reçu",
+      "spendTitle": "Enregistrer une dépense du fonds",
+      "spendHint": "Chaque dépense nécessite son reçu et une campagne. Une dépense ne peut pas dépasser le solde du fonds dans cette devise.",
+      "campaign": "Campagne",
+      "vendor": "Fournisseur",
+      "receiptFile": "Reçu",
+      "recordSpend": "Enregistrer la dépense",
+      "spendRecorded": "Dépense enregistrée.",
+      "campaignsFromMarketing": "Les campagnes sont les campagnes publicitaires réseau, « bientôt ouvert » et formations du Marketing ; leurs dépenses enregistrées sont comptabilisées ici automatiquement."
+    },
+    "payouts": {
+      "title": "Virements",
+      "description": "Virements vers la banque de chaque établissement, avec frais, remboursements et rétrofacturations, rapprochés des paiements et des redevances.",
+      "tab": {
+        "payouts": "Virements",
+        "reconciliation": "Rapprochement",
+        "exports": "Exports"
+      },
+      "sync": "Synchroniser les virements",
+      "synced": "{count, plural, =0 {Aucun nouveau virement} one {# virement mis à jour} other {# virements mis à jour}}.",
+      "netIn": "Versé en {currency}",
+      "feesSub": "Frais {fees} · rétrofacturations {chargebacks}",
+      "empty": "Aucun virement pour l’instant",
+      "emptyBody": "Synchronisez les virements pour les charger depuis le prestataire de paiement.",
+      "arrives": "Arrivée",
+      "fees": "Frais",
+      "chargebacks": "Rétrofacturations",
+      "net": "Net"
+    },
+    "payoutStatus": {
+      "pending": "En attente",
+      "in_transit": "En transit",
+      "paid": "Versé",
+      "failed": "Échoué",
+      "canceled": "Annulé"
+    },
+    "recon": {
+      "hint": "Pour chaque établissement : ce que les clients ont payé dans BranchHarbor, ce qui est arrivé à la banque, et le relevé de redevances et la facture de la même période.",
+      "empty": "Rien à rapprocher pour cette période",
+      "payments": "Paiements",
+      "count": "{count, plural, one {# paiement} other {# paiements}}",
+      "paidOut": "Versé",
+      "statement": "Relevé",
+      "issues": "Contrôles",
+      "ok": "Tout concorde",
+      "issue": {
+        "statement_out_of_date": "Relevé pas à jour",
+        "not_paid_out": "Non versé après 7 jours",
+        "unmatched_payout_transaction": "Ligne de virement sans paiement",
+        "royalty_unpaid": "Redevance en retard",
+        "no_statement": "Aucun relevé"
+      }
+    },
+    "exports": {
+      "title": "Exports comptables",
+      "hint": "Fichiers CSV à importer dans votre logiciel comptable. Les formats Xero et QuickBooks sont des fichiers uniquement ; rien ne leur est envoyé.",
+      "from": "Du",
+      "to": "Au",
+      "currency": "Devise",
+      "currencyHint": "Les fichiers bancaires QuickBooks n’acceptent qu’une devise.",
+      "dataset": {
+        "statements": "Relevés de redevances",
+        "invoices": "Factures",
+        "payouts": "Virements",
+        "fund": "Grand livre du fonds marketing"
+      },
+      "format": {
+        "csv": "CSV",
+        "xero": "Xero",
+        "quickbooks": "QuickBooks"
+      }
+    },
+    "reports": {
+      "title": "Rapports financiers",
+      "description": "Revenus de redevances, encaissement et impayés par devise.",
+      "collectedIn": "Encaissé en {currency}",
+      "collectionSub": "{rate} % de {invoiced} facturés · {onTime} sur {paid} payées à temps",
+      "byLocation": "Revenus de redevances par établissement",
+      "byRegion": "Revenus de redevances par région",
+      "region": "Région",
+      "noRegion": "Sans région",
+      "none": "Aucun relevé cette année.",
+      "ageing": "Balance âgée des impayés",
+      "noArrears": "Rien en retard.",
+      "bucket": {
+        "current": "Pas encore échu",
+        "d1_30": "1 à 30 jours",
+        "d31_60": "31 à 60 jours",
+        "d61_90": "61 à 90 jours",
+        "d90_plus": "Plus de 90 jours"
+      }
+    }
+  }
+}

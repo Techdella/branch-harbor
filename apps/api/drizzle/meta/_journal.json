@@ -148,6 +148,13 @@
       "when": 1792075410728,
       "tag": "0020_marketing_workspace",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792076119313,
+      "tag": "0021_finance",
+      "breakpoints": true
     }
   ]
 }

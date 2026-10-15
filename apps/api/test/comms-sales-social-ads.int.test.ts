@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { eq } from 'drizzle-orm';
 import { splitBudget } from '@bh/shared';
-import { locations, socialPosts } from '../src/db/schema/index.ts';
+import { locations, marketingFundEntries, socialPosts } from '../src/db/schema/index.ts';
 import { onMarketingFundSpend, type MarketingFundSpendEvent } from '../src/services/marketing-fund.ts';
 import { publishDuePosts } from '../src/services/social.ts';
 import { call, createLocation, createOrg, hasDb, makeApp, memberWithRole, verifiedUser } from './helpers.ts';
@@ -183,9 +183,12 @@ describe.skipIf(!hasDb)('lead routing, social approval + handover, network and c
     const r2 = await call(app, 'POST', `/v1/orgs/${orgId}/ad-campaigns/${c.body.id}/results`, { token: marketer.token, body: { locationId: sea.id, day: '2026-11-01', spendMinor: 2000, currency: 'USD', impressions: 4000, clicks: 80 } });
     expect(r2.body.fundEvent).toMatchObject({ amountMinor: -500 });
     expect(events.map((e) => e.amountMinor)).toEqual([2500, -500]);
+    // The Finance fund ledger books each event as it is stored (net 2000 USD of spend on this campaign), so none stay pending.
     const pending = await call(app, 'GET', `/v1/orgs/${orgId}/ad-campaigns/fund-events?pending=true`, { token: owner.token });
-    expect(pending.body.items.reduce((a: number, e: any) => a + e.amountMinor, 0)).toBe(2000);
-    expect((await call(app, 'POST', `/v1/orgs/${orgId}/ad-campaigns/fund-events/consume`, { token: owner.token, body: { ids: pending.body.items.map((e: any) => e.id) } })).body.consumed).toBe(2);
+    expect(pending.body.items).toEqual([]);
+    const booked = await app.ctx.db.select().from(marketingFundEntries).where(eq(marketingFundEntries.campaignId, c.body.id));
+    expect(booked.reduce((a, e) => a - e.amountMinor, 0)).toBe(2000);
+    expect((await call(app, 'POST', `/v1/orgs/${orgId}/ad-campaigns/fund-events/consume`, { token: owner.token, body: { ids: events.map((e) => e.id) } })).body.consumed).toBe(0);
     const sync = await call(app, 'POST', `/v1/orgs/${orgId}/ad-campaigns/${c.body.id}/sync`, { token: marketer.token });
     expect(sync.body.platforms.every((p: any) => p.mode === 'sandbox' && p.imported === 0)).toBe(true);
     off();

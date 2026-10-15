@@ -20,6 +20,17 @@ const hospitalitySweep = setInterval(() => void (async () => {
 const networkSweep = setInterval(() => void import('./services/community.ts').then((m) => m.runNetworkHousekeeping(app.ctx)).catch((err) => app.log.error({ err }, 'network housekeeping failed')), 5 * 60_000);
 // Marketing: resume delayed automation runs, deliver scheduled campaigns and publish scheduled pages (works without Redis).
 const marketingSweep = setInterval(() => void app.ctx.jobs.enqueue('marketing.tick', {}, { jobId: `marketing-tick-${Math.floor(Date.now() / 30_000)}` }).catch(() => {}), 30_000);
+// Finance: dunning (reminders, collection retries, late fees, final notices) once a day per organisation with finance
+// settings; each step is recorded once, so a repeated run is harmless.
+const enqueueDunning = () => void (async () => {
+  const { financeSettings } = await import('./db/schema/index.ts');
+  const day = new Date().toISOString().slice(0, 10);
+  for (const r of await app.ctx.db.select({ organizationId: financeSettings.organizationId }).from(financeSettings)) {
+    await app.ctx.jobs.enqueue('finance.dunning', { organizationId: r.organizationId }, { jobId: `finance-dunning-${r.organizationId}-${day}` });
+  }
+})().catch((err) => app.log.warn({ err }, 'finance dunning schedule failed'));
+const dunningStart = setTimeout(enqueueDunning, 60_000);
+const dunningSweep = setInterval(enqueueDunning, 24 * 3600_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
@@ -29,6 +40,8 @@ const shutdown = async (signal: string) => {
   clearInterval(hospitalitySweep);
   clearInterval(networkSweep);
   clearInterval(marketingSweep);
+  clearTimeout(dunningStart);
+  clearInterval(dunningSweep);
   await app.close();
   process.exit(0);
 };
