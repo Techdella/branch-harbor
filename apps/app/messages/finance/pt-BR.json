@@ -1,0 +1,521 @@
+{
+  "nav": {
+    "financeRoyalties": "Royalties",
+    "financeReports": "Relatórios financeiros",
+    "financeStatements": "Demonstrativos e faturas",
+    "financeFund": "Fundo de marketing",
+    "financePayouts": "Repasses"
+  },
+  "access": {
+    "modules": {
+      "finance": {
+        "royalties": {
+          "name": "Royalties",
+          "description": "Condições de royalties, fechamento de períodos, demonstrativos, contestações, aprovação, faturamento e cobrança em toda a rede."
+        },
+        "invoices": {
+          "name": "Demonstrativos e faturas",
+          "description": "Demonstrativos de royalties e faturas das unidades no escopo, com contestações, declarações de vendas externas e o mandato de débito."
+        },
+        "marketing_fund": {
+          "name": "Fundo de marketing",
+          "description": "Contribuições ao fundo, gastos com campanhas da rede com comprovantes, saldo por moeda e relatório de transparência."
+        },
+        "payouts": {
+          "name": "Repasses",
+          "description": "Repasses, tarifas, reembolsos e chargebacks por unidade, conciliação e exportações contábeis."
+        }
+      }
+    }
+  },
+  "finance": {
+    "common": {
+      "combined": "Todas as moedas",
+      "noConversion": "Não somados: {currencies} aparecem separados e nunca são convertidos.",
+      "sandbox": "Modo de teste: pagamentos, mandatos e repasses são simulados. Nenhum dinheiro é movimentado.",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "exportCsv": "Exportar CSV",
+      "exportXero": "CSV do Xero",
+      "exportQuickbooks": "CSV do QuickBooks"
+    },
+    "frequency": {
+      "monthly": "Mensal",
+      "weekly": "Semanal"
+    },
+    "weekday": {
+      "1": "Segunda-feira",
+      "2": "Terça-feira",
+      "3": "Quarta-feira",
+      "4": "Quinta-feira",
+      "5": "Sexta-feira",
+      "6": "Sábado",
+      "7": "Domingo"
+    },
+    "statementStatus": {
+      "draft": "Rascunho",
+      "disputed": "Contestado",
+      "approved": "Aprovado",
+      "invoiced": "Faturado",
+      "void": "Anulado"
+    },
+    "invoiceState": {
+      "open": "Em aberto",
+      "processing": "Em processamento",
+      "paid": "Paga",
+      "overdue": "Vencida",
+      "void": "Anulada"
+    },
+    "stream": {
+      "bookings": "Reservas",
+      "memberships": "Planos e pacotes",
+      "retail": "Loja",
+      "food": "Alimentos e bebidas",
+      "gift_vouchers": "Vales-presente",
+      "other": "Outras vendas",
+      "external": "Vendas externas"
+    },
+    "line": {
+      "sales": "Vendas: {stream}",
+      "excluded": "Fora da base de royalties: {stream}",
+      "refunds": "Menos reembolsos",
+      "tax": "Menos impostos",
+      "tips": "Menos gorjetas",
+      "external_sales": "Vendas declaradas de um caixa externo",
+      "basis": "Vendas líquidas (base de royalties)",
+      "royalty": "Royalty",
+      "royaltyTier": "Royalty sobre vendas de {from} a {to}",
+      "royaltyTierAbove": "Royalty sobre vendas acima de {from}",
+      "royalty_minimum": "Complemento até o royalty mínimo",
+      "marketing_fund": "Fundo de marketing",
+      "technology_fee": "Taxa de tecnologia",
+      "adjustment": "Ajuste",
+      "disputeAdjustment": "Ajuste de contestação: {text}"
+    },
+    "invoiceLine": {
+      "royalty": "Royalty",
+      "marketing_fund": "Fundo de marketing",
+      "technology_fee": "Taxa de tecnologia",
+      "adjustment": "Ajuste",
+      "late_fee": "Multa por atraso"
+    },
+    "warning": {
+      "no_terms": "Nenhuma condição de royalties se aplica a esta unidade e moeda. Adicione condições e recalcule.",
+      "external_sales_pending_review": "Uma declaração de vendas externas deste período aguarda análise.",
+      "external_sales_excluded": "As vendas externas não fazem parte da base de royalties desta unidade.",
+      "foreign": "Pagamentos em outra moeda ({amount}) não entram: um demonstrativo nunca mistura moedas."
+    },
+    "col": {
+      "location": "Unidade",
+      "franchisee": "Franqueado",
+      "period": "Período",
+      "grossSales": "Vendas brutas",
+      "basis": "Vendas líquidas",
+      "royalty": "Royalty",
+      "fund": "Fundo",
+      "techFee": "Taxa de tecnologia",
+      "minimum": "Mínimo",
+      "total": "Total",
+      "status": "Status",
+      "invoice": "Fatura",
+      "due": "Vencimento",
+      "outstanding": "Em aberto",
+      "refunds": "Reembolsos",
+      "tax": "Impostos",
+      "evidence": "Comprovante",
+      "date": "Data",
+      "kind": "Tipo",
+      "description": "Descrição",
+      "amount": "Valor",
+      "receipt": "Recibo"
+    },
+    "royalties": {
+      "title": "Royalties",
+      "description": "Feche períodos, confira e aprove demonstrativos, fature os franqueados e cobre, na moeda de cada unidade.",
+      "tab": {
+        "statements": "Demonstrativos",
+        "invoices": "Faturas e cobrança",
+        "sales": "Declarações de vendas",
+        "terms": "Condições",
+        "settings": "Configurações"
+      },
+      "closeTitle": "Fechar um período",
+      "closeHint": "Período: {frequency}. Cada período termina à meia-noite no fuso horário de cada unidade. O fechamento cria um demonstrativo para cada unidade franqueada.",
+      "periodStart": "Início do período",
+      "closePeriod": "Fechar período",
+      "closed": "Período fechado: {count, plural, one {# demonstrativo} other {# demonstrativos}} para conferir.",
+      "closedMissing": "Período fechado: {count, plural, one {# demonstrativo} other {# demonstrativos}}. {missing, plural, one {# unidade ainda não tem} other {# unidades ainda não têm}} condições.",
+      "period": "Período",
+      "noPeriods": "Nenhum período fechado ainda",
+      "noPeriodsBody": "Feche o último período para gerar os demonstrativos de royalties.",
+      "noStatements": "Nenhum demonstrativo neste período",
+      "invoiceApproved": "Faturar todos os aprovados",
+      "invoicedAll": "{count, plural, =0 {Nenhuma fatura emitida} one {# fatura emitida} other {# faturas emitidas}}.",
+      "dueIn": "A pagar em {currency}",
+      "statementCount": "{count, plural, one {# demonstrativo} other {# demonstrativos}}",
+      "warnings": "{count, plural, one {# alerta} other {# alertas}}",
+      "receivable": "A receber em {currency}",
+      "overdueSub": "{count, plural, one {# fatura vencida} other {# faturas vencidas}} · {amount}",
+      "noneOverdue": "Nada vencido",
+      "runDunning": "Executar cobrança agora",
+      "dunningDone": "Cobrança executada: {reminders} lembretes, {lateFees} multas, {retries} novas tentativas, {notices} avisos finais."
+    },
+    "statement": {
+      "kicker": "Demonstrativo de royalties",
+      "timeZone": "Período em {zone}",
+      "line": "Linha",
+      "rate": "Taxa",
+      "amount": "Valor",
+      "manual": "manual",
+      "totalDue": "Total a pagar",
+      "adjustTitle": "Ajustar este demonstrativo",
+      "adjustAmount": "Valor em {currency}",
+      "adjustHint": "Negativo para um crédito, ex.: -50.00",
+      "adjustReason": "Motivo",
+      "adjust": "Adicionar ajuste",
+      "adjusted": "Ajuste adicionado.",
+      "recalculate": "Recalcular",
+      "recalculated": "Demonstrativo recalculado com as vendas mais recentes.",
+      "approve": "Aprovar",
+      "approved": "Demonstrativo aprovado. Ele já pode ser faturado.",
+      "issueInvoice": "Emitir fatura",
+      "invoiced": "Fatura emitida."
+    },
+    "dispute": {
+      "title": "Contestações",
+      "status": {
+        "open": "Aberta",
+        "accepted": "Aceita",
+        "rejected": "Recusada"
+      },
+      "resolution": "Matriz: {text}",
+      "resolveTitle": "Resolver a contestação",
+      "resolutionLabel": "Decisão (compartilhada com o franqueado)",
+      "adjustmentLabel": "Ajuste em {currency}",
+      "adjustmentHint": "Opcional. Negativo para um crédito.",
+      "accept": "Aceitar",
+      "reject": "Recusar",
+      "resolved": "Contestação resolvida.",
+      "raiseTitle": "Contestar este demonstrativo",
+      "raiseHint": "O financeiro da matriz analisa antes de o demonstrativo ser faturado.",
+      "lineLabel": "Linha",
+      "wholeStatement": "O demonstrativo inteiro",
+      "reasonLabel": "O que está errado?",
+      "raise": "Enviar contestação",
+      "raised": "Contestação enviada ao financeiro da matriz."
+    },
+    "invoice": {
+      "kicker": "Fatura",
+      "number": "Fatura {number}",
+      "due": "Vence em {date}",
+      "pdf": "PDF",
+      "issued": "Emitida",
+      "dueDate": "Vencimento",
+      "daysOverdue": "{count, plural, one {# dia de atraso} other {# dias de atraso}}",
+      "tax": "{name} ({rate})",
+      "noTax": "Impostos: nenhum configurado",
+      "total": "Total",
+      "paid": "Pago",
+      "outstanding": "Em aberto",
+      "mandate": "Cobrada por {method} com final {last4}.",
+      "noMandate": "Nenhuma forma de pagamento cadastrada: o franqueado precisa configurar um débito ou cartão.",
+      "collect": "Cobrar agora",
+      "collectStarted": "Cobrança iniciada.",
+      "collectFailed": "O pagamento falhou ({code}). A cobrança tentará novamente.",
+      "payNow": "Pagar {amount} agora",
+      "payStarted": "Pagamento iniciado.",
+      "sandboxSettle": "Liquidar débito (teste)",
+      "sandboxFail": "Fazer o débito falhar (teste)",
+      "settled": "Débito liquidado.",
+      "settleFailed": "Débito marcado como falho.",
+      "recordTitle": "Registrar um pagamento recebido fora do BranchHarbor",
+      "recordAmount": "Valor em {currency}",
+      "recordReference": "Referência",
+      "recordDate": "Recebido em",
+      "record": "Registrar pagamento",
+      "recorded": "Pagamento registrado.",
+      "history": "Histórico de pagamentos",
+      "attempt": "Tentativa {n} · {method}"
+    },
+    "attemptMethod": {
+      "debit": "débito",
+      "manual": "registrado pela matriz"
+    },
+    "attemptStatus": {
+      "processing": "Em processamento",
+      "succeeded": "Pago",
+      "failed": "Falhou",
+      "requires_action": "Ação necessária"
+    },
+    "dunning": {
+      "reminder": "Lembrete enviado antes do vencimento",
+      "retry": "Cobrança tentada novamente",
+      "late_fee": "Multa por atraso adicionada",
+      "final_notice": "Aviso final enviado"
+    },
+    "invoices": {
+      "empty": "Nenhuma fatura ainda"
+    },
+    "sales": {
+      "hqHint": "Unidades com caixa externo declaram suas vendas com comprovante. Só as declarações aceitas contam para os royalties.",
+      "empty": "Nenhuma declaração de vendas",
+      "evidence": "Comprovante",
+      "accept": "Aceitar",
+      "reject": "Recusar",
+      "status": {
+        "submitted": "Aguardando análise",
+        "accepted": "Aceita",
+        "rejected": "Recusada"
+      },
+      "submitTitle": "Declarar vendas de um caixa externo",
+      "submitHint": "Para vendas que não passam pelo BranchHarbor. Anexe o relatório do caixa (PDF, imagem, CSV ou planilha, até 5 MB).",
+      "gross": "Vendas brutas em {currency}",
+      "refunds": "Reembolsos em {currency}",
+      "tax": "Impostos incluídos em {currency}",
+      "evidenceFile": "Comprovante",
+      "evidenceHint": "PDF, imagem, CSV ou planilha, até 5 MB.",
+      "note": "Observação para a matriz",
+      "submit": "Enviar declaração",
+      "submitted": "Declaração enviada. O financeiro da matriz vai analisá-la.",
+      "reviewNote": "Observação da matriz"
+    },
+    "terms": {
+      "hint": "As condições valem por franqueado (grupo proprietário) ou como padrão da rede, por moeda e com datas de vigência. As taxas de um contrato de franquia têm prioridade quando ele existe.",
+      "add": "Adicionar condições",
+      "addTitle": "Novas condições de royalties",
+      "editTitle": "Editar condições de royalties",
+      "appliesTo": "Aplica-se a",
+      "orgDefault": "Padrão da rede",
+      "currency": "Moeda",
+      "effectiveFrom": "Vigente a partir de",
+      "effectiveTo": "Vigente até",
+      "effective": "Vigência",
+      "open": "sem data final",
+      "royaltyPct": "Royalty (% das vendas líquidas)",
+      "fundPct": "Fundo de marketing (% das vendas líquidas)",
+      "techFee": "Taxa de tecnologia por unidade e período ({currency})",
+      "techFeeHint": "Valor fixo, 0 se não houver.",
+      "minimum": "Royalty mínimo por período ({currency})",
+      "minimumHint": "0 se não houver mínimo.",
+      "tierMode": "Faixas",
+      "tierMarginal": "Cada faixa com sua própria taxa",
+      "tierWhole": "Todas as vendas na taxa da faixa atingida",
+      "tiers": "Taxas por faixa (opcional)",
+      "tierFrom": "A partir de vendas de ({currency})",
+      "tierRate": "Taxa (%)",
+      "addTier": "Adicionar faixa",
+      "removeTier": "Remover",
+      "tiered": "{count, plural, one {# faixa} other {# faixas}}",
+      "basis": "Receitas consideradas",
+      "netOfRefunds": "Líquidas de reembolsos",
+      "excludeTax": "Sem impostos",
+      "excludeTips": "Sem gorjetas",
+      "includeExternal": "Incluir vendas externas declaradas",
+      "lateFee": "Multa por atraso",
+      "lateFeeNone": "Nenhuma",
+      "lateFeeFlat": "Valor fixo",
+      "lateFeePercent": "Percentual do valor vencido",
+      "lateFeeAmount": "Multa por atraso ({currency})",
+      "lateFeeRate": "Multa por atraso (%)",
+      "graceDays": "Dias de carência após o vencimento",
+      "empty": "Nenhuma condição ainda",
+      "emptyBody": "Adicione as condições padrão da rede para cada moeda em que suas unidades operam."
+    },
+    "settings": {
+      "collectionTitle": "Conta que recebe os royalties",
+      "collectionBody": "Os franqueados pagam na conta Stripe da própria matriz, por cartão ou débito bancário, com um mandato aceito no BranchHarbor. O dinheiro nunca fica com o BranchHarbor.",
+      "collectionConnected": "Conectada: {account}",
+      "collectionMissing": "Ainda não conectada.",
+      "sandboxMode": "teste",
+      "connect": "Conectar conta",
+      "periodsTitle": "Períodos e faturas",
+      "frequency": "Período",
+      "weekStartsOn": "As semanas começam na",
+      "invoicePrefix": "Prefixo do número da fatura",
+      "nextNumber": "Próxima fatura: {number}",
+      "paymentTerms": "Prazo de pagamento (dias)",
+      "autoCollect": "Cobrar automaticamente ao emitir uma fatura",
+      "dunningTitle": "Cobrança",
+      "retryDays": "Tentar a cobrança novamente X dias após o vencimento",
+      "retryDaysHint": "Por exemplo: 3, 7",
+      "reminderDays": "Lembrete X dias antes do vencimento",
+      "finalNotice": "Aviso final após (dias de atraso)",
+      "taxTitle": "Impostos nas faturas",
+      "taxBody": "O BranchHarbor não adiciona impostos por conta própria. Adicione apenas as linhas de imposto confirmadas pelo seu contador, por país.",
+      "taxName": "Nome",
+      "taxRate": "Alíquota (%)",
+      "taxCountry": "País (2 letras)",
+      "taxAppliesTo": "Aplica-se a",
+      "addTax": "Adicionar linha de imposto",
+      "removeTax": "Remover",
+      "issuerTitle": "Dados impressos nas faturas",
+      "issuer": {
+        "legalName": "Razão social",
+        "address": "Endereço",
+        "taxNumber": "Número fiscal",
+        "email": "E-mail de cobrança"
+      },
+      "saved": "Configurações financeiras salvas."
+    },
+    "mine": {
+      "title": "Demonstrativos e faturas",
+      "description": "Seus demonstrativos de royalties, faturas, forma de pagamento e declarações de vendas, só das suas unidades.",
+      "tab": {
+        "statements": "Demonstrativos",
+        "invoices": "Faturas",
+        "method": "Forma de pagamento",
+        "sales": "Declarações de vendas"
+      },
+      "noStatements": "Nenhum demonstrativo ainda",
+      "noStatementsBody": "Os demonstrativos aparecem aqui quando a matriz fecha um período.",
+      "toPay": "A pagar em {currency}"
+    },
+    "method": {
+      "intro": "As faturas são cobradas da forma cadastrada aqui na data de vencimento. Você pode trocá-la ou revogá-la a qualquer momento.",
+      "noGroups": "Nenhuma franquia no seu acesso",
+      "active": "Ativa",
+      "none": "Não configurada",
+      "saved": "{method} com final {last4}",
+      "revoke": "Revogar",
+      "revoked": "Forma de pagamento revogada.",
+      "pending": "{method}: aguardando confirmação.",
+      "sandboxConfirm": "Confirmar (teste)",
+      "sandboxDecline": "Confirmar uma forma que falha (teste)",
+      "confirmed": "Forma de pagamento salva.",
+      "check": "Verificar status",
+      "checked": "Status atualizado.",
+      "type": "Forma",
+      "authorise": "Autorizo a matriz a cobrar desta forma de pagamento as faturas de royalties, fundo de marketing e taxas de {group} em {currency}, a partir de cada vencimento, até que eu revogue.",
+      "setUp": "Configurar",
+      "replace": "Substituir",
+      "started": "Autorização registrada. Confirme a forma de pagamento para concluir.",
+      "card": "Cartão",
+      "us_bank_account": "Conta bancária dos EUA (ACH)",
+      "acss_debit": "Débito pré-autorizado canadense",
+      "bacs_debit": "Débito direto Bacs",
+      "sepa_debit": "Débito direto SEPA",
+      "au_becs_debit": "Débito direto BECS"
+    },
+    "fund": {
+      "title": "Fundo de marketing",
+      "description": "De onde vem o fundo de marketing da rede e o que ele paga, por moeda.",
+      "tab": {
+        "report": "Relatório de transparência",
+        "ledger": "Razão",
+        "spend": "Registrar gasto"
+      },
+      "year": "Ano",
+      "annualStatement": "Extrato anual (CSV)",
+      "empty": "Nenhuma movimentação do fundo ainda",
+      "reportTitle": "{currency} · {year}",
+      "opening": "Saldo inicial",
+      "contributions": "Contribuições ({count, plural, one {# franqueado} other {# franqueados}})",
+      "spend": "Gasto em campanhas",
+      "adjustments": "Ajustes",
+      "closing": "Saldo final",
+      "yours": "Suas contribuições",
+      "byCampaign": "Gastos por campanha",
+      "unallocated": "Não alocado",
+      "balanceIn": "Saldo do fundo em {currency}",
+      "kind": {
+        "contribution": "Contribuição",
+        "spend": "Gasto",
+        "adjustment": "Ajuste"
+      },
+      "contributionFrom": "Contribuição de {who}",
+      "receipt": "Recibo",
+      "campaignsTitle": "Campanhas da rede",
+      "campaignName": "Nome da campanha",
+      "addCampaign": "Adicionar campanha",
+      "spendTitle": "Registrar gasto do fundo",
+      "spendHint": "Todo gasto precisa de recibo e de uma campanha. O gasto não pode ultrapassar o saldo do fundo naquela moeda.",
+      "campaign": "Campanha",
+      "vendor": "Fornecedor",
+      "receiptFile": "Recibo",
+      "recordSpend": "Registrar gasto",
+      "spendRecorded": "Gasto registrado."
+    },
+    "payouts": {
+      "title": "Repasses",
+      "description": "Repasses para o banco de cada unidade, com tarifas, reembolsos e chargebacks, conciliados com pagamentos e royalties.",
+      "tab": {
+        "payouts": "Repasses",
+        "reconciliation": "Conciliação",
+        "exports": "Exportações"
+      },
+      "sync": "Sincronizar repasses",
+      "synced": "{count, plural, =0 {Nenhum repasse novo} one {# repasse atualizado} other {# repasses atualizados}}.",
+      "netIn": "Repassado em {currency}",
+      "feesSub": "Tarifas {fees} · chargebacks {chargebacks}",
+      "empty": "Nenhum repasse ainda",
+      "emptyBody": "Sincronize os repasses para carregá-los do provedor de pagamentos.",
+      "arrives": "Chega em",
+      "fees": "Tarifas",
+      "chargebacks": "Chargebacks",
+      "net": "Líquido"
+    },
+    "payoutStatus": {
+      "pending": "Pendente",
+      "in_transit": "Em trânsito",
+      "paid": "Repassado",
+      "failed": "Falhou",
+      "canceled": "Cancelado"
+    },
+    "recon": {
+      "hint": "Para cada unidade: o que os clientes pagaram no BranchHarbor, o que chegou ao banco e o demonstrativo de royalties e a fatura do mesmo período.",
+      "empty": "Nada a conciliar neste período",
+      "payments": "Pagamentos",
+      "count": "{count, plural, one {# pagamento} other {# pagamentos}}",
+      "paidOut": "Repassado",
+      "statement": "Demonstrativo",
+      "issues": "Verificações",
+      "ok": "Tudo confere",
+      "issue": {
+        "statement_out_of_date": "Demonstrativo desatualizado",
+        "not_paid_out": "Não repassado após 7 dias",
+        "unmatched_payout_transaction": "Linha de repasse sem pagamento",
+        "royalty_unpaid": "Royalty vencido",
+        "no_statement": "Sem demonstrativo"
+      }
+    },
+    "exports": {
+      "title": "Exportações para a contabilidade",
+      "hint": "Arquivos CSV para importar no seu software contábil. Os formatos do Xero e do QuickBooks são apenas arquivos; nada é enviado a eles.",
+      "from": "De",
+      "to": "Até",
+      "currency": "Moeda",
+      "currencyHint": "Arquivos bancários do QuickBooks precisam de uma única moeda.",
+      "dataset": {
+        "statements": "Demonstrativos de royalties",
+        "invoices": "Faturas",
+        "payouts": "Repasses",
+        "fund": "Razão do fundo de marketing"
+      },
+      "format": {
+        "csv": "CSV",
+        "xero": "Xero",
+        "quickbooks": "QuickBooks"
+      }
+    },
+    "reports": {
+      "title": "Relatórios financeiros",
+      "description": "Receita de royalties, cobrança e inadimplência por moeda.",
+      "collectedIn": "Recebido em {currency}",
+      "collectionSub": "{rate}% de {invoiced} faturado · {onTime} de {paid} pagas em dia",
+      "byLocation": "Receita de royalties por unidade",
+      "byRegion": "Receita de royalties por região",
+      "region": "Região",
+      "noRegion": "Sem região",
+      "none": "Nenhum demonstrativo neste ano.",
+      "ageing": "Envelhecimento da inadimplência",
+      "noArrears": "Nada vencido.",
+      "bucket": {
+        "current": "Ainda não vencido",
+        "d1_30": "1–30 dias",
+        "d31_60": "31–60 dias",
+        "d61_90": "61–90 dias",
+        "d90_plus": "Mais de 90 dias"
+      }
+    }
+  }
+}

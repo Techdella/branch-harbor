@@ -112,8 +112,10 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'marketing.brand_assets', area: 'marketing', name: 'Brand assets', description: 'Logos, photos and brand guidelines.', actions: VEP, status: 'planned' },
   // Finance
   { key: 'finance.payments', area: 'finance', name: 'Payments', description: 'Transactions, refunds, reconciliation and payment accounts (financial data).', actions: VEX, actionNotes: { edit: 'Issue refunds and fix reconciliation items.' }, status: 'available', sensitive: 'finance' },
-  { key: 'finance.royalties', area: 'finance', name: 'Royalties', description: 'Royalty and marketing-fund invoices to franchisees.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'finance' },
-  { key: 'finance.payouts', area: 'finance', name: 'Payouts', description: 'Payouts and settlements across the network.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'finance' },
+  { key: 'finance.royalties', area: 'finance', name: 'Royalties', description: 'Royalty terms, period close, statements, disputes, approval, invoicing and collection across the network.', actions: ALL, actionNotes: { edit: 'Set terms, close periods, adjust statements, resolve disputes and run collection.', publish: 'Approve statements and issue invoices.' }, status: 'available', hqOnly: true, sensitive: 'finance' },
+  { key: 'finance.invoices', area: 'finance', name: 'Statements & invoices', description: 'Royalty statements and invoices for the locations in scope, with disputes, external sales reports and the debit mandate.', actions: VEX, actionNotes: { edit: 'Raise disputes, report external sales, set up the debit mandate and pay invoices.' }, status: 'available', sensitive: 'finance' },
+  { key: 'finance.marketing_fund', area: 'finance', name: 'Marketing fund', description: 'Fund contributions, spend on network campaigns with receipts, balance per currency and the transparency report.', actions: VEX, actionNotes: { view: 'See the transparency report and the contributions of the locations in scope.', edit: 'Record fund spend and campaigns (organisation-wide access only).' }, status: 'available', sensitive: 'finance' },
+  { key: 'finance.payouts', area: 'finance', name: 'Payouts', description: 'Payouts, fees, refunds and chargebacks per location, reconciliation and accounting exports.', actions: ALL, status: 'available', hqOnly: true, sensitive: 'finance' },
   // Legal & compliance
   { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'Agreements, signatures, renewals and expiries.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'legal' },
   { key: 'legal.disclosure', area: 'legal', name: 'Disclosure', description: 'Disclosure documents, receipts and waiting periods per jurisdiction.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'legal' },
@@ -399,7 +401,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {
       'network.locations': V, 'network.approvals': V, 'network.reports': ['view', 'export'],
       'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': V,
-      'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX,
+      'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX, 'finance.invoices': VEX, 'finance.marketing_fund': V,
       'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone,
     },
   },

@@ -242,6 +242,69 @@ Without `STRIPE_SECRET_KEY` everything runs in **sandbox mode**: no network call
 clearly labelled as test mode, and `POST /v1/public/payments/:id/sandbox-confirm` / `…/setup/:id/sandbox-complete`
 feed synthetic events through the same processor.
 
+## Finance: royalty collection, payouts and accounting exports
+
+Code: `apps/api/src/services/finance/*`, `apps/api/src/integrations/finance-collection.ts`, routes `/v1/orgs/:orgId/finance/...`.
+
+**Collection mechanism chosen: debit mandate on the franchisor's own connected account.**
+
+- HQ connects a **collection account** (Finance → Royalties → Settings → "Connect account": a Stripe Connect account
+  for the franchisor, stored in `finance_settings.collection_account_id`; in `shared` payment mode the organisation
+  account is used).
+- Each franchisee (owner group) becomes a **Customer on that account**. The franchise owner accepts a written
+  authorisation in BranchHarbor (text, user, time and IP are stored in `finance_payment_methods`), then a
+  **SetupIntent** (`usage: off_session`) saves a card or the local bank debit for the invoice currency: ACH
+  (`us_bank_account`, USD), Canadian PAD (`acss_debit`, `transaction_type: business`, sporadic), Bacs (GBP),
+  SEPA Direct Debit (EUR) or BECS (AUD). Stripe collects the scheme mandate in the Payment Element (confirm the
+  SetupIntent client-side with `stripeAccount` = the collection account), then `setup_intent.succeeded` on the Connect
+  webhook (or `POST …/payment-methods/:id/refresh`) activates it.
+- Invoices are collected with an **off-session PaymentIntent created on the collection account** (direct charge, no
+  application fee), one idempotency key per attempt (`fin_inv:<invoice>:<attempt>`). Each attempt is a
+  `payment_references` row with target `royalty_invoice`, so the existing signed-webhook processor settles it
+  idempotently (`payment_intent.succeeded` / `payment_intent.payment_failed`); bank debits stay `processing` for days
+  until Stripe reports the outcome.
+- Why not Connect **transfers / account debits** from the franchisee's connected account or **application fees** on
+  their sales: those move money to the *platform* (BranchHarbor), not to the franchisor, only work between accounts in
+  the same region, would require BranchHarbor to hold and forward franchisor funds (a money-transmission question),
+  and application fees are per sale, not per approved invoice. The mandate model keeps money flowing franchisee →
+  franchisor, after approval, with the franchisee's explicit authorisation.
+- **Limits:** mandate-based bank debits need the collection account to have the matching capability enabled
+  (`us_bank_account_ach_payments`, `acss_debit_payments`, `bacs_debit_payments`, `sepa_debit_payments`,
+  `au_becs_debit_payments`); Bacs mandates take a few days to activate; ACH may require micro-deposit verification;
+  card fees are higher than bank debits; a cross-border franchisee may need a card. The dashboard has no Payment
+  Element for live SetupIntent confirmation yet (sandbox confirms in place); see gaps in the finance hand-off.
+- Without `STRIPE_SECRET_KEY` (sandbox): methods carry their outcome (`…_decline` fails), cards settle immediately,
+  bank debits stay `processing` until `POST …/finance/invoices/:id/sandbox-settle`. Nothing leaves the server.
+
+**Dunning:** `POST …/finance/dunning/run` (and the `finance.dunning` job, `{ organizationId }`, to schedule daily):
+reminder N days before the due date, late fee once after the agreement's grace days (flat or % of the overdue amount,
+taxed only if HQ configured a tax line for late fees), automatic retries on the configured days after the due date,
+final notice. Each step is recorded once per invoice and day (`finance_dunning_events`), so the run is idempotent.
+Emails go to the franchise owners of the owner group.
+
+**Tax on invoices:** none unless HQ adds tax lines (name, rate, country, which lines they apply to). BranchHarbor never
+decides tax.
+
+**Payouts:** live mode reads each location's connected account (`payouts.list`, then `balanceTransactions.list` with
+`payout` and `expand: ['data.source']`), links charges/refunds/disputes to BranchHarbor payments by PaymentIntent and
+stores them in `finance_payouts` / `finance_balance_transactions`. Restricted keys need Payouts and Balance read access.
+Sandbox mode generates payouts from succeeded payments (2 days after the sale, estimated 2.9% + 30 fee plus the
+application fee), labelled sandbox. Shared-account organisations (one account for all locations) are not split into
+per-location payouts yet.
+
+**Accounting exports (files only, no API push):** `GET …/finance/exports/{statements|invoices|payouts|fund}?format=`
+- `csv`: BranchHarbor columns, every row with its currency.
+- `xero`: invoices in Xero's "Import invoices" CSV layout (`*ContactName`, `*InvoiceNumber`, … `Currency`; account
+  codes `ROYALTY`, `MKTFUND`, `TECHFEE`, `LATEFEE` and tax type `Tax on Sales`/`Tax Exempt` to map on import);
+  payouts in Xero's bank statement CSV layout.
+- `quickbooks`: invoices in the QuickBooks Online invoice import layout; payouts in the 3-column bank CSV (Date,
+  Description, Amount), which has no currency column, so a `currency` filter is required.
+A live Xero / QuickBooks Online API sync (OAuth apps, contact and item mapping) is not built.
+
+**Franchise agreements:** the royalty engine reads rates through `registerAgreementTermsProvider` (services/finance/terms.ts):
+an agreement's royalty / marketing-fund basis points override owner-group terms, which override the organisation
+default; anything the agreement doesn't set (tiers, minimum, technology fee, revenue basis, late fee) falls back.
+
 ## What to set up first (shortest path to a Studios pilot)
 
 1. Stripe account (platform) → enable Connect + Billing + Tax

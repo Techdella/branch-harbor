@@ -1,0 +1,521 @@
+{
+  "nav": {
+    "financeRoyalties": "Royalties",
+    "financeReports": "Finance reports",
+    "financeStatements": "Statements & invoices",
+    "financeFund": "Marketing fund",
+    "financePayouts": "Payouts"
+  },
+  "access": {
+    "modules": {
+      "finance": {
+        "royalties": {
+          "name": "Royalties",
+          "description": "Royalty terms, period close, statements, disputes, approval, invoicing and collection across the network."
+        },
+        "invoices": {
+          "name": "Statements & invoices",
+          "description": "Royalty statements and invoices for the locations in scope, with disputes, external sales reports and the debit mandate."
+        },
+        "marketing_fund": {
+          "name": "Marketing fund",
+          "description": "Fund contributions, spend on network campaigns with receipts, balance per currency and the transparency report."
+        },
+        "payouts": {
+          "name": "Payouts",
+          "description": "Payouts, fees, refunds and chargebacks per location, reconciliation and accounting exports."
+        }
+      }
+    }
+  },
+  "finance": {
+    "common": {
+      "combined": "All currencies",
+      "noConversion": "Not added together: {currencies} are shown separately, never converted.",
+      "sandbox": "Sandbox mode: payments, mandates and payouts are simulated. No money moves.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "exportCsv": "Export CSV",
+      "exportXero": "Xero CSV",
+      "exportQuickbooks": "QuickBooks CSV"
+    },
+    "frequency": {
+      "monthly": "Monthly",
+      "weekly": "Weekly"
+    },
+    "weekday": {
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday",
+      "7": "Sunday"
+    },
+    "statementStatus": {
+      "draft": "Draft",
+      "disputed": "Disputed",
+      "approved": "Approved",
+      "invoiced": "Invoiced",
+      "void": "Void"
+    },
+    "invoiceState": {
+      "open": "Open",
+      "processing": "Processing",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "void": "Void"
+    },
+    "stream": {
+      "bookings": "Bookings",
+      "memberships": "Memberships & packs",
+      "retail": "Retail",
+      "food": "Food & drink",
+      "gift_vouchers": "Gift vouchers",
+      "other": "Other sales",
+      "external": "External sales"
+    },
+    "line": {
+      "sales": "Sales: {stream}",
+      "excluded": "Not in the royalty basis: {stream}",
+      "refunds": "Less refunds",
+      "tax": "Less tax",
+      "tips": "Less tips",
+      "external_sales": "Sales reported from an external till",
+      "basis": "Net sales (royalty basis)",
+      "royalty": "Royalty",
+      "royaltyTier": "Royalty on sales from {from} to {to}",
+      "royaltyTierAbove": "Royalty on sales above {from}",
+      "royalty_minimum": "Top-up to the minimum royalty",
+      "marketing_fund": "Marketing fund",
+      "technology_fee": "Technology fee",
+      "adjustment": "Adjustment",
+      "disputeAdjustment": "Dispute adjustment: {text}"
+    },
+    "invoiceLine": {
+      "royalty": "Royalty",
+      "marketing_fund": "Marketing fund",
+      "technology_fee": "Technology fee",
+      "adjustment": "Adjustment",
+      "late_fee": "Late fee"
+    },
+    "warning": {
+      "no_terms": "No royalty terms apply to this location and currency. Add terms, then recalculate.",
+      "external_sales_pending_review": "An external sales report for this period is waiting for review.",
+      "external_sales_excluded": "External sales are not part of this location’s royalty basis.",
+      "foreign": "Payments in another currency ({amount}) are not included: statements never mix currencies."
+    },
+    "col": {
+      "location": "Location",
+      "franchisee": "Franchisee",
+      "period": "Period",
+      "grossSales": "Gross sales",
+      "basis": "Net sales",
+      "royalty": "Royalty",
+      "fund": "Fund",
+      "techFee": "Technology fee",
+      "minimum": "Minimum",
+      "total": "Total",
+      "status": "Status",
+      "invoice": "Invoice",
+      "due": "Due",
+      "outstanding": "Outstanding",
+      "refunds": "Refunds",
+      "tax": "Tax",
+      "evidence": "Evidence",
+      "date": "Date",
+      "kind": "Type",
+      "description": "Description",
+      "amount": "Amount",
+      "receipt": "Receipt"
+    },
+    "royalties": {
+      "title": "Royalties",
+      "description": "Close periods, check and approve statements, invoice franchisees and collect, in each location’s currency.",
+      "tab": {
+        "statements": "Statements",
+        "invoices": "Invoices & collection",
+        "sales": "Sales reports",
+        "terms": "Terms",
+        "settings": "Settings"
+      },
+      "closeTitle": "Close a period",
+      "closeHint": "Period: {frequency}. Each period ends at midnight in each location’s own time zone. Closing creates a statement for every franchised location.",
+      "periodStart": "Period start",
+      "closePeriod": "Close period",
+      "closed": "Period closed: {count, plural, one {# statement} other {# statements}} ready to check.",
+      "closedMissing": "Period closed: {count, plural, one {# statement} other {# statements}}. {missing, plural, one {# location has} other {# locations have}} no terms yet.",
+      "period": "Period",
+      "noPeriods": "No closed periods yet",
+      "noPeriodsBody": "Close the last period to produce royalty statements.",
+      "noStatements": "No statements in this period",
+      "invoiceApproved": "Invoice all approved",
+      "invoicedAll": "{count, plural, =0 {No invoices issued} one {# invoice issued} other {# invoices issued}}.",
+      "dueIn": "Due in {currency}",
+      "statementCount": "{count, plural, one {# statement} other {# statements}}",
+      "warnings": "{count, plural, one {# warning} other {# warnings}}",
+      "receivable": "Receivable in {currency}",
+      "overdueSub": "{count, plural, one {# overdue invoice} other {# overdue invoices}} · {amount}",
+      "noneOverdue": "Nothing overdue",
+      "runDunning": "Run dunning now",
+      "dunningDone": "Dunning done: {reminders} reminders, {lateFees} late fees, {retries} retries, {notices} final notices."
+    },
+    "statement": {
+      "kicker": "Royalty statement",
+      "timeZone": "Period in {zone}",
+      "line": "Line",
+      "rate": "Rate",
+      "amount": "Amount",
+      "manual": "manual",
+      "totalDue": "Total due",
+      "adjustTitle": "Adjust this statement",
+      "adjustAmount": "Amount in {currency}",
+      "adjustHint": "Negative for a credit, e.g. -50.00",
+      "adjustReason": "Reason",
+      "adjust": "Add adjustment",
+      "adjusted": "Adjustment added.",
+      "recalculate": "Recalculate",
+      "recalculated": "Statement recalculated from the latest sales.",
+      "approve": "Approve",
+      "approved": "Statement approved. It can now be invoiced.",
+      "issueInvoice": "Issue invoice",
+      "invoiced": "Invoice issued."
+    },
+    "dispute": {
+      "title": "Disputes",
+      "status": {
+        "open": "Open",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "resolution": "HQ: {text}",
+      "resolveTitle": "Resolve the dispute",
+      "resolutionLabel": "Resolution (shared with the franchisee)",
+      "adjustmentLabel": "Adjustment in {currency}",
+      "adjustmentHint": "Optional. Negative for a credit.",
+      "accept": "Accept",
+      "reject": "Reject",
+      "resolved": "Dispute resolved.",
+      "raiseTitle": "Dispute this statement",
+      "raiseHint": "HQ finance reviews it before the statement is invoiced.",
+      "lineLabel": "Line",
+      "wholeStatement": "The whole statement",
+      "reasonLabel": "What is wrong?",
+      "raise": "Send dispute",
+      "raised": "Dispute sent to HQ finance."
+    },
+    "invoice": {
+      "kicker": "Invoice",
+      "number": "Invoice {number}",
+      "due": "Due {date}",
+      "pdf": "PDF",
+      "issued": "Issued",
+      "dueDate": "Due date",
+      "daysOverdue": "{count, plural, one {# day overdue} other {# days overdue}}",
+      "tax": "{name} ({rate})",
+      "noTax": "Tax: none configured",
+      "total": "Total",
+      "paid": "Paid",
+      "outstanding": "Outstanding",
+      "mandate": "Collected by {method} ending {last4}.",
+      "noMandate": "No payment method on file: the franchisee needs to set up a debit or card.",
+      "collect": "Collect now",
+      "collectStarted": "Collection started.",
+      "collectFailed": "The payment failed ({code}). Dunning will retry.",
+      "payNow": "Pay {amount} now",
+      "payStarted": "Payment started.",
+      "sandboxSettle": "Settle debit (sandbox)",
+      "sandboxFail": "Fail debit (sandbox)",
+      "settled": "Debit settled.",
+      "settleFailed": "Debit marked as failed.",
+      "recordTitle": "Record a payment received outside BranchHarbor",
+      "recordAmount": "Amount in {currency}",
+      "recordReference": "Reference",
+      "recordDate": "Received on",
+      "record": "Record payment",
+      "recorded": "Payment recorded.",
+      "history": "Payment history",
+      "attempt": "Attempt {n} · {method}"
+    },
+    "attemptMethod": {
+      "debit": "debit",
+      "manual": "recorded by HQ"
+    },
+    "attemptStatus": {
+      "processing": "Processing",
+      "succeeded": "Paid",
+      "failed": "Failed",
+      "requires_action": "Needs action"
+    },
+    "dunning": {
+      "reminder": "Reminder sent before the due date",
+      "retry": "Collection retried",
+      "late_fee": "Late fee added",
+      "final_notice": "Final notice sent"
+    },
+    "invoices": {
+      "empty": "No invoices yet"
+    },
+    "sales": {
+      "hqHint": "Locations on an external till report their sales with evidence. Only accepted reports count towards royalties.",
+      "empty": "No sales reports",
+      "evidence": "Evidence",
+      "accept": "Accept",
+      "reject": "Reject",
+      "status": {
+        "submitted": "Waiting for review",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "submitTitle": "Report sales from an external till",
+      "submitHint": "For sales that don’t go through BranchHarbor. Attach the till’s report (PDF, image, CSV or spreadsheet, up to 5 MB).",
+      "gross": "Gross sales in {currency}",
+      "refunds": "Refunds in {currency}",
+      "tax": "Tax included in {currency}",
+      "evidenceFile": "Evidence",
+      "evidenceHint": "PDF, image, CSV or spreadsheet, up to 5 MB.",
+      "note": "Note for HQ",
+      "submit": "Send report",
+      "submitted": "Report sent. HQ finance will review it.",
+      "reviewNote": "HQ note"
+    },
+    "terms": {
+      "hint": "Terms are set per franchisee (owner group) or as the network default, per currency, with effective dates. A franchise agreement’s rates take priority when one exists.",
+      "add": "Add terms",
+      "addTitle": "New royalty terms",
+      "editTitle": "Edit royalty terms",
+      "appliesTo": "Applies to",
+      "orgDefault": "Network default",
+      "currency": "Currency",
+      "effectiveFrom": "Effective from",
+      "effectiveTo": "Effective until",
+      "effective": "Effective",
+      "open": "open-ended",
+      "royaltyPct": "Royalty (% of net sales)",
+      "fundPct": "Marketing fund (% of net sales)",
+      "techFee": "Technology fee per location per period ({currency})",
+      "techFeeHint": "Flat amount, 0 for none.",
+      "minimum": "Minimum royalty per period ({currency})",
+      "minimumHint": "0 for no minimum.",
+      "tierMode": "Tiers",
+      "tierMarginal": "Each band at its own rate",
+      "tierWhole": "All sales at the rate of the band reached",
+      "tiers": "Tiered rates (optional)",
+      "tierFrom": "From sales of ({currency})",
+      "tierRate": "Rate (%)",
+      "addTier": "Add a tier",
+      "removeTier": "Remove",
+      "tiered": "{count, plural, one {# tier} other {# tiers}}",
+      "basis": "Revenue that counts",
+      "netOfRefunds": "Net of refunds",
+      "excludeTax": "Exclude tax",
+      "excludeTips": "Exclude tips",
+      "includeExternal": "Include reported external sales",
+      "lateFee": "Late fee",
+      "lateFeeNone": "None",
+      "lateFeeFlat": "Flat amount",
+      "lateFeePercent": "Percentage of the amount overdue",
+      "lateFeeAmount": "Late fee ({currency})",
+      "lateFeeRate": "Late fee (%)",
+      "graceDays": "Grace days after the due date",
+      "empty": "No terms yet",
+      "emptyBody": "Add the network default terms for each currency your locations trade in."
+    },
+    "settings": {
+      "collectionTitle": "Account that receives royalties",
+      "collectionBody": "Franchisees pay into HQ’s own Stripe account by card or bank debit, with a mandate they accept in BranchHarbor. Money never sits with BranchHarbor.",
+      "collectionConnected": "Connected: {account}",
+      "collectionMissing": "Not connected yet.",
+      "sandboxMode": "sandbox",
+      "connect": "Connect account",
+      "periodsTitle": "Periods and invoices",
+      "frequency": "Period",
+      "weekStartsOn": "Weeks start on",
+      "invoicePrefix": "Invoice number prefix",
+      "nextNumber": "Next invoice: {number}",
+      "paymentTerms": "Payment terms (days)",
+      "autoCollect": "Collect automatically when an invoice is issued",
+      "dunningTitle": "Dunning",
+      "retryDays": "Retry collection on days after the due date",
+      "retryDaysHint": "For example: 3, 7",
+      "reminderDays": "Reminder days before the due date",
+      "finalNotice": "Final notice after (days overdue)",
+      "taxTitle": "Tax on invoices",
+      "taxBody": "BranchHarbor adds no tax by itself. Add only the tax lines your accountant has confirmed, per country.",
+      "taxName": "Name",
+      "taxRate": "Rate (%)",
+      "taxCountry": "Country (2 letters)",
+      "taxAppliesTo": "Applies to",
+      "addTax": "Add a tax line",
+      "removeTax": "Remove",
+      "issuerTitle": "Details printed on invoices",
+      "issuer": {
+        "legalName": "Legal name",
+        "address": "Address",
+        "taxNumber": "Tax number",
+        "email": "Billing email"
+      },
+      "saved": "Finance settings saved."
+    },
+    "mine": {
+      "title": "Statements & invoices",
+      "description": "Your royalty statements, invoices, payment method and sales reports, for your locations only.",
+      "tab": {
+        "statements": "Statements",
+        "invoices": "Invoices",
+        "method": "Payment method",
+        "sales": "Sales reports"
+      },
+      "noStatements": "No statements yet",
+      "noStatementsBody": "Statements appear here when HQ closes a period.",
+      "toPay": "To pay in {currency}"
+    },
+    "method": {
+      "intro": "Invoices are collected from the method saved here on their due date. You can replace or revoke it at any time.",
+      "noGroups": "No franchise in your access",
+      "active": "Active",
+      "none": "Not set up",
+      "saved": "{method} ending {last4}",
+      "revoke": "Revoke",
+      "revoked": "Payment method revoked.",
+      "pending": "{method}: waiting for confirmation.",
+      "sandboxConfirm": "Confirm (sandbox)",
+      "sandboxDecline": "Confirm a failing method (sandbox)",
+      "confirmed": "Payment method saved.",
+      "check": "Check status",
+      "checked": "Status updated.",
+      "type": "Method",
+      "authorise": "I authorise HQ to collect royalty, marketing fund and fee invoices for {group} in {currency} from this method on or after each due date, until I revoke it.",
+      "setUp": "Set up",
+      "replace": "Replace",
+      "started": "Authorisation recorded. Confirm the method to finish.",
+      "card": "Card",
+      "us_bank_account": "US bank account (ACH)",
+      "acss_debit": "Canadian pre-authorised debit",
+      "bacs_debit": "Bacs Direct Debit",
+      "sepa_debit": "SEPA Direct Debit",
+      "au_becs_debit": "BECS Direct Debit"
+    },
+    "fund": {
+      "title": "Marketing fund",
+      "description": "Where the network’s marketing fund comes from and what it pays for, per currency.",
+      "tab": {
+        "report": "Transparency report",
+        "ledger": "Ledger",
+        "spend": "Record spend"
+      },
+      "year": "Year",
+      "annualStatement": "Annual statement (CSV)",
+      "empty": "No fund activity yet",
+      "reportTitle": "{currency} · {year}",
+      "opening": "Opening balance",
+      "contributions": "Contributions ({count, plural, one {# franchisee} other {# franchisees}})",
+      "spend": "Spent on campaigns",
+      "adjustments": "Adjustments",
+      "closing": "Closing balance",
+      "yours": "Your contributions",
+      "byCampaign": "Spend by campaign",
+      "unallocated": "Not allocated",
+      "balanceIn": "Fund balance in {currency}",
+      "kind": {
+        "contribution": "Contribution",
+        "spend": "Spend",
+        "adjustment": "Adjustment"
+      },
+      "contributionFrom": "Contribution from {who}",
+      "receipt": "Receipt",
+      "campaignsTitle": "Network campaigns",
+      "campaignName": "Campaign name",
+      "addCampaign": "Add campaign",
+      "spendTitle": "Record fund spend",
+      "spendHint": "Every spend needs its receipt and a campaign. Spend can’t exceed the fund balance in that currency.",
+      "campaign": "Campaign",
+      "vendor": "Supplier",
+      "receiptFile": "Receipt",
+      "recordSpend": "Record spend",
+      "spendRecorded": "Spend recorded."
+    },
+    "payouts": {
+      "title": "Payouts",
+      "description": "Payouts to each location’s bank, with fees, refunds and chargebacks, reconciled with payments and royalties.",
+      "tab": {
+        "payouts": "Payouts",
+        "reconciliation": "Reconciliation",
+        "exports": "Exports"
+      },
+      "sync": "Sync payouts",
+      "synced": "{count, plural, =0 {No new payouts} one {# payout updated} other {# payouts updated}}.",
+      "netIn": "Paid out in {currency}",
+      "feesSub": "Fees {fees} · chargebacks {chargebacks}",
+      "empty": "No payouts yet",
+      "emptyBody": "Sync payouts to load them from the payment provider.",
+      "arrives": "Arrives",
+      "fees": "Fees",
+      "chargebacks": "Chargebacks",
+      "net": "Net"
+    },
+    "payoutStatus": {
+      "pending": "Pending",
+      "in_transit": "In transit",
+      "paid": "Paid",
+      "failed": "Failed",
+      "canceled": "Cancelled"
+    },
+    "recon": {
+      "hint": "For each location: what customers paid in BranchHarbor, what reached the bank, and the royalty statement and invoice for the same period.",
+      "empty": "Nothing to reconcile in this period",
+      "payments": "Payments",
+      "count": "{count, plural, one {# payment} other {# payments}}",
+      "paidOut": "Paid out",
+      "statement": "Statement",
+      "issues": "Checks",
+      "ok": "All matched",
+      "issue": {
+        "statement_out_of_date": "Statement out of date",
+        "not_paid_out": "Not paid out after 7 days",
+        "unmatched_payout_transaction": "Payout line without a payment",
+        "royalty_unpaid": "Royalty overdue",
+        "no_statement": "No statement"
+      }
+    },
+    "exports": {
+      "title": "Exports for accounting",
+      "hint": "CSV files to import into your accounting software. Xero and QuickBooks layouts are files only; nothing is sent to them.",
+      "from": "From",
+      "to": "Until",
+      "currency": "Currency",
+      "currencyHint": "QuickBooks bank files need one currency.",
+      "dataset": {
+        "statements": "Royalty statements",
+        "invoices": "Invoices",
+        "payouts": "Payouts",
+        "fund": "Marketing fund ledger"
+      },
+      "format": {
+        "csv": "CSV",
+        "xero": "Xero",
+        "quickbooks": "QuickBooks"
+      }
+    },
+    "reports": {
+      "title": "Finance reports",
+      "description": "Royalty revenue, collection and arrears per currency.",
+      "collectedIn": "Collected in {currency}",
+      "collectionSub": "{rate}% of {invoiced} invoiced · {onTime} of {paid} paid on time",
+      "byLocation": "Royalty revenue by location",
+      "byRegion": "Royalty revenue by region",
+      "region": "Region",
+      "noRegion": "No region",
+      "none": "No statements in this year.",
+      "ageing": "Arrears ageing",
+      "noArrears": "Nothing overdue.",
+      "bucket": {
+        "current": "Not yet due",
+        "d1_30": "1–30 days",
+        "d31_60": "31–60 days",
+        "d61_90": "61–90 days",
+        "d90_plus": "Over 90 days"
+      }
+    }
+  }
+}

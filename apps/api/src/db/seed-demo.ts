@@ -241,6 +241,8 @@ async function main() {
   const northlight = await seedNorthlight({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   console.log(` Access model:  Northlight Yoga International (${northlight.orgId}) — franchisor team, one login per role (same password):`);
   for (const l of northlight.logins) console.log(`                ${l}`);
+  const financeSeed = await (await import('./seed-finance.ts')).seedFinance({ db, today, upsertUser });
+  console.log(` Finance:       closed royalty periods, a disputed statement, an overdue invoice and fund spend with receipts (sandbox). Finance lead: ${financeSeed.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

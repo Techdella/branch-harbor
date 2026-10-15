@@ -1,0 +1,521 @@
+{
+  "nav": {
+    "financeRoyalties": "Regalías",
+    "financeReports": "Informes financieros",
+    "financeStatements": "Liquidaciones y facturas",
+    "financeFund": "Fondo de marketing",
+    "financePayouts": "Liquidaciones bancarias"
+  },
+  "access": {
+    "modules": {
+      "finance": {
+        "royalties": {
+          "name": "Regalías",
+          "description": "Condiciones de regalías, cierre de periodos, liquidaciones, disputas, aprobación, facturación y cobro en toda la red."
+        },
+        "invoices": {
+          "name": "Liquidaciones y facturas",
+          "description": "Liquidaciones de regalías y facturas de los locales del ámbito, con disputas, declaraciones de ventas externas y el mandato de domiciliación."
+        },
+        "marketing_fund": {
+          "name": "Fondo de marketing",
+          "description": "Aportaciones al fondo, gastos en campañas de la red con justificantes, saldo por moneda e informe de transparencia."
+        },
+        "payouts": {
+          "name": "Liquidaciones bancarias",
+          "description": "Liquidaciones, comisiones, reembolsos y contracargos por local, conciliación y exportaciones contables."
+        }
+      }
+    }
+  },
+  "finance": {
+    "common": {
+      "combined": "Todas las monedas",
+      "noConversion": "No se suman: {currencies} se muestran por separado y nunca se convierten.",
+      "sandbox": "Modo de pruebas: pagos, mandatos y liquidaciones son simulados. No se mueve dinero.",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "exportCsv": "Exportar CSV",
+      "exportXero": "CSV de Xero",
+      "exportQuickbooks": "CSV de QuickBooks"
+    },
+    "frequency": {
+      "monthly": "Mensual",
+      "weekly": "Semanal"
+    },
+    "weekday": {
+      "1": "Lunes",
+      "2": "Martes",
+      "3": "Miércoles",
+      "4": "Jueves",
+      "5": "Viernes",
+      "6": "Sábado",
+      "7": "Domingo"
+    },
+    "statementStatus": {
+      "draft": "Borrador",
+      "disputed": "En disputa",
+      "approved": "Aprobada",
+      "invoiced": "Facturada",
+      "void": "Anulada"
+    },
+    "invoiceState": {
+      "open": "Abierta",
+      "processing": "En proceso",
+      "paid": "Pagada",
+      "overdue": "Vencida",
+      "void": "Anulada"
+    },
+    "stream": {
+      "bookings": "Reservas",
+      "memberships": "Membresías y bonos",
+      "retail": "Tienda",
+      "food": "Comida y bebida",
+      "gift_vouchers": "Tarjetas regalo",
+      "other": "Otras ventas",
+      "external": "Ventas externas"
+    },
+    "line": {
+      "sales": "Ventas: {stream}",
+      "excluded": "Fuera de la base de regalías: {stream}",
+      "refunds": "Menos reembolsos",
+      "tax": "Menos impuestos",
+      "tips": "Menos propinas",
+      "external_sales": "Ventas declaradas desde una caja externa",
+      "basis": "Ventas netas (base de regalías)",
+      "royalty": "Regalía",
+      "royaltyTier": "Regalía sobre ventas de {from} a {to}",
+      "royaltyTierAbove": "Regalía sobre ventas por encima de {from}",
+      "royalty_minimum": "Complemento hasta la regalía mínima",
+      "marketing_fund": "Fondo de marketing",
+      "technology_fee": "Cuota tecnológica",
+      "adjustment": "Ajuste",
+      "disputeAdjustment": "Ajuste por disputa: {text}"
+    },
+    "invoiceLine": {
+      "royalty": "Regalía",
+      "marketing_fund": "Fondo de marketing",
+      "technology_fee": "Cuota tecnológica",
+      "adjustment": "Ajuste",
+      "late_fee": "Recargo por demora"
+    },
+    "warning": {
+      "no_terms": "No hay condiciones de regalías para este local y esta moneda. Añade condiciones y vuelve a calcular.",
+      "external_sales_pending_review": "Hay una declaración de ventas externas de este periodo pendiente de revisión.",
+      "external_sales_excluded": "Las ventas externas no forman parte de la base de regalías de este local.",
+      "foreign": "Los pagos en otra moneda ({amount}) no se incluyen: una liquidación nunca mezcla monedas."
+    },
+    "col": {
+      "location": "Local",
+      "franchisee": "Franquiciado",
+      "period": "Periodo",
+      "grossSales": "Ventas brutas",
+      "basis": "Ventas netas",
+      "royalty": "Regalía",
+      "fund": "Fondo",
+      "techFee": "Cuota tecnológica",
+      "minimum": "Mínimo",
+      "total": "Total",
+      "status": "Estado",
+      "invoice": "Factura",
+      "due": "Vencimiento",
+      "outstanding": "Pendiente",
+      "refunds": "Reembolsos",
+      "tax": "Impuestos",
+      "evidence": "Justificante",
+      "date": "Fecha",
+      "kind": "Tipo",
+      "description": "Descripción",
+      "amount": "Importe",
+      "receipt": "Recibo"
+    },
+    "royalties": {
+      "title": "Regalías",
+      "description": "Cierra periodos, revisa y aprueba liquidaciones, factura a los franquiciados y cobra, en la moneda de cada local.",
+      "tab": {
+        "statements": "Liquidaciones",
+        "invoices": "Facturas y cobro",
+        "sales": "Declaraciones de ventas",
+        "terms": "Condiciones",
+        "settings": "Ajustes"
+      },
+      "closeTitle": "Cerrar un periodo",
+      "closeHint": "Periodo: {frequency}. Cada periodo termina a medianoche en la zona horaria de cada local. Al cerrar se crea una liquidación para cada local franquiciado.",
+      "periodStart": "Inicio del periodo",
+      "closePeriod": "Cerrar periodo",
+      "closed": "Periodo cerrado: {count, plural, one {# liquidación} other {# liquidaciones}} para revisar.",
+      "closedMissing": "Periodo cerrado: {count, plural, one {# liquidación} other {# liquidaciones}}. {missing, plural, one {# local aún no tiene} other {# locales aún no tienen}} condiciones.",
+      "period": "Periodo",
+      "noPeriods": "Aún no hay periodos cerrados",
+      "noPeriodsBody": "Cierra el último periodo para generar las liquidaciones de regalías.",
+      "noStatements": "No hay liquidaciones en este periodo",
+      "invoiceApproved": "Facturar todas las aprobadas",
+      "invoicedAll": "{count, plural, =0 {No se emitió ninguna factura} one {# factura emitida} other {# facturas emitidas}}.",
+      "dueIn": "A pagar en {currency}",
+      "statementCount": "{count, plural, one {# liquidación} other {# liquidaciones}}",
+      "warnings": "{count, plural, one {# aviso} other {# avisos}}",
+      "receivable": "Por cobrar en {currency}",
+      "overdueSub": "{count, plural, one {# factura vencida} other {# facturas vencidas}} · {amount}",
+      "noneOverdue": "Nada vencido",
+      "runDunning": "Ejecutar recobro ahora",
+      "dunningDone": "Recobro hecho: {reminders} recordatorios, {lateFees} recargos, {retries} reintentos, {notices} avisos finales."
+    },
+    "statement": {
+      "kicker": "Liquidación de regalías",
+      "timeZone": "Periodo en {zone}",
+      "line": "Línea",
+      "rate": "Tasa",
+      "amount": "Importe",
+      "manual": "manual",
+      "totalDue": "Total a pagar",
+      "adjustTitle": "Ajustar esta liquidación",
+      "adjustAmount": "Importe en {currency}",
+      "adjustHint": "Negativo para un abono, p. ej. -50.00",
+      "adjustReason": "Motivo",
+      "adjust": "Añadir ajuste",
+      "adjusted": "Ajuste añadido.",
+      "recalculate": "Recalcular",
+      "recalculated": "Liquidación recalculada con las ventas más recientes.",
+      "approve": "Aprobar",
+      "approved": "Liquidación aprobada. Ya se puede facturar.",
+      "issueInvoice": "Emitir factura",
+      "invoiced": "Factura emitida."
+    },
+    "dispute": {
+      "title": "Disputas",
+      "status": {
+        "open": "Abierta",
+        "accepted": "Aceptada",
+        "rejected": "Rechazada"
+      },
+      "resolution": "Central: {text}",
+      "resolveTitle": "Resolver la disputa",
+      "resolutionLabel": "Resolución (se comparte con el franquiciado)",
+      "adjustmentLabel": "Ajuste en {currency}",
+      "adjustmentHint": "Opcional. Negativo para un abono.",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "resolved": "Disputa resuelta.",
+      "raiseTitle": "Disputar esta liquidación",
+      "raiseHint": "Finanzas de la central la revisa antes de facturar la liquidación.",
+      "lineLabel": "Línea",
+      "wholeStatement": "Toda la liquidación",
+      "reasonLabel": "¿Qué está mal?",
+      "raise": "Enviar disputa",
+      "raised": "Disputa enviada a finanzas de la central."
+    },
+    "invoice": {
+      "kicker": "Factura",
+      "number": "Factura {number}",
+      "due": "Vence el {date}",
+      "pdf": "PDF",
+      "issued": "Emitida",
+      "dueDate": "Vencimiento",
+      "daysOverdue": "{count, plural, one {# día de retraso} other {# días de retraso}}",
+      "tax": "{name} ({rate})",
+      "noTax": "Impuestos: ninguno configurado",
+      "total": "Total",
+      "paid": "Pagado",
+      "outstanding": "Pendiente",
+      "mandate": "Se cobra con {method} terminado en {last4}.",
+      "noMandate": "No hay método de pago guardado: el franquiciado debe configurar una domiciliación o una tarjeta.",
+      "collect": "Cobrar ahora",
+      "collectStarted": "Cobro iniciado.",
+      "collectFailed": "El pago falló ({code}). El recobro lo volverá a intentar.",
+      "payNow": "Pagar {amount} ahora",
+      "payStarted": "Pago iniciado.",
+      "sandboxSettle": "Liquidar cargo (pruebas)",
+      "sandboxFail": "Hacer fallar el cargo (pruebas)",
+      "settled": "Cargo liquidado.",
+      "settleFailed": "Cargo marcado como fallido.",
+      "recordTitle": "Registrar un pago recibido fuera de BranchHarbor",
+      "recordAmount": "Importe en {currency}",
+      "recordReference": "Referencia",
+      "recordDate": "Recibido el",
+      "record": "Registrar pago",
+      "recorded": "Pago registrado.",
+      "history": "Historial de pagos",
+      "attempt": "Intento {n} · {method}"
+    },
+    "attemptMethod": {
+      "debit": "cargo",
+      "manual": "registrado por la central"
+    },
+    "attemptStatus": {
+      "processing": "En proceso",
+      "succeeded": "Pagado",
+      "failed": "Fallido",
+      "requires_action": "Requiere acción"
+    },
+    "dunning": {
+      "reminder": "Recordatorio enviado antes del vencimiento",
+      "retry": "Cobro reintentado",
+      "late_fee": "Recargo por demora añadido",
+      "final_notice": "Aviso final enviado"
+    },
+    "invoices": {
+      "empty": "Aún no hay facturas"
+    },
+    "sales": {
+      "hqHint": "Los locales con una caja externa declaran sus ventas con un justificante. Solo cuentan para las regalías las declaraciones aceptadas.",
+      "empty": "No hay declaraciones de ventas",
+      "evidence": "Justificante",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "status": {
+        "submitted": "Pendiente de revisión",
+        "accepted": "Aceptada",
+        "rejected": "Rechazada"
+      },
+      "submitTitle": "Declarar ventas de una caja externa",
+      "submitHint": "Para ventas que no pasan por BranchHarbor. Adjunta el informe de la caja (PDF, imagen, CSV u hoja de cálculo, hasta 5 MB).",
+      "gross": "Ventas brutas en {currency}",
+      "refunds": "Reembolsos en {currency}",
+      "tax": "Impuestos incluidos en {currency}",
+      "evidenceFile": "Justificante",
+      "evidenceHint": "PDF, imagen, CSV u hoja de cálculo, hasta 5 MB.",
+      "note": "Nota para la central",
+      "submit": "Enviar declaración",
+      "submitted": "Declaración enviada. Finanzas de la central la revisará.",
+      "reviewNote": "Nota de la central"
+    },
+    "terms": {
+      "hint": "Las condiciones se fijan por franquiciado (grupo propietario) o por defecto para la red, por moneda y con fechas de vigencia. Si existe un contrato de franquicia, sus tasas tienen prioridad.",
+      "add": "Añadir condiciones",
+      "addTitle": "Nuevas condiciones de regalías",
+      "editTitle": "Editar condiciones de regalías",
+      "appliesTo": "Se aplica a",
+      "orgDefault": "Por defecto de la red",
+      "currency": "Moneda",
+      "effectiveFrom": "Vigente desde",
+      "effectiveTo": "Vigente hasta",
+      "effective": "Vigencia",
+      "open": "sin fecha de fin",
+      "royaltyPct": "Regalía (% de ventas netas)",
+      "fundPct": "Fondo de marketing (% de ventas netas)",
+      "techFee": "Cuota tecnológica por local y periodo ({currency})",
+      "techFeeHint": "Importe fijo, 0 si no hay.",
+      "minimum": "Regalía mínima por periodo ({currency})",
+      "minimumHint": "0 si no hay mínimo.",
+      "tierMode": "Tramos",
+      "tierMarginal": "Cada tramo a su propia tasa",
+      "tierWhole": "Todas las ventas a la tasa del tramo alcanzado",
+      "tiers": "Tasas por tramos (opcional)",
+      "tierFrom": "Desde ventas de ({currency})",
+      "tierRate": "Tasa (%)",
+      "addTier": "Añadir un tramo",
+      "removeTier": "Quitar",
+      "tiered": "{count, plural, one {# tramo} other {# tramos}}",
+      "basis": "Ingresos que cuentan",
+      "netOfRefunds": "Netos de reembolsos",
+      "excludeTax": "Sin impuestos",
+      "excludeTips": "Sin propinas",
+      "includeExternal": "Incluir ventas externas declaradas",
+      "lateFee": "Recargo por demora",
+      "lateFeeNone": "Ninguno",
+      "lateFeeFlat": "Importe fijo",
+      "lateFeePercent": "Porcentaje del importe vencido",
+      "lateFeeAmount": "Recargo por demora ({currency})",
+      "lateFeeRate": "Recargo por demora (%)",
+      "graceDays": "Días de gracia tras el vencimiento",
+      "empty": "Aún no hay condiciones",
+      "emptyBody": "Añade las condiciones por defecto de la red para cada moneda en la que operan tus locales."
+    },
+    "settings": {
+      "collectionTitle": "Cuenta que recibe las regalías",
+      "collectionBody": "Los franquiciados pagan en la cuenta de Stripe de la central con tarjeta o domiciliación bancaria, con un mandato que aceptan en BranchHarbor. El dinero nunca pasa por BranchHarbor.",
+      "collectionConnected": "Conectada: {account}",
+      "collectionMissing": "Aún no conectada.",
+      "sandboxMode": "pruebas",
+      "connect": "Conectar cuenta",
+      "periodsTitle": "Periodos y facturas",
+      "frequency": "Periodo",
+      "weekStartsOn": "Las semanas empiezan el",
+      "invoicePrefix": "Prefijo del número de factura",
+      "nextNumber": "Próxima factura: {number}",
+      "paymentTerms": "Plazo de pago (días)",
+      "autoCollect": "Cobrar automáticamente al emitir una factura",
+      "dunningTitle": "Recobro",
+      "retryDays": "Reintentar el cobro X días después del vencimiento",
+      "retryDaysHint": "Por ejemplo: 3, 7",
+      "reminderDays": "Recordatorio X días antes del vencimiento",
+      "finalNotice": "Aviso final tras (días de retraso)",
+      "taxTitle": "Impuestos en las facturas",
+      "taxBody": "BranchHarbor no añade impuestos por su cuenta. Añade solo las líneas de impuestos que haya confirmado tu asesor, por país.",
+      "taxName": "Nombre",
+      "taxRate": "Tasa (%)",
+      "taxCountry": "País (2 letras)",
+      "taxAppliesTo": "Se aplica a",
+      "addTax": "Añadir línea de impuesto",
+      "removeTax": "Quitar",
+      "issuerTitle": "Datos impresos en las facturas",
+      "issuer": {
+        "legalName": "Razón social",
+        "address": "Dirección",
+        "taxNumber": "Número fiscal",
+        "email": "Correo de facturación"
+      },
+      "saved": "Ajustes financieros guardados."
+    },
+    "mine": {
+      "title": "Liquidaciones y facturas",
+      "description": "Tus liquidaciones de regalías, facturas, método de pago y declaraciones de ventas, solo de tus locales.",
+      "tab": {
+        "statements": "Liquidaciones",
+        "invoices": "Facturas",
+        "method": "Método de pago",
+        "sales": "Declaraciones de ventas"
+      },
+      "noStatements": "Aún no hay liquidaciones",
+      "noStatementsBody": "Las liquidaciones aparecen aquí cuando la central cierra un periodo.",
+      "toPay": "A pagar en {currency}"
+    },
+    "method": {
+      "intro": "Las facturas se cobran del método guardado aquí en su fecha de vencimiento. Puedes sustituirlo o revocarlo cuando quieras.",
+      "noGroups": "No hay ninguna franquicia en tu acceso",
+      "active": "Activo",
+      "none": "Sin configurar",
+      "saved": "{method} terminado en {last4}",
+      "revoke": "Revocar",
+      "revoked": "Método de pago revocado.",
+      "pending": "{method}: pendiente de confirmación.",
+      "sandboxConfirm": "Confirmar (pruebas)",
+      "sandboxDecline": "Confirmar un método que falla (pruebas)",
+      "confirmed": "Método de pago guardado.",
+      "check": "Comprobar estado",
+      "checked": "Estado actualizado.",
+      "type": "Método",
+      "authorise": "Autorizo a la central a cobrar de este método las facturas de regalías, fondo de marketing y cuotas de {group} en {currency}, a partir de cada vencimiento, hasta que lo revoque.",
+      "setUp": "Configurar",
+      "replace": "Sustituir",
+      "started": "Autorización registrada. Confirma el método para terminar.",
+      "card": "Tarjeta",
+      "us_bank_account": "Cuenta bancaria de EE. UU. (ACH)",
+      "acss_debit": "Débito preautorizado canadiense",
+      "bacs_debit": "Domiciliación Bacs",
+      "sepa_debit": "Domiciliación SEPA",
+      "au_becs_debit": "Domiciliación BECS"
+    },
+    "fund": {
+      "title": "Fondo de marketing",
+      "description": "De dónde sale el fondo de marketing de la red y qué paga, por moneda.",
+      "tab": {
+        "report": "Informe de transparencia",
+        "ledger": "Libro mayor",
+        "spend": "Registrar gasto"
+      },
+      "year": "Año",
+      "annualStatement": "Extracto anual (CSV)",
+      "empty": "Aún no hay movimientos del fondo",
+      "reportTitle": "{currency} · {year}",
+      "opening": "Saldo inicial",
+      "contributions": "Aportaciones ({count, plural, one {# franquiciado} other {# franquiciados}})",
+      "spend": "Gastado en campañas",
+      "adjustments": "Ajustes",
+      "closing": "Saldo final",
+      "yours": "Tus aportaciones",
+      "byCampaign": "Gasto por campaña",
+      "unallocated": "Sin asignar",
+      "balanceIn": "Saldo del fondo en {currency}",
+      "kind": {
+        "contribution": "Aportación",
+        "spend": "Gasto",
+        "adjustment": "Ajuste"
+      },
+      "contributionFrom": "Aportación de {who}",
+      "receipt": "Recibo",
+      "campaignsTitle": "Campañas de la red",
+      "campaignName": "Nombre de la campaña",
+      "addCampaign": "Añadir campaña",
+      "spendTitle": "Registrar gasto del fondo",
+      "spendHint": "Cada gasto necesita su recibo y una campaña. El gasto no puede superar el saldo del fondo en esa moneda.",
+      "campaign": "Campaña",
+      "vendor": "Proveedor",
+      "receiptFile": "Recibo",
+      "recordSpend": "Registrar gasto",
+      "spendRecorded": "Gasto registrado."
+    },
+    "payouts": {
+      "title": "Liquidaciones bancarias",
+      "description": "Liquidaciones al banco de cada local, con comisiones, reembolsos y contracargos, conciliadas con pagos y regalías.",
+      "tab": {
+        "payouts": "Liquidaciones",
+        "reconciliation": "Conciliación",
+        "exports": "Exportaciones"
+      },
+      "sync": "Sincronizar liquidaciones",
+      "synced": "{count, plural, =0 {No hay liquidaciones nuevas} one {# liquidación actualizada} other {# liquidaciones actualizadas}}.",
+      "netIn": "Liquidado en {currency}",
+      "feesSub": "Comisiones {fees} · contracargos {chargebacks}",
+      "empty": "Aún no hay liquidaciones",
+      "emptyBody": "Sincroniza las liquidaciones para cargarlas desde el proveedor de pagos.",
+      "arrives": "Llega",
+      "fees": "Comisiones",
+      "chargebacks": "Contracargos",
+      "net": "Neto"
+    },
+    "payoutStatus": {
+      "pending": "Pendiente",
+      "in_transit": "En tránsito",
+      "paid": "Pagada",
+      "failed": "Fallida",
+      "canceled": "Cancelada"
+    },
+    "recon": {
+      "hint": "Para cada local: lo que pagaron los clientes en BranchHarbor, lo que llegó al banco y la liquidación de regalías y la factura del mismo periodo.",
+      "empty": "Nada que conciliar en este periodo",
+      "payments": "Pagos",
+      "count": "{count, plural, one {# pago} other {# pagos}}",
+      "paidOut": "Liquidado",
+      "statement": "Liquidación",
+      "issues": "Comprobaciones",
+      "ok": "Todo cuadra",
+      "issue": {
+        "statement_out_of_date": "Liquidación desactualizada",
+        "not_paid_out": "Sin liquidar tras 7 días",
+        "unmatched_payout_transaction": "Línea de liquidación sin pago",
+        "royalty_unpaid": "Regalía vencida",
+        "no_statement": "Sin liquidación"
+      }
+    },
+    "exports": {
+      "title": "Exportaciones contables",
+      "hint": "Archivos CSV para importar en tu programa de contabilidad. Los formatos de Xero y QuickBooks son solo archivos; no se les envía nada.",
+      "from": "Desde",
+      "to": "Hasta",
+      "currency": "Moneda",
+      "currencyHint": "Los archivos bancarios de QuickBooks necesitan una sola moneda.",
+      "dataset": {
+        "statements": "Liquidaciones de regalías",
+        "invoices": "Facturas",
+        "payouts": "Liquidaciones bancarias",
+        "fund": "Libro mayor del fondo de marketing"
+      },
+      "format": {
+        "csv": "CSV",
+        "xero": "Xero",
+        "quickbooks": "QuickBooks"
+      }
+    },
+    "reports": {
+      "title": "Informes financieros",
+      "description": "Ingresos por regalías, cobro y morosidad por moneda.",
+      "collectedIn": "Cobrado en {currency}",
+      "collectionSub": "{rate} % de {invoiced} facturado · {onTime} de {paid} pagadas a tiempo",
+      "byLocation": "Ingresos por regalías por local",
+      "byRegion": "Ingresos por regalías por región",
+      "region": "Región",
+      "noRegion": "Sin región",
+      "none": "No hay liquidaciones este año.",
+      "ageing": "Antigüedad de la deuda",
+      "noArrears": "Nada vencido.",
+      "bucket": {
+        "current": "Aún no vencido",
+        "d1_30": "1–30 días",
+        "d31_60": "31–60 días",
+        "d61_90": "61–90 días",
+        "d90_plus": "Más de 90 días"
+      }
+    }
+  }
+}

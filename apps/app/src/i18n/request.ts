@@ -8,6 +8,7 @@ import partnersEn from '../../messages/partners/en.json';
 import paymentsEn from '../../messages/payments/en.json';
 import dataEn from '../../messages/data/en.json';
 import accessEn from '../../messages/access/en.json';
+import financeEn from '../../messages/finance/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -37,6 +38,8 @@ export default getRequestConfig(async () => {
   messages = merge(messages, paymentsEn as Messages);
   // Access model (workspaces, modules, roles, Team & access) and the demo site: namespaces "access" and "demo".
   messages = merge(messages, accessEn as Messages);
+  // Finance workspace (royalties, statements & invoices, marketing fund, payouts): namespace "finance" plus its nav and module names.
+  messages = merge(messages, financeEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
@@ -46,6 +49,7 @@ export default getRequestConfig(async () => {
     messages = merge(messages, (await import(`../../messages/foods/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/payments/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/access/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/finance/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

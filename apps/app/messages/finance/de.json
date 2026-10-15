@@ -1,0 +1,521 @@
+{
+  "nav": {
+    "financeRoyalties": "Lizenzgebühren",
+    "financeReports": "Finanzberichte",
+    "financeStatements": "Abrechnungen & Rechnungen",
+    "financeFund": "Marketingfonds",
+    "financePayouts": "Auszahlungen"
+  },
+  "access": {
+    "modules": {
+      "finance": {
+        "royalties": {
+          "name": "Lizenzgebühren",
+          "description": "Gebührenbedingungen, Periodenabschluss, Abrechnungen, Einsprüche, Freigabe, Rechnungsstellung und Einzug im gesamten Netzwerk."
+        },
+        "invoices": {
+          "name": "Abrechnungen & Rechnungen",
+          "description": "Gebührenabrechnungen und Rechnungen der Standorte im Bereich, mit Einsprüchen, Meldungen externer Umsätze und dem Lastschriftmandat."
+        },
+        "marketing_fund": {
+          "name": "Marketingfonds",
+          "description": "Fondsbeiträge, Ausgaben für Netzwerkkampagnen mit Belegen, Saldo je Währung und Transparenzbericht."
+        },
+        "payouts": {
+          "name": "Auszahlungen",
+          "description": "Auszahlungen, Gebühren, Erstattungen und Rückbuchungen je Standort, Abgleich und Buchhaltungsexporte."
+        }
+      }
+    }
+  },
+  "finance": {
+    "common": {
+      "combined": "Alle Währungen",
+      "noConversion": "Nicht addiert: {currencies} werden getrennt angezeigt und nie umgerechnet.",
+      "sandbox": "Testmodus: Zahlungen, Mandate und Auszahlungen werden simuliert. Es fließt kein Geld.",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "exportCsv": "CSV exportieren",
+      "exportXero": "Xero-CSV",
+      "exportQuickbooks": "QuickBooks-CSV"
+    },
+    "frequency": {
+      "monthly": "Monatlich",
+      "weekly": "Wöchentlich"
+    },
+    "weekday": {
+      "1": "Montag",
+      "2": "Dienstag",
+      "3": "Mittwoch",
+      "4": "Donnerstag",
+      "5": "Freitag",
+      "6": "Samstag",
+      "7": "Sonntag"
+    },
+    "statementStatus": {
+      "draft": "Entwurf",
+      "disputed": "Beanstandet",
+      "approved": "Freigegeben",
+      "invoiced": "Abgerechnet",
+      "void": "Storniert"
+    },
+    "invoiceState": {
+      "open": "Offen",
+      "processing": "In Bearbeitung",
+      "paid": "Bezahlt",
+      "overdue": "Überfällig",
+      "void": "Storniert"
+    },
+    "stream": {
+      "bookings": "Buchungen",
+      "memberships": "Mitgliedschaften & Pakete",
+      "retail": "Verkauf",
+      "food": "Speisen & Getränke",
+      "gift_vouchers": "Gutscheine",
+      "other": "Sonstige Umsätze",
+      "external": "Externe Umsätze"
+    },
+    "line": {
+      "sales": "Umsatz: {stream}",
+      "excluded": "Nicht in der Gebührenbasis: {stream}",
+      "refunds": "Abzüglich Erstattungen",
+      "tax": "Abzüglich Steuern",
+      "tips": "Abzüglich Trinkgelder",
+      "external_sales": "Gemeldeter Umsatz einer externen Kasse",
+      "basis": "Nettoumsatz (Gebührenbasis)",
+      "royalty": "Lizenzgebühr",
+      "royaltyTier": "Lizenzgebühr auf Umsatz von {from} bis {to}",
+      "royaltyTierAbove": "Lizenzgebühr auf Umsatz über {from}",
+      "royalty_minimum": "Aufstockung auf die Mindestgebühr",
+      "marketing_fund": "Marketingfonds",
+      "technology_fee": "Technologiegebühr",
+      "adjustment": "Korrektur",
+      "disputeAdjustment": "Korrektur nach Einspruch: {text}"
+    },
+    "invoiceLine": {
+      "royalty": "Lizenzgebühr",
+      "marketing_fund": "Marketingfonds",
+      "technology_fee": "Technologiegebühr",
+      "adjustment": "Korrektur",
+      "late_fee": "Säumniszuschlag"
+    },
+    "warning": {
+      "no_terms": "Für diesen Standort und diese Währung gelten keine Gebührenbedingungen. Bedingungen hinzufügen und neu berechnen.",
+      "external_sales_pending_review": "Eine Meldung externer Umsätze für diese Periode wartet auf Prüfung.",
+      "external_sales_excluded": "Externe Umsätze gehören nicht zur Gebührenbasis dieses Standorts.",
+      "foreign": "Zahlungen in einer anderen Währung ({amount}) sind nicht enthalten: Abrechnungen mischen nie Währungen."
+    },
+    "col": {
+      "location": "Standort",
+      "franchisee": "Franchisenehmer",
+      "period": "Periode",
+      "grossSales": "Bruttoumsatz",
+      "basis": "Nettoumsatz",
+      "royalty": "Lizenzgebühr",
+      "fund": "Fonds",
+      "techFee": "Technologiegebühr",
+      "minimum": "Minimum",
+      "total": "Gesamt",
+      "status": "Status",
+      "invoice": "Rechnung",
+      "due": "Fällig",
+      "outstanding": "Offen",
+      "refunds": "Erstattungen",
+      "tax": "Steuern",
+      "evidence": "Nachweis",
+      "date": "Datum",
+      "kind": "Art",
+      "description": "Beschreibung",
+      "amount": "Betrag",
+      "receipt": "Beleg"
+    },
+    "royalties": {
+      "title": "Lizenzgebühren",
+      "description": "Perioden abschließen, Abrechnungen prüfen und freigeben, Franchisenehmern Rechnungen stellen und einziehen, in der Währung jedes Standorts.",
+      "tab": {
+        "statements": "Abrechnungen",
+        "invoices": "Rechnungen & Einzug",
+        "sales": "Umsatzmeldungen",
+        "terms": "Bedingungen",
+        "settings": "Einstellungen"
+      },
+      "closeTitle": "Periode abschließen",
+      "closeHint": "Periode: {frequency}. Jede Periode endet um Mitternacht in der Zeitzone des jeweiligen Standorts. Der Abschluss erstellt eine Abrechnung für jeden Franchise-Standort.",
+      "periodStart": "Periodenbeginn",
+      "closePeriod": "Periode abschließen",
+      "closed": "Periode abgeschlossen: {count, plural, one {# Abrechnung} other {# Abrechnungen}} zur Prüfung.",
+      "closedMissing": "Periode abgeschlossen: {count, plural, one {# Abrechnung} other {# Abrechnungen}}. {missing, plural, one {# Standort hat} other {# Standorte haben}} noch keine Bedingungen.",
+      "period": "Periode",
+      "noPeriods": "Noch keine abgeschlossenen Perioden",
+      "noPeriodsBody": "Schließen Sie die letzte Periode ab, um Gebührenabrechnungen zu erstellen.",
+      "noStatements": "Keine Abrechnungen in dieser Periode",
+      "invoiceApproved": "Alle freigegebenen abrechnen",
+      "invoicedAll": "{count, plural, =0 {Keine Rechnung erstellt} one {# Rechnung erstellt} other {# Rechnungen erstellt}}.",
+      "dueIn": "Fällig in {currency}",
+      "statementCount": "{count, plural, one {# Abrechnung} other {# Abrechnungen}}",
+      "warnings": "{count, plural, one {# Hinweis} other {# Hinweise}}",
+      "receivable": "Forderungen in {currency}",
+      "overdueSub": "{count, plural, one {# überfällige Rechnung} other {# überfällige Rechnungen}} · {amount}",
+      "noneOverdue": "Nichts überfällig",
+      "runDunning": "Mahnlauf jetzt starten",
+      "dunningDone": "Mahnlauf erledigt: {reminders} Erinnerungen, {lateFees} Säumniszuschläge, {retries} erneute Versuche, {notices} letzte Mahnungen."
+    },
+    "statement": {
+      "kicker": "Gebührenabrechnung",
+      "timeZone": "Periode in {zone}",
+      "line": "Position",
+      "rate": "Satz",
+      "amount": "Betrag",
+      "manual": "manuell",
+      "totalDue": "Zu zahlen",
+      "adjustTitle": "Diese Abrechnung korrigieren",
+      "adjustAmount": "Betrag in {currency}",
+      "adjustHint": "Negativ für eine Gutschrift, z. B. -50.00",
+      "adjustReason": "Grund",
+      "adjust": "Korrektur hinzufügen",
+      "adjusted": "Korrektur hinzugefügt.",
+      "recalculate": "Neu berechnen",
+      "recalculated": "Abrechnung mit den neuesten Umsätzen neu berechnet.",
+      "approve": "Freigeben",
+      "approved": "Abrechnung freigegeben. Sie kann jetzt abgerechnet werden.",
+      "issueInvoice": "Rechnung erstellen",
+      "invoiced": "Rechnung erstellt."
+    },
+    "dispute": {
+      "title": "Einsprüche",
+      "status": {
+        "open": "Offen",
+        "accepted": "Angenommen",
+        "rejected": "Abgelehnt"
+      },
+      "resolution": "Zentrale: {text}",
+      "resolveTitle": "Einspruch entscheiden",
+      "resolutionLabel": "Entscheidung (für den Franchisenehmer sichtbar)",
+      "adjustmentLabel": "Korrektur in {currency}",
+      "adjustmentHint": "Optional. Negativ für eine Gutschrift.",
+      "accept": "Annehmen",
+      "reject": "Ablehnen",
+      "resolved": "Einspruch entschieden.",
+      "raiseTitle": "Diese Abrechnung beanstanden",
+      "raiseHint": "Die Finanzabteilung der Zentrale prüft sie, bevor die Abrechnung in Rechnung gestellt wird.",
+      "lineLabel": "Position",
+      "wholeStatement": "Die gesamte Abrechnung",
+      "reasonLabel": "Was stimmt nicht?",
+      "raise": "Einspruch senden",
+      "raised": "Einspruch an die Finanzabteilung der Zentrale gesendet."
+    },
+    "invoice": {
+      "kicker": "Rechnung",
+      "number": "Rechnung {number}",
+      "due": "Fällig am {date}",
+      "pdf": "PDF",
+      "issued": "Ausgestellt",
+      "dueDate": "Fälligkeit",
+      "daysOverdue": "{count, plural, one {# Tag überfällig} other {# Tage überfällig}}",
+      "tax": "{name} ({rate})",
+      "noTax": "Steuern: keine eingerichtet",
+      "total": "Gesamt",
+      "paid": "Bezahlt",
+      "outstanding": "Offen",
+      "mandate": "Einzug über {method} mit Endziffern {last4}.",
+      "noMandate": "Keine Zahlungsmethode hinterlegt: Der Franchisenehmer muss eine Lastschrift oder Karte einrichten.",
+      "collect": "Jetzt einziehen",
+      "collectStarted": "Einzug gestartet.",
+      "collectFailed": "Die Zahlung ist fehlgeschlagen ({code}). Der Mahnlauf versucht es erneut.",
+      "payNow": "{amount} jetzt bezahlen",
+      "payStarted": "Zahlung gestartet.",
+      "sandboxSettle": "Lastschrift ausführen (Test)",
+      "sandboxFail": "Lastschrift scheitern lassen (Test)",
+      "settled": "Lastschrift ausgeführt.",
+      "settleFailed": "Lastschrift als fehlgeschlagen markiert.",
+      "recordTitle": "Außerhalb von BranchHarbor erhaltene Zahlung erfassen",
+      "recordAmount": "Betrag in {currency}",
+      "recordReference": "Referenz",
+      "recordDate": "Erhalten am",
+      "record": "Zahlung erfassen",
+      "recorded": "Zahlung erfasst.",
+      "history": "Zahlungsverlauf",
+      "attempt": "Versuch {n} · {method}"
+    },
+    "attemptMethod": {
+      "debit": "Einzug",
+      "manual": "von der Zentrale erfasst"
+    },
+    "attemptStatus": {
+      "processing": "In Bearbeitung",
+      "succeeded": "Bezahlt",
+      "failed": "Fehlgeschlagen",
+      "requires_action": "Aktion erforderlich"
+    },
+    "dunning": {
+      "reminder": "Erinnerung vor Fälligkeit gesendet",
+      "retry": "Einzug erneut versucht",
+      "late_fee": "Säumniszuschlag hinzugefügt",
+      "final_notice": "Letzte Mahnung gesendet"
+    },
+    "invoices": {
+      "empty": "Noch keine Rechnungen"
+    },
+    "sales": {
+      "hqHint": "Standorte mit externer Kasse melden ihre Umsätze mit Nachweis. Nur angenommene Meldungen zählen für die Lizenzgebühren.",
+      "empty": "Keine Umsatzmeldungen",
+      "evidence": "Nachweis",
+      "accept": "Annehmen",
+      "reject": "Ablehnen",
+      "status": {
+        "submitted": "Wartet auf Prüfung",
+        "accepted": "Angenommen",
+        "rejected": "Abgelehnt"
+      },
+      "submitTitle": "Umsätze einer externen Kasse melden",
+      "submitHint": "Für Umsätze, die nicht über BranchHarbor laufen. Hängen Sie den Kassenbericht an (PDF, Bild, CSV oder Tabelle, bis 5 MB).",
+      "gross": "Bruttoumsatz in {currency}",
+      "refunds": "Erstattungen in {currency}",
+      "tax": "Enthaltene Steuern in {currency}",
+      "evidenceFile": "Nachweis",
+      "evidenceHint": "PDF, Bild, CSV oder Tabelle, bis 5 MB.",
+      "note": "Notiz für die Zentrale",
+      "submit": "Meldung senden",
+      "submitted": "Meldung gesendet. Die Finanzabteilung der Zentrale prüft sie.",
+      "reviewNote": "Notiz der Zentrale"
+    },
+    "terms": {
+      "hint": "Bedingungen gelten je Franchisenehmer (Eigentümergruppe) oder als Netzwerkstandard, je Währung und mit Gültigkeitsdaten. Die Sätze eines Franchisevertrags haben Vorrang, wenn es einen gibt.",
+      "add": "Bedingungen hinzufügen",
+      "addTitle": "Neue Gebührenbedingungen",
+      "editTitle": "Gebührenbedingungen bearbeiten",
+      "appliesTo": "Gilt für",
+      "orgDefault": "Netzwerkstandard",
+      "currency": "Währung",
+      "effectiveFrom": "Gültig ab",
+      "effectiveTo": "Gültig bis",
+      "effective": "Gültigkeit",
+      "open": "unbefristet",
+      "royaltyPct": "Lizenzgebühr (% des Nettoumsatzes)",
+      "fundPct": "Marketingfonds (% des Nettoumsatzes)",
+      "techFee": "Technologiegebühr je Standort und Periode ({currency})",
+      "techFeeHint": "Fester Betrag, 0 für keine.",
+      "minimum": "Mindestgebühr je Periode ({currency})",
+      "minimumHint": "0 für kein Minimum.",
+      "tierMode": "Staffeln",
+      "tierMarginal": "Jede Stufe zu ihrem eigenen Satz",
+      "tierWhole": "Gesamter Umsatz zum Satz der erreichten Stufe",
+      "tiers": "Gestaffelte Sätze (optional)",
+      "tierFrom": "Ab Umsatz von ({currency})",
+      "tierRate": "Satz (%)",
+      "addTier": "Stufe hinzufügen",
+      "removeTier": "Entfernen",
+      "tiered": "{count, plural, one {# Stufe} other {# Stufen}}",
+      "basis": "Berücksichtigte Umsätze",
+      "netOfRefunds": "Abzüglich Erstattungen",
+      "excludeTax": "Ohne Steuern",
+      "excludeTips": "Ohne Trinkgelder",
+      "includeExternal": "Gemeldete externe Umsätze einbeziehen",
+      "lateFee": "Säumniszuschlag",
+      "lateFeeNone": "Keiner",
+      "lateFeeFlat": "Fester Betrag",
+      "lateFeePercent": "Prozentsatz des überfälligen Betrags",
+      "lateFeeAmount": "Säumniszuschlag ({currency})",
+      "lateFeeRate": "Säumniszuschlag (%)",
+      "graceDays": "Karenztage nach Fälligkeit",
+      "empty": "Noch keine Bedingungen",
+      "emptyBody": "Fügen Sie die Netzwerkstandards für jede Währung hinzu, in der Ihre Standorte handeln."
+    },
+    "settings": {
+      "collectionTitle": "Konto für Lizenzgebühren",
+      "collectionBody": "Franchisenehmer zahlen per Karte oder Lastschrift auf das eigene Stripe-Konto der Zentrale, mit einem Mandat, das sie in BranchHarbor erteilen. Das Geld liegt nie bei BranchHarbor.",
+      "collectionConnected": "Verbunden: {account}",
+      "collectionMissing": "Noch nicht verbunden.",
+      "sandboxMode": "Test",
+      "connect": "Konto verbinden",
+      "periodsTitle": "Perioden und Rechnungen",
+      "frequency": "Periode",
+      "weekStartsOn": "Wochen beginnen am",
+      "invoicePrefix": "Präfix der Rechnungsnummer",
+      "nextNumber": "Nächste Rechnung: {number}",
+      "paymentTerms": "Zahlungsziel (Tage)",
+      "autoCollect": "Bei Rechnungsstellung automatisch einziehen",
+      "dunningTitle": "Mahnwesen",
+      "retryDays": "Einzug an diesen Tagen nach Fälligkeit wiederholen",
+      "retryDaysHint": "Zum Beispiel: 3, 7",
+      "reminderDays": "Erinnerung Tage vor Fälligkeit",
+      "finalNotice": "Letzte Mahnung nach (Tagen Verzug)",
+      "taxTitle": "Steuern auf Rechnungen",
+      "taxBody": "BranchHarbor fügt keine Steuern von sich aus hinzu. Fügen Sie nur die von Ihrer Steuerberatung bestätigten Steuerzeilen je Land hinzu.",
+      "taxName": "Name",
+      "taxRate": "Satz (%)",
+      "taxCountry": "Land (2 Buchstaben)",
+      "taxAppliesTo": "Gilt für",
+      "addTax": "Steuerzeile hinzufügen",
+      "removeTax": "Entfernen",
+      "issuerTitle": "Angaben auf Rechnungen",
+      "issuer": {
+        "legalName": "Firmenname",
+        "address": "Anschrift",
+        "taxNumber": "Steuernummer",
+        "email": "Rechnungs-E-Mail"
+      },
+      "saved": "Finanzeinstellungen gespeichert."
+    },
+    "mine": {
+      "title": "Abrechnungen & Rechnungen",
+      "description": "Ihre Gebührenabrechnungen, Rechnungen, Zahlungsmethode und Umsatzmeldungen, nur für Ihre Standorte.",
+      "tab": {
+        "statements": "Abrechnungen",
+        "invoices": "Rechnungen",
+        "method": "Zahlungsmethode",
+        "sales": "Umsatzmeldungen"
+      },
+      "noStatements": "Noch keine Abrechnungen",
+      "noStatementsBody": "Abrechnungen erscheinen hier, sobald die Zentrale eine Periode abschließt.",
+      "toPay": "Zu zahlen in {currency}"
+    },
+    "method": {
+      "intro": "Rechnungen werden zum Fälligkeitstag von der hier hinterlegten Methode eingezogen. Sie können sie jederzeit ersetzen oder widerrufen.",
+      "noGroups": "Kein Franchise in Ihrem Zugriff",
+      "active": "Aktiv",
+      "none": "Nicht eingerichtet",
+      "saved": "{method} mit Endziffern {last4}",
+      "revoke": "Widerrufen",
+      "revoked": "Zahlungsmethode widerrufen.",
+      "pending": "{method}: wartet auf Bestätigung.",
+      "sandboxConfirm": "Bestätigen (Test)",
+      "sandboxDecline": "Fehlschlagende Methode bestätigen (Test)",
+      "confirmed": "Zahlungsmethode gespeichert.",
+      "check": "Status prüfen",
+      "checked": "Status aktualisiert.",
+      "type": "Methode",
+      "authorise": "Ich ermächtige die Zentrale, Rechnungen für Lizenzgebühren, Marketingfonds und Gebühren von {group} in {currency} ab dem jeweiligen Fälligkeitstag von dieser Methode einzuziehen, bis ich widerrufe.",
+      "setUp": "Einrichten",
+      "replace": "Ersetzen",
+      "started": "Ermächtigung erfasst. Bestätigen Sie die Methode, um abzuschließen.",
+      "card": "Karte",
+      "us_bank_account": "US-Bankkonto (ACH)",
+      "acss_debit": "Kanadische Einzugsermächtigung (PAD)",
+      "bacs_debit": "Bacs-Lastschrift",
+      "sepa_debit": "SEPA-Lastschrift",
+      "au_becs_debit": "BECS-Lastschrift"
+    },
+    "fund": {
+      "title": "Marketingfonds",
+      "description": "Woher der Marketingfonds des Netzwerks kommt und wofür er ausgegeben wird, je Währung.",
+      "tab": {
+        "report": "Transparenzbericht",
+        "ledger": "Hauptbuch",
+        "spend": "Ausgabe erfassen"
+      },
+      "year": "Jahr",
+      "annualStatement": "Jahresabrechnung (CSV)",
+      "empty": "Noch keine Fondsbewegungen",
+      "reportTitle": "{currency} · {year}",
+      "opening": "Anfangssaldo",
+      "contributions": "Beiträge ({count, plural, one {# Franchisenehmer} other {# Franchisenehmer}})",
+      "spend": "Für Kampagnen ausgegeben",
+      "adjustments": "Korrekturen",
+      "closing": "Endsaldo",
+      "yours": "Ihre Beiträge",
+      "byCampaign": "Ausgaben je Kampagne",
+      "unallocated": "Nicht zugeordnet",
+      "balanceIn": "Fondssaldo in {currency}",
+      "kind": {
+        "contribution": "Beitrag",
+        "spend": "Ausgabe",
+        "adjustment": "Korrektur"
+      },
+      "contributionFrom": "Beitrag von {who}",
+      "receipt": "Beleg",
+      "campaignsTitle": "Netzwerkkampagnen",
+      "campaignName": "Name der Kampagne",
+      "addCampaign": "Kampagne hinzufügen",
+      "spendTitle": "Fondsausgabe erfassen",
+      "spendHint": "Jede Ausgabe braucht ihren Beleg und eine Kampagne. Ausgaben dürfen den Fondssaldo in dieser Währung nicht übersteigen.",
+      "campaign": "Kampagne",
+      "vendor": "Lieferant",
+      "receiptFile": "Beleg",
+      "recordSpend": "Ausgabe erfassen",
+      "spendRecorded": "Ausgabe erfasst."
+    },
+    "payouts": {
+      "title": "Auszahlungen",
+      "description": "Auszahlungen auf das Bankkonto jedes Standorts, mit Gebühren, Erstattungen und Rückbuchungen, abgeglichen mit Zahlungen und Lizenzgebühren.",
+      "tab": {
+        "payouts": "Auszahlungen",
+        "reconciliation": "Abgleich",
+        "exports": "Exporte"
+      },
+      "sync": "Auszahlungen synchronisieren",
+      "synced": "{count, plural, =0 {Keine neuen Auszahlungen} one {# Auszahlung aktualisiert} other {# Auszahlungen aktualisiert}}.",
+      "netIn": "Ausgezahlt in {currency}",
+      "feesSub": "Gebühren {fees} · Rückbuchungen {chargebacks}",
+      "empty": "Noch keine Auszahlungen",
+      "emptyBody": "Synchronisieren Sie die Auszahlungen, um sie vom Zahlungsanbieter zu laden.",
+      "arrives": "Eingang",
+      "fees": "Gebühren",
+      "chargebacks": "Rückbuchungen",
+      "net": "Netto"
+    },
+    "payoutStatus": {
+      "pending": "Ausstehend",
+      "in_transit": "Unterwegs",
+      "paid": "Ausgezahlt",
+      "failed": "Fehlgeschlagen",
+      "canceled": "Storniert"
+    },
+    "recon": {
+      "hint": "Für jeden Standort: was Kunden in BranchHarbor bezahlt haben, was auf dem Bankkonto ankam, und die Gebührenabrechnung und Rechnung derselben Periode.",
+      "empty": "In dieser Periode gibt es nichts abzugleichen",
+      "payments": "Zahlungen",
+      "count": "{count, plural, one {# Zahlung} other {# Zahlungen}}",
+      "paidOut": "Ausgezahlt",
+      "statement": "Abrechnung",
+      "issues": "Prüfungen",
+      "ok": "Alles stimmt überein",
+      "issue": {
+        "statement_out_of_date": "Abrechnung veraltet",
+        "not_paid_out": "Nach 7 Tagen nicht ausgezahlt",
+        "unmatched_payout_transaction": "Auszahlungsposten ohne Zahlung",
+        "royalty_unpaid": "Lizenzgebühr überfällig",
+        "no_statement": "Keine Abrechnung"
+      }
+    },
+    "exports": {
+      "title": "Exporte für die Buchhaltung",
+      "hint": "CSV-Dateien zum Import in Ihre Buchhaltungssoftware. Die Xero- und QuickBooks-Formate sind nur Dateien; es wird nichts an diese Dienste gesendet.",
+      "from": "Von",
+      "to": "Bis",
+      "currency": "Währung",
+      "currencyHint": "QuickBooks-Bankdateien brauchen genau eine Währung.",
+      "dataset": {
+        "statements": "Gebührenabrechnungen",
+        "invoices": "Rechnungen",
+        "payouts": "Auszahlungen",
+        "fund": "Hauptbuch des Marketingfonds"
+      },
+      "format": {
+        "csv": "CSV",
+        "xero": "Xero",
+        "quickbooks": "QuickBooks"
+      }
+    },
+    "reports": {
+      "title": "Finanzberichte",
+      "description": "Gebühreneinnahmen, Einzug und Rückstände je Währung.",
+      "collectedIn": "Eingezogen in {currency}",
+      "collectionSub": "{rate} % von {invoiced} abgerechnet · {onTime} von {paid} pünktlich bezahlt",
+      "byLocation": "Gebühreneinnahmen je Standort",
+      "byRegion": "Gebühreneinnahmen je Region",
+      "region": "Region",
+      "noRegion": "Keine Region",
+      "none": "Keine Abrechnungen in diesem Jahr.",
+      "ageing": "Altersstruktur der Rückstände",
+      "noArrears": "Nichts überfällig.",
+      "bucket": {
+        "current": "Noch nicht fällig",
+        "d1_30": "1–30 Tage",
+        "d31_60": "31–60 Tage",
+        "d61_90": "61–90 Tage",
+        "d90_plus": "Über 90 Tage"
+      }
+    }
+  }
+}

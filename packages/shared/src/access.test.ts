@@ -65,3 +65,16 @@ test('workspaces only appear for available modules and industry modules follow t
   assert.ok(foodsStaff.has('operations.menu:edit'));
   assert.ok(!foodsStaff.has('operations.classes:view'));
 });
+
+test('finance workspace: franchise owners see their statements and the fund report, never royalties or payouts', () => {
+  const fo = effectiveCapabilities({ role: 'franchise_owner', scopeKind: 'owner_group' }, 'studios');
+  assert.ok(fo.has('finance.invoices:edit'));
+  assert.ok(fo.has('finance.marketing_fund:view'));
+  assert.ok(!fo.has('finance.marketing_fund:edit'));
+  assert.ok(!fo.has('finance.royalties:view'));
+  assert.ok(!fo.has('finance.payouts:view'));
+  const fin = effectiveCapabilities({ role: 'finance', scopeKind: 'organization' }, 'studios');
+  for (const m of ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts']) assert.ok(fin.has(`${m}:view`), m);
+  assert.ok(fin.has('finance.royalties:publish'));
+  assert.deepEqual(workspacesFor(fin, 'studios').find((w) => w.key === 'finance')?.modules, ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts']);
+});
