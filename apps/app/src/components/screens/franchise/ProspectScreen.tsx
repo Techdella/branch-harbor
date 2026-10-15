@@ -194,7 +194,7 @@ function Actions({ p, reload }: { p: ProspectDetail; reload: () => void }) {
             </div>
             <Field label={t('actions.territory')} optional>{(x) => <Input id={x.id} value={terms.territory} onChange={(e) => setTerms((s) => ({ ...s, territory: e.target.value }))} />}</Field>
             <Field label={t('actions.renewal')} optional>{(x) => <Input id={x.id} value={terms.renewal} onChange={(e) => setTerms((s) => ({ ...s, renewal: e.target.value }))} />}</Field>
-            <Toggle checked={material} onChange={setMaterial} label={t('actions.materialChange')} />
+            <div className="flex items-center gap-3 text-[13px]"><Toggle checked={material} onChange={setMaterial} label={t('actions.materialChange')} /><span aria-hidden="true">{t('actions.materialChange')}</span></div>
             <div className="flex flex-wrap gap-2">
               <Button icon="signature" disabled={!agr} loading={act.pending} onClick={async () => {
                 const r = await act.run(() => franchiseApi.sendAgreement(p.id, {

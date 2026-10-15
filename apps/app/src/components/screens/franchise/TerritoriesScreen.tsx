@@ -33,7 +33,7 @@ function Territories() {
         <SectionCard title={t('territories.formTitle')}>
           <div className="flex flex-wrap items-center gap-3">
             {canEdit
-              ? <Toggle checked={settings.data.enquiryFormEnabled} onChange={async (b) => { const r = await act.run(() => franchiseApi.saveSettings({ enquiryFormEnabled: b })); if (r) settings.setData({ ...settings.data!, enquiryFormEnabled: r.enquiryFormEnabled }); }} label={t('territories.formToggle')} />
+              ? <span className="flex items-center gap-3 text-[13px]"><Toggle checked={settings.data.enquiryFormEnabled} onChange={async (b) => { const r = await act.run(() => franchiseApi.saveSettings({ enquiryFormEnabled: b })); if (r) settings.setData({ ...settings.data!, enquiryFormEnabled: r.enquiryFormEnabled }); }} label={t('territories.formToggle')} /><span aria-hidden="true">{t('territories.formToggle')}</span></span>
               : <Badge tone={settings.data.enquiryFormEnabled ? 'success' : 'neutral'}>{settings.data.enquiryFormEnabled ? t('territories.formOn') : t('territories.formOff')}</Badge>}
           </div>
           <p className="mt-2 text-xs text-stone">{t('territories.formHint', { brand: settings.data.brandSlug })}</p>
@@ -45,7 +45,7 @@ function Territories() {
             <div className="min-w-[200px] flex-1"><Field label={t('territories.name')}>{(x) => <Input id={x.id} value={v.name} onChange={(e) => setV((s) => ({ ...s, name: e.target.value }))} />}</Field></div>
             <div className="w-24"><Field label={t('prospect.country')}>{(x) => <Input id={x.id} maxLength={2} value={v.country} onChange={(e) => setV((s) => ({ ...s, country: e.target.value.toUpperCase() }))} />}</Field></div>
             <div className="w-28"><Field label={t('prospect.region')} optional>{(x) => <Input id={x.id} maxLength={6} value={v.region} onChange={(e) => setV((s) => ({ ...s, region: e.target.value.toUpperCase() }))} />}</Field></div>
-            <Toggle checked={v.showOnSite} onChange={(b) => setV((s) => ({ ...s, showOnSite: b }))} label={t('territories.showOnSite')} />
+            <div className="flex h-11 items-center gap-2 text-[13px]"><Toggle checked={v.showOnSite} onChange={(b) => setV((s) => ({ ...s, showOnSite: b }))} label={t('territories.showOnSite')} /><span aria-hidden="true">{t('territories.showOnSite')}</span></div>
             <Button icon="plus" disabled={!v.name || v.country.length !== 2} loading={act.pending} onClick={async () => {
               if (await act.run(() => franchiseApi.createTerritory({ name: v.name, country: v.country, region: v.region || null, showOnSite: v.showOnSite }))) { setV((s) => ({ ...s, name: '' })); res.reload(); }
             }}>{t('territories.addButton')}</Button>

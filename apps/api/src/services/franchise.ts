@@ -444,6 +444,8 @@ export async function createFeeInvoice(s: Services, req: FastifyRequest, p: Pros
     await addActivity(s.db, p, 'blocked', c.paymentBlockers[0]?.message ?? null, req.user!.id, { step: 'payment', blockers: c.paymentBlockers });
     throw blockedError('payment', c);
   }
+  // Rules first (so the reason is always visible to the development team), then the payments permission.
+  await requireOrgPerm(req, s.db, p.organizationId, 'payments.read');
   const org = await orgRow(s.db, p.organizationId);
   const collectLocationId = b.collectLocationId ?? franchiseSettings(org).collectLocationId;
   if (!collectLocationId) throw validationError('Choose the HQ location whose payment account collects franchise fees', { collectLocationId: 'Required' });

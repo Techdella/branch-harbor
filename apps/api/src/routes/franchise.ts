@@ -364,7 +364,6 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req, reply) => {
     const { orgId, id } = req.params;
     await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
-    await requireOrgPerm(req, s.db, orgId, 'payments.read');
     const out = await createFeeInvoice(s, req, await getProspect(s.db, orgId, id), req.body);
     return reply.code(201).send({ invoiceId: out.invoice.id, paymentId: out.payment.id, status: out.invoice.status, sandbox: out.sandbox });
   });
