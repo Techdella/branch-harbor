@@ -52,6 +52,26 @@
     "canSignFrom": "Potrai firmare questo contratto dal {date}. Il periodo di attesa ti dà il tempo di esaminare il documento informativo.",
     "cannotSignYet": "Questo contratto non può ancora essere firmato. L’affiliante ti contatterà.",
     "errSign": "Scrivi nome e cognome e spunta la casella per firmare.",
-    "esignLegal": "La firma elettronica è riconosciuta in molti paesi, ma le regole variano. Se hai dubbi, rivolgiti al tuo avvocato."
+    "esignLegal": "La firma elettronica è riconosciuta in molti paesi, ma le regole variano. Se hai dubbi, rivolgiti al tuo avvocato.",
+    "mapTitle": "Territori disponibili",
+    "mapIntro": "{count, plural, =0 {Al momento non ci sono territori aperti.} one {# territorio è aperto a nuovi affiliati.} other {# territori sono aperti a nuovi affiliati.}}",
+    "mapLabel": "Mappa dei territori in franchising",
+    "mapOutline": "Mappa semplificata",
+    "legendAvailable": "Disponibile",
+    "legendTaken": "Occupato",
+    "availableList": "Territori disponibili",
+    "noneAvailable": "Al momento tutti i territori sono occupati. Inviaci una richiesta e ti avviseremo quando se ne libera uno.",
+    "askAbout": "Chiedi informazioni",
+    "validationTitle": "Parla con i nostri affiliati",
+    "validationIntro": "Ciao {name}, questi affiliati {brand} si sono offerti di raccontarti com’è davvero gestire un punto vendita. Prenota una breve chiamata con ciascuno.",
+    "validationBook": "Prenota un orario",
+    "validationPropose": "Quando ti va bene?",
+    "validationProposeHint": "Proponi due o tre orari, con il tuo fuso orario.",
+    "validationSend": "Invia gli orari",
+    "validationProposed": "Hai proposto: {times}. Ti confermeranno via email.",
+    "validationScheduled": "Chiamata fissata per {date}",
+    "validationDone": "Chiamata fatta. Grazie!",
+    "validationEmpty": "Non è ancora stato assegnato nessuno. Ti scriveremo quando le chiamate saranno organizzate.",
+    "validationNote": "Queste chiamate restano tra te e l’affiliato. {brand} non ascolta."
   }
 }

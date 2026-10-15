@@ -52,6 +52,26 @@
     "canSignFrom": "U kunt deze overeenkomst vanaf {date} ondertekenen. De wachttijd geeft u tijd om het informatiedocument te bestuderen.",
     "cannotSignYet": "Deze overeenkomst kan nog niet worden ondertekend. De franchisegever neemt contact met u op.",
     "errSign": "Typ uw volledige naam en vink het vakje aan om te ondertekenen.",
-    "esignLegal": "Elektronische handtekeningen worden in veel landen erkend, maar de regels verschillen. Vraag uw eigen advocaat als u vragen hebt."
+    "esignLegal": "Elektronische handtekeningen worden in veel landen erkend, maar de regels verschillen. Vraag uw eigen advocaat als u vragen hebt.",
+    "mapTitle": "Beschikbare gebieden",
+    "mapIntro": "{count, plural, =0 {Er is nu geen gebied vrij.} one {# gebied is vrij voor nieuwe franchisenemers.} other {# gebieden zijn vrij voor nieuwe franchisenemers.}}",
+    "mapLabel": "Kaart van franchisegebieden",
+    "mapOutline": "Vereenvoudigde kaart",
+    "legendAvailable": "Beschikbaar",
+    "legendTaken": "Bezet",
+    "availableList": "Beschikbare gebieden",
+    "noneAvailable": "Alle gebieden zijn nu bezet. Stuur een aanvraag en we laten het weten zodra er een vrijkomt.",
+    "askAbout": "Vraag ernaar",
+    "validationTitle": "Praat met onze franchisenemers",
+    "validationIntro": "Hoi {name}, deze {brand}-franchisenemers vertellen je graag hoe het echt is om een vestiging te runnen. Plan met elk van hen een kort gesprek.",
+    "validationBook": "Tijd plannen",
+    "validationPropose": "Wanneer past het je?",
+    "validationProposeHint": "Stel twee of drie tijden voor, met je tijdzone.",
+    "validationSend": "Tijden versturen",
+    "validationProposed": "Je stelde voor: {times}. Je krijgt een bevestiging per e-mail.",
+    "validationScheduled": "Gesprek gepland op {date}",
+    "validationDone": "Gesprek gevoerd. Bedankt!",
+    "validationEmpty": "Er is nog niemand toegewezen. We mailen je zodra de gesprekken zijn geregeld.",
+    "validationNote": "Deze gesprekken zijn tussen jou en de franchisenemer. {brand} luistert niet mee."
   }
 }

@@ -52,6 +52,26 @@
     "canSignFrom": "Sie können diesen Vertrag ab dem {date} unterschreiben. Die Wartefrist gibt Ihnen Zeit, das Offenlegungsdokument zu prüfen.",
     "cannotSignYet": "Dieser Vertrag kann noch nicht unterschrieben werden. Der Franchisegeber meldet sich bei Ihnen.",
     "errSign": "Geben Sie Ihren vollständigen Namen ein und setzen Sie das Häkchen, um zu unterschreiben.",
-    "esignLegal": "Elektronische Unterschriften sind in vielen Ländern anerkannt, die Regeln unterscheiden sich jedoch. Fragen Sie bei Unsicherheiten Ihre eigene Rechtsberatung."
+    "esignLegal": "Elektronische Unterschriften sind in vielen Ländern anerkannt, die Regeln unterscheiden sich jedoch. Fragen Sie bei Unsicherheiten Ihre eigene Rechtsberatung.",
+    "mapTitle": "Verfügbare Gebiete",
+    "mapIntro": "{count, plural, =0 {Gerade ist kein Gebiet frei.} one {# Gebiet ist für neue Franchisenehmer frei.} other {# Gebiete sind für neue Franchisenehmer frei.}}",
+    "mapLabel": "Karte der Franchise-Gebiete",
+    "mapOutline": "Vereinfachte Karte",
+    "legendAvailable": "Frei",
+    "legendTaken": "Vergeben",
+    "availableList": "Verfügbare Gebiete",
+    "noneAvailable": "Gerade sind alle Gebiete vergeben. Senden Sie eine Anfrage, und wir melden uns, sobald eines frei wird.",
+    "askAbout": "Anfragen",
+    "validationTitle": "Sprechen Sie mit unseren Franchisenehmern",
+    "validationIntro": "Hallo {name}, diese {brand}-Franchisenehmer erzählen Ihnen gern, wie es wirklich ist, eine Einheit zu führen. Buchen Sie mit jedem ein kurzes Gespräch.",
+    "validationBook": "Termin buchen",
+    "validationPropose": "Wann passt es Ihnen?",
+    "validationProposeHint": "Schlagen Sie zwei oder drei Zeiten mit Ihrer Zeitzone vor.",
+    "validationSend": "Zeiten senden",
+    "validationProposed": "Ihr Vorschlag: {times}. Die Bestätigung kommt per E-Mail.",
+    "validationScheduled": "Gespräch am {date}",
+    "validationDone": "Gespräch geführt. Danke!",
+    "validationEmpty": "Noch niemand zugeteilt. Wir schreiben Ihnen, sobald die Gespräche geplant sind.",
+    "validationNote": "Diese Gespräche bleiben zwischen Ihnen und dem Franchisenehmer. {brand} hört nicht mit."
   }
 }
