@@ -33,7 +33,6 @@ const fr: Dict = {
     offlineTitle: 'Vous êtes hors ligne',
     offlineBody: 'Données du %{time}. Elles peuvent être obsolètes — les actions attendront la reconnexion.',
     staleBody: 'Actualisation impossible. Données du %{time}.',
-    sampleData: 'Données d’exemple',
   },
   welcome: {
     tagline: 'Un seul foyer pour chaque établissement.',
@@ -43,7 +42,6 @@ const fr: Dict = {
     password: 'Mot de passe',
     guest: 'Continuer en invité',
     chooseExperience: 'Choisir une expérience',
-    demoNote: 'Démo : en production, votre accès dépend de votre compte. Ici, vous pouvez changer pour découvrir chaque expérience.',
     customer: 'Client',
     customerSub: 'Réserver des cours, commander à emporter, gérer ses réservations',
     staff: 'Équipe',
@@ -53,7 +51,16 @@ const fr: Dict = {
     signInError: 'Vérifiez votre e-mail et votre mot de passe, puis réessayez.',
     signedInAs: 'Connecté en tant que %{name}',
     webPreview: 'Aperçu web',
-    demoPassword: 'Démo : 6 caractères ou plus',
+    account: 'Compte d’entreprise',
+    industry: { studios: 'Studios', sports: 'Sport', wellness: 'Bien-être', commerce: 'Commerce', foods: 'Restauration', realty: 'Immobilier', hospitality: 'Hôtellerie' },
+  },
+  demo: {
+    ribbon: 'Environnement de démonstration',
+    ribbonNote: 'Entreprises et personnes fictives pour la démonstration. Pas de vrais clients.',
+    pickerTitle: 'Essayer un compte de démonstration',
+    pickerBody: 'Connectez-vous en tant que n’importe quel membre de ces équipes fictives pour voir ce que voit chaque rôle.',
+    pickerFailed: 'Les comptes de démonstration ne sont pas disponibles pour le moment.',
+    signingIn: 'Connexion…',
   },
   tabs: {
     home: 'Accueil',
@@ -209,7 +216,6 @@ const fr: Dict = {
     emptyCartSub: 'Ajoutez quelque chose depuis la carte.',
     fieldRequired: 'Obligatoire',
     fixErrors: 'Vérifiez les champs signalés.',
-    statusSimNote: 'Exemple : les mises à jour du statut viennent du restaurant.',
     simulateNext: 'Simuler l’étape suivante',
   },
   bookings: {
@@ -263,7 +269,6 @@ const fr: Dict = {
     switchExperience: 'Changer d’expérience',
     signOut: 'Se déconnecter',
     version: 'Version %{version} · %{mode}',
-    mocks: 'données d’exemple',
     live: 'API en direct',
   },
   staff: {
@@ -315,7 +320,6 @@ const fr: Dict = {
     awaitingManager: 'En attente du responsable',
     yourRequests: 'Vos demandes',
     openRequests: 'Demandes ouvertes près de vous',
-    simulateOffline: 'Simuler une perte de connexion',
     kitchenStatus: { awaiting_acceptance: 'En attente d’acceptation', accepted: 'Acceptée', preparing: 'En préparation', ready: 'Prête', collected: 'Récupérée', rejected: 'Refusée', cancelled: 'Annulée' },
   },
   owner: {

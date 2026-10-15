@@ -11,8 +11,8 @@
  */
 import { Platform } from 'react-native';
 import { paymentView, waitForPayment } from './cardPayment.shared';
-import { ROLE_PERMISSIONS, type Permission, type Role, type RoleAssignment } from '@bh/shared';
-import { BRANDS, IMG } from '@/mock/data';
+import { ROLE_PERMISSIONS, permissionsFromCapabilities, type Permission, type Role, type RoleAssignment } from '@bh/shared';
+import { IMG } from './images';
 import { env } from './env';
 import { ApiError } from './errors';
 import { currentLocale, tNow } from '@/i18n/current';
@@ -27,7 +27,11 @@ import type {
 
 // ───────────────────────── raw API shapes (subset) ─────────────────────────
 interface RawUser { id: string; email: string; name: string; locale: string }
-interface RawOrg { id: string; name: string; slug: string; industry: string; roles: { id: string; role: string; scope: { kind: string; id: string } }[]; model?: 'independent' | 'network'; primaryLocationId?: string | null }
+interface RawOrg {
+  id: string; name: string; slug: string; industry: string; roles: { id: string; role: string; name?: string; scope: { kind: string; id: string } }[]; model?: 'independent' | 'network'; primaryLocationId?: string | null;
+  /** What this person holds in the business account (capabilities `<module>:<action>`), from the access model. */
+  access?: { capabilities: string[] };
+}
 interface RawMe { user: RawUser; organizations: RawOrg[] }
 interface RawAddress { line1?: string; city?: string; region?: string; postalCode?: string; country?: string }
 interface RawLocation { id: string; name: string; address: RawAddress; country: string; timeZone: string; currency: string; status: string; organizationId?: string; publiclyVisible?: boolean }
@@ -117,20 +121,45 @@ async function rawMe(): Promise<RawMe | null> {
   return meCache;
 }
 
-const has = (org: RawOrg, p: Permission) => org.roles.some((r) => (ROLE_PERMISSIONS[r.role as Role] ?? []).includes(p));
-const staffOrgs = (m: RawMe | null) => (m?.organizations ?? []).filter((o) => has(o, 'operations.read'));
-const ownerOrgs = (m: RawMe | null) => (m?.organizations ?? []).filter((o) => has(o, 'reports.read') || has(o, 'website.approve'));
+// ───────────────────────── access model: experiences come from capabilities ─────────────────────────
+const caps = (org: RawOrg) => new Set(org.access?.capabilities ?? []);
+const holdsView = (org: RawOrg, prefix: string) => [...caps(org)].some((c) => c.startsWith(prefix) && c.endsWith(':view'));
+const has = (org: RawOrg, p: Permission) =>
+  org.access ? permissionsFromCapabilities(caps(org)).has(p) : org.roles.some((r) => (ROLE_PERMISSIONS[r.role as Role] ?? []).includes(p));
+/** Staff experience: any Operations module (industry screens, staff schedule). */
+const isStaff = (o: RawOrg) => (o.access ? holdsView(o, 'operations.') : has(o, 'operations.read'));
+/** Owner / HQ experience: reports or approvals. */
+const isOwner = (o: RawOrg) => (o.access ? holdsView(o, 'network.reports:') || holdsView(o, 'network.approvals:') : has(o, 'reports.read') || has(o, 'website.approve'));
+const isTeam = (o: RawOrg) => o.roles.some((r) => r.role !== 'customer');
+
+/** One business account at a time (account switcher): data is never mixed between accounts. */
+let selectedAccount: string | null = null;
+export function selectAccount(id: string | null) {
+  selectedAccount = id;
+}
+const teamAccounts = (m: RawMe | null) => (m?.organizations ?? []).filter(isTeam);
+const activeAccount = (m: RawMe | null): RawOrg | null => {
+  const team = teamAccounts(m);
+  return team.find((o) => o.id === selectedAccount) ?? team[0] ?? null;
+};
+const staffOrgs = (m: RawMe | null) => [activeAccount(m)].filter((o): o is RawOrg => !!o && isStaff(o));
+const ownerOrgs = (m: RawMe | null) => [activeAccount(m)].filter((o): o is RawOrg => !!o && isOwner(o));
 
 function toMe(m: RawMe): Me {
-  const experiences: Experience[] = ['customer'];
+  // Only the experiences this person holds: team members get Staff / Owner from their capabilities in the active
+  // business account; Customer is for customers (and people with no team access).
+  const experiences: Experience[] = [];
   if (staffOrgs(m).length) experiences.push('staff');
   if (ownerOrgs(m).length) experiences.push('owner');
+  if (!experiences.length || m.organizations.some((o) => o.roles.some((r) => r.role === 'customer'))) experiences.unshift('customer');
+  const active = activeAccount(m);
+  const accounts = teamAccounts(m).map((o) => ({ id: o.id, name: o.name, industry: o.industry }));
   const assignments: RoleAssignment[] = m.organizations.flatMap((o) => o.roles.map((r) => ({ role: r.role as Role, scope: { kind: r.scope.kind as RoleAssignment['scope']['kind'], id: r.scope.id } })));
   // An owner whose only business is independent (one location) gets the single-business owner experience.
   const owned = ownerOrgs(m);
   const single = owned.length === 1 && owned[0]!.model === 'independent' ? owned[0]! : null;
   return {
-    user: { id: m.user.id, name: m.user.name, email: m.user.email }, assignments, experiences,
+    user: { id: m.user.id, name: m.user.name, email: m.user.email }, assignments, experiences, accounts, accountId: active?.id ?? null,
     ...(single ? { business: { model: 'independent' as const, name: single.name, locationId: single.primaryLocationId ?? null } } : {}),
   };
 }
@@ -197,11 +226,10 @@ const CLASS_IMAGES = [IMG.yogaPink, IMG.yogaMeditate, IMG.yogaStretch, IMG.yogaF
 const pick = (list: string[], key: string) => list[[...key].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % list.length]!;
 const industryOf = (i: string): Brand['industry'] => (i === 'foods' ? 'foods' : 'studios');
 
-/** Presentation copy the API doesn't model yet (tagline, hero, offer) comes from the sample brand of the same industry. */
+/** The API doesn't model brand copy yet: no tagline or offer is invented; the hero is generic product imagery. */
 function brandFrom(org: { slug: string; name: string; industry: string }): Brand {
   const industry = industryOf(org.industry);
-  const sample = BRANDS.find((b) => b.industry === industry)!;
-  return { id: org.slug, name: org.name, industry, tagline: sample.tagline, hero: sample.hero, offer: sample.offer };
+  return { id: org.slug, name: org.name, industry, tagline: '', hero: industry === 'foods' ? IMG.foodTeam : IMG.yogaGroup, offer: '' };
 }
 
 function toLocation(l: RawLocation, brand: Brand): Location {
@@ -369,6 +397,8 @@ function coverStatus(s: string): CoverRequest['status'] | null {
 // ───────────────────────── owner ─────────────────────────
 const sumCounts = (v: Record<string, number> | null) => (v ? Object.values(v).reduce((a, n) => a + n, 0) : null);
 
+export interface DemoOrg { id: string; name: string; industry: string; accounts: { email: string; name: string; roles: { role: string; roleName: string; scope: string | null }[] }[] }
+
 // ───────────────────────── the client ─────────────────────────
 export const liveApi = {
   // auth
@@ -379,6 +409,18 @@ export const liveApi = {
     if (r.refreshToken) await refreshStore.set(r.refreshToken);
     const m = await rawMe();
     return { token: r.accessToken, me: toMe(m!) };
+  },
+  /** Demo build only (API `DEMO_MODE=true`): sign in as a listed demo account without a password. */
+  async demoSignIn(email: string) {
+    resetLiveCaches();
+    const r = await http<{ accessToken: string; refreshToken?: string }>('POST', '/demo/login', { email }, { auth: false });
+    await tokenStore.set(r.accessToken);
+    if (r.refreshToken) await refreshStore.set(r.refreshToken);
+    const m = await rawMe();
+    return { token: r.accessToken, me: toMe(m!) };
+  },
+  async demoAccounts(): Promise<DemoOrg[]> {
+    return (await http<{ organizations: DemoOrg[] }>('GET', '/demo/accounts', undefined, { auth: false })).organizations;
   },
   async guest() {
     resetLiveCaches();

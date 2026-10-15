@@ -1,9 +1,8 @@
 /**
  * Wellness (mobile): customer booking / reschedule / packages, practitioner day + check-in + notes, owner utilisation.
- * Live: /v1 wellness routes (see apps/api/README.md). Mock: small in-memory sample so the screens run without the API.
+ * /v1 wellness routes (see apps/api/README.md).
  */
 import { env } from '@/lib/env';
-import { ApiError } from '@/lib/errors';
 import { http } from '@/lib/http';
 import { payPayment, type PayablePayment, type Translate } from '@/lib/cardPayment';
 /** Money as returned by the API (currency is any ISO code). */
@@ -23,7 +22,6 @@ export interface UtilLoc { orgId: string; orgName: string; locationId: string; l
 interface RawOrg { id: string; name: string; slug: string; industry: string; roles: { role: string }[] }
 
 const today = () => new Date().toISOString().slice(0, 10);
-const sleep = <T,>(v: T, ms = 250) => new Promise<T>((r) => setTimeout(() => r(v), ms));
 
 const live = {
   async locations(): Promise<WLocation[]> {
@@ -91,57 +89,4 @@ const live = {
   },
 };
 
-// ───────────── mock ─────────────
-const M = {
-  locs: [{ id: 'hw-tor', name: 'Harbourline Yorkville', timeZone: 'America/Toronto', currency: 'CAD', city: 'Toronto' }, { id: 'hw-dub', name: 'Harbourline Dublin 2', timeZone: 'Europe/Dublin', currency: 'EUR', city: 'Dublin' }],
-  appts: [] as MyAppointment[],
-  day: [] as DayItem[],
-};
-const svcFor = (l: WLocation): WService[] => {
-  const p = (n: number) => ({ amount: n, currency: l.currency });
-  return [
-    { id: `${l.id}-m`, name: 'Restorative massage', description: 'Slow, full-body massage in a private room.', category: 'Massage', durationMinutes: 60, price: p(11000), deposit: p(2200), practitionersRequired: 1, cancellationPolicy: 'Free cancellation up to 24 hours before.', practitioners: [{ id: 'p1', name: 'Priya Shah' }, { id: 'p2', name: 'Daniel Moreau' }], variants: [{ id: `${l.id}-m60`, name: '60 min', durationMinutes: 60, price: p(11000), deposit: p(2200) }, { id: `${l.id}-m90`, name: '90 min', durationMinutes: 90, price: p(15500), deposit: p(3100) }] },
-    { id: `${l.id}-b`, name: 'Guided breathwork (1:1)', description: 'A guided breathing session.', category: 'Breathwork', durationMinutes: 30, price: p(5500), deposit: p(0), practitionersRequired: 1, cancellationPolicy: 'Free cancellation up to 12 hours before.', practitioners: [{ id: 'p1', name: 'Priya Shah' }], variants: [] },
-  ];
-};
-(() => {
-  const s = new Date(Date.now() + 2 * 86400_000); s.setUTCMinutes(0, 0, 0);
-  const tor = M.locs[0]!;
-  M.appts.push({ id: 'ma1', startsAt: s.toISOString(), endsAt: new Date(s.getTime() + 3600_000).toISOString(), status: 'confirmed', serviceName: 'Restorative massage', practitionerName: 'Priya Shah', businessName: 'Harbourline Wellness', serviceId: `${tor.id}-m`, variantId: null, location: tor, price: { amount: 11000, currency: 'CAD' }, cancellation: { window: 'free', fee: { amount: 0, currency: 'CAD' }, deposit: { paid: 2200, refund: 2200, retained: 0, currency: 'CAD' }, packageSession: null, outstanding: { amount: 0, currency: 'CAD' } }, canReschedule: true, cancellationPolicy: 'Free cancellation up to 24 hours before.' });
-  for (const [i, h] of [1, 3, 5].entries()) {
-    const st = new Date(Date.now() + h * 3600_000 - (i === 0 ? 2 * 3600_000 : 0)); st.setUTCMinutes(0, 0, 0);
-    M.day.push({ id: `d${i}`, startsAt: st.toISOString(), endsAt: new Date(st.getTime() + 3600_000).toISOString(), status: 'confirmed', serviceName: ['Restorative massage', 'Reflexology', 'Hot stone massage'][i]!, clientName: ['Clara Byrne', 'Hugo Lambert', 'Mei Tanaka'][i]!, checkedInAt: null, customerId: `c${i}`, location: tor, orgId: 'org' });
-  }
-})();
-const mock: typeof live = {
-  locations: async () => sleep(M.locs),
-  services: async (id) => sleep(svcFor(M.locs.find((l) => l.id === id) ?? M.locs[0]!)),
-  slots: async (_l, _s, date) => sleep([10, 11, 13, 15, 16].map((h) => ({ startsAt: `${date}T${String(h + 4).padStart(2, '0')}:00:00.000Z`, endsAt: `${date}T${String(h + 5).padStart(2, '0')}:00:00.000Z`, practitionerIds: ['p1'] })).filter((s) => Date.parse(s.startsAt) > Date.now())),
-  book: async (locationId, input) => {
-    const l = M.locs.find((x) => x.id === locationId)!;
-    const s = svcFor(l).find((x) => x.id === input.serviceId)!;
-    const v = s.variants.find((x) => x.id === input.variantId);
-    const price = v?.price ?? s.price;
-    M.appts.unshift({ id: `ma${Date.now()}`, startsAt: input.startsAt, endsAt: new Date(Date.parse(input.startsAt) + (v?.durationMinutes ?? s.durationMinutes) * 60_000).toISOString(), status: 'confirmed', serviceName: s.name, practitionerName: s.practitioners[0]!.name, businessName: 'Harbourline Wellness', serviceId: s.id, variantId: v?.id ?? null, location: l, price, cancellation: null, canReschedule: true, cancellationPolicy: s.cancellationPolicy });
-    const dep = (v?.deposit ?? s.deposit);
-    return sleep({ appointment: { id: M.appts[0]!.id }, payment: dep.amount ? { id: 'pay_mock', sandbox: true, amount: dep.amount, currency: dep.currency } : null, summary: { depositDue: dep, dueAtVisit: { amount: price.amount - dep.amount, currency: price.currency } } });
-  },
-  pay: async () => sleep({ ok: true as const }),
-  myAppointments: async () => sleep(M.appts),
-  cancel: async (id, accept) => {
-    const a = M.appts.find((x) => x.id === id);
-    if (!a) throw new ApiError(404, 'not_found', 'Appointment not found');
-    if (a.cancellation && a.cancellation.fee.amount > 0 && !accept) throw new ApiError(409, 'policy_acceptance_required', 'A late-cancellation fee applies.');
-    a.status = 'cancelled';
-    return sleep({ cancellation: a.cancellation!, payment: { action: 'refunded' } });
-  },
-  reschedule: async (id, startsAt) => { const a = M.appts.find((x) => x.id === id)!; a.startsAt = startsAt; a.endsAt = new Date(Date.parse(startsAt) + 3600_000).toISOString(); return sleep({ appointment: { id } }); },
-  myPackages: async () => sleep({ packages: [{ id: 'pk1', name: '5 × Restorative massage (60 min)', sessionsRemaining: 3, sessionsTotal: 5, expiresAt: new Date(Date.now() + 140 * 86400_000).toISOString(), status: 'active', price: { amount: 49500, currency: 'CAD' } }], vouchers: [{ id: 'v1', code: 'GV-YORK-4821', balance: { amount: 7500, currency: 'CAD' }, expiresAt: new Date(Date.now() + 300 * 86400_000).toISOString(), status: 'active' }] }),
-  orgs: async () => sleep([{ id: 'org', name: 'Harbourline Wellness', slug: 'harbourline-wellness', industry: 'wellness', roles: [] }]),
-  myDay: async () => sleep(M.day),
-  checkIn: async (_o, id) => { const d = M.day.find((x) => x.id === id); if (d) d.checkedInAt = new Date().toISOString(); await sleep(null); },
-  addNote: async () => { await sleep(null); },
-  utilisation: async () => sleep(M.locs.map((l, i) => ({ orgId: 'org', orgName: 'Harbourline Wellness', locationId: l.id, locationName: l.name, currency: l.currency, practitioners: [{ name: 'Priya Shah', rate: 0.72 - i * 0.1, bookedMinutes: 1200 }, { name: 'Daniel Moreau', rate: 0.48, bookedMinutes: 800 }], rooms: [{ name: 'Treatment room 1', rate: 0.55 }, { name: 'Couples suite', rate: i ? null : 0.2 }], avgRate: 0.6 - i * 0.05 }))),
-};
-
-export const wellnessApi = env.useMocks ? mock : live;
+export const wellnessApi = live;

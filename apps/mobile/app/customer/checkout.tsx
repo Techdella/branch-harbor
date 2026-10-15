@@ -6,7 +6,6 @@ import { useCart } from '@/features/customer/cart';
 import { useCatalog } from '@/features/customer/catalog';
 import { useI18n } from '@/i18n';
 import { api, guestContact } from '@/lib/api';
-import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import { fmtMoney, fmtTime, fmtZone } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
@@ -26,7 +25,7 @@ export default function Checkout() {
   const [name, setName] = useState(me?.guest ? '' : me?.user.name ?? '');
   const [phone, setPhone] = useState('');
   // Live API: guests need an email for the order receipt (signed-in customers use their account email).
-  const needsEmail = !env.useMocks && !!me?.guest;
+  const needsEmail = !!me?.guest;
   const [email, setEmail] = useState('');
   useEffect(() => {
     if (!needsEmail) return;

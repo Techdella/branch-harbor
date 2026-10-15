@@ -19,7 +19,7 @@ function StripePay({ label, createIntent, onPaid, disabled }: PaymentStepProps) 
   const sandbox = usePaymentsSandbox();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const simulate = env.useMocks || sandbox;
+  const simulate = sandbox;
   return (
     <>
       {error ? <Banner tone="danger" title={t('pay.failed')} body={`${error} ${t('pay.failedBody')}`} /> : null}
@@ -34,8 +34,8 @@ function StripePay({ label, createIntent, onPaid, disabled }: PaymentStepProps) 
           setError(null);
           try {
             const intent = await createIntent();
-            // Sandbox API (or mock build): the server simulates the provider through the same webhook processor.
-            if (env.useMocks || intent.sandbox) { await onPaid(undefined); return; }
+            // Sandbox API: the server simulates the provider through the same webhook processor.
+            if (intent.sandbox) { await onPaid(undefined); return; }
             const pk = intent.publishableKey || env.stripePublishableKey;
             if (!pk?.startsWith('pk_')) throw new Error(t('pay.unavailable'));
             await initStripe({ publishableKey: pk, ...(intent.stripeAccountId ? { stripeAccountId: intent.stripeAccountId } : {}), merchantIdentifier: MERCHANT_ID, urlScheme: 'branchharbor' });

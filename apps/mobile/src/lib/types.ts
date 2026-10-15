@@ -8,8 +8,12 @@ export type FoodOrderStatus = (typeof foodOrderStates)[number];
 export interface Me {
   user: { id: string; name: string; email: string | null; avatar?: string };
   assignments: RoleAssignment[];
-  /** Experiences the server allows for this account. Demo builds allow all three. */
+  /** Experiences this person holds (from their capabilities in the active business account). */
   experiences: Experience[];
+  /** Business accounts with team access (account switcher; one industry each). */
+  accounts?: { id: string; name: string; industry: string }[];
+  /** The active business account for the Staff and Owner experiences. */
+  accountId?: string | null;
   guest?: boolean;
   /** Owner of a single independent business (one location): no location switching or aggregation. */
   business?: { model: 'independent'; name: string; locationId: string | null };

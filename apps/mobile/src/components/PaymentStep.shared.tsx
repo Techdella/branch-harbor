@@ -2,7 +2,6 @@ import { View } from 'react-native';
 import type { Money } from '@bh/shared';
 import { useI18n } from '@/i18n';
 import { usePaymentsSandbox } from '@/lib/api';
-import { env } from '@/lib/env';
 import { Banner } from './Banner';
 import { Button } from './Button';
 import { Text } from './Text';
@@ -21,12 +20,12 @@ export interface PaymentStepProps {
   busyLabel?: string;
 }
 
-/** Shown when Stripe isn't available: explains clearly and (in dev/mock builds only) offers a simulated payment. */
+/** Shown when Stripe isn't available: explains clearly and (in dev builds or a sandbox API only) offers a simulated payment. */
 export function PaymentFallback({ label, onPaid, disabled, busy, setBusy, reason }: PaymentStepProps & { busy: boolean; setBusy: (b: boolean) => void; reason: 'not_configured' | 'web' }) {
   const { t } = useI18n();
-  // Mock/dev builds, or a live API whose payments run in sandbox mode (no Stripe keys on the server).
+  // Dev builds, or an API whose payments run in sandbox mode (no Stripe keys on the server).
   const sandbox = usePaymentsSandbox();
-  const canSimulate = env.useMocks || __DEV__ || sandbox;
+  const canSimulate = __DEV__ || sandbox;
   return (
     <View style={{ gap: 10 }}>
       <Banner tone="info" icon="card" title={reason === 'web' ? t('pay.title') : t('pay.notConfigured')} body={reason === 'web' ? t('pay.webUnsupported') : t('pay.notConfiguredBody')} />

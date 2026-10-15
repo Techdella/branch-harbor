@@ -4,8 +4,6 @@ import { router } from 'expo-router';
 import { Badge, Banner, Button, Card, Text } from '@/components';
 import { useI18n } from '@/i18n';
 import { policyLines } from './policy';
-import { usePaymentsSandbox } from '@/lib/api';
-import { env } from '@/lib/env';
 import { payPayment } from '@/lib/cardPayment';
 import { ApiError } from '@/lib/errors';
 import { useApi } from '@/lib/useApi';
@@ -30,8 +28,7 @@ export function BuyButton({ locationId, kind, id, label, onDone }: { locationId:
         try {
           const r = await studioApi.buy(locationId, kind, id);
           if (r.payment) {
-            if (env.useMocks && r.payment.sandbox) await studioApi.confirmSandbox(r.payment.id);
-            else {
+            {
               // PaymentSheet (memberships ask for renewal consent first); sandbox API → simulated through the webhook processor.
               const paid = await payPayment(r.payment, t);
               if (!paid.ok) { setMsg({ ok: false, text: paid.message }); return; }

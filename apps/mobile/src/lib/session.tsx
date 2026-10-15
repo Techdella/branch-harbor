@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from './api';
+import { selectAccount } from './live';
 import { setSessionExpiredHandler } from './http';
 import { usePushNotifications } from './push';
 import { storage, tokenStore } from './storage';
@@ -11,7 +12,11 @@ interface SessionCtx {
   experience: Experience | null;
   setExperience: (e: Experience | null) => void;
   signIn: (email: string, password: string) => Promise<void>;
+  /** Demo build only: sign in as a listed demo account. */
+  demoSignIn: (email: string) => Promise<void>;
   continueAsGuest: () => Promise<void>;
+  /** Switch the active business account (one industry each; data never mixed). */
+  switchAccount: (orgId: string) => Promise<void>;
   signOut: () => Promise<void>;
   /** Customer white-label brand (demo can switch between a studio and a food brand). */
   brandId: string;
@@ -22,18 +27,19 @@ interface SessionCtx {
 }
 
 const Ctx = createContext<SessionCtx | null>(null);
-const K = { exp: 'bh.experience', brand: 'bh.brand', locs: 'bh.locations' };
+const K = { exp: 'bh.experience', brand: 'bh.brand', locs: 'bh.locations', account: 'bh.account' };
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<SessionCtx['status']>('loading');
   const [me, setMe] = useState<Me | null>(null);
   const [experience, setExpState] = useState<Experience | null>(null);
-  const [brandId, setBrandState] = useState('stillwater');
+  const [brandId, setBrandState] = useState('');
   const [locs, setLocs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     (async () => {
-      const [exp, brand, l] = await Promise.all([storage.get(K.exp), storage.get(K.brand), storage.get(K.locs)]);
+      const [exp, brand, l, account] = await Promise.all([storage.get(K.exp), storage.get(K.brand), storage.get(K.locs), storage.get(K.account)]);
+      selectAccount(account);
       if (brand) setBrandState(brand);
       if (l) {
         try {
@@ -82,6 +88,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SessionCtx>(() => ({
     status, me, experience, setExperience, brandId,
     signIn: async (email, password) => accept(await api.signIn(email, password)),
+    demoSignIn: async (email) => accept(await api.demoSignIn(email)),
+    switchAccount: async (orgId) => {
+      selectAccount(orgId);
+      await storage.set(K.account, orgId);
+      const m = await api.me();
+      setMe(m);
+      setExpState((e) => (e && m.experiences.includes(e) ? e : m.experiences.length === 1 ? m.experiences[0]! : null));
+    },
     continueAsGuest: async () => accept(await api.guest()),
     signOut: async () => {
       try {

@@ -98,12 +98,12 @@ export default function Profile() {
       <ListItem icon="download" iconBg={pastel.sage} title={t('profile.exportData')} chevron onPress={() => { setReqErr(null); setReq('export'); }} />
       <ListItem icon="shield" iconBg={pastel.blush} title={t('profile.deleteData')} chevron onPress={() => { setReqErr(null); setReq('delete'); }} />
 
-      {me && me.experiences.length > 1 ? (
+      {me && (me.experiences.length > 1 || (me.accounts?.length ?? 0) > 1) ? (
         <Button label={t('profile.switchExperience')} variant="secondary" icon="users" onPress={() => { setExperience(null); router.replace('/'); }} />
       ) : null}
       <Button label={t('profile.signOut')} variant="soft" icon="logout" onPress={async () => { await signOut(); router.replace('/'); }} />
       <Text variant="small" tone="muted" align="center">
-        {t('profile.version', { version: env.appVersion, mode: env.useMocks ? t('profile.mocks') : t('profile.live') })}
+        {t('profile.version', { version: env.appVersion, mode: env.apiUrl })}
       </Text>
 
       <ConfirmSheet

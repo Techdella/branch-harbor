@@ -33,7 +33,6 @@ const es: Dict = {
     offlineTitle: 'Sin conexión',
     offlineBody: 'Mostrando datos de %{time}. Pueden estar desactualizados; las acciones esperarán a que vuelvas a conectarte.',
     staleBody: 'No se pudo actualizar. Datos de las %{time}.',
-    sampleData: 'Datos de ejemplo',
   },
   welcome: {
     tagline: 'Un hogar para cada sede.',
@@ -43,7 +42,6 @@ const es: Dict = {
     password: 'Contraseña',
     guest: 'Continuar como invitado',
     chooseExperience: 'Elige una experiencia',
-    demoNote: 'Demo: en producción, tu acceso depende de tu cuenta. Aquí puedes cambiar para ver cada experiencia.',
     customer: 'Cliente',
     customerSub: 'Reservar clases, pedir para recoger, gestionar reservas',
     staff: 'Personal',
@@ -53,7 +51,16 @@ const es: Dict = {
     signInError: 'Revisa tu correo y tu contraseña e inténtalo de nuevo.',
     signedInAs: 'Sesión iniciada como %{name}',
     webPreview: 'Vista previa web',
-    demoPassword: 'Demo: 6 caracteres o más',
+    account: 'Cuenta de empresa',
+    industry: { studios: 'Estudios', sports: 'Deportes', wellness: 'Bienestar', commerce: 'Comercio', foods: 'Restauración', realty: 'Inmobiliaria', hospitality: 'Hostelería' },
+  },
+  demo: {
+    ribbon: 'Entorno de demostración',
+    ribbonNote: 'Empresas y personas de ejemplo para la demostración. No son clientes reales.',
+    pickerTitle: 'Prueba una cuenta de demostración',
+    pickerBody: 'Inicia sesión como cualquier persona de estos equipos de ejemplo para ver lo que ve cada rol.',
+    pickerFailed: 'Las cuentas de demostración no están disponibles ahora.',
+    signingIn: 'Iniciando sesión…',
   },
   tabs: {
     home: 'Inicio',
@@ -209,7 +216,6 @@ const es: Dict = {
     emptyCartSub: 'Añade algo de la carta.',
     fieldRequired: 'Obligatorio',
     fixErrors: 'Revisa los campos marcados.',
-    statusSimNote: 'Ejemplo: las actualizaciones de estado llegan del restaurante.',
     simulateNext: 'Simular siguiente actualización',
   },
   bookings: {
@@ -263,7 +269,6 @@ const es: Dict = {
     switchExperience: 'Cambiar de experiencia',
     signOut: 'Cerrar sesión',
     version: 'Versión %{version} · %{mode}',
-    mocks: 'datos de ejemplo',
     live: 'API real',
   },
   staff: {
@@ -315,7 +320,6 @@ const es: Dict = {
     awaitingManager: 'Esperando al responsable',
     yourRequests: 'Tus solicitudes',
     openRequests: 'Solicitudes abiertas cerca de ti',
-    simulateOffline: 'Simular pérdida de conexión',
     kitchenStatus: { awaiting_acceptance: 'Pendiente de aceptar', accepted: 'Aceptado', preparing: 'En preparación', ready: 'Listo', collected: 'Recogido', rejected: 'Rechazado', cancelled: 'Cancelado' },
   },
   owner: {

@@ -10,7 +10,7 @@ export interface CustomerPolicy {
   noShowFee?: Money | null;
 }
 
-/** The policy in the app language; responses without `terms` (older API, sample data) keep their lines. */
+/** The policy in the app language; responses without `terms` (older API) keep their lines. */
 export function policyLines(p: CustomerPolicy, t: TFn, locale: string): string[] {
   const x = p.terms;
   if (!x) return p.lines;

@@ -31,7 +31,6 @@ const en = {
     offlineTitle: 'You’re offline',
     offlineBody: 'Showing data from %{time}. It may be out of date — actions will wait until you reconnect.',
     staleBody: 'Couldn’t refresh. Showing data from %{time}.',
-    sampleData: 'Sample data',
   },
   welcome: {
     tagline: 'One home for every location.',
@@ -41,7 +40,6 @@ const en = {
     password: 'Password',
     guest: 'Continue as guest',
     chooseExperience: 'Choose an experience',
-    demoNote: 'Demo: in production your access comes from your account. Here you can switch to preview each experience.',
     customer: 'Customer',
     customerSub: 'Book classes, order pickup, manage bookings',
     staff: 'Staff',
@@ -51,7 +49,16 @@ const en = {
     signInError: 'Check your email and password and try again.',
     signedInAs: 'Signed in as %{name}',
     webPreview: 'Web preview',
-    demoPassword: 'Demo: any 6+ characters',
+    account: 'Business account',
+    industry: { studios: 'Studios', sports: 'Sports', wellness: 'Wellness', commerce: 'Commerce', foods: 'Foods', realty: 'Real estate', hospitality: 'Hospitality' },
+  },
+  demo: {
+    ribbon: 'Demo environment',
+    ribbonNote: 'Sample businesses and people for demonstration. Not real customers.',
+    pickerTitle: 'Try a demo account',
+    pickerBody: 'Sign in as anyone on these sample teams to see what each role sees.',
+    pickerFailed: 'Demo accounts aren’t available right now.',
+    signingIn: 'Signing in…',
   },
   tabs: {
     home: 'Home', book: 'Book', order: 'Order', bookings: 'Bookings', inbox: 'Inbox', profile: 'Profile',
@@ -193,7 +200,6 @@ const en = {
     emptyCartSub: 'Add something from the menu.',
     fieldRequired: 'Required',
     fixErrors: 'Check the highlighted fields.',
-    statusSimNote: 'Sample: status updates arrive from the restaurant.',
     simulateNext: 'Simulate next update',
   },
   bookings: {
@@ -247,7 +253,6 @@ const en = {
     switchExperience: 'Switch experience',
     signOut: 'Sign out',
     version: 'Version %{version} · %{mode}',
-    mocks: 'sample data',
     live: 'live API',
   },
   staff: {
@@ -299,7 +304,6 @@ const en = {
     awaitingManager: 'Awaiting manager',
     yourRequests: 'Your requests',
     openRequests: 'Open requests near you',
-    simulateOffline: 'Simulate connection loss',
     kitchenStatus: {
       awaiting_acceptance: 'Awaiting acceptance',
       accepted: 'Accepted',

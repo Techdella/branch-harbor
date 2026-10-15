@@ -15,6 +15,8 @@ import { I18nProvider } from '@/i18n';
 import { SessionProvider } from '@/lib/session';
 import { PaymentsProvider, ToastProvider } from '@/components';
 import { color } from '@/theme';
+import { env } from '@/lib/env';
+import { DemoRibbon } from '@/features/demo/DemoPicker';
 
 void SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -39,6 +41,7 @@ export default function RootLayout() {
           <PaymentsProvider>
             <ToastProvider>
               <StatusBar style="dark" />
+              {env.demoMode ? <DemoRibbon /> : null}
               <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.canvas } }} />
             </ToastProvider>
           </PaymentsProvider>

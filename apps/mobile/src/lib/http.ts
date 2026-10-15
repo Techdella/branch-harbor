@@ -1,5 +1,5 @@
 /**
- * HTTP transport for the live BranchHarbor API (EXPO_PUBLIC_USE_MOCKS=false).
+ * HTTP transport for the BranchHarbor API.
  *
  * - Bearer access token + rotating refresh token, both kept in expo-secure-store (localStorage on web preview).
  * - `X-BH-Client: mobile` on every call so auth endpoints return the refresh token in the body (no cookies).

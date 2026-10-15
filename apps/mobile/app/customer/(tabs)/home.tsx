@@ -60,14 +60,16 @@ export default function Home() {
 
       {scope ? <ScopeChipView {...scope} /> : null}
 
+      {(brandsQ.data?.length ?? 0) > 1 ? (
       <View style={{ gap: 6 }}>
-        <Text variant="label" tone="muted">{t('customer.brandSwitch')} · {t('common.sampleData')}</Text>
+        <Text variant="label" tone="muted">{t('customer.brandSwitch')}</Text>
         <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
           {(brandsQ.data ?? []).map((b) => (
             <Tag key={b.id} label={b.name} icon={b.industry === 'foods' ? 'utensils' : 'lotus'} selected={b.id === brand?.id} onPress={() => setBrandId(b.id)} />
           ))}
         </View>
       </View>
+      ) : null}
 
       <DataStatus q={locationsQ} />
 
@@ -77,7 +79,7 @@ export default function Home() {
           <View style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.38)' }} />
           <View style={{ position: 'absolute', left: 16, right: 16, bottom: 14, gap: 2 }}>
             <Text variant="small" weight={800} color={color.lime}>{brand.name}</Text>
-            <Text variant="h2" tone="inverse">{brand.offer}</Text>
+            {brand.offer ? <Text variant="h2" tone="inverse">{brand.offer}</Text> : <Text variant="h2" tone="inverse">{brand.name}</Text>}
           </View>
         </View>
       ) : (

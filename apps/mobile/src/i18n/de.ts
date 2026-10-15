@@ -33,7 +33,6 @@ const de: Dict = {
     offlineTitle: 'Du bist offline',
     offlineBody: 'Daten von %{time}. Sie sind evtl. veraltet – Aktionen warten, bis du wieder online bist.',
     staleBody: 'Aktualisierung fehlgeschlagen. Daten von %{time}.',
-    sampleData: 'Beispieldaten',
   },
   welcome: {
     tagline: 'Ein Zuhause für jeden Standort.',
@@ -43,7 +42,6 @@ const de: Dict = {
     password: 'Passwort',
     guest: 'Als Gast fortfahren',
     chooseExperience: 'Ansicht wählen',
-    demoNote: 'Demo: In der Produktion ergibt sich Ihr Zugang aus Ihrem Konto. Hier können Sie wechseln, um jede Ansicht auszuprobieren.',
     customer: 'Kunde',
     customerSub: 'Kurse buchen, zur Abholung bestellen, Buchungen verwalten',
     staff: 'Team',
@@ -53,7 +51,16 @@ const de: Dict = {
     signInError: 'Prüfen Sie E-Mail-Adresse und Passwort und versuchen Sie es erneut.',
     signedInAs: 'Angemeldet als %{name}',
     webPreview: 'Webvorschau',
-    demoPassword: 'Demo: mindestens 6 Zeichen',
+    account: 'Unternehmenskonto',
+    industry: { studios: 'Studios', sports: 'Sport', wellness: 'Wellness', commerce: 'Handel', foods: 'Gastronomie', realty: 'Immobilien', hospitality: 'Hotellerie' },
+  },
+  demo: {
+    ribbon: 'Demo-Umgebung',
+    ribbonNote: 'Beispielunternehmen und -personen zur Vorführung. Keine echten Kunden.',
+    pickerTitle: 'Demo-Konto ausprobieren',
+    pickerBody: 'Melden Sie sich als beliebige Person dieser Beispielteams an, um zu sehen, was jede Rolle sieht.',
+    pickerFailed: 'Demo-Konten sind gerade nicht verfügbar.',
+    signingIn: 'Anmeldung…',
   },
   tabs: {
     home: 'Start',
@@ -209,7 +216,6 @@ const de: Dict = {
     emptyCartSub: 'Fügen Sie etwas von der Speisekarte hinzu.',
     fieldRequired: 'Pflichtfeld',
     fixErrors: 'Prüfen Sie die markierten Felder.',
-    statusSimNote: 'Beispiel: Statusupdates kommen vom Restaurant.',
     simulateNext: 'Nächstes Update simulieren',
   },
   bookings: {
@@ -263,7 +269,6 @@ const de: Dict = {
     switchExperience: 'Ansicht wechseln',
     signOut: 'Abmelden',
     version: 'Version %{version} · %{mode}',
-    mocks: 'Beispieldaten',
     live: 'Live-API',
   },
   staff: {
@@ -315,7 +320,6 @@ const de: Dict = {
     awaitingManager: 'Wartet auf Führungskraft',
     yourRequests: 'Ihre Anfragen',
     openRequests: 'Offene Anfragen in Ihrer Nähe',
-    simulateOffline: 'Verbindungsabbruch simulieren',
     kitchenStatus: { awaiting_acceptance: 'Wartet auf Annahme', accepted: 'Angenommen', preparing: 'In Zubereitung', ready: 'Fertig', collected: 'Abgeholt', rejected: 'Abgelehnt', cancelled: 'Storniert' },
   },
   owner: {

@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { orderStatusCopy } from '@/features/customer/orderStatus';
 import { useI18n } from '@/i18n';
 import { api } from '@/lib/api';
-import { env } from '@/lib/env';
 import { fmtTime, fmtZone } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 import { color, pastel, radius, status as S } from '@/theme';
@@ -89,7 +88,6 @@ export default function OrderStatus() {
         </View>
         <Text variant="small" tone="muted">{t('order.taxNote')}</Text>
       </Card>
-      {env.useMocks ? <Text variant="small" tone="muted">{t('order.statusSimNote')}</Text> : null}
       {reorderMsg ? <Text variant="small" tone="muted">{reorderMsg}</Text> : null}
       <Button label={t('foodsx.reorder')} icon="repeat" onPress={async () => {
         // Re-price against today's menu: unavailable items or options are skipped and reported, never silently added.

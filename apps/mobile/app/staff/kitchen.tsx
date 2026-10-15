@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Badge, Banner, Button, Card, ConfirmSheet, EmptyState, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, ToggleRow } from '@/components';
+import { Badge, Banner, Button, Card, ConfirmSheet, EmptyState, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text } from '@/components';
 import { useLocations } from '@/features/shared/useLocations';
 import { useI18n } from '@/i18n';
 import { api } from '@/lib/api';
-import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import { fmtTime, fmtZone } from '@/lib/format';
 import { announce } from '@/lib/motion';
-import { network, useOnline, useSimulatedOffline } from '@/lib/network';
+import { useOnline } from '@/lib/network';
 import { useApi } from '@/lib/useApi';
 import type { FoodOrderStatus, KitchenOrder } from '@/lib/types';
 import { color, pastel, radius, status as S } from '@/theme';
@@ -24,9 +23,8 @@ const NEXT: Partial<Record<FoodOrderStatus, { to: FoodOrderStatus; key: string }
 export default function Kitchen() {
   const { t, intlLocale } = useI18n();
   const online = useOnline();
-  const simOffline = useSimulatedOffline();
   const { byId } = useLocations();
-  // Mock: the sample Ballard kitchen. Live API: the first Foods location the signed-in user works at.
+  // The first Foods location the signed-in user works at.
   const kitchenQ = useApi(() => api.kitchenLocationId(), []);
   const kitchenId = kitchenQ.data;
   const loc = kitchenId ? byId(kitchenId) : undefined;
@@ -85,11 +83,6 @@ export default function Kitchen() {
           action={t('common.retry')}
           onAction={q.refresh}
         />
-      ) : null}
-      {env.useMocks ? (
-        <Card padding={10} bg={pastel.sand}>
-          <ToggleRow label={t('staff.simulateOffline')} sub={t('common.sampleData')} value={simOffline} onChange={(v) => network.setSimulatedOffline(v)} icon="wifi-off" />
-        </Card>
       ) : null}
 
       {q.loading ? <><SkeletonCard lines={4} /><SkeletonCard lines={4} /></> : null}

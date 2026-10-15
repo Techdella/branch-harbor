@@ -33,7 +33,6 @@ const ptBR: Dict = {
     offlineTitle: 'Você está offline',
     offlineBody: 'Mostrando dados de %{time}. Podem estar desatualizados — as ações aguardarão a reconexão.',
     staleBody: 'Não foi possível atualizar. Dados de %{time}.',
-    sampleData: 'Dados de exemplo',
   },
   welcome: {
     tagline: 'Um lar para cada unidade.',
@@ -43,7 +42,6 @@ const ptBR: Dict = {
     password: 'Senha',
     guest: 'Continuar como visitante',
     chooseExperience: 'Escolha uma experiência',
-    demoNote: 'Demonstração: em produção, seu acesso vem da sua conta. Aqui você pode alternar para conhecer cada experiência.',
     customer: 'Cliente',
     customerSub: 'Reservar aulas, pedir para retirada, gerenciar reservas',
     staff: 'Equipe',
@@ -53,7 +51,16 @@ const ptBR: Dict = {
     signInError: 'Confira seu e-mail e sua senha e tente novamente.',
     signedInAs: 'Conectado como %{name}',
     webPreview: 'Prévia web',
-    demoPassword: 'Demonstração: 6 ou mais caracteres',
+    account: 'Conta empresarial',
+    industry: { studios: 'Estúdios', sports: 'Esportes', wellness: 'Bem-estar', commerce: 'Varejo', foods: 'Alimentação', realty: 'Imóveis', hospitality: 'Hotelaria' },
+  },
+  demo: {
+    ribbon: 'Ambiente de demonstração',
+    ribbonNote: 'Empresas e pessoas fictícias para demonstração. Não são clientes reais.',
+    pickerTitle: 'Experimente uma conta de demonstração',
+    pickerBody: 'Entre como qualquer pessoa destas equipes fictícias para ver o que cada função vê.',
+    pickerFailed: 'As contas de demonstração não estão disponíveis agora.',
+    signingIn: 'Entrando…',
   },
   tabs: {
     home: 'Início',
@@ -209,7 +216,6 @@ const ptBR: Dict = {
     emptyCartSub: 'Adicione algo do cardápio.',
     fieldRequired: 'Obrigatório',
     fixErrors: 'Confira os campos destacados.',
-    statusSimNote: 'Exemplo: as atualizações de status vêm do restaurante.',
     simulateNext: 'Simular próxima atualização',
   },
   bookings: {
@@ -263,7 +269,6 @@ const ptBR: Dict = {
     switchExperience: 'Trocar de experiência',
     signOut: 'Sair',
     version: 'Versão %{version} · %{mode}',
-    mocks: 'dados de exemplo',
     live: 'API real',
   },
   staff: {
@@ -315,7 +320,6 @@ const ptBR: Dict = {
     awaitingManager: 'Aguardando gerente',
     yourRequests: 'Seus pedidos',
     openRequests: 'Pedidos abertos perto de você',
-    simulateOffline: 'Simular queda de conexão',
     kitchenStatus: { awaiting_acceptance: 'Aguardando aceite', accepted: 'Aceito', preparing: 'Em preparo', ready: 'Pronto', collected: 'Retirado', rejected: 'Recusado', cancelled: 'Cancelado' },
   },
   owner: {

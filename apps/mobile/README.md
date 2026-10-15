@@ -8,9 +8,12 @@ One Expo app for iOS and Android (plus a web preview) with three role-based expe
 | **Staff** | Instructors, coaches, kitchen leads, associates | Today · Check-in · Kitchen · Messages · Cover |
 | **Owner / HQ** | Franchise owners, HQ admins | Pulse · Approvals · Locations · Alerts |
 
-Against the real API the available experiences come from `GET /v1/auth/me`: every account gets **Customer**; **Staff** when a role grants
-`operations.read`; **Owner / HQ** when a role grants `reports.read` or `website.approve` (roles → permissions from `@bh/shared`).
-The mock lets any signed-in user switch between all three.
+The app always talks to the API (there is no sample-data mode). The experiences come from the person's capabilities in
+`GET /v1/auth/me` (access model, `@bh/shared` access.ts), for the **active business account**: **Staff** when they hold any
+Operations module, **Owner / HQ** when they hold Reports or Approvals, **Customer** for customers and people without team
+access. Nobody is offered an experience they don't hold; the chooser only appears when they hold more than one. People with
+several business accounts (one industry each) pick the account on the chooser (and from the switch button on Today / Pulse);
+data is never mixed between accounts.
 
 **Sports** (`app/sports/*`, `src/features/sports/`): guardian portal (schedule + absence reporting, balances + instalment payment, messages) from Profile; coach roster & attendance from Staff → Today; enrolment pulse from Owner → Pulse. Live: `/v1/me/sports*`, `/v1/orgs/:orgId/sports/*`.
 
@@ -33,20 +36,22 @@ pnpm --filter @bh/mobile typecheck
 cd apps/mobile && npx expo export --platform web      # static web build in dist/
 ```
 
-Demo sign-in (mock mode): any email + any 6+ character password (`wrongpass` shows the invalid-credentials error). "Continue as guest" gives the customer experience only.
+Sign in with an account on the API you point the app at. "Continue as guest" gives the customer experience only.
 
 ### Against the real API (`apps/api`)
 
 ```bash
 # 1. backend (see apps/api/README.md): Postgres 16, then
-pnpm --filter @bh/api db:migrate && pnpm --filter @bh/api db:seed   # prints the demo password
+pnpm --filter @bh/api db:migrate && pnpm --filter @bh/api db:seed:demo   # demo data; prints the demo password
 pnpm --filter @bh/api dev                                            # http://localhost:4000
 # 2. app
-EXPO_PUBLIC_USE_MOCKS=false EXPO_PUBLIC_API_URL=http://localhost:4000 pnpm --filter @bh/mobile start
+EXPO_PUBLIC_API_URL=http://localhost:4000 pnpm --filter @bh/mobile start
 ```
 
-Sign in as `demo@branchharbor.com` (org owner of both demo brands → Customer, Staff and Owner) with the seeded password, or
-`carlos.ortega@demo.branchharbor.com` (staff, Ballard kitchen). "Continue as guest" uses only public endpoints.
+With the demo seed, sign in as `demo@branchharbor.com` (owner of several demo business accounts → account choice, then
+Staff and Owner) with the seeded password, `carlos.ortega@demo.branchharbor.com` (staff, Ballard kitchen → straight to
+Staff), or any Northlight Yoga team member (`*@northlight.demo.branchharbor.com`). With `EXPO_PUBLIC_DEMO_MODE=true` the
+sign-in screen lists every demo account (one tap signs in). "Continue as guest" uses only public endpoints.
 
 - **Physical device / Android emulator:** `localhost` is the phone itself. Use your machine's LAN IP —
   `EXPO_PUBLIC_API_URL=http://192.168.1.20:4000` — (the API listens on `HOST=0.0.0.0`). The Android emulator can also use `http://10.0.2.2:4000`.
@@ -62,7 +67,7 @@ Sign in as `demo@branchharbor.com` (org owner of both demo brands → Customer, 
 | Variable | Default | Purpose |
 |---|---|---|
 | `EXPO_PUBLIC_API_URL` | `http://localhost:4000` | BranchHarbor API base; routes are under `/v1` |
-| `EXPO_PUBLIC_USE_MOCKS` | `true` | In-app mock API so the app runs without `apps/api`. `false` = live API |
+| `EXPO_PUBLIC_DEMO_MODE` | `false` | Demo build only: "Demo environment" ribbon and the demo account picker on the sign-in screen (API `DEMO_MODE=true`) |
 | `EXPO_PUBLIC_BRAND_SLUGS` | `stillwater-yoga,maple-and-ember` | Live mode: organisation slugs whose public locations form the customer catalogue (white-label brands) |
 | `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY` | *(empty)* | Optional fallback: the API returns the publishable key + connected account per payment. Also mounts `StripeProvider` at startup |
 | `EXPO_PUBLIC_STRIPE_MERCHANT_IDENTIFIER` | `merchant.com.branchharbor.app` | Apple Pay merchant id passed to `initStripe` (same value as `STRIPE_MERCHANT_IDENTIFIER`) |
@@ -84,24 +89,23 @@ src/
   components/                Text, Icon, Button/IconButton, Card, Badge, Tag, Avatar, ListItem, SectionHeader,
                              EmptyState/ErrorState, Skeleton, MoneyText, ScreenHeader + ScopeChip, Banner, ToggleRow,
                              TextField, ConfirmSheet, Screen, TabBar, Toast, DataStatus, PaymentStep(.native)
-  lib/api.ts                 typed client used by screens: mock client or live client (same signatures)
+  lib/api.ts                 typed client used by screens (the live client)
   lib/http.ts                live transport: bearer + refresh token (secure store), single-flight refresh on 401, X-BH-Client: mobile
   lib/live.ts                live adapters: real /v1 routes → app types (see mapping below)
   lib/errors.ts, useApi.ts   ApiError + fetch hook that keeps last-good data (stale banners)
   lib/session.tsx            auth, experience, brand + per-brand location
   lib/storage.ts             expo-secure-store (native) / localStorage (web preview)
   lib/format.ts              Intl money + location-timezone time helpers (DST-safe wall-clock → UTC)
-  lib/network.ts, motion.ts  connectivity (+ simulated outage in mock mode), reduced motion, SR announcements
-  mock/                      sample brands/locations/menu (from design/prototype/bh-data.js) + in-process /v1 mock
+  lib/network.ts, motion.ts  connectivity, reduced motion, SR announcements
+  lib/images.ts              generic product imagery for brand heroes and location cards
   i18n/                      en, fr, es, de, pt-BR — all complete (`pnpm check:messages`)
   features/                  customer catalog/cart/order-status helpers, shared hooks
 ```
 
-## API mapping (`EXPO_PUBLIC_USE_MOCKS=false`)
+## API mapping
 
 `src/lib/live.ts` maps every screen-level call to the real routes and adapts the responses into the app's types (`src/lib/types.ts`),
-so screens are the same in both modes. The mock (`src/mock/server.ts`) keeps the original flat paths and still documents the shapes the
-screens consume. Errors are always `{ error: { code, message, fields } }` → `ApiError`.
+so screens stay independent of the API shapes. Errors are always `{ error: { code, message, fields } }` → `ApiError`.
 
 **Auth & session**
 
@@ -159,7 +163,7 @@ screens consume. Errors are always `{ error: { code, message, fields } }` → `A
 | `decide` | `POST /v1/orgs/:orgId/approvals/:id/decision` (approving runs the refund / schedules the campaign / reassigns the shift on the server) / `POST …/studios/cover-requests/:id/decision` |
 | `notifications` | derived: connections that are not `connected` from `GET /v1/orgs/:orgId/reports/overview` + pending approvals |
 
-**Not available from the API yet (live mode shows an empty state or a clear message, never sample data):** staff team
+**Not available from the API yet (the app shows an empty state or a clear message, never sample data):** staff team
 messages, account deletion from the app (needs the password — use the web app), location tax labels/cancellation windows
 in the catalogue (the server quote applies the business-configured tax; the class cancellation window shown is a 12-hour
 default).
@@ -168,14 +172,14 @@ Money is always `{ amount: <integer minor units>, currency }`; times are UTC ISO
 
 ## Wellness (full product)
 
-`src/features/wellness/` (live + mock client, strings). Customer: `app/customer/wellness.tsx` (book with length, slot, voucher, sandbox deposit; my appointments with policy preview, cancel and reschedule; packages and vouchers) — reached from the Home quick actions; live mode uses `EXPO_PUBLIC_WELLNESS_SLUG` (default `harbourline-wellness`) and `/v1/me/wellness/*`. Staff: `app/staff/appointments.tsx` (today across locations via `/wellness/my-day`, check-in, administrative notes incl. confidential). Owner: `app/owner/utilisation.tsx` (7-day practitioner/room utilisation per location, "Unavailable" when no hours).
+`src/features/wellness/` (client, strings). Customer: `app/customer/wellness.tsx` (book with length, slot, voucher, sandbox deposit; my appointments with policy preview, cancel and reschedule; packages and vouchers) — reached from the Home quick actions; uses `EXPO_PUBLIC_WELLNESS_SLUG` (default `harbourline-wellness`, the demo seed's brand) and `/v1/me/wellness/*`. Staff: `app/staff/appointments.tsx` (today across locations via `/wellness/my-day`, check-in, administrative notes incl. confidential). Owner: `app/owner/utilisation.tsx` (7-day practitioner/room utilisation per location, "Unavailable" when no hours).
 
 ## Product rules implemented
 
 - **International**: locations in Toronto (CAD), Seattle/Denver (USD), Vancouver (CAD), London (GBP), Berlin (EUR), Sydney (AUD). Every time shows the location zone; money uses `Intl.NumberFormat` in the location currency; owner Pulse shows **per-currency** totals only and "Unavailable" (never 0) for missing data.
 - **Studios**: full class → *Join waitlist* (no misleading booking); spot held 5 min with countdown; expiry releases without charge and offers re-check; duplicate booking handled; cancellation shows the location's policy and whether a refund applies.
 - **Foods**: pickup slot first (full slots disabled), sold-out items/modifiers disabled, required modifier validation, server quote with "Tax as configured by the business" (inclusive VAT/MwSt/GST vs added sales tax), slot-taken recovery keeps the cart; "Waiting for the restaurant to accept" vs "Accepted" are visually and textually distinct.
-- **Kitchen**: large cards sorted by promised time, overdue markers, allergy notes highlighted, first names only; status buttons wait for server acknowledgement (pending label, failure keeps the server state); offline/stale banner with last refresh time and dimmed cards; actions disabled while offline. Mock mode has a "Simulate connection loss" switch.
+- **Kitchen**: large cards sorted by promised time, overdue markers, allergy notes highlighted, first names only; status buttons wait for server acknowledgement (pending label, failure keeps the server state); offline/stale banner with last refresh time and dimmed cards; actions disabled while offline.
 - **Staff check-in**: present/absent per person saved individually with pending + retry; no contact/guardian data in the roster payload.
 - **Approvals**: refunds show exact amount + currency + location; ad spend shows amount, channel, duration; shift swaps name both people; every decision goes through a consequence-preview sheet (reject takes an optional reason).
 - **Privacy**: notification consent per channel (push/email/SMS × updates/offers); data export and deletion requests.
@@ -213,7 +217,7 @@ instalments (`src/lib/cardPayment.native.ts` → `payPayment`).
 
 ## Builds
 
-`eas.json` has `development` (dev client, mocks on), `preview` (internal, live API) and `production` profiles. Bundle ids: `com.branchharbor.app` (+ `.development` / `.preview`).
+`eas.json` has `development` (dev client), `preview` (internal), `demo` (internal, `EXPO_PUBLIC_DEMO_MODE=true` for the demo site) and `production` profiles. Bundle ids: `com.branchharbor.app` (+ `.development` / `.preview`).
 
 **Icon & splash.** `assets/` holds PNGs generated from the harbour mark (ink rounded square, white H posts, 35% stem, lime
 hub — `logoSvg` in `@bh/icons`): `icon.png` (1024, full-bleed ink), `adaptive-icon.png` + `adaptive-icon-monochrome.png`

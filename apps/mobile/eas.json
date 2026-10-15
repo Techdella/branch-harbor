@@ -4,17 +4,22 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_USE_MOCKS": "true", "APP_VARIANT": "development" }
+      "env": { "APP_VARIANT": "development" }
     },
     "preview": {
       "distribution": "internal",
       "channel": "preview",
-      "env": { "EXPO_PUBLIC_USE_MOCKS": "false", "APP_VARIANT": "preview" }
+      "env": { "APP_VARIANT": "preview" }
+    },
+    "demo": {
+      "distribution": "internal",
+      "channel": "demo",
+      "env": { "APP_VARIANT": "preview", "EXPO_PUBLIC_DEMO_MODE": "true" }
     },
     "production": {
       "channel": "production",
       "autoIncrement": true,
-      "env": { "EXPO_PUBLIC_USE_MOCKS": "false", "APP_VARIANT": "production" }
+      "env": { "APP_VARIANT": "production" }
     }
   },
   "submit": { "production": {} }
