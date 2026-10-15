@@ -22,7 +22,7 @@ export function CookieBanner() {
       {ready && !record && !settingsOpen && (
         <section
           aria-labelledby={titleId}
-          className="fixed inset-x-2 bottom-2 z-40 mx-auto max-w-[760px] rounded-[24px] bg-surface p-5 shadow-pop sm:inset-x-4 sm:bottom-4 sm:p-6"
+          className="fixed inset-x-2 bottom-safe z-40 mx-auto max-h-[calc(100dvh-24px)] max-w-[760px] overflow-y-auto rounded-[24px] bg-surface p-5 shadow-pop sm:inset-x-4 sm:bottom-4 sm:p-6"
         >
           <h2 id={titleId} className="flex items-center gap-2 text-base font-extrabold">
             <Icon name="shield" size={18} />
@@ -115,7 +115,7 @@ function ConsentDialog() {
           <h2 id={titleId} className="text-xl font-extrabold tracking-[-0.02em]">
             {t('dialogTitle')}
           </h2>
-          <button type="button" onClick={closeSettings} aria-label={tc('close')} className="rounded-full p-1.5 hover:bg-canvas">
+          <button type="button" onClick={closeSettings} aria-label={tc('close')} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-canvas">
             <Icon name="x" size={18} />
           </button>
         </div>

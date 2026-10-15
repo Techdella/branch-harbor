@@ -12,6 +12,10 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
   const app = useApp();
   const path = usePathname();
   const org = app.org;
+  // Desktop sidebar that isn't collapsed by the user: full width from lg, icon rail below (CSS only, so the
+  // layout is right on first paint — no shift when JS measures the viewport).
+  const auto = !mobile && !collapsed;
+  const railHide = auto ? 'max-lg:hidden' : undefined;
 
   // Independent businesses have no Locations directory: their location lives under Settings → Business & location.
   const independent = org.model === 'independent';
@@ -37,17 +41,18 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
           href={it.href}
           onClick={onNavigate}
           aria-current={active ? 'page' : undefined}
-          title={collapsed ? text : undefined}
+          title={collapsed || auto ? text : undefined}
           className={cx(
             'flex h-10 items-center gap-2.5 rounded-full px-3 text-sm transition',
             active ? 'bg-lime font-bold text-ink' : 'font-medium text-graphite hover:bg-canvas',
             (it.later || !allowed) && !active && 'text-mute',
             collapsed && 'justify-center px-0',
+            auto && 'max-lg:justify-center max-lg:px-0',
           )}
         >
-          <Icon name={allowed ? it.icon : 'lock'} size={17} />
+          <Icon name={allowed ? it.icon : 'lock'} size={17} className="shrink-0" />
           {!collapsed && (
-            <>
+            <span className={cx('contents', railHide)}>
               <span className="min-w-0 flex-1 truncate">{text}</span>
               {it.later && <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-bold text-stone">{t('common.later')}</span>}
               {!allowed && !it.later && <span className="sr-only">{t('nav.restricted')}</span>}
@@ -56,7 +61,7 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
                   {badge}
                 </span>
               ) : null}
-            </>
+            </span>
           )}
         </Link>
       </li>
@@ -64,11 +69,11 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
   };
 
   return (
-    <nav aria-label={t('nav.label')} className={cx('flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto scrollbar-thin', mobile ? 'p-4' : 'px-3 py-4')}>
-      <div className={cx('flex shrink-0 items-center gap-2.5 pb-3.5', collapsed ? 'justify-center' : 'px-1.5')}>
+    <nav aria-label={t('nav.label')} className={cx('flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain scrollbar-thin', mobile ? 'p-4' : 'px-3 py-4')}>
+      <div className={cx('flex shrink-0 items-center gap-2.5 pb-3.5', collapsed ? 'justify-center' : 'px-1.5', auto && 'max-lg:justify-center max-lg:px-0')}>
         <LogoMark size={34} />
         {!collapsed && (
-          <div className="min-w-0">
+          <div className={cx('min-w-0', railHide)}>
             <div className="text-[15px] font-extrabold tracking-tight">BranchHarbor</div>
             <div className="truncate text-xs text-stone">
               {org.brand} · {t(`industries.${app.industry}.name`)}
@@ -78,7 +83,7 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
       </div>
 
       {!collapsed && app.industries.length > 1 && (
-        <div role="group" aria-label={t('shell.industrySwitcher')} className="mb-3 grid shrink-0 gap-1 rounded-[18px] bg-canvas p-1" style={{ gridTemplateColumns: `repeat(${app.industries.length}, minmax(0, 1fr))` }}>
+        <div role="group" aria-label={t('shell.industrySwitcher')} className={cx('mb-3 grid shrink-0 gap-1 rounded-[18px] bg-canvas p-1', railHide)} style={{ gridTemplateColumns: `repeat(${app.industries.length}, minmax(0, 1fr))` }}>
           {app.industries.map((k) => (
             <button
               key={k}
@@ -96,17 +101,17 @@ export function Sidebar({ collapsed, onNavigate, mobile }: { collapsed: boolean;
       )}
 
       <ul className="flex flex-col gap-0.5">{topItems.map((i) => item(i, 'top'))}</ul>
-      {!collapsed && <div className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute">{t(`industries.${app.industry}.name`)}</div>}
-      {collapsed && <hr className="mx-3 my-2 border-line-soft" />}
+      {!collapsed && <div className={cx('px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute', railHide)}>{t(`industries.${app.industry}.name`)}</div>}
+      {(collapsed || auto) && <hr className={cx('mx-3 my-2 border-line-soft', auto && 'lg:hidden')} />}
       <ul className="flex flex-col gap-0.5">{opsItems.map((i) => item(i, 'ops'))}</ul>
-      {!collapsed && <div className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute">{t('nav.shared')}</div>}
-      {collapsed && <hr className="mx-3 my-2 border-line-soft" />}
+      {!collapsed && <div className={cx('px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.06em] text-mute', railHide)}>{t('nav.shared')}</div>}
+      {(collapsed || auto) && <hr className={cx('mx-3 my-2 border-line-soft', auto && 'lg:hidden')} />}
       <ul className="flex flex-col gap-0.5">{NAV_SHARED.map((i) => item(i, 'shared'))}</ul>
 
       <div className="mt-auto flex shrink-0 flex-col gap-1 pt-3">
-        <Link href="/onboarding" onClick={onNavigate} title={collapsed ? t('nav.setup') : undefined} className={cx('flex h-10 items-center gap-2.5 rounded-full px-3 text-[13px] font-semibold text-stone hover:bg-canvas', collapsed && 'justify-center px-0')}>
-          <Icon name="flag" size={16} />
-          {!collapsed && t('nav.setup')}
+        <Link href="/onboarding" onClick={onNavigate} title={collapsed || auto ? t('nav.setup') : undefined} className={cx('flex h-10 items-center gap-2.5 rounded-full px-3 text-[13px] font-semibold text-stone hover:bg-canvas', collapsed && 'justify-center px-0', auto && 'max-lg:justify-center max-lg:px-0')}>
+          <Icon name="flag" size={16} className="shrink-0" />
+          {!collapsed && <span className={railHide}>{t('nav.setup')}</span>}
         </Link>
         {!mobile && (
           <button type="button" onClick={app.toggleNav} aria-label={collapsed ? t('shell.expandNav') : t('shell.collapseNav')} className={cx('hidden h-10 items-center gap-2.5 rounded-full px-3 text-[13px] font-semibold text-stone hover:bg-canvas lg:flex', collapsed && 'justify-center px-0')}>

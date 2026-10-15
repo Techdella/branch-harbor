@@ -8,6 +8,10 @@
 }
 
 @layer base {
+  /* The marketing site is designed light-only (see docs/DESIGN_SYSTEM.md → Dark mode). */
+  :root {
+    color-scheme: light;
+  }
   html {
     scroll-behavior: smooth;
   }

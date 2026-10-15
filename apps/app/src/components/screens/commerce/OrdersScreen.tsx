@@ -38,7 +38,7 @@ export function CommerceOrdersScreen() {
             <ul className="flex flex-col gap-1">
               {orders.map((o) => (
                 <li key={o.id}>
-                  <button type="button" onClick={() => setOpen(o.id)} className={cx('grid w-full grid-cols-2 items-center gap-2 rounded-md px-3.5 py-3 text-left text-sm hover:outline hover:outline-1 hover:outline-ink md:grid-cols-[minmax(90px,.6fr)_minmax(160px,1.4fr)_minmax(110px,.8fr)_minmax(120px,.8fr)_minmax(130px,.9fr)_24px]', openId === o.id ? 'bg-canvas' : 'bg-[#FAFAF7]')}>
+                  <button type="button" onClick={() => setOpen(o.id)} className={cx('grid w-full grid-cols-2 items-center gap-2 rounded-md px-3.5 py-3 text-left text-sm hover:outline hover:outline-1 hover:outline-ink xl:grid-cols-[minmax(90px,.6fr)_minmax(160px,1.4fr)_minmax(110px,.8fr)_minmax(120px,.8fr)_minmax(130px,.9fr)_24px]', openId === o.id ? 'bg-canvas' : 'bg-canvas-raised')}>
                     <span className="font-extrabold">#{o.number}</span>
                     <span className="min-w-0 md:order-none">
                       <span className="block truncate font-semibold">{o.lines.map((l) => (l.qty > 1 ? `${l.name} ×${l.qty}` : l.name)).join(', ')}</span>
@@ -52,7 +52,7 @@ export function CommerceOrdersScreen() {
                       {o.refund !== 'none' && <Badge tone={refTone[o.refund]} className="ml-1">{t(`refund.${o.refund}`)}</Badge>}
                     </span>
                     <Badge tone={fulTone[o.fulfilment]} className="justify-self-start">{t(`fulfilment.${o.fulfilment}`)}</Badge>
-                    <Icon name="chevron-right" size={16} className="hidden md:block" />
+                    <Icon name="chevron-right" size={16} className="hidden xl:block" />
                   </button>
                 </li>
               ))}

@@ -208,7 +208,7 @@ function ProductEditor({ id, canEdit, onClose, onSaved, onDistribute }: { id: st
                   </div>
                   <ActionError error={gen.error} />
                 </div>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto" tabIndex={0}>
                   <table className="w-full min-w-[560px] text-sm">
                     <thead><tr className="border-b border-line-soft text-left text-xs uppercase text-stone"><th className="py-2">{t('catalogue.f.sku')}</th><th className="py-2">{t('catalogue.f.variantName')}</th>{currencies.map((c) => <th key={c} className="py-2 text-right">{c}</th>)}<th className="py-2">{t('catalogue.statusCol')}</th></tr></thead>
                     <tbody>

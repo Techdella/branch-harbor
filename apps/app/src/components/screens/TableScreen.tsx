@@ -65,7 +65,7 @@ function TableBody({ data, filter, setFilter, q, setQ, scopeLabel }: { data: Tab
             </button>
           ))}
         </div>
-        <label className="flex h-9 min-w-[160px] flex-1 items-center gap-2 rounded-full bg-canvas px-3 sm:max-w-[260px]">
+        <label className="flex h-11 min-w-[160px] flex-1 items-center gap-2 rounded-full bg-canvas px-3 sm:max-w-[260px]">
           <Icon name="search" size={14} />
           <span className="sr-only">{t('searchTable')}</span>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('searchTable')} className="min-w-0 flex-1 bg-transparent text-[13px] outline-none" />
@@ -77,7 +77,7 @@ function TableBody({ data, filter, setFilter, q, setQ, scopeLabel }: { data: Tab
       {rows.length === 0 ? (
         <Empty icon="filter" title={t('emptyTitle')} body={t('emptyBody')} />
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0}>
           <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} />
         </div>
       )}

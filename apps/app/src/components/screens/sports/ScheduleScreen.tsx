@@ -41,14 +41,14 @@ export function ScheduleScreen() {
       )} />
       {msg && <Banner tone="success" live="polite">{msg}</Banner>}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Button variant="secondary" size="sm" icon="chevron-left" aria-label={t('prevWeek')} onClick={() => setWeek(addDays(week, -7))} />
-          <span className="min-w-44 text-center text-sm font-bold">{fmtYmd(week, locale, { day: 'numeric', month: 'short' })} – {fmtYmd(addDays(week, 6), locale, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          <span className="min-w-0 text-center text-sm font-bold sm:min-w-44">{fmtYmd(week, locale, { day: 'numeric', month: 'short' })} – {fmtYmd(addDays(week, 6), locale, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
           <Button variant="secondary" size="sm" icon="chevron-right" aria-label={t('nextWeek')} onClick={() => setWeek(addDays(week, 7))} />
           <Button variant="ghost" size="sm" onClick={() => setWeek(weekStart(new Date().toISOString().slice(0, 10)))}>{t('thisWeek')}</Button>
         </div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1.5 text-sm"><input type="checkbox" className="size-4" checked={mine} onChange={(e) => setMine(e.target.checked)} />{t('mine')}</label>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" className="size-4" checked={mine} onChange={(e) => setMine(e.target.checked)} />{t('mine')}</label>
           <Tabs items={[{ key: 'week', label: t('week') }, { key: 'list', label: t('list') }]} value={view} onChange={setView} />
         </div>
       </div>

@@ -39,7 +39,7 @@ export default function RealtySearch() {
       <Card>
         <Text variant="h3">{s('saveSearch')}</Text>
         <TextField label={s('email')} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-        <Pressable onPress={() => setConsent(!consent)} accessibilityRole="checkbox" accessibilityState={{ checked: consent }} style={{ flexDirection: 'row', gap: 10, minHeight: 44, alignItems: 'center' }}>
+        <Pressable onPress={() => setConsent(!consent)} accessibilityRole="checkbox" accessibilityState={{ checked: consent }} aria-checked={consent} style={{ flexDirection: 'row', gap: 10, minHeight: 44, alignItems: 'center' }}>
           <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: color.ink, backgroundColor: consent ? color.ink : 'transparent' }} />
           <Text variant="small" style={{ flex: 1 }}>{s('saveSearchConsent')}</Text>
         </Pressable>

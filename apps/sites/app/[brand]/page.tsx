@@ -81,7 +81,7 @@ export default async function BrandHome({ params, searchParams }: Props) {
           {heroText && <p className="mt-4 max-w-2xl text-lg opacity-90">{heroText}</p>}
           <form method="get" action="#finder" role="search" className="mt-8 flex max-w-xl flex-col gap-2 rounded-3xl bg-white p-2 text-ink shadow-pop sm:flex-row sm:rounded-full">
             <label htmlFor="hero-q" className="sr-only">{t('searchLabel')}</label>
-            <input id="hero-q" name="q" defaultValue={q} placeholder={t('searchPlaceholder')} className="h-12 min-w-0 flex-1 rounded-full px-4 text-base outline-offset-0" />
+            <input id="hero-q" name="q" defaultValue={q} placeholder={t('searchPlaceholder')} className="h-12 min-w-0 rounded-full px-4 text-base outline-offset-0 sm:flex-1" />
             <button type="submit" className="btn btn-primary h-12">{t('title')}</button>
           </form>
           {data.brand.industry === 'realty' && (

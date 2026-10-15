@@ -28,7 +28,7 @@ export function useLocationPick(onlyLive = false) {
 export function LocationSelect({ pick, label }: { pick: ReturnType<typeof useLocationPick>; label?: string }) {
   const t = useFx();
   return (
-    <label className="flex h-10 items-center gap-2 rounded-full border border-line-soft bg-surface px-3 text-[13px]">
+    <label className="flex h-11 items-center gap-2 rounded-full border border-line-soft bg-surface px-3 text-[13px]">
       <Icon name="pin" size={14} />
       <span className="sr-only">{label ?? t('common.location')}</span>
       <select value={pick.locationId} onChange={(e) => pick.setLocationId(e.target.value)} className="bg-transparent font-bold focus:outline-none">

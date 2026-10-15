@@ -13,13 +13,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport: Viewport = { themeColor: '#F3F2EE', width: 'device-width', initialScale: 1 };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F3F2EE' },
+    { media: '(prefers-color-scheme: dark)', color: '#141413' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   return (
-    <html lang={locale} className={jakarta.variable}>
-      <body className="min-h-screen bg-canvas font-sans text-ink antialiased">
+    <html lang={locale} className={jakarta.variable} data-scroll-behavior="smooth">
+      <body className="min-h-viewport bg-canvas font-sans text-ink antialiased">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

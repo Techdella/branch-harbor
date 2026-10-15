@@ -97,7 +97,7 @@ export async function IndustryTemplate({ industry }: { industry: IndustryKey }) 
             </a>
           </div>
         </div>
-        <div className="grid grid-cols-[1.4fr_1fr] gap-3">
+        <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-3">
           <div className="relative min-h-[300px] overflow-hidden rounded-[24px] md:min-h-[420px]" style={{ background: def.pastel }}>
             <Image src={def.image} alt={copy.imageAlt} fill priority sizes="(min-width: 1024px) 28vw, 60vw" className="object-cover" />
           </div>

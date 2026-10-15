@@ -69,7 +69,7 @@ export function KitchenScreen() {
 
   const controls = (
     <div className="flex flex-wrap items-center gap-3 rounded-xl bg-surface px-4 py-3">
-      <label className="flex h-10 items-center gap-2 rounded-full border border-line-soft px-3 text-[13px]">
+      <label className="flex h-11 items-center gap-2 rounded-full border border-line-soft px-3 text-[13px]">
         <Icon name="pin" size={14} />
         <span className="sr-only">{t('location')}</span>
         <select value={locId} onChange={(e) => setLocId(e.target.value)} className="bg-transparent font-bold focus:outline-none">

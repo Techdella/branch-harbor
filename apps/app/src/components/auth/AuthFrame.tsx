@@ -12,17 +12,17 @@ const IMG = 'https://images.unsplash.com/photo-1676496962536-d8ef110ff6f0?auto=f
 export function AuthFrame({ title, subtitle, children, footer }: { title: string; subtitle?: string; children: ReactNode; footer?: ReactNode }) {
   const t = useTranslations('auth');
   return (
-    <div className="flex min-h-screen gap-3 p-3">
-      <main className="flex flex-1 flex-col rounded-xl bg-surface px-5 py-6 md:px-12 md:py-10">
-        <div className="flex items-center justify-between gap-3">
+    <div className="flex min-h-viewport gap-3 p-2 sm:p-3">
+      <main className="flex min-w-0 flex-1 flex-col rounded-xl bg-surface px-4 py-6 sm:px-5 md:px-12 md:py-10">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/sign-in" aria-label="BranchHarbor">
             <Logo size={30} />
           </Link>
-          <LanguageSelect className="w-[190px]" />
+          <LanguageSelect className="w-[190px] max-w-full" />
         </div>
         <div className="mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center gap-6 py-10">
           <div>
-            <h1 className="text-[32px] font-bold leading-tight tracking-[-0.035em]">{title}</h1>
+            <h1 className="text-[28px] font-bold leading-tight tracking-[-0.035em] sm:text-[32px]">{title}</h1>
             {subtitle && <p className="mt-2 text-[15px] text-stone">{subtitle}</p>}
           </div>
           {children}

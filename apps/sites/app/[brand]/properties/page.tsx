@@ -101,7 +101,7 @@ export default async function Properties({ params, searchParams }: Props) {
             <select id="areaUnit" name="areaUnit" defaultValue={areaUnit} className="field" aria-invalid={areaWithoutUnit || undefined}><option value="">{t('search.officeUnit')}</option><option value="sqm">m²</option><option value="sqft">sq ft</option></select></div>
           {areaWithoutUnit && <p className="col-span-2 text-sm font-semibold text-danger">{t('search.needUnit')}</p>}
         </div>
-        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
+        <div className="flex flex-wrap items-end gap-2 sm:col-span-2 lg:col-span-4">
           <div><label htmlFor="sort" className="mb-1 block text-sm font-semibold">{t('search.sort')}</label>
             <select id="sort" name="sort" defaultValue={sp.sort ?? 'newest'} className="field"><option value="newest">{t('search.newest')}</option><option value="price_asc">{t('search.priceAsc')}</option><option value="price_desc">{t('search.priceDesc')}</option></select></div>
           <button type="submit" className="btn btn-primary"><Icon name="search" size={16} />{t('search.submit')}</button>

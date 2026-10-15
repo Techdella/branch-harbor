@@ -307,7 +307,7 @@ function ItemDialog({ item, fmt, onClose, onAdd }: { item: MenuItem; fmt: (n: nu
   const valid = item.modifierGroups.every((g) => (picked[g.id]?.length ?? 0) >= g.minSelect && (picked[g.id]?.length ?? 0) <= g.maxSelect);
 
   return (
-    <dialog ref={ref} onClose={onClose} aria-labelledby="dlg-h" className="m-auto w-[min(520px,calc(100vw-24px))] rounded-3xl p-0 backdrop:bg-ink/50">
+    <dialog ref={ref} onClose={onClose} aria-labelledby="dlg-h" className="m-auto w-[min(520px,calc(100vw-24px))] rounded-3xl p-0 backdrop:bg-black/50">
       <form method="dialog" className="p-6" onSubmit={(e) => { e.preventDefault(); if (valid) onAdd(ids, qty); }}>
         <div className="flex items-start justify-between gap-3">
           <h2 id="dlg-h" className="text-xl font-extrabold">{item.name}</h2>

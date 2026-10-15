@@ -43,8 +43,8 @@ export async function SiteFooter() {
 
   return (
     <footer className="rounded-[28px] bg-ink px-6 pt-10 pb-7 text-white md:rounded-2xl md:px-12 md:pt-14">
-      <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(4,1fr)]">
-        <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
+        <div className="col-span-2 flex flex-col gap-4 lg:col-span-1">
           <Logo size={34} dark />
           <p className="max-w-60 text-sm leading-relaxed text-[#B9B9B3]">{t('tagline')}</p>
           <LanguageSwitcher dark />
@@ -52,10 +52,10 @@ export async function SiteFooter() {
         {cols.map((c) => (
           <nav key={c.title} aria-label={c.title}>
             <h2 className="mb-3 text-xs font-bold text-[#a3a39d]">{c.title}</h2>
-            <ul className="flex flex-col gap-2.5">
+            <ul className="flex flex-col md:gap-2.5">
               {c.links.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-sm font-medium text-white hover:text-lime">
+                  <Link href={l.href} className="flex min-h-11 items-center text-sm font-medium text-white hover:text-lime md:inline md:min-h-0">
                     {l.label}
                   </Link>
                 </li>

@@ -176,7 +176,7 @@ function Reconciliation({ res }: { res: ReturnType<typeof useApi<ReconciliationI
           <div className="grid items-start gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))]">
             <section className="flex flex-col gap-1.5 rounded-xl bg-surface p-3" aria-label={t('queue')}>
               {items.map((r) => (
-                <button key={r.id} type="button" aria-pressed={r.id === sel.id} onClick={() => (setSelId(r.id), setConfirming(false))} className={cx('flex w-full items-center gap-3 rounded-[18px] border-[1.5px] p-3.5 text-left', r.id === sel.id ? 'border-ink bg-[#FAFAF7]' : 'border-line-soft')}>
+                <button key={r.id} type="button" aria-pressed={r.id === sel.id} onClick={() => (setSelId(r.id), setConfirming(false))} className={cx('flex w-full items-center gap-3 rounded-[18px] border-[1.5px] p-3.5 text-left', r.id === sel.id ? 'border-ink bg-canvas-raised' : 'border-line-soft')}>
                   <span className={cx('flex h-10 w-10 shrink-0 items-center justify-center rounded-md', r.status === 'needs_action' ? 'bg-blush' : 'bg-canvas')}>
                     <Icon name={icon[r.type]} size={18} />
                   </span>

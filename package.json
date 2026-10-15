@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "pnpm@10.28.0",
   "engines": { "node": ">=22" },
+  "browserslist": [">0.5%", "last 2 versions", "Firefox ESR", "iOS >= 15", "Safari >= 15", "not dead"],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",

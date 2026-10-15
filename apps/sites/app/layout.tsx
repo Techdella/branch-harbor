@@ -9,12 +9,28 @@ import { getRouting, resolveSiteLocale } from '@/lib/site';
 import { CookieBanner } from '@/components/CookieBanner';
 import './globals.css';
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
-
-export const metadata: Metadata = {
-  // Sites carry the client's brand; no BranchHarbor title template.
-  robots: { index: true, follow: true },
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
+    { media: '(prefers-color-scheme: dark)', color: '#141413' },
+  ],
 };
+
+// Sites carry the client's brand; no BranchHarbor title template. Pages without their own title
+// (status, manage and error pages) fall back to the brand name so every document has a <title>.
+export async function generateMetadata(): Promise<Metadata> {
+  const r = await getRouting();
+  let name: string | undefined;
+  try {
+    if (r.brand) name = (await getBrandSite(r.brand)).brand.name;
+  } catch {
+    /* unknown brand / API down */
+  }
+  return { robots: { index: true, follow: true }, title: { default: name ?? 'Website', template: '%s' } };
+}
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const r = await getRouting();
@@ -35,8 +51,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   } as CSSProperties;
 
   return (
-    <html lang={locale} dir={isRtl(locale) ? 'rtl' : 'ltr'} className={fontVariables}>
-      <body style={style} className="min-h-screen font-site antialiased">
+    <html lang={locale} dir={isRtl(locale) ? 'rtl' : 'ltr'} className={fontVariables} data-scroll-behavior="smooth">
+      <body style={style} className="min-h-viewport font-site antialiased">
         <NextIntlClientProvider locale={locale} messages={await getMessages()}>
           <a href="#main" className="sr-only z-[100] rounded-full bg-ink px-5 py-3 text-sm font-bold text-white focus:not-sr-only focus:fixed focus:start-4 focus:top-4">
             {t('skip')}

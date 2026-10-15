@@ -24,6 +24,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     package: `com.branchharbor.app${suffix}`,
+    // Resize the window for the soft keyboard so focused fields and sticky footers stay visible.
+    softwareKeyboardLayoutMode: 'resize',
     adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', monochromeImage: './assets/adaptive-icon-monochrome.png', backgroundColor: color.ink },
   },
   web: { bundler: 'metro', output: 'single', backgroundColor: color.canvas, themeColor: color.ink, favicon: './assets/favicon.png' },

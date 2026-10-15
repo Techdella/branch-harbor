@@ -58,7 +58,7 @@ export function CalendarScreen() {
                   ))}
                 </ul>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto" tabIndex={0}>
                   <div className="grid min-w-[720px] gap-2" style={{ gridTemplateColumns: `70px repeat(${cols.length}, minmax(180px, 1fr))` }}>
                     <div />
                     {cols.map((c) => (
@@ -103,7 +103,7 @@ function Row({ slot, cols, d, matches, onOpen, locale }: { slot: string; cols: {
         const a = d.appointments.find((x) => matches(x, c.id, slot));
         if (!a)
           return (
-            <div key={c.id} className="flex min-h-[62px] items-center rounded-md border border-dashed border-line-soft bg-[#FAFAF7] px-2.5 text-[11px] text-mute">
+            <div key={c.id} className="flex min-h-[62px] items-center rounded-md border border-dashed border-line-soft bg-canvas-raised px-2.5 text-[11px] text-mute">
               {t('available')}
             </div>
           );

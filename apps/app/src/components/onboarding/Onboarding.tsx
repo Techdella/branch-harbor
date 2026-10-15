@@ -192,7 +192,7 @@ export function Onboarding() {
   if (!loaded) return <div className="p-10 text-center text-sm text-stone">{t('loading')}</div>;
 
   return (
-    <div className="flex min-h-screen flex-col gap-3 p-2 md:p-3">
+    <div className="flex min-h-viewport flex-col gap-3 p-2 md:p-3">
       <header className="flex flex-wrap items-center gap-3 rounded-lg bg-surface px-4 py-3">
         <Link href="/overview" aria-label={t('exit')}>
           <Logo size={30} />

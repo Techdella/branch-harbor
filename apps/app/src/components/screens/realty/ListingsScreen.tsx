@@ -36,7 +36,7 @@ export function ListingsScreen() {
       />
       <RAsync res={res} variant="cards" isEmpty={(d) => d.length === 0} empty={<Empty icon="house" title={t('listings.emptyTitle')} body={tab === 'approval' ? t('listings.emptyApproval') : t('listings.emptyBody')} />}>
         {(rows) => (
-          <div className="flex gap-3 overflow-x-auto pb-2" role="list" aria-label={t('listings.board')}>
+          <div className="flex gap-3 overflow-x-auto pb-2" role="group" aria-label={t('listings.board')}>
             {BOARD.filter((s) => tab !== 'board' || rows.some((r) => r.status === s) || ['draft', 'active', 'under_offer'].includes(s)).map((s) => {
               const col = rows.filter((r) => r.status === s);
               return (
@@ -64,7 +64,7 @@ function ListingCard({ l, onOpen }: { l: RealtyListing; onOpen: () => void }) {
   const app = useApp();
   const office = app.locations.find((x) => x.id === l.locationId);
   return (
-    <button type="button" onClick={onOpen} className="flex flex-col gap-2 rounded-lg bg-canvas p-2.5 text-start hover:ring-2 hover:ring-ink/10 focus-visible:ring-2" role="listitem">
+    <button type="button" onClick={onOpen} className="flex flex-col gap-2 rounded-lg bg-canvas p-2.5 text-start hover:ring-2 hover:ring-ink/10 focus-visible:ring-2">
       {l.photos[0] ? <img src={l.photos[0].url} alt="" className="h-28 w-full rounded-md object-cover" loading="lazy" /> : <div className="flex h-28 items-center justify-center rounded-md bg-surface text-xs text-mute">{t('listings.noPhoto')}</div>}
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-[11px] font-bold text-stone">{l.reference}</span>

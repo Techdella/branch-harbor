@@ -16,7 +16,7 @@ export function SchematicMap({ items, label, note, hrefFor }: { items: LocationS
   const y = (lat: number) => H - pad - ((lat - minLat) / (maxLat - minLat)) * (H - 2 * pad);
   return (
     <figure className="card relative overflow-hidden bg-[#EEF1EC]">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="block h-auto w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label={label} className="block h-auto w-full">
         <defs>
           <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
             <path d="M40 0H0V40" fill="none" stroke="#D5DCD3" strokeWidth="1" />

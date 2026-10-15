@@ -18,10 +18,10 @@ export function Tabs<K extends string>({ items, value, onChange, className }: { 
           role="tab"
           aria-selected={value === t.key}
           onClick={() => onChange(t.key)}
-          className={cx('h-9 rounded-full px-4 text-[13px] font-bold transition', value === t.key ? 'bg-ink text-white' : 'text-graphite hover:text-ink')}
+          className={cx('hit-44 h-9 rounded-full px-4 text-[13px] font-bold transition', value === t.key ? 'bg-ink text-white' : 'text-graphite hover:text-ink')}
         >
           {t.label}
-          {t.count != null && <span className="ml-1.5 opacity-60">{t.count}</span>}
+          {t.count != null && <span className="tabular ml-1.5 opacity-80">{t.count}</span>}
         </button>
       ))}
     </div>

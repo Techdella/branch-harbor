@@ -35,7 +35,7 @@ export default function Book() {
           const wd = new Intl.DateTimeFormat(intlLocale, { weekday: 'short', timeZone: tz }).format(new Date(noon));
           const dn = new Intl.DateTimeFormat(intlLocale, { day: 'numeric', timeZone: tz }).format(new Date(noon));
           const full = new Intl.DateTimeFormat(intlLocale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: tz }).format(new Date(noon));
-          return <Tag key={k} label={wd} sub={dn} selected={i === day} onPress={() => setDay(i)} accessibilityLabel={i === 0 ? `${t('common.today')}, ${full}` : full} />;
+          return <Tag key={k} label={wd} sub={dn} tab selected={i === day} onPress={() => setDay(i)} accessibilityLabel={i === 0 ? `${t('common.today')}, ${full}` : full} />;
         })}
       </ScrollView>
 

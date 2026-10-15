@@ -49,7 +49,7 @@ export function PulseScreen() {
               </div>
               <p className="mt-2 text-xs text-stone">{t('pulse.combined')}</p>
             </section>
-            <section className="overflow-x-auto rounded-xl bg-surface p-4">
+            <section className="overflow-x-auto rounded-xl bg-surface p-4" tabIndex={0}>
               <table className="w-full min-w-[720px] text-sm">
                 <caption className="mb-2 text-start text-sm font-bold">{t('pulse.byOffice')}</caption>
                 <thead><tr className="text-start text-xs text-stone"><th className="py-1 text-start">{t('pulse.office')}</th><th className="text-end">{t('pulse.active')}</th><th className="text-end">{t('pulse.domShort')}</th><th className="text-end">{t('pulse.enquiries')}</th><th className="text-end">{t('pulse.viewings')}</th><th className="text-end">{t('pulse.offers')}</th><th className="text-end">{t('pulse.conversion')}</th><th className="text-end">{t('pulse.sold')}</th></tr></thead>
@@ -102,7 +102,7 @@ export function PortalsScreen() {
                 <div className="flex flex-wrap items-center gap-2"><strong className="flex-1">{p.name}</strong><Badge tone="neutral" icon="lock">{t('portals.sandbox')}</Badge><Badge tone="neutral">{p.format.toUpperCase()}</Badge></div>
                 <p className="text-xs text-stone">{p.description} · {p.countries.join(', ')}</p>
                 <p className="text-xs">{t('portals.optedIn', { count: p.optedInListings })} · {p.lastExportedAt ? t('portals.lastExport', { when: relativeTime(p.lastExportedAt, locale) }) : t('portals.neverExported')}</p>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button size="sm" variant="secondary" icon="eye" onClick={() => setPreview(p.id)}>{t('portals.preview')}</Button>
                   <Button size="sm" variant="secondary" icon="refresh" loading={exp.pending} onClick={async () => { const r = await exp.run(p.id); if (r) { setResult(t('portals.exported', { count: r.results.filter((x) => x.status === 'sandbox_exported').length, invalid: r.results.filter((x) => x.status !== 'sandbox_exported').length })); res.reload(); } }}>{t('portals.runSandbox')}</Button>
                 </div>

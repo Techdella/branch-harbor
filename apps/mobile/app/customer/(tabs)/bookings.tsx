@@ -62,8 +62,8 @@ export default function Bookings() {
       {!foods ? (
         <>
           <View style={{ flexDirection: 'row', gap: 8 }} accessibilityRole="tablist">
-            <Tag label={t('bookings.upcoming')} selected={tab === 'upcoming'} onPress={() => setTab('upcoming')} />
-            <Tag label={t('bookings.past')} selected={tab === 'past'} onPress={() => setTab('past')} />
+            <Tag tab label={t('bookings.upcoming')} selected={tab === 'upcoming'} onPress={() => setTab('upcoming')} />
+            <Tag tab label={t('bookings.past')} selected={tab === 'past'} onPress={() => setTab('past')} />
           </View>
           <DataStatus q={q} />
           {q.loading ? <><SkeletonCard /><SkeletonCard /></> : null}

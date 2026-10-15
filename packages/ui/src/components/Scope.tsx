@@ -11,10 +11,10 @@ export interface ScopeOption {
 /** Always-visible scope selector: "All authorised locations", a region, an owner group or a location. */
 export function ScopeSelector({ options, value, onChange }: { options: ScopeOption[]; value: string; onChange: (id: string) => void }) {
   return (
-    <label className="relative inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface pl-3 pr-8 text-[13px] font-bold">
+    <label className="relative inline-flex h-11 max-w-full items-center gap-2 rounded-full border border-line bg-surface pl-3 pr-8 text-[13px] font-bold">
       <Icon name="pin" size={16} />
       <span className="sr-only">Scope</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="appearance-none bg-transparent pr-1 focus:outline-none">
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="min-w-0 max-w-full appearance-none truncate bg-transparent pr-1 focus:outline-none">
         {options.map((o) => (
           <option key={o.id} value={o.id}>
             {o.label}

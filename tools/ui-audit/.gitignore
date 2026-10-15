@@ -1,0 +1,5 @@
+report/screenshots/
+report/results-*.json
+report/SUMMARY-ci.md
+playwright-report/
+test-results/

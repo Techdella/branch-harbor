@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@bh/tokens/theme.css';
+@import '@bh/tokens/theme-dark.css';
 
 @source '../';
 @source '../../../packages/ui/src';
@@ -8,8 +9,8 @@
 @theme inline {
   --color-brand: var(--site-brand, #141414);
   --color-on-brand: var(--site-on-brand, #ffffff);
-  --color-brand-ink: var(--site-brand-ink, #141414);
-  --color-brand-tint: color-mix(in srgb, var(--site-brand-color, #141414) 10%, white);
+  --color-brand-ink: var(--bh-brand-ink, var(--site-brand-ink, #141414));
+  --color-brand-tint: var(--bh-brand-tint, color-mix(in srgb, var(--site-brand-color, #141414) 10%, white));
   --font-site: var(--site-font, system-ui), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -23,9 +24,23 @@
     }
   }
   body {
-    background: #ffffff;
+    background: var(--color-surface);
     color: var(--color-ink);
     font-family: var(--font-site);
+  }
+  /*
+   * Dark scheme: the client's brand colour is tuned for white backgrounds. Text in the brand colour is mixed
+   * towards the light ink so it keeps >= 4.5:1 on the dark surface; tints are mixed into the dark surface.
+   */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) body {
+      --bh-brand-ink: color-mix(in srgb, var(--site-brand-color, #141414) 35%, #f3f2ee);
+      --bh-brand-tint: color-mix(in srgb, var(--site-brand-color, #141414) 22%, #1f1f1d);
+    }
+    /* Dark brand colours would vanish against the dark page: outline brand-filled actions. */
+    :root:not([data-theme='light']) .btn-primary {
+      box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.24);
+    }
   }
   a {
     color: inherit;
@@ -52,11 +67,13 @@
     justify-content: center;
     gap: 0.5rem;
     min-height: 44px;
-    padding: 0 1.25rem;
+    max-width: 100%;
+    padding: 0.5rem 1.25rem;
     border-radius: 999px;
     font-weight: 700;
     font-size: 0.9375rem;
-    white-space: nowrap;
+    line-height: 1.25;
+    text-align: center;
     transition: filter 150ms;
   }
   .btn:disabled {
@@ -71,7 +88,7 @@
     filter: brightness(0.95);
   }
   .btn-secondary {
-    background: #fff;
+    background: var(--color-surface);
     color: var(--color-ink);
     border: 1.5px solid var(--color-line);
   }
@@ -85,19 +102,20 @@
     border: 1.5px solid #8a8a84;
     border-radius: 12px;
     padding: 0.5rem 0.875rem;
-    background: #fff;
+    background: var(--color-surface);
+    color: var(--color-ink);
     font: inherit;
   }
   .field[aria-invalid='true'] {
     border-color: var(--color-danger);
   }
   .card {
-    background: #fff;
+    background: var(--color-surface);
     border: 1px solid var(--color-line-soft);
     border-radius: 20px;
   }
   .link {
-    color: var(--site-brand-ink);
+    color: var(--bh-brand-ink, var(--site-brand-ink, #141414));
     text-decoration: underline;
     text-underline-offset: 3px;
   }

@@ -28,34 +28,41 @@ function Shell({ children }: { children: ReactNode }) {
   const path = usePathname();
   const [mobileNav, setMobileNav] = useState(false);
   const xl = useIsWide('(min-width: 1280px)');
-  const lg = useIsWide('(min-width: 1024px)');
   const mainRef = useRef<HTMLElement>(null);
+  const navCloseRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => setMobileNav(false), [path]);
   useEffect(() => {
     if (!mobileNav) return;
+    // Modal drawer: move focus in, and keep the page behind from scrolling.
+    navCloseRef.current?.focus();
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMobileNav(false);
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [mobileNav]);
 
-  // Tablet: icon rail by default. Desktop: full nav unless the user collapsed it.
-  const collapsed = !lg || app.navCollapsed;
+  // Tablet: icon rail (CSS, below lg). Desktop: full nav unless the user collapsed it.
+  const collapsed = app.navCollapsed;
 
   return (
-    <div className="flex min-h-screen items-start gap-3 p-2 md:p-3">
+    <div className="flex min-h-viewport items-start gap-3 p-2 md:p-3">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-white">
         {t('skip')}
       </a>
-      <aside className={cx('sticky top-3 hidden h-[calc(100vh-24px)] shrink-0 flex-col overflow-hidden rounded-xl bg-surface md:flex', collapsed ? 'w-[72px]' : 'w-[248px]')}>
+      <aside className={cx('sticky top-3 hidden h-viewport-inset shrink-0 flex-col overflow-hidden rounded-xl bg-surface md:flex', collapsed ? 'w-[72px]' : 'w-[72px] lg:w-[248px]')}>
         <Sidebar collapsed={collapsed} />
       </aside>
 
       {mobileNav && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-ink/30" onClick={() => setMobileNav(false)} aria-hidden="true" />
-          <div role="dialog" aria-modal="true" aria-label={t('navigation')} className="absolute inset-y-0 left-0 flex w-[min(320px,88vw)] flex-col bg-surface">
-            <button type="button" onClick={() => setMobileNav(false)} aria-label={t('closeNav')} className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-canvas">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileNav(false)} aria-hidden="true" />
+          <div role="dialog" aria-modal="true" aria-label={t('navigation')} className="absolute inset-y-0 left-0 flex w-[min(320px,88vw)] flex-col bg-surface pb-safe pt-safe">
+            <button ref={navCloseRef} type="button" onClick={() => setMobileNav(false)} aria-label={t('closeNav')} className="absolute right-3 top-[max(12px,env(safe-area-inset-top))] z-10 flex h-11 w-11 items-center justify-center rounded-full bg-canvas">
               <Icon name="x" size={16} />
             </button>
             <Sidebar collapsed={false} mobile onNavigate={() => setMobileNav(false)} />
@@ -84,7 +91,7 @@ function Shell({ children }: { children: ReactNode }) {
 
       {app.aiOpen && !xl && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 hidden bg-ink/30 md:block" onClick={() => app.setAiOpen(false)} aria-hidden="true" />
+          <div className="absolute inset-0 hidden bg-black/40 md:block" onClick={() => app.setAiOpen(false)} aria-hidden="true" />
           <div className="relative h-full w-full md:w-[420px]">
             <AiPanel fullScreen onClose={() => app.setAiOpen(false)} />
           </div>

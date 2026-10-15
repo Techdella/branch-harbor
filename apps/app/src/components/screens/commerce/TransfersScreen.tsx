@@ -62,7 +62,7 @@ function TransferDrawer({ x, onClose, onChanged }: { x: TransferView; onClose: (
         <StatusBadge kind="transfer" value={x.status} />
         {x.orderId && <Banner tone="info" icon="receipt">{t('transfers.orderNote')}</Banner>}
         {x.receiveNote && <Banner tone="warning">{x.receiveNote}</Banner>}
-        <table className="w-full">
+        <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full">
           <thead><tr className="text-left text-xs uppercase text-stone"><th className="py-1">{t('transfers.item')}</th><th className="py-1 text-right">{t('transfers.requested')}</th><th className="py-1 text-right">{t('transfers.shipped')}</th><th className="py-1 text-right">{t('transfers.received')}</th></tr></thead>
           <tbody>{x.lines.map((l) => (
             <tr key={l.variantId} className="border-t border-line-soft">
@@ -71,7 +71,7 @@ function TransferDrawer({ x, onClose, onChanged }: { x: TransferView; onClose: (
               <td className="py-2 text-right">{x.status === 'in_transit' ? <NumberInput value={qty[l.variantId] ?? 0} onChange={(n) => setQty((q) => ({ ...q, [l.variantId]: n }))} label={t('transfers.receiveQty', { name: l.name })} /> : l.received}</td>
             </tr>
           ))}</tbody>
-        </table>
+        </table></div>
         <ActionError error={act.error} />
         {x.status === 'requested' && (manager ? (
           <div className="flex flex-wrap items-center gap-2">

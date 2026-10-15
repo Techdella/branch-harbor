@@ -36,7 +36,7 @@ export function AssortmentScreen() {
                     {p.updateAvailable && <Badge tone="warning">{t('assortment.updateAvailable', { from: p.distributedVersion, to: p.masterVersion })}</Badge>}
                     <span className="ms-auto text-xs text-stone">{t('assortment.locked')}</span>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto" tabIndex={0}>
                     <table className="w-full min-w-[760px] text-sm">
                       <thead><tr className="text-left text-xs uppercase text-stone"><th className="px-4 py-2">{t('assortment.variant')}</th><th className="py-2">{t('assortment.price')}</th><th className="py-2">{t('assortment.availability')}</th><th className="py-2 text-right">{t('assortment.stock')}</th><th className="py-2 pe-4 text-right">{t('assortment.reorder')}</th></tr></thead>
                       <tbody>{p.variants.map((v) => <Row key={v.variantId} loc={loc} v={v} manager={manager} onSaved={(nv) => res.setData({ ...d, items: d.items.map((i) => (i.productId === p.productId ? { ...i, variants: i.variants.map((x) => (x.variantId === nv.variantId ? nv : x)) } : i)) })} />)}</tbody>

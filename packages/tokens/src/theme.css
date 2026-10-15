@@ -10,7 +10,7 @@
   --color-ink-2: #2a2a2a;
   --color-graphite: #3e3e3a;
   --color-stone: #5d5d58;
-  --color-mute: #9c9c96;
+  --color-mute: #6b6b65;
   --color-line: #d8d6cf;
   --color-line-soft: #e4e2dc;
   --color-canvas: #f3f2ee;
@@ -77,11 +77,82 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    /* Long words (German compounds, URLs, business names) wrap instead of overflowing. */
+    overflow-wrap: break-word;
+    /* Landscape phones with a notch: keep content out of the sensor housing (viewport-fit=cover). */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  h1,
+  h2,
+  h3 {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+  /*
+   * Grid items default to `min-width: auto`, so one long word or wide child stretches an implicit (single-column)
+   * grid past a phone screen. Let them shrink to the track; text wraps inside.
+   */
+  :where(.grid) > * {
+    min-width: 0;
+  }
+  /*
+   * Visually hidden text is absolutely positioned; inside a horizontal scroller without a positioned ancestor its
+   * static position can sit past the viewport and widen the page. Pin it to the left edge of its containing block.
+   */
+  .sr-only {
+    inset-inline-start: 0;
+  }
+  /* iOS Safari zooms into inputs below 16px on focus. Touch devices get 16px controls. */
+  @media (pointer: coarse) {
+    input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+    select,
+    textarea {
+      font-size: max(16px, 1em) !important;
+    }
+  }
+  /*
+   * Touch screens: every button-like control gets a 44×44 px hit area (an invisible ::after) without changing
+   * its visual size, so compact pills, icon buttons and switches stay usable with a thumb. Positioned controls
+   * keep their position (utilities win over this base layer); `.no-hit` opts out.
+   */
+  @media (pointer: coarse) {
+    :is(a[href], button, [role='button'], [role='tab'], [role='switch'], summary):not(.no-hit) {
+      position: relative;
+    }
+    :is(a[href], button, [role='button'], [role='tab'], [role='switch'], summary):not(.no-hit)::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+    select:not(label *) {
+      min-height: 44px;
+    }
+    input:is([type='checkbox'], [type='radio']) {
+      min-width: 24px;
+      min-height: 24px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  /* Sticky headers must not cover anchor targets / focused fields. */
+  :target {
+    scroll-margin-top: 96px;
   }
   :focus-visible {
     outline: 3px solid var(--color-focus);
@@ -97,5 +168,53 @@
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+/*
+ * Viewport-height utilities with a `vh` fallback: `dvh` follows mobile browser toolbars (iOS Safari, Chrome
+ * Android) so full-height layouts don't hide content behind them. Browsers without dvh use the vh line.
+ */
+@utility min-h-viewport {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+@utility h-viewport {
+  height: 100vh;
+  height: 100dvh;
+}
+@utility h-viewport-inset {
+  height: calc(100vh - 24px);
+  height: calc(100dvh - 24px);
+}
+@utility max-h-viewport-inset {
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+}
+/* Bottom-anchored bars (cookie banners, sticky checkout footers) clear the iOS home indicator. */
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+}
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+@utility bottom-safe {
+  bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+/*
+ * 44 px touch target without changing the visual size: an invisible ::after centred on the control.
+ * For compact controls (sm buttons, segmented tabs, icon buttons, toggles). Not for elements that are
+ * themselves absolutely positioned (the utility sets position: relative).
+ */
+@utility hit-44 {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
   }
 }

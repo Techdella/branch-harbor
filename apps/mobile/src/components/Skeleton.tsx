@@ -23,7 +23,7 @@ export function Skeleton({ height = 16, width = '100%', r = radius.xs }: { heigh
 
 export function SkeletonCard({ lines = 3 }: { lines?: number }) {
   return (
-    <View accessibilityLabel="Loading" accessible style={{ backgroundColor: color.surface, borderRadius: radius.card, padding: 16, gap: 10 }}>
+    <View accessibilityRole="progressbar" accessibilityLabel="Loading" accessible style={{ backgroundColor: color.surface, borderRadius: radius.card, padding: 16, gap: 10 }}>
       <Skeleton height={18} width="60%" />
       {Array.from({ length: lines - 1 }, (_, i) => (
         <Skeleton key={i} height={12} width={i % 2 ? '40%' : '85%'} />

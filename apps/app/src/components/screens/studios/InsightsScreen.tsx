@@ -63,17 +63,17 @@ export function InsightsScreen() {
               <h2 className="text-base font-bold">{t('attendanceTrend')}</h2>
               <Bars label={t('attendanceTrend')} unit="%" rows={r.attendance.map((w) => ({ key: w.weekStart, label: t('weekOf', { date: fmtYmd(w.weekStart, locale, { day: 'numeric', month: 'short' }) }), value: w.attendanceRatePct, sub: t('attendedNoShow', { a: w.attended, n: w.noShow }) }))} />
               <details className="text-xs"><summary className="cursor-pointer font-bold">{t('table')}</summary>
-                <table className="mt-2 w-full text-left"><thead><tr className="text-stone"><th scope="col">{t('week')}</th><th scope="col">{t('booked')}</th><th scope="col">{t('attended')}</th><th scope="col">{t('noShows')}</th><th scope="col">{t('lateCancels')}</th><th scope="col">{t('unrecorded')}</th></tr></thead>
-                  <tbody>{r.attendance.map((w) => <tr key={w.weekStart} className="border-t border-line-soft tabular"><td>{w.weekStart}</td><td>{w.booked}</td><td>{w.attended}</td><td>{w.noShow}</td><td>{w.lateCancel}</td><td>{w.unrecorded}</td></tr>)}</tbody></table>
+                <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="mt-2 w-full text-left"><thead><tr className="text-stone"><th scope="col">{t('week')}</th><th scope="col">{t('booked')}</th><th scope="col">{t('attended')}</th><th scope="col">{t('noShows')}</th><th scope="col">{t('lateCancels')}</th><th scope="col">{t('unrecorded')}</th></tr></thead>
+                  <tbody>{r.attendance.map((w) => <tr key={w.weekStart} className="border-t border-line-soft tabular"><td>{w.weekStart}</td><td>{w.booked}</td><td>{w.attended}</td><td>{w.noShow}</td><td>{w.lateCancel}</td><td>{w.unrecorded}</td></tr>)}</tbody></table></div>
               </details>
               <p className="text-[11px] text-stone">{r.definitions.attendance}</p>
             </section>
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5">
               <h2 className="text-base font-bold">{t('churn')}</h2>
-              <table className="w-full text-left text-sm">
+              <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-left text-sm">
                 <thead><tr className="text-xs text-stone"><th scope="col">{t('month')}</th><th scope="col">{t('activeStart')}</th><th scope="col">{t('started')}</th><th scope="col">{t('ended')}</th><th scope="col">{t('churnRate')}</th></tr></thead>
                 <tbody>{r.churn.map((c) => <tr key={c.month} className="border-t border-line-soft tabular"><td className="py-1.5">{c.month}</td><td>{c.activeAtStart}</td><td>{c.started}</td><td>{c.cancelled}</td><td className="font-bold">{c.churnRatePct === null ? t('unavailable') : `${c.churnRatePct}%`}</td></tr>)}</tbody>
-              </table>
+              </table></div>
               <p className="text-[11px] text-stone">{r.definitions.churn}</p>
             </section>
             <section className="flex flex-col gap-3 rounded-xl bg-surface p-5 [grid-column:1/-1]">

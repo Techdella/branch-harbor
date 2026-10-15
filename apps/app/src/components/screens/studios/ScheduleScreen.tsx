@@ -61,7 +61,7 @@ export function ScheduleScreen() {
     <>
       <PageHeader icon="repeat" title={t('title')} description={t('description')} actions={<Tabs items={[{ key: 'series', label: t('tabSeries') }, { key: 'new', label: t('tabNew') }]} value={tab} onChange={(k) => setTab(k)} />} />
       <div className="flex flex-wrap items-center gap-2">
-        <label className="flex h-10 items-center gap-2 rounded-full border border-line-soft bg-surface px-3 text-[13px] font-semibold">
+        <label className="flex h-11 items-center gap-2 rounded-full border border-line-soft bg-surface px-3 text-[13px] font-semibold">
           <Icon name="pin" size={14} />
           <span className="sr-only">{t('location')}</span>
           <select value={locId} onChange={(e) => { setLocId(e.target.value); setPreview(null); }} className="bg-transparent font-bold focus:outline-none">
@@ -175,7 +175,7 @@ export function ScheduleScreen() {
                 {preview.summary.conflicts > 0 && <Banner tone="warning" title={t('conflictsTitle', { n: preview.summary.conflicts })}>{t('conflictsBody')}</Banner>}
                 <pre className="overflow-x-auto rounded-md bg-canvas p-2 text-[11px] text-graphite">{preview.rrule}</pre>
                 <div className="max-h-[380px] overflow-y-auto rounded-md border border-line-soft">
-                  <table className="w-full text-left text-[13px]">
+                  <div className="max-w-full overflow-x-auto" tabIndex={0}><table className="w-full text-left text-[13px]">
                     <caption className="sr-only">{t('stepPreview')}</caption>
                     <thead className="sticky top-0 bg-surface text-xs text-stone"><tr><th scope="col" className="px-3 py-2">{t('date')}</th><th scope="col" className="px-3 py-2">{t('localTime')}</th><th scope="col" className="px-3 py-2">UTC</th><th scope="col" className="px-3 py-2">{t('checks')}</th></tr></thead>
                     <tbody>
@@ -191,7 +191,7 @@ export function ScheduleScreen() {
                         );
                       })}
                     </tbody>
-                  </table>
+                  </table></div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button icon="send" onClick={() => save(true)} disabled={create.pending}>{t('publishN', { n: preview.summary.count })}</Button>
