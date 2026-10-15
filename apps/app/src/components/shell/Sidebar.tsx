@@ -16,6 +16,7 @@ export function useNavLabel() {
   const app = useApp();
   return (l: NavLink) => {
     if (l.screen) return t(`ops.${app.industry}.${l.screen}.title`);
+    if (l.msg) return t(l.msg);
     if (l.key === 'customers') return t(`industries.${app.industry}.customers`);
     if (l.key === 'schedule') return t('access.nav.schedule');
     // Inside the Marketing workspace the campaigns screen is called what it is.

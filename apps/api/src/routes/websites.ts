@@ -25,7 +25,7 @@ const templateField = z.object({
 /** Labels for the default fields of pages created without a template (independent businesses). */
 const DEFAULT_FIELD_LABELS: Record<string, string> = { hero_title: 'Headline', offer: 'Offer or announcement', about: 'About your business' };
 
-const originFor = (policy: TemplateField['policy']): FieldOrigin => (policy === 'locked' ? 'locked' : policy === 'approval' ? 'approval' : 'hq');
+export const originFor = (policy: TemplateField['policy']): FieldOrigin => (policy === 'locked' ? 'locked' : policy === 'approval' ? 'approval' : 'hq');
 
 export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;

@@ -109,6 +109,10 @@
         "templates": {
           "name": "Brand templates & policies",
           "description": "Website templates, locked brand fields and business policies set by HQ."
+        },
+        "onboarding": {
+          "name": "New locations",
+          "description": "Onboarding checklists, pre-opening checks and go-live requests for new locations. Franchise owners see the projects of their own locations and their own franchise agreement."
         }
       },
       "operations": {
@@ -205,6 +209,10 @@
         "customers": {
           "name": "Customers",
           "description": "Customer records with contact details and history (personal data)."
+        },
+        "franchise_pipeline": {
+          "name": "Franchise pipeline",
+          "description": "Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals."
         }
       },
       "marketing": {
@@ -247,6 +255,16 @@
         "ai": {
           "name": "AI assistant",
           "description": "Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes."
+        }
+      },
+      "legal": {
+        "agreements": {
+          "name": "Franchise agreements",
+          "description": "The agreements register, executed agreements, the legal document vault, renewals and expiries."
+        },
+        "disclosure": {
+          "name": "Disclosure & jurisdiction rules",
+          "description": "Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction. Approve = record counsel’s review of a rule."
         }
       }
     },

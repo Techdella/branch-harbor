@@ -109,6 +109,10 @@
         "templates": {
           "name": "Modèles de marque et règles",
           "description": "Modèles de site, champs de marque verrouillés et règles définies par le siège."
+        },
+        "onboarding": {
+          "name": "Nouveaux établissements",
+          "description": "Listes d’intégration, vérifications avant ouverture et demandes d’ouverture des nouveaux établissements. Les franchisés voient les projets de leurs propres établissements et leur propre contrat de franchise."
         }
       },
       "operations": {
@@ -205,6 +209,10 @@
         "customers": {
           "name": "Clients",
           "description": "Fiches clients avec coordonnées et historique (données personnelles)."
+        },
+        "franchise_pipeline": {
+          "name": "Pipeline de franchise",
+          "description": "Demandes de franchise, qualification, étapes de divulgation et de contrat, territoires et projets de nouveaux établissements."
         }
       },
       "marketing": {
@@ -247,6 +255,16 @@
         "ai": {
           "name": "Assistant IA",
           "description": "Interroger BranchHarbor AI sur les données que cette personne voit déjà. Il ne fait que rédiger et proposer."
+        }
+      },
+      "legal": {
+        "agreements": {
+          "name": "Contrats de franchise",
+          "description": "Le registre des contrats, les contrats signés, le coffre-fort de documents juridiques, les renouvellements et les échéances."
+        },
+        "disclosure": {
+          "name": "Divulgation et règles par juridiction",
+          "description": "Documents de divulgation, enregistrements et règles par juridiction (délais d’attente et de rétractation). Approuver = consigner la revue d’une règle par l’avocat."
         }
       }
     },

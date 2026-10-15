@@ -4,7 +4,7 @@ import {
   ROLE_PERMISSIONS, ROLE_TEMPLATES, effectiveCapabilities, expandGrants, modulesFor, permissionsFromCapabilities, primaryWorkspace, workspacesFor,
 } from './access.ts';
 import { INDUSTRIES } from './industries.ts';
-import { ROLES, type Permission, type Role } from './permissions.ts';
+import { PERMISSIONS, ROLES, type Permission, type Role } from './permissions.ts';
 
 /** The fixed role → permission lists before the access model; system templates must keep granting exactly these. */
 const LEGACY: Partial<Record<Role, Permission[]>> = {
@@ -19,8 +19,10 @@ const LEGACY: Partial<Record<Role, Permission[]>> = {
 };
 
 test('system templates keep the legacy permission sets', () => {
-  for (const [role, perms] of Object.entries(LEGACY)) assert.deepEqual([...ROLE_PERMISSIONS[role as Role]].sort(), [...perms].sort(), role);
-  assert.equal(ROLE_PERMISSIONS.org_owner.length, 22);
+  // Permissions added with later modules (franchise, legal…) are checked by their own tests; the original 22 must not move.
+  const legacy = new Set(PERMISSIONS.slice(0, 22));
+  for (const [role, perms] of Object.entries(LEGACY)) assert.deepEqual([...ROLE_PERMISSIONS[role as Role]].filter((p) => legacy.has(p)).sort(), [...perms].sort(), role);
+  assert.equal(ROLE_PERMISSIONS.org_owner.length, PERMISSIONS.length);
 });
 
 test('every role has a template and every template only names real modules', () => {
@@ -64,4 +66,19 @@ test('workspaces only appear for available modules and industry modules follow t
   const foodsStaff = expandGrants(ROLE_TEMPLATES.staff.grants, 'foods');
   assert.ok(foodsStaff.has('operations.menu:edit'));
   assert.ok(!foodsStaff.has('operations.classes:view'));
+});
+
+test('franchise development and legal follow the templates; franchise owners only get New locations', () => {
+  const perms = (role: Role, scopeKind: 'organization' | 'owner_group' = 'organization') => permissionsFromCapabilities(effectiveCapabilities({ role, scopeKind }, 'studios'));
+  const vp = perms('vp_franchise');
+  for (const p of ['franchise.pipeline.view', 'franchise.pipeline.edit', 'onboarding.edit', 'legal.view', 'disclosure.edit'] as const) assert.ok(vp.has(p), p);
+  assert.ok(!vp.has('disclosure.approve'));
+  assert.ok(perms('legal').has('disclosure.approve'));
+  assert.ok(!perms('legal').has('franchise.pipeline.edit'));
+  assert.ok(!perms('hq_admin').has('franchise.pipeline.view'));
+  const fo = perms('franchise_owner', 'owner_group');
+  assert.ok(fo.has('onboarding.edit'));
+  for (const p of ['franchise.pipeline.view', 'legal.view', 'disclosure.view'] as const) assert.ok(!fo.has(p), p);
+  const ws = workspacesFor(effectiveCapabilities({ role: 'vp_franchise', scopeKind: 'organization' }, 'studios'), 'studios').map((w) => w.key);
+  assert.deepEqual(ws, ['network', 'sales', 'legal']);
 });

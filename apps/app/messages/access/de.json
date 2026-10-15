@@ -109,6 +109,10 @@
         "templates": {
           "name": "Markenvorlagen & Richtlinien",
           "description": "Website-Vorlagen, gesperrte Markenfelder und Richtlinien der Zentrale."
+        },
+        "onboarding": {
+          "name": "Neue Standorte",
+          "description": "Onboarding-Checklisten, Prüfungen vor der Eröffnung und Eröffnungsanträge für neue Standorte. Franchisenehmer sehen die Projekte ihrer eigenen Standorte und ihren eigenen Franchisevertrag."
         }
       },
       "operations": {
@@ -205,6 +209,10 @@
         "customers": {
           "name": "Kunden",
           "description": "Kundendatensätze mit Kontaktdaten und Verlauf (personenbezogene Daten)."
+        },
+        "franchise_pipeline": {
+          "name": "Franchise-Pipeline",
+          "description": "Franchise-Anfragen, Qualifizierung, Offenlegungs- und Vertragsschritte, Gebiete und neue Standorte."
         }
       },
       "marketing": {
@@ -247,6 +255,16 @@
         "ai": {
           "name": "KI-Assistent",
           "description": "BranchHarbor AI zu Daten befragen, die diese Person ohnehin sieht. Er entwirft und schlägt nur vor."
+        }
+      },
+      "legal": {
+        "agreements": {
+          "name": "Franchiseverträge",
+          "description": "Das Vertragsregister, unterzeichnete Verträge, der Tresor für Rechtsdokumente, Verlängerungen und Fristen."
+        },
+        "disclosure": {
+          "name": "Offenlegung & Rechtsordnungsregeln",
+          "description": "Offenlegungsdokumente, Registrierungen und die Regeln je Rechtsordnung (Warte- und Widerrufsfristen). Genehmigen = die Prüfung einer Regel durch den Anwalt erfassen."
         }
       }
     },

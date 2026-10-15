@@ -12,7 +12,7 @@ import { notify, usersWithPermissionAt } from './notifications.ts';
 import { orgPolicies } from './orgSettings.ts';
 import { refundPayment, serializePayment } from './payments.ts';
 
-export const APPROVAL_KINDS = ['page', 'field', 'refund', 'ad_spend', 'shift_swap'] as const;
+export const APPROVAL_KINDS = ['page', 'field', 'refund', 'ad_spend', 'shift_swap', 'location_go_live'] as const;
 export type ApprovalKind = (typeof APPROVAL_KINDS)[number];
 export type ApprovalRow = typeof approvals.$inferSelect;
 
@@ -26,15 +26,28 @@ export const DECIDER: Record<ApprovalKind, { perm: Permission; also?: Permission
   refund: { perm: 'payments.refund', label: 'Refund' },
   ad_spend: { perm: 'marketing.publish', label: 'Local ad spend' },
   shift_swap: { perm: 'operations.write', also: 'locations.read', label: 'Shift swap' },
+  // New-location flow: HQ approves the opening (organisation-wide location management).
+  location_go_live: { perm: 'locations.write', label: 'Location opening' },
 };
+
+/**
+ * Executors for approval kinds owned by other modules (e.g. franchise go-live), registered at import time so this
+ * file does not depend on them. `execute` runs on approval; `reject` runs inside the rejection transaction.
+ */
+export const approvalExtensions: Partial<Record<ApprovalKind, {
+  execute(s: Services, ap: ApprovalRow, approverId: string, ip: string): Promise<Record<string, unknown>>;
+  reject?(tx: Exec, ap: ApprovalRow, deciderId: string): Promise<void>;
+}>> = {};
 
 const kindOf = (ap: Pick<ApprovalRow, 'targetType'>): ApprovalKind => (APPROVAL_KINDS.includes(ap.targetType as ApprovalKind) ? (ap.targetType as ApprovalKind) : 'field');
 
+/** Kinds decided at organisation level even though the request names a location. */
+const ORG_LEVEL_KINDS: ReadonlySet<ApprovalKind> = new Set(['location_go_live']);
 const scopeOf = (orgId: string, locationId: string | null) => (locationId ? { organizationId: orgId, kind: 'location' as const, id: locationId } : { organizationId: orgId, kind: 'organization' as const, id: orgId });
 
 export async function canDecide(req: FastifyRequest, db: Exec, ap: Pick<ApprovalRow, 'organizationId' | 'locationId' | 'targetType'>): Promise<boolean> {
   const d = DECIDER[kindOf(ap)];
-  const scope = scopeOf(ap.organizationId, ap.locationId);
+  const scope = scopeOf(ap.organizationId, ORG_LEVEL_KINDS.has(kindOf(ap)) ? null : ap.locationId);
   if (!(await hasPerm(req, db, d.perm, scope))) return false;
   return !d.also || (await hasPerm(req, db, d.also, scope));
 }
@@ -60,7 +73,7 @@ export async function assertRefundWithinThreshold(req: FastifyRequest, db: Exec,
 
 /** Structured title: a stable code plus arguments, so apps can phrase it in the viewer's language. */
 export interface ApprovalTitle { code: ApprovalTitleCode; params: Record<string, string | number> }
-export type ApprovalTitleCode = 'refund_payment' | 'refund_order' | 'refund_pickup_order' | 'refund_return' | 'shift_swap' | 'website_change' | 'page_submitted';
+export type ApprovalTitleCode = 'refund_payment' | 'refund_order' | 'refund_pickup_order' | 'refund_return' | 'shift_swap' | 'website_change' | 'page_submitted' | 'location_go_live';
 
 export interface NewApproval {
   organizationId: string;
@@ -90,7 +103,7 @@ export async function insertApproval(tx: Exec, a: NewApproval, ip?: string) {
 /** Push "approval needed" to everyone who can decide it (never the requester). */
 export async function notifyApprovers(s: Services, ap: ApprovalRow) {
   const d = DECIDER[kindOf(ap)];
-  const userIds = (await usersWithPermissionAt(s.db, ap.organizationId, ap.locationId, d.perm, d.also)).filter((id) => id !== ap.requestedBy);
+  const userIds = (await usersWithPermissionAt(s.db, ap.organizationId, ORG_LEVEL_KINDS.has(kindOf(ap)) ? null : ap.locationId, d.perm, d.also)).filter((id) => id !== ap.requestedBy);
   const [loc] = ap.locationId ? await s.db.select({ name: locations.name }).from(locations).where(eq(locations.id, ap.locationId)) : [];
   const money = ap.amountMinor != null && ap.currency ? ` · ${formatMinor(ap.amountMinor, ap.currency)}` : '';
   await notify(s, {
@@ -141,6 +154,8 @@ export async function decideApproval(s: Services, req: FastifyRequest, orgId: st
         await tx.update(campaigns).set({ status: 'archived', updatedAt: new Date() }).where(eq(campaigns.id, ap.targetId));
       } else if (kind === 'shift_swap') {
         await tx.update(shiftSwapRequests).set({ status: 'rejected', decidedBy: me.id, decidedAt: new Date() }).where(eq(shiftSwapRequests.id, ap.targetId));
+      } else if (approvalExtensions[kind]?.reject) {
+        await approvalExtensions[kind]!.reject!(tx, ap, me.id);
       }
       await audit(tx, { organizationId: orgId, actorUserId: me.id, action: 'approval.rejected', scopeKind, scopeId, targetType: ap.targetType, targetId: ap.targetId, metadata: { approvalId: id, comment }, ip: req.ip });
     });
@@ -202,6 +217,11 @@ async function execute(s: Services, ap: ApprovalRow, approverId: string, ip: str
     }
     case 'shift_swap':
       return executeShiftSwap(s, ap.targetId, approverId);
+    default: {
+      const ext = approvalExtensions[kindOf(ap)];
+      if (!ext) throw new AppError(500, 'approval_kind_unhandled', `No executor for ${ap.targetType}`);
+      return ext.execute(s, ap, approverId, ip);
+    }
   }
 }
 

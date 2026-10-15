@@ -8,11 +8,14 @@ const app = await buildApp();
 const sweep = setInterval(() => void app.ctx.jobs.enqueue('studios.expire-holds', {}).catch(() => {}), 60_000);
 // Real Estate: viewing reminders and consented saved-search alerts.
 const realtySweep = setInterval(() => void import('./services/realty-jobs.ts').then((m) => m.runRealtyHousekeeping(app.ctx)), 5 * 60_000);
+// Franchise development: due cadence emails, task reminders, agreement expiry reminders.
+const franchiseSweep = setInterval(() => void import('./services/franchise.ts').then((m) => m.runFranchiseJobs(app.ctx)).catch((err) => app.log.error({ err }, 'franchise jobs failed')), 15 * 60_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
   clearInterval(sweep);
   clearInterval(realtySweep);
+  clearInterval(franchiseSweep);
   await app.close();
   process.exit(0);
 };

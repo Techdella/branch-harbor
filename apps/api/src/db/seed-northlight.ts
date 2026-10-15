@@ -43,7 +43,7 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     { organizationId: orgId, regionId: na!.id, ownerGroupId: pacific!.id, name: 'Kitsilano', code: 'YVR-KT', slug: 'kitsilano', address: { line1: '2190 W 4th Ave', city: 'Vancouver', region: 'BC', postalCode: 'V6K 1N6', country: 'CA' }, country: 'CA', timeZone: 'America/Vancouver', currency: 'CAD', locale: 'en', phone: '+1 604 555 0177', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_kits', hours: { summary: 'Daily 6:30am–9pm' } },
     { organizationId: orgId, regionId: na!.id, ownerGroupId: rose!.id, name: 'Portland Pearl', code: 'PDX-PR', slug: 'portland-pearl', address: { line1: '1122 NW Everett St', city: 'Portland', region: 'OR', postalCode: '97209', country: 'US' }, country: 'US', timeZone: 'America/Los_Angeles', currency: 'USD', locale: 'en', phone: '+1 503 555 0148', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_pearl', hours: { summary: 'Daily 6am–8:30pm' } },
     { organizationId: orgId, regionId: eu!.id, ownerGroupId: thames!.id, name: 'London Hackney', code: 'LON-HK', slug: 'london-hackney', address: { line1: '210 Mare St', city: 'London', postalCode: 'E8 3RD', country: 'GB' }, country: 'GB', timeZone: 'Europe/London', currency: 'GBP', locale: 'en-GB', phone: '+44 20 7946 0210', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nl_hackney', hours: { summary: 'Daily 6:30am–9pm' } },
-    { organizationId: orgId, regionId: eu!.id, name: 'Dublin Portobello', code: 'DUB-PB', slug: 'dublin-portobello', address: { line1: '14 South Richmond St', city: 'Dublin', postalCode: 'D02 YX80', country: 'IE' }, country: 'IE', timeZone: 'Europe/Dublin', currency: 'EUR', locale: 'en-GB', status: 'opening_soon', publiclyVisible: false },
+    { organizationId: orgId, regionId: eu!.id, ownerGroupId: thames!.id, name: 'Dublin Portobello', code: 'DUB-PB', slug: 'dublin-portobello', address: { line1: '14 South Richmond St', city: 'Dublin', postalCode: 'D02 YX80', country: 'IE' }, country: 'IE', timeZone: 'Europe/Dublin', currency: 'EUR', locale: 'en-GB', status: 'opening_soon', publiclyVisible: false },
   ]).returning();
   const L = Object.fromEntries(locs.map((l) => [l.code, l])) as Record<string, (typeof locs)[number]>;
   await db.insert(t.subscriptions).values({ organizationId: orgId, plan: 'network', status: 'active', billedLocationCount: 5, currency: 'CAD', pricePerLocationMinor: 11900 });
@@ -59,6 +59,7 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     brand: await u('theo.laurent', 'Théo Laurent'),
     digital: await u('priyanka.shah', 'Priyanka Shah'),
     ops: await u('grace.kim', 'Grace Kim'),
+    legal: await u('amara.nwosu', 'Amara Nwosu'),
     foPacific: await u('liam.oconnor', 'Liam O’Connor'),
     foRose: await u('ava.thompson', 'Ava Thompson'),
     foThames: await u('oliver.grant', 'Oliver Grant', 'en-GB'),
@@ -78,6 +79,7 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     org_(team.brand.id, 'brand_lead'),
     org_(team.digital.id, 'digital_marketer'),
     org_(team.ops.id, 'operations_manager'),
+    org_(team.legal.id, 'legal'),
     { organizationId: orgId, userId: team.foPacific.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: pacific!.id },
     { organizationId: orgId, userId: team.foRose.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: rose!.id },
     { organizationId: orgId, userId: team.foThames.id, role: 'franchise_owner', scopeKind: 'owner_group', scopeId: thames!.id },
@@ -167,6 +169,13 @@ export async function seedNorthlight({ db, today, sitesBaseUrl, upsertUser }: No
     { organizationId: orgId, locationId: L['TOR-AX']!.id, userId: team.staffAnnex.id, startsAt: zonedToUtc(addDays(today, 1), '06:00', 'America/Toronto'), endsAt: zonedToUtc(addDays(today, 1), '12:00', 'America/Toronto'), role: 'Front desk', createdBy: team.ops.id },
   ]);
 
+  // ── Franchise development: Daniel (VP Franchise) owns the pipeline; Thames Hot Yoga is opening Dublin Portobello ──
+  const { seedFranchise } = await import('./seed-franchise.ts');
+  const franchise = await seedFranchise({
+    db, orgId, demo: team.ceo, lead: team.vpFranchise, brand: 'Northlight', collectLocationCode: 'TOR-AX',
+    onboarding: { ownerGroupId: thames!.id, locationId: L['DUB-PB']!.id, prospect: { name: team.foThames.name, email: team.foThames.email, country: 'IE', city: 'Dublin', currency: 'EUR' } },
+  });
+
   const logins = Object.values(team).map((x) => x.email);
-  return { orgId, logins };
+  return { orgId, logins, franchise };
 }

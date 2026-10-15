@@ -220,6 +220,10 @@ async function main() {
   console.log('Studios:', await (await import('./seed-studios.ts')).seedStudios({ db, today, swId, demo, maya }));
   await (await import('./seed-commerce.ts')).seedCommerce({ db, orgId: ops.orgs.fieldnote, demo, upsertUser });
   const foods = await seedFoods({ db, today, meId, demo, carlos, upsertUser });
+  // Franchise development (Stillwater): Lucia Reyes is VP Franchise.
+  const lucia = await upsertUser('lucia.reyes@demo.branchharbor.com', 'Lucia Reyes');
+  await db.insert(t.roleAssignments).values({ organizationId: swId, userId: lucia.id, role: 'vp_franchise', scopeKind: 'organization', scopeId: swId });
+  const franchise = await (await import('./seed-franchise.ts')).seedFranchise({ db, orgId: swId, demo, lead: lucia, brand: 'Stillwater', collectLocationCode: 'TOR-QW' });
 
   console.log('\nBranchHarbor demo data seeded (sample data only).');
   console.log('─────────────────────────────────────────────────');
@@ -236,6 +240,7 @@ async function main() {
   console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Real Estate:   Keystone Realty Network (${realty.orgId}) — Toronto/Vancouver CAD, London GBP, Madrid EUR, Dubai AED, Sydney AUD; ${realty.listings} listings · ${realty.users.join(', ')}`);
+  console.log(` Franchise:     Stillwater pipeline (${franchise.prospects} prospects; ${franchise.blocked.waitingPeriod} waiting period, ${franchise.blocked.registration} registration pending, ${franchise.readyToSign} ready to sign, ${franchise.onboarding} onboarding) · ${franchise.lead} (VP Franchise)`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
   await seedIndependent({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });
   const northlight = await seedNorthlight({ db, today, upsertUser, sitesBaseUrl: cfg.SITES_BASE_URL });

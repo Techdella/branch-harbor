@@ -18,6 +18,7 @@ const KIND_UI: Record<ApprovalKind, { icon: IconName; bg: string }> = {
   shift_swap: { icon: 'repeat', bg: 'bg-aqua' },
   field: { icon: 'globe', bg: 'bg-butter' },
   page: { icon: 'globe', bg: 'bg-butter' },
+  location_go_live: { icon: 'flag', bg: 'bg-lime' },
 };
 
 /**
@@ -38,7 +39,7 @@ export function ApprovalsScreen() {
       <div className="flex flex-wrap items-center gap-2">
         <Tabs items={[{ key: 'pending', label: t('tab.pending') }, { key: 'done', label: t('tab.done') }]} value={tab} onChange={setTab} />
         <div role="group" aria-label={t('filter')} className="flex flex-wrap gap-1.5">
-          {(['all', 'refund', 'ad_spend', 'shift_swap', 'field'] as const).map((k) => (
+          {(['all', 'refund', 'ad_spend', 'shift_swap', 'field', 'location_go_live'] as const).map((k) => (
             <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)} className={cx('h-9 rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold', kind === k ? 'border-ink bg-ink text-white' : 'border-line-soft bg-surface hover:border-ink')}>
               {t(`kind.${k}`)}
             </button>
@@ -79,6 +80,7 @@ function ApprovalCard({ a, onDecided }: { a: ApprovalRequest; onDecided: (a: App
     ? t('consequence.reject')
     : a.kind === 'refund' ? t('consequence.refund', { amount, location: a.locationName })
     : a.kind === 'ad_spend' ? t('consequence.ad_spend', { amount, location: a.locationName })
+    : a.kind === 'location_go_live' ? t('consequence.location_go_live', { location: a.locationName })
     : a.kind === 'shift_swap' ? t('consequence.shift_swap', { from: a.details.find((d) => (d.key ?? d.label) === 'from' || d.label === 'From')?.value ?? '', to: a.details.find((d) => (d.key ?? d.label) === 'to' || d.label === 'To')?.value ?? '' })
     : t('consequence.website', { location: a.locationName });
   const needsComment = deciding === 'reject' && (a.kind === 'field' || a.kind === 'page');

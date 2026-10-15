@@ -50,7 +50,8 @@ describe.skipIf(!hasDb)('access model (DB)', () => {
     expect(r.status).toBe(200);
     expect(r.body.workspaces.map((w: any) => w.key)).toEqual(['network', 'operations', 'sales', 'marketing', 'finance', 'legal', 'training', 'community']);
     expect(r.body.modules.find((m: any) => m.key === 'operations.classes')).toMatchObject({ area: 'operations', status: 'available' });
-    expect(r.body.modules.find((m: any) => m.key === 'sales.franchise_pipeline')).toMatchObject({ status: 'planned', hqOnly: true });
+    expect(r.body.modules.find((m: any) => m.key === 'sales.franchise_pipeline')).toMatchObject({ status: 'available', hqOnly: true });
+    expect(r.body.modules.find((m: any) => m.key === 'finance.royalties')).toMatchObject({ status: 'planned', hqOnly: true });
     expect(r.body.templates.map((t: any) => t.key)).toEqual(expect.arrayContaining(['org_owner', 'vp_franchise', 'cmo', 'digital_marketer', 'franchise_owner', 'location_manager', 'staff']));
     const hosp = await call(app, 'GET', '/v1/access/catalogue?industry=hospitality');
     expect(hosp.body.modules.some((m: any) => m.key === 'operations.reservations')).toBe(true);

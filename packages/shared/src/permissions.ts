@@ -40,6 +40,11 @@ export const PERMISSIONS = [
   'operations.read', 'operations.write',
   'payments.read', 'payments.refund',
   'reports.read', 'connections.manage', 'ai.use', 'audit.read',
+  // Franchise development (Sales → Franchise pipeline), new locations (Network → New locations) and Legal & compliance.
+  'franchise.pipeline.view', 'franchise.pipeline.edit',
+  'onboarding.view', 'onboarding.edit',
+  'legal.view', 'legal.edit',
+  'disclosure.view', 'disclosure.edit', 'disclosure.approve',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 

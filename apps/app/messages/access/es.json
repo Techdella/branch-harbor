@@ -109,6 +109,10 @@
         "templates": {
           "name": "Plantillas de marca y políticas",
           "description": "Plantillas de sitio, campos de marca bloqueados y políticas definidas por la sede."
+        },
+        "onboarding": {
+          "name": "Nuevas ubicaciones",
+          "description": "Listas de incorporación, comprobaciones previas a la apertura y solicitudes de apertura de nuevas ubicaciones. Los franquiciados ven los proyectos de sus propias ubicaciones y su propio contrato de franquicia."
         }
       },
       "operations": {
@@ -205,6 +209,10 @@
         "customers": {
           "name": "Clientes",
           "description": "Fichas de clientes con datos de contacto e historial (datos personales)."
+        },
+        "franchise_pipeline": {
+          "name": "Embudo de franquicias",
+          "description": "Solicitudes de franquicia, calificación, pasos de divulgación y contrato, territorios y acuerdos de nuevas ubicaciones."
         }
       },
       "marketing": {
@@ -247,6 +255,16 @@
         "ai": {
           "name": "Asistente de IA",
           "description": "Preguntar a BranchHarbor AI sobre los datos que esta persona ya puede ver. Solo redacta y propone."
+        }
+      },
+      "legal": {
+        "agreements": {
+          "name": "Contratos de franquicia",
+          "description": "El registro de contratos, los contratos firmados, el archivo de documentos legales, las renovaciones y los vencimientos."
+        },
+        "disclosure": {
+          "name": "Divulgación y normas por jurisdicción",
+          "description": "Documentos de divulgación, registros y normas por jurisdicción (plazos de espera y de desistimiento). Aprobar = registrar la revisión de una norma por el abogado."
         }
       }
     },

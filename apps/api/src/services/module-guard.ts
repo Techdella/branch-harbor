@@ -28,6 +28,10 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   sites: ['marketing.website_builder'],
   campaigns: ['marketing.campaigns', 'marketing.*'],
   'ad-spend-requests': ['marketing.campaigns', 'marketing.ads'],
+  // Franchise development (Sales), new locations (Network) and Legal. Franchise owners reach their own onboarding
+  // projects and agreement through New locations; each route checks the module it needs.
+  franchise: ['sales.franchise_pipeline', 'legal.*', 'network.onboarding'],
+  legal: ['legal.*', 'network.onboarding'],
   // Finance
   payments: ['finance.payments'],
   'refund-requests': ['finance.payments'],

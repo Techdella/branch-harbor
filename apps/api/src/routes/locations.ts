@@ -1,6 +1,6 @@
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
-import { createLocationSchema, currency, locale, timeZone, isValidTimeZone, locationStatuses, addressSchema } from '@bh/shared';
+import { createLocationSchema, currency, locale, timeZone, isValidTimeZone, locationStatuses, addressSchema, isBrandReservedPath } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { Exec } from '../db/client.ts';
 import { locations, organizations, ownerGroups, regions } from '../db/schema/index.ts';
@@ -16,11 +16,12 @@ import { AppError } from '../lib/errors.ts';
 import { requireMember } from '../services/authz.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
-async function uniqueSlug(db: Exec, orgId: string, name: string) {
+export async function uniqueSlug(db: Exec, orgId: string, name: string) {
   const base = slugify(name);
   const existing = await db.select({ slug: locations.slug }).from(locations).where(eq(locations.organizationId, orgId));
   const taken = new Set(existing.map((e) => e.slug));
-  if (!taken.has(base)) return base;
+  // Brand-level site paths (/{brand}/franchise, …) are never location slugs.
+  if (!taken.has(base) && !isBrandReservedPath(base)) return base;
   for (let i = 2; ; i++) if (!taken.has(`${base}-${i}`)) return `${base}-${i}`;
 }
 

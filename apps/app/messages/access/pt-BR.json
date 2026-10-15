@@ -109,6 +109,10 @@
         "templates": {
           "name": "Modelos de marca e políticas",
           "description": "Modelos de site, campos de marca bloqueados e políticas definidas pela sede."
+        },
+        "onboarding": {
+          "name": "Novas unidades",
+          "description": "Checklists de implantação, verificações pré-abertura e pedidos de inauguração de novas unidades. Franqueados veem os projetos das próprias unidades e o próprio contrato de franquia."
         }
       },
       "operations": {
@@ -205,6 +209,10 @@
         "customers": {
           "name": "Clientes",
           "description": "Cadastros de clientes com contato e histórico (dados pessoais)."
+        },
+        "franchise_pipeline": {
+          "name": "Funil de franquias",
+          "description": "Interessados em franquias, qualificação, etapas de divulgação e contrato, territórios e negócios de novas unidades."
         }
       },
       "marketing": {
@@ -247,6 +255,16 @@
         "ai": {
           "name": "Assistente de IA",
           "description": "Perguntar à BranchHarbor AI sobre os dados que esta pessoa já pode ver. Ela apenas rascunha e propõe."
+        }
+      },
+      "legal": {
+        "agreements": {
+          "name": "Contratos de franquia",
+          "description": "O registro de contratos, contratos assinados, o cofre de documentos jurídicos, renovações e vencimentos."
+        },
+        "disclosure": {
+          "name": "Divulgação e regras por jurisdição",
+          "description": "Documentos de divulgação (COF), registros e regras por jurisdição (prazos de espera e de arrependimento). Aprovar = registrar a revisão de uma regra pelo advogado."
         }
       }
     },

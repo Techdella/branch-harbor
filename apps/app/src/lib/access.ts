@@ -20,6 +20,8 @@ export interface NavLink {
   module: string;
   /** Industry screen key (`/ops/<screen>`). */
   screen?: string;
+  /** Full message key for the label, for screens whose words live in their own catalogue (e.g. `franchise.nav.pipeline`). */
+  msg?: string;
 }
 
 /** Screens for the core modules. Modules not listed here (brand templates, audit log, AI) have no page of their own. */
@@ -27,11 +29,21 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'network.locations': [{ key: 'locations', href: '/locations', icon: 'pin' }],
   'network.approvals': [{ key: 'approvals', href: '/approvals', icon: 'shield' }],
   'network.reports': [{ key: 'reports', href: '/reports', icon: 'chart' }],
+  'network.onboarding': [{ key: 'onboarding', href: '/franchise/onboarding', icon: 'building', msg: 'franchise.nav.onboarding' }],
   'operations.schedule': [{ key: 'schedule', href: '/schedule', icon: 'clock' }],
   'sales.customers': [{ key: 'customers', href: '/customers', icon: 'users' }],
+  'sales.franchise_pipeline': [
+    { key: 'pipeline', href: '/franchise/pipeline', icon: 'flag', msg: 'franchise.nav.pipeline' },
+    { key: 'territories', href: '/franchise/territories', icon: 'map', msg: 'franchise.nav.territories' },
+  ],
   'marketing.website_builder': [{ key: 'websites', href: '/websites', icon: 'globe' }],
   'marketing.campaigns': [{ key: 'marketing', href: '/marketing', icon: 'megaphone' }],
   'finance.payments': [{ key: 'payments', href: '/payments', icon: 'card' }],
+  'legal.agreements': [{ key: 'agreements', href: '/franchise/agreements', icon: 'scale', msg: 'franchise.nav.agreements' }],
+  'legal.disclosure': [
+    { key: 'agreements', href: '/franchise/agreements', icon: 'scale', msg: 'franchise.nav.agreements' },
+    { key: 'rules', href: '/franchise/rules', icon: 'shield', msg: 'franchise.nav.rules' },
+  ],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],
@@ -70,13 +82,25 @@ export function visibleWorkspaces(caps: ReadonlySet<string>, industry: IndustryK
 /** Everything the person holds, flattened (independent businesses: one simple navigation, no workspace switcher). */
 export function flatNav(caps: ReadonlySet<string>, industry: IndustryKey): NavLink[] {
   const out: NavLink[] = [];
-  for (const w of [...WORKSPACES, 'settings'] as const) for (const l of workspaceNav(w, caps, industry)) if (!out.some((o) => o.href === l.href)) out.push(l);
+  const networkOnly = new Set(modulesFor(industry).filter((m) => m.networkOnly).map((m) => m.key));
+  for (const w of [...WORKSPACES, 'settings'] as const) for (const l of workspaceNav(w, caps, industry)) if (!networkOnly.has(l.module) && !out.some((o) => o.href === l.href)) out.push(l);
   return out;
 }
 
 export function settingsNav(caps: ReadonlySet<string>, industry: IndustryKey): NavLink[] {
   return settingsModulesFor(caps, industry).length ? workspaceNav('settings', caps, industry) : [];
 }
+
+/**
+ * Routes reachable without a navigation entry of their own, or by more modules than the one whose navigation lists
+ * them (the API applies the same rules): a prospect's page, a franchise owner's own agreement, the rules browser for
+ * the franchise pipeline.
+ */
+const EXTRA_ROUTE_MODULES: Record<string, readonly string[]> = {
+  '/franchise/prospect': ['sales.franchise_pipeline'],
+  '/franchise/agreements': ['sales.franchise_pipeline', 'network.onboarding'],
+  '/franchise/rules': ['sales.franchise_pipeline'],
+};
 
 /**
  * Modules that make a route available (any of them). `null` = not tied to a module (always available to members).
@@ -91,8 +115,16 @@ export function routeModules(pathname: string, industry: IndustryKey): string[] 
     return m ? [m.key] : [];
   }
   if (first === 'community') return [];
-  const matches = Object.entries(MODULE_LINKS).filter(([, links]) => links.some((l) => l.href === `/${first}`)).map(([k]) => k);
-  return matches.length ? matches : null;
+  // Two-segment screens (/franchise/pipeline) first, then one-segment ones (/customers).
+  for (const href of seg.length > 1 ? [`/${first}/${seg[1]}`, `/${first}`] : [`/${first}`]) {
+    const matches = [
+      ...Object.entries(MODULE_LINKS).filter(([, links]) => links.some((l) => l.href === href)).map(([k]) => k),
+      ...(EXTRA_ROUTE_MODULES[href] ?? []),
+    ];
+    if (matches.length) return [...new Set(matches)];
+  }
+  // Every franchise / legal screen is tied to a module: an unknown one is never available.
+  return first === 'franchise' ? [] : null;
 }
 
 export function canSeeRoute(pathname: string, caps: ReadonlySet<string>, industry: IndustryKey): boolean {

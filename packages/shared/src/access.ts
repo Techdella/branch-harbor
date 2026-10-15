@@ -74,6 +74,8 @@ export interface ModuleDef {
   status: 'available' | 'planned';
   /** HQ-private: only effective on organisation-wide assignments (never for franchisees or location roles). */
   hqOnly?: boolean;
+  /** Franchise / multi-location only: independent businesses never see it. */
+  networkOnly?: boolean;
   /** Sensitive data the module exposes; the API filters these fields by capability. */
   sensitive?: 'finance' | 'legal' | 'personal_data';
   /** Operations modules: the industry screens (dashboard route keys) the module covers. */
@@ -90,7 +92,8 @@ const ALL = ['view', 'edit', 'publish', 'export'] as const;
 export const CORE_MODULES: readonly ModuleDef[] = [
   // Network (HQ)
   { key: 'network.locations', area: 'network', name: 'Locations', description: 'The location directory: addresses, opening hours, status and local details.', actions: VE, status: 'available' },
-  { key: 'network.franchisees', area: 'network', name: 'Franchisees & owner groups', description: 'Franchise owners, their companies and which locations they run.', actions: VE, status: 'planned', hqOnly: true },
+  { key: 'network.onboarding', area: 'network', name: 'New locations', description: 'Onboarding checklists, pre-opening checks and go-live requests for new locations. Franchise owners see the projects of their own locations and their own franchise agreement.', actions: VE, actionNotes: { edit: 'Complete checklist tasks and ask HQ to approve the opening.' }, networkOnly: true, status: 'available' },
+  { key: 'network.franchisees', area: 'network', name: 'Franchisees & owner groups', description: 'Franchise owners, their companies and which locations they run.', actions: VE, networkOnly: true, status: 'planned', hqOnly: true },
   { key: 'network.approvals', area: 'network', name: 'Approvals', description: 'Requests waiting for a decision: refunds over the limit, local ad spend, shift swaps and website changes.', actions: ['view', 'publish'], actionNotes: { publish: 'Approve or reject website changes from locations.' }, status: 'available' },
   { key: 'network.reports', area: 'network', name: 'Reports', description: 'Performance reports for the locations in scope. Revenue figures also need Payments.', actions: ['view', 'export'], status: 'available' },
   { key: 'network.templates', area: 'network', name: 'Brand templates & policies', description: 'Website templates, locked brand fields and business policies set by HQ.', actions: VEP, status: 'available' },
@@ -99,7 +102,7 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   // Sales
   { key: 'sales.customers', area: 'sales', name: 'Customers', description: 'Customer records with contact details and history (personal data).', actions: VEX, status: 'available', sensitive: 'personal_data' },
   { key: 'sales.customer_pipeline', area: 'sales', name: 'Leads & enquiries', description: 'New enquiries and trial customers to follow up.', actions: ALL, status: 'planned', sensitive: 'personal_data' },
-  { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification and new-location deals.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'personal_data' },
+  { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'personal_data' },
   { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and courses.', actions: VEX, status: 'planned', sensitive: 'personal_data' },
   // Marketing
   { key: 'marketing.website_builder', area: 'marketing', name: 'Websites', description: 'Location websites: pages, approvals, publishing and domains.', actions: VEP, status: 'available' },
@@ -115,8 +118,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'finance.royalties', area: 'finance', name: 'Royalties', description: 'Royalty and marketing-fund invoices to franchisees.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'finance' },
   { key: 'finance.payouts', area: 'finance', name: 'Payouts', description: 'Payouts and settlements across the network.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'finance' },
   // Legal & compliance
-  { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'Agreements, signatures, renewals and expiries.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'legal' },
-  { key: 'legal.disclosure', area: 'legal', name: 'Disclosure', description: 'Disclosure documents, receipts and waiting periods per jurisdiction.', actions: ALL, status: 'planned', hqOnly: true, sensitive: 'legal' },
+  { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'The agreements register, executed agreements, the legal document vault, renewals and expiries.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal' },
+  { key: 'legal.disclosure', area: 'legal', name: 'Disclosure & jurisdiction rules', description: 'Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction.', actions: ALL, actionNotes: { publish: 'Record franchise counsel’s review of a jurisdiction rule.' }, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal' },
   // Training
   { key: 'training.academy', area: 'training', name: 'Academy', description: 'Courses, lessons and certifications for staff and franchisees.', actions: ALL, status: 'planned' },
   // Community
@@ -279,6 +282,15 @@ export const PERMISSION_CAPABILITIES: Record<Permission, readonly string[]> = {
   'connections.manage': ['settings.connections:edit'],
   'ai.use': ['settings.ai:view'],
   'audit.read': ['settings.audit:view'],
+  'franchise.pipeline.view': ['sales.franchise_pipeline:view'],
+  'franchise.pipeline.edit': ['sales.franchise_pipeline:edit'],
+  'onboarding.view': ['network.onboarding:view'],
+  'onboarding.edit': ['network.onboarding:edit'],
+  'legal.view': ['legal.agreements:view'],
+  'legal.edit': ['legal.agreements:edit'],
+  'disclosure.view': ['legal.disclosure:view'],
+  'disclosure.edit': ['legal.disclosure:edit'],
+  'disclosure.approve': ['legal.disclosure:publish'],
 };
 
 function holds(caps: ReadonlySet<string>, pattern: string): boolean {
@@ -326,7 +338,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'hq_admin', name: 'HQ admin', description: 'Runs the network: locations, brand templates, websites, marketing, approvals, reports, team and connections. No customer records or payments.',
     primaryWorkspace: 'network', defaultScope: 'organization', networkOnly: true,
     grants: {
-      'network.locations': VE, 'network.franchisees': VE, 'network.templates': VEP, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'],
+      'network.locations': VE, 'network.franchisees': VE, 'network.onboarding': VE, 'network.templates': VEP, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'],
       'marketing.*': ALL, 'operations.*': V, 'settings.team': VE, 'settings.connections': VE, 'settings.audit': V, 'settings.ai': V, 'training.*': ALL, 'community.*': ALL,
     },
   },
@@ -335,7 +347,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     primaryWorkspace: 'sales', defaultScope: 'organization', networkOnly: true,
     grants: {
       'sales.franchise_pipeline': ALL, 'legal.disclosure': VE, 'legal.agreements': VE, 'training.*': ALL, 'network.locations': VE, 'network.franchisees': VE,
-      'network.reports': V, 'sales.course_leads': V, 'community.*': V, 'settings.ai': V,
+      'network.onboarding': VE, 'network.reports': V, 'sales.course_leads': V, 'community.*': V, 'settings.ai': V,
     },
   },
   cmo: {
@@ -389,7 +401,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'regional_manager', name: 'Regional manager', description: 'Oversight of the locations in a region: operations, reports, website approvals and campaign drafts.',
     primaryWorkspace: 'network', defaultScope: 'region', networkOnly: true,
     grants: {
-      'network.locations': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V,
+      'network.locations': V, 'network.onboarding': V, 'network.approvals': ['view', 'publish'], 'network.reports': ['view', 'export'], 'marketing.campaigns': VE, 'marketing.website_builder': V,
       'operations.*': V, ...everyone, 'settings.ai': V,
     },
   },
@@ -397,7 +409,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     key: 'franchise_owner', name: 'Franchise owner', description: 'The full dashboard for their own locations: operations, marketing, customers, payments and their team. Nothing from other franchisees or HQ-private areas.',
     primaryWorkspace: 'operations', defaultScope: 'owner_group', networkOnly: true,
     grants: {
-      'network.locations': V, 'network.approvals': V, 'network.reports': ['view', 'export'],
+      'network.locations': V, 'network.onboarding': VE, 'network.approvals': V, 'network.reports': ['view', 'export'],
       'marketing.website_builder': VEP, 'marketing.campaigns': VEP, 'marketing.email': VEP, 'marketing.automations': VEP, 'marketing.social': VEP, 'marketing.ads': ALL, 'marketing.brand_assets': V,
       'sales.customers': VEX, 'sales.customer_pipeline': ALL, 'operations.*': VE, 'finance.payments': VEX,
       'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone,

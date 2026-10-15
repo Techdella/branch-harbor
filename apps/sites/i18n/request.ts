@@ -2,6 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import en from '../messages/en.json';
 import foodsEn from '../messages/foods/en.json';
 import paymentsEn from '../messages/payments/en.json';
+import franchiseEn from '../messages/franchise/en.json';
 import { resolveSiteLocale } from '../lib/site';
 
 type Messages = Record<string, unknown>;
@@ -26,6 +27,18 @@ const loaders: Record<string, () => Promise<{ default: Messages }>> = {
   ar: () => trio(import('../messages/ar.json'), import('../messages/foods/ar.json'), import('../messages/payments/ar.json')),
 };
 
+/** "Own a franchise" module, disclosure receipt and agreement signing (messages/franchise/*.json, namespace franchiseSite). */
+const franchiseLoaders: Record<string, () => Promise<{ default: unknown }>> = {
+  'en-GB': () => import('../messages/franchise/en-GB.json'),
+  fr: () => import('../messages/franchise/fr.json'),
+  es: () => import('../messages/franchise/es.json'),
+  de: () => import('../messages/franchise/de.json'),
+  'pt-BR': () => import('../messages/franchise/pt-BR.json'),
+  nl: () => import('../messages/franchise/nl.json'),
+  it: () => import('../messages/franchise/it.json'),
+  ar: () => import('../messages/franchise/ar.json'),
+};
+
 const isObject = (v: unknown): v is Messages => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function mergeMessages(base: Messages, override: Messages): Messages {
@@ -39,7 +52,10 @@ export function mergeMessages(base: Messages, override: Messages): Messages {
 
 export async function messagesFor(locale: string): Promise<Messages> {
   const load = loaders[locale] ?? loaders[locale.split('-')[0]!];
-  return mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), load ? (await load()).default : {});
+  const franchise = franchiseLoaders[locale] ?? franchiseLoaders[locale.split('-')[0]!];
+  const base = mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), franchiseEn as Messages);
+  const local = load ? (await load()).default : {};
+  return mergeMessages(base, franchise ? mergeMessages(local, (await franchise()).default as Messages) : local);
 }
 
 export default getRequestConfig(async () => {

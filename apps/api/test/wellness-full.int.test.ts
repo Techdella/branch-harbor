@@ -12,6 +12,21 @@ const allDay = [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({ weekday, start: '00:00'
 const nineToFive = [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({ weekday, start: '09:00', end: '17:00' }));
 const dayN = (n: number) => addDays(new Date().toISOString().slice(0, 10), n);
 const at = (day: string, hhmm: string, tz = TZ) => zonedToUtc(day, hhmm, tz).toISOString();
+/** Minutes since midnight in the location's time zone. */
+const localMinutes = (d: Date) => {
+  const p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d);
+  return Number(p.find((x) => x.type === 'hour')!.value) * 60 + Number(p.find((x) => x.type === 'minute')!.value);
+};
+/**
+ * The first half-hour start at least 30 minutes from now whose local time (location TZ) is between 09:00 and
+ * `latest`, so near-term bookings stay inside working hours whatever time of day the suite runs (always < 24 h away).
+ */
+const workingSlot = (latest: string) => {
+  const [h, m] = latest.split(':').map(Number) as [number, number];
+  let d = new Date(Math.ceil((Date.now() + 30 * 60_000) / 1800_000) * 1800_000);
+  while (localMinutes(d) < 9 * 60 || localMinutes(d) > h * 60 + m) d = new Date(d.getTime() + 1800_000);
+  return d;
+};
 const SECRET_INTAKE = 'ZEBRA-INTAKE-SECRET-4471';
 const SECRET_NOTE = 'CONFIDENTIAL-NOTE-SECRET-9921';
 
@@ -322,8 +337,10 @@ describe.skipIf(!hasDb)('wellness full product (DB)', () => {
     const c = await call(app, 'POST', `/v1/public/wellness/appointments/${r.body.appointment.id}/cancel`, { body: { manageToken: r.body.manageToken } });
     expect(c.body.payment).toMatchObject({ action: 'refunded', amount: 4000 });
     // Late: 50% of 200.00 = 100.00; 40.00 deposit retained, 60.00 outstanding, nothing refunded.
-    const soon = new Date(Date.now() + 5 * 3600_000); soon.setUTCMinutes(0, 0, 0);
+    // Inside the late window (< 24 h) and working hours; the second booking 2 h later ends by 17:00.
+    const soon = workingSlot('14:00');
     const l = await book(deposit, soon.toISOString());
+    expect(l.status, JSON.stringify(l.body)).toBe(201);
     await call(app, 'POST', `/v1/public/payments/${l.body.payment.id}/sandbox-confirm`, { body: { outcome: 'succeeded' } });
     const noAccept = await call(app, 'POST', `/v1/public/wellness/appointments/${l.body.appointment.id}/cancel`, { body: { manageToken: l.body.manageToken } });
     expect(noAccept.status).toBe(409);
@@ -415,11 +432,12 @@ describe.skipIf(!hasDb)('wellness full product (DB)', () => {
   });
 
   it('reminders and rebooking prompts respect consent and never double-send', async () => {
-    const soon = new Date(Date.now() + 14 * 3600_000); soon.setUTCMinutes(30, 0, 0);
+    // Three appointments inside the 24-hour reminder window and inside working hours (the last ends by 17:00).
+    const soon = workingSlot('13:00');
     const optIn = await book(massage, soon.toISOString(), { contact: { ...contact('Opted In'), phone: '+14165550100' }, consents: { smsReminders: true } });
-    const noSms = await book(massage, new Date(soon.getTime() + 2 * 3600_000).toISOString(), { contact: { ...contact('No SMS'), phone: '+14165550101' } });
-    const optedOut = await book(massage, new Date(soon.getTime() + 4 * 3600_000).toISOString(), { contact: { ...contact('Opted Out'), phone: '+14165550102' }, consents: { emailReminders: false } });
-    expect([optIn.status, noSms.status, optedOut.status]).toEqual([201, 201, 201]);
+    const noSms = await book(massage, new Date(soon.getTime() + 1.5 * 3600_000).toISOString(), { contact: { ...contact('No SMS'), phone: '+14165550101' } });
+    const optedOut = await book(massage, new Date(soon.getTime() + 3 * 3600_000).toISOString(), { contact: { ...contact('Opted Out'), phone: '+14165550102' }, consents: { emailReminders: false } });
+    expect([optIn.status, noSms.status, optedOut.status], JSON.stringify([optIn.body, soon, new Date()])).toEqual([201, 201, 201]);
     await call(app, 'POST', `/v1/orgs/${orgId}/wellness/reminders/run`, { token });
     const log = async (id: string) => (await app.ctx.db.select().from(wellnessMessageLog).where(and(eq(wellnessMessageLog.appointmentId, id), eq(wellnessMessageLog.kind, 'reminder')))).map((r) => `${r.channel}:${r.status}`).sort();
     expect(await log(optIn.body.appointment.id)).toEqual(['email:logged', 'sms:logged']);

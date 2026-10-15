@@ -3,6 +3,7 @@
  * so the API URL is only needed on the server. NEXT_PUBLIC_API_URL is inlined at build time; API_URL, when set,
  * overrides it at runtime (useful when one build is deployed to several environments).
  */
+import { BRAND_RESERVED_PATHS } from '@bh/shared/site-paths';
 export const API_URL = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
 export const SITES_BASE_URL = (process.env.SITES_BASE_URL ?? 'http://localhost:3002').replace(/\/$/, '');
 
@@ -13,5 +14,5 @@ export function includedHosts(): string[] {
   return [...new Set([base, 'localhost', ...extra])];
 }
 
-/** First path segments that are not location slugs under /{brand}/… */
-export const BRAND_RESERVED = new Set(['pages', 'sitemap.xml', 'robots.txt', 'properties', 'saved-search']);
+/** First path segments that are not location slugs under /{brand}/… (shared with the API, which keeps location slugs off them). */
+export const BRAND_RESERVED: ReadonlySet<string> = new Set(BRAND_RESERVED_PATHS);
