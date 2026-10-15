@@ -62,7 +62,7 @@ function Search({ onDone }: { onDone?: () => void }) {
     return () => clearTimeout(h);
   }, [q, app.ctx]);
   return (
-    <div className="relative min-w-0 flex-1 md:max-w-[380px]" onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}>
+    <div className="relative min-w-0 flex-1 md:min-w-[240px] md:max-w-[380px]" onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}>
       <label className="flex h-11 items-center gap-2 rounded-full bg-canvas px-4">
         <Icon name="search" size={16} />
         <span className="sr-only">{t('search')}</span>
