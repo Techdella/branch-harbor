@@ -31,6 +31,7 @@ import {
 import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { renderPdf, type PdfLine, type PdfText } from '../lib/pdf.ts';
+import type { EmailAttachment } from '../integrations/mailer.ts';
 import { addDays, localDateParts } from '../lib/tz.ts';
 import { audit } from './audit.ts';
 import { capabilityLocations, hasCapability, requireMember } from './authz.ts';
@@ -235,7 +236,7 @@ export async function createPo(db: Exec, organizationId: string, input: PoCreate
   });
 }
 
-const email = (s: Services, to: string, subject: string, text: string, tag: string) => s.jobs.enqueue('email.send', { to, subject, text, tag });
+const email = (s: Services, to: string, subject: string, text: string, tag: string, attachments?: EmailAttachment[]) => s.jobs.enqueue('email.send', { to, subject, text, tag, ...(attachments?.length ? { attachments } : {}) });
 
 /** Submits a draft: above the threshold it waits for HQ approval, otherwise it is sent to the supplier. */
 export async function submitPo(s: Services, po: PurchaseOrder, by: string) {
@@ -306,9 +307,16 @@ export async function sendPo(s: Services, po: PurchaseOrder, by: string | null) 
   if (to) {
     const files = sup.orderFormat === 'both' ? `PDF: ${supplierFileUrl(s, token, 'pdf')}\nCSV: ${supplierFileUrl(s, token, 'csv')}` : `${sup.orderFormat.toUpperCase()}: ${supplierFileUrl(s, token, sup.orderFormat as 'pdf' | 'csv')}`;
     const lines = po.lines.map((l) => `- ${l.quantity} × ${l.sku} ${l.name}${l.packLabel ? ` (${l.packLabel})` : ''}`).join('\n');
+    const deliverTo = [loc?.address?.line1, loc?.address?.city, loc?.address?.postalCode, loc?.address?.country].filter(Boolean).join(', ');
+    // The order itself goes with the email: the PDF to read and the CSV to import (the links stay for later).
+    const sent = { ...po, expectedDeliveryDate: expected };
+    const attachments: EmailAttachment[] = [
+      { filename: `${po.number}.pdf`, contentType: 'application/pdf', contentBase64: poPdf(sent, { orgName: org?.name ?? '', supplierName: sup.name, locationName: loc?.name ?? '', address: deliverTo }).toString('base64') },
+      { filename: `${po.number}.csv`, contentType: 'text/csv', contentBase64: Buffer.from(poCsv(sent), 'utf8').toString('base64') },
+    ];
     await email(s, to, `Purchase order ${po.number} from ${org?.name ?? ''} – ${loc?.name ?? ''}`,
-      `Hello ${sup.name},\n\nPlease supply the following for ${loc?.name ?? ''} by ${expected}:\n${lines}\n\nTotal: ${major(po.totalMinor, po.currency)} ${po.currency}\n\nView and confirm the order (no login needed): ${url}\n${files}\n\nDeliver to: ${[loc?.address?.line1, loc?.address?.city, loc?.address?.postalCode, loc?.address?.country].filter(Boolean).join(', ')}`,
-      'supply_po_sent');
+      `Hello ${sup.name},\n\nPlease supply the following for ${loc?.name ?? ''} by ${expected}:\n${lines}\n\nTotal: ${major(po.totalMinor, po.currency)} ${po.currency}\n\nThe order is attached as PDF and CSV.\nView and confirm the order (no login needed): ${url}\n${files}\n\nDeliver to: ${deliverTo}`,
+      'supply_po_sent', attachments);
   }
   await audit(s.db, { organizationId: po.organizationId, actorUserId: by, action: 'supply_po.sent', scopeKind: 'location', scopeId: po.locationId, targetType: 'supply_purchase_order', targetId: po.id, metadata: { to } });
   return { purchaseOrder: u!, confirmUrl: url };
