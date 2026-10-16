@@ -110,7 +110,8 @@ export async function prospectCompliance(db: Exec, p: Prospect, now = new Date()
   const [signed] = await db.select().from(franchiseSignatures).where(and(eq(franchiseSignatures.prospectId, p.id), eq(franchiseSignatures.status, 'signed'))).orderBy(asc(franchiseSignatures.signedAt)).limit(1);
   const [paid] = await db.select().from(franchiseFeeInvoices).where(and(eq(franchiseFeeInvoices.prospectId, p.id), eq(franchiseFeeInvoices.status, 'paid'))).orderBy(asc(franchiseFeeInvoices.paidAt)).limit(1);
   // A master franchisee's prospect: the master is the franchisor in their country (franchise-dev, master_agreements).
-  const [master] = p.masterAgreementId ? await db.select({ country: masterAgreements.homeCountry, region: masterAgreements.homeRegion }).from(masterAgreements).where(eq(masterAgreements.id, p.masterAgreementId)) : [];
+  const [master] = p.masterAgreementId || p.scopeTerritoryId ? await db.select({ country: masterAgreements.homeCountry, region: masterAgreements.homeRegion }).from(masterAgreements)
+    .where(and(eq(masterAgreements.status, 'active'), p.masterAgreementId ? eq(masterAgreements.id, p.masterAgreementId) : eq(masterAgreements.scopeTerritoryId, p.scopeTerritoryId!))).limit(1) : [];
   return evaluateFranchiseCompliance({
     franchisor: master ? { country: master.country, region: master.region } : { country: fs.homeCountry, region: fs.homeRegion },
     prospect: { country: p.country, region: p.region },

@@ -317,6 +317,11 @@ async function main() {
   console.log(` Bank debit:    Thames Hot Yoga on SEPA Direct Debit (EUR); ${reviewsSeed.statements} monthly franchisee statements issued`);
   const quality = await (await import('./seed-quality.ts')).seedQuality({ db, today, upsertUser });
   console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
+  const fdev = await (await import('./seed-fdev.ts')).seedFranchiseDev({ db, today });
+  if (fdev) {
+    console.log(` Franchise dev: ${fdev.territories} territories on the map (sandbox demographics), satisfaction survey with ${fdev.surveyRounds} rounds, validation calls, a transfer, a notice of default, the Washington development schedule, ${fdev.statements} master split statements (Northlight Ireland)`);
+    if (fdev.validationToken) console.log(`                validation scheduling page: ${cfg.SITES_BASE_URL}/northlight-yoga/franchise/validation?token=${fdev.validationToken}`);
+  }
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

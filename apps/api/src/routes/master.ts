@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
@@ -7,6 +7,7 @@ import {
   financeInvoices, franchiseDocuments, franchiseProspects, franchiseRegistrations, franchiseTerritories, locations, masterAgreements, masterSplitStatements, organizations, ownerGroups, royaltyPeriods,
   royaltyStatements, territories, type SplitStatementLine,
 } from '../db/schema/index.ts';
+import type { Db } from '../db/client.ts';
 import { transferToMaster } from '../integrations/master-payouts.ts';
 import { mapConfig } from '../services/franchise-dev/territories.ts';
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
@@ -127,7 +128,8 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
   app.get('/orgs/:orgId/master/agreements/:id/pipeline', { schema: { tags, security: secured, params: idParams, summary: 'The master’s pipeline (prospects in their countries), territories and disclosure documents for their jurisdictions' } }, async (req) => {
     const { orgId, id } = req.params;
     const m = await loadMaster(req, orgId, id, PIPE, 'view');
-    const pros = await db.select().from(franchiseProspects).where(and(eq(franchiseProspects.organizationId, orgId), eq(franchiseProspects.masterAgreementId, id))).orderBy(desc(franchiseProspects.updatedAt));
+    // The master's pipeline: prospects added under the agreement, and (access v2) the pipeline of its access territory.
+    const pros = await db.select().from(franchiseProspects).where(and(eq(franchiseProspects.organizationId, orgId), or(eq(franchiseProspects.masterAgreementId, id), ...(m.scopeTerritoryId ? [eq(franchiseProspects.scopeTerritoryId, m.scopeTerritoryId)] : [])))).orderBy(desc(franchiseProspects.updatedAt));
     const terr = await db.select().from(franchiseTerritories).where(and(eq(franchiseTerritories.organizationId, orgId), inArray(franchiseTerritories.country, m.countries)));
     const docs = await db.select().from(franchiseDocuments).where(and(eq(franchiseDocuments.organizationId, orgId), eq(franchiseDocuments.kind, 'disclosure'), eq(franchiseDocuments.status, 'current')));
     const myDocs = docs.filter((d) => d.jurisdictions.some((j) => m.countries.includes(j.slice(0, 2))));
@@ -159,7 +161,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!m.countries.includes(b.country)) throw validationError('Outside this master’s countries', { country: 'Not covered' });
     const [o] = await db.select().from(organizations).where(eq(organizations.id, orgId));
     const p = await db.transaction(async (tx) => {
-      const [p] = await tx.insert(franchiseProspects).values({ organizationId: orgId, name: b.name, email: b.email.toLowerCase(), phone: b.phone ?? null, country: b.country, region: b.region?.toUpperCase().replace(/^[A-Z]{2}-/, '') ?? null, city: b.city ?? null, territoryId: b.territoryId ?? null, source: b.source, message: b.message ?? null, currency: o!.defaultCurrency, ownerUserId: req.user!.id, masterAgreementId: m.id }).returning();
+      const [p] = await tx.insert(franchiseProspects).values({ organizationId: orgId, name: b.name, email: b.email.toLowerCase(), phone: b.phone ?? null, country: b.country, region: b.region?.toUpperCase().replace(/^[A-Z]{2}-/, '') ?? null, city: b.city ?? null, territoryId: b.territoryId ?? null, source: b.source, message: b.message ?? null, currency: o!.defaultCurrency, ownerUserId: req.user!.id, masterAgreementId: m.id, scopeTerritoryId: m.scopeTerritoryId }).returning();
       await addActivity(tx, p!, 'enquiry', b.message ?? null, req.user!.id, { source: b.source, masterAgreementId: m.id });
       await generateCadenceTasks(tx, p!);
       return p!;
@@ -170,7 +172,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
 
   const masterProspect = async (orgId: string, m: Master, pid: string) => {
     const p = await getProspect(db, orgId, pid);
-    if (p.masterAgreementId !== m.id) throw notFound('Prospect');
+    if (p.masterAgreementId !== m.id && !(m.scopeTerritoryId && p.scopeTerritoryId === m.scopeTerritoryId)) throw notFound('Prospect');
     return p;
   };
 
@@ -224,45 +226,7 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post('/orgs/:orgId/master/statements/generate', { schema: { tags, security: secured, params: orgParams, body: z.object({ periodId: z.uuid(), masterAgreementId: z.uuid().optional() }), summary: 'Build (or refresh draft) split statements for a period from the approved / invoiced royalty statements of units in each master’s countries' } }, async (req) => {
     const { orgId } = req.params;
     if ((await reach(req, orgId, SPLITS, 'edit')) !== 'all') throw forbidden('Only HQ finance prepares split statements');
-    const [period] = await db.select().from(royaltyPeriods).where(and(eq(royaltyPeriods.id, req.body.periodId), eq(royaltyPeriods.organizationId, orgId)));
-    if (!period) throw notFound('Period');
-    const masters = await db.select().from(masterAgreements).where(and(eq(masterAgreements.organizationId, orgId), eq(masterAgreements.status, 'active'), ...(req.body.masterAgreementId ? [eq(masterAgreements.id, req.body.masterAgreementId)] : [])));
-    const locs = await db.select().from(locations).where(eq(locations.organizationId, orgId));
-    const stmts = await db.select({ st: royaltyStatements, inv: financeInvoices }).from(royaltyStatements).leftJoin(financeInvoices, eq(financeInvoices.id, royaltyStatements.invoiceId))
-      .where(and(eq(royaltyStatements.periodId, period.id), inArray(royaltyStatements.status, ['approved', 'invoiced'])));
-    const out: Statement[] = [];
-    const skipped: Array<{ masterAgreementId: string; currency: string; reason: string }> = [];
-    for (const m of masters) {
-      const mine = stmts.filter(({ st }) => { const l = locs.find((x) => x.id === st.locationId); return !!l && inMaster(m, l); });
-      for (const cur of [...new Set(mine.map(({ st }) => st.currency))]) {
-        const rule = ruleFor(m.splits, cur);
-        if (!rule) { skipped.push({ masterAgreementId: m.id, currency: cur, reason: 'no_split_for_currency' }); continue; }
-        const lines: SplitStatementLine[] = mine.filter(({ st }) => st.currency === cur).map(({ st, inv }) => {
-          const share = splitAmounts(st.royaltyMinor, st.marketingFundMinor, rule);
-          // Collected part, prorated when the invoice is part paid (the fund share of a payment follows the invoice).
-          const paidRatio = inv ? (inv.status === 'paid' ? 1 : inv.totalMinor > 0 ? Math.min(1, inv.paidMinor / inv.totalMinor) : 0) : 0;
-          return {
-            locationId: st.locationId, locationName: locs.find((l) => l.id === st.locationId)!.name, royaltyStatementId: st.id, statementStatus: inv?.status === 'paid' ? 'paid' : st.status,
-            royaltyMinor: st.royaltyMinor, marketingFundMinor: st.marketingFundMinor, collectedRoyaltyMinor: Math.round(st.royaltyMinor * paidRatio), collectedFundMinor: Math.round(st.marketingFundMinor * paidRatio),
-            masterRoyaltyMinor: share.masterRoyaltyMinor, masterFundMinor: share.masterFundMinor,
-          };
-        }).sort((a, b) => a.locationName.localeCompare(b.locationName));
-        const royalty = lines.reduce((a, l) => a + l.royaltyMinor, 0);
-        const fund = lines.reduce((a, l) => a + l.marketingFundMinor, 0);
-        const total = splitAmounts(royalty, fund, rule);
-        const collected = splitAmounts(lines.reduce((a, l) => a + l.collectedRoyaltyMinor, 0), lines.reduce((a, l) => a + l.collectedFundMinor, 0), rule);
-        const vals = {
-          royaltyShareBps: rule.royaltyShareBps, fundShareBps: rule.fundShareBps, lines, royaltyMinor: royalty, marketingFundMinor: fund, masterRoyaltyMinor: total.masterRoyaltyMinor, masterFundMinor: total.masterFundMinor,
-          hqRoyaltyMinor: total.hqRoyaltyMinor, hqFundMinor: total.hqFundMinor, payableMinor: collected.masterRoyaltyMinor + collected.masterFundMinor, updatedAt: new Date(),
-        };
-        const [existing] = await db.select().from(masterSplitStatements).where(and(eq(masterSplitStatements.masterAgreementId, m.id), eq(masterSplitStatements.periodId, period.id), eq(masterSplitStatements.currency, cur)));
-        if (existing && existing.status !== 'draft') { skipped.push({ masterAgreementId: m.id, currency: cur, reason: `statement_${existing.status}` }); continue; }
-        const [row] = existing
-          ? await db.update(masterSplitStatements).set(vals).where(eq(masterSplitStatements.id, existing.id)).returning()
-          : await db.insert(masterSplitStatements).values({ organizationId: orgId, masterAgreementId: m.id, periodId: period.id, currency: cur, number: `MS-${period.startDate.slice(0, 7).replace('-', '')}-${m.id.slice(0, 4).toUpperCase()}-${cur}`, ...vals }).returning();
-        out.push(row!);
-      }
-    }
+    const { period, masters, out, skipped } = await generateSplitStatements(db, orgId, req.body.periodId, req.body.masterAgreementId);
     await audit(db, { organizationId: orgId, actorUserId: req.user!.id, action: 'master.statements_generated', metadata: { periodId: period.id, statements: out.length, skipped: skipped.length }, ip: req.ip });
     return { items: out.map((x) => stmtOut(x, masters.find((m) => m.id === x.masterAgreementId), null, { startDate: period.startDate, endDate: period.endDate })), skipped };
   });
@@ -342,3 +306,47 @@ export const masterRoutes: FastifyPluginAsyncZod = async (app) => {
     return reply.header('content-type', 'application/pdf').header('content-disposition', `attachment; filename="${x.number}.pdf"`).send(renderPdf([{ texts }], { title: x.number }));
   });
 };
+
+/** Builds (or refreshes draft) split statements for a closed period: one per master agreement and currency. */
+export async function generateSplitStatements(db: Db, orgId: string, periodId: string, masterAgreementId?: string) {
+    const [period] = await db.select().from(royaltyPeriods).where(and(eq(royaltyPeriods.id, periodId), eq(royaltyPeriods.organizationId, orgId)));
+    if (!period) throw notFound('Period');
+    const masters = await db.select().from(masterAgreements).where(and(eq(masterAgreements.organizationId, orgId), eq(masterAgreements.status, 'active'), ...(masterAgreementId ? [eq(masterAgreements.id, masterAgreementId)] : [])));
+    const locs = await db.select().from(locations).where(eq(locations.organizationId, orgId));
+    const stmts = await db.select({ st: royaltyStatements, inv: financeInvoices }).from(royaltyStatements).leftJoin(financeInvoices, eq(financeInvoices.id, royaltyStatements.invoiceId))
+      .where(and(eq(royaltyStatements.periodId, period.id), inArray(royaltyStatements.status, ['approved', 'invoiced'])));
+    const out: Statement[] = [];
+    const skipped: Array<{ masterAgreementId: string; currency: string; reason: string }> = [];
+    for (const m of masters) {
+      const mine = stmts.filter(({ st }) => { const l = locs.find((x) => x.id === st.locationId); return !!l && inMaster(m, l); });
+      for (const cur of [...new Set(mine.map(({ st }) => st.currency))]) {
+        const rule = ruleFor(m.splits, cur);
+        if (!rule) { skipped.push({ masterAgreementId: m.id, currency: cur, reason: 'no_split_for_currency' }); continue; }
+        const lines: SplitStatementLine[] = mine.filter(({ st }) => st.currency === cur).map(({ st, inv }) => {
+          const share = splitAmounts(st.royaltyMinor, st.marketingFundMinor, rule);
+          // Collected part, prorated when the invoice is part paid (the fund share of a payment follows the invoice).
+          const paidRatio = inv ? (inv.status === 'paid' ? 1 : inv.totalMinor > 0 ? Math.min(1, inv.paidMinor / inv.totalMinor) : 0) : 0;
+          return {
+            locationId: st.locationId, locationName: locs.find((l) => l.id === st.locationId)!.name, royaltyStatementId: st.id, statementStatus: inv?.status === 'paid' ? 'paid' : st.status,
+            royaltyMinor: st.royaltyMinor, marketingFundMinor: st.marketingFundMinor, collectedRoyaltyMinor: Math.round(st.royaltyMinor * paidRatio), collectedFundMinor: Math.round(st.marketingFundMinor * paidRatio),
+            masterRoyaltyMinor: share.masterRoyaltyMinor, masterFundMinor: share.masterFundMinor,
+          };
+        }).sort((a, b) => a.locationName.localeCompare(b.locationName));
+        const royalty = lines.reduce((a, l) => a + l.royaltyMinor, 0);
+        const fund = lines.reduce((a, l) => a + l.marketingFundMinor, 0);
+        const total = splitAmounts(royalty, fund, rule);
+        const collected = splitAmounts(lines.reduce((a, l) => a + l.collectedRoyaltyMinor, 0), lines.reduce((a, l) => a + l.collectedFundMinor, 0), rule);
+        const vals = {
+          royaltyShareBps: rule.royaltyShareBps, fundShareBps: rule.fundShareBps, lines, royaltyMinor: royalty, marketingFundMinor: fund, masterRoyaltyMinor: total.masterRoyaltyMinor, masterFundMinor: total.masterFundMinor,
+          hqRoyaltyMinor: total.hqRoyaltyMinor, hqFundMinor: total.hqFundMinor, payableMinor: collected.masterRoyaltyMinor + collected.masterFundMinor, updatedAt: new Date(),
+        };
+        const [existing] = await db.select().from(masterSplitStatements).where(and(eq(masterSplitStatements.masterAgreementId, m.id), eq(masterSplitStatements.periodId, period.id), eq(masterSplitStatements.currency, cur)));
+        if (existing && existing.status !== 'draft') { skipped.push({ masterAgreementId: m.id, currency: cur, reason: `statement_${existing.status}` }); continue; }
+        const [row] = existing
+          ? await db.update(masterSplitStatements).set(vals).where(eq(masterSplitStatements.id, existing.id)).returning()
+          : await db.insert(masterSplitStatements).values({ organizationId: orgId, masterAgreementId: m.id, periodId: period.id, currency: cur, number: `MS-${period.startDate.slice(0, 7).replace('-', '')}-${m.id.slice(0, 4).toUpperCase()}-${cur}`, ...vals }).returning();
+        out.push(row!);
+      }
+    }
+  return { period, masters, out, skipped };
+}
