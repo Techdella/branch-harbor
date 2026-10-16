@@ -7,7 +7,7 @@ import {
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
 import {
-  brands, customRoles, locations, memberAccessOverrides, memberProfiles, organizations, portfolioLocations, portfolios, roleAssignments, roleCapabilities, roleLabels, territories, users,
+  brands, customRoles, franchiseProspects, locations, memberAccessOverrides, memberProfiles, organizations, portfolioLocations, portfolios, roleAssignments, roleCapabilities, roleLabels, territories, users,
 } from '../db/schema/index.ts';
 import { assignmentCovers, canGrantCapabilities, capabilitiesInScope, hasCapabilityInScope, type Assignment, type ScopeChain } from '../domain/scope.ts';
 import { badRequest, conflict, forbidden, notFound } from '../lib/errors.ts';
@@ -602,6 +602,24 @@ export const accessRoutes: FastifyPluginAsyncZod = async (app) => {
         await audit(tx, { organizationId: orgId, ...actor(req), action: 'access.territory_updated', scopeKind: 'territory', scopeId: id, metadata: req.body });
       });
       return { id, updated: true };
+    });
+
+    app.delete('/orgs/:orgId/access/territories/:id', {
+      schema: { tags: ['access'], security: secured, params: idParams, summary: 'Delete a territory nobody is assigned to and whose pipeline is empty (its locations stay, without a territory)' },
+    }, async (req) => {
+      const { orgId, id } = req.params;
+      await requireOrgCap(req, orgId, 'network.locations', 'edit');
+      await chainFor(orgId, 'territory', id);
+      const inUse = await s.db.select({ id: roleAssignments.id }).from(roleAssignments).where(and(eq(roleAssignments.organizationId, orgId), eq(roleAssignments.scopeKind, 'territory'), eq(roleAssignments.scopeId, id))).limit(1);
+      if (inUse.length) throw conflict('scope_in_use', 'People are still assigned to this territory. Move them first.');
+      const pipeline = await s.db.select({ id: franchiseProspects.id }).from(franchiseProspects).where(and(eq(franchiseProspects.organizationId, orgId), eq(franchiseProspects.scopeTerritoryId, id))).limit(1);
+      if (pipeline.length) throw conflict('territory_has_pipeline', 'This territory still has franchise prospects. Move them to another pipeline first.');
+      await s.db.transaction(async (tx) => {
+        await tx.update(locations).set({ territoryId: null }).where(and(eq(locations.organizationId, orgId), eq(locations.territoryId, id)));
+        await tx.delete(territories).where(and(eq(territories.id, id), eq(territories.organizationId, orgId)));
+        await audit(tx, { organizationId: orgId, ...actor(req), action: 'access.territory_deleted', scopeKind: 'organization', scopeId: orgId, targetType: 'territory', targetId: id });
+      });
+      return { id, deleted: true };
     });
 
 };

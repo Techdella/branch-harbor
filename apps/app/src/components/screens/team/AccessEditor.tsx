@@ -12,6 +12,7 @@ import {
   accessApi, useAccess, useAccessAction, type AssignmentAccessVM, type CustomRoleVM, type MemberAccessVM, type MyAccessVM, type PreviewVM, type RoleTemplateVM, type RolesVM, type ScopesVM,
 } from '@/lib/http/access';
 import { useApp } from '../../shell/AppContext';
+import { ScopePicker, type ScopeValue } from './ScopePicker';
 import { useNavLabel } from '../../shell/Sidebar';
 import { Async, Banner, LoadingBlock } from '../../ui/States';
 
@@ -482,15 +483,12 @@ export function scopeChoices(scopes: ScopesVM | null, orgId: string): { value: s
 function AddRole({ userId, roles, scopes, onAdded }: { userId: string; roles: RolesVM; scopes: ScopesVM | null; onAdded: () => void }) {
   const t = useTranslations('access');
   const app = useApp();
-  const scopeLabel = useScopeLabel();
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState('trainer');
-  const choices = scopeChoices(scopes, app.org.id);
-  const [scope, setScope] = useState(choices[0]!.value);
+  const [scope, setScope] = useState<ScopeValue>({ kind: 'organization', id: app.org.id });
   const add = useAccessAction(() => {
-    const s = choices.find((c) => c.value === scope)!;
     const custom = role.startsWith('custom:') ? role.slice(7) : undefined;
-    return accessApi.addAssignment({ userId, role: custom ? 'custom' : role, ...(custom ? { customRoleId: custom } : {}), scope: { kind: s.kind, id: s.id }, grants: [], revokes: [] });
+    return accessApi.addAssignment({ userId, role: custom ? 'custom' : role, ...(custom ? { customRoleId: custom } : {}), scope, grants: [], revokes: [] });
   });
   if (!open) return <div><Button variant="secondary" icon="plus" onClick={() => setOpen(true)} data-testid="add-role">{t('editor.addRole')}</Button></div>;
   return (
@@ -498,14 +496,8 @@ function AddRole({ userId, roles, scopes, onAdded }: { userId: string; roles: Ro
       <h3 className="text-sm font-bold">{t('editor.addRoleTitle')}</h3>
       <div className="grid gap-3 md:grid-cols-2">
         <Field label={t('editor.role')}>{(p) => <Select id={p.id} value={role} onChange={(e) => setRole(e.target.value)} data-testid="add-role-role"><RoleOptions roles={roles} /></Select>}</Field>
-        <Field label={t('editor.scope')}>
-          {(p) => (
-            <Select id={p.id} value={scope} onChange={(e) => setScope(e.target.value)} data-testid="add-role-scope">
-              {choices.map((c) => <option key={c.value} value={c.value}>{scopeLabel(c)}</option>)}
-            </Select>
-          )}
-        </Field>
       </div>
+      <ScopePicker scopes={scopes} orgId={app.org.id} value={scope} onChange={setScope} testId="add-role-scope" />
       {add.error && <Banner tone="danger" live="assertive">{add.error.message}</Banner>}
       <div className="flex gap-2">
         <Button loading={add.pending} onClick={async () => { if (await add.run()) { setOpen(false); onAdded(); } }} data-testid="add-role-save">{t('editor.addRoleSave')}</Button>

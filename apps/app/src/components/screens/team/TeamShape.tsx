@@ -94,78 +94,7 @@ export function TeamShapeTab() {
           );
         }}
       </Async>
-      <ScopesSection />
     </div>
-  );
-}
-
-/** Portfolios (any named set of locations) and territories (sub-networks), for field and partner roles. */
-function ScopesSection() {
-  const t = useTranslations('access.scopes');
-  const app = useApp();
-  const res = useAccess(() => accessApi.scopes(), []);
-  const [kind, setKind] = useState<'portfolio' | 'territory' | null>(null);
-  const [name, setName] = useState('');
-  const [picked, setPicked] = useState<Set<string>>(new Set());
-  const create = useAccessAction(() => (kind === 'portfolio' ? accessApi.createPortfolio({ name: name.trim(), locationIds: [...picked] }) : accessApi.createTerritory({ name: name.trim(), kind: 'master', locationIds: [...picked] })));
-  if (app.org.model === 'independent') return null;
-  const canTerritory = app.capabilities.has('network.locations:edit');
-  return (
-    <Async res={res} loading={<LoadingBlock variant="table" />}>
-      {(scopes: ScopesVM) => {
-        const locName = (id: string) => scopes.locations.find((l) => l.id === id)?.name ?? id;
-        return (
-          <section className="flex flex-col gap-3 rounded-xl bg-surface p-5" aria-labelledby="scopes-title" data-testid="scopes">
-            <div>
-              <h2 id="scopes-title" className="text-lg font-bold">{t('title')}</h2>
-              <p className="text-sm text-stone">{t('intro')}</p>
-            </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-bold">{t('territories')}</h3>
-                {scopes.territories.length === 0 ? <p className="text-xs text-stone">{t('noTerritories')}</p> : (
-                  <ul className="mt-1 flex flex-col gap-1">
-                    {scopes.territories.map((x) => <li key={x.id} className="rounded-md bg-canvas px-3 py-2 text-sm"><strong>{x.name}</strong> <span className="text-xs text-stone">· {t(`kinds.${x.kind}`)} · {x.locationIds.map(locName).join(', ') || t('noLocations')}</span></li>)}
-                  </ul>
-                )}
-              </div>
-              <div>
-                <h3 className="text-sm font-bold">{t('portfolios')}</h3>
-                {scopes.portfolios.length === 0 ? <p className="text-xs text-stone">{t('noPortfolios')}</p> : (
-                  <ul className="mt-1 flex flex-col gap-1">
-                    {scopes.portfolios.map((x) => <li key={x.id} className="rounded-md bg-canvas px-3 py-2 text-sm"><strong>{x.name}</strong> <span className="text-xs text-stone">· {x.locationIds.map(locName).join(', ') || t('noLocations')}</span></li>)}
-                  </ul>
-                )}
-              </div>
-            </div>
-            {kind === null ? (
-              <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" icon="plus" onClick={() => (setKind('portfolio'), setName(''), setPicked(new Set()))}>{t('newPortfolio')}</Button>
-                {canTerritory && <Button variant="secondary" icon="plus" onClick={() => (setKind('territory'), setName(''), setPicked(new Set()))}>{t('newTerritory')}</Button>}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2 rounded-lg border border-line-soft p-3.5">
-                <Field label={kind === 'portfolio' ? t('portfolioName') : t('territoryName')}>{(p) => <Input id={p.id} value={name} onChange={(e) => setName(e.target.value)} />}</Field>
-                <fieldset className="flex flex-wrap gap-1.5">
-                  <legend className="mb-1 text-xs font-bold">{t('locations')}</legend>
-                  {scopes.locations.map((l) => (
-                    <label key={l.id} className={cx('flex h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold', picked.has(l.id) ? 'border-ink bg-lime/30' : 'border-line-soft')}>
-                      <input type="checkbox" className="h-4 w-4 accent-ink" checked={picked.has(l.id)} onChange={(e) => { const n = new Set(picked); if (e.target.checked) n.add(l.id); else n.delete(l.id); setPicked(n); }} />
-                      {l.name}
-                    </label>
-                  ))}
-                </fieldset>
-                {create.error && <Banner tone="danger" live="assertive">{create.error.message}</Banner>}
-                <div className="flex gap-2">
-                  <Button disabled={!name.trim()} loading={create.pending} onClick={async () => { if (await create.run()) { setKind(null); res.reload(); } }}>{t('create')}</Button>
-                  <Button variant="secondary" onClick={() => setKind(null)}>{t('cancel')}</Button>
-                </div>
-              </div>
-            )}
-          </section>
-        );
-      }}
-    </Async>
   );
 }
 

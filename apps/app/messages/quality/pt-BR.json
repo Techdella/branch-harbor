@@ -32,7 +32,9 @@
       "choose": "Escolher…",
       "exportCsv": "Exportar CSV",
       "ownerGroup": "Grupo de proprietários",
-      "region": "Região"
+      "region": "Região",
+      "territory": "Território",
+      "portfolio": "Carteira"
     },
     "col": {
       "location": "Unidade",

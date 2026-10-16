@@ -69,6 +69,8 @@ export interface LeagueVM {
   rows: LeagueRowVM[];
   benchmarks: { locationCount: number; revenue: Array<{ currency: string; quartiles: Quartiles | null }>; growthPct: Quartiles | null; activity: Quartiles | null; occupancyPct: Quartiles | null; auditScorePct: Quartiles | null; reviewRating: Quartiles | null; royaltyOnTimePct: number | null } | null;
   networkRanks: Record<string, { position: number; of: number } | null> | null; settings: { franchiseeQuartiles: boolean }; currencies: string[];
+  /** Territory and portfolio filter choices holding locations in the viewer's scope. */
+  filters?: { territories: { id: string; name: string }[]; portfolios: { id: string; name: string }[] };
   can: { export: boolean; manage: boolean };
 }
 export interface Upload { filename: string; contentType: string; dataBase64: string }

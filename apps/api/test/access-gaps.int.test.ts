@@ -42,6 +42,49 @@ describe.skipIf(!hasDb)('screen-level sub-modules (DB)', () => {
   });
 });
 
+describe.skipIf(!hasDb)('portfolios, territories and league filters (DB)', () => {
+  let app: FastifyInstance;
+  beforeAll(async () => { app = await makeApp(); });
+  afterAll(async () => { await app?.close(); });
+
+  it('portfolios and territories are edited and deleted once nobody is assigned; the league table offers them as filters', async () => {
+    const owner = await verifiedUser(app, 'Scopes Owner');
+    const O = (await createOrg(app, owner.token, { name: `Scopes ${uid()}`, industry: 'studios' })).id;
+    const a = await createLocation(app, owner.token, O, { name: 'Alpha' });
+    const b = await createLocation(app, owner.token, O, { name: 'Bravo' });
+    const pf = (await call(app, 'POST', `/v1/orgs/${O}/access/portfolios`, { token: owner.token, body: { name: 'Coached', locationIds: [a.id] } })).body.id;
+    const tr = (await call(app, 'POST', `/v1/orgs/${O}/access/territories`, { token: owner.token, body: { name: 'North', kind: 'master', country: 'CA', locationIds: [b.id] } })).body.id;
+
+    expect((await call(app, 'PATCH', `/v1/orgs/${O}/access/portfolios/${pf}`, { token: owner.token, body: { name: 'Coached studios', locationIds: [a.id, b.id] } })).status).toBe(200);
+    expect((await call(app, 'PATCH', `/v1/orgs/${O}/access/territories/${tr}`, { token: owner.token, body: { name: 'North & East', locationIds: [a.id, b.id] } })).status).toBe(200);
+    const scopes = (await call(app, 'GET', `/v1/orgs/${O}/access/scopes`, { token: owner.token })).body;
+    expect(scopes.portfolios[0]).toMatchObject({ name: 'Coached studios', locationIds: expect.arrayContaining([a.id, b.id]) });
+    expect(scopes.territories[0]).toMatchObject({ name: 'North & East', locationIds: expect.arrayContaining([a.id, b.id]) });
+
+    const league = await call(app, 'GET', `/v1/orgs/${O}/league-table`, { token: owner.token });
+    expect(league.body.filters).toEqual({ territories: [{ id: tr, name: 'North & East' }], portfolios: [{ id: pf, name: 'Coached studios' }] });
+
+    // Assigned scopes can't be deleted; once the person moves, they can.
+    const coach = await memberWithRole(app, owner.token, O, 'field_consultant', { kind: 'portfolio', id: pf }, 'Cara Coach');
+    const master = await memberWithRole(app, owner.token, O, 'master_franchisee', { kind: 'territory', id: tr }, 'Max Master');
+    expect((await call(app, 'DELETE', `/v1/orgs/${O}/access/portfolios/${pf}`, { token: owner.token })).body.error.code).toBe('scope_in_use');
+    expect((await call(app, 'DELETE', `/v1/orgs/${O}/access/territories/${tr}`, { token: owner.token })).body.error.code).toBe('scope_in_use');
+    // The coach's league table offers only their portfolio.
+    const coachLeague = await call(app, 'GET', `/v1/orgs/${O}/league-table`, { token: coach.token });
+    expect(coachLeague.body.filters.portfolios).toEqual([{ id: pf, name: 'Coached studios' }]);
+    for (const u of [coach, master]) {
+      const acc = await call(app, 'GET', `/v1/orgs/${O}/members/${u.userId}/access`, { token: owner.token });
+      expect((await call(app, 'DELETE', `/v1/orgs/${O}/role-assignments/${acc.body.assignments[0].id}`, { token: owner.token })).status).toBe(200);
+    }
+    expect((await call(app, 'DELETE', `/v1/orgs/${O}/access/portfolios/${pf}`, { token: owner.token })).status).toBe(200);
+    expect((await call(app, 'DELETE', `/v1/orgs/${O}/access/territories/${tr}`, { token: owner.token })).status).toBe(200);
+    const after = (await call(app, 'GET', `/v1/orgs/${O}/access/scopes`, { token: owner.token })).body;
+    expect(after.portfolios).toEqual([]);
+    expect(after.territories).toEqual([]);
+    expect(after.locations.every((l: any) => l.territoryId === null)).toBe(true);
+  });
+});
+
 const pdf = Buffer.from('%PDF-1.4\n% BranchHarbor test document\n').toString('base64');
 
 describe.skipIf(!hasDb)('territory-scoped franchise legal (DB)', () => {
