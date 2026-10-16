@@ -8,7 +8,7 @@ import type { Currency } from '@bh/shared';
 import { moneyWithCode } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
 
-export const CHANNEL_ICON: Record<string, IconName> = { email: 'mail', sms: 'phone', whatsapp: 'message', instagram: 'image', messenger: 'message' };
+export const CHANNEL_ICON: Record<string, IconName> = { email: 'mail', sms: 'phone', whatsapp: 'message', instagram: 'image', messenger: 'message', review: 'star' };
 export const NETWORK_ICON: Record<string, IconName> = { facebook: 'thumb', instagram: 'image', linkedin: 'briefcase', google_business: 'pin' };
 
 /** Location name lookup from the workspace directory (null id = HQ). */

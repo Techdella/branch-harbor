@@ -6,6 +6,7 @@ import franchiseEn from '../messages/franchise/en.json';
 import coursesEn from '../messages/courses/en.json';
 import builderEn from '../messages/builder/en.json';
 import reviewsEn from '../messages/reviews/en.json';
+import listingsEn from '../messages/listings/en.json';
 import { resolveSiteLocale } from '../lib/site';
 
 type Messages = Record<string, unknown>;
@@ -54,6 +55,18 @@ const reviewLoaders: Record<string, () => Promise<{ default: unknown }>> = {
   ar: () => import('../messages/reviews/ar.json'),
 };
 
+/** Listings: holiday / special hours (namespace "listingsSite", messages/listings/*.json). */
+const listingsLoaders: Record<string, () => Promise<{ default: unknown }>> = {
+  'en-GB': () => import('../messages/listings/en-GB.json'),
+  fr: () => import('../messages/listings/fr.json'),
+  es: () => import('../messages/listings/es.json'),
+  de: () => import('../messages/listings/de.json'),
+  'pt-BR': () => import('../messages/listings/pt-BR.json'),
+  nl: () => import('../messages/listings/nl.json'),
+  it: () => import('../messages/listings/it.json'),
+  ar: () => import('../messages/listings/ar.json'),
+};
+
 /** Website builder strings (namespace "builder", messages/builder/*.json). */
 const builderLoaders: Record<string, () => Promise<{ default: unknown }>> = {
   'en-GB': () => import('../messages/builder/en-GB.json'),
@@ -82,13 +95,16 @@ export async function messagesFor(locale: string): Promise<Messages> {
   const franchise = franchiseLoaders[locale] ?? franchiseLoaders[locale.split('-')[0]!];
   const builder = builderLoaders[locale] ?? builderLoaders[locale.split('-')[0]!];
   const review = reviewLoaders[locale] ?? reviewLoaders[locale.split('-')[0]!];
-  const base = mergeMessages(mergeMessages(mergeMessages(mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), franchiseEn as Messages), coursesEn as Messages), builderEn as Messages), reviewsEn as Messages);
+  const listings = listingsLoaders[locale] ?? listingsLoaders[locale.split('-')[0]!];
+  const base0 = mergeMessages(mergeMessages(mergeMessages(mergeMessages(mergeMessages(mergeMessages(en as Messages, foodsEn as Messages), paymentsEn as Messages), franchiseEn as Messages), coursesEn as Messages), builderEn as Messages), reviewsEn as Messages);
+  const base = mergeMessages(base0, listingsEn as Messages);
   const local = load ? (await load()).default : {};
   // Public courses (Training academy): messages/courses/*.json.
   const courseLocale = loaders[locale] ? locale : locale.split('-')[0]!;
   const courses = loaders[courseLocale] ? ((await import(`../messages/courses/${courseLocale}.json`)).default as Messages) : {};
   const withBuilder0 = builder ? mergeMessages(base, (await builder()).default as Messages) : base;
-  const withBuilder = review ? mergeMessages(withBuilder0, (await review()).default as Messages) : withBuilder0;
+  const withBuilder1 = review ? mergeMessages(withBuilder0, (await review()).default as Messages) : withBuilder0;
+  const withBuilder = listings ? mergeMessages(withBuilder1, (await listings()).default as Messages) : withBuilder1;
   return mergeMessages(mergeMessages(withBuilder, franchise ? mergeMessages(local, (await franchise()).default as Messages) : local), courses);
 }
 

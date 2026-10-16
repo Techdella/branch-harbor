@@ -11,7 +11,7 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { hasAt, requireAt, scopeFor } from '../services/comms-scope.ts';
 import {
-  connectionToken, deliverRequest, effectiveSettings, googleBusiness, locationSettingsRow, optOutOfRequests, orgSettingsRow, publicReviewPage, publishReply, queueReviewRequest,
+  connectionToken, deliverRequest, effectiveSettings, emitReviewEvent, googleBusiness, locationSettingsRow, optOutOfRequests, orgSettingsRow, publicReviewPage, publishReply, queueReviewRequest,
   recordLinkOpened, replyNeedsApproval, reviewDashboard, reviewsTick, saveSettings, serializeRequest, serializeReview, submitPublicReview, suggestReply, syncListing,
 } from '../services/reviews.ts';
 import { idParams, orgParams, secured } from './_common.ts';
@@ -184,6 +184,7 @@ export const reviewRoutes: FastifyPluginAsyncZod = async (app) => {
       if (replyNeedsApproval(st.replyApproval, row.rating) && !(await isHqApprover(req, orgId))) {
         const [u] = await db.update(reviews).set({ ...base, replyStatus: 'pending_approval', replySubmittedAt: now, replyDecidedBy: null, replyDecisionNote: null }).where(eq(reviews.id, row.id)).returning();
         await audit(db, { organizationId: orgId, ...actor(req), action: 'reviews.reply_submitted', scopeKind: 'location', scopeId: row.locationId, targetType: 'review', targetId: row.id, metadata: { aiSuggested: req.body.aiSuggested } });
+        await emitReviewEvent(s, { type: 'reply_changed', review: u! });
         return one(orgId, u!);
       }
       const [u] = await db.update(reviews).set({ ...base, replySubmittedAt: now }).where(eq(reviews.id, row.id)).returning();
@@ -199,6 +200,7 @@ export const reviewRoutes: FastifyPluginAsyncZod = async (app) => {
       if (row.replyStatus !== 'pending_approval') throw conflict('not_pending', 'This reply is not waiting for approval');
       const [u] = await db.update(reviews).set({ replyStatus: req.body.decision === 'approve' ? 'pending_approval' : 'rejected', replyText: req.body.text ?? row.replyText, replyDecidedBy: req.user!.id, replyDecisionNote: req.body.note ?? null, updatedAt: new Date() }).where(eq(reviews.id, row.id)).returning();
       await audit(db, { organizationId: orgId, ...actor(req), action: `reviews.reply_${req.body.decision === 'approve' ? 'approved' : 'rejected'}`, scopeKind: 'location', scopeId: row.locationId, targetType: 'review', targetId: row.id });
+      if (req.body.decision === 'reject') await emitReviewEvent(s, { type: 'reply_changed', review: u! });
       return one(orgId, req.body.decision === 'approve' ? await publishReply(s, u!, req.user!.id) : u!);
     });
 

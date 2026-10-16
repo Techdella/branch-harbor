@@ -13,6 +13,8 @@ import { actor, audit } from '../services/audit.ts';
 import { addNote, handleCommsWebhook, isOptedOut, marketingConsent, replyPolicy, sendInConversation, serializeConversations, serializeMessages } from '../services/comms-inbox.ts';
 import { hasAt, inScope, requireAnyAt, requireAt, scopeFor, usersWithCapabilityAt } from '../services/comms-scope.ts';
 import { segmentMembers } from '../services/segments.ts';
+import { effectiveSettings, replyNeedsApproval } from '../services/reviews.ts';
+import { replyFromInbox, reviewForConversation, templatesForReview } from '../services/review-inbox.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 const channel = z.enum(INBOX_CHANNELS);
@@ -32,6 +34,18 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
     const [c] = await s.db.select().from(commsConversations).where(and(eq(commsConversations.id, id), eq(commsConversations.organizationId, orgId)));
     if (!c) throw notFound('Conversation');
     return c;
+  };
+  /** Review details for a `review` conversation: rating, reply status, approval and the reply templates that fit. */
+  const reviewContext = async (req: import('fastify').FastifyRequest, orgId: string, c: typeof commsConversations.$inferSelect) => {
+    const r = await reviewForConversation(s.db, c);
+    if (!r) return null;
+    const isApprover = await hasAt(req, s.db, orgId, null, 'marketing.reviews', 'publish');
+    const st = await effectiveSettings(s.db, orgId, r.locationId);
+    return {
+      id: r.id, rating: r.rating, comment: r.comment, authorName: r.authorName, reviewedAt: r.reviewedAt.toISOString(), sandbox: r.sandbox,
+      reply: { status: r.replyStatus, text: r.replyText, error: r.replyError, decisionNote: r.replyDecisionNote, repliedAt: r.repliedAt?.toISOString() ?? null },
+      needsApproval: replyNeedsApproval(st.replyApproval, r.rating) && !isApprover, canApprove: isApprover, templates: await templatesForReview(s.db, r),
+    };
   };
   const loadAccount = async (orgId: string, id: string) => {
     const [a] = await s.db.select().from(commsChannelAccounts).where(and(eq(commsChannelAccounts.id, id), eq(commsChannelAccounts.organizationId, orgId)));
@@ -87,7 +101,7 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
     const { orgId, id } = req.params;
     const a = await loadAccount(orgId, id);
     await requireAt(req, s.db, orgId, a.locationId, M, 'edit');
-    if (a.mode !== 'sandbox') throw conflict('channel_live', 'Simulation is only available on sandbox channels');
+    if (a.mode !== 'sandbox' || a.channel === 'review') throw conflict('channel_live', 'Simulation is only available on sandbox channels');
     const w = buildSandboxWebhook(s.cfg, { channel: a.channel, to: a.address, from: a.channel === 'email' ? req.body.from.toLowerCase() : req.body.from, name: req.body.name ?? null, subject: req.body.subject ?? null, body: req.body.body, id: req.body.messageId ?? `sim_${randomToken(12)}` });
     return handleCommsWebhook(s, w.provider, w.raw, w.headers);
   });
@@ -99,7 +113,7 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
       tags: ['inbox'], security: secured, params: orgParams,
       summary: 'Conversations in the inboxes you can see. `inbox=hq` for HQ only; `locationIds` to choose locations.',
       querystring: z.object({
-        status: z.enum([...CONVERSATION_STATUSES, 'all']).default('open'), channel: channel.optional(), inbox: z.enum(['all', 'hq']).default('all'),
+        status: z.enum([...CONVERSATION_STATUSES, 'all']).default('open'), channel: z.enum([...INBOX_CHANNELS, 'review']).optional(), inbox: z.enum(['all', 'hq']).default('all'),
         locationIds: z.string().optional(), assigned: z.enum(['me', 'unassigned', 'any']).default('any'), q: z.string().max(80).optional(), limit: z.coerce.number().int().min(1).max(200).default(100),
       }),
     },
@@ -137,9 +151,11 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
     const msgs = await s.db.select().from(commsMessages).where(eq(commsMessages.conversationId, id)).orderBy(asc(commsMessages.createdAt)).limit(500);
     const [customer] = c.customerId ? await s.db.select({ id: customers.id, name: customers.name, email: customers.email, phone: customers.phone, locationId: customers.locationId }).from(customers).where(eq(customers.id, c.customerId)) : [];
     const [lead] = c.leadId ? await s.db.select({ id: leads.id, name: leads.name, status: leads.status, source: leads.source, assignedUserId: leads.assignedUserId }).from(leads).where(eq(leads.id, c.leadId)) : [];
+    const canReply = (await hasAt(req, s.db, orgId, c.locationId, M, 'edit')) && (c.channel !== 'review' || (await hasAt(req, s.db, orgId, c.locationId, 'marketing.reviews', 'edit')));
     return {
       conversation: (await serializeConversations(s.db, [c]))[0]!, messages: await serializeMessages(s.db, msgs), policy: await replyPolicy(s.db, c),
-      customer: customer ?? null, lead: lead ?? null, canReply: await hasAt(req, s.db, orgId, c.locationId, M, 'edit'),
+      customer: customer ?? null, lead: lead ?? null, canReply,
+      review: c.channel === 'review' ? await reviewContext(req, orgId, c) : null,
     };
   });
 
@@ -192,6 +208,12 @@ export const inboxRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!req.body.body?.trim()) throw validationError('Write a note', { body: 'Required' });
       const n = await addNote(s.db, c, req.body.body.trim(), me.id);
       return reply.code(201).send((await serializeMessages(s.db, [n]))[0]!);
+    }
+    if (c.channel === 'review') {
+      // Google review: published through the reviews service (approval policy, Google call, audit).
+      await replyFromInbox(s, c, { text: req.body.body ?? '', userId: me.id, canReply: await hasAt(req, s.db, orgId, c.locationId, 'marketing.reviews', 'edit'), isApprover: await hasAt(req, s.db, orgId, null, 'marketing.reviews', 'publish'), templateId: req.body.templateId ?? null });
+      const [last] = await s.db.select().from(commsMessages).where(and(eq(commsMessages.conversationId, c.id), eq(commsMessages.direction, 'outbound'))).orderBy(desc(commsMessages.createdAt)).limit(1);
+      return reply.code(201).send((await serializeMessages(s.db, [last!]))[0]!);
     }
     const m = await sendInConversation(s, c, { body: req.body.body, templateId: req.body.templateId ?? null, authorUserId: me.id, ip: req.ip });
     return reply.code(201).send((await serializeMessages(s.db, [m]))[0]!);

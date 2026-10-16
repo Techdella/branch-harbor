@@ -25,3 +25,4 @@ export * from './billing.ts';
 export * from './quality.ts';
 export * from './data-platform.ts';
 export * from './supply.ts';
+export * from './local-marketing.ts';

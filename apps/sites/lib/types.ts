@@ -43,6 +43,8 @@ export interface PublishedPage {
 }
 
 export interface WeeklyHours { day: number; opens: string; closes: string }
+/** Holiday / special hours from Listings (dates from today on, in the location's timezone). */
+export interface SpecialHours { date: string; closed: boolean; opens: string | null; closes: string | null; label: string | null }
 
 export interface Address { line1: string; line2?: string; city: string; region?: string; postalCode?: string; country: string }
 
@@ -59,7 +61,7 @@ export interface LocationSummary {
   email: string | null;
   status: string;
   geo: { lat: number; lng: number } | null;
-  hours: { summary: string | null; weekly: WeeklyHours[] | null };
+  hours: { summary: string | null; weekly: WeeklyHours[] | null; special?: SpecialHours[] };
   openNow: { open: boolean; closesAt: string | null } | null;
   path: string;
 }
