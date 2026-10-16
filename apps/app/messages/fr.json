@@ -838,7 +838,7 @@
       },
       "skuLocked": "Identifiant de référence — verrouillé après la diffusion.",
       "ai": {
-        "title": "Rédiger avec l’IA BranchHarbor",
+        "title": "Rédiger avec Marina",
         "draft": "Rédiger à partir des caractéristiques",
         "note": "N’utilise que les caractéristiques ci-dessous. Les affirmations sur la compatibilité, la sécurité, les matériaux ou la disponibilité qui n’y figurent pas sont supprimées. Rien n’est enregistré avant que vous n’enregistriez.",
         "removed": "Affirmations non étayées supprimées",
@@ -3119,7 +3119,7 @@
       "postalCode": "Code postal"
     },
     "ai": {
-      "title": "IA BranchHarbor",
+      "title": "Marina",
       "draftsOnly": "Brouillons uniquement",
       "factsOnly": "Les brouillons n’utilisent que les données de cette annonce. L’IA n’ajoute jamais d’atouts, de vues, d’écoles ou d’affirmations sur le quartier, et ne cible ni n’exclut jamais personne.",
       "instructions": "Consignes",
@@ -4296,7 +4296,7 @@
       "generated": "généré {when}"
     },
     "ai": {
-      "title": "IA BranchHarbor pour les studios",
+      "title": "Marina pour les studios",
       "proposalsOnly": "Brouillons et propositions uniquement",
       "describeTitle": "Rédiger une description de cours",
       "classType": "Type de cours",
@@ -4362,7 +4362,7 @@
     "validation_failed": "Vérifiez les champs signalés et réessayez.",
     "validation_error": "Vérifiez les champs signalés et réessayez.",
     "conflict": "Cet enregistrement existe déjà.",
-    "ai_unavailable": "L’IA BranchHarbor est indisponible pour le moment. Tout le reste fonctionne normalement.",
+    "ai_unavailable": "Marina est indisponible pour le moment. Tout le reste fonctionne normalement.",
     "ai_refused": "L’assistant a refusé cette demande.",
     "fair_housing_refused": "Les demandes qui ciblent, orientent ou excluent des personnes selon une caractéristique protégée ne sont pas autorisées (non-discrimination en matière de logement).",
     "fair_housing_flagged": "Ce brouillon contient une formulation susceptible d’orienter selon une caractéristique protégée. Modifiez-le avant de l’utiliser.",

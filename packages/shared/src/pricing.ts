@@ -18,14 +18,14 @@ import { minorUnitExponent, type Currency } from './money.ts';
  *   cheaper market. Change numbers here only; the website, the app and the API read them.
  */
 export const PRICE_BOOK_VERSION = '2026-11';
-export const PRICE_BOOK_STATUS = 'proposal' as const;
-export const PRICE_BOOK_STATUS_NOTE = 'Proposal: to be validated with pricing tests';
+export const PRICE_BOOK_STATUS = 'approved' as const;
+export const PRICE_BOOK_STATUS_NOTE = 'Approved by the founder on 16 Oct 2026';
 
 export const PLAN_PRICE_KEYS = ['solo', 'connector', 'hosted', 'network'] as const;
 export type PlanPriceKey = (typeof PLAN_PRICE_KEYS)[number];
 /**
  * Fees that are not plans: the Network HQ platform fee, the paid trial, the royalty/fund collection fee and its monthly
- * cap per location, and the monthly fee for each brand beyond the first under one HQ (multi-brand HQ, proposal).
+ * cap per location, and the monthly fee for each brand beyond the first under one HQ (multi-brand HQ).
  */
 export const FEE_PRICE_KEYS = ['platform', 'trial', 'collection', 'collectionCap', 'extraBrand'] as const;
 export type FeePriceKey = (typeof FEE_PRICE_KEYS)[number];
@@ -280,7 +280,7 @@ export function planQuote(input: { priceList: PriceListKey; plan: PlanPriceKey; 
 }
 
 /**
- * Multi-brand HQ (proposal): one platform fee per HQ covers its first brand; each further brand of the same industry
+ * Multi-brand HQ: one platform fee per HQ covers its first brand; each further brand of the same industry
  * adds `extraBrand` per month. Locations are billed as usual, whatever brand they belong to.
  */
 export function extraBrandFee(list: PriceListKey, brands: number): { perBrandMinor: number; extraBrands: number; chargedMinor: number } {

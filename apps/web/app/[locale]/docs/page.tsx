@@ -15,7 +15,7 @@ const ICONS: { icon: IconName; bg: string }[] = [
   { icon: 'wordpress', bg: PASTEL.butter },
   { icon: 'plug', bg: PASTEL.sage },
   { icon: 'card', bg: PASTEL.blush },
-  { icon: 'sparkles', bg: PASTEL.lilac },
+  { icon: 'marina', bg: PASTEL.lilac },
   { icon: 'code', bg: PASTEL.canvas },
 ];
 

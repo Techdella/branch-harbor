@@ -25,10 +25,10 @@ export function SportsOverviewScreen() {
 
   return (
     <>
-      <PageHeader icon="grid" title={tOps('title')} description={tOps('description')} actions={app.can('ai.use') ? <Button variant="secondary" icon="sparkles" loading={ai.pending} onClick={() => void summary(scope.length === 1 ? scope[0] : undefined)}>{t('aiSummary')}</Button> : null} />
-      {ai.error && <Banner tone={ai.error.code === 'ai_unavailable' ? 'neutral' : 'danger'} icon="sparkles">{ai.error.message}</Banner>}
+      <PageHeader icon="grid" title={tOps('title')} description={tOps('description')} actions={app.can('ai.use') ? <Button variant="secondary" icon="marina" loading={ai.pending} onClick={() => void summary(scope.length === 1 ? scope[0] : undefined)}>{t('aiSummary')}</Button> : null} />
+      {ai.error && <Banner tone={ai.error.code === 'ai_unavailable' ? 'neutral' : 'danger'} icon="marina">{ai.error.message}</Banner>}
       {draft && (
-        <SectionCard title={t('aiSummaryTitle')} aside={<Badge tone="info" icon="sparkles">{t('draftOnly')}</Badge>}>
+        <SectionCard title={t('aiSummaryTitle')} aside={<Badge tone="info" icon="marina">{t('draftOnly')}</Badge>}>
           <p className="whitespace-pre-line text-sm">{draft.summary}</p>
           <p className="mt-2 text-xs text-stone">{t('aiSource', { at: fmtDateTime(draft.asOf, 'UTC', locale) })}</p>
         </SectionCard>

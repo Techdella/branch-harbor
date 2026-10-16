@@ -207,7 +207,7 @@ function ItemDrawer({ item, b, vocab, canEdit, currencies, onClose, onSaved }: {
         <Labeled label={t('builder.descriptionField')}><textarea value={description} onChange={(e) => setDescription(e.target.value)} className={cx(inputCls, 'h-20 py-2')} /></Labeled>
         {canEdit && (
           <div className="rounded-lg bg-canvas p-3">
-            <Button size="sm" variant="secondary" icon="sparkles" loading={ai.pending} onClick={async () => setDraft((await ai.run()) ?? null)}>{t('builder.aiDraft')}</Button>
+            <Button size="sm" variant="secondary" icon="marina" loading={ai.pending} onClick={async () => setDraft((await ai.run()) ?? null)}>{t('builder.aiDraft')}</Button>
             {ai.error && <p className="mt-2 text-xs font-bold text-danger">{ai.error.message}</p>}
             {draft && (
               <div className="mt-2 flex flex-col gap-2 text-sm">

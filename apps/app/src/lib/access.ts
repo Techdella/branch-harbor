@@ -100,7 +100,7 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   // The AI assistant: briefing, insights, visit briefs and the content studio.
-  'ai.assistant': [{ key: 'marina', href: '/marina', icon: 'sparkles', msg: 'marina.navLabel' }],
+  'ai.assistant': [{ key: 'marina', href: '/marina', icon: 'marina', msg: 'marina.navLabel' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],
   'settings.billing': [{ key: 'settings', href: '/settings', icon: 'settings' }],
 };

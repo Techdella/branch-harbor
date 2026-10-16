@@ -838,7 +838,7 @@
       },
       "skuLocked": "Identificador mestre — bloqueado após a distribuição.",
       "ai": {
-        "title": "Rascunhar texto com a IA do BranchHarbor",
+        "title": "Rascunhar texto com Marina",
         "draft": "Rascunhar a partir das especificações",
         "note": "Usa apenas as especificações abaixo. Afirmações sobre compatibilidade, segurança, materiais ou disponibilidade que não estejam nelas são removidas. Nada é salvo até você salvar.",
         "removed": "Afirmações sem base removidas",
@@ -3119,7 +3119,7 @@
       "postalCode": "CEP / código postal"
     },
     "ai": {
-      "title": "IA do BranchHarbor",
+      "title": "Marina",
       "draftsOnly": "Somente rascunhos",
       "factsOnly": "Os rascunhos usam apenas os dados deste anúncio. A IA nunca acrescenta características, vistas, escolas ou afirmações sobre o bairro, e nunca direciona nem exclui pessoas.",
       "instructions": "Instruções",
@@ -4296,7 +4296,7 @@
       "generated": "gerado {when}"
     },
     "ai": {
-      "title": "IA do BranchHarbor para estúdios",
+      "title": "Marina para estúdios",
       "proposalsOnly": "Apenas rascunhos e propostas",
       "describeTitle": "Rascunhar descrição de aula",
       "classType": "Tipo de aula",
@@ -4362,7 +4362,7 @@
     "validation_failed": "Confira os campos destacados e tente de novo.",
     "validation_error": "Confira os campos destacados e tente de novo.",
     "conflict": "Esse registro já existe.",
-    "ai_unavailable": "A IA do BranchHarbor está indisponível no momento. Todo o resto continua funcionando.",
+    "ai_unavailable": "A Marina está indisponível no momento. Todo o resto continua funcionando.",
     "ai_refused": "O assistente recusou este pedido.",
     "fair_housing_refused": "Não são permitidos pedidos que direcionem, segmentem ou excluam pessoas por uma característica protegida (moradia justa).",
     "fair_housing_flagged": "Este rascunho contém linguagem que pode direcionar por uma característica protegida. Edite-o antes de usar.",

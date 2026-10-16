@@ -191,10 +191,10 @@ function ListingDrawer({ id, onClose }: { id: string; onClose: () => void }) {
                 )}
                 {l.permissions?.canEdit && (
                   <section className="flex flex-col gap-2 rounded-lg bg-canvas p-3">
-                    <div className="flex items-center gap-2"><Icon name="sparkles" size={16} /><strong>{t('ai.title')}</strong><Badge tone="info">{t('ai.draftsOnly')}</Badge></div>
+                    <div className="flex items-center gap-2"><Icon name="marina" size={16} /><strong>{t('ai.title')}</strong><Badge tone="info">{t('ai.draftsOnly')}</Badge></div>
                     <p className="text-xs text-stone">{t('ai.factsOnly')}</p>
                     <Field label={t('ai.instructions')} optional hint={t('ai.instructionsHint')}>{(p) => <Input {...p} value={instr} onChange={(e) => setInstr(e.target.value)} />}</Field>
-                    <Button size="sm" variant="secondary" icon="sparkles" loading={ai.pending} onClick={async () => { const r = await ai.run(instr); if (r) setDraft(r.proposal ? { id: r.proposal.id, headline: String(r.proposal.output.headline ?? ''), description: String(r.proposal.output.description ?? ''), refusals: r.refusals } : { id: '', refusals: r.refusals }); }} className="self-start">{t('ai.draft')}</Button>
+                    <Button size="sm" variant="secondary" icon="marina" loading={ai.pending} onClick={async () => { const r = await ai.run(instr); if (r) setDraft(r.proposal ? { id: r.proposal.id, headline: String(r.proposal.output.headline ?? ''), description: String(r.proposal.output.description ?? ''), refusals: r.refusals } : { id: '', refusals: r.refusals }); }} className="self-start">{t('ai.draft')}</Button>
                     {ai.error && <Banner tone={ai.error.code === 'fair_housing_refused' ? 'warning' : 'danger'} live="assertive">{ai.error.message}</Banner>}
                     {draft && (
                       <div className="flex flex-col gap-2 rounded-md bg-surface p-3">

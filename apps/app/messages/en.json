@@ -158,7 +158,7 @@
   },
   "ai": {
     "button": "AI",
-    "title": "BranchHarbor AI",
+    "title": "Marina",
     "close": "Close AI panel",
     "scope": "Scope:",
     "activeScope": "Active scope: {scope}",
@@ -170,7 +170,7 @@
     "assumptions": "Assumptions:",
     "sources": "Sources",
     "thinking": "Gathering authorized data…",
-    "askLabel": "Ask BranchHarbor AI",
+    "askLabel": "Ask Marina",
     "askPlaceholder": "Ask about this scope…",
     "send": "Send",
     "proposedAction": "Proposed action · needs approval",
@@ -838,7 +838,7 @@
       },
       "skuLocked": "Master identifier — locked after distribution.",
       "ai": {
-        "title": "Draft copy with BranchHarbor AI",
+        "title": "Draft copy with Marina",
         "draft": "Draft from specifications",
         "note": "Uses only the specifications below. Claims about compatibility, safety, materials or availability that aren’t in them are removed. Nothing is saved until you save.",
         "removed": "Removed unsupported claims",
@@ -3119,7 +3119,7 @@
       "postalCode": "Postal code"
     },
     "ai": {
-      "title": "BranchHarbor AI",
+      "title": "Marina",
       "draftsOnly": "Drafts only",
       "factsOnly": "Drafts use only this listing's facts. AI never adds features, views, schools or neighborhood claims, and never targets or excludes people.",
       "instructions": "Instructions",
@@ -4296,7 +4296,7 @@
       "generated": "generated {when}"
     },
     "ai": {
-      "title": "BranchHarbor AI for studios",
+      "title": "Marina for studios",
       "proposalsOnly": "Drafts and proposals only",
       "describeTitle": "Draft a class description",
       "classType": "Class type",
@@ -4362,7 +4362,7 @@
     "validation_failed": "Check the highlighted fields and try again.",
     "validation_error": "Check the highlighted fields and try again.",
     "conflict": "That record already exists.",
-    "ai_unavailable": "BranchHarbor AI is unavailable right now. Everything else keeps working.",
+    "ai_unavailable": "Marina is unavailable right now. Everything else keeps working.",
     "ai_refused": "The assistant declined this request.",
     "fair_housing_refused": "Requests that target, steer or exclude people by a protected characteristic are not allowed (fair housing).",
     "fair_housing_flagged": "This draft contains language that may steer by a protected characteristic. Edit it before using it.",

@@ -324,7 +324,7 @@
         },
         "ai": {
           "name": "AI assistant",
-          "description": "Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes."
+          "description": "Ask Marina about the data this person can already see. It only drafts and proposes."
         }
       },
       "legal": {

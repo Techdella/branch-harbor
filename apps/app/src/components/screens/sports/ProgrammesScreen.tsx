@@ -42,7 +42,7 @@ export function ProgrammesScreen() {
     <>
       <PageHeader icon="flag" title={tOps('title')} description={tOps('description')} actions={director && !wizard ? <Button icon="plus" onClick={() => setWizard(true)}>{t('setup')}</Button> : null} />
       {msg && <Banner tone="success" live="polite">{msg}</Banner>}
-      {(update.error || ai.error) && <Banner tone={ai.error?.code === 'ai_unavailable' ? 'neutral' : 'danger'} live="assertive" icon={ai.error ? 'sparkles' : undefined}>{(update.error ?? ai.error)!.message}</Banner>}
+      {(update.error || ai.error) && <Banner tone={ai.error?.code === 'ai_unavailable' ? 'neutral' : 'danger'} live="assertive" icon={ai.error ? 'marina' : undefined}>{(update.error ?? ai.error)!.message}</Banner>}
       {wizard && <SetupWizard onCancel={() => setWizard(false)} onDone={(m) => { setWizard(false); setMsg(m); res.reload(); }} />}
       <Async res={res} loading={<LoadingBlock variant="cards" rows={3} />} isEmpty={(d) => d.length === 0} empty={<Empty icon="flag" title={t('empty')} body={director ? t('emptyBody') : undefined} action={director ? <Button icon="plus" onClick={() => setWizard(true)}>{t('setup')}</Button> : undefined} />}>
         {(items) => (
@@ -76,7 +76,7 @@ export function ProgrammesScreen() {
                   {p.refundPolicy ? <p className="text-xs text-stone"><Icon name="undo" size={12} className="mr-1 inline" />{p.refundPolicy}</p> : p.feeMinor > 0 && <p className="text-xs font-bold text-danger">{t('noPolicy')}</p>}
                   {drafts[p.id] && (
                     <div className="rounded-lg border border-line p-3 text-sm">
-                      <div className="mb-1 flex items-center gap-1.5 text-xs font-bold"><Icon name="sparkles" size={13} />{t('aiDraft')}</div>
+                      <div className="mb-1 flex items-center gap-1.5 text-xs font-bold"><Icon name="marina" size={13} />{t('aiDraft')}</div>
                       <p className="whitespace-pre-line">{drafts[p.id]}</p>
                       <div className="mt-2 flex gap-2"><Button size="sm" onClick={() => void applyDraft(p)}>{t('applyDraft')}</Button><Button size="sm" variant="ghost" onClick={() => setDrafts((d) => { const { [p.id]: _, ...rest } = d; return rest; })}>{t('discard')}</Button></div>
                     </div>
@@ -86,7 +86,7 @@ export function ProgrammesScreen() {
                       {p.status === 'draft' && <Button size="sm" icon="globe" loading={update.pending} onClick={() => void setStatus(p, 'published')}>{t('publish')}</Button>}
                       {p.status === 'published' && <Button size="sm" variant="secondary" icon="lock" onClick={() => void setStatus(p, 'closed')}>{t('close')}</Button>}
                       {p.status === 'closed' && <Button size="sm" variant="secondary" icon="globe" onClick={() => void setStatus(p, 'published')}>{t('reopen')}</Button>}
-                      {app.can('ai.use') && <Button size="sm" variant="ghost" icon="sparkles" loading={ai.pending} onClick={() => void draft(p)}>{t('draftDescription')}</Button>}
+                      {app.can('ai.use') && <Button size="sm" variant="ghost" icon="marina" loading={ai.pending} onClick={() => void draft(p)}>{t('draftDescription')}</Button>}
                     </div>
                   )}
                 </article>

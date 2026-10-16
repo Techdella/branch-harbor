@@ -23,7 +23,7 @@ export const aiRoutes: FastifyPluginAsyncZod = async (app) => {
   app.get('/orgs/:orgId/ai/status', { schema: { tags: ['ai'], security: secured, params: orgParams } }, async () => ({
     available: s.ai.enabled, model: s.ai.enabled ? s.ai.model : null, proposableActions: Object.keys(PROPOSABLE_ACTIONS),
     assistant: { name: ASSISTANT_NAME, mode: s.marina.mode },
-    message: s.ai.enabled ? null : 'BranchHarbor AI is unavailable. Manual bookings, orders and publishing are unaffected.',
+    message: s.ai.enabled ? null : 'Marina is unavailable. Manual bookings, orders and publishing are unaffected.',
   }));
 
   app.post('/orgs/:orgId/ai/conversations', {

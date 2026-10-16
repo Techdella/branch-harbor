@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Avatar, Icon, LogoMark, cx } from '@bh/ui';
+import { Avatar, Icon, LogoMark, MarinaMark, cx } from '@bh/ui';
 import { ASSISTANT_NAME } from '@bh/shared';
 import type { SearchGroup } from '@/lib/types';
 import { workspace } from '@/lib/http/workspace';
@@ -265,9 +265,9 @@ function AiButton({ compact }: { compact?: boolean }) {
       type="button"
       onClick={() => app.setAiOpen(!app.aiOpen)}
       aria-pressed={app.aiOpen}
-      className={cx('flex h-11 shrink-0 items-center gap-2 rounded-full text-[13px] font-bold', compact ? 'w-11 justify-center min-[400px]:w-auto min-[400px]:px-4' : 'px-4', app.aiOpen ? 'bg-ink text-white' : 'bg-[#E6EEFC] text-[#2A3E8A]')}
+      className={cx('flex h-11 shrink-0 items-center gap-2 rounded-full text-[13px] font-bold', compact ? 'w-11 justify-center min-[400px]:w-auto min-[400px]:px-4' : 'px-4', app.aiOpen ? 'bg-ink text-white' : 'bg-surface text-ink ring-1 ring-line hover:ring-ink', !compact && 'pl-1.5')}
     >
-      <Icon name="sparkles" size={16} />
+      <MarinaMark size={22} />
       <span className={compact ? 'sr-only min-[400px]:not-sr-only' : undefined}>{ASSISTANT_NAME}</span>
       {!compact && <kbd className="hidden rounded border border-current/20 px-1 text-[10px] font-semibold opacity-70 xl:inline" title={t('command.shortcut')}>⌘K</kbd>}
     </button>

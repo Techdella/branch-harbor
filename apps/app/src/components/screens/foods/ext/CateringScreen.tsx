@@ -204,12 +204,12 @@ function Production({ locationId, tz }: { locationId: string; tz: string }) {
     <Section title={t('catering.tabProduction')} aside={
       <div className="flex flex-wrap items-center gap-2">
         <input type="date" aria-label={t('catering.date')} value={date} onChange={(e) => { setDate(e.target.value); setBrief(null); }} className={cx(inputCls, 'w-44')} />
-        <Button size="sm" variant="secondary" icon="sparkles" loading={ai.pending} onClick={async () => setBrief((await ai.run())?.summary ?? null)}>{t('catering.aiBrief')}</Button>
+        <Button size="sm" variant="secondary" icon="marina" loading={ai.pending} onClick={async () => setBrief((await ai.run())?.summary ?? null)}>{t('catering.aiBrief')}</Button>
         <Button size="sm" variant="ghost" icon="download" onClick={() => window.print()}>{t('catering.print')}</Button>
       </div>
     }>
       {ai.error && <Banner tone="neutral" title={t('catering.aiUnavailable')}>{ai.error.message}</Banner>}
-      {brief && <Banner tone="info" icon="sparkles" title={t('catering.aiBriefTitle')}>{brief}</Banner>}
+      {brief && <Banner tone="info" icon="marina" title={t('catering.aiBriefTitle')}>{brief}</Banner>}
       <Async res={res} loading={<LoadingBlock variant="cards" rows={3} />}>
         {(p: ProductionSummary) => (
           <div className="flex flex-col gap-3">

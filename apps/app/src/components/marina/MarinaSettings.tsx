@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from '@bh/ui';
+import { Button, Icon, MarinaMark } from '@bh/ui';
 import { AI_ACTION_RISKS, AI_TOOL_AREAS, ASSISTANT_NAME } from '@bh/shared';
 import { fileToBase64, marina, type OrgAiSettings, type UsageView } from '@/lib/marina';
 import { useErrorText } from '@/lib/useErrorText';
@@ -32,7 +32,7 @@ export function MarinaSettingsCard() {
   };
   const pct = usage ? Math.min(100, Math.round((usage.credits / Math.max(1, usage.allowance)) * 100)) : 0;
   return (
-    <SectionCard title={t('settings.title', { name: ASSISTANT_NAME })} aside={<Icon name="sparkles" size={16} />}>
+    <SectionCard title={t('settings.title', { name: ASSISTANT_NAME })} aside={<MarinaMark size={24} />}>
       <div className="flex flex-col gap-5" data-testid="marina-settings">
         {usage && (
           <div className="flex flex-col gap-2">

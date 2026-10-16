@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Brouillons et résumés dans la limite de vos autorisations. Les modifications nécessitent une approbation."
+          "desc": "Votre coéquipière IA : réponses, briefings et actions prêtes à confirmer dans toute l’application, selon les accès de chacun."
         },
         {
           "name": "Connexions",
@@ -1916,7 +1916,7 @@
           "Site web et tableau de bord hébergés",
           "Adresse incluse ou votre propre domaine",
           "Parcours métier",
-          "BranchHarbor AI (aperçu)"
+          "Marina"
         ],
         "cta": "Souscrire une offre"
       },
@@ -2222,7 +2222,7 @@
         "d": "Comptes connectés, remboursements, rapprochement et rapports par devise."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Ce que l’IA peut rédiger, ce qui nécessite une approbation et ce qu’elle ne fait jamais."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Rôles et accès"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Périmètre et approbations"
       }
     ],

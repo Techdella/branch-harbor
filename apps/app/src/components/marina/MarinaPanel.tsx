@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Icon, cx } from '@bh/ui';
+import { Icon, cx, MarinaMark } from '@bh/ui';
 import { ASSISTANT_NAME } from '@bh/shared';
 import { marina, suggestionsFor, type ConversationSummary, type Turn } from '@/lib/marina';
 import { useErrorText } from '@/lib/useErrorText';
@@ -13,13 +13,7 @@ import { ActionCard } from './ActionCard';
 import { Citations, MarinaChart, MarinaTable, Notices, RichText } from './Blocks';
 import { useMarina } from './MarinaProvider';
 
-export function MarinaMark({ size = 32 }: { size?: number }) {
-  return (
-    <span className="flex shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#2E6FD8,#5B3FC4_55%,#1E9E8A)] text-white" style={{ width: size, height: size }} aria-hidden="true">
-      <Icon name="sparkles" size={Math.round(size * 0.47)} />
-    </span>
-  );
-}
+export { MarinaMark } from '@bh/ui';
 
 function AssistantTurn({ turn }: { turn: Turn }) {
   const t = useTranslations('marina');
@@ -27,7 +21,7 @@ function AssistantTurn({ turn }: { turn: Turn }) {
   const app = useApp();
   return (
     <div className="flex gap-2.5" data-testid="marina-answer">
-      <MarinaMark size={26} />
+      <MarinaMark size={26} thinking={turn.pending && !turn.text} />
       <div className="flex min-w-0 flex-1 flex-col gap-2.5 rounded-[18px] bg-canvas-raised p-3.5 text-[13px] leading-relaxed">
         {turn.tools.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -117,7 +111,7 @@ export function MarinaPanel({ onClose, fullScreen }: { onClose: () => void; full
   };
   const usage = m.info?.usage;
   return (
-    <aside aria-label={t('panel', { name: ASSISTANT_NAME })} role={fullScreen ? 'dialog' : undefined} aria-modal={fullScreen || undefined} data-testid="marina-panel" className={cx('flex flex-col overflow-hidden bg-surface', fullScreen ? 'h-full' : 'h-viewport-inset rounded-xl')}>
+    <aside aria-label={t('panel', { name: ASSISTANT_NAME })} role={fullScreen ? 'dialog' : undefined} aria-modal={fullScreen || undefined} data-testid="marina-panel" className={cx('flex flex-col overflow-hidden bg-surface', fullScreen ? 'h-full' : 'h-full rounded-xl')}>
       <div className="flex flex-col gap-2 bg-[linear-gradient(135deg,#E6EEFC,#EEE7FB_55%,#E2F4F0)] p-4">
         <div className="flex items-center justify-between gap-2">
           <span className="flex min-w-0 items-center gap-2.5 text-base font-bold">
@@ -153,7 +147,7 @@ export function MarinaPanel({ onClose, fullScreen }: { onClose: () => void; full
               <div className="flex flex-col gap-2" data-testid="marina-suggestions">
                 {suggestions.map((k) => (
                   <button key={k} type="button" onClick={() => submit(t(`suggest.${k}`))} className="flex items-center gap-2 rounded-md border border-line-soft bg-surface px-3.5 py-2.5 text-left text-[13px] font-semibold hover:border-ink">
-                    <Icon name="sparkles" size={13} />
+                    <Icon name="marina" size={13} />
                     {t(`suggest.${k}`)}
                   </button>
                 ))}

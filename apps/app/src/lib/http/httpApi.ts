@@ -1726,7 +1726,7 @@ const httpApiCore: Omit<BranchHarborApi, 'business'> = {
     },
     ask: async (ctx, question) => {
       const status = await http.get<{ available: boolean; message?: string }>(o('/ai/status'));
-      if (!status.available) throw new ApiError('ai_unavailable', status.message ?? 'BranchHarbor AI is unavailable right now. Everything else keeps working.', 503);
+      if (!status.available) throw new ApiError('ai_unavailable', status.message ?? 'Marina is unavailable right now. Everything else keeps working.', 503);
       const scope = apiScope(ctx.scopeId, effectiveRole(ctx.role));
       const conv = await http.post<{ id: string }>(o('/ai/conversations'), { scope, title: question.slice(0, 120) });
       const r = await http.post<{ reply: string; scope: { label?: string }; sources: string[]; proposedActions: { id: string; kind: string; summary: string; scopeKind: string; scopeId: string }[] }>(o(`/ai/conversations/${conv.id}/messages`), { content: question });

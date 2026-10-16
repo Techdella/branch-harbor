@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import type { AiActionCard, AiBlock } from '@bh/shared';
-import { Badge, Button, Card, EmptyState, Icon, Screen, ScreenHeader, SkeletonCard, Text } from '@/components';
+import { Badge, Button, Card, EmptyState, Icon, Screen, ScreenHeader, SkeletonCard, Text, MarinaMark } from '@/components';
 import { color, pastel, radius, space, status } from '@/theme';
 import { useSession } from '@/lib/session';
 import { useApi } from '@/lib/useApi';
@@ -93,7 +93,10 @@ export function MarinaScreen({ tabs = true }: { tabs?: boolean }) {
       }>
       <ScreenHeader title={t('title')} kicker={t('kicker')} back={!tabs} />
       <Card bg={pastel.lilac}>
-        <Text variant="label" tone="muted">{t('briefing')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <MarinaMark size={28} />
+          <Text variant="label" tone="muted">{t('briefing')}</Text>
+        </View>
         {briefing.loading && !briefing.data ? <SkeletonCard /> : null}
         {briefing.data?.summary ? <Text>{briefing.data.summary}</Text> : null}
         {briefing.data && !briefing.data.items.length ? <Text tone="muted">{t('nothing')}</Text> : null}
@@ -107,7 +110,7 @@ export function MarinaScreen({ tabs = true }: { tabs?: boolean }) {
       {turns.length === 0 ? (
         <View style={{ gap: 8 }}>
           <Text variant="small" tone="muted">{t('intro')}</Text>
-          {(['suggestion1', 'suggestion2', 'suggestion3'] as const).map((k) => <Button key={k} label={t(k)} variant="secondary" size="sm" icon="sparkles" onPress={() => ask(t(k))} />)}
+          {(['suggestion1', 'suggestion2', 'suggestion3'] as const).map((k) => <Button key={k} label={t(k)} variant="secondary" size="sm" icon="marina" onPress={() => ask(t(k))} />)}
           <Text variant="small" tone="muted">{t('voiceHint')}</Text>
         </View>
       ) : null}

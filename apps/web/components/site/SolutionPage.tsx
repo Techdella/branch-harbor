@@ -29,7 +29,7 @@ const META: Record<Key, { icon: IconName; img: string; points: { icon: IconName;
       { icon: 'zap', bg: PASTEL.butter },
       { icon: 'globe', bg: PASTEL.aqua },
       { icon: 'plug', bg: PASTEL.lime },
-      { icon: 'sparkles', bg: PASTEL.lilac },
+      { icon: 'marina', bg: PASTEL.lilac },
     ],
   },
 };

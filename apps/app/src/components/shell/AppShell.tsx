@@ -59,7 +59,9 @@ function Shell({ children }: { children: ReactNode }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-white">
         {t('skip')}
       </a>
-      <aside className={cx('sticky top-3 hidden h-viewport-inset shrink-0 flex-col overflow-hidden rounded-xl bg-surface md:flex', collapsed ? 'w-[72px]' : 'w-[72px] lg:w-[248px]')}>
+      {/* The sidebar is pinned to the viewport (it never scrolls with the page); the spacer keeps its place in the layout. */}
+      <div aria-hidden="true" className={cx('hidden shrink-0 md:block', collapsed ? 'w-[72px]' : 'w-[72px] lg:w-[248px]')} />
+      <aside className={cx('fixed bottom-3 start-3 top-3 z-30 hidden flex-col overflow-hidden rounded-xl bg-surface md:flex', collapsed ? 'w-[72px]' : 'w-[72px] lg:w-[248px]')}>
         <Sidebar collapsed={collapsed} />
       </aside>
 
@@ -87,9 +89,13 @@ function Shell({ children }: { children: ReactNode }) {
             </div>
           </main>
           {app.aiOpen && xl && app.hasModule('ai.assistant') && (
-            <div className="sticky top-3 w-[380px] shrink-0">
-              <MarinaPanel onClose={() => app.setAiOpen(false)} />
-            </div>
+            <>
+              {/* Pinned like the sidebar, so Marina stays in view while the page scrolls. */}
+              <div aria-hidden="true" className="w-[380px] shrink-0" />
+              <div className="fixed bottom-3 end-3 top-3 z-30 flex w-[380px] flex-col">
+                <MarinaPanel onClose={() => app.setAiOpen(false)} />
+              </div>
+            </>
           )}
         </div>
       </div>

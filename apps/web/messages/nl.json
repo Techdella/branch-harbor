@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Concepten en samenvattingen binnen jouw bevoegdheden. Wijzigingen vragen goedkeuring."
+          "desc": "Je AI-collega: antwoorden, briefings en acties om te bevestigen in de hele app, binnen ieders toegang."
         },
         {
           "name": "Koppelingen",
@@ -1916,7 +1916,7 @@
           "Gehoste website en dashboard",
           "Meegeleverd adres of je eigen domein",
           "Branchespecifieke werkprocessen",
-          "BranchHarbor AI (preview)"
+          "Marina"
         ],
         "cta": "Start je abonnement"
       },
@@ -2222,7 +2222,7 @@
         "d": "Gekoppelde accounts, terugbetalingen, afstemming en rapportage per valuta."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Wat AI mag opstellen, wat goedkeuring vraagt en wat het nooit doet."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Rollen en toegang"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Reikwijdte en goedkeuringen"
       }
     ],

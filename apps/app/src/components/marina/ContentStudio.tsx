@@ -36,7 +36,7 @@ export function ContentStudio() {
   return (
     <>
       <PageHeader icon="edit" title={t('studio.title')} description={t('studio.description', { name: ASSISTANT_NAME })} scope={false}
-        actions={m.info?.can.admin ? <Button variant="secondary" icon="sparkles" loading={busy === 'voice'} onClick={() => go('voice', marina.learnVoice, (r) => setVoice(r.learned ? t('studio.voiceLearned') : (r.reason ?? '')))}>{t('studio.learnVoice')}</Button> : undefined} />
+        actions={m.info?.can.admin ? <Button variant="secondary" icon="marina" loading={busy === 'voice'} onClick={() => go('voice', marina.learnVoice, (r) => setVoice(r.learned ? t('studio.voiceLearned') : (r.reason ?? '')))}>{t('studio.learnVoice')}</Button> : undefined} />
       {voice && <SectionCard><p role="status" className="text-sm">{voice}</p></SectionCard>}
       <div className="grid gap-3 xl:grid-cols-2">
         <SectionCard title={t('studio.write')}>
@@ -49,7 +49,7 @@ export function ContentStudio() {
             <label className="flex flex-col gap-1 text-xs font-bold">{t('studio.brief')}
               <textarea value={brief} onChange={(e) => setBrief(e.target.value)} rows={4} placeholder={t('studio.briefPlaceholder')} className="rounded-sm border border-line-soft bg-surface p-2 text-sm font-normal" />
             </label>
-            <Button type="submit" icon="sparkles" loading={busy === 'gen'} disabled={brief.trim().length < 3}>{t('studio.generate')}</Button>
+            <Button type="submit" icon="marina" loading={busy === 'gen'} disabled={brief.trim().length < 3}>{t('studio.generate')}</Button>
           </form>
         </SectionCard>
         <SectionCard title={t('studio.result')}>

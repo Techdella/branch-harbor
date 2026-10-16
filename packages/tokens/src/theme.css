@@ -218,3 +218,15 @@
     transform: translate(-50%, -50%);
   }
 }
+
+/* Marina's mark: the guiding light breathes while she works. */
+@keyframes bh-marina-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+.bh-marina-thinking .bh-marina-glow {
+  animation: bh-marina-breathe 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bh-marina-thinking .bh-marina-glow { animation: none; }
+}

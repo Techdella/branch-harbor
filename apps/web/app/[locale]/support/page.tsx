@@ -15,7 +15,7 @@ const TOPICS: { icon: IconName; bg: string }[] = [
   { icon: 'wordpress', bg: PASTEL.butter },
   { icon: 'card', bg: PASTEL.blush },
   { icon: 'users', bg: PASTEL.lime },
-  { icon: 'sparkles', bg: PASTEL.sage },
+  { icon: 'marina', bg: PASTEL.sage },
 ];
 
 export default async function SupportPage({ params }: Props) {

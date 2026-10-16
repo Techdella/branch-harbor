@@ -838,7 +838,7 @@
       },
       "skuLocked": "Identificador maestro: bloqueado tras la distribución.",
       "ai": {
-        "title": "Redactar con la IA de BranchHarbor",
+        "title": "Redactar con Marina",
         "draft": "Redactar a partir de las especificaciones",
         "note": "Solo usa las especificaciones de abajo. Se eliminan las afirmaciones sobre compatibilidad, seguridad, materiales o disponibilidad que no aparezcan en ellas. No se guarda nada hasta que guardes.",
         "removed": "Afirmaciones sin respaldo eliminadas",
@@ -3119,7 +3119,7 @@
       "postalCode": "Código postal"
     },
     "ai": {
-      "title": "IA de BranchHarbor",
+      "title": "Marina",
       "draftsOnly": "Solo borradores",
       "factsOnly": "Los borradores solo usan los datos de este anuncio. La IA nunca añade características, vistas, colegios ni afirmaciones sobre el barrio, y nunca se dirige a personas ni las excluye.",
       "instructions": "Instrucciones",
@@ -4296,7 +4296,7 @@
       "generated": "generado {when}"
     },
     "ai": {
-      "title": "IA de BranchHarbor para estudios",
+      "title": "Marina para estudios",
       "proposalsOnly": "Solo borradores y propuestas",
       "describeTitle": "Redactar la descripción de una clase",
       "classType": "Tipo de clase",
@@ -4362,7 +4362,7 @@
     "validation_failed": "Revisa los campos marcados e inténtalo de nuevo.",
     "validation_error": "Revisa los campos marcados e inténtalo de nuevo.",
     "conflict": "Ese registro ya existe.",
-    "ai_unavailable": "La IA de BranchHarbor no está disponible ahora. Todo lo demás sigue funcionando.",
+    "ai_unavailable": "Marina no está disponible ahora. Todo lo demás sigue funcionando.",
     "ai_refused": "El asistente rechazó esta solicitud.",
     "fair_housing_refused": "No se permiten solicitudes que dirijan, seleccionen o excluyan a personas por una característica protegida (vivienda justa).",
     "fair_housing_flagged": "Este borrador contiene expresiones que podrían discriminar por una característica protegida. Edítalo antes de usarlo.",

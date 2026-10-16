@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Entwürfe und Zusammenfassungen im Rahmen Ihrer Berechtigungen. Änderungen erfordern eine Freigabe."
+          "desc": "Ihre KI-Kollegin: Antworten, Briefings und bestätigungsfertige Aktionen in der ganzen App, im Rahmen der Rechte jeder Person."
         },
         {
           "name": "Verbindungen",
@@ -1916,7 +1916,7 @@
           "Gehostete Website und Dashboard",
           "Inklusive Adresse oder eigene Domain",
           "Branchenabläufe",
-          "BranchHarbor AI (Vorschau)"
+          "Marina"
         ],
         "cta": "Tarif starten"
       },
@@ -2222,7 +2222,7 @@
         "d": "Verbundene Konten, Erstattungen, Abgleich und Berichte je Währung."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Was die KI entwerfen darf, was eine Freigabe braucht und was sie niemals tut."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Rollen und Zugriff"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Umfang und Freigaben"
       }
     ],

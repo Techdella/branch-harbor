@@ -123,7 +123,7 @@ function AiTools({ single }: { single?: string }) {
   return (
     <section className="flex flex-col gap-3 rounded-xl bg-surface p-5" aria-labelledby="studio-ai">
       <div className="flex flex-wrap items-center gap-2">
-        <Icon name="sparkles" size={18} />
+        <Icon name="marina" size={18} />
         <h2 id="studio-ai" className="text-base font-bold">{t('title')}</h2>
         <Badge tone="info">{t('proposalsOnly')}</Badge>
       </div>
@@ -132,7 +132,7 @@ function AiTools({ single }: { single?: string }) {
           <h3 className="text-sm font-bold">{t('describeTitle')}</h3>
           <Labeled label={t('classType')}><select className={inputCls} value={ct} onChange={(e) => { setCt(e.target.value); setDraft(null); setSaved(false); }}><option value="">{t('choose')}</option>{(types.data ?? []).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></Labeled>
           <Labeled label={t('tone')}><select className={inputCls} value={tone} onChange={(e) => setTone(e.target.value as typeof tone)}>{(['warm', 'energetic', 'calm'] as const).map((x) => <option key={x} value={x}>{t(`tones.${x}`)}</option>)}</select></Labeled>
-          <Button size="sm" icon="sparkles" disabled={!ct || d.pending} onClick={async () => { setSaved(false); setDraft((await d.run()) ?? null); }}>{d.pending ? t('working') : t('draft')}</Button>
+          <Button size="sm" icon="marina" disabled={!ct || d.pending} onClick={async () => { setSaved(false); setDraft((await d.run()) ?? null); }}>{d.pending ? t('working') : t('draft')}</Button>
           <ErrorLine message={d.error?.message} />
           {draft && (
             <>

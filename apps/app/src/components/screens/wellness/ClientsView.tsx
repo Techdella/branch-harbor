@@ -66,7 +66,7 @@ function ReplyAssistant() {
         <p className="text-stone">{t('assistantBody')}</p>
         <Field label={t('location')}>{({ id }) => <Select id={id} value={loc} onChange={(e) => setLoc(e.target.value)}>{locs.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}</Select>}</Field>
         <Field label={t('enquiry')} hint={t('enquiryHint')}>{({ id, describedBy }) => <Textarea id={id} aria-describedby={describedBy} value={enquiry} onChange={(e) => setEnquiry(e.target.value)} />}</Field>
-        <Button size="sm" icon="sparkles" disabled={!enquiry.trim() || action.pending} onClick={async () => setDraft((await action.run((api) => api.draftPolicyReply(loc, enquiry))) ?? null)}>{action.pending ? t('drafting') : t('draft')}</Button>
+        <Button size="sm" icon="marina" disabled={!enquiry.trim() || action.pending} onClick={async () => setDraft((await action.run((api) => api.draftPolicyReply(loc, enquiry))) ?? null)}>{action.pending ? t('drafting') : t('draft')}</Button>
         {action.error && <Banner tone={action.error.code === 'ai_unavailable' ? 'warning' : 'danger'} live="polite">{action.error.message}</Banner>}
         {draft && (
           <div className="flex flex-col gap-2 rounded-lg bg-canvas p-3">

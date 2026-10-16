@@ -286,9 +286,9 @@ function ReviewDrawer({ id, onClose }: { id: string | null; onClose: () => void 
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-sm font-bold">{t('drawer.reply')}</span>
-                    {r.aiEnabled && <Button size="sm" variant="secondary" icon="sparkles" loading={suggest.pending} onClick={async () => { const s = await suggest.run(r.id, r.language); if (s) { setText(s.suggestion); setAi(true); } }} data-testid="suggest-reply">{t('drawer.suggest')}</Button>}
+                    {r.aiEnabled && <Button size="sm" variant="secondary" icon="marina" loading={suggest.pending} onClick={async () => { const s = await suggest.run(r.id, r.language); if (s) { setText(s.suggestion); setAi(true); } }} data-testid="suggest-reply">{t('drawer.suggest')}</Button>}
                   </div>
-                  {ai && <p className="flex items-center gap-1.5 text-xs text-stone"><Icon name="sparkles" size={14} />{t('drawer.aiNote')}</p>}
+                  {ai && <p className="flex items-center gap-1.5 text-xs text-stone"><Icon name="marina" size={14} />{t('drawer.aiNote')}</p>}
                   <Field label={t('drawer.replyLabel')} hint={t('drawer.replyHint')}>{(p) => <Textarea id={p.id} rows={6} value={text} onChange={(e) => setText(e.target.value)} data-testid="reply-text" />}</Field>
                   {r.needsApproval && <p className="text-xs text-stone">{t('drawer.needsApproval')}</p>}
                   {r.canReply && (

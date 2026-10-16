@@ -1,5 +1,5 @@
 /**
- * Real Estate — portal syndication (Rightmove RTDF push, idealista / Zillow-RESO / REAXML hosted feeds; per-listing opt-in, per-office status), BranchHarbor AI proposals and
+ * Real Estate — portal syndication (Rightmove RTDF push, idealista / Zillow-RESO / REAXML hosted feeds; per-listing opt-in, per-office status), Marina proposals and
  * housekeeping jobs. Registered inside the authenticated scope by routes/realty.ts.
  */
 import { and, desc, eq, inArray } from 'drizzle-orm';

@@ -628,7 +628,7 @@ const AI_RULES = [
 ].join(' ');
 
 export async function suggestReply(s: Services, review: ReviewRow, opts: { tone?: string; locale?: string | null } = {}) {
-  if (!s.ai.enabled) throw unavailable('ai_unavailable', 'BranchHarbor AI is not available right now. Write the reply yourself; everything else keeps working.');
+  if (!s.ai.enabled) throw unavailable('ai_unavailable', 'Marina is not available right now. Write the reply yourself; everything else keeps working.');
   const [loc] = await s.db.select({ name: locations.name }).from(locations).where(eq(locations.id, review.locationId));
   const [org] = await s.db.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, review.organizationId));
   const msg = await s.ai.createMessage({

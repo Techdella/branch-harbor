@@ -158,7 +158,7 @@
   },
   "ai": {
     "button": "KI",
-    "title": "BranchHarbor KI",
+    "title": "Marina",
     "close": "KI-Bereich schließen",
     "scope": "Bereich:",
     "activeScope": "Aktiver Bereich: {scope}",
@@ -170,7 +170,7 @@
     "assumptions": "Annahmen:",
     "sources": "Quellen",
     "thinking": "Berechtigte Daten werden gesammelt…",
-    "askLabel": "BranchHarbor KI fragen",
+    "askLabel": "Marina fragen",
     "askPlaceholder": "Frage zu diesem Bereich…",
     "send": "Senden",
     "proposedAction": "Vorgeschlagene Aktion · Freigabe nötig",
@@ -838,7 +838,7 @@
       },
       "skuLocked": "Stammkennung – nach der Verteilung gesperrt.",
       "ai": {
-        "title": "Text mit BranchHarbor KI entwerfen",
+        "title": "Text mit Marina entwerfen",
         "draft": "Aus Spezifikationen entwerfen",
         "note": "Verwendet nur die Spezifikationen unten. Aussagen zu Kompatibilität, Sicherheit, Materialien oder Verfügbarkeit, die dort nicht stehen, werden entfernt. Erst beim Speichern wird etwas gesichert.",
         "removed": "Nicht belegte Aussagen entfernt",
@@ -3119,7 +3119,7 @@
       "postalCode": "Postleitzahl"
     },
     "ai": {
-      "title": "BranchHarbor KI",
+      "title": "Marina",
       "draftsOnly": "Nur Entwürfe",
       "factsOnly": "Entwürfe nutzen nur die Fakten dieses Inserats. Die KI fügt nie Ausstattung, Aussichten, Schulen oder Aussagen zur Nachbarschaft hinzu und spricht nie Personen gezielt an oder schließt sie aus.",
       "instructions": "Anweisungen",
@@ -4296,7 +4296,7 @@
       "generated": "erstellt {when}"
     },
     "ai": {
-      "title": "BranchHarbor KI für Studios",
+      "title": "Marina für Studios",
       "proposalsOnly": "Nur Entwürfe und Vorschläge",
       "describeTitle": "Kursbeschreibung entwerfen",
       "classType": "Kursart",
@@ -4362,7 +4362,7 @@
     "validation_failed": "Prüfen Sie die markierten Felder und versuchen Sie es erneut.",
     "validation_error": "Prüfen Sie die markierten Felder und versuchen Sie es erneut.",
     "conflict": "Dieser Eintrag existiert bereits.",
-    "ai_unavailable": "BranchHarbor KI ist gerade nicht verfügbar. Alles andere funktioniert weiterhin.",
+    "ai_unavailable": "Marina ist gerade nicht verfügbar. Alles andere funktioniert weiterhin.",
     "ai_refused": "Der Assistent hat diese Anfrage abgelehnt.",
     "fair_housing_refused": "Anfragen, die Personen aufgrund eines geschützten Merkmals ansprechen, lenken oder ausschließen, sind nicht erlaubt (Diskriminierungsverbot beim Wohnen).",
     "fair_housing_flagged": "Dieser Entwurf enthält Formulierungen, die nach einem geschützten Merkmal lenken könnten. Bearbeiten Sie ihn vor der Verwendung.",

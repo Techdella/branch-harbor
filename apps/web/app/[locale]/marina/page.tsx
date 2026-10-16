@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { IconName } from '@bh/icons';
 import { ASSISTANT_NAME } from '@bh/shared';
-import { Icon } from '@/components/ui';
+import { Icon, MarinaMark } from '@/components/ui';
 import { PASTEL } from '@/content/images';
 import { FaqList, H2, Lead, PageHero, Panel, PastelIcon, SampleBadge } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
@@ -15,7 +15,7 @@ export const generateMetadata = async ({ params }: Props) => buildMetadata((awai
 const FEATURES: { icon: IconName; bg: string }[] = [
   { icon: 'chart', bg: PASTEL.aqua },
   { icon: 'sun', bg: PASTEL.butter },
-  { icon: 'sparkles', bg: PASTEL.lilac },
+  { icon: 'marina', bg: PASTEL.lilac },
   { icon: 'pin', bg: PASTEL.sage },
   { icon: 'edit', bg: PASTEL.blush },
   { icon: 'book', bg: PASTEL.lime },
@@ -40,14 +40,18 @@ export default async function MarinaPage({ params }: Props) {
     <>
       <PageHero
         kicker={t('kicker')}
-        kickerIcon="sparkles"
+        kickerIcon="marina"
         title={t('title', v)}
         intro={t('lead', v)}
         aside={
           <div className="rounded-[24px] bg-lilac p-3 sm:p-4">
+            <div className="flex items-center gap-3 px-2 pb-3 pt-1">
+              <MarinaMark size={56} label={ASSISTANT_NAME} />
+              <span className="text-lg font-extrabold tracking-tight">{ASSISTANT_NAME}</span>
+            </div>
             <div className="rounded-[18px] bg-surface">
               <div className="flex items-center gap-2 border-b border-line-soft px-4 py-3">
-                <Icon name="sparkles" size={16} />
+                <MarinaMark size={28} />
                 <span className="text-sm font-bold">{t('askTitle')}</span>
                 <SampleBadge className="ms-auto">{tc('sampleData')}</SampleBadge>
               </div>
@@ -78,7 +82,7 @@ export default async function MarinaPage({ params }: Props) {
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <li key={f.name} className="flex flex-col gap-3 rounded-[24px] border border-line-soft p-6">
-              <PastelIcon name={FEATURES[i]?.icon ?? 'sparkles'} bg={FEATURES[i]?.bg ?? PASTEL.lilac} />
+              <PastelIcon name={FEATURES[i]?.icon ?? 'marina'} bg={FEATURES[i]?.bg ?? PASTEL.lilac} />
               <h3 className="text-xl font-extrabold tracking-[-0.02em]">{named(f.name)}</h3>
               <p className="text-[15px] leading-relaxed text-stone">{named(f.desc)}</p>
             </li>

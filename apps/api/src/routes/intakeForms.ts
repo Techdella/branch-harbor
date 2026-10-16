@@ -14,7 +14,7 @@ type Form = typeof intakeForms.$inferSelect;
 /**
  * Wellness intake forms. Administrative questions only (contact preferences, goals, accessibility needs,
  * consent) — BranchHarbor is not a clinical record system. Responses record the form and consent versions
- * they answered and are excluded from BranchHarbor AI context by default.
+ * they answered and are excluded from Marina context by default.
  */
 const question = z.object({
   id: z.string().regex(/^[a-z][a-z0-9_]{0,40}$/),

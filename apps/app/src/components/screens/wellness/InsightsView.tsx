@@ -41,7 +41,7 @@ export function InsightsView() {
   ];
   return (
     <>
-      <PageHeader icon="chart" title={t('title')} description={t('description')} actions={app.can('ai.use') ? <Button variant="secondary" icon="sparkles" disabled={action.pending} onClick={async () => setDraft((await action.run((api) => api.draftSummary(from, to, scoped))) ?? null)}>{action.pending ? t('summarising') : t('summarise')}</Button> : null} />
+      <PageHeader icon="chart" title={t('title')} description={t('description')} actions={app.can('ai.use') ? <Button variant="secondary" icon="marina" disabled={action.pending} onClick={async () => setDraft((await action.run((api) => api.draftSummary(from, to, scoped))) ?? null)}>{action.pending ? t('summarising') : t('summarise')}</Button> : null} />
       <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface p-3.5">
         <Tabs items={(['7', '30', '90'] as const).map((k) => ({ key: k, label: t('lastDays', { n: Number(k) }) }))} value={range} onChange={(k) => setRange(k as Range)} />
         <LocationSelect locations={locs} value={locationId} onChange={setLocationId} allLabel={t('allInScope')} label={tw('location')} />

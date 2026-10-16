@@ -65,7 +65,7 @@ export function InsightsScreen() {
         )}
       </View>
       {app.can('ai.use') && (
-        <SectionCard title={<span className="flex items-center gap-2"><Icon name="sparkles" size={18} />{t('insights.merch')}</span>}>
+        <SectionCard title={<span className="flex items-center gap-2"><Icon name="marina" size={18} />{t('insights.merch')}</span>}>
           <View res={merch}>
             {(m) => (
               <div className="flex flex-col gap-2 text-sm">

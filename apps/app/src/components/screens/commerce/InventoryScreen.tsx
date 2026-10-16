@@ -43,7 +43,7 @@ export function InventoryScreen() {
                 { key: 'act', header: '', render: (r) => (
                   <span className="flex gap-1">
                     {app.can('operations.write') && <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); setAdjust(r); }}>{t('inventory.adjust')}</Button>}
-                    <Button size="sm" variant="ghost" icon="sparkles" onClick={(e) => { e.stopPropagation(); setExplain(r); }}>{t('inventory.explain')}</Button>
+                    <Button size="sm" variant="ghost" icon="marina" onClick={(e) => { e.stopPropagation(); setExplain(r); }}>{t('inventory.explain')}</Button>
                   </span>
                 ) },
               ]} />

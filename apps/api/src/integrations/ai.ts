@@ -13,7 +13,7 @@ export interface AiProvider {
 }
 
 /**
- * Anthropic Messages API adapter for BranchHarbor AI. Disabled (enabled=false) without
+ * Anthropic Messages API adapter for Marina. Disabled (enabled=false) without
  * ANTHROPIC_API_KEY; routes return a 503 "AI unavailable" and nothing else is affected.
  *
  * Refusal handling: when ANTHROPIC_REFUSAL_FALLBACK is on (default), requests opt into the

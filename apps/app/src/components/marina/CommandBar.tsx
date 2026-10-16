@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Icon, cx } from '@bh/ui';
+import { Icon, MarinaMark, cx } from '@bh/ui';
 import { ASSISTANT_NAME, WORKSPACES } from '@bh/shared';
 import { flatNav, workspaceNav } from '@/lib/access';
 import { useApp } from '../shell/AppContext';
@@ -67,7 +67,7 @@ export function CommandBar() {
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-black/40 p-4 pt-[12vh]" onClick={() => setOpen(false)}>
       <div role="dialog" aria-modal="true" aria-label={t('command.title', { name: ASSISTANT_NAME })} className="w-full max-w-xl overflow-hidden rounded-xl bg-surface shadow-pop" onClick={(e) => e.stopPropagation()} data-testid="marina-command">
         <label className="flex items-center gap-3 border-b border-line-soft px-4">
-          <Icon name="sparkles" size={18} />
+          <MarinaMark size={22} />
           <span className="sr-only">{t('command.title', { name: ASSISTANT_NAME })}</span>
           <input
             ref={inputRef}
@@ -93,7 +93,7 @@ export function CommandBar() {
               <button type="button" onMouseEnter={() => setActive(i)} onClick={() => choose(i)} className={cx('flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm', i === active && 'bg-canvas')}>
                 {o.kind === 'ask' ? (
                   <>
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#2E6FD8,#5B3FC4)] text-white"><Icon name="sparkles" size={13} /></span>
+                    <MarinaMark size={28} />
                     <span className="min-w-0 flex-1 truncate"><strong>{t('command.ask', { name: ASSISTANT_NAME })}</strong> <span className="text-stone">“{q}”</span></span>
                   </>
                 ) : (

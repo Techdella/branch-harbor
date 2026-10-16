@@ -121,7 +121,7 @@ function InsightCard({ insight, onDone }: { insight: Insight; onDone: () => void
       {card ? <ActionCard action={card} onChange={(a) => a.status !== 'proposed' && onDone()} /> : (
         <div className="flex flex-wrap gap-2">
           {insight.suggestedActions.map((a) => (
-            <Button key={a.index} size="sm" variant="secondary" icon="sparkles" onClick={async () => { try { setCard(await marina.actOnInsight(insight.id, a.index)); } catch (e) { setError(errText(e as ApiError)); } }}>{a.label}</Button>
+            <Button key={a.index} size="sm" variant="secondary" icon="marina" onClick={async () => { try { setCard(await marina.actOnInsight(insight.id, a.index)); } catch (e) { setError(errText(e as ApiError)); } }}>{a.label}</Button>
           ))}
           <Button size="sm" variant="ghost" onClick={async () => { await marina.dismissInsight(insight.id); onDone(); }}>{t('insights.dismiss')}</Button>
         </div>
@@ -191,7 +191,7 @@ function SetupAssistant() {
       <p className="mb-3 text-sm text-stone">{t('setup.body')}</p>
       <form className="flex flex-col gap-2 md:flex-row" onSubmit={async (e) => { e.preventDefault(); setBusy(true); setError(null); try { setRes(await marina.setup(msg)); } catch (err) { setError(errText(err as ApiError)); } finally { setBusy(false); } }}>
         <input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder={t('setup.placeholder')} className="h-11 flex-1 rounded-full bg-canvas px-4 text-sm outline-none" aria-label={t('setup.title', { name: ASSISTANT_NAME })} />
-        <Button type="submit" icon="sparkles" loading={busy} disabled={msg.trim().length < 5}>{t('setup.plan')}</Button>
+        <Button type="submit" icon="marina" loading={busy} disabled={msg.trim().length < 5}>{t('setup.plan')}</Button>
       </form>
       {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       {res && (
@@ -225,9 +225,9 @@ export function MarinaHub() {
   const admin = !!m.info?.can.admin;
   return (
     <>
-      <PageHeader icon="sparkles" title={ASSISTANT_NAME} description={t('hub.description', { name: ASSISTANT_NAME })} scope={false}
+      <PageHeader icon="marina" title={ASSISTANT_NAME} description={t('hub.description', { name: ASSISTANT_NAME })} scope={false}
         actions={<>
-          <Button variant="secondary" icon="sparkles" onClick={() => app.setAiOpen(true)}>{t('hub.ask', { name: ASSISTANT_NAME })}</Button>
+          <Button variant="secondary" icon="marina" onClick={() => app.setAiOpen(true)}>{t('hub.ask', { name: ASSISTANT_NAME })}</Button>
           <Link href="/marina/visit-brief" className="inline-flex h-11 items-center gap-2 rounded-full bg-canvas px-4 text-sm font-bold"><Icon name="pin" size={15} />{t('visit.title')}</Link>
           <Link href="/marina/studio" className="inline-flex h-11 items-center gap-2 rounded-full bg-canvas px-4 text-sm font-bold"><Icon name="edit" size={15} />{t('studio.title')}</Link>
         </>} />

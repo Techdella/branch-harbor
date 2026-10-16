@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Rascunhos e resumos dentro das suas permissões. Alterações precisam de aprovação."
+          "desc": "Sua colega de IA: respostas, resumos e ações prontas para confirmar em todo o app, dentro do acesso de cada pessoa."
         },
         {
           "name": "Conexões",
@@ -1916,7 +1916,7 @@
           "Site e painel hospedados",
           "Endereço incluído ou seu próprio domínio",
           "Fluxos por segmento",
-          "BranchHarbor AI (prévia)"
+          "Marina"
         ],
         "cta": "Assinar um plano"
       },
@@ -2222,7 +2222,7 @@
         "d": "Contas conectadas, reembolsos, conciliação e relatórios por moeda."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "O que a IA pode redigir, o que precisa de aprovação e o que ela nunca faz."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Papéis e acesso"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Escopo e aprovações"
       }
     ],

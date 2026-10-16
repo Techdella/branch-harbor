@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { IconName } from '@bh/icons';
-import { Icon } from '@/components/ui';
+import { Icon, MarinaMark } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { INDUSTRIES, INDUSTRY_KEYS } from '@/content/industries';
 import { INTEGRATIONS, CATEGORY_PASTEL } from '@/content/integrations';
@@ -21,7 +21,7 @@ const CAPABILITIES: { icon: IconName; pastel: string; tag: 'launch' | 'preview' 
   { icon: 'users', pastel: PASTEL.lilac, tag: 'launch' },
   { icon: 'megaphone', pastel: PASTEL.blush, tag: 'launch' },
   { icon: 'card', pastel: PASTEL.butter, tag: 'setup' },
-  { icon: 'sparkles', pastel: PASTEL.lilac, tag: 'preview' },
+  { icon: 'marina', pastel: PASTEL.lilac, tag: 'launch' },
   { icon: 'plug', pastel: PASTEL.sage, tag: 'selected' },
 ];
 const TAG_STYLE = {
@@ -222,7 +222,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* 7b. The assistant */}
       <Panel labelledBy="marina-home-title" tone="lilac" className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
         <div className="flex flex-col items-start gap-4">
-          <Kicker icon="sparkles">{tmar('home.kicker')}</Kicker>
+          <MarinaMark size={64} label={ASSISTANT_NAME} />
+          <Kicker icon="marina">{tmar('home.kicker')}</Kicker>
           <H2 id="marina-home-title">{tmar('home.title', { name: ASSISTANT_NAME })}</H2>
           <Lead>{tmar('home.body', { name: ASSISTANT_NAME })}</Lead>
           <LinkButton href="/marina" iconRight="arrow-right">
@@ -232,7 +233,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <ul className="flex flex-col gap-2">
           {(tmar.raw('askExamples') as string[]).slice(0, 3).map((q) => (
             <li key={q} className="flex items-center gap-3 rounded-[18px] bg-surface px-4 py-3 text-sm font-medium">
-              <Icon name="sparkles" size={16} />
+              <Icon name="marina" size={16} />
               <span>{q}</span>
             </li>
           ))}

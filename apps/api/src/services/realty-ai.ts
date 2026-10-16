@@ -1,5 +1,5 @@
 /**
- * BranchHarbor AI for Real Estate: listing description drafts from supplied facts only, viewing-feedback summaries
+ * Marina for Real Estate: listing description drafts from supplied facts only, viewing-feedback summaries
  * and follow-up proposals. Everything is stored as a proposal; nothing is published, sent or changed by the model.
  *
  * Fair-housing guardrails live OUTSIDE the prompt as well as in it:
@@ -16,7 +16,7 @@ import { AppError } from '../lib/errors.ts';
 import { assertNoProtectedTargeting, type Listing } from './realty.ts';
 
 export const REALTY_AI_SYSTEM = [
-  'You are BranchHarbor AI assisting a real-estate office. You draft and summarise; you never publish, send or change records. People review everything you produce.',
+  'You are Marina, the BranchHarbor assistant, assisting a real-estate office. You draft and summarise; you never publish, send or change records. People review everything you produce.',
   'FAIR HOUSING: Never describe, target, prefer, exclude or steer people by race, colour, religion, national origin, ethnicity, sex, gender identity, sexual orientation, familial status (children, families, couples, singles), disability, age (young, senior, retirees, students), marital status, pregnancy, citizenship or source of income. Describe the property, not who should live there — no “perfect for families”, “ideal for young professionals”, “walking distance to church”, “safe neighbourhood”. If asked to target or exclude people by such characteristics, refuse and say why.',
   'FACTS: Use ONLY the facts in the request. Do not invent features, finishes, renovations, views, light, schools, neighbourhood or crime claims, commute times, investment returns, measurements or legal statements. If a fact is missing, leave it out. Keep the price, currency and area unit exactly as given.',
   'Regulated disclosures and legal wording come only from the business; never write them.',
@@ -79,7 +79,7 @@ export function guardFollowUps(input: Record<string, unknown>, knownRefs: Set<st
 type Kind = 'listing_description' | 'feedback_summary' | 'follow_up';
 
 async function runTool(s: Services, input: { kind: Kind; tool: AiTool; prompt: string; guard: (out: Record<string, unknown>) => ToolGuardResult }) {
-  if (!s.ai.enabled) throw new AppError(503, 'ai_unavailable', 'BranchHarbor AI is unavailable right now. Listings, viewings and offers keep working.');
+  if (!s.ai.enabled) throw new AppError(503, 'ai_unavailable', 'Marina is unavailable right now. Listings, viewings and offers keep working.');
   const messages: AiMessageParam[] = [{ role: 'user', content: [{ type: 'text', text: input.prompt }] }];
   const refusals: string[] = [];
   for (let i = 0; i < 3; i++) {
@@ -88,7 +88,7 @@ async function runTool(s: Services, input: { kind: Kind; tool: AiTool; prompt: s
       res = await s.ai.createMessage({ system: REALTY_AI_SYSTEM, messages, tools: [input.tool] });
     } catch (err) {
       s.log.error({ err }, 'realty AI request failed');
-      throw new AppError(503, 'ai_unavailable', 'BranchHarbor AI could not respond. Please try again later; other features are unaffected.');
+      throw new AppError(503, 'ai_unavailable', 'Marina could not respond. Please try again later; other features are unaffected.');
     }
     if (res.stop_reason === 'refusal') return { output: null, refusals: [...refusals, 'The assistant declined this request.'], model: res.model };
     messages.push({ role: 'assistant', content: res.content as AiMessageParam['content'] });

@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Bozze e riepiloghi nel rispetto dei tuoi permessi. Le modifiche richiedono approvazione."
+          "desc": "La tua collega IA: risposte, briefing e azioni pronte da confermare in tutta l’app, entro gli accessi di ciascuno."
         },
         {
           "name": "Connessioni",
@@ -1916,7 +1916,7 @@
           "Sito web e dashboard ospitati",
           "Indirizzo incluso o il tuo dominio",
           "Processi di settore",
-          "BranchHarbor AI (anteprima)"
+          "Marina"
         ],
         "cta": "Attiva il tuo piano"
       },
@@ -2222,7 +2222,7 @@
         "d": "Account collegati, rimborsi, riconciliazione e report per valuta."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Cosa può redigere l’IA, cosa richiede approvazione e cosa non fa mai."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Ruoli e accessi"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Ambito e approvazioni"
       }
     ],

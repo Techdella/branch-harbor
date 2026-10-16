@@ -1,5 +1,5 @@
 /**
- * BranchHarbor AI for Sports: draft programme descriptions, summarise enrolment and rank schedule-conflict
+ * Marina for Sports: draft programme descriptions, summarise enrolment and rank schedule-conflict
  * resolutions. Outputs are drafts/proposals only — nothing is published or applied by the model.
  *
  * Context is built from aggregate, non-sensitive data. Participant names, guardian contact details,
@@ -13,7 +13,7 @@ import { AppError } from '../lib/errors.ts';
 import type { ResolutionCandidate } from './sports-schedule.ts';
 
 const SYSTEM = [
-  'You are BranchHarbor AI helping a youth sports academy. You only draft text or rank options for a human to review; you never publish, send or change anything.',
+  'You are Marina, the BranchHarbor assistant, helping a youth sports academy. You only draft text or rank options for a human to review; you never publish, send or change anything.',
   'Use only the facts provided. Never invent medical, safety, injury, dietary or safeguarding claims, qualifications, results or guarantees.',
   'Never select, rank or judge children or their ability. Do not mention individual participants.',
   'Never add amounts in different currencies together.',
@@ -28,13 +28,13 @@ const rankTool: AiTool = {
 };
 
 async function ask(s: Services, prompt: string, tool: AiTool): Promise<Record<string, unknown> | string> {
-  if (!s.ai.enabled) throw new AppError(503, 'ai_unavailable', 'BranchHarbor AI is unavailable right now. Everything else keeps working.');
+  if (!s.ai.enabled) throw new AppError(503, 'ai_unavailable', 'Marina is unavailable right now. Everything else keeps working.');
   let msg;
   try {
     msg = await s.ai.createMessage({ system: SYSTEM, messages: [{ role: 'user', content: prompt }], tools: [tool] });
   } catch (err) {
     s.log.error({ err }, '[sports-ai] request failed');
-    throw new AppError(503, 'ai_unavailable', 'BranchHarbor AI could not respond. Please try again later; other features are unaffected.');
+    throw new AppError(503, 'ai_unavailable', 'Marina could not respond. Please try again later; other features are unaffected.');
   }
   const use = msg.content.find((c) => c.type === 'tool_use' && c.name === tool.name) as { input?: Record<string, unknown> } | undefined;
   if (use?.input) return use.input;

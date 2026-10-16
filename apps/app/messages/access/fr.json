@@ -324,7 +324,7 @@
         },
         "ai": {
           "name": "Assistant IA",
-          "description": "Interroger BranchHarbor AI sur les données que cette personne voit déjà. Il ne fait que rédiger et proposer."
+          "description": "Interroger Marina sur les données que cette personne voit déjà. Il ne fait que rédiger et proposer."
         }
       },
       "legal": {

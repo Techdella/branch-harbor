@@ -324,7 +324,7 @@
         },
         "ai": {
           "name": "Asistente de IA",
-          "description": "Preguntar a BranchHarbor AI sobre los datos que esta persona ya puede ver. Solo redacta y propone."
+          "description": "Preguntar a Marina sobre los datos que esta persona ya puede ver. Solo redacta y propone."
         }
       },
       "legal": {

@@ -148,7 +148,7 @@ function SessionDrawer({ s, director, onClose, onChanged }: { s: SSession | null
             <ul>{s.conflicts.map((c) => <li key={c.sessionId}>{c.teamName} · {fmtTime(c.startsAt, s.location.timeZone, locale)}–{fmtTime(c.endsAt, s.location.timeZone, locale)}</li>)}</ul>
             <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="secondary" icon="list" loading={resolutions.pending} onClick={async () => setProposals((await resolutions.run(s.id))?.proposals ?? null)}>{t('suggest')}</Button>
-              {app.can('ai.use') && director && <Button size="sm" variant="ghost" icon="sparkles" loading={ai.pending} onClick={async () => { const r = await ai.run(s.id); if (r) setProposals((p) => [...(p ?? []), ...r]); }}>{t('askAi')}</Button>}
+              {app.can('ai.use') && director && <Button size="sm" variant="ghost" icon="marina" loading={ai.pending} onClick={async () => { const r = await ai.run(s.id); if (r) setProposals((p) => [...(p ?? []), ...r]); }}>{t('askAi')}</Button>}
             </div>
             {(ai.error || resolutions.error) && <p className="text-xs">{(ai.error ?? resolutions.error)!.message}</p>}
           </section>
@@ -160,7 +160,7 @@ function SessionDrawer({ s, director, onClose, onChanged }: { s: SSession | null
             {proposals.map((p) => (
               <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line-soft p-3">
                 <div>
-                  <div className="flex items-center gap-1.5 font-bold">{p.source === 'ai' && <Icon name="sparkles" size={13} />}{p.proposal.venueName} · {fmtTime(p.proposal.startsAt, s.location.timeZone, locale)}</div>
+                  <div className="flex items-center gap-1.5 font-bold">{p.source === 'ai' && <Icon name="marina" size={13} />}{p.proposal.venueName} · {fmtTime(p.proposal.startsAt, s.location.timeZone, locale)}</div>
                   <div className="text-xs text-stone">{p.rationale}</div>
                 </div>
                 {director && <Button size="sm" loading={apply.pending} onClick={async () => { const r = await apply.run(p.id); if (r) onChanged(t('applied', { n: r.recipients })); }}>{t('apply')}</Button>}

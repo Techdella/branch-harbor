@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Drafts and summaries within your permissions. Changes need approval."
+          "desc": "Your AI teammate: answers, briefings and ready-to-confirm actions across the app, within each person’s access."
         },
         {
           "name": "Connections",
@@ -1916,7 +1916,7 @@
           "Hosted website and dashboard",
           "Included address or your own domain",
           "Industry workflows",
-          "BranchHarbor AI (preview)"
+          "Marina"
         ],
         "cta": "Start your plan"
       },
@@ -2222,7 +2222,7 @@
         "d": "Connected accounts, refunds, reconciliation and per-currency reporting."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "What AI can draft, what needs approval and what it never does."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Roles and access"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Scope and approvals"
       }
     ],

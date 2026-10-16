@@ -1,6 +1,6 @@
 # Pricing: price book, paid trial, regional tiers and checkout
 
-**Status: proposal — to be validated with pricing tests.** Price book version `2026-11` (`PRICE_BOOK_VERSION` in
+**Status: approved by the founder on 16 Oct 2026.** Price book version `2026-11` (`PRICE_BOOK_VERSION` in
 `packages/shared/src/pricing.ts`). The model follows the founder's decisions of 15 Oct 2026 and the competitive
 research (§8 localised pricing, §10 pricing models).
 
@@ -23,7 +23,7 @@ the trial fee is small, and **every price list stays within its tier's multiplie
 | **Hosted** | BranchHarbor-hosted site: per location per month |
 | **Network** | A monthly **HQ platform fee** (covers Franchise development, Legal, Finance, Training and Community; **includes 3 locations**, `NETWORK_INCLUDED_LOCATIONS`) + the Network per-location fee for every further location. **Unlimited users.** |
 | **Paid trial** | Every plan starts with a **14-day trial for a small fee** (USD 4.99 or the local price point). The chosen plan starts automatically on day 15 unless the customer cancels before. No free plan, no free trial. |
-| **Extra brands (multi-brand HQ)** | One platform fee per HQ covers its first brand; each further brand of the same industry adds **USD 99 per month** (local price points, `extraBrand`). Proposal, see [Multi-brand HQ](#multi-brand-hq-proposal). |
+| **Extra brands (multi-brand HQ)** | One platform fee per HQ covers its first brand; each further brand of the same industry adds **USD 99 per month** (local price points, `extraBrand`). See [Multi-brand HQ](#multi-brand-hq). |
 | **Royalty & marketing-fund collection** | A **flat fee per collection, capped per location per month** (USD 1.00, max USD 10). Never a percentage of royalties (`collectionFee`). |
 | **Online customer payments** | Stripe Connect application fee of **1 %** (`DEFAULT_PAYMENT_APPLICATION_FEE_BPS` = `STRIPE_APPLICATION_FEE_BPS` default, per org `applicationFeeBps`), plus Stripe's own processing fee. Shown on the pricing page. |
 | **Terms** | Monthly by default; annual = 10 × monthly (2 months included, `annualMonthlyPrice`); no cancellation fees; free data export at any time. |
@@ -61,7 +61,7 @@ BRL 5.5, TRY 40, ZAR 18, INR 85, PHP 57, IDR 16,300, EGP 49, NGN 1,550, KES 129,
 0.50), EGP (0.31 → 0.47), NGN (0.30 → 0.47), KES (0.36 → 0.48), GHS (0.35 → 0.48). USD, CAD, GBP, EUR, AUD, NZD,
 SEK, NOK, DKK, SGD, HKD, AED, PLN, CZK, MXN and ZAR keep their plan prices (MXN Hosted 649 → 669).
 
-## Price book (proposal: to be validated with pricing tests)
+## Price book (approved 16 Oct 2026)
 
 Monthly list prices in whole currency units (trial and collection fees with decimals). Stored and charged in ISO 4217
 minor units (`listPriceMinor`): × 100 except JPY. Tax is added on top.
@@ -145,13 +145,13 @@ Every other country is billed from the `USD` list (tier A).
 **Review cadence:** quarterly for volatile currencies (TRY, NGN, EGP, GHS, ARS-billed USD@C) and yearly for the rest.
 Existing subscriptions keep the price stored at checkout until customers are told about a change.
 
-## Multi-brand HQ (proposal)
+## Multi-brand HQ
 
 **Product decision:** one industry per business account. A group running two industries uses two business accounts
 under one login. **Multi-brand** means several brands of the **same** industry under one franchisor HQ (for example a
 fitness franchisor with two yoga concepts), as FranConnect models with its Brand level.
 
-**Proposal:** the HQ pays **one platform fee**, which covers its **first brand**. Each **further brand** adds a small
+The HQ pays **one platform fee**, which covers its **first brand**. Each **further brand** adds a small
 monthly fee, `extraBrand` in the price book (`FEE_PRICE_KEYS`): **USD 99 per brand per month**, set as a local price
 point in every price list (same regional tier bands as the other fees; checked by `pricing.test.ts`).
 `extraBrandFee(list, brands)` gives the amount. Locations are billed exactly as before, whatever brand they belong to
@@ -162,9 +162,8 @@ community set-up; what it adds is its own identity, sites and domain, email send
 cost us little to host but are worth a lot to a multi-concept franchisor. A second platform fee would push such groups
 into two accounts, which loses the network summary and brand comparison.
 
-Status: the fee is shown on the pricing page in all 9 website locales. **Not yet charged**: the API subscription does not
-add an `extraBrand` line until the proposal is validated with pricing tests (the billing service reads the price book, so
-it is one line in `planQuote` when approved).
+Status: the fee is shown on the pricing page in all 9 website locales and charged as a subscription item for each brand
+beyond the first.
 
 | Price list | Network platform fee (incl. first brand) | Each extra brand / month |
 |---|---:|---:|

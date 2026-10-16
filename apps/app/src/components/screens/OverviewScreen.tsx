@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { Badge, Button, Icon, cx } from '@bh/ui';
+import { Badge, Button, Icon, MarinaMark, cx } from '@bh/ui';
 import { useApi } from '@/lib/useApi';
 import { fmtTime, zoneLabel } from '@/lib/format';
 import { useApp } from '../shell/AppContext';
@@ -80,9 +80,7 @@ export function OverviewScreen({ header = true }: { header?: boolean }) {
                   )}
                 </SectionCard>
                 <div className="flex flex-wrap items-center gap-3.5 rounded-xl bg-ink p-5 text-white">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#7B4FD6,#E8835A)]">
-                    <Icon name="sparkles" size={20} />
-                  </span>
+                  <MarinaMark size={44} />
                   <div className="min-w-0 flex-1">
                     <div className="text-[15px] font-bold">{dt(ov.aiPromptKey, undefined, ov.aiPrompt)}</div>
                     <div className="text-xs text-[#B9B9B3]">{t('aiNote', { scope: scopeLabel })}</div>

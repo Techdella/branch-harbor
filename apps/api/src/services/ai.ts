@@ -94,7 +94,7 @@ async function runTool(s: Services, req: FastifyRequest, conv: Conversation, nam
 
 function systemPrompt(orgName: string, scopeLabel: string, permissions: string[]) {
   return [
-    `You are BranchHarbor AI, an assistant inside BranchHarbor for the organisation "${orgName}".`,
+    `You are Marina, the assistant inside BranchHarbor for the organisation "${orgName}".`,
     `Active scope: ${scopeLabel}. Only discuss data from this scope. If the user asks about data outside it, explain they need to switch scope or ask someone with access — never guess.`,
     `The user's permissions in this scope: ${permissions.join(', ') || 'none'}.`,
     'You can read authorised data with tools and PROPOSE changes with propose_action. You cannot execute changes: an authorised person approves proposals in BranchHarbor.',
@@ -106,7 +106,7 @@ function systemPrompt(orgName: string, scopeLabel: string, permissions: string[]
 }
 
 export async function sendAiMessage(s: Services, req: FastifyRequest, conv: Conversation, content: string) {
-  if (!s.ai.enabled) throw new AppError(503, 'ai_unavailable', 'BranchHarbor AI is unavailable right now. Everything else keeps working.');
+  if (!s.ai.enabled) throw new AppError(503, 'ai_unavailable', 'Marina is unavailable right now. Everything else keeps working.');
   const scope: ScopeTarget = { organizationId: conv.organizationId, kind: conv.scopeKind as ScopeTarget['kind'], id: conv.scopeId };
   await requirePerm(req, s.db, 'ai.use', scope);
   const perms = await permissionsAt(req, s.db, scope);
@@ -132,7 +132,7 @@ export async function sendAiMessage(s: Services, req: FastifyRequest, conv: Conv
       response = await s.ai.createMessage({ system: systemPrompt(org?.name ?? 'your organisation', scopeLabel, perms), messages, tools: TOOLS });
     } catch (err) {
       s.log.error({ err }, 'AI request failed');
-      throw new AppError(503, 'ai_unavailable', 'BranchHarbor AI could not respond. Please try again later; other features are unaffected.');
+      throw new AppError(503, 'ai_unavailable', 'Marina could not respond. Please try again later; other features are unaffected.');
     }
     messages.push({ role: 'assistant', content: response.content as AiMessageParam['content'] });
     await s.db.insert(aiMessages).values({ organizationId: conv.organizationId, conversationId: conv.id, role: 'assistant', content: response.content, inputTokens: response.usage.input_tokens, outputTokens: response.usage.output_tokens, model: response.model });
@@ -192,7 +192,7 @@ export async function executeProposedAction(s: Services, req: FastifyRequest, ac
       if (!f) throw notFound('Field');
       if (f.origin === 'locked') throw forbidden('This field is locked brand content');
       if (f.origin === 'approval' && !(await hasPerm(req, s.db, 'website.approve', scope))) {
-        const [ap] = await s.db.insert(approvals).values({ organizationId: orgId, locationId: page.locationId, targetType: 'field', targetId: f.id, payload: { pageId: page.id, fieldKey: f.fieldKey, value: p.value }, requestedBy: req.user!.id, requestComment: 'Proposed by BranchHarbor AI' }).returning();
+        const [ap] = await s.db.insert(approvals).values({ organizationId: orgId, locationId: page.locationId, targetType: 'field', targetId: f.id, payload: { pageId: page.id, fieldKey: f.fieldKey, value: p.value }, requestedBy: req.user!.id, requestComment: 'Proposed by Marina' }).returning();
         await s.db.update(fieldOverrides).set({ pendingValue: p.value, pendingApprovalId: ap!.id }).where(eq(fieldOverrides.id, f.id));
         return { result: 'pending_approval', approvalId: ap!.id };
       }

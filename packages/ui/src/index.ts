@@ -13,3 +13,4 @@ export * from './components/Avatar';
 export * from './components/Money';
 export * from './components/Table';
 export * from './components/Scope';
+export * from './components/MarinaMark';

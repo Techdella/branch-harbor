@@ -239,7 +239,7 @@
         },
         {
           "name": "{name}",
-          "desc": "Borradores y resúmenes dentro de tus permisos. Los cambios requieren aprobación."
+          "desc": "Tu compañera de IA: respuestas, resúmenes y acciones listas para confirmar en toda la app, según los accesos de cada persona."
         },
         {
           "name": "Conexiones",
@@ -1916,7 +1916,7 @@
           "Sitio web y panel alojados",
           "Dirección incluida o tu propio dominio",
           "Flujos por sector",
-          "BranchHarbor AI (vista previa)"
+          "Marina"
         ],
         "cta": "Contratar tu plan"
       },
@@ -2222,7 +2222,7 @@
         "d": "Cuentas conectadas, reembolsos, conciliación e informes por moneda."
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Qué puede redactar la IA, qué requiere aprobación y qué no hace nunca."
       },
       {
@@ -2261,7 +2261,7 @@
         "d": "Roles y accesos"
       },
       {
-        "t": "BranchHarbor AI",
+        "t": "Marina",
         "d": "Alcance y aprobaciones"
       }
     ],

@@ -145,7 +145,7 @@ export const intakeResponses = pgTable('intake_responses', {
   answers: jsonb('answers').$type<Record<string, unknown>>().notNull().default({}),
   consentVersion: text('consent_version').notNull(),
   consentGivenAt: ts('consent_given_at').notNull(),
-  /** Responses are never passed to BranchHarbor AI unless a business explicitly changes this per response. */
+  /** Responses are never passed to Marina unless a business explicitly changes this per response. */
   aiContextExcluded: boolean('ai_context_excluded').notNull().default(true),
   submittedAt: ts('submitted_at').notNull().defaultNow(),
 }, (t) => [index('intake_responses_form_idx').on(t.formId), index('intake_responses_customer_idx').on(t.customerId)]);

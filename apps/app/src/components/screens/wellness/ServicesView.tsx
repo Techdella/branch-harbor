@@ -153,7 +153,7 @@ function ServiceEditor({ svc, pracs, onClose, onSaved }: { svc: WService | null;
         <Field label={t('descriptionLabel')} hint={t('noHealthClaims')} optional>{({ id, describedBy }) => <Textarea id={id} aria-describedby={describedBy} value={f.description} onChange={(e) => set('description', e.target.value)} />}</Field>
         {svc && app.can('ai.use') && (
           <div className="flex flex-col gap-2 rounded-lg bg-canvas p-3">
-            <div className="flex flex-wrap items-center gap-2"><Button size="sm" variant="secondary" icon="sparkles" disabled={action.pending} onClick={async () => setDraft((await action.run((api) => api.draftServiceCopy(svc.id, 'calm'))) ?? null)}>{t('aiDraft')}</Button><span className="text-xs text-stone">{t('aiDraftHint')}</span></div>
+            <div className="flex flex-wrap items-center gap-2"><Button size="sm" variant="secondary" icon="marina" disabled={action.pending} onClick={async () => setDraft((await action.run((api) => api.draftServiceCopy(svc.id, 'calm'))) ?? null)}>{t('aiDraft')}</Button><span className="text-xs text-stone">{t('aiDraftHint')}</span></div>
             {draft && (
               <div className="flex flex-col gap-2 text-[13px]">
                 <p className="rounded-md bg-surface p-2.5">{draft.output}</p>

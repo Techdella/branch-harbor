@@ -143,7 +143,7 @@ function ProductEditor({ id, canEdit, onClose, onSaved, onDistribute }: { id: st
                 {id && (
                   <div className="rounded-lg bg-canvas-raised p-3 text-sm">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Icon name="sparkles" size={16} /><strong>{t('catalogue.ai.title')}</strong>
+                      <Icon name="marina" size={16} /><strong>{t('catalogue.ai.title')}</strong>
                       <Button size="sm" variant="secondary" loading={ai.pending} onClick={() => ai.run()}>{t('catalogue.ai.draft')}</Button>
                     </div>
                     <p className="mt-1 text-xs text-stone">{t('catalogue.ai.note')}</p>

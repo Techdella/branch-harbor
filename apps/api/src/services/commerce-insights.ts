@@ -143,7 +143,7 @@ const COPY_TOOL: AiTool = {
 export async function draftProductCopy(s: Services, organizationId: string, productId: string, opts: { locale: string; tone?: string; extraSpecs?: Record<string, string> }) {
   const [p] = await s.db.select().from(products).where(and(eq(products.id, productId), eq(products.organizationId, organizationId)));
   if (!p) throw notFound('Product');
-  if (!s.ai.enabled) throw unavailable('ai_unavailable', 'BranchHarbor AI is not available right now. You can still write and publish copy manually.');
+  if (!s.ai.enabled) throw unavailable('ai_unavailable', 'Marina is not available right now. You can still write and publish copy manually.');
   const vs = await s.db.select().from(variants).where(eq(variants.productId, p.id));
   const specs = { ...p.specs, ...(opts.extraSpecs ?? {}) };
   const supplied = { name: p.name, vendor: p.vendor, productType: p.productType, specs, options: p.options, variants: vs.map((v) => v.name) };
