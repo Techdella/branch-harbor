@@ -208,8 +208,15 @@
     {
       "idx": 29,
       "version": "7",
-      "when": 1792111165601,
-      "tag": "0029_franchise_dev",
+      "when": 1792111120183,
+      "tag": "0029_local_marketing",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1792112168257,
+      "tag": "0030_franchise_dev",
       "breakpoints": true
     }
   ]

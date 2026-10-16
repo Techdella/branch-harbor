@@ -323,6 +323,8 @@ async function main() {
   console.log(` Suppliers:     Maple & Ember — ${supply.suppliers} approved suppliers, ${supply.orders} purchase orders (one waiting for HQ approval, one due at Ballard today), rebates with a claim, off-contract spend`);
   console.log(`                supplier confirmation link (no login): ${supply.confirmLink}`);
   console.log(` Audits ph. 2:  recurring schedules (${supply.visits} visits created), visit planner, retraining link, ${supply.selfChecks} self-check runs · ${supply.logins.join(', ')}`);
+  const lm = await seedLocalMarketingDemo(northlight.orgId, today);
+  console.log(` Local marketing: listings for ${lm.locations} locations on Google/Apple/Bing (sandbox) with drift and holiday hours (${lm.holidaysApplied} locations), ${lm.inboxConversations} Google reviews in the inbox, co-op requests at every stage (${lm.reimbursed} reimbursed), ${lm.calls} tracked calls (${lm.missed} missed), a content calendar`);
   const fdev = await (await import('./seed-fdev.ts')).seedFranchiseDev({ db, today });
   if (fdev) {
     console.log(` Franchise dev: ${fdev.territories} territories on the map (sandbox demographics), satisfaction survey with ${fdev.surveyRounds} rounds, validation calls, a transfer, a notice of default, the Washington development schedule, ${fdev.statements} master split statements (Northlight Ireland)`);
@@ -534,6 +536,183 @@ async function seedDataPlatformDemo(orgId: string) {
   }
   await db.insert(t.benchmarkCohorts).values(cohorts).onConflictDoNothing();
   return { connections: Object.keys(conns).length, days: rows, imports: 2, launched: launchRows.length };
+}
+
+/**
+ * Demo data for local marketing (Northlight): listings (profiles, structured hours, Google/Apple/Bing sandbox
+ * directories, drift, a change waiting for approval, network holiday hours), Google reviews as inbox conversations with
+ * reply templates, the co-op fund (allowance, requests at every stage, a reimbursement in the fund ledger, a brand
+ * template), call tracking (sandbox numbers, a month of calls with missed-call leads) and the content calendar. All
+ * sandbox: no directory, phone number or social account is real.
+ */
+async function seedLocalMarketingDemo(orgId: string, today: string) {
+  const noop = () => {};
+  const s = { cfg, db, log: { info: noop, warn: noop, error: noop, debug: noop }, jobs: { enqueue: async () => {} }, partnerFetch: async () => ({ ok: false, status: 503, text: async () => '' }) } as unknown as import('../context.ts').Services;
+  const { pushLocation, simulateDirectoryEdit, applyHolidayHours, updateListing, ensureSyncs } = await import('../services/listings.ts');
+  const { backfillReviewConversations } = await import('../services/review-inbox.ts');
+  const { DEFAULT_RECORDING_DISCLOSURE } = await import('@bh/shared');
+  const user = async (local: string) => (await db.select().from(t.users).where(sql`${t.users.email} = ${`${local}@northlight.demo.branchharbor.com`}`))[0]!;
+  const [cmo, digital, brand, noah, mia, oliver, liam, ava] = (await Promise.all(['hannah.cho', 'priyanka.shah', 'theo.laurent', 'noah.williams', 'mia.rossi', 'oliver.grant', 'liam.oconnor', 'ava.thompson'].map(user))) as [typeof t.users.$inferSelect, typeof t.users.$inferSelect, typeof t.users.$inferSelect, typeof t.users.$inferSelect, typeof t.users.$inferSelect, typeof t.users.$inferSelect, typeof t.users.$inferSelect, typeof t.users.$inferSelect];
+  const locs = await db.select().from(t.locations).where(sql`${t.locations.organizationId} = ${orgId} and ${t.locations.status} = 'operating'`).orderBy(t.locations.name);
+  const L = Object.fromEntries(locs.map((l) => [l.code, l]));
+  const [orgRow] = await db.select({ slug: t.organizations.slug }).from(t.organizations).where(sql`${t.organizations.id} = ${orgId}`);
+  const site = `${cfg.SITES_BASE_URL.replace(/\/$/, '')}/${orgRow!.slug}`;
+  const now = Date.now();
+  const ago = (days: number, hours = 0) => new Date(now - days * 86_400_000 - hours * 3_600_000);
+  const year = Number(today.slice(0, 4));
+
+  // Settings: default field policy, review reply SLA, call recording only in the UK (with the disclosure).
+  await db.insert(t.localMarketingSettings).values({ organizationId: orgId, updatedBy: cmo.id, settings: {
+    reviewSla: { positiveHours: 48, negativeHours: 12 },
+    callRecording: { enabled: true, jurisdictions: { GB: { message: DEFAULT_RECORDING_DISCLOSURE['en-GB'] } } },
+  } });
+
+  // Listings: structured weekly hours (the hosted sites show them), profiles and categories.
+  const weekly = (opens: string, closes: string, weekendOpens = '08:00', weekendCloses = '18:00') => [1, 2, 3, 4, 5].map((day) => ({ day, opens, closes })).concat([6, 0].map((day) => ({ day, opens: weekendOpens, closes: weekendCloses })));
+  for (const [i, l] of locs.entries()) {
+    await db.update(t.locations).set({ hours: { weekly: weekly(i % 2 ? '06:30' : '06:00', i % 3 ? '21:00' : '21:30') } }).where(sql`${t.locations.id} = ${l.id}`);
+    const complete = i % 3 !== 2;
+    await db.insert(t.listingProfiles).values({
+      organizationId: orgId, locationId: l.id, primaryCategory: 'Yoga studio', additionalCategories: ['Meditation centre', 'Gym'],
+      description: complete ? `Hot yoga, vinyasa and yin classes in ${l.address.city}, with mats, towels and showers for every member. Intro month for new students.` : 'Hot yoga studio.',
+      photos: complete ? [1, 2, 3].map((n) => ({ url: `https://images.northlight.demo.branchharbor.com/${l.code.toLowerCase()}/${n}.jpg`, kind: n === 1 ? 'cover' as const : 'interior' as const, alt: '' })) : [],
+      websiteUrl: `${site}/${l.slug}`, bookingUrl: complete ? `${site}/${l.slug}/classes` : null, attributes: { wheelchair_accessible: i % 2 === 0, showers: true }, updatedBy: brand.id,
+    });
+  }
+  // Apple Business Connect and Bing Places in sandbox (no partner approval yet); Google comes from the Reviews connection.
+  for (const provider of ['apple', 'bing'] as const) {
+    const [c] = await db.insert(t.listingConnections).values({ organizationId: orgId, provider, mode: 'sandbox', connectedBy: digital.id }).returning();
+    for (const l of locs) await db.insert(t.listingSyncs).values({ organizationId: orgId, locationId: l.id, provider, connectionId: c!.id, externalId: `sandbox-${provider}-${l.code.toLowerCase()}`, mode: 'sandbox', status: 'pending' });
+  }
+  await ensureSyncs(db, orgId);
+  for (const l of locs) await pushLocation(s, orgId, l.id, { actorUserId: digital.id });
+  // Edited outside BranchHarbor: Apple Maps shows other Monday hours for Hackney; someone changed Kitsilano's phone on Google.
+  const syncOf = async (code: string, provider: string) => (await db.select().from(t.listingSyncs).where(sql`${t.listingSyncs.locationId} = ${L[code]!.id} and ${t.listingSyncs.provider} = ${provider}`))[0]!;
+  const freshHours = async (code: string) => (((await db.select({ hours: t.locations.hours }).from(t.locations).where(sql`${t.locations.id} = ${L[code]!.id}`))[0]!.hours ?? {}) as { weekly?: Array<{ day: number; opens: string; closes: string }>; special?: unknown[] });
+  if (L['LON-HK']) await simulateDirectoryEdit(s, orgId, (await syncOf('LON-HK', 'apple')).id, { hours: [{ day: 1, opens: '09:00', closes: '17:00' }, ...((await freshHours('LON-HK')).weekly ?? []).filter((h) => h.day !== 1)] });
+  if (L['YVR-KT']) await simulateDirectoryEdit(s, orgId, (await syncOf('YVR-KT', 'google')).id, { phone: '+1 604 555 0199' });
+  // A location change waiting for HQ (descriptions need approval).
+  if (L['LON-HK']) await updateListing(s, orgId, L['LON-HK'].id, { description: 'Hackney’s friendliest hot yoga studio: 40 classes a week, a sauna-warm room and a community that keeps you coming back.' }, { userId: noah.id, hq: false, note: 'New studio description for the autumn season' });
+  // Network holiday hours (Hackney had already set its own Boxing Day hours, so it keeps them).
+  if (L['LON-HK']) await db.update(t.locations).set({ hours: { ...(await freshHours('LON-HK')), special: [{ date: `${year}-12-26`, closed: false, opens: '10:00', closes: '14:00', label: 'Boxing Day' }] } }).where(sql`${t.locations.id} = ${L['LON-HK'].id}`);
+  const hol = await applyHolidayHours(s, orgId, { name: `Winter holidays ${year}`, entries: [{ date: `${year}-12-25`, closed: true, label: 'Christmas Day' }, { date: `${year}-12-26`, closed: false, opens: '09:00', closes: '13:00', label: 'Boxing Day' }, { date: `${year + 1}-01-01`, closed: false, opens: '10:00', closes: '16:00', label: 'New Year’s Day' }], locationIds: locs.map((l) => l.id), overwrite: false }, cmo.id);
+
+  // Reviews in the inbox: reply templates, and every Google review becomes a conversation.
+  await db.insert(t.reviewReplyTemplates).values([
+    { organizationId: orgId, name: 'Thank you (4–5★)', minRating: 4, maxRating: 5, locale: 'en', body: 'Thank you, {first_name}! We’re so glad you enjoy practising with us at {location}. See you on the mat soon.', createdBy: cmo.id },
+    { organizationId: orgId, name: 'Sorry, let’s talk (1–2★)', minRating: 1, maxRating: 2, locale: 'en', body: 'Thank you for telling us, {first_name}. We’re sorry your visit to {location} fell short. Please write to the studio so we can make it right.', createdBy: cmo.id },
+    { organizationId: orgId, name: 'Mixed visit (3★)', minRating: 3, maxRating: 3, locale: 'en', body: 'Thanks for the honest feedback, {first_name}. We’ve shared it with the {location} team.', createdBy: cmo.id },
+  ]);
+  const inboxConversations = await backfillReviewConversations(s, orgId);
+  // Older unanswered reviews were already dealt with before the inbox existed: only the last three weeks are open.
+  await db.execute(sql`update comms_conversations set status = 'closed', reply_due_at = null, unread = 0 where organization_id = ${orgId} and channel = 'review' and last_inbound_at < now() - interval '21 days'`);
+
+  // This quarter's marketing fund contributions per location (sample), so reimbursements have a balance to come from.
+  const qStart = (await import('@bh/shared')).coopPeriodBounds('quarter', today).start;
+  await db.insert(t.marketingFundEntries).values(locs.map((l) => ({ organizationId: orgId, kind: 'contribution', currency: l.currency, amountMinor: 400_000, occurredOn: qStart, description: 'Marketing fund contribution (sample)', locationId: l.id, ownerGroupId: l.ownerGroupId })));
+  // Co-op fund: 1,500 per quarter in each location's currency, HQ matches 50%.
+  await db.insert(t.coopAllowances).values({ organizationId: orgId, locationId: null, period: 'quarter', basis: 'fixed', fixedMinor: 150_000, matchRatioBps: 5000, updatedBy: cmo.id });
+  const q = (await import('@bh/shared')).coopPeriodBounds('quarter', today);
+  const checklist = (passed: boolean) => (['logo', 'colours_fonts', 'approved_claims', 'offer_terms', 'legal_disclaimer', 'local_details', 'placement']).map((key) => ({ key, label: null, passed, note: null }));
+  const doc = async (locationId: string, name: string, by: string) => (await db.insert(t.financeDocuments).values({ organizationId: orgId, kind: 'receipt', locationId, filename: name, contentType: 'application/pdf', sizeBytes: 20, dataBase64: Buffer.from('%PDF-1.4 demo invoice').toString('base64'), sha256: sha256(name), uploadedBy: by }).returning())[0]!.id;
+  const day = (offset: number) => addDays(today, offset);
+  const coop: Array<{ code: string; by: typeof noah; kind: string; title: string; vendor: string; start: number; budget: number; status: string; claim?: 'submitted' | 'approved' | 'paid'; spent?: number }> = [
+    { code: 'LON-HK', by: oliver, kind: 'print', title: 'Mare Street flyers and posters', vendor: 'Hackney Print Co', start: -40, budget: 80_000, status: 'claimed', claim: 'paid', spent: 76_500 },
+    { code: 'YVR-KT', by: liam, kind: 'event', title: 'Kits Beach sunrise yoga', vendor: 'Parks Board permit + rentals', start: -20, budget: 120_000, status: 'claimed', claim: 'submitted', spent: 112_000 },
+    { code: 'PDX-PR', by: ava, kind: 'ad', title: 'Pearl District radio spots', vendor: 'KXPD Radio', start: 10, budget: 90_000, status: 'submitted' },
+    { code: 'YVR-MS', by: liam, kind: 'digital', title: 'Main Street Instagram boost', vendor: 'Meta', start: 5, budget: 40_000, status: 'approved' },
+    { code: 'LON-HK', by: oliver, kind: 'sponsorship', title: 'Hackney Half Marathon stand', vendor: 'Hackney Half', start: 25, budget: 150_000, status: 'changes_requested' },
+  ];
+  let reimbursed = 0;
+  for (const c of coop) {
+    const l = L[c.code];
+    if (!l) continue;
+    const startsOn = day(c.start) < q.start ? q.start : day(c.start);
+    const decided = c.status !== 'submitted';
+    const [r] = await db.insert(t.coopRequests).values({
+      organizationId: orgId, locationId: l.id, kind: c.kind, title: c.title, description: `${c.title} to promote the intro month at ${l.name}.`, vendor: c.vendor, startsOn, budgetMinor: c.budget, currency: l.currency,
+      periodKey: q.key, creative: [{ kind: 'link', url: `https://assets.northlight.demo.branchharbor.com/${l.code.toLowerCase()}/${c.kind}.pdf`, name: `${c.kind}-proof.pdf` }], status: c.status,
+      checklist: checklist(c.status === 'approved' || c.status === 'claimed'), approvedMinor: c.status === 'approved' || c.status === 'claimed' ? c.budget : null,
+      decidedBy: decided ? cmo.id : null, decidedAt: decided ? ago(Math.max(1, -c.start)) : null, decisionNote: c.status === 'changes_requested' ? 'Please use the approved race-day banner template and add the offer terms.' : null, requestedBy: c.by.id,
+    }).returning();
+    if (!c.claim) continue;
+    const reimbursable = Math.floor((Math.min(c.spent!, c.budget) * 5000) / 10_000);
+    const invoice = await doc(l.id, `${c.code.toLowerCase()}-invoice.pdf`, c.by.id);
+    const proof = await doc(l.id, `${c.code.toLowerCase()}-proof.pdf`, c.by.id);
+    let fundEntryId: string | null = null;
+    if (c.claim === 'paid') {
+      const [e] = await db.insert(t.marketingFundEntries).values({ organizationId: orgId, kind: 'spend', currency: l.currency, amountMinor: -reimbursable, occurredOn: day(-3), description: `Co-op reimbursement: ${c.title} (${l.name})`, locationId: l.id, receiptDocumentId: invoice, vendor: c.vendor, createdBy: cmo.id }).returning();
+      fundEntryId = e!.id;
+      reimbursed++;
+    }
+    await db.insert(t.coopClaims).values({
+      organizationId: orgId, requestId: r!.id, locationId: l.id, spentMinor: c.spent!, currency: l.currency, invoiceDocumentId: invoice, proofDocumentIds: [proof], proofNotes: '5,000 flyers delivered door to door; 12 posters in local cafés.',
+      performance: { leads: 34, impressions: 5000 }, reimbursableMinor: c.claim === 'submitted' ? null : reimbursable, status: c.claim, decidedBy: c.claim === 'submitted' ? null : cmo.id, decidedAt: c.claim === 'submitted' ? null : ago(4),
+      fundEntryId, payoutMethod: c.claim === 'paid' ? 'bank_transfer' : null, payoutReference: c.claim === 'paid' ? `NL-COOP-${year}-0042` : null, paidAt: c.claim === 'paid' ? ago(3) : null, paidBy: c.claim === 'paid' ? cmo.id : null, submittedBy: c.by.id,
+    });
+  }
+  const [tpl] = await db.insert(t.localAssetTemplates).values({ organizationId: orgId, name: 'Intro month poster', kind: 'poster', width: 1080, height: 1350, status: 'published', createdBy: brand.id, fields: [
+    { key: 'headline', label: 'Headline', locked: true, default: 'Find your warmth', maxLength: 40, x: 8, y: 18, size: 64 },
+    { key: 'offer', label: 'Offer', locked: false, default: '30 days unlimited for £39', maxLength: 40, x: 8, y: 70, size: 34 },
+    { key: 'address', label: 'Studio address', locked: false, default: 'Your studio address', maxLength: 60, x: 8, y: 80, size: 26 },
+  ] }).returning();
+  if (L['LON-HK']) await db.insert(t.localAssetVersions).values({ organizationId: orgId, templateId: tpl!.id, locationId: L['LON-HK'].id, values: { headline: 'Find your warmth', offer: '30 days unlimited for £39', address: '210 Mare St, Hackney' }, createdBy: noah.id });
+
+  // Call tracking: sandbox numbers per location and campaign, a month of calls, missed calls that became leads.
+  const [campaign] = await db.select().from(t.adCampaigns).where(sql`${t.adCampaigns.organizationId} = ${orgId} and ${t.adCampaigns.kind} = 'network'`).limit(1);
+  const numberRows: Array<typeof t.trackingNumbers.$inferSelect> = [];
+  const fictional: Record<string, string[]> = { 'TOR-AX': ['+14165550101', '+14165550102'], 'YVR-KT': ['+16045550101', '+16045550102'], 'LON-HK': ['+447700900101', '+447700900102'], 'PDX-PR': ['+15035550101'] };
+  for (const [code, nums] of Object.entries(fictional)) {
+    const l = L[code];
+    if (!l?.phone) continue;
+    const [web] = await db.insert(t.trackingNumbers).values({ organizationId: orgId, locationId: l.id, label: 'Website', source: 'website', number: nums[0]!, mode: 'sandbox', forwardTo: l.phone.replace(/[^0-9+]/g, ''), isDefault: true, recordCalls: l.country === 'GB', createdBy: digital.id }).returning();
+    numberRows.push(web!);
+    if (nums[1]) {
+      const [ads] = await db.insert(t.trackingNumbers).values({ organizationId: orgId, locationId: l.id, campaignId: campaign?.id ?? null, label: 'Google Ads — intro month', source: 'google_ads', number: nums[1], mode: 'sandbox', forwardTo: l.phone.replace(/[^0-9+]/g, ''), dniMatch: { utmSource: 'google' }, recordCalls: l.country === 'GB', createdBy: digital.id }).returning();
+      numberRows.push(ads!);
+    }
+  }
+  const callers = [['Jordan Price', '+16475550111'], [null, '+14375550123'], ['Amelia Ross', '+16045550144'], [null, '+447700900555'], ['Sam Kim', '+15035550166'], ['Hiro Tanaka', '+16045550177'], [null, '+14165550188'], ['Grace Liu', '+447700900199']] as const;
+  let calls = 0;
+  let missed = 0;
+  for (let i = 0; i < 36; i++) {
+    const n = numberRows[i % numberRows.length]!;
+    const [name, phone] = callers[(i * 5) % callers.length]!;
+    const status = i % 7 === 3 ? 'missed' : i % 11 === 5 ? 'busy' : 'answered';
+    const startedAt = ago(i % 28, (i * 3) % 9 + 1);
+    let leadId: string | null = null;
+    if (status !== 'answered' && i % 2 === 1) {
+      const [lead] = await db.insert(t.leads).values({ organizationId: orgId, locationId: n.locationId, adCampaignId: n.campaignId, source: 'phone_call', kind: 'customer', name, phone, message: `Missed call (${n.source}).`, utm: { source: n.source }, createdAt: startedAt }).returning();
+      leadId = lead!.id;
+    }
+    await db.insert(t.trackedCalls).values({
+      organizationId: orgId, locationId: n.locationId, trackingNumberId: n.id, campaignId: n.campaignId, source: n.source, callerNumber: phone, callerName: name, externalSid: `CA_demo_${i}_${randomBytes(4).toString('hex')}`,
+      status, startedAt, durationSeconds: status === 'answered' ? 45 + ((i * 37) % 400) : 0, recorded: n.recordCalls && status === 'answered', sandbox: true, leadId, firstTimeCaller: i % 3 !== 0,
+      missedAlertedAt: status === 'answered' ? null : startedAt, followedUpAt: status !== 'answered' && i % 4 === 0 ? new Date(startedAt.getTime() + 3_600_000) : null,
+    });
+    calls++;
+    if (status !== 'answered') missed++;
+  }
+
+  // Content calendar: HQ posts for the coming weeks; Kitsilano already scheduled two on its Google Business Profile.
+  const [gbpKits] = L['YVR-KT'] ? await db.select().from(t.socialAccounts).where(sql`${t.socialAccounts.locationId} = ${L['YVR-KT'].id} and ${t.socialAccounts.ownerKind} = 'location'`).limit(1) : [];
+  const at = (d: number, h: number) => new Date(`${day(d)}T${String(h).padStart(2, '0')}:00:00Z`);
+  const posts = [
+    { title: 'Intro month is back', body: 'New to hot yoga? Your first 30 days at {location} are unlimited. Book your first class: {booking_link}', d: 2, h: 15, status: 'published' },
+    { title: 'Meet the teachers', body: 'Say hello to the teachers at Northlight {location} in {city} — drop in this week and find your favourite class.', d: 6, h: 16, status: 'published' },
+    { title: 'Winter holiday hours', body: 'Holiday hours at {location}: check the timetable before you come. Questions? Call us on {phone}.', d: 12, h: 15, status: 'published', allowEdits: true },
+    { title: 'Bring a friend week', body: 'Bring a friend to {location} for free this week. Book together: {booking_link}', d: 17, h: 17, status: 'published' },
+    { title: 'New Year intentions', body: 'Start the year grounded at {location}. New beginner series starting soon.', d: 24, h: 15, status: 'draft' },
+  ];
+  for (const [i, p] of posts.entries()) {
+    const [item] = await db.insert(t.socialCalendarItems).values({ organizationId: orgId, title: p.title, body: p.body, networks: ['facebook', 'instagram', 'google_business'], suggestedAt: at(p.d, p.h), allowEdits: !!p.allowEdits, status: p.status, publishedAt: p.status === 'published' ? ago(3) : null, createdBy: digital.id }).returning();
+    if (gbpKits && L['YVR-KT'] && i < 2) {
+      const body = p.body.replace('{location}', L['YVR-KT'].name).replace('{city}', 'Vancouver').replace('{booking_link}', `${site}/${L['YVR-KT'].slug}/classes`);
+      const [post] = await db.insert(t.socialPosts).values({ organizationId: orgId, locationId: L['YVR-KT'].id, body, accountIds: [gbpKits.id], scheduledAt: at(p.d, p.h), status: 'scheduled', authorUserId: mia.id }).returning();
+      await db.insert(t.socialCalendarAdoptions).values({ organizationId: orgId, itemId: item!.id, locationId: L['YVR-KT'].id, postId: post!.id, status: 'scheduled', adoptedBy: mia.id });
+    }
+  }
+  return { locations: locs.length, holidaysApplied: hol.applied.length, inboxConversations, reimbursed, calls, missed };
 }
 
 main()

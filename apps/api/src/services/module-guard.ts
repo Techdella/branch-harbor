@@ -72,6 +72,11 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   // Suppliers and supplier rebates (each endpoint checks its own module) and self-checks.
   supply: ['operations.suppliers', 'finance.supplier_rebates'],
   'self-checks': ['operations.self_checks'],
+  // Local marketing: listings, co-op fund, call tracking and their shared settings.
+  listings: ['marketing.listings'],
+  coop: ['marketing.coop'],
+  'call-tracking': ['marketing.call_tracking'],
+  'local-marketing': ['marketing.*'],
   // Franchise development: territory map, surveys & validation, agreement lifecycle, master franchise and splits.
   territories: ['sales.territories', 'sales.franchise_pipeline'],
   surveys: ['community.surveys'],

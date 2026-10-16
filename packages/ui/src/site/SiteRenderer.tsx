@@ -242,7 +242,7 @@ export function SectionView({ section, ctx, labels, live, renderForm, renderNews
             <Paras v={p.note} className="bhs-subtle" />
             <div className="bhs-actions">
               <a className="bhs-btn bhs-btn-primary" href={loc.directionsUrl} rel="noopener">{labels.directions}</a>
-              {p.showPhone !== false && loc.phone && <a className="bhs-btn bhs-btn-secondary" href={`tel:${loc.phone.replace(/\s+/g, '')}`}>{labels.call}</a>}
+              {p.showPhone !== false && loc.phone && <a className="bhs-btn bhs-btn-secondary" data-bh-phone="href" href={`tel:${loc.phone.replace(/\s+/g, '')}`}>{labels.call}</a>}
               {p.showEmail !== false && loc.email && <a className="bhs-btn bhs-btn-secondary" href={`mailto:${loc.email}`}>{labels.email}</a>}
             </div>
           </div>
@@ -277,7 +277,7 @@ export function SectionView({ section, ctx, labels, live, renderForm, renderNews
         <footer id={`s-${section.id}`} className={`${cls} bhs-footer bhs-footer-${variant}`} data-section="footer">
           <div className="bhs-inner bhs-footer-grid">
             <div><p className="bhs-footer-brand">{ctx.brandName}</p><Paras v={p.text} className="bhs-subtle" /></div>
-            {p.showAddress !== false && loc && <address className="bhs-address"><strong>{loc.name}</strong>{loc.addressLines.map((l, i) => <span key={i}><bdi>{l}</bdi></span>)}{loc.phone && <a href={`tel:${loc.phone.replace(/\s+/g, '')}`}>{loc.phone}</a>}</address>}
+            {p.showAddress !== false && loc && <address className="bhs-address"><strong>{loc.name}</strong>{loc.addressLines.map((l, i) => <span key={i}><bdi>{l}</bdi></span>)}{loc.phone && <a data-bh-phone="text" href={`tel:${loc.phone.replace(/\s+/g, '')}`}>{loc.phone}</a>}</address>}
             {p.showHours !== false && loc?.hours.weekly && <div><p className="bhs-footer-title">{labels.hours}</p><HoursTable loc={loc} locale={ctx.locale} closed={labels.closed} /></div>}
             {(arr(p.links).length > 0 || arr(p.socials).length > 0) && (
               <nav aria-label={ctx.brandName}>

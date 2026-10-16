@@ -12,6 +12,7 @@ import { actor, audit } from '../services/audit.ts';
 import { hasAt, requireAnyAt, requireAt, scopeFor } from '../services/comms-scope.ts';
 import { createRoutedLead } from '../services/lead-routing.ts';
 import { FUNDED_KINDS, markConsumed, recordFundSpend } from '../services/marketing-fund.ts';
+import { callCountsByCampaign } from '../services/call-tracking.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 const NC = 'marketing.network_campaigns';
@@ -51,14 +52,17 @@ export const adCampaignRoutes: FastifyPluginAsyncZod = async (app) => {
     const results = await s.db.select({ campaignId: adCampaignResults.campaignId, locationId: adCampaignResults.locationId, spend: sql<number>`sum(${adCampaignResults.spendMinor})::bigint`, impressions: sql<number>`sum(${adCampaignResults.impressions})::int`, clicks: sql<number>`sum(${adCampaignResults.clicks})::int`, platformLeads: sql<number>`sum(${adCampaignResults.platformLeads})::int` })
       .from(adCampaignResults).where(inArray(adCampaignResults.campaignId, ids)).groupBy(adCampaignResults.campaignId, adCampaignResults.locationId);
     const leadCounts = await s.db.select({ campaignId: leads.adCampaignId, locationId: leads.locationId, n: sql<number>`count(*)::int` }).from(leads).where(and(eq(leads.organizationId, orgId), inArray(leads.adCampaignId, ids))).groupBy(leads.adCampaignId, leads.locationId);
+    // Calls to the campaign's tracking numbers (Marketing → Call tracking).
+    const callCounts = await callCountsByCampaign(s.db, orgId, ids);
     return rows.map((c) => {
       const locs = locRows.filter((l) => l.cl.campaignId === c.id && (!visibleLocs || visibleLocs.includes(l.cl.locationId))).map((l) => {
         const r = results.find((x) => x.campaignId === c.id && x.locationId === l.cl.locationId);
         const leadsN = leadCounts.find((x) => x.campaignId === c.id && x.locationId === l.cl.locationId)?.n ?? 0;
+        const calls = callCounts.find((x) => x.campaignId === c.id && x.locationId === l.cl.locationId);
         const spend = Number(r?.spend ?? 0);
         return {
           locationId: l.cl.locationId, name: l.name, city: l.city, locationStatus: l.status, budget: { amount: l.cl.budgetMinor, currency: l.cl.currency }, radiusKm: l.cl.radiusKm,
-          spend: { amount: spend, currency: l.cl.currency }, impressions: r?.impressions ?? 0, clicks: r?.clicks ?? 0, platformLeads: r?.platformLeads ?? 0, leads: leadsN,
+          spend: { amount: spend, currency: l.cl.currency }, impressions: r?.impressions ?? 0, clicks: r?.clicks ?? 0, platformLeads: r?.platformLeads ?? 0, leads: leadsN, calls: calls?.calls ?? 0, answeredCalls: calls?.answered ?? 0,
           costPerLead: leadsN ? { amount: Math.round(spend / leadsN), currency: l.cl.currency } : null,
         };
       });
@@ -72,6 +76,7 @@ export const adCampaignRoutes: FastifyPluginAsyncZod = async (app) => {
         approvalId: c.approvalId, createdAt: c.createdAt.toISOString(), leadFormPath: c.kind === 'coming_soon' || c.kind === 'course' ? `/v1/public/ad-campaigns/${c.id}/leads` : null,
         totals: [...byCur.entries()].map(([cur, t]) => ({ currency: cur, budget: t.budget, spend: t.spend, leads: t.leads, costPerLead: t.leads ? Math.round(t.spend / t.leads) : null })),
         unattributedLeads: leadCounts.filter((x) => x.campaignId === c.id && !x.locationId).reduce((a, x) => a + x.n, 0),
+        calls: callCounts.filter((x) => x.campaignId === c.id && (!visibleLocs || visibleLocs.includes(x.locationId))).reduce((a, x) => a + x.calls, 0),
         locations: locs,
       };
     });

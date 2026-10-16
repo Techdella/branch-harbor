@@ -40,7 +40,7 @@ Env var names match `apps/api/.env.example`, `apps/app/.env.example` and `apps/m
 | # | Service | What it's for | Recommended | Alternatives | Env vars |
 |---|---|---|---|---|---|
 | 18 | **Maps, geocoding and address autocomplete** | Location finder, address entry for any country, timezone lookup from coordinates | **Google Maps Platform** (Places Autocomplete, Geocoding, Time Zone API) | Mapbox + Mapbox Search, HERE | `GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` |
-| 19 | **Google Business Profile** | Review monitoring and replies per location (live, see [Reviews](#reviews-requests-and-google-business-profile)); hours and posts later | **Google Business Profile APIs** (requires Google approval) | — | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
+| 19 | **Google Business Profile** | Review monitoring and replies per location (live, see [Reviews](#reviews-requests-and-google-business-profile)); listings sync of hours, special hours and details (see [Local marketing](#local-marketing-listings-call-tracking-co-op-fund-and-local-social)) | **Google Business Profile APIs** (requires Google approval) | — | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
 | 20 | **Calendar sync** | Staff schedules and appointments to Google/Outlook calendars | **Google Calendar API**, **Microsoft Graph** | Nylas (one API for both) | `GOOGLE_OAUTH_*`, `MS_GRAPH_CLIENT_ID/SECRET` |
 
 ## 4. Industry connectors: "existing-system connection" model (P1, pick per pilot)
@@ -475,6 +475,107 @@ Split statements pay the master franchisee's share of **collected** royalties an
 - `stripe_transfer`: `transfers.create` from the **platform balance** to the master's connected account (idempotency key per statement). Royalties are collected on the franchisor's own connected account, so the platform balance must hold funds in that currency first; transfers are same-currency only and limited to regions where Stripe supports cross-border transfers from the platform's country. The master's account needs the `transfers` capability.
 - `manual`: HQ pays by bank transfer and records the reference. Use this whenever transfers are not supported.
 - Without `STRIPE_SECRET_KEY` (sandbox) transfers get a `tr_sandbox_…` id and move no money.
+
+## Local marketing: listings, call tracking, co-op fund and local social
+
+Code: `apps/api/src/services/{listings,review-inbox,coop,call-tracking,local-social,local-marketing}.ts`,
+`apps/api/src/integrations/{listings,call-tracking}.ts`, routes `/v1/orgs/:orgId/{listings,coop,call-tracking,local-marketing}/…`,
+`/v1/orgs/:orgId/social/calendar/…`, `/v1/orgs/:orgId/reviews/templates`; shared rules in
+`packages/shared/src/local-marketing.ts`. Modules `marketing.listings`, `marketing.coop`, `marketing.call_tracking`
+(plus `marketing.reviews`, `marketing.inbox` and `marketing.social` for reviews in the inbox and the content calendar).
+
+### Listings (Google Business Profile, Apple Business Connect, Bing Places)
+
+One source of truth per location. Name, address, phone, weekly hours and special / holiday hours are stored **on the
+location itself** (`locations.hours.weekly` / `.special`), so the hosted location sites (opening hours, "open now",
+schema.org) always match the directories; categories, description, photos, website and booking links and attributes
+live in `listing_profiles`. HQ decides per field who may change it (HQ only / location / location with HQ approval);
+changes are pushed to every linked directory when saved (`autoPush`). Drift: the directory's copy is compared with what
+BranchHarbor last pushed (every `LISTINGS_DRIFT_CHECK_MINUTES` for live directories, or on "Check for changes"); a
+difference opens a drift that alerts HQ and the location, and HQ accepts it (the value becomes BranchHarbor's and goes to
+the other directories) or overwrites it. Bulk holiday hours set special hours at many locations at once, keeping a
+location's own hours for those dates unless "overwrite" is chosen. Each location gets a health score (0–100).
+
+**Google Business Profile:** no new credentials and no new scope. Listings reuse the Reviews OAuth connection
+(`GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, scope `business.manage`, which covers
+`locations.patch` / `locations.get` in the **My Business Business Information API**) and the Google location linked to
+each BranchHarbor location in Reviews. Pushed fields: title, storefront address, primary phone, regular and special
+hours, categories (only when stored as Google category ids, `gcid:…`), description and website. Photos (Media API) and
+booking links (Place Actions API) are not pushed yet. Note: Google may hold edits for review and may reject edits to
+verified listings that look like spam; a rejected edit shows as drift on the next check.
+
+**Apple Business Connect** (sandbox until approved): env `APPLE_BUSINESS_CONNECT_CLIENT_ID`,
+`APPLE_BUSINESS_CONNECT_CLIENT_SECRET`, optional `APPLE_BUSINESS_CONNECT_API_URL`. Steps:
+1. Enrol the BranchHarbor company in Apple Business Connect and apply for **API access as a partner** (Apple reviews the
+   application; approval is not automatic).
+2. After approval, create API credentials (client id and secret) in Business Connect and set the env vars; confirm the
+   base URL Apple gives partners (the adapter's endpoints follow the `/v1/companies/{companyId}/locations/{id}` shape and
+   must be checked against Apple's current API reference before going live).
+3. Each brand authorises BranchHarbor on its Apple company; in Marketing → Listings → Directories connect Apple with the
+   company id and link each location to its Apple location id.
+
+**Bing Places for Business** (sandbox until approved): env `BING_PLACES_API_KEY`, optional `BING_PLACES_API_URL`.
+Steps: apply to Microsoft's Bing Places partner programme for API access (bulk / multi-location partners), receive the
+subscription key and base URL, verify the adapter's endpoints against Microsoft's reference, then connect Bing and link
+locations to their Bing store ids. Without approval, brands can still upload Bing's bulk file by hand.
+
+Without credentials, directory connections are **sandbox**: nothing leaves BranchHarbor, the "directory copy" is
+simulated (`listing_syncs.remote_snapshot`) and "Simulate an edit" exercises drift detection end to end.
+
+### Google reviews in the unified inbox
+
+Every Google review becomes an inbox conversation of type `review` in the location's inbox (one per review), with a
+reply SLA from Settings (negative reviews sooner, default 12 h; others 48 h). Replies written in the inbox are published
+through the reviews service: the same HQ approval policy, the same Google reply call, the same audit. Reply templates
+(`{first_name}`, `{location}`, `{business}`) per rating band, HQ-wide or per location. No extra credentials.
+
+### Call tracking (Twilio Programmable Voice)
+
+Env: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` (shared with SMS), `CALL_TRACKING_LIVE` (default true; set false to keep
+call tracking in sandbox while SMS is live). Steps:
+1. Twilio console: upgrade the account (trial accounts can only call verified numbers) and complete **Regulatory
+   Compliance** bundles for each country you buy numbers in (UK, EU and Australian numbers need an address and identity
+   bundle; approval can take days).
+2. Nothing to configure per number: BranchHarbor buys local numbers through the API with the voice webhook
+   `https://api.<domain>/v1/webhooks/call-tracking/twilio/voice` (`PUBLIC_API_URL` + path); the outcome arrives on
+   `/v1/webhooks/call-tracking/twilio/status`. Both are verified with `X-Twilio-Signature` (auth token).
+3. Calls forward to the location's phone with the tracking number as caller id. Missed and busy calls alert the
+   location and, for unknown callers, create a lead routed by the lead rules.
+
+**Call recording is off by default.** Laws differ: some US states require every party's consent (California,
+Connecticut, Delaware, Florida, Illinois, Maryland, Massachusetts, Michigan, Montana, Nevada, New Hampshire, Oregon,
+Pennsylvania, Washington); Canada, the UK, the EU and Australia require at least a clear notice and a lawful basis
+(GDPR: tell callers why and how long recordings are kept). HQ switches recording on per jurisdiction (`GB`, `US-CA`, …)
+with a disclosure that is played before the call connects; a number can only record where its location's jurisdiction
+has a rule. Check with counsel before enabling it; recordings are stored by Twilio (`RecordingUrl`), not BranchHarbor.
+
+**Dynamic number insertion:** hosted location sites swap the phone number by the visitor's first UTM source / referrer
+(`components/TrackingNumber.tsx`, elements marked `data-bh-phone`). Other sites (e.g. WordPress) add
+`<script async src="https://api.<domain>/v1/public/call-tracking/dni.js" data-brand="…" data-location="…">`.
+Calls appear in ad campaign reports (`calls`, `answeredCalls` per campaign and location).
+
+Without Twilio credentials numbers are fictional (reserved ranges: NANP 555-01xx, Ofcom 07700 900xxx, ACMA
+0491 570xxx), never ring, and "Simulate a call" posts signed webhooks through the same handlers.
+
+### Co-op / local marketing fund
+
+No third party. HQ sets allowances per location (a share of its marketing fund contributions in the period, or a fixed
+amount per month / quarter / year) with a matching ratio; owners submit pre-approval requests (budget, dates, creative
+from brand assets, local templates or links); HQ approves against the brand checklist; after the spend the owner claims
+with the invoice and proof of performance; HQ approves (reimbursable = min(spent, approved) × match, capped at the
+allowance left) and records the reimbursement, which is booked as spend in the Finance marketing fund ledger with the
+invoice as receipt. **Payout:** recorded as a bank transfer (with reference) or marked paid. Stripe Connect transfers
+are deliberately not used: fund money sits on the franchisor's own collection account (see Finance: royalty
+collection), and routing it through the platform balance would make BranchHarbor a money transmitter. A credit on the
+next royalty invoice is a possible later option.
+
+### Local social (content calendar)
+
+No new credentials: posts are ordinary local social posts published by the existing dispatcher through the social
+adapters (Meta live with `META_APP_ID` / `META_APP_SECRET`; LinkedIn and Google Business posts sandbox). HQ publishes
+calendar items with `{location}`, `{city}`, `{phone}`, `{booking_link}`, `{website}`, `{brand}`; a location localises
+and schedules in one click on its own connected accounts (or HQ accounts it was granted). Unedited posts need no
+further approval (HQ wrote them); edited posts follow the location's marketing tier.
 
 ## What to set up first (shortest path to a Studios pilot)
 
