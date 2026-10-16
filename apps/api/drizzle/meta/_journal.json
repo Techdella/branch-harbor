@@ -225,6 +225,13 @@
       "when": 1792112869128,
       "tag": "0031_marina",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792113397238,
+      "tag": "0032_franchise_dev",
+      "breakpoints": true
     }
   ]
 }

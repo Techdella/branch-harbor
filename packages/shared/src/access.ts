@@ -277,6 +277,54 @@ export const LOCAL_MARKETING_GRANTS: Partial<Record<Role, GrantSpec>> = {
   location_manager: { 'marketing.listings': ['view', 'edit'], 'marketing.coop': ['view', 'edit'], 'marketing.call_tracking': ['view', 'edit'] },
 };
 
+/* ------------------------------------------------------------------ */
+/* Franchise development: territories, surveys, lifecycle, master      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Franchise development modules (one block):
+ * - `sales.territories`: the territory map (drawn or postcode territories), status from the pipeline and agreements,
+ *   exclusivity and overlap checks, demographics, scoring, Item 12-style and GeoJSON exports, the public map opt-in.
+ *   Franchise pipeline holders keep seeing territories through `sales.franchise_pipeline`.
+ * - `community.surveys`: franchisee satisfaction surveys (eNPS + custom questions, anonymity threshold, results by
+ *   region and owner group, trends, action plans) and opting in as a validator for candidate validation calls. View
+ *   = answer surveys; publish = run surveys and see results (in scope); edit = action plans.
+ * - `legal.lifecycle`: transfers, notices of default with cure periods and termination, amendments, renewals with
+ *   option windows, and multi-unit development schedules. Franchise owners see their own through New locations.
+ * - `sales.master_franchise`: master franchise and area representative agreements; a master franchisee (owner-group
+ *   scope) runs the pipeline, territories and disclosure for their own countries under the jurisdiction rules.
+ * - `finance.royalty_splits`: royalty and marketing-fund splits between HQ and a master franchisee, split statements
+ *   per period and currency, and payouts (Stripe Connect transfer or recorded bank payment). A master franchisee sees
+ *   their own statements.
+ */
+export const FRANCHISE_DEV_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'sales.territories', area: 'sales', name: 'Territory map', description: 'Territories drawn on a map or built from postcodes, their status in the pipeline, exclusivity and overlaps, demographics and scores, exports and the public map of available territories.',
+    actions: ALL, actionNotes: { edit: 'Draw, import and change territories, refresh demographics.', publish: 'Show available territories on the brand site.', export: 'Item 12 descriptions, CSV and GeoJSON.' },
+    networkOnly: true, status: 'available', hqOnly: true,
+  },
+  {
+    key: 'community.surveys', area: 'community', name: 'Surveys & validation', description: 'Franchisee satisfaction surveys with anonymous results by region and owner group, trends and action plans, and validation calls with prospective franchisees.',
+    actions: ALL, actionNotes: { view: 'Answer surveys and volunteer for validation calls.', edit: 'Work on action plans.', publish: 'Create and schedule surveys and see results for the people in scope.', export: 'Download results.' },
+    networkOnly: true, status: 'available',
+  },
+  {
+    key: 'legal.lifecycle', area: 'legal', name: 'Agreement lifecycle', description: 'Transfers between owners, notices of default and cure periods, terminations, amendments, renewals with option windows and multi-unit development schedules.',
+    actions: ALL, actionNotes: { edit: 'Prepare transfers, notices, amendments and schedules.', publish: 'Approve transfers, issue notices after counsel review, terminate and apply amendments.', export: 'Download notices and schedules.' },
+    networkOnly: true, status: 'available', hqOnly: true, sensitive: 'legal',
+  },
+  {
+    key: 'sales.master_franchise', area: 'sales', name: 'Master franchise', description: 'Master franchise and area representative agreements. A master franchisee runs the pipeline, territories and disclosure for their own countries.',
+    actions: ALL, actionNotes: { edit: 'HQ: manage master agreements. Master franchisee: work their own pipeline.', publish: 'Send disclosure documents for the master’s countries.' },
+    networkOnly: true, status: 'available', sensitive: 'personal_data',
+  },
+  {
+    key: 'finance.royalty_splits', area: 'finance', name: 'Royalty splits', description: 'Shares of royalties and marketing fund paid to master franchisees and area representatives, with split statements per period and currency and their payouts.',
+    actions: ALL, actionNotes: { view: 'Master franchisees see their own split statements.', edit: 'Set splits and prepare statements.', publish: 'Approve statements and pay out.', export: 'Download statements.' },
+    networkOnly: true, status: 'available', sensitive: 'finance',
+  },
+];
+
 /** Modules every business account has, whatever its industry. */
 export const CORE_MODULES: readonly ModuleDef[] = [
   // Network (HQ)
@@ -344,6 +392,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   ...SUPPLY_MODULES,
   // Listings, co-op fund and call tracking (see LOCAL_MARKETING_MODULES).
   ...LOCAL_MARKETING_MODULES,
+  // Territory map, surveys & validation, agreement lifecycle, master franchise and royalty splits (see FRANCHISE_DEV_MODULES).
+  ...FRANCHISE_DEV_MODULES,
 ];
 
 const ops = (key: string, name: string, description: string, screens: readonly string[], status: ModuleDef['status'] = 'available'): ModuleDef => ({
@@ -649,6 +699,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {
       'sales.franchise_pipeline': ALL, 'legal.disclosure': VE, 'legal.agreements': VE, 'network.locations': V, 'network.franchisees': VE, 'network.onboarding': VE, 'network.reports': V,
       ...everyone, 'settings.ai': V,
+      // Franchise development: territory map, validation calls, agreement lifecycle and master franchise.
+      'sales.territories': ALL, 'sales.master_franchise': ALL, 'legal.lifecycle': VE, 'community.surveys': VE,
     },
   },
   development_rep: {
@@ -760,6 +812,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'settings.team': VE, 'settings.ai': V,
       // Suppliers and self-checks for the territory (approving orders above the threshold there).
       'operations.suppliers': ALL, 'operations.self_checks': ALL,
+      // Franchise development: their own master agreement, pipeline and disclosure, and their royalty split statements.
+      'sales.master_franchise': ALL, 'finance.royalty_splits': V,
     },
   },
   area_developer: {

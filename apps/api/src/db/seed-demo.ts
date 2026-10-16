@@ -329,6 +329,11 @@ async function main() {
   console.log(` Audits ph. 2:  recurring schedules (${supply.visits} visits created), visit planner, retraining link, ${supply.selfChecks} self-check runs · ${supply.logins.join(', ')}`);
   const lm = await seedLocalMarketingDemo(northlight.orgId, today);
   console.log(` Local marketing: listings for ${lm.locations} locations on Google/Apple/Bing (sandbox) with drift and holiday hours (${lm.holidaysApplied} locations), ${lm.inboxConversations} Google reviews in the inbox, co-op requests at every stage (${lm.reimbursed} reimbursed), ${lm.calls} tracked calls (${lm.missed} missed), a content calendar`);
+  const fdev = await (await import('./seed-fdev.ts')).seedFranchiseDev({ db, today });
+  if (fdev) {
+    console.log(` Franchise dev: ${fdev.territories} territories on the map (sandbox demographics), satisfaction survey with ${fdev.surveyRounds} rounds, validation calls, a transfer, a notice of default, the Washington development schedule, ${fdev.statements} master split statements (Northlight Ireland)`);
+    if (fdev.validationToken) console.log(`                validation scheduling page: ${cfg.SITES_BASE_URL}/northlight-yoga/franchise/validation?token=${fdev.validationToken}`);
+  }
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }

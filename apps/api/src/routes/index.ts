@@ -118,4 +118,13 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./call-tracking.ts')).callTrackingWebhookRoutes);
   await app.register((await import('./call-tracking.ts')).callTrackingRoutes);
   await app.register((await import('./local-marketing.ts')).localMarketingRoutes);
+  // Franchise development: territory map (+ public map), surveys, validation calls (+ public scheduling page),
+  // agreement lifecycle and master franchise.
+  await app.register((await import('./territories.ts')).territoryRoutes);
+  await app.register((await import('./territories.ts')).territoryPublicRoutes);
+  await app.register((await import('./surveys.ts')).surveyRoutes);
+  await app.register((await import('./validation.ts')).validationRoutes);
+  await app.register((await import('./validation.ts')).validationPublicRoutes);
+  await app.register((await import('./lifecycle.ts')).lifecycleRoutes);
+  await app.register((await import('./master.ts')).masterRoutes);
 };

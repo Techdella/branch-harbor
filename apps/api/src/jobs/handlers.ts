@@ -67,6 +67,12 @@ export function registerJobHandlers(s: Services) {
   });
 
   // Field audits and compliance documents: overdue reminders and expiry reminders (60/30/7 days, on expiry + HQ).
+  // Franchise development: survey rounds on schedule, cure periods that ended.
+  s.jobs.register('franchise-dev.hourly', async () => {
+    await (await import('../services/franchise-dev/surveys.ts')).runSurveyJobs(s);
+    await (await import('../routes/lifecycle.ts')).runLifecycleJobs(s);
+  });
+
   s.jobs.register('quality.daily', async () => {
     await (await import('../services/audits.ts')).runAuditJobs(s);
     await (await import('../services/compliance.ts')).runComplianceJobs(s);

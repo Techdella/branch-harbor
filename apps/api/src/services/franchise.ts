@@ -17,7 +17,7 @@ import type { Exec } from '../db/client.ts';
 import {
   brands, campaigns, fieldOverrides, franchiseActivities, franchiseAgreements, franchiseCadences, franchiseDeliveries, franchiseDocuments, franchiseEmailTemplates,
   franchiseFeeInvoices, franchiseJurisdictionRules, franchiseProjects, franchiseProspects, franchiseRegistrations, franchiseSignatures, franchiseTasks,
-  franchiseTerritories, invitations, locations, organizations, ownerGroups, pages, templates, users, websites,
+  franchiseTerritories, invitations, locations, masterAgreements, organizations, ownerGroups, pages, templates, users, websites,
 } from '../db/schema/index.ts';
 import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
@@ -109,8 +109,11 @@ export async function prospectCompliance(db: Exec, p: Prospect, now = new Date()
   const regs = await db.select().from(franchiseRegistrations).where(eq(franchiseRegistrations.organizationId, p.organizationId));
   const [signed] = await db.select().from(franchiseSignatures).where(and(eq(franchiseSignatures.prospectId, p.id), eq(franchiseSignatures.status, 'signed'))).orderBy(asc(franchiseSignatures.signedAt)).limit(1);
   const [paid] = await db.select().from(franchiseFeeInvoices).where(and(eq(franchiseFeeInvoices.prospectId, p.id), eq(franchiseFeeInvoices.status, 'paid'))).orderBy(asc(franchiseFeeInvoices.paidAt)).limit(1);
+  // A master franchisee's prospect: the master is the franchisor in their country (franchise-dev, master_agreements).
+  const [master] = p.masterAgreementId || p.scopeTerritoryId ? await db.select({ country: masterAgreements.homeCountry, region: masterAgreements.homeRegion }).from(masterAgreements)
+    .where(and(eq(masterAgreements.status, 'active'), p.masterAgreementId ? eq(masterAgreements.id, p.masterAgreementId) : eq(masterAgreements.scopeTerritoryId, p.scopeTerritoryId!))).limit(1) : [];
   return evaluateFranchiseCompliance({
-    franchisor: { country: fs.homeCountry, region: fs.homeRegion },
+    franchisor: master ? { country: master.country, region: master.region } : { country: fs.homeCountry, region: fs.homeRegion },
     prospect: { country: p.country, region: p.region },
     rules, now,
     deliveries: dels.map(({ d, doc }) => ({ id: d.id, kind: d.kind as 'disclosure' | 'agreement', jurisdictions: doc.jurisdictions, deliveredAt: d.deliveredAt, receiptSignedAt: d.receiptSignedAt, materialChange: d.materialChange })),

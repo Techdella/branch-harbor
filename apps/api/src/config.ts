@@ -177,6 +177,15 @@ const envSchema = z.object({
 
   // Maps / FX / storage / observability
   GOOGLE_MAPS_API_KEY: optional,
+  /**
+   * Basemap for territory maps (dashboard and the public "available territories" map): a MapLibre style JSON URL
+   * (e.g. https://api.maptiler.com/maps/streets-v2/style.json?key=…) or a raster XYZ template with {z}/{x}/{y}.
+   * Unset: maps draw territories on a plain styled background with a graticule (no third-party tiles, no key).
+   */
+  MAP_TILES_URL: optional,
+  MAP_ATTRIBUTION: optional,
+  /** US Census Bureau API key: ACS 5-year demographics by ZIP code (ZCTA) for territory scoring. Unset: sandbox figures. */
+  CENSUS_API_KEY: optional,
   OPEN_EXCHANGE_RATES_APP_ID: optional,
   S3_ENDPOINT: optional,
   S3_REGION: z.string().default('auto'),
@@ -288,6 +297,8 @@ export function integrationStatus(cfg: Config) {
     push: mode(!!cfg.EXPO_ACCESS_TOKEN || cfg.ENABLE_EXPO_PUSH, 'sandbox'),
     domains: mode(!!(cfg.CLOUDFLARE_API_TOKEN && cfg.CLOUDFLARE_ZONE_ID), 'sandbox'),
     maps: mode(!!cfg.GOOGLE_MAPS_API_KEY),
+    territoryBasemap: cfg.MAP_TILES_URL ? 'live (MAP_TILES_URL)' : 'outline (no tiles configured)',
+    demographics: cfg.CENSUS_API_KEY ? 'US Census ACS live; other countries sandbox' : 'sandbox (sample figures)',
     fx: mode(!!cfg.OPEN_EXCHANGE_RATES_APP_ID),
     storage: mode(!!(cfg.S3_BUCKET && cfg.S3_ACCESS_KEY_ID), 'sandbox'),
     sentry: mode(!!cfg.SENTRY_DSN),

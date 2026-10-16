@@ -5,7 +5,8 @@ import { NearMe } from '@/components/NearMe';
 import { OpenBadge } from '@/components/OpenBadge';
 import { SchematicMap } from '@/components/SchematicMap';
 import { FranchiseEnquiry } from '@/components/franchise/FranchiseEnquiry';
-import { getFranchiseForm } from '@/lib/franchise';
+import { getFranchiseForm, getTerritoryMap } from '@/lib/franchise';
+import { AvailableTerritories } from '@/components/franchise/AvailableTerritories';
 import { BrandDocument } from '@/components/builder/SiteContent';
 import { getRouting, loadBrand, makeLinks, resolveSiteLocale, str } from '@/lib/site';
 import type { BrandSite } from '@/lib/types';
@@ -73,6 +74,8 @@ export default async function BrandHome({ params, searchParams }: Props) {
   const heroImage = data.brand.theme.heroImageUrl ?? str(home?.content.hero_image);
   // "Own a franchise" module: franchise networks that switched the enquiry form on (posts to their pipeline).
   const franchise = data.brand.model === 'independent' ? null : await getFranchiseForm(slug);
+  // Opt-in "Available territories" map for the recruitment section.
+  const territoryMap = data.brand.model === 'independent' ? null : await getTerritoryMap(slug);
   const tf = await getTranslations('franchiseSite');
 
   return (
@@ -153,11 +156,12 @@ export default async function BrandHome({ params, searchParams }: Props) {
         </div>
       </section>
 
-      {franchise && (
+      {(franchise || territoryMap) && (
         <section id="own-a-franchise" aria-labelledby="franchise-h" className="mx-auto mt-14 max-w-3xl scroll-mt-20 px-4">
           <h2 id="franchise-h" className="text-2xl font-extrabold tracking-tight sm:text-3xl">{tf('title', { brand: data.brand.name })}</h2>
-          <p className="mb-5 mt-2 text-graphite">{tf('intro')}</p>
-          <FranchiseEnquiry brandSlug={slug} brandName={data.brand.name} currency={franchise.currency ?? 'USD'} countries={franchise.countries ?? []} territories={franchise.territories ?? []} />
+          {franchise && <p className="mb-5 mt-2 text-graphite">{tf('intro')}</p>}
+          {territoryMap && <AvailableTerritories data={territoryMap} formAnchor={franchise ? '#franchise-form' : null} />}
+          {franchise && <div id="franchise-form" className="scroll-mt-20"><FranchiseEnquiry brandSlug={slug} brandName={data.brand.name} currency={franchise.currency ?? 'USD'} countries={franchise.countries ?? []} territories={franchise.territories ?? []} /></div>}
         </section>
       )}
 

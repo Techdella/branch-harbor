@@ -52,6 +52,26 @@
     "canSignFrom": "Vous pourrez signer ce contrat à partir du {date}. Ce délai vous laisse le temps d’étudier le document d’information.",
     "cannotSignYet": "Ce contrat ne peut pas encore être signé. Le franchiseur vous contactera.",
     "errSign": "Saisissez votre nom complet et cochez la case pour signer.",
-    "esignLegal": "La signature électronique est reconnue dans de nombreux pays, mais les règles varient. Consultez votre propre avocat si vous avez des questions."
+    "esignLegal": "La signature électronique est reconnue dans de nombreux pays, mais les règles varient. Consultez votre propre avocat si vous avez des questions.",
+    "mapTitle": "Territoires disponibles",
+    "mapIntro": "{count, plural, =0 {Aucun territoire n’est ouvert pour le moment.} one {# territoire est ouvert aux nouveaux franchisés.} other {# territoires sont ouverts aux nouveaux franchisés.}}",
+    "mapLabel": "Carte des territoires de franchise",
+    "mapOutline": "Carte simplifiée",
+    "legendAvailable": "Disponible",
+    "legendTaken": "Pris",
+    "availableList": "Territoires disponibles",
+    "noneAvailable": "Tous les territoires sont pris pour le moment. Envoyez une demande et nous vous préviendrons dès qu’un territoire se libère.",
+    "askAbout": "Se renseigner",
+    "validationTitle": "Parlez à nos franchisés",
+    "validationIntro": "Bonjour {name}, ces franchisés {brand} vous proposent de raconter ce qu’est vraiment la gestion d’une unité. Réservez un court appel avec chacun d’eux.",
+    "validationBook": "Réserver un créneau",
+    "validationPropose": "Quand êtes-vous disponible ?",
+    "validationProposeHint": "Proposez deux ou trois créneaux, avec votre fuseau horaire.",
+    "validationSend": "Envoyer les créneaux",
+    "validationProposed": "Vous avez proposé : {times}. La confirmation arrivera par e-mail.",
+    "validationScheduled": "Appel prévu le {date}",
+    "validationDone": "Appel terminé. Merci !",
+    "validationEmpty": "Personne n’est encore désigné. Nous vous écrirons quand les appels seront organisés.",
+    "validationNote": "Ces appels restent entre vous et le franchisé. {brand} n’écoute pas."
   }
 }

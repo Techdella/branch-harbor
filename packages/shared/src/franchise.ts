@@ -16,7 +16,8 @@ export const MANUAL_STAGES: readonly FranchiseStage[] = ['enquiry', 'qualified',
 export const PROSPECT_SOURCES = ['website', 'brand_site', 'referral', 'ads', 'campaign', 'broker', 'event', 'franchise_portal', 'other'] as const;
 export type ProspectSource = (typeof PROSPECT_SOURCES)[number];
 
-export const TERRITORY_STATUSES = ['available', 'reserved', 'sold', 'unavailable'] as const;
+/** `under_development` (agreement signed, location being built) and `open` follow the pipeline and agreements. */
+export const TERRITORY_STATUSES = ['available', 'reserved', 'sold', 'under_development', 'open', 'unavailable'] as const;
 export type TerritoryStatus = (typeof TERRITORY_STATUSES)[number];
 
 export const REGISTRATION_STATUSES = ['not_filed', 'pending', 'registered', 'exempt', 'expired'] as const;

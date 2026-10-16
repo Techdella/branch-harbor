@@ -52,6 +52,26 @@
     "canSignFrom": "You can sign this agreement from {date}. The waiting period gives you time to review the disclosure document.",
     "cannotSignYet": "This agreement cannot be signed yet. The franchisor will contact you.",
     "errSign": "Type your full name and tick the box to sign.",
-    "esignLegal": "Electronic signatures are recognised in many countries, but rules differ. Ask your own lawyer if you have questions about signing electronically."
+    "esignLegal": "Electronic signatures are recognised in many countries, but rules differ. Ask your own lawyer if you have questions about signing electronically.",
+    "mapTitle": "Available territories",
+    "mapIntro": "{count, plural, =0 {No territory is open right now.} one {# territory is open for new franchisees.} other {# territories are open for new franchisees.}}",
+    "mapLabel": "Map of franchise territories",
+    "mapOutline": "Simplified map",
+    "legendAvailable": "Available",
+    "legendTaken": "Taken",
+    "availableList": "Available territories",
+    "noneAvailable": "Every territory is taken right now. Send an enquiry and we'll tell you when one opens.",
+    "askAbout": "Ask about it",
+    "validationTitle": "Talk to our franchisees",
+    "validationIntro": "Hi {name}, these {brand} franchise owners offered to tell you what running a unit is really like. Book a short call with each of them.",
+    "validationBook": "Book a time",
+    "validationPropose": "When suits you?",
+    "validationProposeHint": "Suggest two or three times, with your time zone.",
+    "validationSend": "Send times",
+    "validationProposed": "You suggested: {times}. They will confirm by email.",
+    "validationScheduled": "Call booked for {date}",
+    "validationDone": "Call done. Thank you!",
+    "validationEmpty": "Nobody is assigned yet. We'll email you when calls are set up.",
+    "validationNote": "These calls are between you and the franchisee. {brand} doesn't listen in."
   }
 }

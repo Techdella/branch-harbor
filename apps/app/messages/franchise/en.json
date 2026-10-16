@@ -270,6 +270,8 @@
       "available": "Available",
       "reserved": "Reserved",
       "sold": "Sold",
+      "under_development": "Under development",
+      "open": "Open",
       "unavailable": "Unavailable"
     },
     "onboarding": {

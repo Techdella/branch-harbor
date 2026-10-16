@@ -52,6 +52,26 @@
     "canSignFrom": "Podrás firmar este contrato a partir del {date}. El plazo te da tiempo para revisar el documento informativo.",
     "cannotSignYet": "Este contrato aún no se puede firmar. El franquiciador te contactará.",
     "errSign": "Escribe tu nombre completo y marca la casilla para firmar.",
-    "esignLegal": "La firma electrónica está reconocida en muchos países, pero las normas varían. Consulta a tu propio abogado si tienes dudas."
+    "esignLegal": "La firma electrónica está reconocida en muchos países, pero las normas varían. Consulta a tu propio abogado si tienes dudas.",
+    "mapTitle": "Territorios disponibles",
+    "mapIntro": "{count, plural, =0 {Ahora mismo no hay territorios abiertos.} one {# territorio está abierto a nuevos franquiciados.} other {# territorios están abiertos a nuevos franquiciados.}}",
+    "mapLabel": "Mapa de territorios de franquicia",
+    "mapOutline": "Mapa simplificado",
+    "legendAvailable": "Disponible",
+    "legendTaken": "Ocupado",
+    "availableList": "Territorios disponibles",
+    "noneAvailable": "Ahora mismo todos los territorios están ocupados. Envía una consulta y te avisaremos cuando se libere uno.",
+    "askAbout": "Preguntar",
+    "validationTitle": "Habla con nuestros franquiciados",
+    "validationIntro": "Hola, {name}: estos franquiciados de {brand} se ofrecen a contarte cómo es realmente llevar una unidad. Reserva una llamada corta con cada uno.",
+    "validationBook": "Reservar hora",
+    "validationPropose": "¿Cuándo te viene bien?",
+    "validationProposeHint": "Propón dos o tres horarios, con tu zona horaria.",
+    "validationSend": "Enviar horarios",
+    "validationProposed": "Has propuesto: {times}. Te confirmarán por correo.",
+    "validationScheduled": "Llamada reservada para el {date}",
+    "validationDone": "Llamada hecha. ¡Gracias!",
+    "validationEmpty": "Aún no hay nadie asignado. Te escribiremos cuando se organicen las llamadas.",
+    "validationNote": "Estas llamadas son entre tú y el franquiciado. {brand} no escucha."
   }
 }

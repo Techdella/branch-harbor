@@ -77,6 +77,12 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   coop: ['marketing.coop'],
   'call-tracking': ['marketing.call_tracking'],
   'local-marketing': ['marketing.*'],
+  // Franchise development: territory map, surveys & validation, agreement lifecycle, master franchise and splits.
+  territories: ['sales.territories', 'sales.franchise_pipeline'],
+  surveys: ['community.surveys'],
+  validation: ['sales.franchise_pipeline', 'community.surveys'],
+  lifecycle: ['legal.lifecycle', 'network.onboarding'],
+  master: ['sales.master_franchise', 'finance.royalty_splits'],
   // The inbox holds refunds (finance), local ad spend (marketing), shift swaps and website changes; each decision is
   // checked per kind.
   approvals: ['network.approvals', 'finance.payments', 'marketing.campaigns'],

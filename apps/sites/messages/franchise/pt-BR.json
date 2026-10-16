@@ -52,6 +52,26 @@
     "canSignFrom": "Você poderá assinar este contrato a partir de {date}. O prazo dá tempo para analisar o documento de divulgação.",
     "cannotSignYet": "Este contrato ainda não pode ser assinado. A franqueadora vai entrar em contato.",
     "errSign": "Digite seu nome completo e marque a caixa para assinar.",
-    "esignLegal": "A assinatura eletrônica é reconhecida em muitos países, mas as regras variam. Consulte seu próprio advogado em caso de dúvidas."
+    "esignLegal": "A assinatura eletrônica é reconhecida em muitos países, mas as regras variam. Consulte seu próprio advogado em caso de dúvidas.",
+    "mapTitle": "Territórios disponíveis",
+    "mapIntro": "{count, plural, =0 {Nenhum território está aberto no momento.} one {# território está aberto a novos franqueados.} other {# territórios estão abertos a novos franqueados.}}",
+    "mapLabel": "Mapa de territórios de franquia",
+    "mapOutline": "Mapa simplificado",
+    "legendAvailable": "Disponível",
+    "legendTaken": "Ocupado",
+    "availableList": "Territórios disponíveis",
+    "noneAvailable": "No momento todos os territórios estão ocupados. Envie um contato e avisaremos quando um abrir.",
+    "askAbout": "Perguntar",
+    "validationTitle": "Converse com nossos franqueados",
+    "validationIntro": "Olá, {name}! Estes franqueados {brand} se ofereceram para contar como é de verdade tocar uma unidade. Agende uma conversa rápida com cada um.",
+    "validationBook": "Agendar horário",
+    "validationPropose": "Quando fica bom para você?",
+    "validationProposeHint": "Sugira dois ou três horários, com seu fuso horário.",
+    "validationSend": "Enviar horários",
+    "validationProposed": "Você sugeriu: {times}. A confirmação chega por e-mail.",
+    "validationScheduled": "Ligação marcada para {date}",
+    "validationDone": "Ligação feita. Obrigado!",
+    "validationEmpty": "Ainda não há ninguém designado. Avisaremos por e-mail quando as ligações forem combinadas.",
+    "validationNote": "Essas conversas ficam entre você e o franqueado. A {brand} não escuta."
   }
 }
