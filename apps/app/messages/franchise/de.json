@@ -367,7 +367,8 @@
       "fileNumber": "Aktenzeichen",
       "expires": "Läuft ab",
       "noRegistrations": "Keine Registrierungen erfasst",
-      "recordRegistration": "Registrierung erfassen"
+      "recordRegistration": "Registrierung erfassen",
+      "expiredAgo": "Seit {days, plural, one {# Tag} other {# Tagen}} abgelaufen"
     },
     "agreementStatus": {
       "active": "Aktiv",

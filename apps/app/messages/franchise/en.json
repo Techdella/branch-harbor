@@ -367,7 +367,8 @@
       "fileNumber": "File number",
       "expires": "Expires",
       "noRegistrations": "No registrations recorded",
-      "recordRegistration": "Record a registration"
+      "recordRegistration": "Record a registration",
+      "expiredAgo": "Expired {days, plural, one {# day} other {# days}} ago"
     },
     "agreementStatus": {
       "active": "Active",

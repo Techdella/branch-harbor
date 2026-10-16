@@ -367,7 +367,8 @@
       "fileNumber": "Número do processo",
       "expires": "Vence em",
       "noRegistrations": "Nenhum registro cadastrado",
-      "recordRegistration": "Cadastrar registro"
+      "recordRegistration": "Cadastrar registro",
+      "expiredAgo": "Venceu há {days, plural, one {# dia} other {# dias}}"
     },
     "agreementStatus": {
       "active": "Vigente",

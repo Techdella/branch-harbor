@@ -367,7 +367,8 @@
       "fileNumber": "Número de expediente",
       "expires": "Vence",
       "noRegistrations": "No hay registros",
-      "recordRegistration": "Anotar un registro"
+      "recordRegistration": "Anotar un registro",
+      "expiredAgo": "Venció hace {days, plural, one {# día} other {# días}}"
     },
     "agreementStatus": {
       "active": "Vigente",

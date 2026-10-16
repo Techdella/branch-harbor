@@ -67,7 +67,7 @@ function Agreements() {
                 { key: 'term', header: t('legal.term'), render: (r) => `${f.date(r.startDate)} – ${f.date(r.endDate)}` },
                 { key: 'fees', header: t('legal.fees'), render: (r) => t('legal.feesValue', { royalty: f.pct(r.royaltyBps), fund: f.pct(r.marketingFundBps) }) },
                 { key: 'renewal', header: t('legal.renewal'), render: (r) => r.renewalOption ?? '—' },
-                { key: 'status', header: t('legal.status'), render: (r) => r.expiringSoon ? <Badge tone="warning" icon="clock">{t('legal.expiresIn', { days: r.daysToExpiry })}</Badge> : <Badge tone={r.status === 'active' ? 'success' : 'neutral'}>{t(`agreementStatus.${r.status}` as 'agreementStatus.active')}</Badge> },
+                { key: 'status', header: t('legal.status'), render: (r) => r.daysToExpiry !== null && r.daysToExpiry !== undefined && r.daysToExpiry < 0 && r.status === 'active' ? <Badge tone="danger" icon="clock">{t('legal.expiredAgo', { days: -r.daysToExpiry })}</Badge> : r.expiringSoon ? <Badge tone="warning" icon="clock">{t('legal.expiresIn', { days: r.daysToExpiry })}</Badge> : <Badge tone={r.status === 'active' ? 'success' : 'neutral'}>{t(`agreementStatus.${r.status}` as 'agreementStatus.active')}</Badge> },
               ]}
             />
           </div>

@@ -367,7 +367,8 @@
       "fileNumber": "Numéro de dossier",
       "expires": "Expire le",
       "noRegistrations": "Aucun enregistrement",
-      "recordRegistration": "Enregistrer un dépôt"
+      "recordRegistration": "Enregistrer un dépôt",
+      "expiredAgo": "Expiré depuis {days, plural, one {# jour} other {# jours}}"
     },
     "agreementStatus": {
       "active": "Actif",
