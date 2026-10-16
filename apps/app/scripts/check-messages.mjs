@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Verifies every app locale against English for each catalogue set (messages/*.json and the namespace folders
- * single/, foods/, partners/, payments/, data/, access/, franchise/, network/, comms/, mkt/, finance/, reviews/): every key present, no extra keys, no empty strings, ICU arguments preserved.
+ * single/, foods/, partners/, payments/, data/, access/, franchise/, network/, comms/, mkt/, finance/, reviews/, billing/, quality/, supply/): every key present, no extra keys, no empty strings, ICU arguments preserved.
  * Rules are shared with the marketing site (scripts/i18n/catalog.mjs). Usage: node scripts/check-messages.mjs [--verbose]
  */
 import fs from 'node:fs';
@@ -12,7 +12,7 @@ import { icuArgs, report } from '../../../scripts/i18n/catalog.mjs';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'messages');
 /** Kept in sync with src/i18n/config.ts APP_LOCALES. */
 const LOCALES = ['en', 'fr', 'es', 'de', 'pt-BR'];
-const SETS = ['', 'single', 'foods', 'partners', 'payments', 'data', 'access', 'franchise', 'network', 'comms', 'mkt', 'finance', 'reviews', 'billing', 'quality', 'fdev'];
+const SETS = ['', 'single', 'foods', 'partners', 'payments', 'data', 'access', 'franchise', 'network', 'comms', 'mkt', 'finance', 'reviews', 'billing', 'quality', 'scale', 'supply', 'fdev'];
 
 const read = (dir, l) => {
   const f = path.join(root, dir, `${l}.json`);

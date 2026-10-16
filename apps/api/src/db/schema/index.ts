@@ -23,4 +23,6 @@ export * from './finance.ts';
 export * from './reviews.ts';
 export * from './billing.ts';
 export * from './quality.ts';
+export * from './data-platform.ts';
+export * from './supply.ts';
 export * from './franchise-dev.ts';

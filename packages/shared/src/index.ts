@@ -24,4 +24,7 @@ export * from './marketing-forms.ts';
 export * from './fees.ts';
 export * from './reviews.ts';
 export * from './quality.ts';
+export * from './data-platform.ts';
+export * from './supply.ts';
+export * from './audit-programmes.ts';
 export * from './franchise-dev.ts';

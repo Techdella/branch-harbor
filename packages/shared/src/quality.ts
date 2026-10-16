@@ -34,6 +34,10 @@ export const auditQuestionSchema = z.object({
   max: z.number().optional(),
   /** Number questions: the unit shown next to the value (e.g. °C). */
   unit: z.string().trim().max(12).optional(),
+  /** Training academy course recommended when this item fails (retraining loop). */
+  trainingCourseId: z.uuid().optional(),
+  /** Assign that course to the location's team automatically when the item fails. */
+  trainingAutoAssign: z.boolean().optional(),
 });
 export type AuditQuestion = z.infer<typeof auditQuestionSchema>;
 

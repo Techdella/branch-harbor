@@ -47,6 +47,15 @@ const tableReviews: ReviewProvider = async (db, organizationId, locationIds, fro
   return out;
 };
 
+/** Review ratings per location from the first provider that has data (used by network benchmarks too). */
+export async function reviewRatings(db: Exec, organizationId: string, locationIds: string[], from: Date, to: Date) {
+  for (const p of [...reviewProviders, tableReviews]) {
+    const m = await p(db, organizationId, locationIds, from, to).catch(() => new Map<string, { rating: number; count: number }>());
+    if (m.size) return m;
+  }
+  return new Map<string, { rating: number; count: number }>();
+}
+
 export interface LeagueSettings { franchiseeQuartiles: boolean }
 export function leagueSettings(org: { settings: Record<string, unknown> }): LeagueSettings {
   const l = (org.settings.leagueTable ?? {}) as Partial<LeagueSettings>;
@@ -61,7 +70,7 @@ export interface LeagueQuery { from: string; to: string; regionId?: string; owne
 const DAY = 86_400_000;
 const dayStart = (ymd: string) => new Date(`${ymd}T00:00:00Z`);
 
-async function activityCounts(db: Exec, industry: string, ids: string[], from: Date, to: Date): Promise<{ activity: Map<string, number>; occupancy: Map<string, number | null> }> {
+export async function activityCounts(db: Exec, industry: string, ids: string[], from: Date, to: Date): Promise<{ activity: Map<string, number>; occupancy: Map<string, number | null> }> {
   const activity = new Map<string, number>();
   const occupancy = new Map<string, number | null>();
   if (!ids.length) return { activity, occupancy };
@@ -109,7 +118,7 @@ async function activityCounts(db: Exec, industry: string, ids: string[], from: D
   return { activity, occupancy };
 }
 
-async function revenueByLocation(db: Exec, organizationId: string, locs: Array<{ id: string; currency: string }>, from: Date, to: Date) {
+export async function revenueByLocation(db: Exec, organizationId: string, locs: Array<{ id: string; currency: string }>, from: Date, to: Date) {
   const out = new Map<string, number>();
   if (!locs.length) return out;
   const rows = await db.select({ id: paymentReferences.locationId, currency: paymentReferences.currency, gross: sql<string>`coalesce(sum(${paymentReferences.amountMinor}),0)`, refunded: sql<string>`coalesce(sum(${paymentReferences.refundedMinor}),0)` })
@@ -124,7 +133,7 @@ async function revenueByLocation(db: Exec, organizationId: string, locs: Array<{
   return out;
 }
 
-async function royaltyStatus(db: Exec, organizationId: string, ids: string[], today: string) {
+export async function royaltyStatus(db: Exec, organizationId: string, ids: string[], today: string) {
   const out = new Map<string, 'on_time' | 'overdue' | 'none'>();
   if (!ids.length) return out;
   const inv = await db.select({ id: financeInvoices.locationId, status: financeInvoices.status, dueDate: financeInvoices.dueDate, total: financeInvoices.totalMinor, paid: financeInvoices.paidMinor })

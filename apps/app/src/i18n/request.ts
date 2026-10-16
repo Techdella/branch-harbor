@@ -16,6 +16,8 @@ import financeEn from '../../messages/finance/en.json';
 import reviewsEn from '../../messages/reviews/en.json';
 import billingEn from '../../messages/billing/en.json';
 import qualityEn from '../../messages/quality/en.json';
+import scaleEn from '../../messages/scale/en.json';
+import supplyEn from '../../messages/supply/en.json';
 import fdevEn from '../../messages/fdev/en.json';
 
 type Messages = Record<string, unknown>;
@@ -62,6 +64,10 @@ export default getRequestConfig(async () => {
   messages = merge(messages, billingEn as Messages);
   // Field audits, compliance documents and the league table: namespace "quality" plus its nav and module names.
   messages = merge(messages, qualityEn as Messages);
+  // Sales connectors and reconciliation, the import wizard, bulk launch and network benchmarks: namespace "scale" plus nav, module and error keys.
+  messages = merge(messages, scaleEn as Messages);
+  // Suppliers, supplier rebates, audits phase 2 and self-checks: namespaces "supply" and "auditsPlus" plus nav and module names.
+  messages = merge(messages, supplyEn as Messages);
   // Franchise development (territory map, surveys & validation, agreement lifecycle, master franchise): namespace "fdev" plus module names.
   messages = merge(messages, fdevEn as Messages);
   if (locale !== 'en') {
@@ -81,6 +87,8 @@ export default getRequestConfig(async () => {
     messages = merge(messages, (await import(`../../messages/reviews/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/billing/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/quality/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/scale/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/supply/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/fdev/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };

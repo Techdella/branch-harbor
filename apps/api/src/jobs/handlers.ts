@@ -72,6 +72,9 @@ export function registerJobHandlers(s: Services) {
   s.jobs.register('quality.daily', async () => {
     await (await import('../services/audits.ts')).runAuditJobs(s);
     await (await import('../services/compliance.ts')).runComplianceJobs(s);
+    // Audits phase 2: recurring audit schedules and self-checks (today's runs, reminders, missed).
+    await (await import('../services/audit-programmes.ts')).runAuditSchedules(s);
+    await (await import('../services/audit-programmes.ts')).runSelfCheckJobs(s);
   });
 
   s.jobs.register('studios.expire-holds', async () => {
