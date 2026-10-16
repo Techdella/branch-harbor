@@ -105,15 +105,15 @@
       "noTerms": "No terms yet",
       "link": "Compare brands"
     },
-    "buying": "Brand being bought"
-  },
-  "docs": {
-    "brand": "Brand",
-    "brandHint": "Only prospects buying this brand receive it.",
-    "allBrands": "Every brand (shared)"
-  },
-  "territory": {
-    "brand": "Brand",
-    "brandHint": "The territory shows on this brand’s availability map. Exclusivity is checked within the brand."
+    "buying": "Brand being bought",
+    "docs": {
+      "brand": "Brand",
+      "brandHint": "Only prospects buying this brand receive it.",
+      "allBrands": "Every brand (shared)"
+    },
+    "territory": {
+      "brand": "Brand",
+      "brandHint": "The territory shows on this brand’s availability map. Exclusivity is checked within the brand."
+    }
   }
 }

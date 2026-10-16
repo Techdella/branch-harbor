@@ -105,15 +105,15 @@
       "noTerms": "Aún sin condiciones",
       "link": "Comparar marcas"
     },
-    "buying": "Marca que compra"
-  },
-  "docs": {
-    "brand": "Marca",
-    "brandHint": "Solo lo reciben los candidatos que compran esta marca.",
-    "allBrands": "Todas las marcas (compartido)"
-  },
-  "territory": {
-    "brand": "Marca",
-    "brandHint": "El territorio aparece en el mapa de disponibilidad de esta marca. La exclusividad se comprueba dentro de la marca."
+    "buying": "Marca que compra",
+    "docs": {
+      "brand": "Marca",
+      "brandHint": "Solo lo reciben los candidatos que compran esta marca.",
+      "allBrands": "Todas las marcas (compartido)"
+    },
+    "territory": {
+      "brand": "Marca",
+      "brandHint": "El territorio aparece en el mapa de disponibilidad de esta marca. La exclusividad se comprueba dentro de la marca."
+    }
   }
 }
