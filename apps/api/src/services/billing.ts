@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNotNull, isNull, lte } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNotNull, isNull, lte } from 'drizzle-orm';
 import type Stripe from 'stripe';
 import {
   NETWORK_INCLUDED_LOCATIONS, PRICE_BOOK_VERSION, TRIAL_DAYS, TRIAL_REMINDER_DAYS, assertBillingCurrency, asBusinessModel, isPriceListKey, listPriceMinor,
@@ -8,7 +8,7 @@ import {
 import type { Services } from '../context.ts';
 import type { Db, Exec, Tx } from '../db/client.ts';
 import {
-  billingInvoices, billingTrialClaims, franchiseeBillingAccounts, locationFeePayers, locations, organizations, ownerGroups, roleAssignments, subscriptions, users,
+  billingInvoices, billingTrialClaims, brands, franchiseeBillingAccounts, locationFeePayers, locations, organizations, ownerGroups, roleAssignments, subscriptions, users,
 } from '../db/schema/index.ts';
 import { CardDeclinedError, invoiceFromStripe, subscriptionPeriodEnd, type CardDetails, type PlatformInvoice, type SubscriptionLine } from '../integrations/platform-billing.ts';
 import { sha256 } from '../lib/crypto.ts';
@@ -60,6 +60,15 @@ async function loadOrgRow(db: Exec, orgId: string): Promise<Org> {
   const [o] = await db.select().from(organizations).where(eq(organizations.id, orgId));
   if (!o) throw notFound('Organisation');
   return o;
+}
+
+/**
+ * Brands the business runs (not archived), at least 1. Multi-brand HQ: each brand beyond the first is billed at the
+ * extraBrand fee as its own subscription item (`extra_brand`).
+ */
+export async function brandCount(db: Exec, orgId: string): Promise<number> {
+  const [r] = await db.select({ n: count() }).from(brands).where(and(eq(brands.organizationId, orgId), isNull(brands.archivedAt)));
+  return Math.max(1, Number(r?.n ?? 0));
 }
 
 /** Settings → Billing in the app (linked from billing emails). */
@@ -199,8 +208,8 @@ export function billingTerms(country: string | null) {
   };
 }
 
-export function quoteFor(sub: Pick<Sub, 'priceList' | 'currency' | 'billingCountry'>, plan: PlanPriceKey, interval: BillingInterval, locationCount: number) {
-  return planQuote({ priceList: subPriceList(sub), plan, interval, locations: locationCount });
+export function quoteFor(sub: Pick<Sub, 'priceList' | 'currency' | 'billingCountry'>, plan: PlanPriceKey, interval: BillingInterval, locationCount: number, brands = 1) {
+  return planQuote({ priceList: subPriceList(sub), plan, interval, locations: locationCount, brands });
 }
 
 export function serializeInvoice(i: typeof billingInvoices.$inferSelect) {
@@ -218,7 +227,7 @@ export async function billingView(s: Services, orgId: string) {
   const plan = subPlan(sub, org.model);
   const list = subPriceList(sub);
   const rows = await locationBilling(s.db, orgId, sub, org.model);
-  const quote = planQuote({ priceList: list, plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: rows.length });
+  const quote = planQuote({ priceList: list, plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: rows.length, brands: await brandCount(s.db, orgId) });
   const invoices = await s.db.select().from(billingInvoices).where(and(eq(billingInvoices.organizationId, orgId), eq(billingInvoices.payer, 'hq'))).orderBy(desc(billingInvoices.createdAt)).limit(24);
   const payers = await s.db.select().from(locationFeePayers).where(eq(locationFeePayers.organizationId, orgId));
   const groups = asBusinessModel(org.model) === 'network' ? await s.db.select({ id: ownerGroups.id, name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.organizationId, orgId)) : [];
@@ -279,8 +288,8 @@ export interface CheckoutState {
 /** Subscription items: one recurring price per line at the interval amount (a year = 10 months). */
 function linesFor(quote: PlanQuote): SubscriptionLine[] {
   return quote.lines.map((l) => ({
-    lookupKey: l.kind === 'platform' ? 'network_platform' : `${quote.plan}_${l.kind}`,
-    productName: l.kind === 'platform' ? 'BranchHarbor Network platform fee' : quote.plan === 'solo' ? 'BranchHarbor Solo' : `BranchHarbor ${quote.plan[0]!.toUpperCase()}${quote.plan.slice(1)} (per location)`,
+    lookupKey: l.kind === 'platform' ? 'network_platform' : l.kind === 'brand' ? 'extra_brand' : `${quote.plan}_${l.kind}`,
+    productName: l.kind === 'platform' ? 'BranchHarbor Network platform fee' : l.kind === 'brand' ? 'BranchHarbor extra brand' : quote.plan === 'solo' ? 'BranchHarbor Solo' : `BranchHarbor ${quote.plan[0]!.toUpperCase()}${quote.plan.slice(1)} (per location)`,
     unitAmountMinor: l.unitMinor, quantity: l.quantity,
   }));
 }
@@ -298,7 +307,7 @@ export async function startCheckout(s: Services, orgId: string, input: { plan: P
     throw conflict('currency_mismatch', `Customers billed in ${regionName(billingCountry)} pay in ${check.expected}.`, { expected: check.expected });
   }
   const billable = await billableLocations(s.db, orgId);
-  const quote = planQuote({ priceList: check.priceList, plan: input.plan, interval: input.interval, locations: Math.max(input.locations ?? 0, billable.length) });
+  const quote = planQuote({ priceList: check.priceList, plan: input.plan, interval: input.interval, locations: Math.max(input.locations ?? 0, billable.length), brands: await brandCount(s.db, orgId) });
   const eligibility = await trialEligibility(s.db, orgId, { email: actor.email });
   const customer = sub.stripeCustomerId && sub.currency === check.currency && sub.billingCountry === billingCountry
     ? { id: sub.stripeCustomerId }
@@ -338,7 +347,7 @@ export async function confirmCheckout(s: Services, orgId: string, input: { setup
   const lock = lockBillingCountry({ billingCountry: co.billingCountry, currency: co.currency, card, taxId: input.taxId });
   if (lock.priceList !== co.priceList) throw conflict('price_changed', 'The price for your billing country has changed. Start the checkout again.');
   const eligibility = await trialEligibility(s.db, orgId, { email: actor.email, cardFingerprint: card?.fingerprint ?? null });
-  const quote = planQuote({ priceList: co.priceList, plan: co.plan, interval: co.interval, locations: co.locations });
+  const quote = planQuote({ priceList: co.priceList, plan: co.plan, interval: co.interval, locations: co.locations, brands: await brandCount(s.db, orgId) });
   if (input.taxId) await s.billing.addTaxId(co.customerId, co.billingCountry, input.taxId);
   let created;
   try {
@@ -444,7 +453,7 @@ export async function startCountryChange(s: Services, orgId: string, input: { bi
   await s.db.update(subscriptions).set({ pendingChange: pending, updatedAt: new Date() }).where(eq(subscriptions.id, sub.id));
   const plan = subPlan(sub, org.model);
   return {
-    pendingChange: pending, quote: planQuote({ priceList: target.key, plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: sub.billedLocationCount || 1 }),
+    pendingChange: pending, quote: planQuote({ priceList: target.key, plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: sub.billedLocationCount || 1, brands: await brandCount(s.db, orgId) }),
     setup: { mode: s.billing.mode, clientSecret: si.clientSecret, publishableKey: s.billing.publishableKey, setupIntentId: si.id },
   };
 }
@@ -486,7 +495,7 @@ async function applyCountryChange(s: Services, sub: Sub, model: string, now: Dat
   const p = sub.pendingChange as Record<string, any>;
   const plan = subPlan(sub, model);
   const interval: BillingInterval = sub.billingInterval === 'year' ? 'year' : 'month';
-  const quote = planQuote({ priceList: p.priceList, plan, interval, locations: sub.billedLocationCount || 1 });
+  const quote = planQuote({ priceList: p.priceList, plan, interval, locations: sub.billedLocationCount || 1, brands: await brandCount(db, sub.organizationId) });
   const created = await s.billing.createSubscription({
     customerId: p.customerId, paymentMethodId: p.paymentMethodId, currency: quote.currency, interval, lines: linesFor(quote), trialDays: null, trialFee: null,
     metadata: { bh_org: sub.organizationId, bh_kind: 'platform', bh_plan: plan, bh_price_list: p.priceList, bh_billing_country: p.billingCountry, bh_price_book: PRICE_BOOK_VERSION },
@@ -561,7 +570,22 @@ export async function franchiseeBillingView(s: Services, orgId: string, scopes: 
   return {
     plan, interval: sub.billingInterval, hqStatus: sub.status,
     scopes, locations: items,
-    accounts: accounts.map((a) => ({ id: a.id, scopeKind: a.scopeKind, scopeId: a.scopeId, billingCountry: a.billingCountry, currency: a.currency, priceList: a.priceList, status: a.status, card: a.card })),
+    accounts: accounts.map((a) => {
+      // The franchisee's own subscription: its status, when and how much it charges next (its share, in its currency).
+      const amount = items.filter((l) => l.accountId === a.id).reduce((x, l) => x + l.amount.amount, 0);
+      const live = !!a.stripeSubscriptionId && a.subscriptionStatus !== 'canceled';
+      const startsAt = sub.status === 'trialing' ? sub.trialEndsAt : sub.currentPeriodEnd;
+      return {
+        id: a.id, scopeKind: a.scopeKind, scopeId: a.scopeId, billingCountry: a.billingCountry, currency: a.currency, priceList: a.priceList, status: a.status, card: a.card,
+        subscription: {
+          status: live ? a.subscriptionStatus ?? 'active' : amount > 0 && a.status === 'active' ? 'scheduled' : 'none',
+          interval: sub.billingInterval,
+          nextChargeAt: amount > 0 ? iso(live ? a.currentPeriodEnd : startsAt) : null,
+          nextCharge: { amount, currency: a.currency },
+          startsWithHqPlan: sub.status === 'trialing',
+        },
+      };
+    }),
     invoices: invoices.map(serializeInvoice),
     provider: s.billing.mode === 'live' ? 'stripe' : 'sandbox', publishableKey: s.billing.publishableKey,
   };
@@ -619,6 +643,8 @@ async function billFranchisees(s: Services, tx: Tx, sub: Sub, model: string, per
       lines: ls.map((l) => ({ description: `${l.name} (${l.franchiseePercent}%)`, quantity: 1, amountMinor: l.amount.amount })), periodStart, periodEnd,
       stripeInvoiceId: `in_sandbox_fr_${accountId.slice(0, 8)}_${periodStart.getTime()}`,
     }).onConflictDoNothing();
+    // The franchisee's own subscription renews with HQ's period (live: Stripe's renewal and webhooks do this).
+    await tx.update(franchiseeBillingAccounts).set({ subscriptionStatus: 'active', currentPeriodEnd: periodEnd, updatedAt: new Date() }).where(eq(franchiseeBillingAccounts.id, accountId));
   }
   void model;
 }
@@ -668,7 +694,7 @@ export async function runBillingSweep(s: Services, now = new Date()) {
     const plan = subPlan(sub, org.model);
     const rows = await locationBilling(s.db, sub.organizationId, sub, org.model);
     const interval: BillingInterval = sub.billingInterval === 'year' ? 'year' : 'month';
-    const quote = planQuote({ priceList: subPriceList(sub), plan, interval, locations: rows.length });
+    const quote = planQuote({ priceList: subPriceList(sub), plan, interval, locations: rows.length, brands: await brandCount(s.db, sub.organizationId) });
     const start = sub.currentPeriodEnd!;
     const end = new Date(start.getTime() + (interval === 'year' ? 365 : 30) * DAY);
     const amount = hqTotal(quote, rows);
@@ -697,7 +723,7 @@ async function sendTrialReminder(s: Services, sub: Sub, days: number) {
   const org = await loadOrgRow(s.db, sub.organizationId);
   const plan = subPlan(sub, org.model);
   const rows = await locationBilling(s.db, sub.organizationId, sub, org.model);
-  const quote = planQuote({ priceList: subPriceList(sub), plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: rows.length });
+  const quote = planQuote({ priceList: subPriceList(sub), plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: rows.length, brands: await brandCount(s.db, sub.organizationId) });
   const amount = hqTotal(quote, rows);
   await sendBillingEmails(s, await ownerEmails(s.db, sub.organizationId), 'billing-trial-reminder', {
     kind: 'trial_reminder', business: org.name, days, planName: planName(plan), amount: { amountMinor: amount, currency: quote.currency }, interval: quote.interval, startsOn: sub.trialEndsAt!,
@@ -839,7 +865,8 @@ function groupLines(amounts: { amountMinor: number; key: string; name: string }[
 export function hqLinesFor(quote: PlanQuote, rows: LocationBillingRow[]): Line[] {
   const plan = linesFor(quote);
   if (quote.plan !== 'network') return plan;
-  const platform = plan.filter((l) => l.lookupKey === 'network_platform');
+  // The platform fee and extra brands are HQ's own; only the per-location line is split with franchisees.
+  const platform = plan.filter((l) => l.lookupKey === 'network_platform' || l.lookupKey === 'extra_brand');
   const full = plan.find((l) => l.lookupKey === 'network_location');
   const perLocation = groupLines(rows.filter((r) => !r.included).map((r) => ({
     amountMinor: r.hqMinor,
@@ -872,7 +899,7 @@ export async function syncBillingSubscriptions(s: Services, orgId: string, db: E
   const plan = subPlan(sub, org.model);
   const interval: BillingInterval = sub.billingInterval === 'year' ? 'year' : 'month';
   const rows = await locationBilling(db, orgId, sub, org.model);
-  const quote = planQuote({ priceList: subPriceList(sub), plan, interval, locations: rows.length });
+  const quote = planQuote({ priceList: subPriceList(sub), plan, interval, locations: rows.length, brands: await brandCount(db, orgId) });
   const lines = hqLinesFor(quote, rows);
   if (!sameLines(lines, sub.syncedLines)) {
     if (sub.stripeSubscriptionId) await s.billing.updateItems(sub.stripeSubscriptionId, { currency: quote.currency, interval, lines, prorate: sub.status !== 'trialing', idempotencyKey: `bh-billing-sync:${sub.id}:${sha256(JSON.stringify(lines)).slice(0, 16)}` });
@@ -893,15 +920,32 @@ export async function syncBillingSubscriptions(s: Services, orgId: string, db: E
       if (hasSub) await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.franchisee_subscription_ended', scopeKind: acct.scopeKind, scopeId: acct.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id });
     } else if (!hasSub) {
       const startAt = sub.status === 'trialing' ? sub.trialEndsAt : sub.currentPeriodEnd;
+      // Mid-period handover: HQ's period is running, so the franchisee pays the rest of it now (prorated) and then
+      // renews with HQ. During HQ's trial the share simply starts when the plan starts.
+      const midPeriod = sub.status !== 'trialing' && !!sub.currentPeriodEnd && sub.currentPeriodEnd.getTime() > now.getTime();
       const created = await s.billing.createSubscription({
-        customerId: acct.stripeCustomerId!, paymentMethodId: acct.stripePaymentMethodId!, currency: acct.currency, interval, lines: flines, trialDays: null, trialFee: null, trialEnd: startAt,
+        customerId: acct.stripeCustomerId!, paymentMethodId: acct.stripePaymentMethodId!, currency: acct.currency, interval, lines: flines, trialDays: null, trialFee: null,
+        trialEnd: midPeriod ? null : startAt, billingCycleAnchor: midPeriod ? sub.currentPeriodEnd : null,
         metadata: { bh_org: orgId, bh_kind: 'franchisee', bh_account: acct.id, bh_price_list: acct.priceList, bh_billing_country: acct.billingCountry, bh_price_book: PRICE_BOOK_VERSION },
         idempotencyKey: `bh-franchisee-sub:${acct.id}:${sha256(JSON.stringify(flines)).slice(0, 16)}`,
       });
       await db.update(franchiseeBillingAccounts).set({ stripeSubscriptionId: created.id, subscriptionStatus: created.status, subscriptionLines: flines, currentPeriodEnd: created.currentPeriodEnd, updatedAt: now }).where(eq(franchiseeBillingAccounts.id, acct.id));
+      if (midPeriod && created.latestInvoice && created.latestInvoice.total > 0) {
+        await upsertInvoice(db, orgId, created.latestInvoice, { kind: 'franchisee_fee', payer: 'franchisee', franchiseeAccountId: acct.id, description: 'Location fees (prorated for the rest of this period)', lines: [{ description: 'proration', quantity: 1, amountMinor: created.latestInvoice.total }] });
+      }
       await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.franchisee_subscription_created', scopeKind: acct.scopeKind, scopeId: acct.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id, metadata: { currency: acct.currency, lines: flines.map((l) => `${l.lookupKey}×${l.quantity}`), startsAt: iso(created.trialEnd) } });
     } else {
-      await s.billing.updateItems(acct.stripeSubscriptionId!, { currency: acct.currency, interval, lines: flines, prorate: acct.subscriptionStatus === 'active', idempotencyKey: `bh-franchisee-sync:${acct.id}:${sha256(JSON.stringify(flines)).slice(0, 16)}` });
+      const active = acct.subscriptionStatus === 'active';
+      await s.billing.updateItems(acct.stripeSubscriptionId!, { currency: acct.currency, interval, lines: flines, prorate: active, invoiceNow: active, idempotencyKey: `bh-franchisee-sync:${acct.id}:${sha256(JSON.stringify(flines)).slice(0, 16)}` });
+      // Another location handed over mid-period: the franchisee pays its share of the rest of the period now. Live,
+      // Stripe invoices the proration at once (always_invoice, recorded by the invoice webhooks); the sandbox records it here.
+      const before = acct.subscriptionLines.reduce((x, l) => x + l.unitAmountMinor * l.quantity, 0);
+      const after = flines.reduce((x, l) => x + l.unitAmountMinor * l.quantity, 0);
+      const prorated = active && after > before ? Math.round((after - before) * remainingShare(sub, now)) : 0;
+      if (prorated > 0 && acct.stripeSubscriptionId!.includes('_sandbox_')) {
+        await upsertInvoice(db, orgId, { id: `in_sandbox_fr_prorate_${acct.id.slice(0, 8)}_${now.getTime()}`, number: null, status: 'paid', amountPaid: prorated, amountDue: prorated, tax: 0, total: prorated, subtotal: prorated, currency: acct.currency, hostedUrl: null, periodStart: now, periodEnd: sub.currentPeriodEnd },
+          { kind: 'franchisee_fee', payer: 'franchisee', franchiseeAccountId: acct.id, description: 'Location fees (prorated for the rest of this period)', lines: [{ description: 'proration', quantity: 1, amountMinor: prorated }] });
+      }
       await db.update(franchiseeBillingAccounts).set({ subscriptionLines: flines, updatedAt: now }).where(eq(franchiseeBillingAccounts.id, acct.id));
       await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.franchisee_quantities_synced', scopeKind: acct.scopeKind, scopeId: acct.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id, metadata: { lines: flines.map((l) => `${l.lookupKey}×${l.quantity}`) } });
     }
@@ -979,8 +1023,9 @@ export async function previewPlanChange(s: Services, orgId: string, input: { pla
   const curInterval: BillingInterval = sub.billingInterval === 'year' ? 'year' : 'month';
   const next = { ...sub, plan: input.plan, billingInterval: input.interval };
   const [curRows, newRows] = await Promise.all([locationBilling(s.db, orgId, sub, org.model), locationBilling(s.db, orgId, next as Sub, org.model)]);
-  const curQuote = planQuote({ priceList: subPriceList(sub), plan: current, interval: curInterval, locations: curRows.length });
-  const newQuote = planQuote({ priceList: subPriceList(sub), plan: input.plan, interval: input.interval, locations: newRows.length });
+  const brandsNow = await brandCount(s.db, orgId);
+  const curQuote = planQuote({ priceList: subPriceList(sub), plan: current, interval: curInterval, locations: curRows.length, brands: brandsNow });
+  const newQuote = planQuote({ priceList: subPriceList(sub), plan: input.plan, interval: input.interval, locations: newRows.length, brands: brandsNow });
   const curHq = hqTotal(curQuote, curRows);
   const newHq = hqTotal(newQuote, newRows);
   const share = remainingShare(sub, now);
@@ -997,6 +1042,8 @@ export async function previewPlanChange(s: Services, orgId: string, input: { pla
     quote: newQuote,
     proration: { amount: proration, currency: newQuote.currency },
     effective: sub.status === 'trialing' ? 'trial_end' as const : 'now' as const,
+    /** When the prorated amount is charged: now (a new billing period starts: monthly ↔ annual), on the next invoice, or nothing during the trial. */
+    charge: sub.status === 'trialing' ? 'none' as const : input.interval !== curInterval ? 'now' as const : 'next_invoice' as const,
     effectiveAt: iso(sub.status === 'trialing' ? sub.trialEndsAt : now),
     nextChargeAt: iso(sub.status === 'trialing' ? sub.trialEndsAt : input.interval === curInterval ? sub.currentPeriodEnd : now),
     unchanged: current === input.plan && curInterval === input.interval,
@@ -1011,7 +1058,7 @@ export async function changePlan(s: Services, orgId: string, input: { plan: Plan
   const sub = await loadSub(s.db, orgId);
   const next = { ...sub, plan: input.plan, billingInterval: input.interval } as Sub;
   const rows = await locationBilling(s.db, orgId, next, org.model);
-  const quote = planQuote({ priceList: subPriceList(sub), plan: input.plan, interval: input.interval, locations: rows.length });
+  const quote = planQuote({ priceList: subPriceList(sub), plan: input.plan, interval: input.interval, locations: rows.length, brands: await brandCount(s.db, orgId) });
   const lines = hqLinesFor(quote, rows);
   let periodEnd = sub.currentPeriodEnd;
   if (sub.stripeSubscriptionId) {
@@ -1036,6 +1083,8 @@ export async function changePlan(s: Services, orgId: string, input: { plan: Plan
   await sendBillingEmails(s, await ownerEmails(s.db, orgId), 'billing', {
     kind: 'plan_changed', business: org.name, planName: planName(input.plan), amount: { amountMinor: preview.to.hqTotal.amount, currency: preview.to.hqTotal.currency }, interval: input.interval,
     prorationNow: preview.proration.amount ? { amountMinor: preview.proration.amount, currency: preview.proration.currency } : null, billingUrl: billingLink(s),
+    // Monthly ↔ annual: the new period starts and is charged now (not added to the next invoice).
+    chargedNow: preview.effective === 'now' && preview.from.interval !== preview.to.interval,
   });
   return preview;
 }

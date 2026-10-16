@@ -71,7 +71,8 @@
       "payPlan": "Pagar {amount} y empezar el plan",
       "linePlatform": "Cuota de plataforma (incluye {count} locales)",
       "linePlan": "Solo, un local",
-      "lineLocations": "{count, plural, one {# local} other {# locales}} × {price}"
+      "lineLocations": "{count, plural, one {# local} other {# locales}} × {price}",
+      "lineBrands": "{count, plural, one {# marca adicional} other {# marcas adicionales}} × {price}"
     },
     "card": {
       "title": "Tarjeta",
@@ -200,7 +201,26 @@
       "needsCard": "Falta la tarjeta",
       "cardOnFile": "{brand} •••• {last4} · facturado en {currency}",
       "setup": "Configurar la facturación",
-      "saveCard": "Guardar tarjeta"
+      "saveCard": "Guardar tarjeta",
+      "subscription": {
+        "status": "Suscripción",
+        "nextCharge": "Próximo cobro",
+        "on": "Fecha",
+        "per": {
+          "month": "al mes",
+          "year": "al año"
+        },
+        "startsWithHq": "Empieza cuando empiece el plan de la central.",
+        "pastDueHint": "El último cobro falló. Actualiza tu tarjeta; lo intentaremos de nuevo automáticamente.",
+        "statuses": {
+          "active": "Activa",
+          "trialing": "Empieza con el plan de la central",
+          "scheduled": "Programada",
+          "past_due": "Pago fallido",
+          "canceled": "Finalizada",
+          "none": "Nada que pagar"
+        }
+      }
     },
     "change": {
       "title": "Cambiar de plan",
@@ -222,7 +242,9 @@
       "prorationNote": "Prorrateado por el resto de este periodo; el nuevo precio se aplica desde el {date}.",
       "creditNote": "Se abona la parte no usada de tu plan actual.",
       "confirm": "Cambiar de plan",
-      "done": "Ahora estás en el plan {plan}."
+      "done": "Ahora estás en el plan {plan}.",
+      "chargedNow": "Se cobra ahora",
+      "chargedNowNote": "Hoy empieza un nuevo periodo de facturación y se cobra ahora, descontando la parte no usada de tu periodo actual."
     },
     "cardChange": {
       "open": "Cambiar tarjeta",

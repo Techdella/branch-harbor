@@ -71,7 +71,8 @@
       "payPlan": "Pay {amount} and start plan",
       "linePlatform": "Platform fee (includes {count} locations)",
       "linePlan": "Solo, one location",
-      "lineLocations": "{count, plural, one {# location} other {# locations}} × {price}"
+      "lineLocations": "{count, plural, one {# location} other {# locations}} × {price}",
+      "lineBrands": "{count, plural, one {# extra brand} other {# extra brands}} × {price}"
     },
     "card": {
       "title": "Card",
@@ -200,7 +201,26 @@
       "needsCard": "Card needed",
       "cardOnFile": "{brand} •••• {last4} · billed in {currency}",
       "setup": "Set up billing",
-      "saveCard": "Save card"
+      "saveCard": "Save card",
+      "subscription": {
+        "status": "Subscription",
+        "nextCharge": "Next charge",
+        "on": "On",
+        "per": {
+          "month": "per month",
+          "year": "per year"
+        },
+        "startsWithHq": "Starts when headquarters’ plan starts.",
+        "pastDueHint": "The last charge failed. Update your card; we’ll try again automatically.",
+        "statuses": {
+          "active": "Active",
+          "trialing": "Starts with headquarters’ plan",
+          "scheduled": "Scheduled",
+          "past_due": "Payment failed",
+          "canceled": "Ended",
+          "none": "Nothing to pay"
+        }
+      }
     },
     "change": {
       "title": "Change plan",
@@ -222,7 +242,9 @@
       "prorationNote": "Prorated for the rest of this period; the new price applies from {date}.",
       "creditNote": "The unused part of your current plan is credited.",
       "confirm": "Switch plan",
-      "done": "You are now on the {plan} plan."
+      "done": "You are now on the {plan} plan.",
+      "chargedNow": "Charged now",
+      "chargedNowNote": "A new billing period starts today and is charged now, less the unused part of your current period."
     },
     "cardChange": {
       "open": "Change card",

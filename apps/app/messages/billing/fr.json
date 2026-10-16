@@ -71,7 +71,8 @@
       "payPlan": "Payer {amount} et démarrer l’offre",
       "linePlatform": "Frais de plateforme ({count} établissements inclus)",
       "linePlan": "Solo, un établissement",
-      "lineLocations": "{count, plural, one {# établissement} other {# établissements}} × {price}"
+      "lineLocations": "{count, plural, one {# établissement} other {# établissements}} × {price}",
+      "lineBrands": "{count, plural, one {# marque supplémentaire} other {# marques supplémentaires}} × {price}"
     },
     "card": {
       "title": "Carte",
@@ -200,7 +201,26 @@
       "needsCard": "Carte requise",
       "cardOnFile": "{brand} •••• {last4} · facturé en {currency}",
       "setup": "Configurer la facturation",
-      "saveCard": "Enregistrer la carte"
+      "saveCard": "Enregistrer la carte",
+      "subscription": {
+        "status": "Abonnement",
+        "nextCharge": "Prochain prélèvement",
+        "on": "Le",
+        "per": {
+          "month": "par mois",
+          "year": "par an"
+        },
+        "startsWithHq": "Commence au démarrage de la formule du siège.",
+        "pastDueHint": "Le dernier prélèvement a échoué. Mettez à jour votre carte ; nous réessaierons automatiquement.",
+        "statuses": {
+          "active": "Actif",
+          "trialing": "Démarre avec la formule du siège",
+          "scheduled": "Programmé",
+          "past_due": "Paiement échoué",
+          "canceled": "Terminé",
+          "none": "Rien à payer"
+        }
+      }
     },
     "change": {
       "title": "Changer de formule",
@@ -222,7 +242,9 @@
       "prorationNote": "Au prorata pour le reste de la période ; le nouveau prix s’applique à partir du {date}.",
       "creditNote": "La partie non utilisée de votre formule actuelle est créditée.",
       "confirm": "Changer de formule",
-      "done": "Vous êtes maintenant en formule {plan}."
+      "done": "Vous êtes maintenant en formule {plan}.",
+      "chargedNow": "Prélevé maintenant",
+      "chargedNowNote": "Une nouvelle période de facturation commence aujourd’hui et est prélevée maintenant, déduction faite de la partie non utilisée de votre période actuelle."
     },
     "cardChange": {
       "open": "Changer de carte",
