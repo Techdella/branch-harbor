@@ -21,7 +21,7 @@
  */
 import { and, desc, eq, gt, isNull, lte, or } from 'drizzle-orm';
 import type { Exec } from '../../db/client.ts';
-import { financeSettings, franchiseAgreements, royaltyTerms } from '../../db/schema/index.ts';
+import { financeSettings, franchiseAgreements, locations, royaltyTerms } from '../../db/schema/index.ts';
 import type { LateFeeTerms, RevenueBasis, RoyaltyTier } from '../../db/schema/finance.ts';
 import { DEFAULT_BASIS, type RoyaltyTerms } from '../../domain/royalty.ts';
 
@@ -75,7 +75,10 @@ registerAgreementTermsProvider({
       eq(franchiseAgreements.organizationId, q.organizationId), eq(franchiseAgreements.ownerGroupId, q.ownerGroupId), eq(franchiseAgreements.status, 'active'),
       lte(franchiseAgreements.startDate, q.onDate), gt(franchiseAgreements.endDate, q.onDate),
     )).orderBy(desc(franchiseAgreements.startDate));
-    const a = rows.find((r) => !r.locationIds.length || r.locationIds.includes(q.locationId));
+    // An owner group can hold agreements for several brands: use the one for the location's brand.
+    const [loc] = await db.select({ brandId: locations.brandId }).from(locations).where(eq(locations.id, q.locationId));
+    const brandOk = (r: (typeof rows)[number]) => !r.brandId || r.brandId === (loc?.brandId ?? null);
+    const a = rows.find((r) => (!r.locationIds.length || r.locationIds.includes(q.locationId)) && brandOk(r));
     if (!a || (a.royaltyBps == null && a.marketingFundBps == null)) return null;
     return { sourceId: a.id, ...(a.royaltyBps != null ? { royaltyBps: a.royaltyBps } : {}), ...(a.marketingFundBps != null ? { marketingFundBps: a.marketingFundBps } : {}) };
   },
@@ -92,10 +95,12 @@ function rowToTerms(r: TermsRow): RoyaltyTerms {
   };
 }
 
-async function termsRow(db: Exec, organizationId: string, ownerGroupId: string | null, currency: string, onDate: string) {
+async function termsRow(db: Exec, organizationId: string, ownerGroupId: string | null, currency: string, onDate: string, brandId: string | null = null) {
   const [r] = await db.select().from(royaltyTerms).where(and(
     eq(royaltyTerms.organizationId, organizationId),
     ownerGroupId ? eq(royaltyTerms.ownerGroupId, ownerGroupId) : isNull(royaltyTerms.ownerGroupId),
+    // Owner-group rows apply to every brand the group runs; organisation-level rows are per brand or the network default.
+    ownerGroupId ? undefined : brandId ? eq(royaltyTerms.brandId, brandId) : isNull(royaltyTerms.brandId),
     eq(royaltyTerms.currency, currency),
     lte(royaltyTerms.effectiveFrom, onDate),
     or(isNull(royaltyTerms.effectiveTo), gt(royaltyTerms.effectiveTo, onDate)),
@@ -106,7 +111,10 @@ async function termsRow(db: Exec, organizationId: string, ownerGroupId: string |
 /** The terms for a location's statement, or null when nothing is configured for its currency. */
 export async function resolveTerms(db: Exec, q: AgreementTermsQuery): Promise<RoyaltyTerms | null> {
   const groupRow = q.ownerGroupId ? await termsRow(db, q.organizationId, q.ownerGroupId, q.currency, q.onDate) : null;
-  const base = groupRow ?? (await termsRow(db, q.organizationId, null, q.currency, q.onDate));
+  // Multi-brand HQ: a brand's own default terms sit between the owner group's terms and the network default.
+  const [loc] = await db.select({ brandId: locations.brandId }).from(locations).where(eq(locations.id, q.locationId));
+  const brandRow = !groupRow && loc?.brandId ? await termsRow(db, q.organizationId, null, q.currency, q.onDate, loc.brandId) : null;
+  const base = groupRow ?? brandRow ?? (await termsRow(db, q.organizationId, null, q.currency, q.onDate));
   let agreement: AgreementTerms | null = null;
   for (const p of agreementTermsProviders) {
     agreement = await p.find(db, q);
@@ -136,7 +144,7 @@ export async function getFinanceSettings(db: Exec, organizationId: string): Prom
 
 export function serializeTerms(r: TermsRow) {
   return {
-    id: r.id, ownerGroupId: r.ownerGroupId, currency: r.currency, effectiveFrom: r.effectiveFrom, effectiveTo: r.effectiveTo,
+    id: r.id, ownerGroupId: r.ownerGroupId, brandId: r.brandId, currency: r.currency, effectiveFrom: r.effectiveFrom, effectiveTo: r.effectiveTo,
     royaltyBps: r.royaltyBps, tiers: r.tiers, tierMode: r.tierMode, minimumRoyaltyMinor: r.minimumRoyaltyMinor, marketingFundBps: r.marketingFundBps,
     technologyFeeMinor: r.technologyFeeMinor, basis: { ...DEFAULT_BASIS, ...r.basis }, lateFee: r.lateFee, notes: r.notes,
     createdAt: r.createdAt.toISOString(), updatedAt: r.updatedAt.toISOString(),

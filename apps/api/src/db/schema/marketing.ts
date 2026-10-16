@@ -6,7 +6,7 @@
 import { boolean, customType, index, integer, jsonb, pgTable, primaryKey, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { AutomationGraph, EmailDocument, FormField, FormSettings, PageDocument } from '@bh/shared';
 import { createdAt, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations } from './core.ts';
+import { brands, locations, organizations } from './core.ts';
 import { customers } from './crm.ts';
 import { pages, websites } from './websites.ts';
 
@@ -40,6 +40,8 @@ export const emailTemplates = pgTable('email_templates', {
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   /** null = HQ template shared with every location. */
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
+  /** Brand email theme: only for this brand (null = every brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   name: text('name').notNull(),
   subject: text('subject').notNull().default(''),
   preheader: text('preheader').notNull().default(''),
@@ -201,6 +203,8 @@ export const brandAssets = pgTable('brand_assets', {
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   /** null = HQ asset. */
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
+  /** Brand library the asset belongs to (null = shared by every brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   folder: text('folder').notNull().default(''),
   name: text('name').notNull(),
   mime: text('mime').notNull(),

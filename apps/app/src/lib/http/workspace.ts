@@ -8,6 +8,7 @@ import { ApiError } from '../errors';
 import type { IndustryKey, Location, Organization, ScopeOptionT, Session, ViewRole } from '../types';
 import { APP_INDUSTRIES } from '../types';
 import { http } from './client';
+import { brandsApi, setBrandFilter, storedBrandFilter, type ApiBrand, type BrandList } from './brands';
 
 /* ---------------- API shapes (subset of /docs/json) ---------------- */
 
@@ -67,6 +68,8 @@ export interface ApiLocation {
   hours: { summary?: string } | null;
   templateId?: string | null;
   paymentsEnabled?: boolean;
+  /** Brand (null = the main brand). */
+  brandId?: string | null;
 }
 export interface ApiNamed {
   id: string;
@@ -110,6 +113,13 @@ export interface Workspace {
   websites: ApiWebsite[];
   connections: ApiConnection[];
   templates: ApiNamed[];
+  /** Brands the person covers (multi-brand HQ); one item for a single-brand business. */
+  brands: ApiBrand[];
+  /** The business runs several brands. */
+  multiBrand: boolean;
+  canManageBrands: boolean;
+  /** The top-bar brand filter (null = all brands). */
+  brandFilter: string | null;
 }
 
 let ws: Workspace | null = null;
@@ -163,6 +173,7 @@ function toLocation(l: ApiLocation, i: number, ctx: { websites: ApiWebsite[]; co
     site: site?.status === 'live' ? 'live' : 'unpublished',
     sync: conns.some((c) => c.state !== 'connected' && c.state !== 'initial_sync') ? 'attention' : 'ok',
     pastel: PASTELS[i % PASTELS.length]!,
+    brandId: l.brandId ?? null,
   };
 }
 
@@ -183,6 +194,11 @@ async function loadDirectory(meOrg: ApiMeOrg): Promise<Omit<Workspace, 'user' | 
   const caps = new Set(meOrg.access?.capabilities ?? []);
   const holds = (...mods: string[]) => !meOrg.access || mods.some((m) => caps.has(`${m}:view`));
   const none = <T>() => Promise.resolve([] as T[]);
+  // Brands first: the stored brand filter (if still valid for this person) narrows the directory below.
+  const brandList = await settle(brandsApi.list(id), { items: [], multiBrand: false, canManage: false } as BrandList);
+  const stored = storedBrandFilter(id);
+  const brandFilter = brandList.items.length > 1 && stored && brandList.items.some((b) => b.id === stored) ? stored : null;
+  setBrandFilter(id, brandFilter);
   const [org, locs, regions, ownerGroups, websites, connections, templates] = await Promise.all([
     http.get<ApiOrg>(`/orgs/${id}`),
     items(http.get<{ items: ApiLocation[] }>(`/orgs/${id}/locations`)),
@@ -226,6 +242,10 @@ async function loadDirectory(meOrg: ApiMeOrg): Promise<Omit<Workspace, 'user' | 
     websites,
     connections,
     templates,
+    brands: brandList.items,
+    multiBrand: brandList.multiBrand,
+    canManageBrands: brandList.canManage,
+    brandFilter,
   };
 }
 
@@ -233,7 +253,7 @@ async function loadDirectory(meOrg: ApiMeOrg): Promise<Omit<Workspace, 'user' | 
 export async function loadWorkspace(preferredOrgId?: string | null): Promise<Workspace> {
   const me = await http.get<{ user: ApiUser; organizations: ApiMeOrg[] }>('/auth/me', undefined, { redirectOnAuthLoss: false });
   const pick = me.organizations.find((o) => o.id === preferredOrgId) ?? me.organizations[0];
-  const empty = { org: null, orgView: null, assignments: [], locations: [], regions: [], ownerGroups: [], websites: [], connections: [], templates: [] };
+  const empty = { org: null, orgView: null, assignments: [], locations: [], regions: [], ownerGroups: [], websites: [], connections: [], templates: [], brands: [], multiBrand: false, canManageBrands: false, brandFilter: null };
   ws = { user: me.user, orgs: me.organizations, ...(pick ? await loadDirectory(pick) : empty) };
   emit();
   return ws;

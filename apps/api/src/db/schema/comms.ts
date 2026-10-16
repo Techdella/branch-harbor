@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { SegmentRules } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations, users } from './core.ts';
+import { brands, locations, organizations, users } from './core.ts';
 import { customers } from './crm.ts';
 
 /**
@@ -222,6 +222,8 @@ export const socialAccounts = pgTable('social_accounts', {
   ownerKind: text('owner_kind').notNull().default('hq'), // hq | location
   /** The location the account represents (a location page) — or the owning location for location-owned accounts. */
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'set null' }),
+  /** Brand the account speaks for (null = the default brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   network: text('network').$type<SocialNetwork>().notNull(),
   handle: text('handle').notNull(),
   externalId: text('external_id'),
@@ -286,6 +288,8 @@ export const adCampaigns = pgTable('ad_campaigns', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   kind: text('kind').notNull(), // network | coming_soon | local | course
+  /** Brand the campaign promotes (null = every brand / the default brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   name: text('name').notNull(),
   objective: text('objective').notNull().default('leads'), // leads | awareness | traffic | bookings
   platforms: jsonb('platforms').$type<string[]>().notNull().default([]), // meta | google | linkedin

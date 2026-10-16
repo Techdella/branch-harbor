@@ -11,6 +11,7 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { serializeLocation } from '../services/serializers.ts';
+import { brandInOrg } from '../services/brands.ts';
 import { activeLocations, isIndependent, requireNetwork, upgradeRequired, upgradeToNetwork } from '../services/businessMode.ts';
 import { AppError } from '../lib/errors.ts';
 import { requireMember } from '../services/authz.ts';
@@ -77,6 +78,7 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
       tags: ['locations'], security: secured, params: orgParams,
       body: createLocationSchema.extend({
         status: z.enum(locationStatuses).default('draft'),
+        brandId: z.uuid().optional().describe('Brand the location belongs to (multi-brand HQ); default = the main brand'),
         upgradeToNetwork: z.boolean().default(false).describe('Independent businesses only: adding a second location requires upgrading to a network. Set true (owner only) to upgrade in the same step.'),
       }),
       summary: 'Add a location. Never auto-publishes or makes it visible to customers.',
@@ -85,7 +87,7 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req, reply) => {
     const { orgId } = req.params;
     const { upgradeToNetwork: wantsUpgrade, ...b } = req.body;
-    const target: ScopeTarget = b.regionId ? { organizationId: orgId, kind: 'region', id: b.regionId } : { organizationId: orgId, kind: 'organization', id: orgId };
+    const target: ScopeTarget = b.regionId ? { organizationId: orgId, kind: 'region', id: b.regionId } : b.brandId ? { organizationId: orgId, kind: 'brand', id: b.brandId } : { organizationId: orgId, kind: 'organization', id: orgId };
     await requirePerm(req, s.db, 'locations.write', target);
     const [orgRow] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     let upgrade = false;
@@ -106,6 +108,14 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
     }
     if (!isValidTimeZone(b.timeZone)) throw validationError('Unknown timezone', { timeZone: 'Use an IANA timezone such as America/Toronto' });
     await assertParents(s.db, orgId, b.regionId, b.ownerGroupId);
+    let brandId: string | null = null;
+    if (b.brandId) {
+      // Each location belongs to one brand; choosing one is an HQ decision (it decides who can see the location).
+      await requirePerm(req, s.db, 'locations.write', { organizationId: orgId, kind: 'brand', id: b.brandId });
+      const brand = await brandInOrg(s.db, orgId, b.brandId);
+      if (!brand || brand.archivedAt) throw notFound('Brand');
+      brandId = brand.isDefault ? null : brand.id;
+    }
     const [dupe] = await s.db.select({ id: locations.id }).from(locations).where(and(eq(locations.organizationId, orgId), eq(locations.code, b.code)));
     if (dupe) throw validationError('Location code already in use', { code: 'Each location needs a unique internal code' });
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
@@ -116,7 +126,7 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
         organizationId: orgId, regionId: b.regionId ?? null, ownerGroupId: b.ownerGroupId ?? null, name: b.name, code: b.code,
         slug: await uniqueSlug(tx, orgId, b.name), address: b.address, country: b.address.country, timeZone: b.timeZone,
         currency: b.currency, locale: b.locale ?? org?.defaultLocale ?? 'en', phone: b.phone ?? null, email: b.email ?? null,
-        templateId: b.templateId ?? null, status: b.status, geo,
+        templateId: b.templateId ?? null, status: b.status, geo, brandId,
       }).returning();
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'location.created', scopeKind: 'location', scopeId: row!.id, targetType: 'location', targetId: row!.id });
       return row!;

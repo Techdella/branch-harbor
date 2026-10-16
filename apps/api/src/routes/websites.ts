@@ -14,6 +14,7 @@ import { documentForRestore, draftDocument, saveDraft, syncLegacyFieldsToDocumen
 import { isIndependent, websiteApprovalMode } from '../services/businessMode.ts';
 import { slugify } from '../lib/slug.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
+import { brandInOrg } from '../services/brands.ts';
 
 const templateField = z.object({
   key: z.string().regex(/^[a-z][a-z0-9_]{0,40}$/),
@@ -130,7 +131,7 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post('/orgs/:orgId/websites', {
     schema: {
       tags: ['websites'], security: secured, params: orgParams,
-      body: z.object({ locationId: z.uuid().nullable().default(null), kind: z.enum(['hosted', 'wordpress']).default('hosted'), templateId: z.uuid().optional(), connectionId: z.uuid().optional(), pages: z.array(z.object({ slug: z.string().min(1), title: z.string().min(1) })).default([{ slug: 'home', title: 'Home' }]) }),
+      body: z.object({ locationId: z.uuid().nullable().default(null), brandId: z.uuid().nullable().optional().describe('Brand site (no location) of a multi-brand HQ'), kind: z.enum(['hosted', 'wordpress']).default('hosted'), templateId: z.uuid().optional(), connectionId: z.uuid().optional(), pages: z.array(z.object({ slug: z.string().min(1), title: z.string().min(1) })).default([{ slug: 'home', title: 'Home' }]) }),
     },
   }, async (req, reply) => {
     const { orgId } = req.params;
@@ -141,11 +142,16 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
     if (b.locationId && !loc) throw notFound('Location');
     const [tpl] = b.templateId ? await s.db.select().from(templates).where(and(eq(templates.id, b.templateId), eq(templates.organizationId, orgId))) : [];
     if (b.templateId && !tpl) throw notFound('Template');
+    // Multi-brand HQ: a location site lives under its brand's address; a brand site is the site of one brand.
+    const brandId = loc ? loc.brandId : b.brandId ?? null;
+    const brand = brandId ? await brandInOrg(s.db, orgId, brandId) : null;
+    if (brandId && !brand) throw notFound('Brand');
+    const siteSlug = brand?.slug ?? org!.slug;
     const out = await s.db.transaction(async (tx) => {
       const [site] = await tx.insert(websites).values({
-        organizationId: orgId, locationId: b.locationId, kind: b.kind, templateId: tpl?.id ?? null, connectionId: b.connectionId ?? null,
+        organizationId: orgId, locationId: b.locationId, brandId: loc ? null : brand && !brand.isDefault ? brand.id : null, kind: b.kind, templateId: tpl?.id ?? null, connectionId: b.connectionId ?? null,
         // Independent businesses: the brand site IS the location site, served at /{brand}.
-        includedAddress: `${s.cfg.SITES_BASE_URL}/${org!.slug}${loc && !isIndependent(org!) ? `/${loc.slug}` : ''}`,
+        includedAddress: `${s.cfg.SITES_BASE_URL}/${siteSlug}${loc && !isIndependent(org!) ? `/${loc.slug}` : ''}`,
       }).returning();
       for (const p of b.pages) {
         const [page] = await tx.insert(pages).values({ organizationId: orgId, websiteId: site!.id, locationId: b.locationId, templateId: tpl?.id ?? null, slug: slugify(p.slug), title: p.title }).returning();

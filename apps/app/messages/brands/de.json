@@ -1,0 +1,109 @@
+{
+  "brands": {
+    "brand": "Marke",
+    "meta": {
+      "settings": "Marken",
+      "compare": "Markenvergleich"
+    },
+    "switcher": {
+      "label": "Marke",
+      "all": "Alle Marken ({count})"
+    },
+    "settings": {
+      "title": "Marken",
+      "description": "Jede Marke Ihres Unternehmens: Erscheinungsbild, Webadresse, Sprachen, Absender und Franchisebedingungen.",
+      "add": "Marke hinzufügen",
+      "list": "Ihre Marken",
+      "locationCount": "{count, plural, =0 {Keine Standorte} one {# Standort} other {# Standorte}}",
+      "main": "Hauptmarke",
+      "denied": "Marken werden von der Zentrale verwaltet.",
+      "addTitle": "Marke hinzufügen",
+      "addHint": "Eine neue Marke derselben Branche unter dieser Zentrale, mit eigenem Erscheinungsbild, eigenen Websites, Absender und Franchisebedingungen. Team, Finanzen und Recht bleiben gemeinsam.",
+      "create": "Marke anlegen",
+      "cancel": "Abbrechen",
+      "error": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+      "saved": "Marke gespeichert.",
+      "save": "Marke speichern",
+      "singleHint": "Führen Sie mehr als eine Marke dieser Branche?",
+      "manage": "Marken verwalten"
+    },
+    "fields": {
+      "name": "Markenname",
+      "slug": "Website-Adresse",
+      "slugHint": "Die Websites Ihrer Marke liegen unter /adresse/standort.",
+      "logoUrl": "Logo (https-Link)",
+      "tagline": "Slogan",
+      "primaryColor": "Hauptfarbe",
+      "accentColor": "Akzentfarbe",
+      "headingFont": "Schrift für Überschriften",
+      "bodyFont": "Schrift für Text",
+      "inherit": "Wie das Unternehmen",
+      "theme": "Standard-Website-Design",
+      "themeHint": "Neue Seiten der Websites dieser Marke starten damit.",
+      "domain": "Webadresse der Marke",
+      "domainHint": "Verbinden Sie sie unter Websites → Domains; sie ist aktiv, sobald das DNS geprüft ist.",
+      "currency": "Standardwährung",
+      "locales": "Sprachen",
+      "senderHint": "E-Mails der Standorte dieser Marke gehen mit diesem Namen und dieser Antwortadresse raus.",
+      "fromName": "Absendername",
+      "replyTo": "Antwortadresse"
+    },
+    "sections": {
+      "identity": "Erscheinungsbild und Adresse",
+      "email": "E-Mail-Absender",
+      "templates": "Markenvorlagen",
+      "franchise": "Franchisebedingungen dieser Marke"
+    },
+    "templates": {
+      "site": "Website-Vorlagen und Designs",
+      "email": "E-Mail-Designs",
+      "assets": "Markenmediathek",
+      "open": "Öffnen",
+      "hint": "Vorlagen, E-Mail-Designs und Dateien können einer Marke gehören oder von allen geteilt werden. Der Markenfilter zeigt die eigenen jeder Marke und die geteilten."
+    },
+    "preview": {
+      "label": "Vorschau der Marke",
+      "tagline": "Hier steht Ihr Slogan.",
+      "button": "Kurs buchen"
+    },
+    "franchise": {
+      "hint": "Geteilte Dokumente gelten für alle Marken.",
+      "disclosure": "Offenlegungsdokumente",
+      "agreements": "Vertragsvorlagen",
+      "royalties": "Lizenz- und Fondssätze",
+      "rate": "{currency}: Lizenzgebühr {royalty}, Fonds {fund}",
+      "networkTerms": "Nutzt die Standardbedingungen des Netzwerks.",
+      "onboarding": "Eröffnungs-Checkliste für neue Standorte: {key}",
+      "none": "Noch keine.",
+      "shared": "Geteilt"
+    },
+    "compare": {
+      "title": "Markenvergleich",
+      "description": "Ihre Marken nebeneinander und das Netzwerk als Ganzes. Beträge bleiben in ihrer Währung.",
+      "period": "Zeitraum",
+      "days": "{count, plural, one {Letzter Tag} other {Letzte # Tage}}",
+      "singleBrand": "Der Markenvergleich ist für Unternehmen mit mehreren Marken.",
+      "noFinance": "Erfordert Zugriff auf Zahlungen",
+      "noRevenue": "Noch keine Zahlungen",
+      "network": "Netzwerkübersicht",
+      "neverSummed": "Beträge in verschiedenen Währungen werden nie addiert.",
+      "brands": "Marken",
+      "locations": "Standorte",
+      "locationsValue": "{total} ({operating} geöffnet)",
+      "revenue": "Umsatz (netto)",
+      "openProspects": "Offene Franchise-Interessenten",
+      "byBrand": "Nach Marke",
+      "brand": "Marke",
+      "pipeline": "Franchise-Expansion",
+      "terms": "Lizenzgebühr und Fonds",
+      "opening": "{count, plural, one {# eröffnet bald} other {# eröffnen bald}}",
+      "openCount": "{count, plural, =0 {Keine offenen Interessenten} one {# offener Interessent} other {# offene Interessenten}}",
+      "signedCount": "{count} unterschrieben",
+      "territories": "{count, plural, one {# Gebiet frei} other {# Gebiete frei}}",
+      "hidden": "Nicht in Ihrem Zugriff",
+      "networkDefault": "Netzwerkstandard",
+      "noTerms": "Noch keine Bedingungen",
+      "link": "Marken vergleichen"
+    }
+  }
+}

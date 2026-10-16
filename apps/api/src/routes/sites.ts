@@ -13,6 +13,7 @@ import { authenticate } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
 import { requirePerm } from '../services/authz.ts';
 import { orgParams, secured } from './_common.ts';
+import { brandForSiteSlug, brandInOrg, brandSiteSettings, siteSlugCond } from '../services/brands.ts';
 
 /**
  * Hosted customer-facing websites ("Hosted" delivery model) served by apps/sites at
@@ -142,17 +143,33 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
   const base = s.cfg.SITES_BASE_URL.replace(/\/$/, '');
 
+  /**
+   * The business behind a site address, with the brand the address names (multi-brand HQ: `/{brand}` is the business
+   * slug for its main brand, or another brand's slug). `siteSlug` is the address segment to link with.
+   */
   async function loadBrand(slug: string) {
-    const [org] = await s.db.select().from(organizations).where(and(eq(organizations.slug, slug), isNull(organizations.deletedAt), ne(organizations.status, 'suspended')));
+    const [org] = await s.db.select().from(organizations).where(and(siteSlugCond(slug), isNull(organizations.deletedAt), ne(organizations.status, 'suspended')));
     if (!org) throw notFound('Site');
-    return org;
+    const siteBrand = await brandForSiteSlug(s.db, org.id, slug);
+    return { ...org, siteBrand, siteSlug: siteBrand?.slug ?? org.slug };
   }
+  type SiteOrg = Awaited<ReturnType<typeof loadBrand>>;
 
-  function brandView(org: typeof organizations.$inferSelect) {
-    const settings = readSiteSettings(org.settings.site);
+  /** Locations of the brand the address names (the main brand also holds locations without a brand). */
+  const inBrand = (org: SiteOrg) => {
+    const b = org.siteBrand;
+    if (!b) return undefined;
+    return b.isDefault ? or(isNull(locations.brandId), eq(locations.brandId, b.id)) : eq(locations.brandId, b.id);
+  };
+  const visibleIn = (org: SiteOrg) => and(visible(org.id), inBrand(org));
+
+  function brandView(org: SiteOrg) {
+    // The brand's identity (logo, colours, fonts, theme, languages) on top of the business's site settings.
+    const settings = readSiteSettings(brandSiteSettings((org.settings.site ?? {}) as Parameters<typeof brandSiteSettings>[0], org.siteBrand));
     const locales = [...new Set([org.defaultLocale, ...settings.enabledLocales])].filter((l): l is Locale => (SUPPORTED_LOCALES as readonly string[]).includes(l));
+    const brandName = org.siteBrand && !org.siteBrand.isDefault ? org.siteBrand.name : org.name;
     return {
-      name: org.name, slug: org.slug, industry: org.industry, country: org.country, defaultLocale: org.defaultLocale, locales,
+      name: brandName, slug: org.siteSlug, industry: org.industry, country: org.country, defaultLocale: org.defaultLocale, locales,
       tagline: settings.tagline, poweredBy: settings.poweredBy, theme: themeFrom(settings),
       /** independent: the brand site IS the location site (served at /{brand}, no location finder). */
       model: org.model === 'independent' ? ('independent' as const) : ('network' as const),
@@ -160,9 +177,9 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
   }
 
   /** Independent business: its single customer-visible location (the brand site renders it directly). */
-  async function singleLocation(org: typeof organizations.$inferSelect) {
+  async function singleLocation(org: SiteOrg) {
     if (org.model !== 'independent') return null;
-    const [l] = await s.db.select().from(locations).where(visible(org.id)).orderBy(asc(locations.createdAt)).limit(1);
+    const [l] = await s.db.select().from(locations).where(visibleIn(org)).orderBy(asc(locations.createdAt)).limit(1);
     return l ?? null;
   }
 
@@ -170,9 +187,11 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
   const visible = (orgId: string) => and(eq(locations.organizationId, orgId), eq(locations.publiclyVisible, true), isNull(locations.archivedAt));
 
   /** Hosted (not WordPress, not paused) website for a location (or the brand site when locationId is null). */
-  async function hostedSite(orgId: string, locationId: string | null) {
+  async function hostedSite(orgId: string, locationId: string | null, brand: SiteOrg['siteBrand'] = null) {
+    // A brand site (no location) is the site of one brand; the main brand's site may carry no brand.
+    const brandCond = locationId || !brand ? undefined : brand.isDefault ? or(isNull(websites.brandId), eq(websites.brandId, brand.id)) : eq(websites.brandId, brand.id);
     const [site] = await s.db.select().from(websites).where(and(
-      eq(websites.organizationId, orgId), locationId ? eq(websites.locationId, locationId) : isNull(websites.locationId),
+      eq(websites.organizationId, orgId), locationId ? eq(websites.locationId, locationId) : isNull(websites.locationId), brandCond,
       eq(websites.kind, 'hosted'), ne(websites.status, 'paused'),
     ));
     return site ?? null;
@@ -253,7 +272,11 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     }
     const primary = await primaryHost(row.w.id);
     reply.header('cache-control', 'public, max-age=60');
-    return { hostname: host, brandSlug: row.o.slug, locationSlug, isPrimary: row.d.isPrimary, primaryHost: primary };
+    // Multi-brand HQ: the address segment of the brand the site belongs to.
+    let brandId = row.w.brandId;
+    if (locId) brandId = (await s.db.select({ b: locations.brandId }).from(locations).where(eq(locations.id, locId)))[0]?.b ?? null;
+    const brandSlug = brandId ? (await brandInOrg(s.db, row.o.id, brandId))?.slug ?? row.o.slug : row.o.slug;
+    return { hostname: host, brandSlug, locationSlug, isPrimary: row.d.isPrimary, primaryHost: primary };
   });
 
   // ── Brand mode (proxy.ts in apps/sites): independent brands serve their single location at /{brand} ──
@@ -266,7 +289,7 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     const org = await loadBrand(req.query.brand);
     const single = await singleLocation(org);
     reply.header('cache-control', 'public, max-age=60');
-    return { brandSlug: org.slug, model: org.model === 'independent' ? 'independent' : 'network', singleLocationSlug: single?.slug ?? null };
+    return { brandSlug: org.siteSlug, model: org.model === 'independent' ? 'independent' : 'network', singleLocationSlug: single?.slug ?? null };
   });
 
   // ── Brand site ──
@@ -274,8 +297,8 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags: ['sites'], summary: 'Brand site: theme, published brand pages, customer-visible locations (with sitemap data)', params: z.object({ brandSlug: z.string().min(1).max(80) }) },
   }, async (req) => {
     const org = await loadBrand(req.params.brandSlug);
-    const site = await hostedSite(org.id, null);
-    const locs = await s.db.select().from(locations).where(visible(org.id)).orderBy(asc(locations.name));
+    const site = await hostedSite(org.id, null, org.siteBrand);
+    const locs = await s.db.select().from(locations).where(visibleIn(org)).orderBy(asc(locations.name));
     const locSites = locs.length ? await s.db.select().from(websites).where(and(inArray(websites.locationId, locs.map((l) => l.id)), eq(websites.kind, 'hosted'), ne(websites.status, 'paused'))) : [];
     const locPages = locSites.length ? await s.db.select({ websiteId: pages.websiteId, slug: pages.slug, publishedAt: pages.publishedAt }).from(pages)
       .where(and(inArray(pages.websiteId, locSites.map((w) => w.id)), isNotNull(pages.publishedVersionId), isNull(pages.archivedAt), ne(pages.status, 'archived'))) : [];
@@ -285,11 +308,11 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
     return {
       brand: brandView(org),
       pages: await publishedPages(site?.id ?? null),
-      site: { includedAddress: `${base}/${org.slug}`, primaryHost: await primaryHost(site?.id ?? null), singleLocationSlug: single ? locs[0]?.slug ?? null : null },
+      site: { includedAddress: `${base}/${org.siteSlug}`, primaryHost: await primaryHost(site?.id ?? null), singleLocationSlug: single ? locs[0]?.slug ?? null : null },
       locations: (single ? locs.slice(0, 1) : locs).map((l) => {
         const w = locSites.find((x) => x.locationId === l.id);
         return {
-          ...locationSummary(l, org.slug, single),
+          ...locationSummary(l, org.siteSlug, single),
           primaryHost: w ? hosts.find((h) => h.websiteId === w.id)?.hostname ?? null : null,
           pages: w ? locPages.filter((p) => p.websiteId === w.id).map((p) => ({ slug: p.slug, publishedAt: p.publishedAt?.toISOString() ?? null })) : [],
         };
@@ -299,7 +322,8 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
 
   async function loadLocation(brandSlug: string, locationSlug: string) {
     const org = await loadBrand(brandSlug);
-    const [loc] = await s.db.select().from(locations).where(and(visible(org.id), eq(locations.slug, locationSlug)));
+    // A location is only served under its own brand's address.
+    const [loc] = await s.db.select().from(locations).where(and(visibleIn(org), eq(locations.slug, locationSlug)));
     if (!loc) throw notFound('Location');
     return { org, loc };
   }
@@ -313,17 +337,17 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req) => {
     const { org, loc } = await loadLocation(req.params.brandSlug, req.params.locationSlug);
     const site = await hostedSite(org.id, loc.id);
-    const brandSite = await hostedSite(org.id, null);
-    const others = await s.db.select({ n: locations.id }).from(locations).where(visible(org.id));
+    const brandSite = await hostedSite(org.id, null, org.siteBrand);
+    const others = await s.db.select({ n: locations.id }).from(locations).where(visibleIn(org));
     const single = org.model === 'independent';
     return {
       brand: brandView(org),
-      location: locationSummary(loc, org.slug, single),
+      location: locationSummary(loc, org.siteSlug, single),
       pages: await publishedPages(site?.id ?? null),
       module: await moduleFor(org, loc),
       site: {
         // Independent businesses: one address for the whole business.
-        includedAddress: single ? `${base}/${org.slug}` : `${base}/${org.slug}/${loc.slug}`,
+        includedAddress: single ? `${base}/${org.siteSlug}` : `${base}/${org.siteSlug}/${loc.slug}`,
         singleLocation: single,
         primaryHost: await primaryHost(site?.id ?? null),
         brandPrimaryHost: await primaryHost(brandSite?.id ?? null),

@@ -315,10 +315,85 @@ async function main() {
   const reviewsSeed = await seedReviewsAndDebitDemo(northlight.orgId);
   console.log(` Reviews:       ${reviewsSeed.reviews} demo reviews (Google sandbox + private feedback), ${reviewsSeed.requests} review requests; hosted page: ${reviewsSeed.link}`);
   console.log(` Bank debit:    Thames Hot Yoga on SEPA Direct Debit (EUR); ${reviewsSeed.statements} monthly franchisee statements issued`);
+  const barre = await seedNorthlightBarre(northlight.orgId);
+  console.log(` Multi-brand:   Northlight Barre (/${barre.slug}) — ${barre.locations.join(', ')}; own theme, sender, royalty terms (7% + 2.5% fund), disclosure and agreement template · brand lead: ${barre.login}`);
   const quality = await (await import('./seed-quality.ts')).seedQuality({ db, today, upsertUser });
   console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
+}
+
+/**
+ * Multi-brand HQ demo: Northlight runs a second brand of the same industry, "Northlight Barre", with its own identity
+ * (theme, colours, fonts, languages, sender), two locations in two currencies, brand royalty terms, a disclosure document
+ * and agreement template, a territory and a prospect, and a brand-scoped brand lead who only ever sees Barre.
+ */
+async function seedNorthlightBarre(orgId: string) {
+  const MAIL = 'northlight.demo.branchharbor.com';
+  const [org] = await db.select().from(t.organizations).where(sql`${t.organizations.id} = ${orgId}`);
+  const [main] = await db.select().from(t.brands).where(sql`${t.brands.organizationId} = ${orgId} and ${t.brands.isDefault}`);
+  await db.update(t.brands).set({ slug: org!.slug, primaryColor: '#E2552B', themeId: 'pulse', emailFromName: 'Northlight Yoga' }).where(sql`${t.brands.id} = ${main!.id}`);
+  const slug = 'northlight-barre';
+  const [brand] = await db.insert(t.brands).values({
+    organizationId: orgId, name: 'Northlight Barre', slug, primaryColor: '#B4436C', accentColor: '#F6D9E3', headingFont: 'cormorant-garamond', bodyFont: 'work-sans',
+    themeId: 'atelier', tagline: 'Low-impact barre, high-energy community.', domain: 'barre.northlight-demo.example', locales: ['en', 'fr'], defaultCurrency: 'USD',
+    emailFromName: 'Northlight Barre', emailReplyTo: `hello@barre.${MAIL}`, onboardingTemplateKey: 'standard_unit',
+    settings: { reviews: { links: [{ kind: 'facebook', label: '', url: 'https://www.facebook.com/northlightbarre/reviews' }] }, assetFolder: 'Northlight Barre' },
+  }).returning();
+  const [na] = await db.select().from(t.regions).where(sql`${t.regions.organizationId} = ${orgId} and ${t.regions.name} = 'North America'`);
+  const locs = await db.insert(t.locations).values([
+    { organizationId: orgId, regionId: na?.id ?? null, brandId: brand!.id, name: 'Seattle Capitol Hill', code: 'BAR-SEA', slug: 'barre-capitol-hill', address: { line1: '1520 E Olive Way', city: 'Seattle', region: 'WA', postalCode: '98122', country: 'US' }, country: 'US', timeZone: 'America/Los_Angeles', currency: 'USD', locale: 'en', phone: '+1 206 555 0123', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nlb_seattle', hours: { summary: 'Mon–Sat 6am–8pm' } },
+    { organizationId: orgId, regionId: na?.id ?? null, brandId: brand!.id, name: 'Montréal Mile End', code: 'BAR-MTL', slug: 'barre-mile-end', address: { line1: '5333 Av. Casgrain', city: 'Montréal', region: 'QC', postalCode: 'H2T 1X3', country: 'CA' }, country: 'CA', timeZone: 'America/Toronto', currency: 'CAD', locale: 'fr', phone: '+1 514 555 0188', status: 'operating', publiclyVisible: true, paymentsEnabled: true, stripeAccountId: 'acct_sandbox_nlb_mtl', hours: { summary: 'Tous les jours 7h–20h' } },
+  ]).returning();
+  // Brand site and location sites at /northlight-barre/{location}, from the brand's own template.
+  const [tpl] = await db.insert(t.templates).values({ organizationId: orgId, brandId: brand!.id, name: 'Northlight Barre studio home', industry: 'studios', fields: [
+    { key: 'brand_tagline', label: 'Brand tagline', type: 'text', policy: 'locked', defaultValue: 'Low-impact barre, high-energy community.' },
+    { key: 'hero_title', label: 'Hero title', type: 'text', policy: 'editable', defaultValue: 'Barre classes in your neighbourhood' },
+  ] }).returning();
+  await db.update(t.brands).set({ settings: { ...brand!.settings, siteTemplateId: tpl!.id } }).where(sql`${t.brands.id} = ${brand!.id}`);
+  await db.insert(t.websites).values({ organizationId: orgId, brandId: brand!.id, kind: 'hosted', includedAddress: `${cfg.SITES_BASE_URL}/${slug}`, status: 'live' });
+  for (const l of locs) {
+    const [site] = await db.insert(t.websites).values({ organizationId: orgId, locationId: l.id, kind: 'hosted', templateId: tpl!.id, includedAddress: `${cfg.SITES_BASE_URL}/${slug}/${l.slug}`, status: 'live' }).returning();
+    await db.insert(t.pages).values({ organizationId: orgId, websiteId: site!.id, locationId: l.id, templateId: tpl!.id, slug: 'home', title: `${l.name} — Northlight Barre` });
+  }
+  await db.insert(t.classTypes).values(locs.map((l) => ({ organizationId: orgId, locationId: l.id, name: 'Barre Burn', durationMinutes: 50, defaultCapacity: 16, category: 'barre' })));
+  // Revenue in two currencies (the comparison never adds them up).
+  const ago = (d: number) => new Date(Date.now() - d * 86400_000);
+  await db.insert(t.paymentReferences).values(locs.flatMap((l, li) => Array.from({ length: 6 }, (_, i) => ({
+    organizationId: orgId, locationId: l.id, externalId: `pi_demo_barre_${li}_${i}`, amountMinor: (li ? 3200 : 2800) + i * 500, currency: l.currency, state: 'succeeded', sandbox: 1, succeededAt: ago(i * 4 + 1), createdAt: ago(i * 4 + 1),
+  }))));
+  // Brand franchise terms: royalty 7% and fund 2.5% in USD and CAD (the yoga network default stays 6% + 2%).
+  const finance = (await db.select().from(t.users).where(sql`${t.users.email} = ${`elena.marsh@${MAIL}`}`))[0];
+  const year = Number(today.slice(0, 4));
+  const basis = { streams: ['bookings', 'memberships', 'retail'], netOfRefunds: true, excludeTax: true, excludeTips: true, includeExternalSales: true } as const;
+  await db.insert(t.royaltyTerms).values((['USD', 'CAD'] as const).map((currency) => ({
+    organizationId: orgId, brandId: brand!.id, currency, effectiveFrom: `${year - 1}-01-01`, royaltyBps: 700, marketingFundBps: 250, technologyFeeMinor: currency === 'USD' ? 9_900 : 12_900,
+    basis: { ...basis, streams: [...basis.streams] }, lateFee: { kind: 'percent' as const, bps: 150, graceDays: 5 }, notes: 'Northlight Barre standard terms', createdBy: finance?.id ?? null,
+  })));
+  const pdf = (title: string) => Buffer.from(`%PDF-1.4\n% ${title} (demo document)\n`);
+  const doc = (kind: string, title: string, jurisdictions: string[]) => {
+    const b = pdf(title);
+    return { organizationId: orgId, brandId: brand!.id, kind, title, version: `${year}.1`, jurisdictions, status: 'current', issuedOn: `${year}-03-01`, fileName: `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`, contentType: 'application/pdf', sizeBytes: b.length, sha256: sha256(b.toString('base64')), contentBase64: b.toString('base64'), uploadedBy: finance?.id ?? null };
+  };
+  await db.insert(t.franchiseDocuments).values([
+    doc('disclosure', 'Northlight Barre Franchise Disclosure Document', ['US']),
+    doc('disclosure', 'Northlight Barre disclosure document (Canada)', ['CA-ON', 'CA-AB', 'CA-BC']),
+    doc('agreement_template', 'Northlight Barre franchise agreement', []),
+  ]);
+  const [terr] = await db.insert(t.franchiseTerritories).values({ organizationId: orgId, brandId: brand!.id, name: 'Seattle Eastside (Barre)', country: 'US', region: 'WA', description: 'Bellevue, Kirkland and Redmond', status: 'available' }).returning();
+  const vp = (await db.select().from(t.users).where(sql`${t.users.email} = ${`daniel.okafor@${MAIL}`}`))[0];
+  await db.insert(t.franchiseProspects).values([
+    { organizationId: orgId, brandId: brand!.id, name: 'Renée Dubois', email: 'renee.dubois@example.com', country: 'US', region: 'WA', city: 'Bellevue', territoryId: terr!.id, currency: 'USD', liquidCapitalMinor: 25_000_000, source: 'website', stage: 'qualified', ownerUserId: vp?.id ?? null, message: 'Barre teacher for 8 years, looking at the Eastside.' },
+    { organizationId: orgId, brandId: brand!.id, name: 'Marc-André Côté', email: 'ma.cote@example.com', country: 'CA', region: 'QC', city: 'Québec', currency: 'CAD', liquidCapitalMinor: 20_000_000, source: 'referral', stage: 'enquiry', ownerUserId: vp?.id ?? null, locale: 'fr' },
+  ]);
+  // Brand-scoped brand lead: Operations lead on the Barre brand only (no access to the yoga studios).
+  const lead = await upsertUser(`isla.reyes@${MAIL}`, 'Isla Reyes');
+  await db.insert(t.roleAssignments).values([
+    { organizationId: orgId, userId: lead.id, role: 'operations_lead', scopeKind: 'brand', scopeId: brand!.id, createdBy: finance?.id ?? null },
+    { organizationId: orgId, userId: lead.id, role: 'brand_manager', scopeKind: 'brand', scopeId: brand!.id, createdBy: finance?.id ?? null },
+  ]);
+  await db.insert(t.memberProfiles).values({ organizationId: orgId, userId: lead.id, jobTitle: 'Brand lead, Northlight Barre' }).onConflictDoNothing();
+  return { slug, locations: locs.map((l) => `${l.name} ${l.currency}`), login: `isla.reyes@${MAIL} (brand lead, Barre only)` };
 }
 
 /**

@@ -18,6 +18,7 @@ import { findOrCreateCustomer } from '../services/customers.ts';
 import { ALERT_CONSENT_PURPOSE, ALERT_CONSENT_VERSION } from '../services/realty-jobs.ts';
 import { areaView, bookViewing, bookingAgents, matchesCriteria, officeFor, publicListing, routeEnquiry, viewingSlots, viewingView, type SearchCriteria } from '../services/realty.ts';
 import { isoDateTime } from './_common.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const contact = z.object({ name: z.string().min(1).max(120), email: z.email(), phone: z.string().max(40).optional() });
@@ -43,7 +44,7 @@ export const realtyPublicRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
 
   async function brand(slug: string) {
-    const [org] = await s.db.select().from(organizations).where(and(eq(organizations.slug, slug), isNull(organizations.deletedAt)));
+    const [org] = await s.db.select().from(organizations).where(and(siteSlugCond(slug), isNull(organizations.deletedAt)));
     if (!org || org.industry !== 'realty') throw notFound('Agency');
     return org;
   }

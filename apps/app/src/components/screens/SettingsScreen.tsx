@@ -16,6 +16,7 @@ import { COUNTRY_ZONES } from './LocationWizard';
 import { AddLocationCard, BusinessLocationCard, WebsiteApprovalsCard } from './independent/BusinessSettings';
 import { BillingLinkCard } from './billing/BillingLinkCard';
 import { DataExportCard } from './billing/DataExportCard';
+import { BrandsCard } from '../brands/BrandLinks';
 
 export function SettingsScreen() {
   const t = useTranslations('settings');
@@ -56,6 +57,7 @@ export function SettingsScreen() {
                   </div>
                 </SectionCard>
                 {independent && <BusinessLocationCard />}
+                {!independent && <BrandsCard />}
                 {!independent && (
                 <SectionCard title={t('defaults')} aside={<span className="text-xs text-stone">{t('defaultsHint')}</span>}>
                   <div className="grid gap-3.5 md:grid-cols-3">

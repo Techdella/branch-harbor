@@ -20,6 +20,7 @@ import {
 } from '../services/training.ts';
 import { idParams, iso, isoDateTime, orgParams, secured } from './_common.ts';
 import { attachmentsSchema, audienceSchema, httpUrl } from './network-common.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 const tags = ['training'];
 const quizSchema = z.array(z.object({
@@ -44,7 +45,7 @@ export const trainingRoutes: FastifyPluginAsyncZod = async (_root) => {
 
   // ───────────────────────── public (brand site) ─────────────────────────
   async function brand(slug: string) {
-    const [org] = await s.db.select().from(organizations).where(and(eq(organizations.slug, slug), eq(organizations.status, 'active')));
+    const [org] = await s.db.select().from(organizations).where(and(siteSlugCond(slug), eq(organizations.status, 'active')));
     if (!org) throw notFound('Brand');
     return org;
   }

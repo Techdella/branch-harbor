@@ -1,0 +1,109 @@
+{
+  "brands": {
+    "brand": "Marca",
+    "meta": {
+      "settings": "Marcas",
+      "compare": "Comparação de marcas"
+    },
+    "switcher": {
+      "label": "Marca",
+      "all": "Todas as marcas ({count})"
+    },
+    "settings": {
+      "title": "Marcas",
+      "description": "Cada marca da sua empresa: visual, endereço web, idiomas, remetente e condições de franquia.",
+      "add": "Adicionar marca",
+      "list": "Suas marcas",
+      "locationCount": "{count, plural, =0 {Nenhuma unidade} one {# unidade} other {# unidades}}",
+      "main": "Marca principal",
+      "denied": "As marcas são gerenciadas pela sede.",
+      "addTitle": "Adicionar marca",
+      "addHint": "Uma nova marca do mesmo setor sob esta sede, com visual, sites, remetente e condições de franquia próprios. Equipe, financeiro e jurídico continuam compartilhados.",
+      "create": "Criar marca",
+      "cancel": "Cancelar",
+      "error": "Algo deu errado. Tente novamente.",
+      "saved": "Marca salva.",
+      "save": "Salvar marca",
+      "singleHint": "Você opera mais de uma marca deste setor?",
+      "manage": "Gerenciar marcas"
+    },
+    "fields": {
+      "name": "Nome da marca",
+      "slug": "Endereço do site",
+      "slugHint": "Os sites da sua marca ficam em /endereço/unidade.",
+      "logoUrl": "Logo (link https)",
+      "tagline": "Slogan",
+      "primaryColor": "Cor principal",
+      "accentColor": "Cor de destaque",
+      "headingFont": "Fonte dos títulos",
+      "bodyFont": "Fonte do texto",
+      "inherit": "Igual à empresa",
+      "theme": "Tema padrão do site",
+      "themeHint": "As novas páginas dos sites desta marca começam com ele.",
+      "domain": "Endereço web da marca",
+      "domainHint": "Conecte em Sites → Domínios; ele funciona depois que o DNS for verificado.",
+      "currency": "Moeda padrão",
+      "locales": "Idiomas",
+      "senderHint": "Os e-mails das unidades desta marca saem com este nome e endereço de resposta.",
+      "fromName": "Nome do remetente",
+      "replyTo": "Endereço de resposta"
+    },
+    "sections": {
+      "identity": "Visual e endereço",
+      "email": "Remetente de e-mail",
+      "templates": "Modelos da marca",
+      "franchise": "Condições de franquia desta marca"
+    },
+    "templates": {
+      "site": "Modelos e temas de site",
+      "email": "Temas de e-mail",
+      "assets": "Biblioteca de arquivos da marca",
+      "open": "Abrir",
+      "hint": "Modelos, temas de e-mail e arquivos podem ser de uma marca ou compartilhados por todas. O filtro de marca mostra os de cada marca e os compartilhados."
+    },
+    "preview": {
+      "label": "Prévia da marca",
+      "tagline": "Seu slogan aparece aqui.",
+      "button": "Reservar aula"
+    },
+    "franchise": {
+      "hint": "Documentos compartilhados valem para todas as marcas.",
+      "disclosure": "Documentos de divulgação",
+      "agreements": "Modelos de contrato",
+      "royalties": "Taxas de royalties e fundo",
+      "rate": "{currency}: royalties {royalty}, fundo {fund}",
+      "networkTerms": "Usa as condições padrão da rede.",
+      "onboarding": "Checklist de abertura de novas unidades: {key}",
+      "none": "Nenhum ainda.",
+      "shared": "Compartilhado"
+    },
+    "compare": {
+      "title": "Comparação de marcas",
+      "description": "Suas marcas lado a lado e a rede como um todo. Cada valor fica na sua moeda.",
+      "period": "Período",
+      "days": "{count, plural, one {Último dia} other {Últimos # dias}}",
+      "singleBrand": "A comparação de marcas é para empresas com várias marcas.",
+      "noFinance": "Requer acesso a pagamentos",
+      "noRevenue": "Nenhum pagamento ainda",
+      "network": "Resumo da rede",
+      "neverSummed": "Valores em moedas diferentes nunca são somados.",
+      "brands": "Marcas",
+      "locations": "Unidades",
+      "locationsValue": "{total} ({operating} abertas)",
+      "revenue": "Receita (líquida)",
+      "openProspects": "Candidatos a franquia em aberto",
+      "byBrand": "Por marca",
+      "brand": "Marca",
+      "pipeline": "Expansão de franquias",
+      "terms": "Royalties e fundo",
+      "opening": "{count, plural, one {# abre em breve} other {# abrem em breve}}",
+      "openCount": "{count, plural, =0 {Nenhum candidato em aberto} one {# candidato em aberto} other {# candidatos em aberto}}",
+      "signedCount": "{count} assinados",
+      "territories": "{count, plural, one {# território disponível} other {# territórios disponíveis}}",
+      "hidden": "Fora do seu acesso",
+      "networkDefault": "padrão da rede",
+      "noTerms": "Ainda sem condições",
+      "link": "Comparar marcas"
+    }
+  }
+}

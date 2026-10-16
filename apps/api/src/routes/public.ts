@@ -6,6 +6,7 @@ import { consentRecords, demoRequests, locations, organizations } from '../db/sc
 import { CONNECTOR_CATALOG } from '../integrations/connectors.ts';
 import { notFound, validationError } from '../lib/errors.ts';
 import { demoRequestCopy } from '../lib/demoRequestCopy.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 export const publicRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
@@ -53,7 +54,7 @@ export const publicRoutes: FastifyPluginAsyncZod = async (app) => {
       querystring: z.object({ country: z.string().length(2).optional(), q: z.string().max(80).optional(), near: z.string().regex(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/).optional().describe('lat,lng — sorts by distance when locations have coordinates') }),
     },
   }, async (req) => {
-    const [org] = await s.db.select().from(organizations).where(and(eq(organizations.slug, req.params.orgSlug), isNull(organizations.deletedAt)));
+    const [org] = await s.db.select().from(organizations).where(and(siteSlugCond(req.params.orgSlug), isNull(organizations.deletedAt)));
     if (!org) throw notFound('Business');
     const conds = [eq(locations.organizationId, org.id), eq(locations.publiclyVisible, true), isNull(locations.archivedAt)];
     if (req.query.country) conds.push(eq(locations.country, req.query.country.toUpperCase()));

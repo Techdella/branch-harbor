@@ -85,6 +85,8 @@ export interface Location {
   site: 'live' | 'unpublished';
   sync: 'ok' | 'attention';
   pastel: string;
+  /** Brand of a multi-brand HQ (null = the main brand). */
+  brandId?: string | null;
 }
 
 export interface ScopeOptionT {

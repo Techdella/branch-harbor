@@ -88,9 +88,9 @@ export async function defaultBrandId(db: Exec, organizationId: string): Promise<
   const found = await find();
   if (found) return found;
   // Every business has a default brand (created on first use for businesses made after the brands migration).
-  const [o] = await db.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, organizationId));
+  const [o] = await db.select({ name: organizations.name, slug: organizations.slug }).from(organizations).where(eq(organizations.id, organizationId));
   if (!o) return null;
-  await db.insert(brands).values({ organizationId, name: o.name, isDefault: true }).onConflictDoNothing();
+  await db.insert(brands).values({ organizationId, name: o.name, isDefault: true, slug: o.slug }).onConflictDoNothing();
   return find();
 }
 
@@ -256,10 +256,35 @@ export function requireCapabilityHook(module: string, action: AccessAction, reso
   };
 }
 
-/** Location ids where the user holds a module action ('all' for organisation-wide grants). */
+/* ---------------- Brand filter (top-bar brand switcher) ---------------- */
+
+/** Request header carrying the brand the person filtered the app to ("All brands" = no header). */
+export const BRAND_FILTER_HEADER = 'x-bh-brand';
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The brand a read request is filtered to, or null for all brands. The filter is a view filter: it narrows what lists,
+ * reports, KPIs and the league table return, and never changes what a write may touch (writes are checked by scope).
+ */
+export function requestedBrandId(req: FastifyRequest): string | null {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return null;
+  const raw = req.headers[BRAND_FILTER_HEADER];
+  const v = (Array.isArray(raw) ? raw[0] : raw)?.trim();
+  return v && UUID_RE.test(v) ? v.toLowerCase() : null;
+}
+
+/** Narrows a set of location ids to the requested brand's locations (no-op without a brand filter). */
+export async function withBrandFilter(req: FastifyRequest, db: Exec, organizationId: string, allowed: 'all' | Set<string>): Promise<'all' | Set<string>> {
+  const brandId = requestedBrandId(req);
+  if (!brandId) return allowed;
+  const inBrand = (await scopedLocations(db, organizationId)).filter((l) => l.brandId === brandId).map((l) => l.id);
+  return new Set(inBrand.filter((id) => allowed === 'all' || allowed.has(id)));
+}
+
+/** Location ids where the user holds a module action ('all' for organisation-wide grants), narrowed by the brand filter. */
 export async function capabilityLocations(req: FastifyRequest, db: Exec, organizationId: string, module: string, action: AccessAction): Promise<'all' | Set<string>> {
   const assignments = await requireMember(req, db, organizationId);
-  return capabilityLocationIds(assignments, module, action, organizationId, await scopedLocations(db, organizationId));
+  return withBrandFilter(req, db, organizationId, capabilityLocationIds(assignments, module, action, organizationId, await scopedLocations(db, organizationId)));
 }
 
 /** Territories (sub-networks) where the user holds a module action ('all' for organisation-wide grants). */
@@ -272,7 +297,7 @@ export async function authorisedLocations(req: FastifyRequest, db: Exec, organiz
   const assignments = await requireMember(req, db, organizationId);
   const locs = await scopedLocations(db, organizationId);
   const ops = opsCapabilityFor(req, permission, assignments);
-  return ops ? capabilityLocationIds(assignments, ops.module, ops.action, organizationId, locs) : authorisedLocationIds(assignments, permission, organizationId, locs);
+  return withBrandFilter(req, db, organizationId, ops ? capabilityLocationIds(assignments, ops.module, ops.action, organizationId, locs) : authorisedLocationIds(assignments, permission, organizationId, locs));
 }
 
 /**

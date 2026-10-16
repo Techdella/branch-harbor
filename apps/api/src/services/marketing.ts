@@ -14,6 +14,7 @@ import { randomToken } from '../lib/crypto.ts';
 import { audit } from './audit.ts';
 import { renderEmail, type EmailBrand } from './email-render.ts';
 import { segmentConditions } from './segments.ts';
+import { emailIdentity } from './brands.ts';
 
 export type CustomerRow = typeof customers.$inferSelect;
 export const CONSENT_FOR_CHANNEL = { email: 'marketing_email', sms: 'marketing_sms', whatsapp: 'marketing_whatsapp' } as const;
@@ -106,7 +107,8 @@ export async function sendMarketingEmail(s: Services, input: SendEmailInput): Pr
   const email = input.to ?? input.customer?.email ?? null;
   if (!email) return { status: 'skipped', sendId: null, skipReason: 'no_email' };
   if (!input.test && input.customer && !(await hasConsent(s.db, input.customer.id, 'marketing_email'))) return { status: 'skipped', sendId: null, skipReason: 'no_consent' };
-  const { brand, org } = await emailBrandFor(s.db, input.organizationId);
+  // Multi-brand HQ: email from a location goes out as its brand (name, logo, palette, sender and reply-to).
+  const { email: brand, org, sender } = await emailIdentity(s.db, input.organizationId, input.locationId);
   const settings = marketingSettingsOf(org);
   const [loc] = input.locationId ? await s.db.select().from(locations).where(eq(locations.id, input.locationId)) : [];
   const address = settings.postalAddress || (loc ? [loc.address.line1, loc.address.line2, loc.address.postalCode, loc.address.city, loc.country].filter(Boolean).join(', ') : '');
@@ -126,12 +128,12 @@ export async function sendMarketingEmail(s: Services, input: SendEmailInput): Pr
   try {
     const rendered = await renderEmail({
       document: input.document, subject: input.subject, preheader: input.preheader, brand, locale: input.customer?.locale ?? loc?.locale ?? org.defaultLocale,
-      values: personalValues(input.customer ?? { name: '', email }, { locationName: loc?.name, businessName: org.name }),
+      values: personalValues(input.customer ?? { name: '', email }, { locationName: loc?.name, businessName: brand.name }),
       postalAddress: address, unsubscribeUrl: `${base}/v1/public/email/unsubscribe/${token}`,
       trackLink: settings.tracking.clicks && !input.test ? (_href, i) => `${base}/v1/public/email/c/${token}/${i}` : undefined,
       openPixelUrl: settings.tracking.opens && !input.test ? `${base}/v1/public/email/o/${token}.gif` : null,
     });
-    const res = await s.mailer.send({ to: email, subject: rendered.subject, text: rendered.text, html: rendered.html, tag: input.campaignId ? 'campaign' : input.test ? 'marketing-test' : 'automation' });
+    const res = await s.mailer.send({ to: email, subject: rendered.subject, text: rendered.text, html: rendered.html, tag: input.campaignId ? 'campaign' : input.test ? 'marketing-test' : 'automation', fromName: sender.fromName, replyTo: sender.replyTo });
     const status = res.delivered ? 'sent' : 'sandbox';
     await s.db.update(emailSends).set({ status, links: rendered.links, sentAt: new Date() }).where(eq(emailSends.id, sendId));
     return { status, sendId };

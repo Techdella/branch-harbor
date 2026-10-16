@@ -13,6 +13,7 @@ import { hasAt, requireAnyAt, requireAt, scopeFor } from '../services/comms-scop
 import { createRoutedLead } from '../services/lead-routing.ts';
 import { FUNDED_KINDS, markConsumed, recordFundSpend } from '../services/marketing-fund.ts';
 import { idParams, orgParams, secured } from './_common.ts';
+import { brandSharedCond } from '../services/brands.ts';
 
 const NC = 'marketing.network_campaigns';
 const ADS = 'marketing.ads';
@@ -149,6 +150,9 @@ export const adCampaignRoutes: FastifyPluginAsyncZod = async (app) => {
       const ads = await scopeFor(req, s.db, orgId, ADS);
       const conds: SQL[] = [eq(adCampaigns.organizationId, orgId)];
       if (req.query.kind !== 'all') conds.push(eq(adCampaigns.kind, req.query.kind));
+      // Brand switcher: campaigns of the chosen brand (campaigns without a brand are network-wide and always listed).
+      const byBrand = await brandSharedCond(req, s.db, orgId, adCampaigns.brandId);
+      if (byBrand) conds.push(byBrand);
       let rows = await s.db.select().from(adCampaigns).where(and(...conds)).orderBy(desc(adCampaigns.createdAt)).limit(200);
       let visible: string[] | null = null;
       if (!hq && !ads.all) {
@@ -223,7 +227,9 @@ export const adCampaignRoutes: FastifyPluginAsyncZod = async (app) => {
         for (const v of split.values()) totals[v.currency] = (totals[v.currency] ?? 0) + v.budgetMinor;
       }
       const c = await s.db.transaction(async (tx) => {
-        const [row] = await tx.insert(adCampaigns).values({ organizationId: orgId, kind: b.kind, name: b.name, objective: b.objective, platforms: b.platforms, status: 'draft', startsOn: b.startsOn, endsOn: b.endsOn ?? null, creative: b.creative, comingSoon: b.comingSoon ?? null, budgetTotals: totals, createdBy: req.user!.id }).returning();
+        // A campaign whose locations are all in one brand is that brand's campaign.
+        const chosenBrands = [...new Set(chosen.map((l) => l.brandId ?? null))];
+        const [row] = await tx.insert(adCampaigns).values({ organizationId: orgId, brandId: chosenBrands.length === 1 ? chosenBrands[0] : null, kind: b.kind, name: b.name, objective: b.objective, platforms: b.platforms, status: 'draft', startsOn: b.startsOn, endsOn: b.endsOn ?? null, creative: b.creative, comingSoon: b.comingSoon ?? null, budgetTotals: totals, createdBy: req.user!.id }).returning();
         await tx.insert(adCampaignLocations).values(chosen.map((l) => ({ organizationId: orgId, campaignId: row!.id, locationId: l.id, budgetMinor: split.get(l.id)!.budgetMinor, currency: split.get(l.id)!.currency, radiusKm: b.radiusKm, geo: l.geo ?? null })));
         if (b.kind === 'coming_soon') {
           for (const l of chosen) await tx.update(locations).set({ settings: sql`${locations.settings} || ${JSON.stringify({ openingDate: b.comingSoon!.openingDate })}::jsonb`, updatedAt: new Date() }).where(eq(locations.id, l.id));

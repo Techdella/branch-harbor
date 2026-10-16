@@ -18,6 +18,7 @@ import { authorisedLocations, hasPerm, requirePerm, type ScopeTarget } from '../
 import { isIndependent } from '../services/businessMode.ts';
 import { applyMasterToLocation, assertValidDocument, checkpoint, documentForRestore, draftDocument, saveDraft, syncMasterToPages } from '../services/site-builder.ts';
 import { iso, isoDateTime, orgParams, secured } from './_common.ts';
+import { brandInOrg, brandSharedCond } from '../services/brands.ts';
 
 const tags = ['website builder'];
 const pageParams = z.object({ orgId: z.uuid(), id: z.uuid() });
@@ -298,26 +299,27 @@ export const marketingSiteRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   // ── HQ master pages ──
-  const masterView = (t: typeof templates.$inferSelect, pageCount = 0) => ({ id: t.id, name: t.name, pageSlug: t.pageSlug ?? 'home', document: t.document, version: t.version, updatedAt: t.updatedAt.toISOString(), pageCount });
+  const masterView = (t: typeof templates.$inferSelect, pageCount = 0) => ({ id: t.id, name: t.name, pageSlug: t.pageSlug ?? 'home', brandId: t.brandId, document: t.document, version: t.version, updatedAt: t.updatedAt.toISOString(), pageCount });
 
   app.get('/orgs/:orgId/builder/masters', { schema: { tags, security: secured, params: orgParams } }, async (req) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'website.edit', orgScope(orgId)).catch(async () => { await requirePerm(req, s.db, 'website.design', orgScope(orgId)); });
-    const rows = await s.db.select().from(templates).where(and(eq(templates.organizationId, orgId)));
+    const rows = await s.db.select().from(templates).where(and(eq(templates.organizationId, orgId), await brandSharedCond(req, s.db, orgId, templates.brandId)));
     const masters = rows.filter((t) => t.document);
     const counts = masters.length ? await s.db.select({ t: pages.templateId }).from(pages).where(and(inArray(pages.templateId, masters.map((m) => m.id)), isNull(pages.archivedAt))) : [];
     return { items: masters.map((m) => masterView(m, counts.filter((c) => c.t === m.id).length)) };
   });
 
   app.post('/orgs/:orgId/builder/masters', {
-    schema: { tags, security: secured, params: orgParams, body: z.object({ name: z.string().trim().min(1).max(80), pageSlug: z.string().max(60).default('home'), document: pageDocumentSchema.optional() }) },
+    schema: { tags, security: secured, params: orgParams, body: z.object({ name: z.string().trim().min(1).max(80), pageSlug: z.string().max(60).default('home'), document: pageDocumentSchema.optional(), brandId: z.uuid().nullable().optional() }) },
   }, async (req, reply) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'website.design', orgScope(orgId));
     await requirePerm(req, s.db, 'templates.write', orgScope(orgId));
     const doc = assertValidDocument(req.body.document ?? { schemaVersion: 1, sections: [] }, 'draft');
     const [org] = await s.db.select({ industry: organizations.industry }).from(organizations).where(eq(organizations.id, orgId));
-    const [t] = await s.db.insert(templates).values({ organizationId: orgId, name: req.body.name, industry: org?.industry ?? null, fields: [], document: doc, pageSlug: slugify(req.body.pageSlug) }).returning();
+    if (req.body.brandId && !(await brandInOrg(s.db, orgId, req.body.brandId))) throw notFound('Brand');
+    const [t] = await s.db.insert(templates).values({ organizationId: orgId, name: req.body.name, industry: org?.industry ?? null, fields: [], document: doc, pageSlug: slugify(req.body.pageSlug), brandId: req.body.brandId ?? null }).returning();
     await audit(s.db, { organizationId: orgId, ...actor(req), action: 'template.created', targetType: 'template', targetId: t!.id, metadata: { builder: true } });
     return reply.code(201).send(masterView(t!));
   });
@@ -365,7 +367,8 @@ export const marketingSiteRoutes: FastifyPluginAsyncZod = async (app) => {
     const results: Array<{ locationId: string; status: string; reason: string | null; pageId: string | null }> = [];
     for (const l of locs) {
       try {
-        const r = await s.db.transaction((tx) => applyMasterToLocation(tx, t, l.id, `${s.cfg.SITES_BASE_URL}/${org.slug}/${l.slug}`));
+        const siteSlug = l.brandId ? (await brandInOrg(s.db, orgId, l.brandId))?.slug ?? org.slug : org.slug;
+        const r = await s.db.transaction((tx) => applyMasterToLocation(tx, t, l.id, `${s.cfg.SITES_BASE_URL}/${siteSlug}/${l.slug}`));
         results.push({ locationId: l.id, ...r });
       } catch (err) {
         results.push({ locationId: l.id, status: 'failed', reason: (err as Error).message.slice(0, 200), pageId: null });

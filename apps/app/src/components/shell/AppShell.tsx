@@ -79,7 +79,10 @@ function Shell({ children }: { children: ReactNode }) {
           <main id="main" ref={mainRef} tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-3 outline-none">
             {/* No padlocks: a route outside the person's access shows "not available" and never loads its data. */}
             <TrialBanner />
-            {canSeeRoute(path, app.capabilities, app.industry) ? children : <NotAvailable />}
+            {/* Keyed by the brand filter: every screen reloads its data for the chosen brand. */}
+            <div key={app.brandId ?? 'all'} className="contents">
+              {canSeeRoute(path, app.capabilities, app.industry) ? children : <NotAvailable />}
+            </div>
           </main>
           {app.aiOpen && xl && (
             <div className="sticky top-3 w-[380px] shrink-0">

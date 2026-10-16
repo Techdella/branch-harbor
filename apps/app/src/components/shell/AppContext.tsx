@@ -19,6 +19,7 @@ import {
   workspace,
   type Workspace,
 } from '@/lib/http/workspace';
+import { setBrandFilter, type ApiBrand } from '@/lib/http/brands';
 
 /** A business account the signed-in person belongs to (one industry each). */
 export interface Account {
@@ -77,6 +78,16 @@ interface AppCtx {
   setAiOpen: (open: boolean) => void;
   toggleNav: () => void;
   reloadWorkspace: () => Promise<void>;
+  /** Brands this person covers (multi-brand HQ). */
+  brands: ApiBrand[];
+  /** True when this person covers several brands: the brand switcher and brand UI show only then. */
+  multiBrand: boolean;
+  /** The business runs several brands (even if this person covers one). */
+  orgMultiBrand: boolean;
+  canManageBrands: boolean;
+  /** Top-bar brand filter: a brand id, or null for all brands. */
+  brandId: string | null;
+  setBrandId: (id: string | null) => void;
 }
 
 const KEY = 'bh_app_state';
@@ -169,6 +180,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       permissions: permissionsOf(capabilities),
       workspaces,
       primaryWorkspace: access.primaryWorkspace && workspaces.includes(access.primaryWorkspace) ? access.primaryWorkspace : (workspaces[0] ?? null),
+      brands: ws.brands,
+      orgMultiBrand: ws.multiBrand,
+      canManageBrands: ws.canManageBrands,
+      brandFilter: ws.brandFilter,
       accounts: ws.orgs.map((o) => ({ id: o.id, name: o.name, industry: asIndustryKey(o.industry), model: o.model === 'independent' ? ('independent' as const) : ('network' as const) })),
     };
   }, [ws]);
@@ -213,6 +228,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await refreshWorkspace();
   }, []);
   const retry = useCallback(() => setAttempt((a) => a + 1), []);
+  const setBrandId = useCallback((id: string | null) => {
+    const o = workspace()?.org;
+    if (!o) return;
+    setBrandFilter(o.id, id);
+    // The directory (locations, scopes) and every screen reload for the chosen brand.
+    void refreshWorkspace();
+  }, []);
 
   const value = useMemo<AppCtx>(() => {
     const industry = derived?.industry ?? 'studios';
@@ -247,8 +269,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setAiOpen,
       toggleNav,
       reloadWorkspace,
+      brands: derived?.brands ?? [],
+      multiBrand: (derived?.brands.length ?? 0) > 1,
+      orgMultiBrand: !!derived?.orgMultiBrand,
+      canManageBrands: !!derived?.canManageBrands,
+      brandId: derived?.brandFilter ?? null,
+      setBrandId,
     };
-  }, [derived, loadState, retry, scope, scopes, state.aiOpen, state.navCollapsed, activeWorkspace, switchAccount, setWorkspace, setScopeId, setAiOpen, toggleNav, reloadWorkspace]);
+  }, [setBrandId, derived, loadState, retry, scope, scopes, state.aiOpen, state.navCollapsed, activeWorkspace, switchAccount, setWorkspace, setScopeId, setAiOpen, toggleNav, reloadWorkspace]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

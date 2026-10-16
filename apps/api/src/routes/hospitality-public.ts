@@ -15,6 +15,7 @@ import {
 } from '../services/hospitality.ts';
 import { guestReservations } from '../services/hospitality-ops.ts';
 import { isoDate, reservationRoomsView, reservationView } from './hospitality-views.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 const guest = z.object({ name: z.string().min(1).max(120), email: z.email(), phone: z.string().max(40).optional() });
 const roomReq = z.object({ roomTypeId: z.uuid(), ratePlanId: z.uuid(), adults: z.number().int().min(1).max(20), children: z.number().int().min(0).max(20).default(0) });
@@ -23,7 +24,7 @@ export const hospitalityPublicRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
 
   async function brand(slug: string) {
-    const [org] = await s.db.select().from(organizations).where(and(eq(organizations.slug, slug), isNull(organizations.deletedAt)));
+    const [org] = await s.db.select().from(organizations).where(and(siteSlugCond(slug), isNull(organizations.deletedAt)));
     if (!org || org.industry !== 'hospitality') throw notFound('Brand');
     return org;
   }

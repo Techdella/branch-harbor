@@ -10,6 +10,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { useScopeLabel } from '../shell/ScopePicker';
 import { Async, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { useTxt } from '../ui/useDataText';
+import { BrandComparisonLink } from '../brands/BrandLinks';
 
 function fmt(r: Report, v: number, locale: string) {
   if (r.unit === 'percent') return `${v}%`;
@@ -29,7 +30,7 @@ export function ReportsScreen() {
   if (!app.can('reports.read')) return <DeniedState permission="reports.read" />;
   return (
     <>
-      <PageHeader icon="chart" title={t('title')} description={t('description')} />
+      <PageHeader icon="chart" title={t('title')} description={t('description')} actions={app.orgMultiBrand ? <BrandComparisonLink /> : undefined} />
       <Async res={res} permission="reports.read" loading={<LoadingBlock variant="detail" />} isEmpty={(d) => d.length === 0} empty={<Empty icon="chart" title={t('empty')} />}>
         {(reports) => (
           <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">

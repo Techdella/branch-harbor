@@ -11,6 +11,7 @@ import { createRoutedLead } from '../services/lead-routing.ts';
 import { sha256 } from '../lib/crypto.ts';
 import { AppError, notFound, validationError } from '../lib/errors.ts';
 import { addTag, emitMarketingEvent, marketingSettingsOf, upsertContact } from '../services/marketing.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 const PIXEL = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 const UNSUB_COPY: Record<string, { title: string; body: string; button: string; done: string }> = {
@@ -110,7 +111,7 @@ export const marketingPublicRoutes: FastifyPluginAsyncZod = async (app) => {
     if (b.website) return { ok: true };
     if (b.startedAt && Date.now() - b.startedAt < 1500) throw new AppError(422, 'too_fast', 'Please take a moment to fill in the form');
     if (!(await s.botCheck.verify(b.turnstileToken, req.ip))) throw new AppError(422, 'bot_check_failed', 'We could not verify this submission. Try again.');
-    const [o] = await s.db.select().from(organizations).where(and(eq(organizations.slug, b.brandSlug), isNull(organizations.deletedAt), ne(organizations.status, 'suspended')));
+    const [o] = await s.db.select().from(organizations).where(and(siteSlugCond(b.brandSlug), isNull(organizations.deletedAt), ne(organizations.status, 'suspended')));
     if (!o) throw notFound('Site');
     const [loc] = b.locationSlug ? await s.db.select().from(locations).where(and(eq(locations.organizationId, o.id), eq(locations.slug, b.locationSlug), eq(locations.publiclyVisible, true))) : [];
     const ipHash = sha256(`${req.ip}|${new Date().toISOString().slice(0, 10)}|${s.cfg.JWT_SECRET.slice(0, 8)}`);
@@ -193,7 +194,7 @@ export const marketingPublicRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // ── Site redirects (old page addresses after a slug change) ──
   app.get('/public/sites/redirect', { schema: { tags: ['sites'], querystring: z.object({ brand: z.string().min(1).max(80), location: z.string().max(80).optional(), slug: z.string().min(1).max(80) }) } }, async (req, reply) => {
-    const [o] = await s.db.select({ id: organizations.id }).from(organizations).where(and(eq(organizations.slug, req.query.brand), isNull(organizations.deletedAt)));
+    const [o] = await s.db.select({ id: organizations.id }).from(organizations).where(and(siteSlugCond(req.query.brand), isNull(organizations.deletedAt)));
     if (!o) throw notFound('Redirect');
     let websiteLoc: string | null = null;
     if (req.query.location) {

@@ -14,6 +14,7 @@ import { createReturn, creditBalances, returnWindow, serializeReturn } from '../
 import { credentialsOf } from '../services/connections.ts';
 import { ingestWooOrder, verifyWooSignature, type WooOrder } from '../services/commerce-woo.ts';
 import { secured } from './_common.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 const tags = ['commerce-storefront'];
 const slugParam = z.string().min(1).max(80);
@@ -25,7 +26,7 @@ export const commerceStorefrontRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
 
   async function storeBySlugs(brandSlug: string, locationSlug: string) {
-    const [org] = await s.db.select().from(organizations).where(and(eq(organizations.slug, brandSlug), isNull(organizations.deletedAt), ne(organizations.status, 'suspended')));
+    const [org] = await s.db.select().from(organizations).where(and(siteSlugCond(brandSlug), isNull(organizations.deletedAt), ne(organizations.status, 'suspended')));
     if (!org) throw notFound('Store');
     const [loc] = await s.db.select().from(locations).where(and(eq(locations.organizationId, org.id), eq(locations.slug, locationSlug), eq(locations.publiclyVisible, true), isNull(locations.archivedAt)));
     if (!loc) throw notFound('Store');
@@ -197,7 +198,7 @@ export const commerceStorefrontRoutes: FastifyPluginAsyncZod = async (app) => {
     config: { rateLimit: { max: 10, timeWindow: '1 minute' } },
     schema: { tags, summary: 'Check a gift card / store credit balance', body: z.object({ brandSlug: slugParam, code: z.string().min(6).max(40) }) },
   }, async (req) => {
-    const [org] = await s.db.select({ id: organizations.id }).from(organizations).where(eq(organizations.slug, req.body.brandSlug));
+    const [org] = await s.db.select({ id: organizations.id }).from(organizations).where(siteSlugCond(req.body.brandSlug));
     const card = org ? await findGiftCard(s.db, org.id, req.body.code) : null;
     if (!card || card.status !== 'active') throw notFound('Gift card');
     return { kind: card.kind, last4: card.codeLast4, balance: { amount: card.balanceMinor, currency: card.currency }, expiresAt: card.expiresAt?.toISOString() ?? null };

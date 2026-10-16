@@ -23,8 +23,11 @@ export const PRICE_BOOK_STATUS_NOTE = 'Proposal: to be validated with pricing te
 
 export const PLAN_PRICE_KEYS = ['solo', 'connector', 'hosted', 'network'] as const;
 export type PlanPriceKey = (typeof PLAN_PRICE_KEYS)[number];
-/** Fees that are not plans: the Network HQ platform fee, the paid trial, the royalty/fund collection fee and its monthly cap per location. */
-export const FEE_PRICE_KEYS = ['platform', 'trial', 'collection', 'collectionCap'] as const;
+/**
+ * Fees that are not plans: the Network HQ platform fee, the paid trial, the royalty/fund collection fee and its monthly
+ * cap per location, and the monthly fee for each brand beyond the first under one HQ (multi-brand HQ, proposal).
+ */
+export const FEE_PRICE_KEYS = ['platform', 'trial', 'collection', 'collectionCap', 'extraBrand'] as const;
 export type FeePriceKey = (typeof FEE_PRICE_KEYS)[number];
 export type PriceItem = PlanPriceKey | FeePriceKey;
 
@@ -99,50 +102,51 @@ export function tierForCountry(country: string | null | undefined): RegionTier {
 /* ------------------------------------------------------------------ */
 
 type Row = Record<PriceItem, number>;
-const row = (solo: number, connector: number, hosted: number, network: number, platform: number, trial: number, collection: number, collectionCap: number): Row => ({
-  solo, connector, hosted, network, platform, trial, collection, collectionCap,
+const row = (solo: number, connector: number, hosted: number, network: number, platform: number, trial: number, collection: number, collectionCap: number, extraBrand: number): Row => ({
+  solo, connector, hosted, network, platform, trial, collection, collectionCap, extraBrand,
 });
 
 /**
  * Monthly list prices in major units, one row per billing currency, at the currency's home tier (`CURRENCY_TIER`).
  * Columns: Solo (flat, one location) · Connector / Hosted / Network per location · Network HQ platform fee (includes
- * 3 locations) · 14-day paid trial · royalty/fund collection fee per collection · its monthly cap per location.
+ * 3 locations) · 14-day paid trial · royalty/fund collection fee per collection · its monthly cap per location ·
+ * each extra brand per month (multi-brand HQ: the first brand is in the platform fee).
  */
 export const PRICE_BOOK = {
   // Tier A
-  USD: row(39, 29, 59, 89, 299, 4.99, 1, 10),
-  CAD: row(52, 39, 79, 119, 399, 6.99, 1.4, 14),
-  GBP: row(31, 23, 47, 71, 239, 3.99, 0.8, 8),
-  AUD: row(59, 45, 89, 135, 449, 7.99, 1.5, 15),
-  NZD: row(65, 49, 95, 145, 489, 8.49, 1.7, 17),
-  CHF: row(35, 25, 49, 75, 249, 3.9, 0.9, 9),
-  SEK: row(379, 279, 579, 849, 2890, 49, 10, 100),
-  NOK: row(429, 319, 649, 949, 3190, 55, 10, 100),
-  DKK: row(259, 189, 389, 589, 1990, 35, 7, 70),
+  USD: row(39, 29, 59, 89, 299, 4.99, 1, 10, 99),
+  CAD: row(52, 39, 79, 119, 399, 6.99, 1.4, 14, 129),
+  GBP: row(31, 23, 47, 71, 239, 3.99, 0.8, 8, 79),
+  AUD: row(59, 45, 89, 135, 449, 7.99, 1.5, 15, 149),
+  NZD: row(65, 49, 95, 145, 489, 8.49, 1.7, 17, 159),
+  CHF: row(35, 25, 49, 75, 249, 3.9, 0.9, 9, 79),
+  SEK: row(379, 279, 579, 849, 2890, 49, 10, 100, 949),
+  NOK: row(429, 319, 649, 949, 3190, 55, 10, 100, 1049),
+  DKK: row(259, 189, 389, 589, 1990, 35, 7, 70, 649),
   // Euro area West: tier A (IE, FI) and tier B (rest of Western Europe) share one euro list
-  EUR: row(36, 27, 55, 83, 279, 4.49, 0.9, 9),
+  EUR: row(36, 27, 55, 83, 279, 4.49, 0.9, 9, 89),
   // Tier B
-  JPY: row(5400, 4000, 8200, 12400, 41000, 700, 140, 1400),
-  SGD: row(49, 36, 75, 109, 369, 6.49, 1.2, 12),
-  HKD: row(279, 209, 419, 629, 2090, 39, 7, 70),
-  AED: row(129, 99, 199, 299, 999, 18, 3.5, 35),
-  SAR: row(139, 99, 209, 319, 1049, 18, 3.5, 35),
+  JPY: row(5400, 4000, 8200, 12400, 41000, 700, 140, 1400, 13500),
+  SGD: row(49, 36, 75, 109, 369, 6.49, 1.2, 12, 119),
+  HKD: row(279, 209, 419, 629, 2090, 39, 7, 70, 690),
+  AED: row(129, 99, 199, 299, 999, 18, 3.5, 35, 329),
+  SAR: row(139, 99, 209, 319, 1049, 18, 3.5, 35, 349),
   // Tier C
-  PLN: row(99, 69, 149, 219, 729, 14.99, 2.5, 25),
-  CZK: row(590, 440, 890, 1340, 4490, 89, 15, 150),
-  MYR: row(119, 85, 169, 259, 869, 14.9, 3, 30),
-  MXN: row(449, 329, 669, 999, 3349, 69, 13, 130),
-  BRL: row(139, 99, 209, 319, 1069, 17.9, 3.5, 35),
-  TRY: row(949, 729, 1449, 2199, 7399, 129, 25, 250),
+  PLN: row(99, 69, 149, 219, 729, 14.99, 2.5, 25, 239),
+  CZK: row(590, 440, 890, 1340, 4490, 89, 15, 150, 1490),
+  MYR: row(119, 85, 169, 259, 869, 14.9, 3, 30, 289),
+  MXN: row(449, 329, 669, 999, 3349, 69, 13, 130, 1099),
+  BRL: row(139, 99, 209, 319, 1069, 17.9, 3.5, 35, 349),
+  TRY: row(949, 729, 1449, 2199, 7399, 129, 25, 250, 2449),
   // Tier D
-  ZAR: row(329, 249, 499, 749, 2490, 49, 9, 90),
-  INR: row(1699, 1249, 2499, 3799, 12999, 299, 45, 450),
-  PHP: row(1099, 829, 1699, 2499, 8499, 149, 29, 290),
-  IDR: row(319000, 239000, 479000, 729000, 2449000, 39000, 8000, 80000),
-  EGP: row(899, 679, 1399, 2099, 6999, 119, 25, 250),
-  NGN: row(28500, 21000, 43000, 65000, 219000, 2500, 750, 7500),
-  KES: row(2400, 1800, 3650, 5500, 18500, 299, 60, 600),
-  GHS: row(225, 165, 339, 509, 1719, 29, 6, 60),
+  ZAR: row(329, 249, 499, 749, 2490, 49, 9, 90, 829),
+  INR: row(1699, 1249, 2499, 3799, 12999, 299, 45, 450, 4299),
+  PHP: row(1099, 829, 1699, 2499, 8499, 149, 29, 290, 2799),
+  IDR: row(319000, 239000, 479000, 729000, 2449000, 39000, 8000, 80000, 809000),
+  EGP: row(899, 679, 1399, 2099, 6999, 119, 25, 250, 2299),
+  NGN: row(28500, 21000, 43000, 65000, 219000, 2500, 750, 7500, 72500),
+  KES: row(2400, 1800, 3650, 5500, 18500, 299, 60, 600, 6099),
+  GHS: row(225, 165, 339, 509, 1719, 29, 6, 60, 569),
 } as const satisfies Partial<Record<Currency, Row>>;
 
 export type PricedCurrency = keyof typeof PRICE_BOOK;
@@ -159,10 +163,10 @@ export const CURRENCY_TIER: Readonly<Record<PricedCurrency, RegionTier>> = {
 
 /** Tier variants for countries billed in a currency whose base list is set for a richer tier. */
 export const TIER_PRICE_LISTS = {
-  'EUR@C': row(25, 19, 37, 55, 189, 2.99, 0.6, 6),
-  'USD@B': row(37, 27, 55, 85, 279, 4.99, 0.95, 9.5),
-  'USD@C': row(27, 20, 41, 62, 209, 3.49, 0.7, 7),
-  'USD@D': row(19, 14, 29, 44, 149, 2.49, 0.5, 5),
+  'EUR@C': row(25, 19, 37, 55, 189, 2.99, 0.6, 6, 59),
+  'USD@B': row(37, 27, 55, 85, 279, 4.99, 0.95, 9.5, 89),
+  'USD@C': row(27, 20, 41, 62, 209, 3.49, 0.7, 7, 69),
+  'USD@D': row(19, 14, 29, 44, 149, 2.49, 0.5, 5, 49),
 } as const satisfies Record<string, Row>;
 
 export type PriceListKey = PricedCurrency | keyof typeof TIER_PRICE_LISTS;
@@ -267,6 +271,16 @@ export function planQuote(input: { priceList: PriceListKey; plan: PlanPriceKey; 
     priceList, currency: priceListCurrency(priceList), tier: priceListTier(priceList), plan, interval, locations: plan === 'solo' ? 1 : n, includedLocations: included,
     lines, totalMinor: lines.reduce((s, l) => s + l.amountMinor, 0), trialFeeMinor: listPriceMinor(priceList, 'trial'), trialDays: TRIAL_DAYS,
   };
+}
+
+/**
+ * Multi-brand HQ (proposal): one platform fee per HQ covers its first brand; each further brand of the same industry
+ * adds `extraBrand` per month. Locations are billed as usual, whatever brand they belong to.
+ */
+export function extraBrandFee(list: PriceListKey, brands: number): { perBrandMinor: number; extraBrands: number; chargedMinor: number } {
+  const per = listPriceMinor(list, 'extraBrand');
+  const extra = Math.max(0, Math.floor(brands) - 1);
+  return { perBrandMinor: per, extraBrands: extra, chargedMinor: per * extra };
 }
 
 /** Royalty / marketing-fund collection fee: flat per collection, capped per location per month. Never a % of royalties. */

@@ -2029,6 +2029,10 @@
         "title": "Royalty and marketing-fund collection",
         "body": "{fee} per collection, capped at {cap} per location per month. A flat fee, never a percentage of your royalties."
       },
+      "extraBrand": {
+        "title": "Extra brands",
+        "body": "Run several brands of the same industry under one HQ: {fee} per month for each brand after the first. The first brand is included in the {platform} platform fee."
+      },
       "payments": {
         "title": "Online customer payments",
         "body": "A {percent} application fee on payments your customers make online, plus the payment provider's own processing fee. Both are shown on every payout."

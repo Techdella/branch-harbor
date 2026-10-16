@@ -6,6 +6,7 @@ import { consentRecords, franchiseDeliveries, franchiseTerritories, locations, o
 import { AppError, notFound, validationError } from '../lib/errors.ts';
 import { ESIGN_DISCLAIMER } from '../integrations/esign.ts';
 import { completeSignature, createEnquiry, deliveryByToken, franchiseSettings, prospectCompliance, signReceipt, signatureByToken } from '../services/franchise.ts';
+import { siteSlugCond } from '../services/brands.ts';
 
 const tags = ['public', 'franchise'];
 const tokenParams = z.object({ token: z.string().min(20).max(200) });
@@ -18,7 +19,7 @@ export const franchisePublicRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
 
   const brandOrg = async (brand: string) => {
-    const [org] = await s.db.select().from(organizations).where(eq(organizations.slug, brand));
+    const [org] = await s.db.select().from(organizations).where(siteSlugCond(brand));
     if (!org || org.status !== 'active' || org.deletedAt || org.model !== 'network') throw notFound('Brand');
     return org;
   };

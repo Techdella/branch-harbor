@@ -1,0 +1,109 @@
+{
+  "brands": {
+    "brand": "Marca",
+    "meta": {
+      "settings": "Marcas",
+      "compare": "Comparación de marcas"
+    },
+    "switcher": {
+      "label": "Marca",
+      "all": "Todas las marcas ({count})"
+    },
+    "settings": {
+      "title": "Marcas",
+      "description": "Cada marca de su empresa: su estilo, dirección web, idiomas, remitente y condiciones de franquicia.",
+      "add": "Añadir una marca",
+      "list": "Sus marcas",
+      "locationCount": "{count, plural, =0 {Sin sedes} one {# sede} other {# sedes}}",
+      "main": "Marca principal",
+      "denied": "Las marcas las gestiona la central.",
+      "addTitle": "Añadir una marca",
+      "addHint": "Una nueva marca del mismo sector bajo esta central, con su propio estilo, sitios, remitente y condiciones de franquicia. Su equipo, finanzas y área legal se comparten.",
+      "create": "Crear marca",
+      "cancel": "Cancelar",
+      "error": "Algo salió mal. Inténtelo de nuevo.",
+      "saved": "Marca guardada.",
+      "save": "Guardar marca",
+      "singleHint": "¿Gestiona más de una marca de este sector?",
+      "manage": "Gestionar marcas"
+    },
+    "fields": {
+      "name": "Nombre de la marca",
+      "slug": "Dirección del sitio",
+      "slugHint": "Los sitios de su marca están en /dirección/sede.",
+      "logoUrl": "Logotipo (enlace https)",
+      "tagline": "Eslogan",
+      "primaryColor": "Color principal",
+      "accentColor": "Color de acento",
+      "headingFont": "Fuente de títulos",
+      "bodyFont": "Fuente de texto",
+      "inherit": "Igual que la empresa",
+      "theme": "Tema web predeterminado",
+      "themeHint": "Las páginas nuevas de los sitios de esta marca empiezan con él.",
+      "domain": "Dirección web de la marca",
+      "domainHint": "Conéctela en Sitios web → Dominios; funciona cuando se verifica su DNS.",
+      "currency": "Moneda predeterminada",
+      "locales": "Idiomas",
+      "senderHint": "Los correos de las sedes de esta marca salen con este nombre y dirección de respuesta.",
+      "fromName": "Nombre del remitente",
+      "replyTo": "Dirección de respuesta"
+    },
+    "sections": {
+      "identity": "Estilo y dirección",
+      "email": "Remitente de correo",
+      "templates": "Plantillas de la marca",
+      "franchise": "Condiciones de franquicia de esta marca"
+    },
+    "templates": {
+      "site": "Plantillas y temas web",
+      "email": "Temas de correo",
+      "assets": "Biblioteca de recursos de la marca",
+      "open": "Abrir",
+      "hint": "Las plantillas, temas de correo y recursos pueden ser de una marca o compartidos por todas. El filtro de marca muestra los de cada marca y los compartidos."
+    },
+    "preview": {
+      "label": "Vista previa de la marca",
+      "tagline": "Su eslogan aparece aquí.",
+      "button": "Reservar una clase"
+    },
+    "franchise": {
+      "hint": "Los documentos compartidos se aplican a todas las marcas.",
+      "disclosure": "Documentos de divulgación",
+      "agreements": "Plantillas de contrato",
+      "royalties": "Tasas de regalías y fondo",
+      "rate": "{currency}: regalías {royalty}, fondo {fund}",
+      "networkTerms": "Usa las condiciones estándar de la red.",
+      "onboarding": "Lista de apertura para nuevas sedes: {key}",
+      "none": "Ninguno todavía.",
+      "shared": "Compartido"
+    },
+    "compare": {
+      "title": "Comparación de marcas",
+      "description": "Sus marcas lado a lado y la red en conjunto. Cada importe se queda en su moneda.",
+      "period": "Periodo",
+      "days": "{count, plural, one {Último día} other {Últimos # días}}",
+      "singleBrand": "La comparación de marcas es para empresas con varias marcas.",
+      "noFinance": "Requiere acceso a pagos",
+      "noRevenue": "Aún no hay pagos",
+      "network": "Resumen de la red",
+      "neverSummed": "Los importes en monedas distintas nunca se suman.",
+      "brands": "Marcas",
+      "locations": "Sedes",
+      "locationsValue": "{total} ({operating} abiertas)",
+      "revenue": "Ingresos (netos)",
+      "openProspects": "Candidatos a franquicia abiertos",
+      "byBrand": "Por marca",
+      "brand": "Marca",
+      "pipeline": "Expansión de franquicias",
+      "terms": "Regalías y fondo",
+      "opening": "{count, plural, one {# abre pronto} other {# abren pronto}}",
+      "openCount": "{count, plural, =0 {Sin candidatos abiertos} one {# candidato abierto} other {# candidatos abiertos}}",
+      "signedCount": "{count} firmados",
+      "territories": "{count, plural, one {# territorio disponible} other {# territorios disponibles}}",
+      "hidden": "Fuera de su acceso",
+      "networkDefault": "estándar de la red",
+      "noTerms": "Aún sin condiciones",
+      "link": "Comparar marcas"
+    }
+  }
+}

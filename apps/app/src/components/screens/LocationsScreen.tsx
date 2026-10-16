@@ -12,6 +12,7 @@ import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Async, DeniedState, Empty, LoadingBlock } from '../ui/States';
 import { IndependentLocations } from './independent/IndependentLocations';
+import { brandsApi } from '@/lib/http/brands';
 
 function useNow(ms = 30000) {
   const [now, setNow] = useState(() => new Date());
@@ -30,6 +31,7 @@ export function LocationsScreen() {
 
 function NetworkLocationsScreen() {
   const t = useTranslations('locations');
+  const tb = useTranslations('brands');
   const locale = useLocale();
   const app = useApp();
   const router = useRouter();
@@ -42,6 +44,8 @@ function NetworkLocationsScreen() {
   const org = app.org;
   const ownerName = (id: string) => org.ownerGroups.find((g) => g.id === id)?.name ?? id;
   const regionName = (id: string) => org.regions.find((r) => r.id === id)?.name ?? id;
+  // Multi-brand HQ: each location shows its brand (single-brand businesses see no brand at all).
+  const brandOf = (l: Location) => app.brands.find((b) => b.id === l.brandId) ?? app.brands.find((b) => b.isDefault) ?? null;
 
   if (!app.can('locations.read')) return <DeniedState permission="locations.read" detail={t('denied')} />;
 
@@ -85,6 +89,12 @@ function NetworkLocationsScreen() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
+                    {app.multiBrand && brandOf(l) && (
+                      <span className="flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 text-[11px] font-bold" data-testid="location-brand">
+                        <span aria-hidden="true" className="h-2 w-2 rounded-full" style={{ background: brandOf(l)!.primaryColor ?? '#141414' }} />
+                        {brandOf(l)!.name}
+                      </span>
+                    )}
                     <span className="rounded-full bg-canvas px-2.5 py-1 text-[11px] font-bold">{ownerName(l.ownerGroupId)}</span>
                     <Badge tone={l.sync === 'ok' ? 'success' : 'warning'}>{l.sync === 'ok' ? t('synced') : t('attention')}</Badge>
                     <Badge tone={l.site === 'live' ? 'success' : 'neutral'} icon={l.site === 'live' ? 'globe' : 'eye'}>
@@ -103,6 +113,7 @@ function NetworkLocationsScreen() {
                 columns={[
                   { key: 'name', header: t('col.name'), render: (l) => <span className="font-bold">{l.name}</span> },
                   { key: 'code', header: t('col.code'), render: (l) => l.code },
+                  ...(app.multiBrand ? [{ key: 'brand', header: tb('brand'), render: (l: Location) => brandOf(l)?.name ?? '' }] : []),
                   { key: 'country', header: t('col.country'), render: (l) => countryName(l.address.country, locale) },
                   { key: 'region', header: t('col.region'), render: (l) => regionName(l.regionId) },
                   { key: 'currency', header: t('col.currency'), render: (l) => l.currency },
@@ -180,6 +191,7 @@ function LocationDrawer({ l, onClose, ownerName, regionName }: { l?: Location; o
             </li>
           ))}
         </ul>
+        <LocationBrand l={l} />
         <p className="text-xs leading-normal text-stone">{t('noAutoPublish')}</p>
         {!app.can('locations.write') && <p className="text-xs text-stone">{t('readOnly')}</p>}
         <Button variant="secondary" size="sm" onClick={onClose} className="self-start md:hidden">
@@ -187,5 +199,54 @@ function LocationDrawer({ l, onClose, ownerName, regionName }: { l?: Location; o
         </Button>
       </div>
     </Drawer>
+  );
+}
+
+/** Multi-brand HQ: which brand the location belongs to; HQ can move it to another brand. */
+function LocationBrand({ l }: { l: Location }) {
+  const t = useTranslations('brands');
+  const app = useApp();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  if (!app.orgMultiBrand || !app.brands.length) return null;
+  const current = app.brands.find((b) => b.id === l.brandId) ?? app.brands.find((b) => b.isDefault);
+  const canMove = app.canManageBrands && app.can('locations.write') && app.brands.length > 1;
+  return (
+    <div className="rounded-[14px] bg-canvas-raised px-3 py-2.5 text-[13px]">
+      {canMove ? (
+        <label className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-stone">{t('brand')}</span>
+          <select
+            value={current?.id ?? ''}
+            disabled={pending}
+            onChange={async (e) => {
+              setPending(true);
+              setError(null);
+              try {
+                await brandsApi.setLocationBrand(app.org.id, l.id, e.target.value);
+                await app.reloadWorkspace();
+              } catch (err) {
+                setError(err instanceof Error ? err.message : t('settings.error'));
+              } finally {
+                setPending(false);
+              }
+            }}
+            className="h-9 rounded-full border border-line bg-surface px-3 font-bold"
+          >
+            {app.brands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : (
+        <span className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-stone">{t('brand')}</span>
+          <strong>{current?.name}</strong>
+        </span>
+      )}
+      {error && <p role="alert" className="mt-1 text-danger">{error}</p>}
+    </div>
   );
 }

@@ -23,6 +23,7 @@ the trial fee is small, and **every price list stays within its tier's multiplie
 | **Hosted** | BranchHarbor-hosted site: per location per month |
 | **Network** | A monthly **HQ platform fee** (covers Franchise development, Legal, Finance, Training and Community; **includes 3 locations**, `NETWORK_INCLUDED_LOCATIONS`) + the Network per-location fee for every further location. **Unlimited users.** |
 | **Paid trial** | Every plan starts with a **14-day trial for a small fee** (USD 4.99 or the local price point). The chosen plan starts automatically on day 15 unless the customer cancels before. No free plan, no free trial. |
+| **Extra brands (multi-brand HQ)** | One platform fee per HQ covers its first brand; each further brand of the same industry adds **USD 99 per month** (local price points, `extraBrand`). Proposal, see [Multi-brand HQ](#multi-brand-hq-proposal). |
 | **Royalty & marketing-fund collection** | A **flat fee per collection, capped per location per month** (USD 1.00, max USD 10). Never a percentage of royalties (`collectionFee`). |
 | **Online customer payments** | Stripe Connect application fee of **1 %** (`DEFAULT_PAYMENT_APPLICATION_FEE_BPS` = `STRIPE_APPLICATION_FEE_BPS` default, per org `applicationFeeBps`), plus Stripe's own processing fee. Shown on the pricing page. |
 | **Terms** | Monthly by default; annual = 10 × monthly (2 months included, `annualMonthlyPrice`); no cancellation fees; free data export at any time. |
@@ -143,6 +144,63 @@ Every other country is billed from the `USD` list (tier A).
 
 **Review cadence:** quarterly for volatile currencies (TRY, NGN, EGP, GHS, ARS-billed USD@C) and yearly for the rest.
 Existing subscriptions keep the price stored at checkout until customers are told about a change.
+
+## Multi-brand HQ (proposal)
+
+**Product decision:** one industry per business account. A group running two industries uses two business accounts
+under one login. **Multi-brand** means several brands of the **same** industry under one franchisor HQ (for example a
+fitness franchisor with two yoga concepts), as FranConnect models with its Brand level.
+
+**Proposal:** the HQ pays **one platform fee**, which covers its **first brand**. Each **further brand** adds a small
+monthly fee, `extraBrand` in the price book (`FEE_PRICE_KEYS`): **USD 99 per brand per month**, set as a local price
+point in every price list (same regional tier bands as the other fees; checked by `pricing.test.ts`).
+`extraBrandFee(list, brands)` gives the amount. Locations are billed exactly as before, whatever brand they belong to
+(the 3 included locations are per HQ, not per brand), and users stay unlimited.
+
+Why a per-brand fee rather than a second platform fee: a brand reuses the HQ's team, finance, legal, training and
+community set-up; what it adds is its own identity, sites and domain, email sender, franchise terms and pipeline, which
+cost us little to host but are worth a lot to a multi-concept franchisor. A second platform fee would push such groups
+into two accounts, which loses the network summary and brand comparison.
+
+Status: the fee is shown on the pricing page in all 9 website locales. **Not yet charged**: the API subscription does not
+add an `extraBrand` line until the proposal is validated with pricing tests (the billing service reads the price book, so
+it is one line in `planQuote` when approved).
+
+| Price list | Network platform fee (incl. first brand) | Each extra brand / month |
+|---|---:|---:|
+| USD | 299 | 99 |
+| CAD | 399 | 129 |
+| GBP | 239 | 79 |
+| AUD | 449 | 149 |
+| NZD | 489 | 159 |
+| CHF | 249 | 79 |
+| SEK | 2,890 | 949 |
+| NOK | 3,190 | 1,049 |
+| DKK | 1,990 | 649 |
+| EUR | 279 | 89 |
+| JPY | 41,000 | 13,500 |
+| SGD | 369 | 119 |
+| HKD | 2,090 | 690 |
+| AED | 999 | 329 |
+| SAR | 1,049 | 349 |
+| PLN | 729 | 239 |
+| CZK | 4,490 | 1,490 |
+| MYR | 869 | 289 |
+| MXN | 3,349 | 1,099 |
+| BRL | 1,069 | 349 |
+| TRY | 7,399 | 2,449 |
+| ZAR | 2,490 | 829 |
+| INR | 12,999 | 4,299 |
+| PHP | 8,499 | 2,799 |
+| IDR | 2,449,000 | 809,000 |
+| EGP | 6,999 | 2,299 |
+| NGN | 219,000 | 72,500 |
+| KES | 18,500 | 6,099 |
+| GHS | 1,719 | 569 |
+| EUR@C | 189 | 59 |
+| USD@B | 279 | 89 |
+| USD@C | 209 | 69 |
+| USD@D | 149 | 49 |
 
 ## The paid trial
 
