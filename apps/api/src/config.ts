@@ -99,6 +99,22 @@ const envSchema = z.object({
   /** First-reply SLA for new inbox conversations, in minutes. */
   INBOX_REPLY_SLA_MINUTES: z.coerce.number().int().min(5).default(240),
 
+  // Local marketing: listing directories (Google reuses GOOGLE_OAUTH_CLIENT_ID/SECRET) and call tracking (Twilio).
+  /** Apple Business Connect partner API (approval required). Without both, Apple listing connections are sandbox. */
+  APPLE_BUSINESS_CONNECT_CLIENT_ID: optional,
+  APPLE_BUSINESS_CONNECT_CLIENT_SECRET: optional,
+  APPLE_BUSINESS_CONNECT_API_URL: z.string().default('https://businessconnect.apple.com/api'),
+  /** Bing Places for Business partner API key (approval required). Without it, Bing listing connections are sandbox. */
+  BING_PLACES_API_KEY: optional,
+  BING_PLACES_API_URL: z.string().default('https://api.bingplaces.com/v1'),
+  /**
+   * Call tracking buys numbers and receives calls through the Twilio account above (TWILIO_ACCOUNT_SID/AUTH_TOKEN).
+   * Set to false to keep call tracking in sandbox even when Twilio SMS is live (e.g. before the voice setup is done).
+   */
+  CALL_TRACKING_LIVE: bool(true),
+  /** How often listings are checked for drift, in minutes (live connections only). */
+  LISTINGS_DRIFT_CHECK_MINUTES: z.coerce.number().int().min(15).default(360),
+
   // Payments
   STRIPE_SECRET_KEY: optional,
   STRIPE_WEBHOOK_SECRET: optional,
@@ -289,5 +305,9 @@ export function integrationStatus(cfg: Config) {
     inboxMeta: cfg.META_APP_ID && cfg.META_APP_SECRET ? 'live (per-page tokens)' : 'sandbox (simulated inbound)',
     socialPublishing: cfg.META_APP_ID && cfg.META_APP_SECRET ? 'meta live; linkedin/google business sandbox' : 'sandbox (posts simulated, never claimed as published)',
     adsPlatforms: 'manual results entry (Meta/Google Ads OAuth scaffolding only)',
+    listingsGoogle: cfg.GOOGLE_OAUTH_CLIENT_ID && cfg.GOOGLE_OAUTH_CLIENT_SECRET ? 'live (through the Reviews Google connection)' : 'sandbox (simulated directory)',
+    listingsApple: cfg.APPLE_BUSINESS_CONNECT_CLIENT_ID && cfg.APPLE_BUSINESS_CONNECT_CLIENT_SECRET ? 'live' : 'sandbox (simulated directory)',
+    listingsBing: cfg.BING_PLACES_API_KEY ? 'live' : 'sandbox (simulated directory)',
+    callTracking: cfg.TWILIO_ACCOUNT_SID && cfg.TWILIO_AUTH_TOKEN && cfg.CALL_TRACKING_LIVE ? 'live (Twilio voice)' : 'sandbox (simulated numbers and calls)',
   } as const;
 }

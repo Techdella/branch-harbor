@@ -20,7 +20,7 @@ const LOCALES = JSON.parse(
     .exec(shared)[1]
     .replace(/'/g, '"'),
 );
-const SETS = ['', 'foods', 'fallback', 'payments', 'franchise', 'courses', 'builder', 'reviews'];
+const SETS = ['', 'foods', 'fallback', 'payments', 'franchise', 'courses', 'builder', 'reviews', 'listings'];
 
 const read = (dir, l) => {
   const f = path.join(root, dir, `${l}.json`);

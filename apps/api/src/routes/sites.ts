@@ -101,9 +101,15 @@ export function themeFrom(settings: SiteSettings) {
 type WeeklyHours = Array<{ day: number; opens: string; closes: string }>;
 const hhmm = /^([01]\d|2[0-4]):[0-5]\d$/;
 
-/** Normalise `locations.hours`: `{ summary?, weekly?: [{ day 0=Sun, opens 'HH:MM', closes 'HH:MM' }] }`. */
-export function normaliseHours(raw: Record<string, unknown> | null): { summary: string | null; weekly: WeeklyHours | null } {
-  if (!raw) return { summary: null, weekly: null };
+type SpecialHours = Array<{ date: string; closed: boolean; opens: string | null; closes: string | null; label: string | null }>;
+const ymdRe = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Normalise `locations.hours`: `{ summary?, weekly?: [{ day 0=Sun, opens 'HH:MM', closes 'HH:MM' }], special?: [{ date,
+ * closed, opens?, closes?, label? }] }`. Special (holiday) hours are kept from `today` on (Listings writes them).
+ */
+export function normaliseHours(raw: Record<string, unknown> | null, today?: string): { summary: string | null; weekly: WeeklyHours | null; special: SpecialHours } {
+  if (!raw) return { summary: null, weekly: null, special: [] };
   const summary = typeof raw.summary === 'string' ? raw.summary : null;
   const weekly = Array.isArray(raw.weekly)
     ? (raw.weekly as unknown[]).filter((w): w is WeeklyHours[number] => {
@@ -111,7 +117,12 @@ export function normaliseHours(raw: Record<string, unknown> | null): { summary: 
       return !!x && Number.isInteger(x.day) && (x.day as number) >= 0 && (x.day as number) <= 6 && typeof x.opens === 'string' && typeof x.closes === 'string' && hhmm.test(x.opens) && hhmm.test(x.closes);
     })
     : null;
-  return { summary, weekly: weekly && weekly.length ? weekly : null };
+  const special: SpecialHours = Array.isArray(raw.special)
+    ? (raw.special as Array<Record<string, unknown>>).filter((x) => !!x && typeof x.date === 'string' && ymdRe.test(x.date) && (!today || x.date >= today) && (x.closed === true || (typeof x.opens === 'string' && hhmm.test(x.opens) && typeof x.closes === 'string' && hhmm.test(x.closes))))
+      .map((x) => ({ date: x.date as string, closed: x.closed === true, opens: x.closed === true ? null : (x.opens as string), closes: x.closed === true ? null : (x.closes as string), label: typeof x.label === 'string' ? x.label : null }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+    : [];
+  return { summary, weekly: weekly && weekly.length ? weekly : null, special };
 }
 
 const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -120,10 +131,17 @@ const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
  * Open-now in the location's own timezone. Handles intervals past midnight (closes <= opens).
  * Returns null when only a free-text summary exists — we never guess.
  */
-export function openNow(weekly: WeeklyHours | null, timeZone: string, at = new Date()): { open: boolean; closesAt: string | null } | null {
-  if (!weekly) return null;
-  const { weekday, time } = localDateParts(at, timeZone);
+export function openNow(weekly: WeeklyHours | null, timeZone: string, at = new Date(), special: SpecialHours = []): { open: boolean; closesAt: string | null } | null {
+  const { weekday, time, date } = localDateParts(at, timeZone);
   const now = toMin(time);
+  // Holiday / special hours for today replace the weekly hours.
+  const today = special.find((x) => x.date === date);
+  if (today) {
+    if (today.closed || !today.opens || !today.closes) return { open: false, closesAt: null };
+    const o = toMin(today.opens), c = toMin(today.closes);
+    return (c > o ? now >= o && now < c : now >= o || now < c) ? { open: true, closesAt: today.closes } : { open: false, closesAt: null };
+  }
+  if (!weekly) return null;
   for (const w of weekly) {
     const o = toMin(w.opens), c = toMin(w.closes);
     if (c > o) { if (w.day === weekday && now >= o && now < c) return { open: true, closesAt: w.closes }; }
@@ -202,10 +220,10 @@ export const siteRoutes: FastifyPluginAsyncZod = async (app) => {
   }
 
   function locationSummary(l: typeof locations.$inferSelect, brandSlug: string, single = false) {
-    const hours = normaliseHours(l.hours);
+    const hours = normaliseHours(l.hours, localDateParts(new Date(), l.timeZone).date);
     return {
       id: l.id, slug: l.slug, name: l.name, address: l.address, country: l.country, timeZone: l.timeZone, currency: l.currency, locale: l.locale,
-      phone: l.phone, email: l.email, status: l.status, geo: l.geo, hours, openNow: openNow(hours.weekly, l.timeZone),
+      phone: l.phone, email: l.email, status: l.status, geo: l.geo, hours, openNow: openNow(hours.weekly, l.timeZone, new Date(), hours.special),
       path: single ? `/${brandSlug}` : `/${brandSlug}/${l.slug}`,
     };
   }

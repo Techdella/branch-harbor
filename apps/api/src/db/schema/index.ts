@@ -26,3 +26,4 @@ export * from './quality.ts';
 export * from './ai.ts';
 export * from './data-platform.ts';
 export * from './supply.ts';
+export * from './local-marketing.ts';

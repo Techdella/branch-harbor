@@ -28,3 +28,4 @@ export * from './ai.ts';
 export * from './data-platform.ts';
 export * from './supply.ts';
 export * from './audit-programmes.ts';
+export * from './local-marketing.ts';
