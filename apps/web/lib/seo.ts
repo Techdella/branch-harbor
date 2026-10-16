@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { DEFAULT_LOCALE, type Locale } from '@bh/shared';
+import { ASSISTANT_NAME, DEFAULT_LOCALE, type Locale } from '@bh/shared';
 import { routing } from '@/i18n/routing';
 import { INDUSTRY_KEYS, type IndustryKey } from '@/content/industries';
 import { getArticle, type ArticleKind } from '@/lib/articles';
@@ -40,6 +40,7 @@ export const PAGES = {
   independent: { path: '/solutions/independent-businesses', title: 'solutions.independent.metaTitle', description: 'solutions.independent.intro', headline: 'solutions.independent.headline', priority: 0.8 },
   wordpress: { path: '/wordpress', title: 'wordpress.metaTitle', description: 'wordpress.intro', headline: 'wordpress.headline', priority: 0.8 },
   integrations: { path: '/integrations', title: 'integrations.metaTitle', description: 'integrations.intro', headline: 'integrations.headline', priority: 0.8 },
+  marina: { path: '/marina', title: 'marina.metaTitle', description: 'marina.intro', headline: 'marina.headline', priority: 0.8 },
   pricing: { path: '/pricing', title: 'pricing.metaTitle', description: 'pricing.intro', headline: 'pricing.headline', priority: 0.9 },
   demo: { path: '/demo', title: 'demo.metaTitle', description: 'demo.intro', headline: 'demo.headline', priority: 0.9 },
   blog: { path: '/blog', title: 'articles.blog.metaTitle', description: 'articles.blog.intro', headline: 'articles.blog.headline', priority: 0.7 },
@@ -79,12 +80,14 @@ export function languageAlternates(path: string, absolute = false): Record<strin
 export async function pageCopy(locale: string, id: PageId) {
   const t = await getTranslations({ locale });
   const p: PageDef = PAGES[id];
-  const title = t(p.title as never) as string;
+  // Every page may name the assistant; its name lives in one constant.
+  const v = { name: ASSISTANT_NAME } as never;
+  const title = t(p.title as never, v) as string;
   return {
     title,
     fullTitle: p.absoluteTitle ? title : t('meta.titleTemplate').replace('%s', title),
-    description: t(p.description as never) as string,
-    headline: t(p.headline as never) as string,
+    description: t(p.description as never, v) as string,
+    headline: t(p.headline as never, v) as string,
     siteName: 'BranchHarbor',
   };
 }

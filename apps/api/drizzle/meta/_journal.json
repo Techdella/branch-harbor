@@ -218,6 +218,13 @@
       "when": 1792111925111,
       "tag": "0030_multi_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792112869128,
+      "tag": "0031_marina",
+      "breakpoints": true
     }
   ]
 }

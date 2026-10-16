@@ -9,6 +9,7 @@ import { PASTEL } from '@/content/images';
 import { ProductPreview } from '@/components/home/ProductPreview';
 import { FaqList, H2, Kicker, Lead, Panel, PastelIcon, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
+import { ASSISTANT_NAME } from '@bh/shared';
 import { buildMetadata } from '@/lib/seo';
 import { DEMO_URL, otherIndustryMailto, signUpUrl } from '@/lib/links';
 
@@ -45,7 +46,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const tn = await getTranslations('nav');
 
   const steps = t.raw('steps.items') as { title: string; desc: string }[];
-  const caps = t.raw('capabilities.items') as { name: string; desc: string }[];
+  const tmar = await getTranslations('marina');
+  const caps = (t.raw('capabilities.items') as { name: string; desc: string }[]).map((c) => ({ name: c.name.replaceAll('{name}', ASSISTANT_NAME), desc: c.desc.replaceAll('{name}', ASSISTANT_NAME) }));
   const faqs = t.raw('faq.items') as { q: string; a: string }[];
   const hqChips = t.raw('hqLocal.hq.chips') as string[];
   const localChips = t.raw('hqLocal.local.chips') as string[];
@@ -211,6 +213,26 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </li>
             );
           })}
+        </ul>
+      </Panel>
+
+      {/* 7b. The assistant */}
+      <Panel labelledBy="marina-home-title" tone="lilac" className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
+        <div className="flex flex-col items-start gap-4">
+          <Kicker icon="sparkles">{tmar('home.kicker')}</Kicker>
+          <H2 id="marina-home-title">{tmar('home.title', { name: ASSISTANT_NAME })}</H2>
+          <Lead>{tmar('home.body', { name: ASSISTANT_NAME })}</Lead>
+          <LinkButton href="/marina" iconRight="arrow-right">
+            {tmar('home.cta', { name: ASSISTANT_NAME })}
+          </LinkButton>
+        </div>
+        <ul className="flex flex-col gap-2">
+          {(tmar.raw('askExamples') as string[]).slice(0, 3).map((q) => (
+            <li key={q} className="flex items-center gap-3 rounded-[18px] bg-surface px-4 py-3 text-sm font-medium">
+              <Icon name="sparkles" size={16} />
+              <span>{q}</span>
+            </li>
+          ))}
         </ul>
       </Panel>
 

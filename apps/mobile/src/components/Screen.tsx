@@ -28,7 +28,10 @@ export function Screen({ children, onRefresh, refreshing = false, tabs = true, f
         {children}
       </ScrollView>
       {footer ? (
-        <View style={{ position: 'absolute', left: space[4], right: space[4], bottom: (tabs ? 92 : 16) + insets.bottom, maxWidth: 688, alignSelf: 'center', width: '100%' }}>{footer}</View>
+        // Full-width row with side gutters; the inner view caps the width (left/right plus width 100% overflowed).
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: (tabs ? 92 : 16) + insets.bottom, paddingLeft: space[4] + insets.left, paddingRight: space[4] + insets.right, alignItems: 'center' }} pointerEvents="box-none">
+          <View style={{ width: '100%', maxWidth: 688 }}>{footer}</View>
+        </View>
       ) : null}
     </KeyboardAvoidingView>
   );

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon, LogoMark, cx } from '@bh/ui';
-import type { WorkspaceKey } from '@bh/shared';
+import { ASSISTANT_NAME, type WorkspaceKey } from '@bh/shared';
 import { INDUSTRY_UI } from '@/lib/nav';
 import { WORKSPACE_ICON, flatNav, settingsNav, workspaceNav, type NavLink } from '@/lib/access';
 import { Popover } from '../ui/Popover';
@@ -16,7 +16,7 @@ export function useNavLabel() {
   const app = useApp();
   return (l: NavLink) => {
     if (l.screen) return t(`ops.${app.industry}.${l.screen}.title`);
-    if (l.msg) return t(l.msg);
+    if (l.msg) return t(l.msg, { name: ASSISTANT_NAME });
     if (l.key === 'customers') return t(`industries.${app.industry}.customers`);
     if (l.key === 'schedule') return t('access.nav.schedule');
     // Inside the Marketing workspace the campaigns screen is called what it is.

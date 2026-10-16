@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useI18n } from '@/i18n';
 import { NetworkEntry } from '@/features/network/NetworkEntry';
 import { QualityEntry } from '@/features/quality/QualityEntry';
+import { MarinaEntry } from '@/features/marina/MarinaEntry';
 import { SupplyEntry } from '@/features/supply/SupplyEntry';
 import { api } from '@/lib/api';
 import { relativeAgo } from '@/lib/format';
@@ -22,6 +23,7 @@ export default function Alerts() {
     <Screen onRefresh={q.refresh} refreshing={q.refreshing}>
       <ScreenHeader title={t('owner.notificationsTitle')} />
       <NetworkEntry onPress={() => router.push('/network')} />
+      <MarinaEntry onPress={() => router.push('/marina')} />
       <QualityEntry onPress={() => router.push('/quality')} />
       <SupplyEntry onPress={() => router.push('/supply')} />
       <DataStatus q={q} />

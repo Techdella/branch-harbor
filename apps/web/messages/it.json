@@ -238,7 +238,7 @@
           "desc": "Tramite un account di pagamento collegato per ogni attività o sede."
         },
         {
-          "name": "BranchHarbor AI",
+          "name": "{name}",
           "desc": "Bozze e riepiloghi nel rispetto dei tuoi permessi. Le modifiche richiedono approvazione."
         },
         {
@@ -2568,6 +2568,96 @@
       "registration": "Iscrizioni",
       "pricing": "Prezzi",
       "leads": "Richieste"
+    }
+  },
+  "marina": {
+    "metaTitle": "{name}, l’assistente AI per le attività con più sedi",
+    "intro": "{name} risponde alle domande sulle tue sedi, prepara il lavoro e ti fa un riepilogo ogni mattina. Vede solo ciò che vedi tu e nulla cambia finché non confermi.",
+    "headline": "Ecco {name}",
+    "kicker": "Assistente AI",
+    "title": "Ecco {name}, la tua assistente in tutte le sedi",
+    "lead": "Chiedi con parole tue, nella tua lingua. {name} legge i tuoi dati in tempo reale con il tuo accesso, mostra la risposta in tabella o grafico e prepara le modifiche come schede da confermare.",
+    "ctaDemo": "Guarda {name} nella demo",
+    "ctaPricing": "Crediti AI per piano",
+    "askTitle": "Chiedi tutto ciò che puoi vedere",
+    "askExamples": [
+      "Quali sedi non hanno pagato le royalty il mese scorso?",
+      "Ricavi per sede questo trimestre rispetto al precedente",
+      "Quali documenti di conformità scadono nei prossimi 60 giorni?",
+      "Scrivi un’email di prossima apertura per la nostra nuova sede"
+    ],
+    "featuresTitle": "Cosa fa {name}",
+    "features": [
+      {
+        "name": "Risposte con i tuoi numeri",
+        "desc": "Ricavi, prenotazioni, royalty, recensioni, audit e lead, in tabelle e grafici. Ogni valuta resta separata."
+      },
+      {
+        "name": "Riepilogo giornaliero o settimanale",
+        "desc": "Azioni scadute, documenti in scadenza, recensioni negative, cali degli indicatori e lead da ricontattare, nell’app e via email."
+      },
+      {
+        "name": "Analisi che si spiegano",
+        "desc": "Cambiamenti insoliti nelle tue sedi, con i numeri alla base e un passo successivo suggerito."
+      },
+      {
+        "name": "Schede di visita",
+        "desc": "Una pagina prima di visitare una sede: indicatori, ultimo audit, azioni aperte, recensioni, conformità e punti da discutere."
+      },
+      {
+        "name": "Contenuti con la voce del tuo marchio",
+        "desc": "Email, post, annunci e sezioni del sito, senza le affermazioni vietate dalla sede centrale e con le avvertenze obbligatorie, poi tradotti."
+      },
+      {
+        "name": "Risposte dal tuo manuale",
+        "desc": "Il manuale operativo, la biblioteca, i corsi e le risposte dell’assistenza, con i link alle fonti. I franchisee vedono solo ciò che è condiviso con loro."
+      }
+    ],
+    "safetyTitle": "Pensata per essere affidabile",
+    "safety": [
+      {
+        "name": "Il tuo accesso, mai di più",
+        "desc": "{name} passa dagli stessi controlli di accesso dell’app. Un franchisee non vede mai i dati di un altro."
+      },
+      {
+        "name": "Confermi ogni modifica",
+        "desc": "Bozze, email, post e aggiornamenti vengono preparati come schede. Nulla viene inviato, pubblicato o pagato senza la tua conferma, e la sede centrale può richiedere un approvatore."
+      },
+      {
+        "name": "Attenta a ciò che scrivono gli altri",
+        "desc": "Recensioni, messaggi e documenti sono trattati come informazioni, non come istruzioni, e le azioni che ne derivano vengono segnalate."
+      },
+      {
+        "name": "I tuoi dati restano tuoi",
+        "desc": "Ogni domanda e azione viene registrata per la tua tracciabilità, con i dati personali mascherati. I tuoi dati non vengono usati per addestrare modelli di AI."
+      }
+    ],
+    "usageTitle": "Incluso in ogni piano",
+    "usageBody": "Ogni piano include crediti AI mensili, visibili nelle Impostazioni, con un limite di uso equo oltre. La sede centrale decide dove {name} può lavorare e per quanto tempo si conservano le conversazioni.",
+    "faqTitle": "Domande su {name}",
+    "faq": [
+      {
+        "q": "{name} può modificare qualcosa da sola?",
+        "a": "No. La lettura è immediata; ogni modifica è preparata come scheda da confermare, e la tua organizzazione può richiedere un approvatore della sede centrale per invii, pubblicazioni o pagamenti."
+      },
+      {
+        "q": "Cosa possono chiedere i franchisee?",
+        "a": "Tutto ciò che rientra nel loro accesso: le loro sedi, i loro clienti, le loro royalty e ciò che la sede centrale condivide con loro."
+      },
+      {
+        "q": "È una consulenza legale?",
+        "a": "No. Le risposte su diritto del franchising e contratti provengono dai tuoi dati e dalle tue regole, con una nota per verificare con il tuo legale."
+      },
+      {
+        "q": "In quali lingue?",
+        "a": "{name} risponde nella lingua in cui scrivi. L’app è disponibile in inglese, francese, spagnolo, tedesco e portoghese brasiliano."
+      }
+    ],
+    "home": {
+      "kicker": "Assistente AI",
+      "title": "{name} lavora accanto al tuo team",
+      "body": "Chiedi di qualsiasi sede, ricevi un riepilogo ogni mattina e lascia che {name} prepari il lavoro. Confermi ogni modifica.",
+      "cta": "Scopri {name}"
     }
   }
 }

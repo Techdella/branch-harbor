@@ -16,6 +16,7 @@
  * Modules with `status: 'planned'` are not built yet: they can sit in role templates (so access is ready the day
  * they ship) but clients never show them. Other features flip them to `available` when they ship.
  */
+import { AI_ASSISTANT_MODULE, ASSISTANT_NAME } from './ai.ts';
 import type { Industry } from './industries.ts';
 import { PERMISSIONS, SENSITIVE_CLASSES, canonicalRole, type Permission, type Role, type RoleAssignment, type ScopeKind, type SensitiveClass } from './permissions.ts';
 
@@ -129,6 +130,30 @@ export const QUALITY_MODULES: readonly ModuleDef[] = [
 ];
 
 /* ------------------------------------------------------------------ */
+/* AI assistant (ai.assistant)                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The AI assistant (named by `ASSISTANT_NAME`; docs/AI.md). One block, appended after the other modules. The assistant
+ * only ever acts as the signed-in person: every tool runs through the same capability and scope checks as the REST
+ * routes, so holding `ai.assistant` never widens what someone can see or do.
+ * - view: ask questions, read briefings, insights and visit briefs, search the knowledge base.
+ * - edit: let the assistant prepare changes (action cards the person confirms) and generate content.
+ * - publish: organisation AI controls (on/off, areas, approvals, guardrails, brand voice, knowledge base, retention)
+ *   and approving held actions.
+ * - export: usage and the assistant's tool-call log.
+ */
+export const AI_MODULES: readonly ModuleDef[] = [
+  {
+    key: AI_ASSISTANT_MODULE, area: 'settings', name: ASSISTANT_NAME,
+    description: `${ASSISTANT_NAME}, the AI assistant: answers questions about the data this person can already see, prepares changes for them to confirm, briefings and insights.`,
+    actions: ['view', 'edit', 'publish', 'export'],
+    actionNotes: { view: 'Ask questions, briefings, insights and visit briefs.', edit: 'Prepare changes to confirm and generate content.', publish: 'Organisation AI controls, knowledge base, brand voice and guardrails; approve held actions.', export: 'AI usage and the tool-call log.' },
+    status: 'available',
+  },
+];
+
+/* ------------------------------------------------------------------ */
 /* Network data platform: sales connectors, import, launch, benchmarks */
 /* ------------------------------------------------------------------ */
 
@@ -194,6 +219,15 @@ export const SUPPLY_MODULES: readonly ModuleDef[] = [
     status: 'available',
   },
 ];
+
+/**
+ * AI assistant grants. Every role template that includes `settings.ai` also gets `ai.assistant` view and edit (the
+ * assistant only ever acts as the person, so this never widens access); the roles listed here get more on top.
+ */
+export const AI_DEFAULT_ACTIONS: readonly AccessAction[] = ['view', 'edit'];
+export const AI_ROLE_GRANTS: Partial<Record<Role, GrantSpec>> = {
+  hq_admin: { [AI_ASSISTANT_MODULE]: ['view', 'edit', 'publish', 'export'] },
+};
 
 /* ------------------------------------------------------------------ */
 /* Local marketing: listings, co-op fund, call tracking                */
@@ -302,6 +336,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'settings.ai', area: 'settings', name: 'AI assistant', description: 'Ask BranchHarbor AI about the data this person can already see. It only drafts and proposes.', actions: V, status: 'available' },
   // Field audits, compliance documents and the league table (see QUALITY_MODULES).
   ...QUALITY_MODULES,
+  // The AI assistant (see AI_MODULES).
+  ...AI_MODULES,
   // Sales connectors, bulk launch, benchmarks and the import wizard (see DATA_PLATFORM_MODULES).
   ...DATA_PLATFORM_MODULES,
   // Suppliers, supplier rebates and self-checks (see SUPPLY_MODULES).
@@ -459,7 +495,7 @@ export const PERMISSION_CAPABILITIES: Record<Permission, readonly string[]> = {
   'payments.refund': ['finance.payments:edit'],
   'reports.read': ['network.reports:view'],
   'connections.manage': ['settings.connections:edit'],
-  'ai.use': ['settings.ai:view'],
+  'ai.use': ['settings.ai:view', 'ai.assistant:view'],
   'audit.read': ['settings.audit:view'],
   'franchise.pipeline.view': ['sales.franchise_pipeline:view'],
   'franchise.pipeline.edit': ['sales.franchise_pipeline:edit'],
@@ -809,8 +845,12 @@ export function rolesByTeam(roles: readonly Role[] = TEAM_ROLE_ORDER): { team: R
 
 /** Capabilities of a system role for an industry (before scope filtering and overrides). Legacy keys resolve to their template. */
 export function templateCapabilities(role: Role | string, industry: Industry | string): Set<Capability> {
-  const t = ROLE_TEMPLATES[canonicalRole(role) as Role];
-  return t ? expandGrants(t.grants, industry) : new Set();
+  const key = canonicalRole(role) as Role;
+  const t = ROLE_TEMPLATES[key];
+  if (!t) return new Set();
+  const caps = expandGrants({ ...t.grants, ...(AI_ROLE_GRANTS[key] ?? {}) }, industry);
+  if (caps.has('settings.ai:view')) for (const a of AI_DEFAULT_ACTIONS) caps.add(capability(AI_ASSISTANT_MODULE, a));
+  return caps;
 }
 
 /**

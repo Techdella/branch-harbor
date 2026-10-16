@@ -14,6 +14,9 @@ import type { FetchLike } from './integrations/partners/http.ts';
 import { mtlsFetch } from './integrations/partners/rightmove.ts';
 import { createAssetStore, type AssetStore } from './integrations/asset-storage.ts';
 import { createPlatformBilling, type PlatformBilling } from './integrations/platform-billing.ts';
+import { randomBytes } from 'node:crypto';
+import type { InjectOptions, LightMyRequestResponse as InjectResponse } from 'fastify';
+import { createMarinaLlm, type MarinaLlm } from './ai/llm.ts';
 
 /** Dependency container shared by routes, services and jobs. Tests override individual members. */
 export interface Services {
@@ -37,6 +40,15 @@ export interface Services {
   /** Brand asset library storage (S3/R2 when configured, Postgres sandbox otherwise). */
   assets: AssetStore;
   ai: AiProvider;
+  /** The assistant's model layer: live Claude API, or the deterministic sandbox (no key, tests, demo). */
+  marina: MarinaLlm;
+  /**
+   * In-process call into the REST API (set by buildApp once routes are registered). The assistant's tools use it with
+   * the signed-in person's own token, so they pass exactly the same access checks as the app.
+   */
+  inject?: (opts: InjectOptions) => Promise<InjectResponse>;
+  /** Per-process secret marking those in-process calls (exempt from per-IP rate limits, never accepted from outside). */
+  internalKey: string;
   push: PushProvider;
   botCheck: ReturnType<typeof createBotCheck>;
   /** HTTP for partner APIs (Uber Direct, Deliverect, Rightmove). Tests inject a mock; never the real network. */
@@ -67,6 +79,8 @@ export async function createServices(cfg: Config, dbHandle: DbHandle, log: Fasti
     storage: overrides.storage ?? createStorage(cfg, log),
     assets: overrides.assets ?? createAssetStore(cfg),
     ai: overrides.ai ?? createAi(cfg, log),
+    marina: overrides.marina ?? createMarinaLlm(cfg, log),
+    internalKey: overrides.internalKey ?? randomBytes(24).toString('hex'),
     push: overrides.push ?? createPushProvider(cfg, log),
     botCheck: overrides.botCheck ?? createBotCheck(cfg, log),
     partnerFetch: overrides.partnerFetch ?? ((url, init) => fetch(url, init)),

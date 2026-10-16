@@ -10,6 +10,7 @@ import { useNavLabel } from '../shell/Sidebar';
 import { PageHeader } from '../shell/PageHeader';
 import { Empty } from '../ui/States';
 import { OverviewScreen } from './OverviewScreen';
+import { MarinaHomeCard } from '../marina/MarinaHub';
 import { BenchmarksCard } from '../scale/BenchmarksScreen';
 
 /**
@@ -20,7 +21,13 @@ export function WorkspaceHome() {
   const t = useTranslations('access');
   const app = useApp();
   const label = useNavLabel();
-  if (app.org.model === 'independent') return <OverviewScreen />;
+  if (app.org.model === 'independent')
+    return (
+      <>
+        <MarinaHomeCard />
+        <OverviewScreen />
+      </>
+    );
   const ws = app.workspace;
   if (!ws)
     return (
@@ -49,6 +56,7 @@ export function WorkspaceHome() {
   return (
     <>
       <PageHeader icon={WORKSPACE_ICON[ws]} title={t(`workspace.${ws}.name`)} description={t(`workspace.${ws}.description`)} scope={metrics} />
+      <MarinaHomeCard />
       <section aria-label={t('home.modules')} className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))]" data-testid="workspace-home">
         {cards.map(({ link: l, description }) => (
           <Link key={l.href} href={l.href} className="group flex flex-col gap-2 rounded-xl bg-surface p-4 transition hover:shadow-card">

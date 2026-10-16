@@ -238,7 +238,7 @@
           "desc": "A través de una cuenta de pagos conectada para cada negocio o sede."
         },
         {
-          "name": "BranchHarbor AI",
+          "name": "{name}",
           "desc": "Borradores y resúmenes dentro de tus permisos. Los cambios requieren aprobación."
         },
         {
@@ -2568,6 +2568,96 @@
       "registration": "Inscripciones",
       "pricing": "Precios",
       "leads": "Consultas"
+    }
+  },
+  "marina": {
+    "metaTitle": "{name}, la asistente de IA para negocios con varias ubicaciones",
+    "intro": "{name} responde preguntas sobre tus ubicaciones, prepara el trabajo y te da un resumen cada mañana. Solo ve lo que tú ves y nada cambia hasta que lo confirmas.",
+    "headline": "Conoce a {name}",
+    "kicker": "Asistente de IA",
+    "title": "Conoce a {name}, tu asistente en todas tus ubicaciones",
+    "lead": "Pregunta con tus palabras y en tu idioma. {name} lee tus datos en tiempo real con tu propio acceso, muestra la respuesta en tabla o gráfico y prepara los cambios como tarjetas que tú confirmas.",
+    "ctaDemo": "Ver a {name} en la demo",
+    "ctaPricing": "Créditos de IA por plan",
+    "askTitle": "Pregunta lo que puedas ver",
+    "askExamples": [
+      "¿Qué ubicaciones no pagaron regalías el mes pasado?",
+      "Ingresos por ubicación este trimestre frente al anterior",
+      "¿Qué documentos de cumplimiento vencen en los próximos 60 días?",
+      "Redacta un correo de próxima apertura para nuestra nueva ubicación"
+    ],
+    "featuresTitle": "Lo que hace {name}",
+    "features": [
+      {
+        "name": "Respuestas con tus cifras",
+        "desc": "Ingresos, reservas, regalías, reseñas, auditorías y leads, en tablas y gráficos. Cada moneda se mantiene separada."
+      },
+      {
+        "name": "Resumen diario o semanal",
+        "desc": "Acciones vencidas, documentos por vencer, malas reseñas, caídas de indicadores y leads por atender, en la aplicación y por correo."
+      },
+      {
+        "name": "Análisis que se explican",
+        "desc": "Cambios inusuales en tus ubicaciones, con las cifras que los respaldan y un siguiente paso sugerido."
+      },
+      {
+        "name": "Fichas de visita",
+        "desc": "Una página antes de visitar una ubicación: indicadores, última auditoría, acciones abiertas, reseñas, cumplimiento y temas a tratar."
+      },
+      {
+        "name": "Contenido con la voz de tu marca",
+        "desc": "Correos, publicaciones, anuncios y secciones web, sin las afirmaciones que la central prohíbe y con los avisos obligatorios, y luego traducidos."
+      },
+      {
+        "name": "Respuestas de tu manual",
+        "desc": "Tu manual de operaciones, la biblioteca, los cursos y las respuestas de soporte, con enlaces a las fuentes. Los franquiciados solo ven lo que se comparte con ellos."
+      }
+    ],
+    "safetyTitle": "Hecha para generar confianza",
+    "safety": [
+      {
+        "name": "Tu acceso, nunca más",
+        "desc": "{name} pasa por los mismos controles de permisos que la aplicación. Un franquiciado nunca ve los datos de otro."
+      },
+      {
+        "name": "Tú confirmas cada cambio",
+        "desc": "Borradores, correos, publicaciones y cambios se preparan como tarjetas. Nada se envía, publica o paga sin tu confirmación, y la central puede exigir un aprobador."
+      },
+      {
+        "name": "Prudente con lo que escriben otros",
+        "desc": "Las reseñas, mensajes y documentos se tratan como información, no como instrucciones, y las acciones que surgen de ellos se señalan."
+      },
+      {
+        "name": "Tus datos son tuyos",
+        "desc": "Cada pregunta y acción queda registrada para tu auditoría, con los datos personales ocultos. Tus datos no se usan para entrenar modelos de IA."
+      }
+    ],
+    "usageTitle": "Incluido en todos los planes",
+    "usageBody": "Cada plan incluye créditos de IA mensuales, visibles en Ajustes, con un límite de uso razonable por encima. La central decide dónde puede trabajar {name} y cuánto tiempo se guardan las conversaciones.",
+    "faqTitle": "Preguntas sobre {name}",
+    "faq": [
+      {
+        "q": "¿Puede {name} cambiar cosas por su cuenta?",
+        "a": "No. Leer es inmediato; cada cambio se prepara como una tarjeta que confirmas, y tu organización puede exigir un aprobador de la central para envíos, publicaciones o pagos."
+      },
+      {
+        "q": "¿Qué pueden preguntar los franquiciados?",
+        "a": "Todo lo que esté dentro de su acceso: sus ubicaciones, sus clientes, sus regalías y lo que la central comparte con ellos."
+      },
+      {
+        "q": "¿Es asesoramiento legal?",
+        "a": "No. Las respuestas sobre derecho de franquicias y contratos salen de tus propios registros y reglas, con una nota para consultarlo con tu abogado."
+      },
+      {
+        "q": "¿En qué idiomas?",
+        "a": "{name} responde en el idioma en que escribes. La aplicación está disponible en inglés, francés, español, alemán y portugués de Brasil."
+      }
+    ],
+    "home": {
+      "kicker": "Asistente de IA",
+      "title": "{name} trabaja junto a tu equipo",
+      "body": "Pregunta sobre cualquier ubicación, recibe un resumen cada mañana y deja que {name} prepare el trabajo. Tú confirmas cada cambio.",
+      "cta": "Conocer a {name}"
     }
   }
 }

@@ -56,6 +56,8 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register(crmRoutes);
   await app.register(commerceRoutes);
   await app.register(aiRoutes);
+  // The AI assistant (docs/AI.md): chat with streaming, action cards, briefings, insights, knowledge base and skills.
+  await app.register((await import('./marina.ts')).marinaRoutes);
   await app.register(mobileRoutes);
   await app.register(approvalRoutes);
   await app.register(shiftRoutes);

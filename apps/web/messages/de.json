@@ -238,7 +238,7 @@
           "desc": "Über ein verbundenes Zahlungskonto pro Unternehmen oder Standort."
         },
         {
-          "name": "BranchHarbor AI",
+          "name": "{name}",
           "desc": "Entwürfe und Zusammenfassungen im Rahmen Ihrer Berechtigungen. Änderungen erfordern eine Freigabe."
         },
         {
@@ -2568,6 +2568,96 @@
       "registration": "Anmeldungen",
       "pricing": "Preise",
       "leads": "Anfragen"
+    }
+  },
+  "marina": {
+    "metaTitle": "{name}, die KI-Assistentin für Unternehmen mit mehreren Standorten",
+    "intro": "{name} beantwortet Fragen zu Ihren Standorten, bereitet die Arbeit vor und brieft Sie jeden Morgen. Sie sieht nur, was Sie sehen, und nichts ändert sich ohne Ihre Bestätigung.",
+    "headline": "Das ist {name}",
+    "kicker": "KI-Assistentin",
+    "title": "Das ist {name}, Ihre Assistentin für alle Standorte",
+    "lead": "Fragen Sie in Ihren Worten und in Ihrer Sprache. {name} liest Ihre Live-Daten mit Ihrem eigenen Zugriff, zeigt die Antwort als Tabelle oder Diagramm und bereitet Änderungen als Karten zum Bestätigen vor.",
+    "ctaDemo": "{name} in der Demo ansehen",
+    "ctaPricing": "KI-Credits je Tarif",
+    "askTitle": "Fragen Sie alles, was Sie sehen können",
+    "askExamples": [
+      "Welche Standorte haben letzten Monat keine Lizenzgebühren gezahlt?",
+      "Umsatz je Standort in diesem Quartal im Vergleich zum letzten",
+      "Welche Compliance-Dokumente laufen in den nächsten 60 Tagen ab?",
+      "Entwirf eine Eröffnungs-E-Mail für unseren nächsten Standort"
+    ],
+    "featuresTitle": "Was {name} kann",
+    "features": [
+      {
+        "name": "Antworten mit Ihren Zahlen",
+        "desc": "Umsatz, Buchungen, Lizenzgebühren, Bewertungen, Audits und Leads als Tabellen und Diagramme. Jede Währung bleibt getrennt."
+      },
+      {
+        "name": "Tägliches oder wöchentliches Briefing",
+        "desc": "Überfällige Maßnahmen, ablaufende Dokumente, schlechte Bewertungen, sinkende Kennzahlen und offene Leads, in der App und per E-Mail."
+      },
+      {
+        "name": "Erkenntnisse, die sich erklären",
+        "desc": "Ungewöhnliche Veränderungen an Ihren Standorten, mit den Zahlen dahinter und einem vorgeschlagenen nächsten Schritt."
+      },
+      {
+        "name": "Besuchsbriefings",
+        "desc": "Eine Seite vor jedem Standortbesuch: Kennzahlen, letztes Audit, offene Maßnahmen, Bewertungen, Compliance und Gesprächspunkte."
+      },
+      {
+        "name": "Inhalte in Ihrer Markenstimme",
+        "desc": "E-Mails, Beiträge, Anzeigen und Website-Abschnitte, ohne die von der Zentrale verbotenen Aussagen und mit Pflichthinweisen, danach übersetzt."
+      },
+      {
+        "name": "Antworten aus Ihrem Handbuch",
+        "desc": "Ihr Betriebshandbuch, die Bibliothek, Kurse und Helpdesk-Antworten, mit Links zu den Quellen. Franchisenehmer sehen nur, was mit ihnen geteilt ist."
+      }
+    ],
+    "safetyTitle": "Gebaut für Vertrauen",
+    "safety": [
+      {
+        "name": "Ihr Zugriff, nie mehr",
+        "desc": "{name} durchläuft dieselben Berechtigungsprüfungen wie die App. Ein Franchisenehmer sieht nie die Daten eines anderen."
+      },
+      {
+        "name": "Sie bestätigen jede Änderung",
+        "desc": "Entwürfe, E-Mails, Beiträge und Änderungen werden als Karten vorbereitet. Nichts wird gesendet, veröffentlicht oder bezahlt, bevor Sie bestätigen, und die Zentrale kann eine Freigabe verlangen."
+      },
+      {
+        "name": "Vorsichtig mit fremden Texten",
+        "desc": "Bewertungen, Nachrichten und Dokumente gelten als Informationen, nicht als Anweisungen, und daraus folgende Aktionen werden markiert."
+      },
+      {
+        "name": "Ihre Daten bleiben Ihre",
+        "desc": "Jede Frage und Aktion wird für Ihren Prüfpfad protokolliert, personenbezogene Daten maskiert. Ihre Daten werden nicht zum Training von KI-Modellen verwendet."
+      }
+    ],
+    "usageTitle": "In jedem Tarif enthalten",
+    "usageBody": "Jeder Tarif enthält monatliche KI-Credits, sichtbar in den Einstellungen, mit einer Grenze für faire Nutzung darüber. Die Zentrale legt fest, wo {name} arbeiten darf und wie lange Unterhaltungen gespeichert werden.",
+    "faqTitle": "Fragen zu {name}",
+    "faq": [
+      {
+        "q": "Kann {name} selbst etwas ändern?",
+        "a": "Nein. Lesen geht sofort; jede Änderung wird als Karte zum Bestätigen vorbereitet, und Ihre Organisation kann für Versand, Veröffentlichung oder Zahlungen eine Freigabe der Zentrale verlangen."
+      },
+      {
+        "q": "Was können Franchisenehmer fragen?",
+        "a": "Alles innerhalb ihres eigenen Zugriffs: ihre Standorte, ihre Kunden, ihre Lizenzgebühren und was die Zentrale mit ihnen teilt."
+      },
+      {
+        "q": "Ist das Rechtsberatung?",
+        "a": "Nein. Antworten zu Franchiserecht und Verträgen stammen aus Ihren eigenen Daten und Regeln und enthalten den Hinweis, dies mit Ihrer Kanzlei zu klären."
+      },
+      {
+        "q": "In welchen Sprachen?",
+        "a": "{name} antwortet in der Sprache, in der Sie schreiben. Die App gibt es auf Englisch, Französisch, Spanisch, Deutsch und brasilianischem Portugiesisch."
+      }
+    ],
+    "home": {
+      "kicker": "KI-Assistentin",
+      "title": "{name} arbeitet an der Seite Ihres Teams",
+      "body": "Fragen Sie zu jedem Standort, erhalten Sie jeden Morgen ein Briefing und lassen Sie {name} die Arbeit vorbereiten. Sie bestätigen jede Änderung.",
+      "cta": "{name} kennenlernen"
     }
   }
 }

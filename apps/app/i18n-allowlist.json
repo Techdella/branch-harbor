@@ -1,6 +1,6 @@
 {
   "$comment": "Strings the hard-coded-string lint (pnpm lint:strings) accepts: brand and provider names, units, code formats and example values that are the same in every language. Prefer moving UI text to messages/*.json.",
   "files": [],
-  "texts": ["BranchHarbor", "Uber Direct", "Deliverect", "https://", "UTC", "ml", "grill", "LDN-SH", "LOC-2", "GV-XXXX-XXXX", "www.yourbusiness.example"],
+  "texts": ["BranchHarbor", "Esc", "Uber Direct", "Deliverect", "https://", "UTC", "ml", "grill", "LDN-SH", "LOC-2", "GV-XXXX-XXXX", "www.yourbusiness.example"],
   "patterns": []
 }

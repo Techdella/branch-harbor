@@ -319,6 +319,8 @@ async function main() {
   console.log(` Multi-brand:   Northlight Barre (/${barre.slug}) — ${barre.locations.join(', ')}; own theme, sender, royalty terms (7% + 2.5% fund), disclosure and agreement template · brand lead: ${barre.login}`);
   const quality = await (await import('./seed-quality.ts')).seedQuality({ db, today, upsertUser });
   console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
+  const marina = await seedMarinaDemo(northlight.orgId, northlight.logins);
+  console.log(` Assistant:     ${marina.insights} insights, ${marina.briefings} briefings and a sample conversation (${marina.turns} questions, ${marina.actions} action card waiting) for ${marina.email}; sandbox engine, answers from the seeded data only`);
   const platform = await seedDataPlatformDemo(northlight.orgId);
   console.log(` Data platform: ${platform.connections} sales connectors (sandbox) with ${platform.days} daily sales rows, a self-reported variance, ${platform.imports} imports, a bulk launch of ${platform.launched} locations and opted-in benchmarks`);
   const supply = await (await import('./seed-supply.ts')).seedSupply({ db, today, upsertUser, appUrl: cfg.APP_URL });
@@ -502,6 +504,53 @@ async function seedReviewsAndDebitDemo(orgId: string) {
     if (invoiced.length) statements += (await issueFranchiseeStatements(s, orgId, p.id, finance.id)).items.length;
   }
   return { reviews, requests, link, statements };
+}
+
+/**
+ * Demo data for the AI assistant (Northlight): today's briefings, the insights feed and a sample conversation. All of it
+ * is produced by the real engine in sandbox mode (MARINA_SANDBOX), which answers only from tool results over the data
+ * seeded above, so nothing here is invented copy.
+ */
+async function seedMarinaDemo(orgId: string, logins: string[]) {
+  const { buildApp } = await import('../app.ts');
+  const { signAccessToken } = await import('../plugins/auth.ts');
+  const { refreshInsights } = await import('../ai/skills/insights.ts');
+  const { generateBriefing } = await import('../ai/skills/briefing.ts');
+  const { syncOrgKnowledge } = await import('../ai/knowledge.ts');
+  const app = await buildApp({ config: { ...cfg, LOG_LEVEL: 'error', MARINA_SANDBOX: true }, logger: false });
+  await app.ready();
+  try {
+    const s = app.ctx;
+    await syncOrgKnowledge(s, orgId);
+    const insights = await refreshInsights(s, orgId);
+    const people = await db.select({ id: t.users.id, email: t.users.email }).from(t.users).where(inArray(t.users.email, logins));
+    let briefings = 0;
+    for (const p of people) {
+      await generateBriefing(s, orgId, p.id, { kind: 'daily', force: true }).then(() => briefings++).catch(() => undefined);
+    }
+    // The sample conversation belongs to the CEO login (the first Northlight login).
+    const owner = people.find((p) => p.email === logins[0]) ?? people[0]!;
+    const token = await signAccessToken(s.cfg, { id: owner.id, email: owner.email, emailVerified: true });
+    const questions = [
+      'Which locations have overdue royalties?',
+      'Show revenue by location this quarter vs last quarter',
+      'Any overdue corrective actions?',
+      'Remind me to call the Thames Hot Yoga owner about the audit on Friday',
+    ];
+    let conversationId: string | null = null;
+    let actions = 0;
+    for (const message of questions) {
+      const r = await app.inject({ method: 'POST', url: `/v1/orgs/${orgId}/ai/ask`, headers: { authorization: `Bearer ${token}` }, payload: { message, conversationId, screen: { path: '/home' } } });
+      if (r.statusCode !== 200) throw new Error(`Assistant demo turn failed (${r.statusCode}): ${r.body.slice(0, 200)}`);
+      const j = r.json() as { conversationId: string; actions: unknown[] };
+      conversationId = j.conversationId;
+      actions += j.actions.length;
+    }
+    if (conversationId) await db.update(t.aiConversations).set({ title: 'Royalties, revenue and audits' }).where(sql`${t.aiConversations.id} = ${conversationId}`);
+    return { insights, briefings, turns: questions.length, actions, email: owner.email };
+  } finally {
+    await app.close();
+  }
 }
 
 /**
