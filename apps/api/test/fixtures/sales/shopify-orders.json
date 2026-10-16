@@ -1,0 +1,10 @@
+{
+  "orders": [
+    { "id": 450789469, "processed_at": "2026-10-12T15:00:00-04:00", "currency": "USD", "total_price": "54.40", "total_tax": "4.40", "total_tip_received": "0.00", "total_discounts": "5.00",
+      "source_name": "web", "location_id": null, "cancelled_at": null, "refunds": [] },
+    { "id": 450789470, "processed_at": "2026-10-12T18:30:00-04:00", "currency": "USD", "total_price": "21.60", "total_tax": "1.60", "total_tip_received": "2.00", "total_discounts": "0.00",
+      "source_name": "pos", "location_id": 655441491, "cancelled_at": null,
+      "refunds": [ { "created_at": "2026-10-13T10:00:00-04:00", "transactions": [ { "kind": "refund", "status": "success", "amount": "10.80" } ], "refund_line_items": [ { "total_tax": "0.80" } ] } ] },
+    { "id": 450789471, "processed_at": "2026-10-12T19:00:00-04:00", "currency": "USD", "total_price": "99.00", "total_tax": "0.00", "source_name": "pos", "location_id": 999, "cancelled_at": null, "refunds": [] }
+  ]
+}

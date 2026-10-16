@@ -153,6 +153,73 @@ export const AI_MODULES: readonly ModuleDef[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Network data platform: sales connectors, import, launch, benchmarks */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Data platform modules (one block, appended after the quality modules):
+ * - `network.sales_connectors`: POS and booking sales connectors (Square, Toast, Mindbody, Shopify, Lightspeed, Clover)
+ *   per location, the gross-sales source of each location and the reconciliation view. Edit connects and resyncs the
+ *   locations in scope; publish (HQ) decides each location's gross-sales source.
+ * - `network.bulk_launch`: create many locations at once from the brand template with sites, listings data and staff
+ *   invitations, and follow the progress board. HQ-private.
+ * - `network.benchmarks`: opt-in, anonymised cross-network benchmarks ("you vs similar networks"). Publish decides
+ *   whether the organisation takes part. HQ-private.
+ * - `settings.import`: the import wizard (locations, staff, customers, memberships, products, rooms or listings, leads)
+ *   with mapping, preview, dry run and a 24-hour undo. Each record type also needs edit rights on what it creates.
+ */
+export const DATA_PLATFORM_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'network.sales_connectors', area: 'network', name: 'Sales connectors', description: 'POS and booking connections that bring in daily sales for royalties, each location’s gross-sales source and the reconciliation view.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { edit: 'Connect, re-authorise and resync the locations in scope.', publish: 'Choose each location’s gross-sales source and review variances.', export: 'Download the reconciliation.' },
+    networkOnly: true, status: 'available', sensitive: 'finance',
+  },
+  {
+    key: 'network.bulk_launch', area: 'network', name: 'Bulk launch', description: 'Launch many locations at once from the brand template: sites, listings data and staff invitations, with a progress board.',
+    actions: ['view', 'edit', 'publish'], actionNotes: { edit: 'Start launches with sites saved as drafts.', publish: 'Start launches that publish the sites.' }, networkOnly: true, hqOnly: true, status: 'available',
+  },
+  {
+    key: 'network.benchmarks', area: 'network', name: 'Network benchmarks', description: 'Anonymised comparisons with similar networks (opt-in): revenue per location, bookings, occupancy, reviews, audits and royalties paid on time.',
+    actions: ['view', 'publish'], actionNotes: { publish: 'Decide whether the business takes part in benchmarks.' }, networkOnly: true, hqOnly: true, status: 'available',
+  },
+  {
+    key: 'settings.import', area: 'settings', name: 'Import', description: 'Import locations, staff, customers, memberships, products, rooms or listings and leads from CSV or Excel files, with a preview and undo.',
+    actions: ['view', 'edit'], actionNotes: { edit: 'Run imports (each record type also needs edit rights on it).' }, status: 'available',
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Suppliers, rebates and self-checks                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Supply network and audits phase 2 modules (one block, appended after the quality modules):
+ * - `operations.suppliers`: HQ's approved suppliers per region / country with catalogues and contracts; locations order
+ *   from the catalogue, receive deliveries and log off-contract purchases. Publish = manage suppliers and approve
+ *   purchase orders above the threshold. Granted by name only (never through `operations.*`).
+ * - `finance.supplier_rebates`: rebate programmes negotiated by HQ, accruals from orders, claims and statements, and
+ *   the share booked into the marketing fund. HQ only.
+ * - `operations.self_checks`: daily / weekly checklists a location runs itself (opening, closing, temperature logs),
+ *   kept apart from HQ audits. Publish = set the schedules.
+ */
+export const SUPPLY_MODULES: readonly ModuleDef[] = [
+  {
+    key: 'operations.suppliers', area: 'operations', name: 'Suppliers', description: 'Approved suppliers and their catalogues, purchase orders from the catalogue, receiving deliveries, off-contract purchases and supplier scorecards for the locations in scope.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { view: 'See approved suppliers, catalogues and orders.', edit: 'Place purchase orders, receive deliveries and log off-contract purchases.', publish: 'Manage suppliers and catalogues, approve purchase orders above the threshold and review off-contract spend.', export: 'Download orders and spend.' },
+    networkOnly: true, status: 'available', explicitGrant: true,
+  },
+  {
+    key: 'finance.supplier_rebates', area: 'finance', name: 'Supplier rebates', description: 'Rebate programmes negotiated with suppliers, accrued rebates from orders, claims, statements and the share paid into the marketing fund.',
+    actions: ['view', 'edit', 'export'], actionNotes: { edit: 'Set up programmes, raise claims and record payments.' }, networkOnly: true, status: 'available', hqOnly: true, sensitive: 'finance',
+  },
+  {
+    key: 'operations.self_checks', area: 'operations', name: 'Self-checks', description: 'Checklists a location runs itself every day or week (opening, closing, food-safety temperature logs) with reminders, kept apart from HQ audits.',
+    actions: ['view', 'edit', 'publish', 'export'], actionNotes: { edit: 'Fill in the day’s checklists.', publish: 'Set which checklists each location runs and when.', export: 'Download self-check results.' },
+    status: 'available',
+  },
+];
+
 /**
  * AI assistant grants. Every role template that includes `settings.ai` also gets `ai.assistant` view and edit (the
  * assistant only ever acts as the person, so this never widens access); the roles listed here get more on top.
@@ -223,6 +290,10 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   ...QUALITY_MODULES,
   // The AI assistant (see AI_MODULES).
   ...AI_MODULES,
+  // Sales connectors, bulk launch, benchmarks and the import wizard (see DATA_PLATFORM_MODULES).
+  ...DATA_PLATFORM_MODULES,
+  // Suppliers, supplier rebates and self-checks (see SUPPLY_MODULES).
+  ...SUPPLY_MODULES,
 ];
 
 const ops = (key: string, name: string, description: string, screens: readonly string[], status: ModuleDef['status'] = 'available'): ModuleDef => ({
@@ -490,6 +561,8 @@ const ownerGrants: GrantSpec = {
   'settings.team': VE, 'settings.connections': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
   // Field audits, compliance documents and the league table (own locations; network quartiles, never other franchisees).
   [AUDITS_MODULE]: VEX, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'],
+  // Suppliers (order, receive, log off-contract spend) and self-checks for their own locations.
+  'operations.suppliers': VEX, 'operations.self_checks': ALL,
 };
 
 /** Support roles: see and support locations, coach, run audits. Never finance, legal or customers' personal data. */
@@ -497,6 +570,8 @@ const supportGrants: GrantSpec = {
   // Audits are granted by name (`operations.*` never includes them).
   'network.locations': V, 'network.onboarding': V, 'network.approvals': V, 'network.reports': V, 'operations.*': V, [AUDITS_MODULE]: VE, 'network.league_table': V,
   ...everyone, 'community.help_desk': VE, 'training.assignments': VE, 'settings.ai': V,
+  // Suppliers (read-only) and self-check results of the locations they support.
+  'operations.suppliers': V, 'operations.self_checks': V,
 };
 
 export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
@@ -513,6 +588,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'marketing.*': ALL, 'operations.*': V, 'settings.team': VE, 'settings.connections': VE, 'settings.audit': V, 'settings.ai': V, 'training.*': ALL, 'community.*': ALL,
       // Field audits, compliance documents and the league table.
       'operations.audits': ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'publish', 'export'],
+      // Suppliers, supplier rebates and self-checks.
+      'operations.suppliers': ALL, 'finance.supplier_rebates': ['view', 'export'], 'operations.self_checks': ['view', 'publish', 'export'],
     },
   },
   // ── Franchise development ──
@@ -583,6 +660,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'community.help_desk': VE, 'community.library': VE, 'training.assignments': VE, 'settings.connections': VE, 'settings.ai': V,
       // Field audits, compliance documents and the league table.
       [AUDITS_MODULE]: ALL, 'legal.compliance_documents': ALL, 'network.league_table': ['view', 'export'],
+      // Suppliers and self-checks (rebates are finance).
+      'operations.suppliers': ALL, 'operations.self_checks': ALL,
     },
   },
   field_consultant: {
@@ -594,7 +673,7 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
   finance_lead: {
     key: 'finance_lead', name: 'Finance lead', team: 'finance', description: 'Payments, refunds, reconciliation, royalties, invoices, the marketing fund, payouts and financial reports.',
     primaryWorkspace: 'finance', defaultScope: 'organization',
-    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': ['view', 'publish'], 'network.locations': V, 'settings.billing': V, ...everyone },
+    grants: { 'finance.*': ALL, 'network.reports': ['view', 'export'], 'network.approvals': ['view', 'publish'], 'network.locations': V, 'settings.billing': V, ...everyone, 'operations.suppliers': ['view', 'export'] },
   },
   accountant: {
     key: 'accountant', name: 'Accountant', team: 'finance', description: 'Reads and exports payments, statements, royalties, payouts and fund reports for the books. Changes nothing.',
@@ -629,6 +708,8 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'operations.*': V, [AUDITS_MODULE]: VEP, 'legal.compliance_documents': VE, 'network.league_table': ['view', 'export'], 'marketing.reviews': VEP, 'finance.payments': ['view', 'export'], 'finance.invoices': VEX, 'finance.marketing_fund': V,
       ...everyone, 'community.announcements': VEP, 'community.discussions': VEP, 'community.library': VE, 'community.help_desk': VE, 'training.academy': VE, 'training.assignments': VE,
       'settings.team': VE, 'settings.ai': V,
+      // Suppliers and self-checks for the territory (approving orders above the threshold there).
+      'operations.suppliers': ALL, 'operations.self_checks': ALL,
     },
   },
   area_developer: {
@@ -661,12 +742,14 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
       'sales.customers': VE, 'sales.customer_pipeline': VE, 'operations.*': VE, 'finance.payments': V, 'settings.ai': V, ...everyone, 'training.assignments': VE,
       // Field audits, compliance documents and the league table.
       'operations.audits': VE, 'legal.compliance_documents': VE, 'network.league_table': V,
+      // Suppliers (order, receive, log off-contract spend) and self-checks.
+      'operations.suppliers': VE, 'operations.self_checks': VE,
     },
   },
   staff: {
     key: 'staff', name: 'Staff', team: 'locations', description: 'Their own shifts, classes and appointments, cover requests and check-in at their location, plus community and training.',
     primaryWorkspace: 'operations', defaultScope: 'location',
-    grants: { 'operations.schedule': VE, ...each(STAFF_LOOKUP, V), ...each(STAFF_FRONTLINE, VE), ...everyone },
+    grants: { 'operations.schedule': VE, ...each(STAFF_LOOKUP, V), ...each(STAFF_FRONTLINE, VE), ...everyone, 'operations.self_checks': VE },
   },
   // ── Other ──
   auditor: {
@@ -679,6 +762,26 @@ export const ROLE_TEMPLATES: Record<Role, RoleTemplate> = {
     grants: {},
   },
 };
+
+/**
+ * Data platform grants per role template (one block, merged into the templates here). Owners already hold everything
+ * through `*`. Grants are copied, never mutated in place (templates share grant objects).
+ */
+export const DATA_PLATFORM_ROLE_GRANTS: Partial<Record<Role, GrantSpec>> = {
+  hq_admin: { 'network.sales_connectors': ALL, 'network.bulk_launch': VEP, 'network.benchmarks': ['view', 'publish'], 'settings.import': VE },
+  development_lead: { 'network.bulk_launch': VEP, 'settings.import': VE },
+  operations_lead: { 'network.sales_connectors': VEX, 'network.benchmarks': V, 'settings.import': VE },
+  finance_lead: { 'network.sales_connectors': ALL, 'network.benchmarks': V },
+  accountant: { 'network.sales_connectors': ['view', 'export'] },
+  marketing_lead: { 'network.benchmarks': V },
+  master_franchisee: { 'network.sales_connectors': VEX, 'settings.import': VE },
+  multi_unit_operator: { 'network.sales_connectors': VEX, 'settings.import': VE },
+  franchise_owner: { 'network.sales_connectors': VEX, 'settings.import': VE },
+  location_manager: { 'network.sales_connectors': V },
+};
+for (const [role, spec] of Object.entries(DATA_PLATFORM_ROLE_GRANTS) as Array<[Role, GrantSpec]>) {
+  if (ROLE_TEMPLATES[role]) ROLE_TEMPLATES[role].grants = { ...ROLE_TEMPLATES[role].grants, ...spec };
+}
 
 /** System roles offered when inviting, in display order (grouped by team). */
 export const TEAM_ROLE_ORDER: readonly Role[] = (Object.keys(ROLE_TEMPLATES) as Role[]).filter((r) => !ROLE_TEMPLATES[r].hidden);

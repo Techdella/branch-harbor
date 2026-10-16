@@ -54,8 +54,8 @@ export interface StreamTotals { grossMinor: number; refundsMinor: number; taxMin
 export interface SalesAggregate {
   currency: string;
   streams: Partial<Record<RevenueStream, StreamTotals>>;
-  /** Accepted external (manually reported) sales for the period. */
-  external?: { grossMinor: number; refundsMinor: number; taxMinor: number } | null;
+  /** Accepted external (manually reported) sales for the period, or POS connector sales (which also report tips). */
+  external?: { grossMinor: number; refundsMinor: number; taxMinor: number; tipsMinor?: number } | null;
 }
 
 export interface ComputedLine {
@@ -146,7 +146,7 @@ export function computeStatement(terms: RoyaltyTerms, sales: SalesAggregate, adj
   let external = 0;
   if (sales.external) {
     if (b.includeExternalSales) {
-      external = sales.external.grossMinor - (b.netOfRefunds ? sales.external.refundsMinor : 0) - (b.excludeTax ? sales.external.taxMinor : 0);
+      external = sales.external.grossMinor - (b.netOfRefunds ? sales.external.refundsMinor : 0) - (b.excludeTax ? sales.external.taxMinor : 0) - (b.excludeTips ? sales.external.tipsMinor ?? 0 : 0);
       lines.push({ kind: 'external_sales', stream: 'external', description: 'external_sales', amountMinor: external, charge: false });
     } else warnings.push('external_sales_excluded');
   }

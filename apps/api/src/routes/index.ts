@@ -99,4 +99,15 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./audits.ts')).auditRoutes);
   await app.register((await import('./compliance.ts')).complianceRoutes);
   await app.register((await import('./league-table.ts')).leagueTableRoutes);
+  // Network data platform: POS / booking sales connectors (+ public OAuth callback), import wizard, bulk launch, benchmarks.
+  await app.register((await import('./sales-connectors.ts')).salesConnectorPublicRoutes);
+  await app.register((await import('./sales-connectors.ts')).salesConnectorRoutes);
+  await app.register((await import('./imports.ts')).importRoutes);
+  await app.register((await import('./launches.ts')).launchRoutes);
+  await app.register((await import('./benchmarks.ts')).benchmarkRoutes);
+  // Suppliers (catalogue, purchase orders, receiving, rebates, off-contract spend) and the supplier's magic-link pages.
+  await app.register((await import('./supply.ts')).supplyRoutes);
+  await app.register((await import('./supply.ts')).supplyPublicRoutes);
+  // Audits phase 2 (recurring schedules, trends, visit planner, retraining) and self-checks.
+  await app.register((await import('./audit-programmes.ts')).auditProgrammeRoutes);
 };

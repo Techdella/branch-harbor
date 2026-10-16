@@ -47,6 +47,15 @@ const tableReviews: ReviewProvider = async (db, organizationId, locationIds, fro
   return out;
 };
 
+/** Review ratings per location from the first provider that has data (used by network benchmarks too). */
+export async function reviewRatings(db: Exec, organizationId: string, locationIds: string[], from: Date, to: Date) {
+  for (const p of [...reviewProviders, tableReviews]) {
+    const m = await p(db, organizationId, locationIds, from, to).catch(() => new Map<string, { rating: number; count: number }>());
+    if (m.size) return m;
+  }
+  return new Map<string, { rating: number; count: number }>();
+}
+
 export interface LeagueSettings { franchiseeQuartiles: boolean }
 export function leagueSettings(org: { settings: Record<string, unknown> }): LeagueSettings {
   const l = (org.settings.leagueTable ?? {}) as Partial<LeagueSettings>;
@@ -124,7 +133,7 @@ export async function revenueByLocation(db: Exec, organizationId: string, locs: 
   return out;
 }
 
-async function royaltyStatus(db: Exec, organizationId: string, ids: string[], today: string) {
+export async function royaltyStatus(db: Exec, organizationId: string, ids: string[], today: string) {
   const out = new Map<string, 'on_time' | 'overdue' | 'none'>();
   if (!ids.length) return out;
   const inv = await db.select({ id: financeInvoices.locationId, status: financeInvoices.status, dueDate: financeInvoices.dueDate, total: financeInvoices.totalMinor, paid: financeInvoices.paidMinor })

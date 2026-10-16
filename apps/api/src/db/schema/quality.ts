@@ -87,9 +87,12 @@ export const audits = pgTable('audits', {
   reauditDueDate: date('reaudit_due_date'),
   remindedAt: ts('reminded_at'),
   cancelReason: text('cancel_reason'),
+  /** Created by a recurring schedule (`audit_schedules`): one audit per schedule, location and due date. */
+  scheduleId: uuid('schedule_id'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [
+  uniqueIndex('audits_schedule_due_uq').on(t.scheduleId, t.locationId, t.dueDate),
   index('audits_org_loc_idx').on(t.organizationId, t.locationId, t.status),
   index('audits_org_auditor_idx').on(t.organizationId, t.auditorUserId),
   index('audits_project_idx').on(t.projectId),
@@ -120,6 +123,9 @@ export const auditActions = pgTable('audit_actions', {
   reviewNote: text('review_note'),
   reopenedCount: integer('reopened_count').notNull().default(0),
   remindedAt: ts('reminded_at'),
+  /** Retraining loop: the academy course this failed item recommends, and the assignment made for the location. */
+  trainingCourseId: uuid('training_course_id'),
+  trainingAssignmentId: uuid('training_assignment_id'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [

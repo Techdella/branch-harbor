@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { complianceDocuments, financeInvoices, franchiseProjects, locations, paymentReferences, royaltyPeriods, royaltyStatements } from '../src/db/schema/index.ts';
-import { runComplianceJobs } from '../src/services/compliance.ts';
+import { orgDay, runComplianceJobs } from '../src/services/compliance.ts';
 import { runAuditJobs } from '../src/services/audits.ts';
 import { call, createLocation, createOrg, hasDb, makeApp, memberWithRole, uid, verifiedUser } from './helpers.ts';
 
@@ -288,7 +288,9 @@ describe.skipIf(!hasDb)('audits, compliance documents and league table (DB)', ()
     // Vancouver: below the minimum (approved by HQ upload, amount too low); expiring soon at Toronto's licence.
     const low = await call(app, 'POST', `${C()}/documents`, { token: hqAdmin.token, body: { ...base, locationId: van, coverageAmountMinor: 100_000_000 } });
     expect(low.body.status).toBe('approved');
-    const soon = new Date(Date.now() + 10 * 86_400_000).toISOString().slice(0, 10);
+    // Expiry dates count in the organisation's own calendar day, so build "10 days from now" from that day (not UTC).
+    const orgToday = await orgDay(app.ctx.db, orgId);
+    const soon = new Date(Date.parse(`${orgToday}T00:00:00Z`) + 10 * 86_400_000).toISOString().slice(0, 10);
     await call(app, 'POST', `${C()}/documents`, { token: hqAdmin.token, body: { requirementId: lic, locationId: tor, category: 'licence', title: 'Business licence', expiresOn: soon, file: pdf } });
     m = await call(app, 'GET', `${C()}/matrix`, { token: hqAdmin.token });
     expect(cell(m, tor, gl)).toBe('valid');

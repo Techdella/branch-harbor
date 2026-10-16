@@ -1,0 +1,9 @@
+{
+  "elements": [
+    { "id": "JH4ZQX3G3F2YE", "state": "locked", "total": 1695, "clientCreatedTime": 1791813600000, "orderType": { "label": "Dine In" },
+      "payments": { "elements": [ { "amount": 1695, "taxAmount": 195, "tipAmount": 300, "result": "SUCCESS" } ] }, "refunds": { "elements": [] } },
+    { "id": "JH4ZQX3G3F2YF", "state": "locked", "total": 1130, "clientCreatedTime": 1791817200000, "orderType": { "label": "Delivery" },
+      "payments": { "elements": [ { "amount": 1130, "taxAmount": 130, "tipAmount": 0, "result": "SUCCESS" }, { "amount": 1130, "result": "FAIL" } ] },
+      "refunds": { "elements": [ { "amount": 565, "taxAmount": 65, "tipAmount": 0, "createdTime": 1791903600000 } ] } }
+  ]
+}

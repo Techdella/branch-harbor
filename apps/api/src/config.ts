@@ -204,6 +204,25 @@ const envSchema = z.object({
   DELIVERECT_API_URL: optional,
   /** Fallback Deliverect webhook HMAC secret (production partner secret). */
   DELIVERECT_WEBHOOK_SECRET: optional,
+
+  // POS and booking sales connectors (platform app credentials; each location authorises its own account).
+  // Without them a connection runs in sandbox mode with sample sales. See docs/API_INTEGRATIONS.md "Sales connectors".
+  SQUARE_APPLICATION_ID: optional,
+  SQUARE_APPLICATION_SECRET: optional,
+  TOAST_CLIENT_ID: optional,
+  TOAST_CLIENT_SECRET: optional,
+  TOAST_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
+  /** Mindbody source credentials (developer portal) used with MINDBODY_API_KEY for site activation and staff tokens. */
+  MINDBODY_SOURCE_NAME: optional,
+  MINDBODY_SOURCE_PASSWORD: optional,
+  LIGHTSPEED_X_CLIENT_ID: optional,
+  LIGHTSPEED_X_CLIENT_SECRET: optional,
+  LIGHTSPEED_K_CLIENT_ID: optional,
+  LIGHTSPEED_K_CLIENT_SECRET: optional,
+  LIGHTSPEED_K_ENVIRONMENT: z.enum(['trial', 'production']).default('trial'),
+  CLOVER_APP_ID: optional,
+  CLOVER_APP_SECRET: optional,
+  CLOVER_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
 });
 
 export type Config = z.infer<typeof envSchema>;

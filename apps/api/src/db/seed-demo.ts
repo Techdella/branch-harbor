@@ -319,6 +319,12 @@ async function main() {
   console.log(` Audits:        ${quality.audits} completed audits with scores, open corrective actions, a re-audit and a pre-opening audit; ${quality.documents} compliance documents (one expiring, one expired); league table. Field consultant: ${quality.logins.join(', ')}`);
   const marina = await seedMarinaDemo(northlight.orgId, northlight.logins);
   console.log(` Assistant:     ${marina.insights} insights, ${marina.briefings} briefings and a sample conversation (${marina.turns} questions, ${marina.actions} action card waiting) for ${marina.email}; sandbox engine, answers from the seeded data only`);
+  const platform = await seedDataPlatformDemo(northlight.orgId);
+  console.log(` Data platform: ${platform.connections} sales connectors (sandbox) with ${platform.days} daily sales rows, a self-reported variance, ${platform.imports} imports, a bulk launch of ${platform.launched} locations and opted-in benchmarks`);
+  const supply = await (await import('./seed-supply.ts')).seedSupply({ db, today, upsertUser, appUrl: cfg.APP_URL });
+  console.log(` Suppliers:     Maple & Ember — ${supply.suppliers} approved suppliers, ${supply.orders} purchase orders (one waiting for HQ approval, one due at Ballard today), rebates with a claim, off-contract spend`);
+  console.log(`                supplier confirmation link (no login): ${supply.confirmLink}`);
+  console.log(` Audits ph. 2:  recurring schedules (${supply.visits} visits created), visit planner, retraining link, ${supply.selfChecks} self-check runs · ${supply.logins.join(', ')}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
 }
@@ -468,6 +474,110 @@ async function seedMarinaDemo(orgId: string, logins: string[]) {
   } finally {
     await app.close();
   }
+}
+
+/**
+ * Demo data for the network data platform (Northlight). Everything is sandbox / sample data and labelled as such:
+ *  - sales connectors: Kitsilano on Mindbody (its gross-sales source), Portland Pearl on Square (self-reported, with a
+ *    variance against Square), Toronto Annex on Shopify (online shop, not the source), London Hackney on Mindbody with
+ *    an expired authorisation; ~95 days of sandbox daily sales written through the real upsert;
+ *  - import history (a Mindbody customer import and a dry run), a completed bulk launch of three opening-soon
+ *    locations from the brand template, and benchmark participation with demo cohort percentiles (aggregates only;
+ *    the demo site keeps them because `recomputeBenchmarks` does not withdraw cohorts in DEMO_MODE).
+ */
+async function seedDataPlatformDemo(orgId: string) {
+  const { sandboxSales } = await import('../integrations/sales/index.ts');
+  const { bucketSales, writeDailySales } = await import('../services/sales-connectors.ts');
+  const { runLaunch } = await import('../services/launches.ts');
+  const { computeContributions, lastFullMonth } = await import('../services/benchmarks.ts');
+  const { datesBetween } = await import('@bh/shared');
+  const user = async (local: string) => (await db.select().from(t.users).where(sql`${t.users.email} = ${`${local}@northlight.demo.branchharbor.com`}`))[0]!;
+  const ceo = await user('elena.marsh');
+  const finance = await user('ruth.adeyemi');
+  const locs = await db.select().from(t.locations).where(sql`${t.locations.organizationId} = ${orgId}`);
+  const byCode = (code: string) => locs.find((l) => l.code === code)!;
+  const days = datesBetween(addDays(today, -95), addDays(today, -1));
+  const plan: Array<{ code: string; provider: string; status: string; account: string; config: Record<string, unknown> }> = [
+    { code: 'YVR-KT', provider: 'mindbody', status: 'connected', account: 'Mindbody sandbox site -99', config: { siteId: '-99', externalLocationId: '1' } },
+    { code: 'PDX-PR', provider: 'square', status: 'connected', account: 'Square sandbox', config: { externalLocationId: 'L-PEARL' } },
+    { code: 'TOR-AX', provider: 'shopify', status: 'connected', account: 'northlight-shop.myshopify.com', config: { shopDomain: 'northlight-shop.myshopify.com' } },
+    { code: 'LON-HK', provider: 'mindbody', status: 'authorization_expired', account: 'Mindbody sandbox site -77', config: { siteId: '-77' } },
+  ];
+  let rows = 0;
+  const conns: Record<string, typeof t.salesConnections.$inferSelect> = {};
+  for (const p of plan) {
+    const loc = byCode(p.code);
+    if (!loc) continue;
+    const [c] = await db.insert(t.salesConnections).values({
+      organizationId: orgId, locationId: loc.id, provider: p.provider, status: p.status, mode: 'sandbox', config: p.config, externalAccountName: p.account, createdBy: ceo.id,
+      lastSyncAt: new Date(Date.now() - 6 * 3600_000), lastSyncStatus: p.status === 'connected' ? 'succeeded' : 'failed',
+      lastError: p.status === 'connected' ? null : 'Mindbody returned 401: the site owner removed BranchHarbor’s access (sample)', lastErrorAt: p.status === 'connected' ? null : new Date(Date.now() - 6 * 3600_000),
+    }).returning();
+    conns[p.code] = c!;
+    const recs = sandboxSales(c!.id, p.status === 'connected' ? days : days.slice(0, 60), loc.currency);
+    const r = await writeDailySales(db, c!, loc, bucketSales(recs, loc.timeZone, days[0]!, days[days.length - 1]!), days[0]!, p.status === 'connected' ? days[days.length - 1]! : days[59]!);
+    rows += r.written;
+    await db.insert(t.salesSyncRuns).values([
+      { organizationId: orgId, connectionId: c!.id, trigger: 'initial', status: 'succeeded', fromDate: days[0]!, toDate: days[34]!, daysWritten: 70, sandbox: true, startedAt: new Date(Date.now() - 40 * 86_400_000), finishedAt: new Date(Date.now() - 40 * 86_400_000) },
+      p.status === 'connected'
+        ? { organizationId: orgId, connectionId: c!.id, trigger: 'nightly', status: 'succeeded', fromDate: addDays(today, -3), toDate: addDays(today, -1), daysWritten: 2, daysUnchanged: 4, ordersSeen: 118, sandbox: true, startedAt: new Date(Date.now() - 6 * 3600_000), finishedAt: new Date(Date.now() - 6 * 3600_000) }
+        : { organizationId: orgId, connectionId: c!.id, trigger: 'nightly', status: 'failed', fromDate: addDays(today, -3), toDate: addDays(today, -1), sandbox: true, error: 'Mindbody returned 401 (sample)', startedAt: new Date(Date.now() - 6 * 3600_000), finishedAt: new Date(Date.now() - 6 * 3600_000) },
+    ]);
+  }
+  // Gross-sales sources: Kitsilano from Mindbody; Portland Pearl self-reported (and 12 % above what Square shows).
+  if (conns['YVR-KT']) await db.insert(t.locationSalesSources).values({ locationId: byCode('YVR-KT').id, organizationId: orgId, source: 'connector', connectionId: conns['YVR-KT'].id, setBy: finance.id });
+  const pearl = byCode('PDX-PR');
+  if (pearl && conns['PDX-PR']) {
+    await db.insert(t.locationSalesSources).values({ locationId: pearl.id, organizationId: orgId, source: 'self_reported', varianceThresholdBps: 500, note: 'Franchisee reports from the Square end-of-month summary', setBy: finance.id });
+    const monthStart = `${today.slice(0, 7)}-01`;
+    const lastStart = addDays(monthStart, -1).slice(0, 7) + '-01';
+    const lastEnd = addDays(monthStart, -1);
+    const sq = await db.select().from(t.dailySales).where(sql`${t.dailySales.connectionId} = ${conns['PDX-PR'].id} and ${t.dailySales.businessDate} >= ${lastStart} and ${t.dailySales.businessDate} <= ${lastEnd}`);
+    const observed = sq.reduce((a, x) => a + x.grossMinor - x.refundsMinor - x.taxMinor, 0);
+    const pdf = Buffer.from('%PDF-1.4 Square end-of-month summary (sample)').toString('base64');
+    const [doc] = await db.insert(t.financeDocuments).values({ organizationId: orgId, kind: 'evidence', locationId: pearl.id, filename: 'square-month-summary.pdf', contentType: 'application/pdf', sizeBytes: 44, dataBase64: pdf, sha256: sha256(pdf), uploadedBy: ceo.id }).returning();
+    await db.insert(t.externalSalesReports).values({
+      organizationId: orgId, locationId: pearl.id, frequency: 'monthly', periodStart: lastStart, currency: pearl.currency, grossMinor: Math.round(observed * 1.12), refundsMinor: 0, taxMinor: 0,
+      note: 'From the Square end-of-month summary', evidenceDocumentId: doc!.id, status: 'accepted', submittedBy: ceo.id, reviewedBy: finance.id, reviewedAt: new Date(),
+    }).onConflictDoNothing();
+  }
+  // Import history.
+  const yesterday = new Date(Date.now() - 86_400_000);
+  await db.insert(t.importBatches).values([
+    { organizationId: orgId, entity: 'customers', templateKey: 'mindbody_clients', filename: 'mindbody-client-export.csv', format: 'csv', status: 'completed', headers: ['Client ID', 'First Name', 'Last Name', 'Email', 'Mobile Phone', 'Send Promotional Emails'], mapping: { first_name: 1, last_name: 2, email: 3, phone: 4, marketing_email: 5 }, totalRows: 412, validRows: 405, errorRows: 7, processedRows: 412, createdCount: 361, updatedCount: 44, skippedCount: 7, errors: [{ row: 18, field: 'email', code: 'invalid_email', message: 'Invalid email' }, { row: 92, field: 'email', code: 'contact_required', message: 'An email or a phone number is required' }], createdBy: ceo.id, startedAt: yesterday, finishedAt: yesterday, undoUntil: new Date(yesterday.getTime() - 1000) },
+    { organizationId: orgId, entity: 'staff', templateKey: null, filename: 'instructors.xlsx', format: 'xlsx', status: 'completed', dryRun: true, headers: ['Employee Name', 'Work Email', 'Job Title', 'Home Location'], mapping: { name: 0, email: 1, role: 2, location_code: 3 }, totalRows: 14, validRows: 13, errorRows: 1, processedRows: 14, createdCount: 13, skippedCount: 1, errors: [{ row: 9, field: 'location_code', code: 'unknown_location', message: 'No location with code or name "YYZ-QW"' }], createdBy: ceo.id, startedAt: yesterday, finishedAt: yesterday },
+  ]);
+  // Bulk launch: three opening-soon locations from the brand template (drafts), run through the real launch steps.
+  const [tpl] = await db.select().from(t.templates).where(sql`${t.templates.organizationId} = ${orgId}`).limit(1);
+  const [launch] = await db.insert(t.bulkLaunches).values({ organizationId: orgId, name: 'Spring 2027 openings', templateId: tpl?.id ?? null, siteMode: 'draft', locationStatus: 'opening_soon', inviteStaff: true, total: 3, createdBy: ceo.id }).returning();
+  const launchRows = [
+    { name: 'Calgary Beltline', code: 'YYC-BL', address_line1: '1010 17 Ave SW', city: 'Calgary', state_region: 'AB', postal_code: 'T2T 0A7', country: 'CA', time_zone: 'America/Edmonton', currency: 'CAD', manager_email: 'calgary.manager@northlight.demo.branchharbor.com', staff_emails: 'calgary.front@northlight.demo.branchharbor.com', listing_categories: 'Yoga studio;Hot yoga', listing_description: 'Heated flow and yin in the Beltline.', staff_role: 'staff' },
+    { name: 'Ottawa Glebe', code: 'YOW-GL', address_line1: '800 Bank St', city: 'Ottawa', state_region: 'ON', postal_code: 'K1S 3V8', country: 'CA', time_zone: 'America/Toronto', currency: 'CAD', manager_email: 'ottawa.manager@northlight.demo.branchharbor.com', listing_categories: 'Yoga studio', staff_role: 'staff' },
+    { name: 'Seattle Capitol Hill', code: 'SEA-CH', address_line1: '1520 E Olive Way', city: 'Seattle', state_region: 'WA', postal_code: '98122', country: 'US', time_zone: 'America/Los_Angeles', currency: 'USD', listing_categories: 'Yoga studio;Pilates studio', staff_role: 'staff' },
+  ];
+  await db.insert(t.bulkLaunchItems).values(launchRows.map((r, i) => ({ organizationId: orgId, launchId: launch!.id, rowNumber: i + 1, name: r.name, code: r.code, input: r, steps: {} })));
+  const noop = () => {};
+  const launchCtx = { cfg, db, geocoder: { geocode: async () => null }, jobs: { enqueue: async () => {} }, log: { info: noop, warn: noop, error: noop, debug: noop } } as unknown as import('../context.ts').Services;
+  await runLaunch(launchCtx, launch!.id);
+  // Benchmarks: opted in, with demo cohorts around Northlight's own values (aggregates only, k ≥ 10 by construction).
+  const [org] = await db.select().from(t.organizations).where(sql`${t.organizations.id} = ${orgId}`);
+  await db.update(t.organizations).set({ settings: { ...org!.settings, benchmarks: { optIn: true, optedInAt: new Date(Date.now() - 60 * 86_400_000).toISOString(), optedInBy: ceo.id } } }).where(sql`${t.organizations.id} = ${orgId}`);
+  const period = lastFullMonth();
+  const mine = await computeContributions(db, org!, period);
+  const DEFAULTS: Record<string, number> = { bookings_per_location: 640, occupancy_pct: 58, review_rating: 4.5, audit_pass_rate: 78, royalty_on_time_rate: 88 };
+  const cohort = (metric: string, currency: string, v: number, size: number, scale: [number, number, number, number, number], cap?: number) => {
+    const p = scale.map((s) => Math.round(v * s * 100) / 100).map((x) => (cap ? Math.min(cap, x) : x));
+    return { period, industry: 'studios', region: 'north_america', metric, currency, cohortSize: size, p10: p[0]!, p25: p[1]!, p50: p[2]!, p75: p[3]!, p90: p[4]! };
+  };
+  const cohorts = [];
+  for (const m of mine.filter((x) => x.metric === 'revenue_per_location' && ['CAD', 'USD'].includes(x.currency))) cohorts.push(cohort('revenue_per_location', m.currency, Math.max(m.value, 1_500_000), m.currency === 'CAD' ? 25 : 15, [0.45, 0.7, 0.92, 1.15, 1.45]));
+  for (const metric of ['bookings_per_location', 'occupancy_pct', 'review_rating', 'audit_pass_rate', 'royalty_on_time_rate']) {
+    const v = mine.find((x) => x.metric === metric)?.value || DEFAULTS[metric]!;
+    const cap = metric === 'review_rating' ? 5 : metric === 'bookings_per_location' ? undefined : 100;
+    cohorts.push(cohort(metric, '', v, 25, metric === 'review_rating' ? [0.86, 0.93, 0.98, 1.01, 1.04] : [0.55, 0.78, 0.95, 1.08, 1.2], cap));
+  }
+  await db.insert(t.benchmarkCohorts).values(cohorts).onConflictDoNothing();
+  return { connections: Object.keys(conns).length, days: rows, imports: 2, launched: launchRows.length };
 }
 
 main()

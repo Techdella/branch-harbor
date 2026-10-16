@@ -46,9 +46,19 @@ const billingSweep = setInterval(() => void (async () => {
 // (each step is idempotent, so a repeated run is harmless).
 const marinaTick = setInterval(() => void app.ctx.jobs.enqueue('marina.tick', {}, { jobId: `marina-tick-${Math.floor(Date.now() / 300_000)}` }).catch(() => {}), 5 * 60_000);
 const marinaDaily = setInterval(() => void app.ctx.jobs.enqueue('marina.daily', {}, { jobId: `marina-daily-${Math.floor(Date.now() / 3600_000)}` }).catch(() => {}), 3600_000);
+// Network data platform: nightly POS / booking sales sync (last three local days per connection, one job per
+// connection and day), daily benchmark recompute, and purging parsed import rows once the undo window has closed.
+const dataPlatformHourly = setInterval(() => void (async () => {
+  const hour = Math.floor(Date.now() / 3600_000);
+  const day = new Date().toISOString().slice(0, 10);
+  await app.ctx.jobs.enqueue('sales.nightly', {}, { jobId: `sales-nightly-${day}` });
+  if (hour % 24 === 3) await app.ctx.jobs.enqueue('benchmarks.recompute', {}, { jobId: `benchmarks-${day}` });
+  await (await import('./services/imports.ts')).purgeImportRows(app.ctx.db);
+})().catch((err) => app.log.warn({ err }, 'data platform sweep failed')), 3600_000);
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, 'shutting down');
+  clearInterval(dataPlatformHourly);
   clearInterval(sweep);
   clearInterval(realtySweep);
   clearInterval(franchiseSweep);

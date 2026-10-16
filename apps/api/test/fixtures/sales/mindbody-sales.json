@@ -1,0 +1,15 @@
+{
+  "PaginationResponse": { "RequestedLimit": 200, "RequestedOffset": 0, "PageSize": 3, "TotalResults": 3 },
+  "Sales": [
+    { "Id": 100231, "SaleDateTime": "2026-10-12T14:05:00Z", "LocationId": 1,
+      "PurchasedItems": [ { "Id": 1, "Description": "10 Class Pack", "IsService": true, "TotalAmount": 180.00, "TaxAmount": 20.71, "DiscountAmount": 0, "Returned": false },
+                          { "Id": 2, "Description": "Tip - Instructor", "IsService": false, "TotalAmount": 10.00, "TaxAmount": 0, "DiscountAmount": 0, "Returned": false } ],
+      "Payments": [ { "Id": 1, "Amount": 190.00, "Type": "Visa" } ] },
+    { "Id": 100232, "SaleDateTime": "2026-10-12T19:40:00Z", "LocationId": 98,
+      "PurchasedItems": [ { "Id": 3, "Description": "Drop-in", "TotalAmount": 25.00, "TaxAmount": 2.88, "DiscountAmount": 5.0, "Returned": false } ],
+      "Payments": [ { "Id": 2, "Amount": 25.00, "Type": "Online" } ] },
+    { "Id": 100233, "SaleDateTime": "2026-10-13T15:00:00Z", "LocationId": 1,
+      "PurchasedItems": [ { "Id": 4, "Description": "Mat rental", "TotalAmount": -5.00, "TaxAmount": -0.58, "DiscountAmount": 0, "Returned": true } ],
+      "Payments": [] }
+  ]
+}
