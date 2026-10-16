@@ -200,10 +200,10 @@
         },
         "inventory": {
           "name": "Inventory",
-          "description": "Stock levels and counts.",
+          "description": "Stock levels, counts and transfers between stores.",
           "purchasing": {
-            "name": "Transfers & purchasing",
-            "description": "Stock transfers between locations, purchase orders and suppliers."
+            "name": "Purchasing",
+            "description": "Purchase orders and suppliers."
           }
         },
         "commerce_insights": {
@@ -244,10 +244,10 @@
         },
         "agents": {
           "name": "Agents & offices",
-          "description": "Look up agents and offices.",
-          "manage": {
-            "name": "Manage agents & offices",
-            "description": "Add and change agents and offices."
+          "description": "Agents, their own lead settings and offices.",
+          "offices": {
+            "name": "Offices & lead routing",
+            "description": "Office settings and how enquiries are routed between agents."
           }
         },
         "reservations": {

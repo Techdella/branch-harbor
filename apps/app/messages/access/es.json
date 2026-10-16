@@ -200,10 +200,10 @@
         },
         "inventory": {
           "name": "Inventario",
-          "description": "Niveles de stock y recuentos.",
+          "description": "Niveles de stock, recuentos y traspasos entre tiendas.",
           "purchasing": {
-            "name": "Traspasos y compras",
-            "description": "Traspasos de stock entre ubicaciones, pedidos de compra y proveedores."
+            "name": "Compras",
+            "description": "Pedidos de compra y proveedores."
           }
         },
         "commerce_insights": {
@@ -244,10 +244,10 @@
         },
         "agents": {
           "name": "Agentes y oficinas",
-          "description": "Consultar agentes y oficinas.",
-          "manage": {
-            "name": "Gestionar agentes y oficinas",
-            "description": "Añadir y cambiar agentes y oficinas."
+          "description": "Agentes, sus propios ajustes de contactos y oficinas.",
+          "offices": {
+            "name": "Oficinas y reparto de contactos",
+            "description": "Ajustes de oficina y cómo se reparten las consultas entre agentes."
           }
         },
         "reservations": {

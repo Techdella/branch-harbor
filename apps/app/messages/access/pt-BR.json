@@ -200,10 +200,10 @@
         },
         "inventory": {
           "name": "Estoque",
-          "description": "Níveis de estoque e contagens.",
+          "description": "Níveis de estoque, contagens e transferências entre lojas.",
           "purchasing": {
-            "name": "Transferências e compras",
-            "description": "Transferências de estoque entre unidades, pedidos de compra e fornecedores."
+            "name": "Compras",
+            "description": "Pedidos de compra e fornecedores."
           }
         },
         "commerce_insights": {
@@ -244,10 +244,10 @@
         },
         "agents": {
           "name": "Corretores e escritórios",
-          "description": "Consultar corretores e escritórios.",
-          "manage": {
-            "name": "Gerenciar corretores e escritórios",
-            "description": "Adicionar e alterar corretores e escritórios."
+          "description": "Corretores, suas próprias configurações de leads e escritórios.",
+          "offices": {
+            "name": "Escritórios e distribuição de leads",
+            "description": "Configurações do escritório e como os contatos são distribuídos entre corretores."
           }
         },
         "reservations": {

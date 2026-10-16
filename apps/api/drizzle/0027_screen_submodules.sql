@@ -9,7 +9,7 @@ INSERT INTO "_screen_submodules" ("parent", "child") VALUES
   ('operations.memberships', 'operations.memberships.packs_offers'), ('operations.teams', 'operations.teams.schedule_builder'),
   ('operations.appointments', 'operations.appointments.practitioners'), ('operations.inventory', 'operations.inventory.purchasing'),
   ('operations.food_orders', 'operations.food_orders.catering'), ('operations.listings', 'operations.listings.portals'),
-  ('operations.agents', 'operations.agents.manage');
+  ('operations.agents', 'operations.agents.offices');
 --> statement-breakpoint
 INSERT INTO "role_capabilities" ("role_id", "organization_id", "capability")
 SELECT rc."role_id", rc."organization_id", x."child" || substr(rc."capability", length(x."parent") + 1)

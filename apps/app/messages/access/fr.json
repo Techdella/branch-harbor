@@ -200,10 +200,10 @@
         },
         "inventory": {
           "name": "Stock",
-          "description": "Niveaux de stock et inventaires.",
+          "description": "Niveaux de stock, inventaires et transferts entre magasins.",
           "purchasing": {
-            "name": "Transferts et achats",
-            "description": "Transferts de stock entre sites, bons de commande et fournisseurs."
+            "name": "Achats",
+            "description": "Bons de commande et fournisseurs."
           }
         },
         "commerce_insights": {
@@ -244,10 +244,10 @@
         },
         "agents": {
           "name": "Agents et agences",
-          "description": "Consulter les agents et les agences.",
-          "manage": {
-            "name": "Gérer agents et agences",
-            "description": "Ajouter et modifier des agents et des agences."
+          "description": "Agents, leurs propres réglages de prospects et agences.",
+          "offices": {
+            "name": "Agences et attribution des prospects",
+            "description": "Réglages des agences et répartition des demandes entre agents."
           }
         },
         "reservations": {

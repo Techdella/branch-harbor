@@ -220,7 +220,7 @@ export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
   commerce: [
     ops('orders', 'Orders', 'Orders, returns and gift cards.', ['pulse', 'orders', 'returns', 'giftcards']),
     ops('catalogue', 'Catalogue', 'Products, assortment per location and the online store.', ['catalogue', 'assortment', 'storefront']),
-    ops('inventory', 'Inventory', 'Stock levels and counts. Transfers and purchasing are their own screen (below).', ['inventory']),
+    ops('inventory', 'Inventory', 'Stock levels, counts and transfers between stores. Purchasing is its own screen (below).', ['inventory', 'transfers']),
     ops('commerce_insights', 'Commerce insights', 'Sales and stock reports.', ['insights']),
   ],
   foods: [
@@ -232,7 +232,7 @@ export const INDUSTRY_MODULES: Record<Industry, readonly ModuleDef[]> = {
   realty: [
     ops('listings', 'Listings', 'Listings and approvals. Portal feeds are their own screen (below).', ['pulse', 'listings']),
     ops('enquiries', 'Enquiries & viewings', 'Enquiries, viewings and offers.', ['enquiries', 'viewings', 'offers']),
-    ops('agents', 'Agents & offices', 'Look up agents and offices. Managing them is its own screen (below).', []),
+    ops('agents', 'Agents & offices', 'Agents, their own lead settings and offices. Office settings and lead routing are their own capability (below).', ['agents']),
   ],
   hospitality: [
     ops('reservations', 'Front desk & reservations', 'Today at the property, the room grid, reservations, check-in and check-out, folios and guest registration.', ['pulse', 'grid', 'reservations']),
@@ -271,14 +271,14 @@ export const SCREEN_MODULES: Record<Industry, readonly ModuleDef[]> = {
     screen('operations.appointments', 'practitioners', 'Practitioners & hours', 'Practitioners, their working hours, and rooms or equipment.', ['practitioners']),
   ],
   commerce: [
-    screen('operations.inventory', 'purchasing', 'Transfers & purchasing', 'Stock transfers between locations, purchase orders and suppliers.', ['transfers', 'purchasing']),
+    screen('operations.inventory', 'purchasing', 'Purchasing', 'Purchase orders and suppliers.', ['purchasing']),
   ],
   foods: [
     screen('operations.food_orders', 'catering', 'Catering & meal plans', 'Catering menus and events, meal plans and production dates, delivery zones and providers.', ['catering', 'mealplans']),
   ],
   realty: [
     screen('operations.listings', 'portals', 'Portal feeds', 'Which listings go to which property portals.', ['portals']),
-    screen('operations.agents', 'manage', 'Manage agents & offices', 'Add and change agents and offices.', ['agents']),
+    screen('operations.agents', 'offices', 'Offices & lead routing', 'Office settings and how enquiries are routed between agents.', []),
   ],
   hospitality: [],
 };

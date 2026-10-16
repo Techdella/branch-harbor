@@ -200,10 +200,10 @@
         },
         "inventory": {
           "name": "Bestand",
-          "description": "Lagerbestände und Inventuren.",
+          "description": "Lagerbestände, Inventuren und Umlagerungen zwischen Filialen.",
           "purchasing": {
-            "name": "Umlagerungen & Einkauf",
-            "description": "Umlagerungen zwischen Standorten, Bestellungen und Lieferanten."
+            "name": "Einkauf",
+            "description": "Bestellungen und Lieferanten."
           }
         },
         "commerce_insights": {
@@ -244,10 +244,10 @@
         },
         "agents": {
           "name": "Makler & Büros",
-          "description": "Makler und Büros nachschlagen.",
-          "manage": {
-            "name": "Makler & Büros verwalten",
-            "description": "Makler und Büros anlegen und ändern."
+          "description": "Makler, ihre eigenen Lead-Einstellungen und Büros.",
+          "offices": {
+            "name": "Büros & Lead-Verteilung",
+            "description": "Büroeinstellungen und wie Anfragen an Makler verteilt werden."
           }
         },
         "reservations": {

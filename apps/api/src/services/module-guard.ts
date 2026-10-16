@@ -164,9 +164,9 @@ const OPS_SCREEN_ROUTES: Record<string, Record<string, string>> = {
   },
   sports: Object.fromEntries(['schedule-proposals', 'venues'].map((k) => [k, 'operations.teams.schedule_builder'])),
   wellness: Object.fromEntries(['practitioners', 'resources'].map((k) => [k, 'operations.appointments.practitioners'])),
-  commerce: Object.fromEntries(['transfers', 'purchase-orders', 'suppliers'].map((k) => [k, 'operations.inventory.purchasing'])),
+  commerce: Object.fromEntries(['purchase-orders', 'suppliers'].map((k) => [k, 'operations.inventory.purchasing'])),
   foods: Object.fromEntries(['catering', 'meal-plans', 'production-dates', 'delivery-zones', 'delivery-providers'].map((k) => [k, 'operations.food_orders.catering'])),
-  realty: { syndication: 'operations.listings.portals', agents: 'operations.agents.manage', offices: 'operations.agents.manage' },
+  realty: { syndication: 'operations.listings.portals', offices: 'operations.agents.offices' },
 };
 
 const READS = new Set(['GET', 'HEAD', 'OPTIONS']);
