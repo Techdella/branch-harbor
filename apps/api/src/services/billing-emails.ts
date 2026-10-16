@@ -337,18 +337,27 @@ export async function renderBillingEmail(e: BillingEmail, to: { name: string; lo
     case 'plan_changed': subject = c.changed.subject(e.planName); paras = c.changed.body(e, f); cta = { label: c.button.billing, url: e.billingUrl }; break;
     case 'export_ready': subject = c.exportReady.subject; paras = c.exportReady.body(e, f); cta = { label: c.button.download, url: e.link }; break;
   }
-  const footer = c.footer(e.business);
-  const text = [c.hi(to.name), '', ...paras.flatMap((p) => [p, '']), ...(cta ? [`${cta.label}: ${cta.url}`, ''] : []), '— BranchHarbor', '', footer, ''].join('\n');
-  const mjml = `<mjml lang="${locale}"><mj-head><mj-title>${esc(subject)}</mj-title><mj-attributes><mj-all font-family="Helvetica, Arial, sans-serif" /><mj-text font-size="15px" line-height="1.55" color="#1c1c1a" /></mj-attributes></mj-head>
+  const out = await renderSimpleEmail({ locale, subject, greeting: c.hi(to.name), paragraphs: paras, cta, footer: c.footer(e.business) });
+  return { ...out, locale };
+}
+
+/**
+ * The BranchHarbor email layout (MJML, the same look as the billing emails) with a plain-text part: a greeting, the
+ * paragraphs, an optional button and a footer. Text is escaped; callers pass it already in the recipient's language.
+ */
+export async function renderSimpleEmail(m: { locale: string; subject: string; greeting: string; paragraphs: string[]; cta: { label: string; url: string } | null; footer: string }): Promise<{ subject: string; text: string; html: string }> {
+  const { locale, subject, paragraphs: paras, cta, footer } = m;
+  const text = [m.greeting, '', ...paras.flatMap((p) => [p, '']), ...(cta ? [`${cta.label}: ${cta.url}`, ''] : []), '— BranchHarbor', '', footer, ''].join('\n');
+  const mjml = `<mjml lang="${esc(locale)}"><mj-head><mj-title>${esc(subject)}</mj-title><mj-attributes><mj-all font-family="Helvetica, Arial, sans-serif" /><mj-text font-size="15px" line-height="1.55" color="#1c1c1a" /></mj-attributes></mj-head>
 <mj-body background-color="#f4f2ec"><mj-section padding="24px 0 8px"><mj-column><mj-text font-size="18px" font-weight="700">BranchHarbor</mj-text></mj-column></mj-section>
 <mj-section background-color="#ffffff" border-radius="16px" padding="20px 8px"><mj-column>
-<mj-text>${esc(c.hi(to.name))}</mj-text>
+<mj-text>${esc(m.greeting)}</mj-text>
 ${paras.map((p) => `<mj-text>${esc(p)}</mj-text>`).join('\n')}
 ${cta ? `<mj-button href="${esc(cta.url)}" background-color="#1c1c1a" color="#ffffff" border-radius="999px" font-weight="700" align="left">${esc(cta.label)}</mj-button>` : ''}
 </mj-column></mj-section>
 <mj-section padding="12px 0 24px"><mj-column><mj-text font-size="12px" color="#6b6a64">${esc(footer)}</mj-text></mj-column></mj-section></mj-body></mjml>`;
   const html = (await mjml2html(mjml, { validationLevel: 'soft' })).html;
-  return { subject, text, html, locale };
+  return { subject, text, html };
 }
 
 /** Sends a billing email to each recipient in their own language. Never throws (billing must not fail on email). */
