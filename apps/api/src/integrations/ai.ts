@@ -22,7 +22,7 @@ export interface AiProvider {
  */
 export function createAi(cfg: Config, log: FastifyBaseLogger): AiProvider {
   if (!cfg.ANTHROPIC_API_KEY) {
-    log.warn('[ai] ANTHROPIC_API_KEY not set — BranchHarbor AI is disabled (other features unaffected)');
+    log.warn('[ai] ANTHROPIC_API_KEY not set — the assistant runs its sandbox engine (answers only from real tool results); legacy AI drafting endpoints return 503')
     return {
       enabled: false,
       model: cfg.ANTHROPIC_MODEL,
