@@ -43,6 +43,8 @@ interface ToolBase<I> {
   industries?: string[];
   /** Hidden for independent (single-location) businesses. */
   networkOnly?: boolean;
+  /** Offered only to people with an organisation-wide (HQ) assignment, for tools whose REST route is HQ only. */
+  hqOnly?: boolean;
 }
 
 export interface ReadTool<I = any> extends ToolBase<I> {
