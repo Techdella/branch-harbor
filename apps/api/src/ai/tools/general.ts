@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { defineTool, ToolError } from '../types.ts';
 import { itemsOf, table } from '../present.ts';
+import type { AssistantContext } from '../context.ts';
+
+/** A date-time as the person reads it: their language, the organisation's time zone. */
+const localWhen = (ctx: AssistantContext, iso: string) =>
+  new Intl.DateTimeFormat(ctx.locale, { timeZone: ctx.org.defaultTimeZone, weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 
 /** App screens the assistant may open, with the modules that make them available (as in the app's navigation). */
 export const SCREENS: Array<{ path: string; label: string; modules: string[] | null }> = [
@@ -74,11 +79,11 @@ const createTask = defineTool({
   risk: 'change',
   description: 'Add a task to the person’s own to-do list (visible on their assistant home). Use for follow-ups they ask you to track.',
   input: taskInput,
-  async preview(_ctx, i) {
+  async preview(ctx, i) {
     return {
       title: `Add task: ${i.title}`,
-      summary: i.dueAt ? `Due ${i.dueAt.slice(0, 16).replace('T', ' ')}` : 'No due date',
-      details: [{ label: 'Task', value: i.title }, ...(i.note ? [{ label: 'Note', value: i.note }] : []), ...(i.dueAt ? [{ label: 'Due', value: i.dueAt }] : [])],
+      summary: i.dueAt ? `Due ${localWhen(ctx, i.dueAt)}` : 'No due date',
+      details: [{ label: 'Task', value: i.title }, ...(i.note ? [{ label: 'Note', value: i.note }] : []), ...(i.dueAt ? [{ label: 'Due', value: localWhen(ctx, i.dueAt) }] : [])],
       editable: [{ key: 'title', label: 'Task', kind: 'text' }, { key: 'dueAt', label: 'Due', kind: 'date' }],
     };
   },
@@ -96,12 +101,12 @@ const remindMe = defineTool({
   risk: 'change',
   description: 'Set a reminder for the person: at the given time they get an in-app notification (and push on mobile) with the text.',
   input: taskInput.omit({ dueAt: true }).extend({ remindAt: z.iso.datetime({ offset: true }).describe('When to remind (ISO 8601 with offset), in the future') }),
-  async preview(_ctx, i) {
+  async preview(ctx, i) {
     if (new Date(i.remindAt).getTime() < Date.now() - 60_000) throw new ToolError('validation_failed', 'The reminder time is in the past.');
     return {
       title: `Remind me: ${i.title}`,
-      summary: `On ${i.remindAt.slice(0, 16).replace('T', ' ')}`,
-      details: [{ label: 'Reminder', value: i.title }, { label: 'When', value: i.remindAt }],
+      summary: `On ${localWhen(ctx, i.remindAt)}`,
+      details: [{ label: 'Reminder', value: i.title }, { label: 'When', value: localWhen(ctx, i.remindAt) }],
       editable: [{ key: 'title', label: 'Reminder', kind: 'text' }, { key: 'remindAt', label: 'When', kind: 'date' }],
     };
   },

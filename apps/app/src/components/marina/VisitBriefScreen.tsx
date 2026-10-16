@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button, Icon } from '@bh/ui';
@@ -25,11 +25,21 @@ export function VisitBriefScreen() {
   const loc = params.get('location') ?? '';
   const [brief, setBrief] = useState<VisitBrief | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // useErrorText returns a new function each render; keep it out of the effect's dependencies so the brief loads once
+  // per location instead of on every render.
+  const errTextRef = useRef(errText);
+  errTextRef.current = errText;
   useEffect(() => {
+    let live = true;
     setBrief(null);
     setError(null);
-    if (loc) marina.visitBrief(loc).then(setBrief).catch((e) => setError(errText(e instanceof ApiError ? e : new ApiError('unknown_error', String(e)))));
-  }, [loc, errText]);
+    if (loc) {
+      marina.visitBrief(loc)
+        .then((b) => { if (live) setBrief(b); })
+        .catch((e) => { if (live) setError(errTextRef.current(e instanceof ApiError ? e : new ApiError('unknown_error', String(e)))); });
+    }
+    return () => { live = false; };
+  }, [loc]);
   return (
     <>
       <PageHeader icon="pin" title={t('visit.title')} description={t('visit.description', { name: ASSISTANT_NAME })} scope={false}

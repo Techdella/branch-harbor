@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { addDays, localDateParts, weekdayOf, zonedToUtc } from '../lib/tz.ts';
 import type { LlmCall, LlmContentBlock, LlmMessage, LlmResult, MarinaLlm } from './llm.ts';
 
 /**
@@ -93,26 +94,35 @@ function periodOf(q: string): Period {
 
 const quoted = (q: string) => q.match(/["“«„']([^"”»“']{2,200})["”»“']/)?.[1] ?? null;
 
-function whenOf(q: string): string {
-  const d = new Date();
-  const inDays = q.match(/in (\d+) days?/);
-  if (inDays) d.setUTCDate(d.getUTCDate() + Number(inDays[1]));
-  else if (/next week|semaine prochaine|próxima semana|nächste woche/.test(q)) d.setUTCDate(d.getUTCDate() + 7);
-  else d.setUTCDate(d.getUTCDate() + 1);
-  d.setUTCHours(9, 0, 0, 0);
-  return d.toISOString();
+// Weekday names (Sunday first) in the five app languages.
+const WEEKDAYS: RegExp[] = [
+  /sunday|dimanche|domingo|sonntag/, /monday|lundi|lunes|montag|segunda/, /tuesday|mardi|martes|dienstag|terça/,
+  /wednesday|mercredi|miércoles|mittwoch|quarta/, /thursday|jeudi|jueves|donnerstag|quinta/,
+  /friday|vendredi|viernes|freitag|sexta/, /saturday|samedi|sábado|samstag/,
+];
+
+/** "on Friday", "in 3 days", "next week" → 09:00 that day in the organisation's time zone (default: tomorrow). */
+function whenOf(q: string, timeZone = 'UTC'): string {
+  const today = localDateParts(new Date(), timeZone).date;
+  const inDays = q.match(/in (\d+) (?:days?|jours?|días?|tagen?|dias?)/);
+  const named = WEEKDAYS.findIndex((re) => re.test(q));
+  let date = addDays(today, 1);
+  if (inDays) date = addDays(today, Number(inDays[1]));
+  else if (named >= 0) date = addDays(today, ((named - weekdayOf(today) + 6) % 7) + 1);
+  else if (/next week|semaine prochaine|próxima semana|nächste woche/.test(q)) date = addDays(today, 7);
+  return zonedToUtc(date, '09:00', timeZone).toISOString();
 }
 
 interface Rule {
   test: RegExp;
   tool: string;
-  input: (q: string, raw: string) => Record<string, unknown>;
+  input: (q: string, raw: string, timeZone: string) => Record<string, unknown>;
 }
 
 /** Keyword rules, most specific first. Inputs are only taken from the question itself. */
 const RULES: Rule[] = [
   { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|what does (our|the) (manual|handbook|policy|guide)|where do (we|i)|comment |cómo |wie |como |que dit |qué dice |was sagt |o que diz )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
-  { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q) }) },
+  { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw, tz) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q, tz) }) },
   { test: /(create|add|new) (a )?(task|to-?do)|crée une tâche|crear tarea|aufgabe/, tool: 'create_task', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 120) }) },
   { test: /(draft|write|create|prepare).*(email|newsletter)|(email|newsletter).*(draft|campaign)|rédige.*e-?mail|redacta.*correo/, tool: 'create_email_campaign_draft', input: (_q, raw) => ({ name: quoted(raw) ?? raw.slice(0, 80), subject: quoted(raw) ?? raw.slice(0, 80) }) },
   { test: /(draft|write|create|prepare).*(social|post|instagram|facebook)/, tool: 'create_social_post_draft', input: (_q, raw) => ({ text: quoted(raw) ?? raw.slice(0, 280) }) },
@@ -240,7 +250,7 @@ export function createSandboxLlm(): MarinaLlm {
         if (!r.test.test(q)) continue;
         // The first matching rule decides: a tool outside the person's access is never replaced by another one.
         if (!offered.has(r.tool)) break;
-        const input = Object.fromEntries(Object.entries(r.input(q, text.trim())).filter(([, v]) => v !== undefined));
+        const input = Object.fromEntries(Object.entries(r.input(q, text.trim(), c.context?.match(/time zone ([A-Za-z0-9_/+-]+)\)/)?.[1] ?? 'UTC')).filter(([, v]) => v !== undefined));
         words(p.checking + ' ', c.onText);
         return done([textBlock(p.checking), { type: 'tool_use', id: `toolu_${randomUUID().replace(/-/g, '')}`, name: r.tool, input, caller: { type: 'direct' } } as unknown as LlmContentBlock], 'tool_use');
       }
