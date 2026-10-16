@@ -12,6 +12,7 @@ import { Async, Banner, Empty, LoadingBlock } from '../ui/States';
 import { NotAvailable } from '../screens/NotAvailable';
 import { inboxApi, type ConversationDetail, type Conversation } from './api';
 import { CHANNEL_ICON, Chip, useCan, useLocationName, useScopeLocations } from './shared';
+import { ReviewPanel, ReviewReplyNote, ReviewTemplatePicker } from '../local-marketing/ReviewInbox';
 
 type StatusTab = 'open' | 'pending' | 'closed' | 'all';
 
@@ -55,7 +56,7 @@ export function InboxScreen() {
         />
         <div role="group" aria-label={t('channelFilter')} className="flex flex-wrap gap-1.5">
           <Chip active={!channel} onClick={() => setChannel('')}>{t('allChannels')}</Chip>
-          {INBOX_CHANNELS.map((c) => <Chip key={c} active={channel === c} onClick={() => setChannel(c)}>{t(`channel.${c}`)}</Chip>)}
+          {[...INBOX_CHANNELS, 'review' as const].map((c) => <Chip key={c} active={channel === c} onClick={() => setChannel(c)}>{t(`channel.${c}`)}</Chip>)}
         </div>
         {list.data?.hq && <Chip active={hqOnly} onClick={() => setHqOnly(!hqOnly)}>{t('hqOnly')}</Chip>}
       </div>
@@ -125,7 +126,7 @@ function Thread({ id, onBack, onChanged }: { id: string; onBack: () => void; onC
             <button type="button" onClick={onBack} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-canvas lg:hidden" aria-label={t('back')}><Icon name="arrow-left" /></button>
             <div className="min-w-0 flex-1">
               <h2 className="truncate text-lg font-bold">{d.conversation.contactName ?? d.conversation.handle}</h2>
-              <p className="text-[13px] text-stone">{t(`channel.${d.conversation.channel}`)} · {d.conversation.handle} · {locName(d.conversation.locationId)}</p>
+              <p className="text-[13px] text-stone">{t(`channel.${d.conversation.channel}`)}{d.conversation.channel !== 'review' ? ` · ${d.conversation.handle}` : ''} · {locName(d.conversation.locationId)}</p>
               {d.conversation.subject && <p className="text-[13px] font-semibold">{d.conversation.subject}</p>}
             </div>
             <ThreadControls d={d} onChanged={() => { res.reload(); onChanged(); }} />
@@ -138,6 +139,7 @@ function Thread({ id, onBack, onChanged }: { id: string; onBack: () => void; onC
               : <Badge tone="warning" icon="clock">{t('windowClosed')}</Badge>)}
             {d.policy.optedOut && <Badge tone="danger">{t('optedOut')}</Badge>}
           </div>
+          {d.review && <ReviewPanel review={d.review} />}
           <ol className="flex max-h-[52vh] flex-1 flex-col gap-2 overflow-y-auto pr-1" aria-label={t('messagesLabel')}>
             {d.messages.map((m) => (
               <li key={m.id} className={cx('max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm', m.direction === 'inbound' ? 'self-start bg-canvas' : m.direction === 'note' ? 'self-end border border-dashed border-warning bg-warning-bg' : 'self-end bg-ink text-white')}>
@@ -197,7 +199,8 @@ function Composer({ d, onSent }: { d: ConversationDetail; onSent: () => void }) 
     <div className="flex flex-col gap-2 border-t border-line-soft pt-3" data-testid="inbox-composer">
       <div className="flex flex-wrap items-center gap-2">
         <Tabs items={[{ key: 'reply', label: t('reply') }, { key: 'note', label: t('addNote') }]} value={mode} onChange={setMode} />
-        {mode === 'reply' && !needsTemplate && (canned.data?.items.length ?? 0) > 0 && (
+        {mode === 'reply' && d.review && d.review.templates.length > 0 && <ReviewTemplatePicker templates={d.review.templates} onPick={(b) => setBody(b)} />}
+        {mode === 'reply' && !d.review && !needsTemplate && (canned.data?.items.length ?? 0) > 0 && (
           <Select aria-label={t('canned')} className="h-10 w-auto" value="" onChange={(e) => { const c = canned.data!.items.find((x) => x.id === e.target.value); if (c) setBody((b) => (b ? `${b}\n${c.body}` : c.body)); }}>
             <option value="">{t('canned')}</option>
             {canned.data!.items.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
@@ -230,7 +233,7 @@ function Composer({ d, onSent }: { d: ConversationDetail; onSent: () => void }) 
           <Button icon={mode === 'note' ? 'edit' : 'send'} loading={send.pending} disabled={needsTemplate ? !templateId : !body.trim()} onClick={submit}>
             {mode === 'note' ? t('saveNote') : needsTemplate ? t('sendTemplate') : t('send')}
           </Button>
-          {mode === 'reply' && <span className="text-xs text-stone">{t('sandboxNote')}</span>}
+          {mode === 'reply' && (d.review ? <ReviewReplyNote review={d.review} /> : <span className="text-xs text-stone">{t('sandboxNote')}</span>)}
         </div>
       )}
     </div>

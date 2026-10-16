@@ -1,8 +1,30 @@
 import { getLocale, getTranslations } from 'next-intl/server';
-import { clock, weekdayInZone, weekdayName, zone } from '@/lib/format';
+import { calendarLabel, clock, weekdayInZone, weekdayName, zone } from '@/lib/format';
 import type { LocationSummary } from '@/lib/types';
 
-/** Weekly hours in the location's timezone, Monday first, today highlighted. */
+/** Upcoming holiday / special hours (next 60 days) from Listings; they replace the weekly hours on those dates. */
+async function SpecialHoursList({ loc }: { loc: LocationSummary }) {
+  const t = await getTranslations('listingsSite');
+  const locale = await getLocale();
+  const until = new Date(Date.now() + 60 * 86_400_000).toISOString().slice(0, 10);
+  const items = (loc.hours.special ?? []).filter((x) => x.date <= until);
+  if (!items.length) return null;
+  return (
+    <div className="mt-4">
+      <h3 className="text-sm font-bold">{t('specialHours')}</h3>
+      <ul className="mt-1 text-sm">
+        {items.map((x) => (
+          <li key={x.date} className="flex justify-between gap-4 py-1">
+            <span className="font-semibold">{calendarLabel(x.date, locale)}{x.label ? ` · ${x.label}` : ''}</span>
+            <span className="tabular">{x.closed || !x.opens || !x.closes ? t('closed') : `${clock(x.opens, locale)}–${clock(x.closes, locale)}`}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Weekly hours in the location's timezone, Monday first, today highlighted; upcoming special hours below. */
 export async function Hours({ loc }: { loc: LocationSummary }) {
   const t = await getTranslations();
   const locale = await getLocale();
@@ -12,6 +34,7 @@ export async function Hours({ loc }: { loc: LocationSummary }) {
       <div>
         {loc.hours.summary ? <p className="text-lg">{loc.hours.summary}</p> : null}
         <p className="mt-1 text-sm text-graphite">{t('common.timesIn', { zone: `${tz} (${loc.timeZone})` })}</p>
+        <SpecialHoursList loc={loc} />
       </div>
     );
   }
@@ -39,6 +62,7 @@ export async function Hours({ loc }: { loc: LocationSummary }) {
         </tbody>
       </table>
       <p className="mt-2 text-sm text-graphite">{t('common.timesIn', { zone: `${tz} (${loc.timeZone})` })}</p>
+      <SpecialHoursList loc={loc} />
     </div>
   );
 }

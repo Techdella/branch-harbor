@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Icon } from '@bh/ui';
 import { Hours } from '@/components/Hours';
+import { TrackingNumber } from '@/components/TrackingNumber';
 import { OpenBadge } from '@/components/OpenBadge';
 import { PageContent } from '@/components/PageContent';
 import { LocationDocument } from '@/components/builder/SiteContent';
@@ -91,6 +92,7 @@ export default async function LocationHome({ params }: Props) {
     return (
       <main id="main">
         {ld}
+        <TrackingNumber brand={data.brand.slug} location={l.slug} />
         <LocationDocument doc={home.document} site={data} brandSlug={brand} locationSlug={location} href={(p) => links.location(location, p)} brandHref={(p) => links.brand(p)} pageUrl={links.locationCanonical(location, data.site.primaryHost)} />
       </main>
     );
@@ -99,6 +101,7 @@ export default async function LocationHome({ params }: Props) {
   return (
     <main id="main">
       {ld}
+      <TrackingNumber brand={data.brand.slug} location={l.slug} />
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div>
           <p className="text-sm font-bold uppercase tracking-wider text-brand-ink">{data.brand.name} · {l.address.city}</p>
@@ -108,7 +111,7 @@ export default async function LocationHome({ params }: Props) {
           <ul className="mt-4 space-y-2 text-graphite">
             <li className="flex gap-2"><Icon name="pin" size={18} className="mt-0.5 shrink-0" /><bdi>{address}</bdi></li>
             {l.hours.summary && <li className="flex gap-2"><Icon name="clock" size={18} className="mt-0.5 shrink-0" />{l.hours.summary}</li>}
-            {l.phone && <li className="flex gap-2"><Icon name="phone" size={18} className="mt-0.5 shrink-0" /><a href={`tel:${l.phone.replace(/\s+/g, '')}`} className="hover:underline" dir="ltr">{l.phone}</a></li>}
+            {l.phone && <li className="flex gap-2"><Icon name="phone" size={18} className="mt-0.5 shrink-0" /><a href={`tel:${l.phone.replace(/\s+/g, '')}`} className="hover:underline" dir="ltr" data-bh-phone="text">{l.phone}</a></li>}
           </ul>
           {offer && (
             <p className="mt-5 flex items-start gap-2 rounded-2xl bg-brand-tint p-4 font-semibold">
@@ -183,7 +186,7 @@ export default async function LocationHome({ params }: Props) {
           </address>
           <div className="mt-4 flex flex-wrap gap-2">
             <a href={directions} className="btn btn-secondary" rel="noopener"><Icon name="map" size={16} />{t('location.directions')}</a>
-            {l.phone && <a href={`tel:${l.phone.replace(/\s+/g, '')}`} className="btn btn-secondary"><Icon name="phone" size={16} />{t('location.call')}</a>}
+            {l.phone && <a href={`tel:${l.phone.replace(/\s+/g, '')}`} className="btn btn-secondary" data-bh-phone="href"><Icon name="phone" size={16} />{t('location.call')}</a>}
             {l.email && <a href={`mailto:${l.email}`} className="btn btn-secondary"><Icon name="mail" size={16} />{t('location.email')}</a>}
           </div>
         </div>

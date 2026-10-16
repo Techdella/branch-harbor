@@ -55,6 +55,21 @@ export function setGoogleBusiness(s: Services, a: GoogleBusinessAdapter) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Review events (the inbox listens: Google reviews become conversations) */
+/* ------------------------------------------------------------------ */
+
+export type ReviewEvent = { type: 'received' | 'reply_changed'; review: ReviewRow };
+const reviewListeners = new Set<(s: Services, e: ReviewEvent) => Promise<void>>();
+/** Registers a listener for new reviews and reply status changes (services/review-inbox.ts). */
+export function onReviewEvent(fn: (s: Services, e: ReviewEvent) => Promise<void>) {
+  reviewListeners.add(fn);
+  return () => reviewListeners.delete(fn);
+}
+export async function emitReviewEvent(s: Services, e: ReviewEvent) {
+  for (const l of reviewListeners) await l(s, e).catch((err) => s.log.warn({ err, reviewId: e.review.id }, '[reviews] listener failed'));
+}
+
+/* ------------------------------------------------------------------ */
 /* Settings                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -480,6 +495,7 @@ async function deliverFeedbackToInbox(s: Services, review: ReviewRow, req: Revie
 export async function onReviewReceived(s: Services, review: ReviewRow) {
   await emitMarketingEvent(s, { organizationId: review.organizationId, type: 'review.received', key: `review:${review.id}`, customerId: review.customerId, locationId: review.locationId, data: { rating: review.rating, source: review.source } });
   if (review.rating <= NEGATIVE_REVIEW_MAX_RATING) await alertNegativeReview(s, review);
+  await emitReviewEvent(s, { type: 'received', review });
 }
 
 export async function alertNegativeReview(s: Services, review: ReviewRow) {
@@ -594,6 +610,7 @@ export async function publishReply(s: Services, review: ReviewRow, actorUserId: 
   }
   const [row] = await s.db.update(reviews).set({ replyStatus: error ? 'failed' : 'published', replyError: error, repliedAt: error ? null : new Date(), sandbox: review.sandbox || sandbox, updatedAt: new Date() }).where(eq(reviews.id, review.id)).returning();
   await audit(s.db, { organizationId: review.organizationId, actorUserId, action: error ? 'reviews.reply_failed' : 'reviews.reply_published', scopeKind: 'location', scopeId: review.locationId, targetType: 'review', targetId: review.id, metadata: { sandbox, aiSuggested: review.replyAiSuggested } });
+  await emitReviewEvent(s, { type: 'reply_changed', review: row! });
   return row!;
 }
 

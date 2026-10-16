@@ -12,13 +12,15 @@ import { customers } from './crm.ts';
  */
 
 export type InboxChannel = 'email' | 'sms' | 'whatsapp' | 'instagram' | 'messenger';
+/** Conversations also hold Google reviews (`review`): replies go through the reviews service, not a messaging channel. */
+export type ConversationChannel = InboxChannel | 'review';
 
 /** An inbound endpoint of an inbox: a phone number, WhatsApp number id, Meta page / IG account or inbound email address. */
 export const commsChannelAccounts = pgTable('comms_channel_accounts', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
-  channel: text('channel').$type<InboxChannel>().notNull(),
+  channel: text('channel').$type<ConversationChannel>().notNull(),
   /** Provider address that inbound webhooks are matched on (E.164 number, phone_number_id, page id, IG id, email). */
   address: text('address').notNull(),
   displayName: text('display_name').notNull(),
@@ -36,7 +38,7 @@ export const commsConversations = pgTable('comms_conversations', {
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
   channelAccountId: uuid('channel_account_id').notNull().references(() => commsChannelAccounts.id, { onDelete: 'cascade' }),
-  channel: text('channel').$type<InboxChannel>().notNull(),
+  channel: text('channel').$type<ConversationChannel>().notNull(),
   /** The contact's handle on the channel (phone, email, PSID, IG-scoped id). */
   handle: text('handle').notNull(),
   contactName: text('contact_name'),

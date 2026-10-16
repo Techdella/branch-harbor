@@ -13,13 +13,15 @@ export interface MoneyV { amount: number; currency: string }
 
 export interface ChannelAccount { id: string; locationId: string | null; channel: InboxChannelKey; address: string; displayName: string; mode: 'live' | 'sandbox'; active: boolean }
 export interface Conversation {
-  id: string; locationId: string | null; channel: InboxChannelKey; channelAccountId: string; handle: string; contactName: string | null; customerId: string | null; leadId: string | null; subject: string | null;
+  id: string; locationId: string | null; channel: InboxChannelKey | 'review'; channelAccountId: string; handle: string; contactName: string | null; customerId: string | null; leadId: string | null; subject: string | null;
   status: 'open' | 'pending' | 'closed'; assignedUser: Person | null; lastMessageAt: string; lastInboundAt: string | null; lastMessagePreview: string | null; unread: number;
   replyDueAt: string | null; slaBreached: boolean; window: { open: boolean; closesAt: string | null };
 }
 export interface Message { id: string; direction: 'inbound' | 'outbound' | 'note'; body: string; status: string; error: string | null; templateId: string | null; createdAt: string; author: Person | null }
 export interface ReplyPolicy { optedOut: boolean; consent: boolean | null; window: { open: boolean; closesAt: string | null }; canReply: boolean; needsTemplate: boolean; blockedReason: null | 'contact_opted_out' | 'consent_required' | 'messaging_window_closed' }
-export interface ConversationDetail { conversation: Conversation; messages: Message[]; policy: ReplyPolicy; customer: { id: string; name: string; email: string | null; phone: string | null } | null; lead: { id: string; name: string | null; status: string; source: string } | null; canReply: boolean }
+export interface ConversationDetail { conversation: Conversation; messages: Message[]; policy: ReplyPolicy; customer: { id: string; name: string; email: string | null; phone: string | null } | null; lead: { id: string; name: string | null; status: string; source: string } | null; canReply: boolean; review?: ReviewContext | null }
+/** Google review behind a `review` conversation (replies publish through Reviews; approval may apply). */
+export interface ReviewContext { id: string; rating: number; comment: string | null; authorName: string | null; reviewedAt: string; sandbox: boolean; reply: { status: string; text: string | null; error: string | null; decisionNote: string | null; repliedAt: string | null }; needsApproval: boolean; canApprove: boolean; templates: Array<{ id: string; name: string; body: string }> }
 export interface WaTemplate { id: string; name: string; language: string; category: string; body: string; status: 'pending' | 'approved' | 'rejected' }
 export interface CannedReply { id: string; locationId: string | null; title: string; body: string }
 export interface Segment { id: string; locationId: string | null; name: string; rules: Record<string, unknown>; count: number }
