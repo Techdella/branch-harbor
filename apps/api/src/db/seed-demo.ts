@@ -334,8 +334,63 @@ async function main() {
     console.log(` Franchise dev: ${fdev.territories} territories on the map (sandbox demographics), satisfaction survey with ${fdev.surveyRounds} rounds, validation calls, a transfer, a notice of default, the Washington development schedule, ${fdev.statements} master split statements (Northlight Ireland)`);
     if (fdev.validationToken) console.log(`                validation scheduling page: ${cfg.SITES_BASE_URL}/northlight-yoga/franchise/validation?token=${fdev.validationToken}`);
   }
+  const geo = await backfillDemoGeo();
+  console.log(` Map positions: ${geo.updated} demo locations placed on the map (visit planner, nearby locations)${geo.missing.length ? `; no position for ${geo.missing.join(', ')}` : ''}`);
   console.log(` Demo site:     run the API with DEMO_MODE=true and the app with NEXT_PUBLIC_DEMO_MODE=true for the demo sign-in picker.`);
   console.log('─────────────────────────────────────────────────\n');
+}
+
+/** Street-level positions of demo locations seeded without one (by location code). */
+const DEMO_GEO: Record<string, { lat: number; lng: number }> = {
+  'FG-AMS': { lat: 52.3745, lng: 4.882 }, 'FG-YUL': { lat: 45.5236, lng: -73.5975 }, 'FG-PDX': { lat: 45.5276, lng: -122.6821 }, 'FG-RTM': { lat: 51.9156, lng: 4.475 },
+  'HW-DUB': { lat: 53.3381, lng: -6.2592 }, 'HW-MEL': { lat: -37.7986, lng: 144.9784 }, 'HW-TOR': { lat: 43.6709, lng: -79.3933 },
+  'PDX-PL': { lat: 45.529, lng: -122.685 },
+  'NS-AUS': { lat: 30.2984, lng: -97.7056 }, 'NS-MAN': { lat: 53.4831, lng: -2.2004 }, 'NS-TOR': { lat: 43.6305, lng: -79.4778 },
+  'YYC-BL': { lat: 51.04, lng: -114.0719 }, 'YOW-GL': { lat: 45.401, lng: -75.687 }, 'SEA-CH': { lat: 47.6235, lng: -122.32 }, 'BAR-MTL': { lat: 45.5262, lng: -73.5958 }, 'BAR-SEA': { lat: 47.618, lng: -122.326 },
+  'TOR-LV': { lat: 43.6627, lng: -79.333 }, 'TAC-SD': { lat: 47.2652, lng: -122.4479 }, 'GWY-DK': { lat: 53.2707, lng: -9.0486 },
+  'DUB-PB': { lat: 53.3315, lng: -6.265 }, 'LON-HK': { lat: 51.545, lng: -0.0553 }, 'PDX-PR': { lat: 45.53, lng: -122.682 }, 'SEA-FR': { lat: 47.6505, lng: -122.3493 },
+  'TOR-AX': { lat: 43.67, lng: -79.404 }, 'YVR-KT': { lat: 49.2684, lng: -123.1683 }, 'YVR-MS': { lat: 49.26, lng: -123.101 },
+};
+
+/** City centres for any other demo location without a position (accents and case ignored). */
+const DEMO_CITY_GEO: Record<string, { lat: number; lng: number }> = {
+  tacoma: { lat: 47.2529, lng: -122.4443 }, 'san diego': { lat: 32.7157, lng: -117.1611 }, galway: { lat: 53.2707, lng: -9.0568 }, cork: { lat: 51.8985, lng: -8.4756 },
+  seattle: { lat: 47.6062, lng: -122.3321 }, bellevue: { lat: 47.6101, lng: -122.2015 }, spokane: { lat: 47.6588, lng: -117.426 }, portland: { lat: 45.5152, lng: -122.6784 }, eugene: { lat: 44.0521, lng: -123.0868 },
+  'san francisco': { lat: 37.7749, lng: -122.4194 }, 'los angeles': { lat: 34.0522, lng: -118.2437 }, denver: { lat: 39.7392, lng: -104.9903 }, austin: { lat: 30.2672, lng: -97.7431 },
+  dallas: { lat: 32.7767, lng: -96.797 }, houston: { lat: 29.7604, lng: -95.3698 }, chicago: { lat: 41.8781, lng: -87.6298 }, boston: { lat: 42.3601, lng: -71.0589 }, 'new york': { lat: 40.7128, lng: -74.006 },
+  brooklyn: { lat: 40.6782, lng: -73.9442 }, miami: { lat: 25.7617, lng: -80.1918 }, atlanta: { lat: 33.749, lng: -84.388 },
+  toronto: { lat: 43.6532, lng: -79.3832 }, ottawa: { lat: 45.4215, lng: -75.6972 }, montreal: { lat: 45.5019, lng: -73.5674 }, vancouver: { lat: 49.2827, lng: -123.1207 }, victoria: { lat: 48.4284, lng: -123.3656 },
+  calgary: { lat: 51.0447, lng: -114.0719 }, edmonton: { lat: 53.5461, lng: -113.4938 }, winnipeg: { lat: 49.8951, lng: -97.1384 }, halifax: { lat: 44.6488, lng: -63.5752 }, kitchener: { lat: 43.4516, lng: -80.4925 },
+  london: { lat: 51.5074, lng: -0.1278 }, manchester: { lat: 53.4808, lng: -2.2426 }, edinburgh: { lat: 55.9533, lng: -3.1883 }, dublin: { lat: 53.3498, lng: -6.2603 },
+  amsterdam: { lat: 52.3676, lng: 4.9041 }, rotterdam: { lat: 51.9244, lng: 4.4777 }, berlin: { lat: 52.52, lng: 13.405 }, paris: { lat: 48.8566, lng: 2.3522 }, madrid: { lat: 40.4168, lng: -3.7038 },
+  barcelona: { lat: 41.3874, lng: 2.1686 }, lisbon: { lat: 38.7223, lng: -9.1393 }, 'sao paulo': { lat: -23.5505, lng: -46.6333 }, 'mexico city': { lat: 19.4326, lng: -99.1332 },
+  sydney: { lat: -33.8688, lng: 151.2093 }, melbourne: { lat: -37.8136, lng: 144.9631 }, fitzroy: { lat: -37.7986, lng: 144.9784 }, brisbane: { lat: -27.4698, lng: 153.0251 }, perth: { lat: -31.9523, lng: 115.8613 },
+  auckland: { lat: -36.8485, lng: 174.7633 }, singapore: { lat: 1.3521, lng: 103.8198 }, dubai: { lat: 25.2048, lng: 55.2708 },
+};
+
+/**
+ * Every demo location gets a map position, so the visit planner orders visits by distance and "nearby" works: known
+ * locations by code, others at their city centre with a small, stable offset (two locations in one city don't overlap).
+ */
+async function backfillDemoGeo() {
+  const rows = await db.select({ id: t.locations.id, code: t.locations.code, name: t.locations.name, address: t.locations.address }).from(t.locations).where(sql`${t.locations.geo} is null`);
+  const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  let updated = 0;
+  const missing: string[] = [];
+  for (const r of rows) {
+    let geo = DEMO_GEO[r.code];
+    if (!geo) {
+      const c = DEMO_CITY_GEO[norm(r.address?.city ?? '')];
+      if (c) {
+        const h = parseInt(sha256(r.code).slice(0, 8), 16);
+        geo = { lat: Math.round((c.lat + ((h % 200) - 100) / 10_000) * 1e5) / 1e5, lng: Math.round((c.lng + ((Math.floor(h / 200) % 200) - 100) / 10_000) * 1e5) / 1e5 };
+      }
+    }
+    if (!geo) { missing.push(r.name); continue; }
+    await db.update(t.locations).set({ geo }).where(sql`${t.locations.id} = ${r.id}`);
+    updated++;
+  }
+  return { updated, missing };
 }
 
 /**
@@ -408,7 +463,12 @@ async function seedNorthlightBarre(orgId: string) {
     { organizationId: orgId, userId: lead.id, role: 'brand_manager', scopeKind: 'brand', scopeId: brand!.id, createdBy: finance?.id ?? null },
   ]);
   await db.insert(t.memberProfiles).values({ organizationId: orgId, userId: lead.id, jobTitle: 'Brand lead, Northlight Barre' }).onConflictDoNothing();
-  return { slug, locations: locs.map((l) => `${l.name} ${l.currency}`), login: `isla.reyes@${MAIL} (brand lead, Barre only)` };
+  // Brand-scoped franchise development: the Barre development lead works Barre's pipeline, disclosure and agreements only.
+  const dev = await upsertUser(`noor.haddad@${MAIL}`, 'Noor Haddad');
+  await db.insert(t.roleAssignments).values({ organizationId: orgId, userId: dev.id, role: 'development_lead', scopeKind: 'brand', scopeId: brand!.id, createdBy: finance?.id ?? null });
+  await db.insert(t.memberProfiles).values({ organizationId: orgId, userId: dev.id, jobTitle: 'Development lead, Northlight Barre' }).onConflictDoNothing();
+  await db.update(t.franchiseProspects).set({ ownerUserId: dev.id }).where(sql`${t.franchiseProspects.organizationId} = ${orgId} and ${t.franchiseProspects.brandId} = ${brand!.id} and ${t.franchiseProspects.name} = 'Marc-André Côté'`);
+  return { slug, locations: locs.map((l) => `${l.name} ${l.currency}`), login: `isla.reyes@${MAIL} (brand lead, Barre only) · noor.haddad@${MAIL} (Barre development lead: Barre's pipeline, disclosure and agreements)` };
 }
 
 /**
