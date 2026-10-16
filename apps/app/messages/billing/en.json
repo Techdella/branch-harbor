@@ -201,6 +201,35 @@
       "cardOnFile": "{brand} •••• {last4} · billed in {currency}",
       "setup": "Set up billing",
       "saveCard": "Save card"
+    },
+    "change": {
+      "title": "Change plan",
+      "body": "Switch plan or billing period at any time. Upgrades and downgrades are prorated for the rest of this period; there is no fee for changing.",
+      "plan": "Plan",
+      "current": "Current",
+      "billingPeriod": "Billing period",
+      "interval": {
+        "month": "Monthly",
+        "year": "Annual"
+      },
+      "annualNote": "Annual is 10 × monthly (2 months included).",
+      "now": "Now",
+      "after": "After the change",
+      "dueNow": "Added to your next invoice",
+      "credit": "Credit on your next invoice",
+      "dueAtTrialEnd": "Charged now",
+      "trialNote": "You are in your trial: nothing is charged now, and the new plan starts on {date}.",
+      "prorationNote": "Prorated for the rest of this period; the new price applies from {date}.",
+      "creditNote": "The unused part of your current plan is credited.",
+      "confirm": "Switch plan",
+      "done": "You are now on the {plan} plan."
+    },
+    "cardChange": {
+      "open": "Change card",
+      "title": "New card",
+      "body": "Use a card issued in {country}, your billing country, or add your business tax ID from there.",
+      "save": "Save card",
+      "done": "Your new card is saved and will be used for the next charge."
     }
   },
   "shell": {

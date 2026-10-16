@@ -201,6 +201,35 @@
       "cardOnFile": "{brand} •••• {last4} · Abrechnung in {currency}",
       "setup": "Abrechnung einrichten",
       "saveCard": "Karte speichern"
+    },
+    "change": {
+      "title": "Tarif wechseln",
+      "body": "Wechseln Sie Tarif oder Abrechnungszeitraum jederzeit. Up- und Downgrades werden für den Rest des Zeitraums anteilig berechnet; ein Wechsel kostet nichts.",
+      "plan": "Tarif",
+      "current": "Aktuell",
+      "billingPeriod": "Abrechnungszeitraum",
+      "interval": {
+        "month": "Monatlich",
+        "year": "Jährlich"
+      },
+      "annualNote": "Jährlich kostet 10 × monatlich (2 Monate inklusive).",
+      "now": "Jetzt",
+      "after": "Nach dem Wechsel",
+      "dueNow": "Kommt auf Ihre nächste Rechnung",
+      "credit": "Gutschrift auf Ihrer nächsten Rechnung",
+      "dueAtTrialEnd": "Jetzt berechnet",
+      "trialNote": "Sie sind im Test: Jetzt wird nichts berechnet, und der neue Tarif beginnt am {date}.",
+      "prorationNote": "Anteilig für den Rest dieses Zeitraums; der neue Preis gilt ab dem {date}.",
+      "creditNote": "Der nicht genutzte Teil Ihres aktuellen Tarifs wird gutgeschrieben.",
+      "confirm": "Tarif wechseln",
+      "done": "Sie nutzen jetzt den Tarif {plan}."
+    },
+    "cardChange": {
+      "open": "Karte ändern",
+      "title": "Neue Karte",
+      "body": "Verwenden Sie eine in {country}, Ihrem Abrechnungsland, ausgegebene Karte oder geben Sie die Steuernummer Ihres Unternehmens von dort an.",
+      "save": "Karte speichern",
+      "done": "Ihre neue Karte ist gespeichert und wird für die nächste Abbuchung verwendet."
     }
   },
   "shell": {

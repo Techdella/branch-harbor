@@ -53,6 +53,18 @@ export interface BillingView {
   trialEligibility: { eligible: boolean; reason: string | null } | null;
 }
 
+/** A plan or interval switch: new price and the prorated amount for the rest of the current period. */
+export interface ChangePreview {
+  from: { plan: PlanKey; interval: Interval; hqTotal: Amount };
+  to: { plan: PlanKey; interval: Interval; hqTotal: Amount };
+  quote: Quote;
+  proration: Amount;
+  effective: 'now' | 'trial_end';
+  effectiveAt: string | null;
+  nextChargeAt: string | null;
+  unchanged: boolean;
+}
+
 export interface SetupInfo { mode: 'live' | 'sandbox'; clientSecret: string | null; publishableKey: string | null; setupIntentId: string }
 
 export interface FranchiseeView {
@@ -77,6 +89,10 @@ export const billingApi = {
   confirm: (b: { setupIntentId?: string; paymentMethodId?: string; taxId?: string }) =>
     http.post<{ status: string; trialEndsAt: string | null; trialUsed: boolean; billing: BillingView }>(o('/billing/checkout/confirm'), { ...b, acceptTerms: true }),
   cancel: () => http.post<{ cancelAtPeriodEnd: boolean; endsAt: string | null }>(o('/billing/cancel'), {}),
+  startCardChange: () => http.post<{ billingCountry: string; setup: SetupInfo }>(o('/billing/payment-method'), {}),
+  confirmCardChange: (b: { setupIntentId?: string; paymentMethodId?: string; taxId?: string }) => http.post<{ card: BillingView['card']; billing: BillingView }>(o('/billing/payment-method/confirm'), b),
+  previewChange: (q: { plan: PlanKey; interval: Interval }) => http.get<ChangePreview>(o('/billing/change/preview'), q),
+  change: (b: { plan: PlanKey; interval: Interval }) => http.post<ChangePreview & { billing: BillingView }>(o('/billing/change'), b),
   resume: () => http.post<{ cancelAtPeriodEnd: boolean }>(o('/billing/resume'), {}),
   startCountry: (billingCountry: string) => http.post<{ quote: Quote; setup: SetupInfo }>(o('/billing/country'), { billingCountry }),
   confirmCountry: (b: { setupIntentId?: string; paymentMethodId?: string; taxId?: string }) => http.post<{ pendingChange: unknown }>(o('/billing/country/confirm'), b),
