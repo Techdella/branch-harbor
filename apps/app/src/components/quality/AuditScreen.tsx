@@ -11,6 +11,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, LoadingBlock, SectionCard } from '../ui/States';
 import { qualityApi, readUpload, useQuality, useQualityAction, type ActionVM, type AuditDetailVM, type FileRef } from './api';
 import { ActionError, ScoreBadge, StatusBadge, Tiles, useQFmt } from './ui';
+import { RetrainingRow } from '../supply/AuditProgrammes';
 
 /** One audit: conduct it (assigned auditor or HQ) with autosave, or read the report and work the corrective actions. */
 export function AuditScreen({ id }: { id: string }) {
@@ -319,6 +320,7 @@ function ActionCard({ x, audit, onChanged }: { x: ActionVM; audit: AuditDetailVM
           <img src={p.url} alt={t('actions.evidenceOf', { item: x.title })} className="h-16 w-16 rounded-md object-cover" />
         </a>
       ))}</span>}
+      <RetrainingRow x={x} audit={audit} onChanged={onChanged} />
       {x.status === 'verified' && <span className="text-xs text-success">{t('actions.verifiedBy', { name: x.verifiedBy?.name ?? '—', date: f.date(x.verifiedAt) })}</span>}
       <ActionError error={act.error} />
       {canRespond && (

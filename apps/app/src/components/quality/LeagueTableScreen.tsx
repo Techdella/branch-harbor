@@ -9,6 +9,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { downloadCsv, qualityApi, useQuality, useQualityAction, type LeagueRowVM, type LeagueSort, type LeagueVM } from './api';
 import { ActionError, ScoreBadge, useQFmt } from './ui';
+import { BenchmarksCard } from '../scale/BenchmarksScreen';
 
 type Preset = 'last_month' | 'this_month' | 'last_quarter' | 'year' | 'custom';
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
@@ -98,6 +99,8 @@ export function LeagueTableScreen() {
             {d.currencies.length > 1 && d.sort === 'revenue' && <Banner tone="neutral" icon="info">{t('league.perCurrency', { currencies: d.currencies.join(' · ') })}</Banner>}
             {d.view === 'own' && <Benchmarks d={d} />}
             <LeagueTable d={d} />
+            {/* Opt-in cross-network benchmarks (HQ): this network against similar networks, as percentiles. */}
+            {d.view === 'network' && <BenchmarksCard />}
             {d.can.manage && <Settings d={d} onSaved={res.reload} />}
           </>
         )}

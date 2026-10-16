@@ -174,7 +174,7 @@ test('finance workspace: franchise owners see their statements and the fund repo
   assert.ok(fin.has('finance.royalties:publish'));
   const acc = caps('accountant');
   assert.ok(acc.has('finance.royalties:export') && !acc.has('finance.royalties:edit') && !acc.has('finance.payments:edit'));
-  assert.deepEqual(workspacesFor(fin, 'studios').find((w) => w.key === 'finance')?.modules, ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts']);
+  assert.deepEqual(workspacesFor(fin, 'studios').find((w) => w.key === 'finance')?.modules, ['finance.payments', 'finance.royalties', 'finance.invoices', 'finance.marketing_fund', 'finance.payouts', 'finance.supplier_rebates']);
 });
 
 test('team shapes and combined roles', () => {

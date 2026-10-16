@@ -11,6 +11,7 @@ import { useApp } from '../shell/AppContext';
 import { PageHeader } from '../shell/PageHeader';
 import { Banner, DeniedState, ErrorState, LoadingBlock } from '../ui/States';
 import { qualityApi, useQualityAction } from './api';
+import { QuestionTraining } from '../supply/AuditProgrammes';
 import { ActionError } from './ui';
 
 const rid = (p: string) => `${p}_${Math.random().toString(36).slice(2, 8)}`;
@@ -125,6 +126,7 @@ export function TemplateEditor({ id }: { id: string }) {
                   <Button variant="ghost" size="sm" icon="x" aria-label={t('editor.removeQuestion')} disabled={s.questions.length === 1} onClick={() => setSection(si, { ...s, questions: s.questions.filter((_, k) => k !== qi) })} />
                 </div>
                 {q.critical && <p className="text-xs font-bold text-danger">{t('editor.criticalHint')}</p>}
+                <QuestionTraining q={q} onChange={(p) => setQuestion(si, qi, p)} />
               </li>
             ))}
           </ol>

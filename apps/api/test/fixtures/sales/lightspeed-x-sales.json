@@ -1,0 +1,11 @@
+{
+  "data": [
+    { "id": "0a6f6e36-8b0e-11e6-ae22-56b6b6499611", "outlet_id": "06bf537b-c7d7-11e7-ff13-2f3d0f9b8a2b", "sale_date": "2026-10-12T21:30:00Z", "status": "CLOSED",
+      "total_price": 40.0, "total_tax": 6.0, "line_items": [ { "discount_total": 2.5 } ] },
+    { "id": "0a6f6e36-8b0e-11e6-ae22-56b6b6499612", "outlet_id": "06bf537b-c7d7-11e7-ff13-2f3d0f9b8a2b", "sale_date": "2026-10-13T01:10:00Z", "status": "CLOSED",
+      "total_price": -10.0, "total_tax": -1.5, "line_items": [] },
+    { "id": "0a6f6e36-8b0e-11e6-ae22-56b6b6499613", "outlet_id": "06bf537b-c7d7-11e7-ff13-2f3d0f9b8a2b", "sale_date": "2026-10-12T22:00:00Z", "status": "VOIDED",
+      "total_price": 500, "total_tax": 75 }
+  ],
+  "version": { "min": 1, "max": 3 }
+}

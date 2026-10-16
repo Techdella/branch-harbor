@@ -375,6 +375,83 @@ Replies can be drafted with BranchHarbor AI (`ANTHROPIC_API_KEY`; drafts only) a
 (none / negative reviews / all). `getLocationRatingSummary(db, orgId, locationIds, period)` exposes per-location
 ratings for the network league table.
 
+## Sales connectors: POS and booking sales for royalties
+
+Network → Connections → Sales connectors (`/v1/orgs/:orgId/sales-connectors`, module `network.sales_connectors`). For
+franchisees who don't take payments through BranchHarbor, a connector pulls daily sales so royalties use real sales.
+Code: `apps/api/src/integrations/sales/*` (one adapter per vendor, injected `fetch`, recorded fixtures in
+`apps/api/test/fixtures/sales`), `services/sales-connectors.ts`, `services/sales-sources.ts`.
+
+**Normalised model.** `daily_sales` holds one row per location × local business date × channel (`in_store`, `online`,
+`delivery`, `other`) × currency × source: gross (everything the customer paid, tax and tips included), refunds, tax,
+tips, discounts (information only), orders, and net = gross − refunds − tax − tips. Upserts are idempotent on that
+key with a content hash (an unchanged day is counted, not rewritten); a quiet day gets a zero row so it is not
+mistaken for a gap; rows a vendor no longer reports in the window are removed. Amounts in another currency than the
+location's are kept in their own rows and never converted or added.
+
+**Sync.** Nightly (hourly sweep, once per connection and local day) for the last three local days; manual resync of
+up to 92 days; first sync after connecting covers 35 days. Tokens are AES-256-GCM encrypted (`ENCRYPTION_KEY`) and
+refreshed before expiry; a 401/403 marks the connection `authorization_expired` with a re-authorise action.
+
+**One gross-sales source per location** (`location_sales_sources`, set by HQ with `network.sales_connectors:publish`):
+`branchharbor` (payments through BranchHarbor), `connector` (one connection's daily sales) or `self_reported` (the
+accepted sales report with evidence, Finance → external sales). With no explicit source the period close keeps its
+previous behaviour (BranchHarbor payments plus an accepted report). The period close (`services/finance/statements.ts`)
+asks `statementSales()` for the location's sales: connector sales enter the statement as external sales with tips
+excluded per the royalty basis; BranchHarbor payments are then left out and reported as a warning. Self-reported
+figures are compared with connector data for the same period ((gross − refunds − tax) on both sides) and a difference
+above the threshold (default 5 %) is flagged on the statement (`self_reported_variance`) and in the reconciliation.
+
+**Without platform credentials every connection runs in sandbox**: the OAuth flow completes on our own callback,
+deterministic sample sales are written and flagged `sandbox` everywhere (statements warn `connector_sandbox_data`).
+
+| Vendor | API used | Connect flow | Platform credentials | Partner approval needed before production |
+|---|---|---|---|---|
+| Square | OAuth 2 (`/oauth2/authorize`, `/oauth2/token`, scopes `ORDERS_READ PAYMENTS_READ MERCHANT_PROFILE_READ`); `POST /v2/orders/search` (COMPLETED, by `closed_at`), `GET /v2/locations`; `Square-Version` header | Merchant signs in; HQ or the owner picks the Square location | `SQUARE_APPLICATION_ID`, `SQUARE_APPLICATION_SECRET`, `SQUARE_ENVIRONMENT` | None for OAuth apps in your own account; listing in the Square App Marketplace needs Square's app review. Register the redirect URL `{PUBLIC_API_URL}/v1/sales-connectors/oauth/callback`. |
+| Toast | Partner API: `POST /authentication/v1/authentication/login` (machine client), `GET /restaurants/v1/restaurants/{guid}`, `GET /orders/v2/ordersBulk?businessDate=` with `Toast-Restaurant-External-ID` | Restaurant enables the BranchHarbor integration in Toast Web; we store its GUID | `TOAST_CLIENT_ID`, `TOAST_CLIENT_SECRET`, `TOAST_ENVIRONMENT` | Toast Partner Connect: apply as an integration partner, sign the partner agreement, build against the sandbox, pass Toast's certification; production credentials are scoped to restaurants that enable you. |
+| Mindbody | Public API v6: `GET /site/activationcode`, `POST /usertoken/issue` (source credentials), `GET /sale/sales`, `GET /site/locations`; headers `Api-Key`, `SiteId` | Owner opens the activation link and approves; then re-check | `MINDBODY_API_KEY`, `MINDBODY_SOURCE_NAME`, `MINDBODY_SOURCE_PASSWORD` | Developer account and API key; "Go live" request reviewed by Mindbody; per-call fees above the free tier. Each site owner approves through the activation link. |
+| Shopify | Admin REST 2025-07: OAuth (`/admin/oauth/authorize`, `/admin/oauth/access_token`, HMAC-verified callback), `GET /orders.json?status=any&processed_at_min/max&since_id`, `GET /locations.json` | Owner installs the app on their shop | `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET` | Custom/unlisted app per shop, or a public app (Shopify app review). `read_all_orders` (orders older than 60 days) must be requested and approved in the Partner Dashboard. Protected customer data is not requested. |
+| Lightspeed X-Series | OAuth (`secure.retail.lightspeed.app/connect`, `{prefix}.retail.lightspeed.app/api/1.0/token`), `GET /api/2.0/search?type=sales`, `GET /api/2.0/outlets` | Retailer signs in; pick the outlet | `LIGHTSPEED_X_CLIENT_ID`, `LIGHTSPEED_X_CLIENT_SECRET` | Lightspeed developer application; listing in the Lightspeed marketplace needs partner review. |
+| Lightspeed K-Series | OAuth (`/oauth/authorize`, `/oauth/token`, scope `financial-api`), `GET /f/data/businesses`, `GET /f/finance/{blId}/financials/{from}/{to}` | Restaurant signs in; pick the business location | `LIGHTSPEED_K_CLIENT_ID`, `LIGHTSPEED_K_CLIENT_SECRET`, `LIGHTSPEED_K_ENVIRONMENT` | Lightspeed Restaurant partner programme: trial environment first, then production credentials after Lightspeed approves the integration. Field names of the financial API are marked ASSUMPTIONS in the adapter until confirmed. |
+| Clover | OAuth v2 (`/oauth/v2/authorize`, `/oauth/v2/token`, `/oauth/v2/refresh`), `GET /v3/merchants/{mId}/orders?filter=clientCreatedTime…&expand=payments,refunds` | Merchant installs the app; `merchant_id` arrives on the callback | `CLOVER_APP_ID`, `CLOVER_APP_SECRET`, `CLOVER_ENVIRONMENT` | Clover developer account; app approval by Clover before merchants outside your test merchants can install it; per-region production hosts (North America by default). |
+
+**Reconciliation** (`GET …/sales-connectors/reconciliation?from&to`, CSV export): per location, BranchHarbor payments,
+each connector (missing days, sandbox), and self-reported periods with their variance, plus flags (`variance`,
+`missing_days`, `no_report`, `foreign_currency`, `sandbox`, `branchharbor_payments_ignored`, `connector_not_source`).
+
+## Import wizard and bulk launch
+
+Settings → Import (`/v1/orgs/:orgId/imports`, module `settings.import`). CSV (comma, semicolon or tab) or XLSX
+(first sheet; read without a dependency in `lib/xlsx.ts`), up to 8 MB and 5,000 rows. Columns are matched
+automatically; migration templates recognise the standard customer exports of Mindbody, Glofox, Square, Shopify,
+Fresha and Vagaro (and Mindbody / Glofox membership exports). Every row is validated in the importer's scope before
+anything is written; a dry run reports what would happen; the run is a background job (`imports.run`) with progress;
+each write is recorded in `import_batch_records`, so a batch can be undone for 24 hours (created rows removed, updated
+customers restored, invitations revoked). Consent is only recorded from an explicit consent column (`consent_records`,
+source `import:<template>`); empty or unclear values record nothing. Parsed rows are purged after the undo window.
+
+Network → Bulk launch (`/v1/orgs/:orgId/launches`, module `network.bulk_launch`, HQ-private): a spreadsheet (or a
+locations import) creates locations from the brand template, each with its site (published with Bulk launch
+`publish`, otherwise drafts), listings data on the location (`settings.listing`, ready for listings sync) and staff
+invitations, on a progress board; failed locations resume at the failed step.
+
+## Network benchmarks (opt-in) and the privacy approach
+
+Network → Benchmarks (`/v1/orgs/:orgId/benchmarks`, module `network.benchmarks`, HQ-private), also shown as "you vs
+similar networks" on the league table and the Network home. Metrics per calendar month: revenue per location (per
+currency), bookings or orders per location, occupancy, review rating, audit pass rate and royalties paid on time.
+
+- **Off by default; give to get.** Only organisations whose HQ opted in contribute, and only they can see benchmarks.
+  Opting out deletes the organisation's contributions at once.
+- **Minimal data.** One number per organisation, month, metric (and currency for money): no location rows, names,
+  customers or transactions leave the organisation. Contributions are never returned by any endpoint.
+- **k-anonymity.** A cohort (same industry and region, widening to the whole industry when the region is too small)
+  is published only with at least **k = 10** distinct organisations; cohort sizes are published in bands of 5.
+- **Noise.** Published percentiles (p10–p90) carry Laplace noise scaled to the cohort spread and size, seeded per
+  cohort and period (so repeated reads cannot be averaged away), clamped to the metric's range and kept monotone.
+- **No currency mixing.** Revenue is compared only with networks reporting in the same currency; never converted.
+- Recomputed daily (`benchmarks.recompute`); your own values are computed live from your data.
+
 ## What to set up first (shortest path to a Studios pilot)
 
 1. Stripe account (platform) → enable Connect + Billing + Tax

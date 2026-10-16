@@ -1,0 +1,19 @@
+[
+  {
+    "guid": "6b8a2a1e-0d6e-4f3b-9a64-2b5f1c0c9e01", "businessDate": 20261012, "voided": false, "deleted": false, "source": "In Store",
+    "diningOption": { "behavior": "DINE_IN" },
+    "checks": [
+      { "voided": false, "amount": 42.0, "taxAmount": 5.46, "totalAmount": 47.46, "appliedDiscounts": [{ "discountAmount": 2.0 }],
+        "payments": [{ "amount": 47.46, "tipAmount": 8.0, "refundStatus": "NONE", "refund": null }] }
+    ]
+  },
+  {
+    "guid": "6b8a2a1e-0d6e-4f3b-9a64-2b5f1c0c9e02", "businessDate": 20261012, "voided": false, "source": "Online",
+    "diningOption": { "behavior": "DELIVERY" },
+    "checks": [
+      { "amount": 20.0, "taxAmount": 2.6, "totalAmount": 22.6,
+        "payments": [{ "amount": 22.6, "tipAmount": 3.0, "refundStatus": "PARTIAL", "refund": { "refundAmount": 5.65, "tipRefundAmount": 0 } }] }
+    ]
+  },
+  { "guid": "6b8a2a1e-0d6e-4f3b-9a64-2b5f1c0c9e03", "businessDate": 20261012, "voided": true, "checks": [{ "amount": 99, "taxAmount": 1, "totalAmount": 100 }] }
+]

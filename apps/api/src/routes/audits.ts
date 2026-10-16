@@ -222,7 +222,8 @@ export const auditRoutes: FastifyPluginAsyncZod = async (r) => {
       if (allowed !== 'all') conds.push(allowed.size ? inArray(auditActions.locationId, [...allowed]) : sql`false`);
       const rows = await db.select({ x: auditActions, loc: locations.name }).from(auditActions).innerJoin(locations, eq(locations.id, auditActions.locationId)).where(and(...conds)).orderBy(asc(auditActions.dueDate)).limit(500);
       const people = await names(db, rows.flatMap(({ x }) => [x.submittedBy, x.verifiedBy]));
-      return { items: rows.map(({ x, loc }) => serializeAction(s, x, today, { locationName: loc, names: people })), today };
+      const training = await (await import('../services/audit-programmes.ts')).trainingFor(db, rows.map(({ x }) => x));
+      return { items: rows.map(({ x, loc }) => serializeAction(s, x, today, { locationName: loc, names: people, training })), today };
     });
 
     r.post('/orgs/:orgId/audits/actions/:id/evidence', { bodyLimit: UPLOAD_BODY_LIMIT, schema: { tags, security: secured, params: idParams, body: uploadSchema, summary: 'Upload an evidence photo for a corrective action (Audits edit at the location)' } }, async (req, reply) => {
@@ -324,6 +325,8 @@ export const auditRoutes: FastifyPluginAsyncZod = async (r) => {
       if (!(await canConduct(req, db, a))) throw forbidden('Only the assigned auditor can complete this audit');
       if (req.body.answers && Object.keys(req.body.answers).length) a = await saveAnswers(db, a, req.body.answers);
       const out = await completeAudit(s, a, req.user!.id, req.body.summary ?? null);
+      // Retraining loop: failed items that recommend an academy course record it (and auto-assign it to the location's team).
+      await (await import('../services/audit-programmes.ts')).linkTraining(s, out.audit, req.user!.id);
       await auditLog(db, { organizationId: orgId, actorUserId: req.user!.id, action: 'audit.completed', scopeKind: 'location', scopeId: a.locationId, targetType: 'audit', targetId: id, metadata: { scorePct: out.score.scorePct, passed: out.score.passed, criticalFailed: out.score.criticalFailed, actions: out.score.failedItems.length }, ip: req.ip });
       if (out.score.failedItems.length) {
         const ids = (await usersWithCapability(db, orgId, a.locationId, MODULE, 'edit')).filter((u) => u !== req.user!.id);

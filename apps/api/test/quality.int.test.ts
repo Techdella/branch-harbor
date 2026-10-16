@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { complianceDocuments, complianceMissingReminders, financeInvoices, franchiseProjects, locations, paymentReferences, royaltyPeriods, royaltyStatements } from '../src/db/schema/index.ts';
-import { runComplianceJobs } from '../src/services/compliance.ts';
+import { orgDay, runComplianceJobs } from '../src/services/compliance.ts';
 import { runAuditJobs } from '../src/services/audits.ts';
 import { call, createLocation, createOrg, hasDb, makeApp, memberWithRole, uid, verifiedUser } from './helpers.ts';
 
@@ -288,7 +288,9 @@ describe.skipIf(!hasDb)('audits, compliance documents and league table (DB)', ()
     // Vancouver: below the minimum (approved by HQ upload, amount too low); expiring soon at Toronto's licence.
     const low = await call(app, 'POST', `${C()}/documents`, { token: hqAdmin.token, body: { ...base, locationId: van, coverageAmountMinor: 100_000_000 } });
     expect(low.body.status).toBe('approved');
-    const soon = new Date(Date.now() + 10 * 86_400_000).toISOString().slice(0, 10);
+    // Expiry dates count in the organisation's own calendar day, so build "10 days from now" from that day (not UTC).
+    const orgToday = await orgDay(app.ctx.db, orgId);
+    const soon = new Date(Date.parse(`${orgToday}T00:00:00Z`) + 10 * 86_400_000).toISOString().slice(0, 10);
     await call(app, 'POST', `${C()}/documents`, { token: hqAdmin.token, body: { requirementId: lic, locationId: tor, category: 'licence', title: 'Business licence', expiresOn: soon, file: pdf } });
     m = await call(app, 'GET', `${C()}/matrix`, { token: hqAdmin.token });
     expect(cell(m, tor, gl)).toBe('valid');
@@ -322,7 +324,7 @@ describe.skipIf(!hasDb)('audits, compliance documents and league table (DB)', ()
     app.ctx.jobs.enqueue = async (name: string, data: any, o?: any) => { if (name === 'email.send') sent.push({ to: data.to, subject: data.subject }); return orig(name, data, o); };
     const r1 = await runComplianceJobs(app.ctx, new Date(), orgId);
     expect(r1.reminders).toBe(1); // the licence expiring in 10 days (the 7-day step not yet)
-    expect(sent.some((x) => /^Expires in 1[01] days: Business licence \(Toronto Annex\)/.test(x.subject) /* 10 or 11: UTC vs Toronto day */ && x.to === lm.email)).toBe(true);
+    expect(sent.some((x) => x.subject.startsWith('Expires in 10 days: Business licence (Toronto Annex)') && x.to === lm.email)).toBe(true);
     expect(sent.some((x) => x.to === fo2.email && !x.subject.startsWith('Missing:'))).toBe(false);
     expect((await runComplianceJobs(app.ctx, new Date(), orgId)).reminders).toBe(0);
     sent.length = 0;

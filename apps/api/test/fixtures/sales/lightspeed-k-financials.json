@@ -1,0 +1,10 @@
+{
+  "sales": [
+    { "receiptId": "R-1001", "timeClosed": "2026-10-12T12:30:00Z", "cancelled": false, "type": "SALE", "deliveryType": "eat_in",
+      "salesLines": [ { "totalNetAmountWithTax": "24.00", "taxAmount": "4.00", "discountAmount": "0" }, { "totalNetAmountWithTax": "6.00", "taxAmount": "1.00", "discountAmount": "1.00" } ],
+      "payments": [ { "netAmountWithTax": "30.00", "tip": "3.00" } ] },
+    { "receiptId": "R-1002", "timeClosed": "2026-10-12T13:00:00Z", "cancelled": false, "type": "REFUND", "deliveryType": "eat_in",
+      "salesLines": [ { "totalNetAmountWithTax": "-6.00", "taxAmount": "-1.00" } ], "payments": [ { "netAmountWithTax": "-6.00", "tip": "0" } ] },
+    { "receiptId": "R-1003", "timeClosed": "2026-10-12T14:00:00Z", "cancelled": true, "type": "SALE", "salesLines": [ { "totalNetAmountWithTax": "50.00", "taxAmount": "8.00" } ] }
+  ]
+}

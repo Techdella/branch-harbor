@@ -64,6 +64,14 @@ export const ROUTE_MODULES: Record<string, readonly string[]> = {
   audits: ['operations.audits'],
   compliance: ['legal.compliance_documents'],
   'league-table': ['network.league_table'],
+  // Network data platform: sales connectors, bulk launch, benchmarks and the import wizard.
+  'sales-connectors': ['network.sales_connectors'],
+  launches: ['network.bulk_launch'],
+  benchmarks: ['network.benchmarks'],
+  imports: ['settings.import'],
+  // Suppliers and supplier rebates (each endpoint checks its own module) and self-checks.
+  supply: ['operations.suppliers', 'finance.supplier_rebates'],
+  'self-checks': ['operations.self_checks'],
   // The inbox holds refunds (finance), local ad spend (marketing), shift swaps and website changes; each decision is
   // checked per kind.
   approvals: ['network.approvals', 'finance.payments', 'marketing.campaigns'],

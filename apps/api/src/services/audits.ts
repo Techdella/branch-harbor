@@ -21,7 +21,7 @@ import { auditActions, auditTemplates, audits, franchiseProjects, locations, org
 import { hasCapabilityInScope, type ScopeChain } from '../domain/scope.ts';
 import { addDays, localDateParts } from '../lib/tz.ts';
 import { AppError, conflict, forbidden, notFound } from '../lib/errors.ts';
-import { capabilityLocations, hasCapability, loadOrgAssignments, requireMember } from './authz.ts';
+import { capabilityLocations, hasCapability, loadOrgAssignments, requireMember, resolveScopeChain } from './authz.ts';
 import { filesById, signedFileUrl } from './ops-files.ts';
 
 export const MODULE = 'operations.audits';
@@ -66,10 +66,9 @@ export async function canConduct(req: FastifyRequest, db: Exec, a: Audit): Promi
 /** People who hold a capability at a location (or organisation-wide when `locationId` is null). */
 export async function usersWithCapability(db: Exec, organizationId: string, locationId: string | null, module: string, action: AccessAction): Promise<string[]> {
   let chain: ScopeChain = { organizationId, kind: 'organization' };
-  if (locationId) {
-    const [l] = await db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(eq(locations.id, locationId));
-    if (l) chain = { organizationId, kind: 'location', locationId: l.id, regionId: l.regionId, ownerGroupId: l.ownerGroupId };
-  }
+  // The location's full chain (region, owner group, territory, brand and portfolios), so portfolio-scoped field
+  // consultants and territory roles are found too.
+  if (locationId) chain = await resolveScopeChain(db, { organizationId, kind: 'location', id: locationId }).catch(() => chain);
   const byUser = await loadOrgAssignments(db, organizationId);
   return [...byUser.entries()].filter(([, a]) => hasCapabilityInScope(a, module, action, chain)).map(([id]) => id);
 }
@@ -213,13 +212,16 @@ export function actionOverdue(x: Pick<AuditAction, 'status' | 'dueDate'>, today:
   return x.status === 'open' && x.dueDate < today;
 }
 
-export function serializeAction(s: Services, x: AuditAction, today: string, extra: { locationName?: string | null; names?: Map<string, string> } = {}) {
+export interface ActionTraining { courseId: string; courseTitle: string | null; assigned: boolean; enrolled: number; completed: number }
+export function serializeAction(s: Services, x: AuditAction, today: string, extra: { locationName?: string | null; names?: Map<string, string>; training?: Map<string, ActionTraining> } = {}) {
   return {
     id: x.id, auditId: x.auditId, locationId: x.locationId, locationName: extra.locationName ?? null, questionId: x.questionId, sectionTitle: x.sectionTitle, title: x.title, reason: x.reason,
     critical: x.critical, auditorNote: x.auditorNote, dueDate: x.dueDate, status: x.status, overdue: actionOverdue(x, today), responseNote: x.responseNote,
     evidence: x.evidenceFileIds.map((id) => ({ id, url: signedFileUrl(s, id) })), submittedBy: x.submittedBy ? { id: x.submittedBy, name: extra.names?.get(x.submittedBy) ?? null } : null,
     submittedAt: iso(x.submittedAt), verifiedBy: x.verifiedBy ? { id: x.verifiedBy, name: extra.names?.get(x.verifiedBy) ?? null } : null, verifiedAt: iso(x.verifiedAt),
     reviewNote: x.reviewNote, reopenedCount: x.reopenedCount,
+    // Retraining loop (audits phase 2): the recommended course and the location team's progress on it.
+    training: extra.training?.get(x.id) ?? (x.trainingCourseId ? { courseId: x.trainingCourseId, courseTitle: null, assigned: !!x.trainingAssignmentId, enrolled: 0, completed: 0 } : null),
   };
 }
 
@@ -254,6 +256,7 @@ export async function auditDetail(s: Services, req: FastifyRequest, a: Audit) {
   const actions = await s.db.select().from(auditActions).where(eq(auditActions.auditId, a.id)).orderBy(asc(auditActions.dueDate));
   const people = await names(s.db, [a.auditorUserId, a.scheduledBy, ...actions.flatMap((x) => [x.submittedBy, x.verifiedBy])]);
   const conduct = await canConduct(req, s.db, a);
+  const training = await (await import('./audit-programmes.ts')).trainingFor(s.db, actions);
   const showAnswers = a.status === 'completed' || conduct;
   const answers = showAnswers ? a.answers : {};
   const photoIds = Object.values(answers).flatMap((x) => x.photoIds ?? []);
@@ -266,7 +269,8 @@ export async function auditDetail(s: Services, req: FastifyRequest, a: Audit) {
     timeZone: loc?.timeZone ?? 'UTC', summary: a.summary, checklist: a.checklist,
     answers: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, { ...v, photos: (v.photoIds ?? []).map((id) => ({ id, url: signedFileUrl(s, id), name: files.get(id)?.name ?? null })) }])),
     breakdown: score ? { sections: score.sections, failed: score.failedItems.map((f) => ({ questionId: f.questionId, reason: f.reason, critical: f.critical })), unanswered: score.unanswered, liveScorePct: score.scorePct, livePassed: score.passed } : null,
-    actions: actions.map((x) => serializeAction(s, x, today, { locationName: loc?.name, names: people })),
+    actions: actions.map((x) => serializeAction(s, x, today, { locationName: loc?.name, names: people, training })),
+    scheduleId: a.scheduleId,
     parent: parent ? { id: parent.id, scorePct: parent.scoreTenths === null ? null : parent.scoreTenths / 10, completedAt: iso(parent.completedAt) } : null,
     reaudit: next ?? null,
     permissions: {
