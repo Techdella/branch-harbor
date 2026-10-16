@@ -10,6 +10,8 @@ import { useApi, useMutation } from '@/lib/useApi';
 import { accessApi, useAccess } from '@/lib/http/access';
 import { MemberAccessPanel, RoleOptions, RolesTab, labelsOf, scopeChoices, useRoleName } from './team/AccessEditor';
 import { CoverageCard, TeamShapeTab } from './team/TeamShape';
+import { ScopesManager } from './team/ScopesManager';
+import { ScopePicker, inviteScopeId, type ScopeValue } from './team/ScopePicker';
 import { useApp } from '../shell/AppContext';
 import { useBusinessMode } from '@/lib/useBusinessMode';
 import { PageHeader } from '../shell/PageHeader';
@@ -21,7 +23,7 @@ export function TeamScreen() {
   const t = useTranslations('team');
   const ta = useTranslations('access');
   const app = useApp();
-  const [tab, setTab] = useState<'members' | 'roles' | 'shape'>('members');
+  const [tab, setTab] = useState<'members' | 'roles' | 'shape' | 'scopes'>('members');
   if (!app.hasModule('settings.team')) return <DeniedState />;
   const canEdit = app.capabilities.has('settings.team:edit');
   // Team shape and scopes are business-wide: for people who manage the team of the whole business.
@@ -34,13 +36,13 @@ export function TeamScreen() {
           items={[
             { key: 'members' as const, label: t('tab.members') },
             { key: 'roles' as const, label: ta('roleAdmin.tab') },
-            ...(orgAdmin && app.org.model !== 'independent' ? [{ key: 'shape' as const, label: ta('shape.tab') }] : []),
+            ...(orgAdmin && app.org.model !== 'independent' ? [{ key: 'shape' as const, label: ta('shape.tab') }, { key: 'scopes' as const, label: ta('scopes.tab') }] : []),
           ]}
           value={tab}
           onChange={setTab}
         />
       )}
-      {tab === 'roles' && canEdit ? <RolesTab /> : tab === 'shape' && orgAdmin ? <TeamShapeTab /> : <MembersTab />}
+      {tab === 'roles' && canEdit ? <RolesTab /> : tab === 'shape' && orgAdmin ? <TeamShapeTab /> : tab === 'scopes' && orgAdmin ? <ScopesManager /> : <MembersTab />}
     </>
   );
 }
@@ -62,6 +64,8 @@ function MembersTab() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<string>(mode.isIndependent ? 'staff' : 'location_manager');
   const [scopeId, setScopeId] = useState(app.scopes.find((s) => s.kind === 'location')?.id ?? 'all');
+  const firstLoc = app.scopes.find((s) => s.kind === 'location')?.id.replace(/^loc:/, '');
+  const [pickedScope, setPickedScope] = useState<ScopeValue>(firstLoc ? { kind: 'location', id: firstLoc } : { kind: 'organization', id: app.org.id });
   const [ok, setOk] = useState('');
   const template = roles.data?.templates.find((r) => r.key === role);
   const custom = role.startsWith('custom:') ? roles.data?.custom.find((c) => `custom:${c.id}` === role) : undefined;
@@ -77,7 +81,7 @@ function MembersTab() {
   const invite = useMutation((api) =>
     mode.isIndependent
       ? api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId: independentScope, scopeLabel: mode.businessName })
-      : api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? '' }),
+      : api.team.invite({ email, role: roleLabel(role), roleKey: role, scopeId, scopeLabel: app.scopes.find((s) => s.id === scopeId)?.label ?? scopeChoices(scopes.data ?? null, app.org.id).find((c) => c.kind === pickedScope.kind && c.id === pickedScope.id)?.name ?? '' }),
   );
 
   return (
@@ -103,22 +107,28 @@ function MembersTab() {
               )}
             </Field>
             {!mode.isIndependent && (
-            <Field label={t('scope')} hint={t('scopeHint')}>
-              {(p) => (
-                <Select id={p.id} aria-describedby={p.describedBy} value={scopeId} onChange={(e) => setScopeId(e.target.value)}>
-                  {app.scopes.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.kind === 'all' ? t('wholeOrg') : s.label}
-                    </option>
-                  ))}
-                  {extraScopes.length > 0 && (
-                    <optgroup label={ta('scopes.title')}>
-                      {extraScopes.map((c) => <option key={c.value} value={c.value}>{`${ta(`scopeKind.${c.kind}`)}: ${c.name ?? ''}`}</option>)}
-                    </optgroup>
-                  )}
-                </Select>
-              )}
-            </Field>
+              <div className={orgWide && scopes.data ? 'md:col-span-3' : undefined}>
+                {orgWide && scopes.data ? (
+                  <ScopePicker scopes={scopes.data} orgId={app.org.id} value={pickedScope} onChange={(v) => { setPickedScope(v); setScopeId(inviteScopeId(v)); }} testId="invite-scope" />
+                ) : (
+                  <Field label={t('scope')} hint={t('scopeHint')}>
+                    {(p) => (
+                      <Select id={p.id} aria-describedby={p.describedBy} value={scopeId} onChange={(e) => setScopeId(e.target.value)}>
+                        {app.scopes.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.kind === 'all' ? t('wholeOrg') : s.label}
+                          </option>
+                        ))}
+                        {extraScopes.length > 0 && (
+                          <optgroup label={ta('scopes.title')}>
+                            {extraScopes.map((c) => <option key={c.value} value={c.value}>{`${ta(`scopeKind.${c.kind}`)}: ${c.name ?? ''}`}</option>)}
+                          </optgroup>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                )}
+              </div>
             )}
           </div>
           <p className="text-xs text-stone">{custom ? (custom.description ?? '') : ta.has(`roles.${role}.description`) ? ta(`roles.${role}.description`) : (template?.description ?? '')}</p>

@@ -167,7 +167,7 @@ export async function resolveScopeChain(db: Exec, t: ScopeTarget): Promise<Scope
  */
 function opsCapabilityFor(req: FastifyRequest, permission: Permission, assignments: Assignment[]): { module: string; action: AccessAction } | null {
   if (permission !== 'operations.read' && permission !== 'operations.write') return null;
-  const module = opsModuleFor(req.routeOptions?.url, capabilitiesAnywhere(assignments));
+  const module = opsModuleFor(req.routeOptions?.url, capabilitiesAnywhere(assignments), req.method);
   return module ? { module, action: permission === 'operations.read' ? 'view' : 'edit' } : null;
 }
 

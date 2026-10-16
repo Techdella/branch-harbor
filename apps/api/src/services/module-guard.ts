@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { INDUSTRY_MODULES } from '@bh/shared';
+import { INDUSTRIES, industryModules } from '@bh/shared';
 import { AppError } from '../lib/errors.ts';
 import { capabilitiesAnywhere } from '../domain/scope.ts';
 import { requireMember } from './authz.ts';
@@ -170,11 +170,40 @@ const OPS_SUB_ROUTES: Record<string, Record<string, string>> = {
   'time-clock': { '': 'operations.schedule' },
 };
 
-/** The Operations module an industry route belongs to (null when it belongs to any, or isn't an Operations route). */
-export function opsModuleForRoute(routeUrl: string | undefined): string | null {
+/**
+ * Screen-level sub-modules (management screens, `SCREEN_MODULES` in @bh/shared): routes that change what a management
+ * screen manages need the sub-module. Reads stay with the parent module, because front-line screens look up rooms,
+ * class types or agents. Keyed like OPS_SUB_ROUTES: industry prefix → second path segment → sub-module.
+ */
+const OPS_SCREEN_ROUTES: Record<string, Record<string, string>> = {
+  studios: {
+    ...Object.fromEntries(['series', 'class-types', 'policies'].map((k) => [k, 'operations.classes.schedule_builder'])),
+    rooms: 'operations.classes.rooms',
+    ...Object.fromEntries(['membership-plans', 'pack-products', 'offers'].map((k) => [k, 'operations.memberships.packs_offers'])),
+  },
+  sports: Object.fromEntries(['schedule-proposals', 'venues'].map((k) => [k, 'operations.teams.schedule_builder'])),
+  wellness: Object.fromEntries(['practitioners', 'resources'].map((k) => [k, 'operations.appointments.practitioners'])),
+  commerce: Object.fromEntries(['purchase-orders', 'suppliers'].map((k) => [k, 'operations.inventory.purchasing'])),
+  foods: Object.fromEntries(['catering', 'meal-plans', 'production-dates', 'delivery-zones', 'delivery-providers'].map((k) => [k, 'operations.food_orders.catering'])),
+  realty: { syndication: 'operations.listings.portals', offices: 'operations.agents.offices' },
+};
+
+const READS = new Set(['GET', 'HEAD', 'OPTIONS']);
+/** Front-line actions on a management screen's records (staff receive the goods of a purchase order at their store). */
+const FRONTLINE_ACTIONS = /\/receive$/;
+
+/**
+ * The Operations module an industry route belongs to (null when it belongs to any, or isn't an Operations route).
+ * Changes (`method` other than GET/HEAD) on a management screen's routes need its screen-level sub-module.
+ */
+export function opsModuleForRoute(routeUrl: string | undefined, method?: string): string | null {
   const m = routeUrl ? ORG_ROUTE.exec(routeUrl) : null;
   const subs = m ? OPS_SUB_ROUTES[m[1]!] : undefined;
   if (!subs) return null;
+  if (method && !READS.has(method.toUpperCase()) && !FRONTLINE_ACTIONS.test(routeUrl!)) {
+    const screenModule = OPS_SCREEN_ROUTES[m![1]!]?.[m![2] ?? ''];
+    if (screenModule) return screenModule;
+  }
   return subs[''] ?? subs[m![2] ?? ''] ?? null;
 }
 
@@ -182,20 +211,20 @@ export function opsModuleForRoute(routeUrl: string | undefined): string | null {
  * The Operations module that governs this route for a person: the route's module, unless the business is of another
  * industry (e.g. a hotel's restaurant outlet runs on the Foods engine) — then any Operations module, as before.
  */
-export function opsModuleFor(routeUrl: string | undefined, caps: ReadonlySet<string>): string | null {
-  const m = opsModuleForRoute(routeUrl);
+export function opsModuleFor(routeUrl: string | undefined, caps: ReadonlySet<string>, method?: string): string | null {
+  const m = opsModuleForRoute(routeUrl, method);
   if (!m) return null;
-  const industry = (Object.keys(INDUSTRY_MODULES) as (keyof typeof INDUSTRY_MODULES)[]).find((i) => INDUSTRY_MODULES[i].some((x) => x.key === m));
+  const industry = INDUSTRIES.find((i) => industryModules(i).some((x) => x.key === m));
   if (!industry) return m; // shared Operations modules (the staff schedule)
-  const own = INDUSTRY_MODULES[industry].map((x) => `${x.key}:`);
+  const own = industryModules(industry).map((x) => `${x.key}:`);
   for (const c of caps) if (own.some((p) => c.startsWith(p))) return m;
   return null;
 }
 
-export function modulesForRoute(routeUrl: string | undefined, caps?: ReadonlySet<string>): readonly string[] | null {
+export function modulesForRoute(routeUrl: string | undefined, caps?: ReadonlySet<string>, method?: string): readonly string[] | null {
   const m = routeUrl ? ORG_ROUTE.exec(routeUrl) : null;
   if (!m) return null;
-  const ops = caps ? opsModuleFor(routeUrl, caps) : opsModuleForRoute(routeUrl);
+  const ops = caps ? opsModuleFor(routeUrl, caps, method) : opsModuleForRoute(routeUrl, method);
   if (ops) return [ops];
   return SUB_ROUTE_MODULES[`${m[1]}/${m[2]}`] ?? ROUTE_MODULES[m[1]!] ?? null;
 }
@@ -216,7 +245,7 @@ export async function moduleGuard(req: FastifyRequest, _reply: FastifyReply) {
   if (!orgId || !/^[0-9a-f-]{36}$/i.test(orgId)) return;
   const assignments = await requireMember(req, req.server.ctx.db, orgId);
   const caps = capabilitiesAnywhere(assignments);
-  const modules = modulesForRoute(req.routeOptions.url, caps)!;
+  const modules = modulesForRoute(req.routeOptions.url, caps, req.method)!;
   if (!holdsAny(caps, modules)) {
     throw new AppError(403, 'module_not_available', 'This area is not part of your access in this business.', undefined, { modules });
   }

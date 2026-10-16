@@ -11,6 +11,7 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Async, Banner, DeniedState, LoadingBlock, SectionCard } from '../../ui/States';
 import { CardEntry, type CardResult } from './CardEntry';
+import { ChangeCardButton, ChangePlanCard } from './PlanChange';
 
 const COUNTRY_CODES = [...new Set([...Object.keys(COUNTRY_CURRENCY), ...Object.keys(COUNTRY_TIER)])];
 
@@ -53,6 +54,7 @@ function BillingBody({ b, onChange }: { b: BillingView; onChange: (v?: BillingVi
   return (
     <>
       {needsCheckout ? <CheckoutCard b={b} onDone={onChange} /> : <CurrentPlanCard b={b} onChange={onChange} />}
+      {!needsCheckout && !b.cancelAtPeriodEnd && <ChangePlanCard b={b} onChange={onChange} />}
       {b.businessModel === 'network' && b.plan === 'network' && b.status !== 'checkout_required' && <PayersCard b={b} onChange={onChange} />}
       {!needsCheckout && <CountryCard b={b} onChange={onChange} />}
       <InvoicesCard b={b} />
@@ -288,6 +290,7 @@ function CurrentPlanCard({ b, onChange }: { b: BillingView; onChange: (v?: Billi
             </div>
           )}
         </dl>
+        <ChangeCardButton b={b} onChange={onChange} />
         {(cancel.error || resume.error) && <Banner tone="danger" live="assertive">{(cancel.error ?? resume.error)!.message}</Banner>}
         {b.cancelAtPeriodEnd ? (
           <div>

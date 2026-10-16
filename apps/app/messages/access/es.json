@@ -132,11 +132,23 @@
         },
         "classes": {
           "name": "Clases y horario",
-          "description": "Horario de clases, salas, reservas, asistencia y sustituciones."
+          "description": "Horario de clases, reservas, registro de entrada, asistencia y sustituciones.",
+          "schedule_builder": {
+            "name": "Creador de horarios",
+            "description": "Series de clases recurrentes, tipos de clase y políticas de reserva."
+          },
+          "rooms": {
+            "name": "Salas",
+            "description": "Salas por ubicación, su capacidad y características."
+          }
         },
         "memberships": {
           "name": "Miembros y precios",
-          "description": "Miembros, membresías, bonos de clases, ofertas y clases a la carta."
+          "description": "Miembros, membresías y clases a la carta.",
+          "packs_offers": {
+            "name": "Precios, bonos y ofertas",
+            "description": "Planes de membresía, bonos de clases y ofertas de bienvenida."
+          }
         },
         "studio_insights": {
           "name": "Análisis del estudio",
@@ -148,7 +160,11 @@
         },
         "teams": {
           "name": "Equipos y sesiones",
-          "description": "Equipos, calendario, asistencia, anuncios y tutores."
+          "description": "Equipos, asistencia, anuncios y tutores.",
+          "schedule_builder": {
+            "name": "Creador de calendarios",
+            "description": "Calendarios de temporada, propuestas de calendario e instalaciones."
+          }
         },
         "sports_reports": {
           "name": "Informes deportivos",
@@ -156,7 +172,11 @@
         },
         "appointments": {
           "name": "Citas",
-          "description": "Agenda, profesionales y sus horarios."
+          "description": "El calendario de citas.",
+          "practitioners": {
+            "name": "Profesionales y horarios",
+            "description": "Profesionales, su horario laboral, y salas o equipos."
+          }
         },
         "services": {
           "name": "Servicios y paquetes",
@@ -180,7 +200,11 @@
         },
         "inventory": {
           "name": "Inventario",
-          "description": "Existencias, traspasos y compras."
+          "description": "Niveles de stock, recuentos y traspasos entre tiendas.",
+          "purchasing": {
+            "name": "Compras",
+            "description": "Pedidos de compra y proveedores."
+          }
         },
         "commerce_insights": {
           "name": "Análisis de comercio",
@@ -192,7 +216,11 @@
         },
         "food_orders": {
           "name": "Pedidos y cocina",
-          "description": "Pedidos, pantalla de cocina, recogida, entrega, mesas, catering y planes de comidas."
+          "description": "Pedidos, pantalla de cocina, recogida, entrega y mesas.",
+          "catering": {
+            "name": "Catering y planes de comida",
+            "description": "Menús y eventos de catering, planes de comida y fechas de producción, zonas y proveedores de entrega."
+          }
         },
         "ordering_settings": {
           "name": "Ajustes de pedidos",
@@ -204,7 +232,11 @@
         },
         "listings": {
           "name": "Inmuebles",
-          "description": "Inmuebles, aprobaciones y envíos a portales."
+          "description": "Inmuebles y aprobaciones.",
+          "portals": {
+            "name": "Envío a portales",
+            "description": "Qué inmuebles van a qué portales inmobiliarios."
+          }
         },
         "enquiries": {
           "name": "Consultas y visitas",
@@ -212,7 +244,11 @@
         },
         "agents": {
           "name": "Agentes y oficinas",
-          "description": "Agentes, oficinas y asignación de prospectos."
+          "description": "Agentes, sus propios ajustes de contactos y oficinas.",
+          "offices": {
+            "name": "Oficinas y reparto de contactos",
+            "description": "Ajustes de oficina y cómo se reparten las consultas entre agentes."
+          }
         },
         "reservations": {
           "name": "Recepción y reservas",
@@ -501,7 +537,8 @@
       "addRole": "Añadir otro rol",
       "addRoleTitle": "Añadir otro rol",
       "addRoleSave": "Añadir rol",
-      "removeRole": "Quitar este rol"
+      "removeRole": "Quitar este rol",
+      "subModule": "Pantalla de {parent}"
     },
     "teams": {
       "leadership": "Dirección",
@@ -647,7 +684,36 @@
         "master": "Máster franquicia",
         "development": "Área de desarrollo",
         "support": "Área de apoyo"
-      }
+      },
+      "tab": "Carteras y territorios",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "confirmDelete": "Eliminar definitivamente",
+      "deleted": "Se eliminó {name}.",
+      "locationCount": "{count, plural, =0 {Sin ubicaciones} one {# ubicación} other {# ubicaciones}}",
+      "assigned": "Asignados: {people}",
+      "noMembers": "Todavía no hay nadie asignado.",
+      "editTitle": "Editar {name}",
+      "kind": "Tipo",
+      "country": "País",
+      "countryHint": "Código de dos letras, p. ej. IE. Las normas jurisdiccionales de este país se pueden conceder al territorio.",
+      "locationsPicked": "Ubicaciones ({count} de {total} seleccionadas)",
+      "searchLocations": "Buscar una ubicación",
+      "selectAll": "Seleccionar las mostradas",
+      "clear": "Quitar las mostradas",
+      "movesFrom": "sale de {territory}",
+      "saved": "Se guardó {name}.",
+      "save": "Guardar cambios",
+      "members": "Personas asignadas",
+      "remove": "Quitar",
+      "unassigned": "{name} ya no tiene este ámbito.",
+      "person": "Persona",
+      "choosePerson": "Elige una persona…",
+      "role": "Rol",
+      "assign": "Asignar",
+      "assignedOne": "{name} ahora tiene este ámbito.",
+      "membersHint": "Asignar da a la persona el rol exactamente para estas ubicaciones. Solo puedes dar el acceso que tú tienes.",
+      "scopeType": "Ámbito"
     }
   },
   "demo": {

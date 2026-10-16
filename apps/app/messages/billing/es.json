@@ -201,6 +201,35 @@
       "cardOnFile": "{brand} •••• {last4} · facturado en {currency}",
       "setup": "Configurar la facturación",
       "saveCard": "Guardar tarjeta"
+    },
+    "change": {
+      "title": "Cambiar de plan",
+      "body": "Cambia de plan o de periodo de facturación cuando quieras. Las subidas y bajadas se prorratean por el resto del periodo; cambiar no tiene coste.",
+      "plan": "Plan",
+      "current": "Actual",
+      "billingPeriod": "Periodo de facturación",
+      "interval": {
+        "month": "Mensual",
+        "year": "Anual"
+      },
+      "annualNote": "El anual cuesta 10 × el mensual (2 meses incluidos).",
+      "now": "Ahora",
+      "after": "Tras el cambio",
+      "dueNow": "Se añade a tu próxima factura",
+      "credit": "Abono en tu próxima factura",
+      "dueAtTrialEnd": "Se cobra ahora",
+      "trialNote": "Estás en tu prueba: no se cobra nada ahora y el nuevo plan empieza el {date}.",
+      "prorationNote": "Prorrateado por el resto de este periodo; el nuevo precio se aplica desde el {date}.",
+      "creditNote": "Se abona la parte no usada de tu plan actual.",
+      "confirm": "Cambiar de plan",
+      "done": "Ahora estás en el plan {plan}."
+    },
+    "cardChange": {
+      "open": "Cambiar tarjeta",
+      "title": "Nueva tarjeta",
+      "body": "Usa una tarjeta emitida en {country}, tu país de facturación, o añade el número fiscal de tu empresa en ese país.",
+      "save": "Guardar tarjeta",
+      "done": "Tu nueva tarjeta está guardada y se usará en el próximo cobro."
     }
   },
   "shell": {

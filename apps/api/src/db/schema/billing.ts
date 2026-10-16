@@ -92,6 +92,13 @@ export const franchiseeBillingAccounts = pgTable('franchisee_billing_accounts', 
   status: text('status').notNull().default('needs_payment_method'),
   /** Open card setup (setup intent) for the live card form. */
   setup: jsonb('setup').$type<Record<string, unknown> | null>(),
+  /**
+   * The franchisee's own Stripe subscription for the location fees HQ passes on (live franchisee charging): its
+   * status (trialing until HQ's plan starts, then active / past_due / canceled), the lines last synced and the period.
+   */
+  subscriptionStatus: text('subscription_status'),
+  subscriptionLines: jsonb('subscription_lines').$type<{ lookupKey: string; productName: string; unitAmountMinor: number; quantity: number }[]>().notNull().default([]),
+  currentPeriodEnd: ts('current_period_end'),
   createdBy: uuid('created_by'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),

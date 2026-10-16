@@ -21,6 +21,7 @@ import {
   documentEditPerm, getProject, getProspect, listOrderedActivities, loadRules, orgHas, prospectCompliance, provisionLocation, requestGoLive, requireAnyOrgPerm, requireOrgPerm, runFranchiseJobs,
   sendAgreement, sendDisclosure, serializeAgreement, serializeDocument, serializeProspect, serializeTask, setStage, userNames,
 } from '../services/franchise.ts';
+import { agreementFilter, documentFilter, hasLegalScope, jurisdictionIn, jurisdictionsIn, legalScope, requireJurisdiction, territoryOwnerGroups, type LegalModule } from '../services/franchise-legal-scope.ts';
 import { idParams, iso, orgParams, secured } from './_common.ts';
 
 const tags = ['franchise'];
@@ -55,11 +56,30 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!inPipeline(t, p.scopeTerritoryId)) throw notFound('Prospect');
     return p;
   };
-  /** Settings and rules: anyone with the pipeline (any territory), agreements or disclosure. */
+  /** Settings and rules: anyone with the pipeline (any territory), agreements or disclosure (organisation-wide or a territory). */
   const requireFranchiseView = async (req: FastifyRequest, orgId: string) => {
     const t = await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'view');
     if (t === 'all' || t.size) return;
+    if (hasLegalScope(await legalScope(req, s.db, orgId, 'legal.disclosure', 'view')) || hasLegalScope(await legalScope(req, s.db, orgId, 'legal.agreements', 'view'))) return;
     await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
+  };
+  /**
+   * Territory-scoped legal: a prospect of a territory pipeline needs the legal module (granted on that territory, or
+   * held organisation-wide) for disclosure and agreement steps. HQ's own pipeline keeps the pipeline permission alone.
+   */
+  const requireLegalForProspect = async (req: FastifyRequest, orgId: string, p: { scopeTerritoryId: string | null }, module: LegalModule) => {
+    const pipe = await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'edit');
+    if (pipe === 'all') return;
+    const ls = await legalScope(req, s.db, orgId, module, 'edit');
+    if (ls.all || (p.scopeTerritoryId && ls.territoryIds.has(p.scopeTerritoryId))) return;
+    throw forbidden(module === 'legal.disclosure' ? 'Sending disclosure in your territory needs Disclosure (edit) granted on your territory' : 'Agreements in your territory need Franchise agreements (edit) granted on your territory');
+  };
+  /** Organisation-wide permission, or the legal module on a territory covering `jurisdiction`. */
+  const requireRuleScope = async (req: FastifyRequest, orgId: string, perm: 'disclosure.edit' | 'disclosure.approve', jurisdiction: string, what: string) => {
+    if (await orgHas(req, s.db, orgId, perm)) return;
+    const ls = await legalScope(req, s.db, orgId, 'legal.disclosure', perm === 'disclosure.edit' ? 'edit' : 'publish');
+    if (!hasLegalScope(ls)) await requireOrgPerm(req, s.db, orgId, perm);
+    requireJurisdiction(ls, jurisdiction, what);
   };
 
   /* ------------------------------- settings ------------------------------ */
@@ -71,8 +91,11 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     const editScope = await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'edit');
     return {
       ...franchiseSettings(org!), brandSlug: org!.slug, esign: esignStatus(), esignDisclaimer: ESIGN_DISCLAIMER, disclaimer: RULES_DISCLAIMER,
-      canEdit: editScope === 'all' || editScope.size > 0, territoryScoped: editScope !== 'all' && (await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'view')) !== 'all', legal: { view: await orgHas(req, s.db, orgId, 'legal.view'), edit: await orgHas(req, s.db, orgId, 'legal.edit') },
-      disclosure: { view: await orgHas(req, s.db, orgId, 'disclosure.view'), edit: await orgHas(req, s.db, orgId, 'disclosure.edit'), approve: await orgHas(req, s.db, orgId, 'disclosure.approve') },
+      canEdit: editScope === 'all' || editScope.size > 0, territoryScoped: editScope !== 'all' && (await capabilityTerritories(req, s.db, orgId, 'sales.franchise_pipeline', 'view')) !== 'all',
+      // Organisation-wide, or granted on the person's territory (then limited to its records and its country's jurisdictions).
+      legal: { view: hasLegalScope(await legalScope(req, s.db, orgId, 'legal.agreements', 'view')), edit: hasLegalScope(await legalScope(req, s.db, orgId, 'legal.agreements', 'edit')) },
+      disclosure: { view: hasLegalScope(await legalScope(req, s.db, orgId, 'legal.disclosure', 'view')), edit: hasLegalScope(await legalScope(req, s.db, orgId, 'legal.disclosure', 'edit')), approve: hasLegalScope(await legalScope(req, s.db, orgId, 'legal.disclosure', 'publish')) },
+      legalCountries: await (async () => { const d = await legalScope(req, s.db, orgId, 'legal.disclosure', 'view'); return d.all ? null : [...d.countries].sort(); })(),
     };
   });
 
@@ -127,7 +150,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: orgParams, body: ruleBody, summary: 'Add this organisation’s own version of a jurisdiction rule (legal.disclosure edit). Starts as not reviewed by counsel.' },
   }, async (req, reply) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'disclosure.edit');
+    await requireRuleScope(req, orgId, 'disclosure.edit', req.body.code, 'add rule versions');
     const b = req.body;
     const [ctry, reg] = b.code.split('-') as [string, string | undefined];
     const data: JurisdictionRule = { ...b, country: ctry, region: reg ?? null, reviewedByCounsel: false, needsCounselReview: true };
@@ -142,9 +165,10 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ reviewed: z.boolean(), note: z.string().max(2000).optional() }), summary: 'Record franchise counsel’s review of a rule version (legal.disclosure publish / approve). Platform rules are copied into the organisation first.' },
   }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'disclosure.approve');
+    await requireFranchiseView(req, orgId);
     const [r] = await s.db.select().from(franchiseJurisdictionRules).where(and(eq(franchiseJurisdictionRules.id, id), or(eq(franchiseJurisdictionRules.organizationId, orgId), sql`${franchiseJurisdictionRules.organizationId} is null`)));
     if (!r) throw notFound('Rule');
+    await requireRuleScope(req, orgId, 'disclosure.approve', r.code, 'record counsel reviews');
     const set = { reviewedByCounsel: req.body.reviewed, reviewedBy: req.user!.id, reviewedAt: new Date(), reviewNote: req.body.note ?? null };
     let rowId = r.id;
     if (!r.organizationId) {
@@ -160,8 +184,10 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/franchise/registrations', { schema: { tags, security: secured, params: orgParams } }, async (req) => {
     const { orgId } = req.params;
-    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
-    const rows = await s.db.select().from(franchiseRegistrations).where(eq(franchiseRegistrations.organizationId, orgId)).orderBy(asc(franchiseRegistrations.jurisdiction));
+    const disc = await legalScope(req, s.db, orgId, 'legal.disclosure', 'view');
+    const orgWide = disc.all || (await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]).then(() => true, (e) => { if (hasLegalScope(disc)) return false; throw e; }));
+    const rows = (await s.db.select().from(franchiseRegistrations).where(eq(franchiseRegistrations.organizationId, orgId)).orderBy(asc(franchiseRegistrations.jurisdiction)))
+      .filter((r) => orgWide || jurisdictionIn(disc, r.jurisdiction));
     return { items: rows.map((r) => ({ id: r.id, jurisdiction: r.jurisdiction, status: r.status, fileNumber: r.fileNumber, effectiveFrom: iso(r.effectiveFrom), expiresAt: iso(r.expiresAt), notes: r.notes, active: (r.status === 'registered' || r.status === 'exempt') && (!r.expiresAt || r.expiresAt > new Date()) })) };
   });
 
@@ -173,7 +199,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     },
   }, async (req) => {
     const { orgId, jurisdiction } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'disclosure.edit');
+    await requireRuleScope(req, orgId, 'disclosure.edit', jurisdiction, 'record registrations');
     const b = req.body;
     const vals = { status: b.status, fileNumber: b.fileNumber ?? null, effectiveFrom: b.effectiveFrom ? new Date(b.effectiveFrom) : null, expiresAt: b.expiresAt ? new Date(b.expiresAt) : null, notes: b.notes ?? null, updatedBy: req.user!.id, updatedAt: new Date() };
     const [row] = await s.db.insert(franchiseRegistrations).values({ organizationId: orgId, jurisdiction, ...vals }).onConflictDoUpdate({ target: [franchiseRegistrations.organizationId, franchiseRegistrations.jurisdiction], set: vals }).returning();
@@ -380,7 +406,9 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: idParams, body: z.object({ documentId: z.uuid() }), summary: 'Deliver a disclosure document by email link; the prospect signs an e-receipt (timestamp + IP) that starts the waiting period' },
   }, async (req, reply) => {
     const { orgId, id } = req.params;
-    const out = await sendDisclosure(s, req, await prospectIn(req, orgId, id, 'edit'), req.body.documentId);
+    const p = await prospectIn(req, orgId, id, 'edit');
+    await requireLegalForProspect(req, orgId, p, 'legal.disclosure');
+    const out = await sendDisclosure(s, req, p, req.body.documentId);
     return reply.code(201).send({ deliveryId: out.delivery.id, stage: out.prospect.stage, link: out.link, warnings: out.warnings, ...(out.devToken ? { devToken: out.devToken } : {}) });
   });
 
@@ -392,7 +420,9 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     },
   }, async (req, reply) => {
     const { orgId, id } = req.params;
-    const out = await sendAgreement(s, req, await prospectIn(req, orgId, id, 'edit'), req.body);
+    const p = await prospectIn(req, orgId, id, 'edit');
+    await requireLegalForProspect(req, orgId, p, 'legal.agreements');
+    const out = await sendAgreement(s, req, p, req.body);
     return reply.code(201).send({ signatureId: out.signature.id, provider: out.signature.provider, stage: out.prospect.stage, link: out.link, disclaimer: ESIGN_DISCLAIMER, ...(out.devToken ? { devToken: out.devToken } : {}) });
   });
 
@@ -401,6 +431,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req) => {
     const { orgId, id } = req.params;
     const p = await prospectIn(req, orgId, id, 'edit');
+    await requireLegalForProspect(req, orgId, p, 'legal.agreements');
     const [sig] = await s.db.select().from(franchiseSignatures).where(and(eq(franchiseSignatures.id, req.body.signatureId), eq(franchiseSignatures.prospectId, p.id)));
     if (!sig) throw notFound('Agreement');
     const r = await completeSignature(s, sig.id, { name: req.body.signerName, ip: req.ip, userAgent: req.headers['user-agent'] ?? null, actorUserId: req.user!.id });
@@ -514,7 +545,15 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     schema: { tags, security: secured, params: orgParams, querystring: z.object({ kind: z.enum(['disclosure', 'agreement_template', 'executed_agreement', 'vault']).optional(), ownerGroupId: z.uuid().optional() }), summary: 'Disclosure documents and agreement templates (pipeline or legal view); executed agreements and the legal vault need legal.view' },
   }, async (req) => {
     const { orgId } = req.params;
-    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
+    // Territory-scoped legal (no organisation-wide franchise access): only the documents of the territory.
+    const territorial = await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]).then(() => null, async (e) => { const f = await documentFilter(req, s.db, orgId); if (!f.any) throw e; return f; });
+    if (territorial) {
+      const conds = [eq(franchiseDocuments.organizationId, orgId)];
+      if (req.query.kind) conds.push(eq(franchiseDocuments.kind, req.query.kind));
+      if (req.query.ownerGroupId) conds.push(eq(franchiseDocuments.ownerGroupId, req.query.ownerGroupId));
+      const rows = await s.db.select().from(franchiseDocuments).where(and(...conds)).orderBy(desc(franchiseDocuments.createdAt));
+      return { items: rows.filter(territorial.allows).map(serializeDocument) };
+    }
     const legal = await orgHas(req, s.db, orgId, 'legal.view');
     if (req.query.kind && LEGAL_ONLY_KINDS.has(req.query.kind) && !legal) throw forbidden('Missing permission legal.view');
     const conds = [eq(franchiseDocuments.organizationId, orgId)];
@@ -545,7 +584,15 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req, reply) => {
     const { orgId } = req.params;
     const b = req.body;
-    await requireOrgPerm(req, s.db, orgId, documentEditPerm(b.kind));
+    if (!(await orgHas(req, s.db, orgId, documentEditPerm(b.kind)))) {
+      // Territory-scoped legal: documents for the territory's country, or its owner groups' agreements.
+      const module: LegalModule = b.kind === 'disclosure' ? 'legal.disclosure' : 'legal.agreements';
+      const ls = await legalScope(req, s.db, orgId, module, 'edit');
+      if (!hasLegalScope(ls)) await requireOrgPerm(req, s.db, orgId, documentEditPerm(b.kind));
+      if (b.kind === 'disclosure' || b.kind === 'agreement_template') {
+        if (!jurisdictionsIn(ls, b.jurisdictions)) throw forbidden('You can only upload documents for the jurisdictions of your own territory');
+      } else if (!b.ownerGroupId || !(await territoryOwnerGroups(s.db, orgId, ls)).has(b.ownerGroupId)) throw forbidden('You can only file agreements for the owner groups of your own territory');
+    }
     if (b.kind === 'disclosure' && !b.jurisdictions.length) throw validationError('Say which jurisdictions this disclosure document covers', { jurisdictions: 'At least one' });
     if (b.ownerGroupId) {
       const [g] = await s.db.select({ id: ownerGroups.id }).from(ownerGroups).where(and(eq(ownerGroups.id, b.ownerGroupId), eq(ownerGroups.organizationId, orgId)));
@@ -571,16 +618,16 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     const { orgId, id } = req.params;
     const [d] = await s.db.select().from(franchiseDocuments).where(and(eq(franchiseDocuments.id, id), eq(franchiseDocuments.organizationId, orgId)));
     if (!d) { await requireMember(req, s.db, orgId); throw notFound('Document'); }
-    await assertCanReadDocument(req, s.db, d);
+    await assertCanReadDocument(req, s.db, d).catch(async (e) => { if (!(await documentFilter(req, s.db, orgId)).allows(d)) throw e; });
     if (LEGAL_ONLY_KINDS.has(d.kind)) await audit(s.db, { organizationId: orgId, actorUserId: req.user!.id, action: 'legal.document_downloaded', targetType: 'franchise_document', targetId: d.id, ip: req.ip });
     return reply.header('content-type', d.contentType).header('content-disposition', `attachment; filename="${d.fileName.replace(/["\\\r\n]/g, '_')}"`).header('cache-control', 'private, no-store').send(Buffer.from(d.contentBase64, 'base64'));
   });
 
   app.patch('/orgs/:orgId/franchise/documents/:id', { schema: { tags, security: secured, params: idParams, body: z.object({ status: z.enum(['draft', 'current', 'superseded']) }) } }, async (req) => {
     const { orgId, id } = req.params;
-    const [cur] = await s.db.select({ kind: franchiseDocuments.kind }).from(franchiseDocuments).where(and(eq(franchiseDocuments.id, id), eq(franchiseDocuments.organizationId, orgId)));
+    const [cur] = await s.db.select().from(franchiseDocuments).where(and(eq(franchiseDocuments.id, id), eq(franchiseDocuments.organizationId, orgId)));
     if (!cur) { await requireMember(req, s.db, orgId); throw notFound('Document'); }
-    await requireOrgPerm(req, s.db, orgId, documentEditPerm(cur.kind));
+    await requireOrgPerm(req, s.db, orgId, documentEditPerm(cur.kind)).catch(async (e) => { if (!(await documentFilter(req, s.db, orgId, 'edit')).allows(cur)) throw e; });
     const [d] = await s.db.update(franchiseDocuments).set({ status: req.body.status }).where(and(eq(franchiseDocuments.id, id), eq(franchiseDocuments.organizationId, orgId))).returning();
     if (!d) throw notFound('Document');
     return serializeDocument(d);
@@ -661,6 +708,17 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     const mine = await requireMember(req, s.db, orgId);
     const legal = await orgHas(req, s.db, orgId, 'legal.view');
     const ownGroups = mine.filter((a) => a.scopeKind === 'owner_group' && a.permissions?.has('onboarding.view')).map((a) => a.scopeId);
+    // A territory with Franchise agreements granted sees its prospects', owner groups' and locations' agreements.
+    const terr = legal ? null : await legalScope(req, s.db, orgId, 'legal.agreements', 'view');
+    if (terr && hasLegalScope(terr)) {
+      const inTerritory = await agreementFilter(s.db, orgId, terr);
+      const conds = [eq(franchiseAgreements.organizationId, orgId)];
+      if (req.query.status !== 'all') conds.push(eq(franchiseAgreements.status, req.query.status));
+      const rows = await s.db.select({ a: franchiseAgreements, g: ownerGroups.name }).from(franchiseAgreements).leftJoin(ownerGroups, eq(ownerGroups.id, franchiseAgreements.ownerGroupId)).where(and(...conds)).orderBy(asc(franchiseAgreements.endDate));
+      let items = rows.filter((r) => inTerritory(r.a) || (!!r.a.ownerGroupId && ownGroups.includes(r.a.ownerGroupId))).map((r) => serializeAgreement(r.a, r.g));
+      if (req.query.expiringWithinDays) items = items.filter((a) => a.daysToExpiry <= req.query.expiringWithinDays!);
+      return { scope: 'territory', items };
+    }
     if (!legal && !ownGroups.length) throw forbidden('Missing permission legal.view');
     const conds = [eq(franchiseAgreements.organizationId, orgId)];
     if (req.query.status !== 'all') conds.push(eq(franchiseAgreements.status, req.query.status));
@@ -679,8 +737,13 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.post('/orgs/:orgId/legal/agreements', { schema: { tags: ['legal'], security: secured, params: orgParams, body: agreementBody, summary: 'Add an agreement to the register, e.g. for existing franchisees (legal.agreements edit)' } }, async (req, reply) => {
     const { orgId } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'legal.edit');
     const b = req.body;
+    if (!(await orgHas(req, s.db, orgId, 'legal.edit'))) {
+      const ls = await legalScope(req, s.db, orgId, 'legal.agreements', 'edit');
+      if (!hasLegalScope(ls)) await requireOrgPerm(req, s.db, orgId, 'legal.edit');
+      if (!(await territoryOwnerGroups(s.db, orgId, ls)).has(b.ownerGroupId)) throw forbidden('You can only add agreements for the owner groups of your own territory');
+      if (b.jurisdiction) requireJurisdiction(ls, b.jurisdiction, 'add agreements');
+    }
     if (b.endDate <= b.startDate) throw validationError('The end date must be after the start date', { endDate: 'After start date' });
     const [g] = await s.db.select().from(ownerGroups).where(and(eq(ownerGroups.id, b.ownerGroupId), eq(ownerGroups.organizationId, orgId)));
     if (!g) throw notFound('Owner group');
@@ -691,7 +754,13 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.patch('/orgs/:orgId/legal/agreements/:id', { schema: { tags: ['legal'], security: secured, params: idParams, body: agreementBody.partial() } }, async (req) => {
     const { orgId, id } = req.params;
-    await requireOrgPerm(req, s.db, orgId, 'legal.edit');
+    if (!(await orgHas(req, s.db, orgId, 'legal.edit'))) {
+      const ls = await legalScope(req, s.db, orgId, 'legal.agreements', 'edit');
+      if (!hasLegalScope(ls)) await requireOrgPerm(req, s.db, orgId, 'legal.edit');
+      const [cur] = await s.db.select().from(franchiseAgreements).where(and(eq(franchiseAgreements.id, id), eq(franchiseAgreements.organizationId, orgId)));
+      if (!cur || !(await agreementFilter(s.db, orgId, ls))(cur)) throw notFound('Agreement');
+      if (req.body.ownerGroupId && !(await territoryOwnerGroups(s.db, orgId, ls)).has(req.body.ownerGroupId)) throw forbidden('You can only move agreements to the owner groups of your own territory');
+    }
     const [a] = await s.db.update(franchiseAgreements).set({ ...req.body, ...(req.body.endDate ? { remindersSent: [] } : {}), updatedAt: new Date() }).where(and(eq(franchiseAgreements.id, id), eq(franchiseAgreements.organizationId, orgId))).returning();
     if (!a) throw notFound('Agreement');
     await audit(s.db, { organizationId: orgId, actorUserId: req.user!.id, action: 'legal.agreement_updated', targetType: 'franchise_agreement', targetId: a.id, metadata: { changes: Object.keys(req.body) }, ip: req.ip });
@@ -701,8 +770,10 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/franchise/owner-groups', { schema: { tags, security: secured, params: orgParams } }, async (req) => {
     const { orgId } = req.params;
-    await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]);
-    const rows = await s.db.select().from(ownerGroups).where(eq(ownerGroups.organizationId, orgId)).orderBy(asc(ownerGroups.name));
+    const agr = await legalScope(req, s.db, orgId, 'legal.agreements', 'view');
+    const orgWide = await requireAnyOrgPerm(req, s.db, orgId, [...VIEW]).then(() => true, (e) => { if (hasLegalScope(agr)) return false; throw e; });
+    const mineOnly = orgWide ? null : await territoryOwnerGroups(s.db, orgId, agr);
+    const rows = (await s.db.select().from(ownerGroups).where(eq(ownerGroups.organizationId, orgId)).orderBy(asc(ownerGroups.name))).filter((g) => !mineOnly || mineOnly.has(g.id));
     return { items: rows.map((g) => ({ id: g.id, name: g.name, legalName: g.legalName })) };
   });
 

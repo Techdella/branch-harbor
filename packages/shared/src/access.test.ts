@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  COMBINED_ROLES, COVERAGE_AREAS, PENDING_MODULES, ROLE_PERMISSIONS, ROLE_TEMPLATES, TEAM_ROLE_ORDER, TEAM_SHAPE_SUGGESTIONS, applyDenies, combinedRoleCapabilities, coverageAreasFor,
+  COMBINED_ROLES, COVERAGE_AREAS, PENDING_MODULES, ROLE_PERMISSIONS, ROLE_TEMPLATES, SCREEN_MODULES, industryModules, TEAM_ROLE_ORDER, TEAM_SHAPE_SUGGESTIONS, applyDenies, combinedRoleCapabilities, coverageAreasFor,
   effectiveCapabilities, expandGrants, modulesFor, parseCapability, permissionsFromCapabilities, primaryWorkspace, rolesByTeam, sensitiveClassesIn, templateCapabilities, workspacesFor,
 } from './access.ts';
 import { INDUSTRIES } from './industries.ts';
@@ -80,6 +80,10 @@ test('territories run their own franchise pipeline; other HQ-private modules sta
   assert.ok(mf.has('sales.franchise_pipeline:publish'));
   assert.ok(mf.has('network.onboarding:edit') && mf.has('finance.invoices:view') && mf.has('community.announcements:publish') && mf.has('settings.team:edit'));
   assert.ok(!mf.has('finance.royalties:view') && !mf.has('legal.agreements:view') && !mf.has('settings.billing:view'));
+  // Franchise legal is never in the template, but HQ can grant it on a territory (not on an owner group).
+  const granted = effectiveCapabilities({ role: 'master_franchisee', scopeKind: 'territory', grants: ['legal.disclosure:edit', 'legal.agreements:edit'] }, 'studios');
+  assert.ok(granted.has('legal.disclosure:edit') && granted.has('legal.agreements:view'));
+  assert.ok(!effectiveCapabilities({ role: 'franchise_owner', scopeKind: 'owner_group', grants: ['legal.disclosure:edit'] }, 'studios').has('legal.disclosure:edit'));
   const ad = caps('area_developer', 'territory');
   assert.ok(ad.has('sales.franchise_pipeline:view') && ad.has('operations.classes:edit') && ad.has('finance.payments:view'));
   // The same template at a region does not get the pipeline (it is not a sub-network).
@@ -190,4 +194,23 @@ test('coverage areas name real capabilities and suggest a template that covers t
   }
   assert.ok(!coverageAreasFor('studios', 'independent').some((a) => a.key === 'royalties'));
   assert.ok(coverageAreasFor('studios', 'network').some((a) => a.key === 'royalties'));
+});
+
+test('screen-level sub-modules: staff get front-line screens only, location managers and above get every screen', () => {
+  for (const industry of INDUSTRIES) {
+    const staff = caps('staff', 'location', industry);
+    for (const m of SCREEN_MODULES[industry]) {
+      assert.ok(m.parent && modulesFor(industry).some((p) => p.key === m.parent), `${m.key} has a parent module`);
+      assert.ok(!staff.has(`${m.key}:view`), `staff never get ${m.key}`);
+      assert.ok(caps('location_manager', 'location', industry).has(`${m.key}:edit`), `location managers get ${m.key}`);
+      assert.ok(caps('franchise_owner', 'owner_group', industry).has(`${m.key}:edit`), `franchise owners get ${m.key}`);
+      assert.ok(caps('operations_lead', 'organization', industry).has(`${m.key}:edit`), `operations leads get ${m.key}`);
+      // A management screen belongs to its sub-module only (the parent no longer lists it).
+      for (const sc of m.screens ?? []) assert.ok(!modulesFor(industry).some((p) => p.key !== m.key && p.screens?.includes(sc)), `${sc} belongs to one module`);
+    }
+  }
+  const s = caps('staff', 'location', 'studios');
+  assert.ok(s.has('operations.classes:edit') && !s.has('operations.classes.schedule_builder:view') && !s.has('operations.classes.rooms:view'));
+  assert.ok(caps('sales_lead', 'organization', 'studios').has('operations.memberships.packs_offers:edit'));
+  assert.deepEqual(industryModules('studios').map((m) => m.key).filter((k) => k.split('.').length > 2), ['operations.classes.schedule_builder', 'operations.classes.rooms', 'operations.memberships.packs_offers']);
 });

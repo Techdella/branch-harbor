@@ -107,7 +107,7 @@ describe.skipIf(!hasDb)('BranchHarbor billing: paid trial, country lock, payers,
     await runBillingSweep(app.ctx, new Date(end - 0.5 * DAY));
     const reminders = app.ctx.mailer.outbox.filter((m) => m.to === owner.email && m.tag === 'billing-trial-reminder');
     expect(reminders.map((m) => m.subject)).toEqual([expect.stringMatching(/ends in 3 days/), expect.stringMatching(/ends tomorrow/)]);
-    expect(reminders[0]!.text).toMatch(/GBP 239\.00 per month/);
+    expect(reminders[0]!.text).toMatch(/£239\.00 per month/);
     await runBillingSweep(app.ctx, new Date(end + 60_000));
     const after = await call(app, 'GET', b(org.id), { token: owner.token });
     expect(after.body.status).toBe('active');

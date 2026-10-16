@@ -8,6 +8,7 @@ import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, notFound } from '../lib/errors.ts';
 import { audit } from './audit.ts';
 import { ownerEmails } from './billing.ts';
+import { sendBillingEmails } from './billing-emails.ts';
 
 /**
  * Free data export (Settings → Export your data, owner only). A background job writes one CSV per core table, scoped
@@ -144,14 +145,9 @@ export async function buildExport(s: Services, exportId: string): Promise<void> 
       expiresAt, completedAt: new Date(), error: null,
     }).where(eq(dataExports.id, ex.id));
     const link = `${s.cfg.PUBLIC_API_URL.replace(/\/$/, '')}/v1/exports/${ex.id}/download?token=${token}`;
-    const [requester] = await s.db.select({ email: users.email, name: users.name }).from(users).where(eq(users.id, ex.requestedBy));
+    const [requester] = await s.db.select({ email: users.email, name: users.name, locale: users.locale }).from(users).where(eq(users.id, ex.requestedBy));
     const to = requester ? [requester] : await ownerEmails(s.db, ex.organizationId);
-    for (const r of to) {
-      await s.mailer.send({
-        to: r.email, tag: 'data-export', subject: 'Your BranchHarbor data export is ready',
-        text: `Hi ${r.name},\n\nYour data export for ${org?.name ?? 'your business'} is ready: ${files.length} CSV files in one ZIP (${Math.ceil(bytes.length / 1024)} KB).\n\nDownload it here (the link works until ${expiresAt.toISOString().slice(0, 10)}):\n${link}\n\nYou can also download it from Settings → Export your data while it is valid. Exports are free.\n`,
-      }).catch((err) => s.log.warn({ err }, '[export] email failed'));
-    }
+    await sendBillingEmails(s, to, 'data-export', { kind: 'export_ready', business: org?.name ?? 'BranchHarbor', files: files.length, sizeKb: Math.ceil(bytes.length / 1024), expiresOn: expiresAt, link });
     await audit(s.db, { organizationId: ex.organizationId, actorUserId: null, actorType: 'system', action: 'data_export.ready', scopeKind: 'organization', scopeId: ex.organizationId, targetType: 'data_export', targetId: ex.id, metadata: { files: files.length, bytes: bytes.length } });
   } catch (err) {
     s.log.error({ err, exportId }, '[export] failed');

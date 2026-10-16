@@ -218,6 +218,9 @@ it is one line in `planQuote` when approved).
 - **Reminders**: the billing sweep (`runBillingSweep`, every `BILLING_SWEEP_MINUTES`, default 60) emails owners 3 days
   and 1 day before the trial ends (`TRIAL_REMINDER_DAYS`), with the plan price and how to cancel. Not sent once the
   customer has cancelled.
+- **Emails** (trial confirmation, plan started, reminders, conversion, payment failed, plan changed, export link) are
+  written in each recipient's language (`services/billing-emails.ts`: en, fr, es, de, pt-BR; other locales read
+  English), with local money and date formats.
 - **Cancel** any time (`POST /billing/cancel`): during the trial nothing more is charged; on a paid plan it runs to
   the end of the paid period. `POST /billing/resume` withdraws it. No cancellation fee.
 - Terms are shown on the pricing page (how the trial works, FAQ) and at checkout (bullet list + a required
@@ -250,6 +253,23 @@ On the **platform** Stripe account (`integrations/platform-billing.ts`, never a 
 `pm_sandbox_card_GB_<fingerprint>` is a card issued in GB; `pm_sandbox_decline…` is declined. The sweep does what
 Stripe does live: converts ended trials (or cancels them), renews periods, invoices franchisee shares and applies
 scheduled billing-country changes.
+
+### Change card, change plan, live franchisee charging
+
+- **Change card**: `POST /billing/payment-method` opens a SetupIntent on the billing customer; `…/confirm` applies the
+  same country lock as checkout (card from the billing country, or its business tax ID) and makes the card the default
+  for the customer and the subscription.
+- **Change plan or interval**: `GET /billing/change/preview?plan&interval` returns the new price and the prorated
+  amount for the rest of the period (Stripe's invoice preview live; computed in sandbox), `POST /billing/change`
+  applies it (`proration_behavior: create_prorations`; during the trial nothing is prorated and the new plan starts on
+  day 15). Cancel at period end and resume as before.
+- **Live franchisee charging**: when a location's fee is passed to a franchisee (or split), the franchisee's billing
+  account gets its own Stripe subscription, in its currency and price list, with one item per share
+  (`network_location_franchisee_<pct>pct` × locations). It starts with HQ's plan (`trial_end` = HQ's trial end or next
+  period). HQ's own items only carry HQ's share. Quantities follow the network: location changes, payer changes, the
+  billing sweep and `invoice.created` (renewals) call `syncBillingSubscriptions`; a franchisee with nothing passed on
+  any more is cancelled. Webhooks: `customer.subscription.updated` (trialing → active converts the trial: email, audit,
+  franchisee shares), `invoice.payment_failed` (HQ or franchisee: past due + email).
 
 ## Billing-country lock
 
@@ -301,6 +321,11 @@ The pricing page is rendered per request and picks the display price list on the
 `A1`/`A2`, `EU`, `AP`), then the region of the highest-priority `Accept-Language` tag, else USD tier A. There is no
 currency selector. Language follows the URL; currency follows location. Test locally with
 `curl -H 'x-vercel-ip-country: NG' http://localhost:3000/en/pricing`.
+
+The **home page stays static**: its "Try it for 14 days for {local price}" line is a small client island
+(`components/home/TrialLine.tsx`) that reads `/api/geo-price`, a route handler applying the same header rule and cached
+at the CDN per country (`s-maxage` 1 day, `Vary: x-vercel-ip-country, cf-ipcountry, accept-language`). Test with
+`curl -H 'x-vercel-ip-country: NG' http://localhost:3000/api/geo-price`.
 
 **Founder decisions still open:** approve or edit each row and the tier bands; the platform fee level and the 3
 included locations; the collection fee (USD 1, capped at USD 10 per location per month); whether franchisee-paid

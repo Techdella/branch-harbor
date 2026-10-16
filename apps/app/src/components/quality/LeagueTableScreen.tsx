@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Button, Field, Input, Select, Toggle, cx } from '@bh/ui';
 import type { Quartiles } from '@bh/shared';
@@ -36,8 +36,14 @@ export function LeagueTableScreen() {
   const [sort, setSort] = useState<LeagueSort>('revenue');
   const [region, setRegion] = useState('');
   const [group, setGroup] = useState('');
+  const [territory, setTerritory] = useState('');
+  const [portfolio, setPortfolio] = useState('');
   const range = preset === 'custom' ? custom : presetRange(preset);
-  const res = useQuality(() => qualityApi.league({ ...range, sort, regionId: region || undefined, ownerGroupId: group || undefined }), [app.org.id, range.from, range.to, sort, region, group]);
+  const filterQuery = { regionId: region || undefined, ownerGroupId: group || undefined, territoryId: territory || undefined, portfolioId: portfolio || undefined };
+  const res = useQuality(() => qualityApi.league({ ...range, sort, ...filterQuery }), [app.org.id, range.from, range.to, sort, region, group, territory, portfolio]);
+  // Choices come with the table (only scopes holding locations you rank); keep the last ones while a filter reloads.
+  const [choices, setChoices] = useState<NonNullable<LeagueVM['filters']>>({ territories: [], portfolios: [] });
+  useEffect(() => { if (res.data?.filters) setChoices(res.data.filters); }, [res.data?.filters]);
   const hq = res.data?.view === 'network';
   const groups = useQuality(() => qualityApi.ownerGroups().catch(() => ({ items: [] })), [app.org.id], hq);
   const regions = useQuality(() => qualityApi.regions().catch(() => ({ items: [] })), [app.org.id], hq);
@@ -46,7 +52,7 @@ export function LeagueTableScreen() {
   return (
     <>
       <PageHeader icon="trophy" title={t('league.title')} description={hq || !res.data ? t('league.description') : t('league.descriptionOwn')} scope={false}
-        actions={res.data?.can.export ? <Button variant="ghost" size="sm" icon="download" onClick={() => void downloadCsv('/league-table/export', `league-table-${range.from}-${range.to}.csv`, { ...range, sort, regionId: region || undefined, ownerGroupId: group || undefined })}>{t('common.exportCsv')}</Button> : undefined} />
+        actions={res.data?.can.export ? <Button variant="ghost" size="sm" icon="download" onClick={() => void downloadCsv('/league-table/export', `league-table-${range.from}-${range.to}.csv`, { ...range, sort, ...filterQuery })}>{t('common.exportCsv')}</Button> : undefined} />
       <section className="flex flex-wrap items-end gap-2 rounded-xl bg-surface p-4" aria-label={t('league.filters')}>
         <div className="w-44"><Field label={t('league.period')}>{(x) => (
           <Select id={x.id} value={preset} onChange={(e) => setPreset(e.target.value as Preset)}>
@@ -72,6 +78,18 @@ export function LeagueTableScreen() {
           <Select id={x.id} value={group} onChange={(e) => setGroup(e.target.value)}>
             <option value="">{t('common.all')}</option>
             {groups.data!.items.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </Select>
+        )}</Field></div>}
+        {choices.territories.length > 0 && <div className="w-48"><Field label={t('common.territory')}>{(x) => (
+          <Select id={x.id} value={territory} onChange={(e) => setTerritory(e.target.value)} data-testid="league-territory">
+            <option value="">{t('common.all')}</option>
+            {choices.territories.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </Select>
+        )}</Field></div>}
+        {choices.portfolios.length > 0 && <div className="w-48"><Field label={t('common.portfolio')}>{(x) => (
+          <Select id={x.id} value={portfolio} onChange={(e) => setPortfolio(e.target.value)} data-testid="league-portfolio">
+            <option value="">{t('common.all')}</option>
+            {choices.portfolios.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
           </Select>
         )}</Field></div>}
       </section>

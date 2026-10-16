@@ -201,6 +201,35 @@
       "cardOnFile": "{brand} •••• {last4} · cobrado em {currency}",
       "setup": "Configurar a cobrança",
       "saveCard": "Salvar cartão"
+    },
+    "change": {
+      "title": "Mudar de plano",
+      "body": "Mude de plano ou de periodicidade quando quiser. Upgrades e downgrades são proporcionais ao restante do período; mudar não tem custo.",
+      "plan": "Plano",
+      "current": "Atual",
+      "billingPeriod": "Periodicidade",
+      "interval": {
+        "month": "Mensal",
+        "year": "Anual"
+      },
+      "annualNote": "O anual custa 10 × o mensal (2 meses incluídos).",
+      "now": "Agora",
+      "after": "Depois da mudança",
+      "dueNow": "Entra na sua próxima fatura",
+      "credit": "Crédito na sua próxima fatura",
+      "dueAtTrialEnd": "Cobrado agora",
+      "trialNote": "Você está no teste: nada é cobrado agora, e o novo plano começa em {date}.",
+      "prorationNote": "Proporcional ao restante deste período; o novo preço vale a partir de {date}.",
+      "creditNote": "A parte não usada do seu plano atual é creditada.",
+      "confirm": "Mudar de plano",
+      "done": "Agora você está no plano {plan}."
+    },
+    "cardChange": {
+      "open": "Trocar cartão",
+      "title": "Novo cartão",
+      "body": "Use um cartão emitido em {country}, seu país de faturamento, ou informe o número fiscal da sua empresa nesse país.",
+      "save": "Salvar cartão",
+      "done": "Seu novo cartão foi salvo e será usado na próxima cobrança."
     }
   },
   "shell": {

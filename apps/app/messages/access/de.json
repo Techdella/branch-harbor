@@ -132,11 +132,23 @@
         },
         "classes": {
           "name": "Kurse & Stundenplan",
-          "description": "Kursplan, Räume, Buchungen, Anwesenheit und Vertretungen."
+          "description": "Kursplan, Buchungen, Check-in, Anwesenheit und Vertretungen.",
+          "schedule_builder": {
+            "name": "Stundenplan-Editor",
+            "description": "Wiederkehrende Kursreihen, Kursarten und Buchungsregeln."
+          },
+          "rooms": {
+            "name": "Räume",
+            "description": "Räume je Standort, ihre Kapazität und Ausstattung."
+          }
         },
         "memberships": {
           "name": "Mitglieder & Preise",
-          "description": "Mitglieder, Mitgliedschaften, Kursguthaben, Angebote und On-Demand-Kurse."
+          "description": "Mitglieder, Mitgliedschaften und On-Demand-Kurse.",
+          "packs_offers": {
+            "name": "Preise, Kursguthaben & Angebote",
+            "description": "Mitgliedschaftstarife, Kursguthaben und Einstiegsangebote."
+          }
         },
         "studio_insights": {
           "name": "Studio-Auswertungen",
@@ -148,7 +160,11 @@
         },
         "teams": {
           "name": "Teams & Einheiten",
-          "description": "Teams, Spielplan, Anwesenheit, Ankündigungen und Erziehungsberechtigte."
+          "description": "Teams, Anwesenheit, Ankündigungen und Erziehungsberechtigte.",
+          "schedule_builder": {
+            "name": "Spielplan-Editor",
+            "description": "Saisonpläne, Planvorschläge und Spielstätten."
+          }
         },
         "sports_reports": {
           "name": "Sportberichte",
@@ -156,7 +172,11 @@
         },
         "appointments": {
           "name": "Termine",
-          "description": "Kalender, Behandler und ihre Zeiten."
+          "description": "Der Terminkalender.",
+          "practitioners": {
+            "name": "Behandler & Zeiten",
+            "description": "Behandler, ihre Arbeitszeiten sowie Räume oder Geräte."
+          }
         },
         "services": {
           "name": "Leistungen & Pakete",
@@ -180,7 +200,11 @@
         },
         "inventory": {
           "name": "Bestand",
-          "description": "Lagerbestand, Umlagerungen und Einkauf."
+          "description": "Lagerbestände, Inventuren und Umlagerungen zwischen Filialen.",
+          "purchasing": {
+            "name": "Einkauf",
+            "description": "Bestellungen und Lieferanten."
+          }
         },
         "commerce_insights": {
           "name": "Handels-Auswertungen",
@@ -192,7 +216,11 @@
         },
         "food_orders": {
           "name": "Bestellungen & Küche",
-          "description": "Bestellungen, Küchendisplay, Abholung, Lieferung, Tische, Catering und Essenspläne."
+          "description": "Bestellungen, Küchendisplay, Abholung, Lieferung und Tische.",
+          "catering": {
+            "name": "Catering & Essenspläne",
+            "description": "Catering-Menüs und -Veranstaltungen, Essenspläne und Produktionstage, Liefergebiete und -dienste."
+          }
         },
         "ordering_settings": {
           "name": "Bestelleinstellungen",
@@ -204,7 +232,11 @@
         },
         "listings": {
           "name": "Inserate",
-          "description": "Inserate, Freigaben und Portal-Feeds."
+          "description": "Inserate und Freigaben.",
+          "portals": {
+            "name": "Portal-Feeds",
+            "description": "Welche Inserate an welche Immobilienportale gehen."
+          }
         },
         "enquiries": {
           "name": "Anfragen & Besichtigungen",
@@ -212,7 +244,11 @@
         },
         "agents": {
           "name": "Makler & Büros",
-          "description": "Makler, Büros und Lead-Verteilung."
+          "description": "Makler, ihre eigenen Lead-Einstellungen und Büros.",
+          "offices": {
+            "name": "Büros & Lead-Verteilung",
+            "description": "Büroeinstellungen und wie Anfragen an Makler verteilt werden."
+          }
         },
         "reservations": {
           "name": "Rezeption & Reservierungen",
@@ -501,7 +537,8 @@
       "addRole": "Weitere Rolle hinzufügen",
       "addRoleTitle": "Weitere Rolle hinzufügen",
       "addRoleSave": "Rolle hinzufügen",
-      "removeRole": "Diese Rolle entfernen"
+      "removeRole": "Diese Rolle entfernen",
+      "subModule": "Bildschirm in {parent}"
     },
     "teams": {
       "leadership": "Leitung",
@@ -647,7 +684,36 @@
         "master": "Master-Franchise",
         "development": "Entwicklungsgebiet",
         "support": "Betreuungsgebiet"
-      }
+      },
+      "tab": "Portfolios & Gebiete",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "confirmDelete": "Endgültig löschen",
+      "deleted": "{name} wurde gelöscht.",
+      "locationCount": "{count, plural, =0 {Keine Standorte} one {# Standort} other {# Standorte}}",
+      "assigned": "Zugewiesen: {people}",
+      "noMembers": "Noch niemand zugewiesen.",
+      "editTitle": "{name} bearbeiten",
+      "kind": "Art",
+      "country": "Land",
+      "countryHint": "Zweistelliger Code, z. B. IE. Die Rechtsregeln dieses Landes können dem Gebiet übertragen werden.",
+      "locationsPicked": "Standorte ({count} von {total} ausgewählt)",
+      "searchLocations": "Standort suchen",
+      "selectAll": "Angezeigte auswählen",
+      "clear": "Angezeigte abwählen",
+      "movesFrom": "wechselt aus {territory}",
+      "saved": "{name} gespeichert.",
+      "save": "Änderungen speichern",
+      "members": "Zugewiesene Personen",
+      "remove": "Entfernen",
+      "unassigned": "{name} hat diesen Bereich nicht mehr.",
+      "person": "Person",
+      "choosePerson": "Person wählen…",
+      "role": "Rolle",
+      "assign": "Zuweisen",
+      "assignedOne": "{name} hat jetzt diesen Bereich.",
+      "membersHint": "Die Zuweisung gibt der Person die Rolle für genau diese Standorte. Sie können nur Zugriff vergeben, den Sie selbst haben.",
+      "scopeType": "Bereich"
     }
   },
   "demo": {

@@ -16,7 +16,7 @@ import type { FastifyRequest } from 'fastify';
 import { growthPct, quartileOf, quartiles, type Quartiles } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
 import {
-  appointments, portfolios, territories, classBookings, classOccurrences, financeInvoices, foodOrders, franchiseTerritories, hospReservationRooms, hospReservations, hospRooms, locations, orders, organizations, ownerGroups, paymentReferences,
+  appointments, portfolioLocations, portfolios, territories, classBookings, classOccurrences, financeInvoices, foodOrders, franchiseTerritories, hospReservationRooms, hospReservations, hospRooms, locations, orders, organizations, ownerGroups, paymentReferences,
   realtyEnquiries, regions, registrations,
 } from '../db/schema/index.ts';
 import { localDateParts } from '../lib/tz.ts';
@@ -323,5 +323,25 @@ export async function leagueTable(req: FastifyRequest, db: Exec, organizationId:
     columns: { revenue: rows.some((r) => r.revenueMinor !== null), occupancy: hasOccupancy, auditScore: some(auditsSeen), royaltyStatus: some(invoices), reviewRating: hasReviews },
     rows, benchmarks, networkRanks, settings: { franchiseeQuartiles: settings.franchiseeQuartiles },
     currencies: [...new Set(rows.map((r) => r.currency))].sort(),
+    filters: await filterChoices(db, organizationId, network.filter((l) => has(allowed, l.id)).map((l) => l.id)),
+  };
+}
+
+/**
+ * Territory and portfolio filter choices: the access-scope territories (sub-networks) and portfolios holding at least
+ * one location the viewer ranks (a master franchisee sees their territory, a field consultant their portfolios).
+ */
+async function filterChoices(db: Exec, organizationId: string, visible: string[]) {
+  const seen = new Set(visible);
+  const [terrs, locTerr, pfs, members] = await Promise.all([
+    db.select({ id: territories.id, name: territories.name }).from(territories).where(eq(territories.organizationId, organizationId)),
+    db.select({ id: locations.id, territoryId: locations.territoryId }).from(locations).where(eq(locations.organizationId, organizationId)),
+    db.select({ id: portfolios.id, name: portfolios.name }).from(portfolios).where(eq(portfolios.organizationId, organizationId)),
+    db.select({ portfolioId: portfolioLocations.portfolioId, locationId: portfolioLocations.locationId }).from(portfolioLocations).where(eq(portfolioLocations.organizationId, organizationId)),
+  ]);
+  const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
+  return {
+    territories: terrs.filter((t) => locTerr.some((l) => l.territoryId === t.id && seen.has(l.id))).sort(byName),
+    portfolios: pfs.filter((p) => members.some((m) => m.portfolioId === p.id && seen.has(m.locationId))).sort(byName),
   };
 }

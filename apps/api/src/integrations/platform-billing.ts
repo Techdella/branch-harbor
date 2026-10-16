@@ -41,10 +41,24 @@ export interface PlatformBilling {
   createSubscription(input: {
     customerId: string; paymentMethodId: string; currency: string; interval: 'month' | 'year'; lines: SubscriptionLine[];
     trialDays: number | null; trialFee: { amountMinor: number; description: string } | null; metadata: Record<string, string>; idempotencyKey: string;
+    /** Start billing at this moment instead (e.g. a franchisee share aligned with HQ's trial end or period). */
+    trialEnd?: Date | null;
   }): Promise<PlatformSubscription>;
   setCancelAtPeriodEnd(subscriptionId: string, cancel: boolean): Promise<void>;
   cancelNow(subscriptionId: string): Promise<void>;
+  /**
+   * Replaces the subscription's items with `lines` (same lookup key → same item, new price/quantity; missing → removed)
+   * and optionally the interval. `prorate`: create prorations for the change (none during a trial).
+   */
+  updateItems(subscriptionId: string, input: { currency: string; interval: 'month' | 'year'; lines: SubscriptionLine[]; prorate: boolean; idempotencyKey: string }): Promise<PlatformSubscription>;
+  /** What the change would cost now (prorated amount added to the next invoice, minor units; credits are negative). */
+  previewItems(subscriptionId: string, customerId: string, input: { currency: string; interval: 'month' | 'year'; lines: SubscriptionLine[] }): Promise<{ prorationMinor: number } | null>;
+  /** Saves a confirmed card as the customer's (and subscription's) default payment method. */
+  setDefaultPaymentMethod(customerId: string, subscriptionId: string | null, paymentMethodId: string): Promise<void>;
 }
+
+/** Item lookup key of a line (prices are lookup-keyed per currency, interval and amount: `<line>:<cur>:<interval>:<amount>`). */
+export const lineKeyOf = (lookupKey: string | null | undefined) => (lookupKey ?? '').split(':')[0] ?? '';
 
 const isSandbox = (id: string | null | undefined) => !id || id.includes('_sandbox_');
 const fake = (prefix: string, seed: string) => `${prefix}_sandbox_${sha256(seed).slice(0, 14)}`;
@@ -157,11 +171,11 @@ export function createPlatformBilling(cfg: Config, payments: Pick<PaymentsProvid
       if (!stripe || isSandbox(i.customerId)) {
         if (i.paymentMethodId.includes('decline')) throw new CardDeclinedError('Your card was declined (sandbox).', 'card_declined');
         const now = Date.now();
-        const trialEnd = i.trialDays ? new Date(now + i.trialDays * 86400_000) : null;
+        const trialEnd = i.trialEnd && i.trialEnd.getTime() > now ? i.trialEnd : i.trialDays ? new Date(now + i.trialDays * 86400_000) : null;
         const periodEnd = trialEnd ?? new Date(now + (i.interval === 'year' ? 365 : 30) * 86400_000);
         const id = fake('sub', i.idempotencyKey);
         const planTotal = i.lines.reduce((s, l) => s + l.unitAmountMinor * l.quantity, 0);
-        const charged = i.trialFee ? i.trialFee.amountMinor : planTotal;
+        const charged = i.trialFee ? i.trialFee.amountMinor : trialEnd ? 0 : planTotal;
         return {
           id, status: trialEnd ? 'trialing' : 'active', trialEnd, currentPeriodEnd: periodEnd,
           latestInvoice: { id: fake('in', `${i.idempotencyKey}:first`), number: null, status: 'paid', amountPaid: charged, amountDue: charged, tax: 0, total: charged, subtotal: charged, currency: i.currency, hostedUrl: null, periodStart: new Date(now), periodEnd },
@@ -174,7 +188,8 @@ export function createPlatformBilling(cfg: Config, payments: Pick<PaymentsProvid
           customer: i.customerId,
           default_payment_method: i.paymentMethodId,
           items,
-          ...(i.trialDays ? { trial_period_days: i.trialDays, trial_settings: { end_behavior: { missing_payment_method: 'cancel' } } } : {}),
+          ...(i.trialEnd && i.trialEnd.getTime() > Date.now() ? { trial_end: Math.floor(i.trialEnd.getTime() / 1000), trial_settings: { end_behavior: { missing_payment_method: 'cancel' } } }
+            : i.trialDays ? { trial_period_days: i.trialDays, trial_settings: { end_behavior: { missing_payment_method: 'cancel' } } } : {}),
           ...(i.trialFee ? { add_invoice_items: [{ price_data: { currency: i.currency.toLowerCase(), product: await trialProduct(), unit_amount: i.trialFee.amountMinor, tax_behavior: 'exclusive' } }] } : {}),
           automatic_tax: { enabled: cfg.STRIPE_TAX_ENABLED },
           payment_behavior: 'error_if_incomplete',
@@ -198,6 +213,50 @@ export function createPlatformBilling(cfg: Config, payments: Pick<PaymentsProvid
     async cancelNow(id) {
       if (!stripe || isSandbox(id)) return;
       await stripe.subscriptions.cancel(id);
+    },
+    async updateItems(id, i) {
+      if (!stripe || isSandbox(id)) {
+        return { id, status: 'active', trialEnd: null, currentPeriodEnd: null, latestInvoice: null };
+      }
+      const cur = await stripe.subscriptions.retrieve(id);
+      const existing = cur.items.data.map((it) => ({ id: it.id, key: lineKeyOf(it.price.lookup_key) }));
+      const items: Stripe.SubscriptionUpdateParams.Item[] = [];
+      const used = new Set<string>();
+      for (const l of i.lines) {
+        const price = await ensurePrice(i.currency, i.interval, l);
+        const match = existing.find((e) => e.key === l.lookupKey && !used.has(e.id));
+        if (match) used.add(match.id);
+        items.push(match ? { id: match.id, price, quantity: l.quantity } : { price, quantity: l.quantity });
+      }
+      for (const e of existing) if (!used.has(e.id)) items.push({ id: e.id, deleted: true });
+      const sub = await stripe.subscriptions.update(id, { items, proration_behavior: i.prorate ? 'create_prorations' : 'none', expand: ['latest_invoice'] }, { idempotencyKey: i.idempotencyKey });
+      const raw = sub as unknown as Record<string, any>;
+      return { id: sub.id, status: sub.status, trialEnd: toDate(raw.trial_end), currentPeriodEnd: subscriptionPeriodEnd(raw), latestInvoice: raw.latest_invoice && typeof raw.latest_invoice === 'object' ? invoiceFromStripe(raw.latest_invoice) : null };
+    },
+    async previewItems(id, customerId, i) {
+      if (!stripe || isSandbox(id)) return null;
+      const cur = await stripe.subscriptions.retrieve(id);
+      const existing = cur.items.data.map((it) => ({ id: it.id, key: lineKeyOf(it.price.lookup_key) }));
+      const items: Array<{ id?: string; price?: string; quantity?: number; deleted?: boolean }> = [];
+      const used = new Set<string>();
+      for (const l of i.lines) {
+        const price = await ensurePrice(i.currency, i.interval, l);
+        const match = existing.find((e) => e.key === l.lookupKey && !used.has(e.id));
+        if (match) used.add(match.id);
+        items.push(match ? { id: match.id, price, quantity: l.quantity } : { price, quantity: l.quantity });
+      }
+      for (const e of existing) if (!used.has(e.id)) items.push({ id: e.id, deleted: true });
+      const preview = await (stripe.invoices as unknown as { createPreview: (p: Record<string, unknown>) => Promise<Record<string, any>> }).createPreview({
+        customer: customerId, subscription: id, subscription_details: { items, proration_behavior: 'create_prorations', proration_date: Math.floor(Date.now() / 1000) },
+      });
+      const lines = (preview.lines?.data ?? []) as Array<Record<string, any>>;
+      const prorationMinor = lines.filter((l) => l.proration || l.parent?.subscription_item_details?.proration).reduce((sum, l) => sum + Number(l.amount ?? 0), 0);
+      return { prorationMinor };
+    },
+    async setDefaultPaymentMethod(customerId, subscriptionId, pm) {
+      if (!stripe || isSandbox(customerId)) return;
+      await stripe.customers.update(customerId, { invoice_settings: { default_payment_method: pm } });
+      if (subscriptionId && !isSandbox(subscriptionId)) await stripe.subscriptions.update(subscriptionId, { default_payment_method: pm });
     },
   };
 }

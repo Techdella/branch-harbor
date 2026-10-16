@@ -232,6 +232,20 @@
       "when": 1792113397238,
       "tag": "0032_franchise_dev",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792113935276,
+      "tag": "0033_screen_submodules",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792113939415,
+      "tag": "0034_billing_sync_compliance_missing",
+      "breakpoints": true
     }
   ]
 }

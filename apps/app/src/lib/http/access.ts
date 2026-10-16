@@ -135,10 +135,25 @@ export const accessApi = {
   setTeamShape: (shape: string, names?: Record<string, string>, descriptions?: Record<string, string>) => http.put<TeamShapeVM>(o('/access/team-shape'), { shape, names, descriptions }),
   scopes: () => http.get<ScopesVM>(o('/access/scopes')),
   createPortfolio: (body: { name: string; description?: string | null; locationIds: string[] }) => http.post<{ id: string }>(o('/access/portfolios'), body),
-  updatePortfolio: (id: string, body: { name?: string; locationIds?: string[] }) => http.patch<{ id: string }>(o(`/access/portfolios/${id}`), body),
+  updatePortfolio: (id: string, body: { name?: string; description?: string | null; locationIds?: string[] }) => http.patch<{ id: string }>(o(`/access/portfolios/${id}`), body),
   createTerritory: (body: { name: string; kind: string; country?: string | null; locationIds: string[] }) => http.post<{ id: string }>(o('/access/territories'), body),
-  updateTerritory: (id: string, body: { name?: string; locationIds?: string[] }) => http.patch<{ id: string }>(o(`/access/territories/${id}`), body),
+  updateTerritory: (id: string, body: { name?: string; kind?: string; country?: string | null; locationIds?: string[] }) => http.patch<{ id: string }>(o(`/access/territories/${id}`), body),
+  deletePortfolio: (id: string) => http.del<{ deleted: true }>(o(`/access/portfolios/${id}`)),
+  deleteTerritory: (id: string) => http.del<{ deleted: true }>(o(`/access/territories/${id}`)),
+  /** Role assignments you manage, with role names and scopes (who is assigned to a portfolio or territory). */
+  assignments: () => http.get<{ items: AssignmentListItemVM[]; held: string[] }>(o('/access/assignments')),
 };
+
+export interface AssignmentListItemVM {
+  id: string;
+  user: { id: string; name: string; email: string };
+  role: string;
+  customRoleId: string | null;
+  roleName: string;
+  scope: { kind: ScopeKind; id: string; name: string | null };
+  workspaces: string[];
+  editable: boolean;
+}
 
 type Res<T> = { status: 'loading'; data?: T; error?: undefined } | { status: 'ready'; data: T; error?: undefined } | { status: 'error'; data?: T; error: ApiError };
 const toErr = (e: unknown) => (e instanceof ApiError ? e : new ApiError('unknown_error', e instanceof Error ? e.message : 'Something went wrong.'));

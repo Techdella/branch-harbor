@@ -201,6 +201,35 @@
       "cardOnFile": "{brand} •••• {last4} · facturé en {currency}",
       "setup": "Configurer la facturation",
       "saveCard": "Enregistrer la carte"
+    },
+    "change": {
+      "title": "Changer de formule",
+      "body": "Changez de formule ou de périodicité à tout moment. Les changements sont calculés au prorata pour le reste de la période ; aucuns frais de changement.",
+      "plan": "Formule",
+      "current": "Actuelle",
+      "billingPeriod": "Périodicité",
+      "interval": {
+        "month": "Mensuelle",
+        "year": "Annuelle"
+      },
+      "annualNote": "L’annuel coûte 10 × le mensuel (2 mois offerts).",
+      "now": "Aujourd’hui",
+      "after": "Après le changement",
+      "dueNow": "Ajouté à votre prochaine facture",
+      "credit": "Avoir sur votre prochaine facture",
+      "dueAtTrialEnd": "Prélevé maintenant",
+      "trialNote": "Vous êtes en période d’essai : rien n’est prélevé maintenant, et la nouvelle formule démarre le {date}.",
+      "prorationNote": "Au prorata pour le reste de la période ; le nouveau prix s’applique à partir du {date}.",
+      "creditNote": "La partie non utilisée de votre formule actuelle est créditée.",
+      "confirm": "Changer de formule",
+      "done": "Vous êtes maintenant en formule {plan}."
+    },
+    "cardChange": {
+      "open": "Changer de carte",
+      "title": "Nouvelle carte",
+      "body": "Utilisez une carte émise en/au {country}, votre pays de facturation, ou ajoutez votre numéro fiscal d’entreprise de ce pays.",
+      "save": "Enregistrer la carte",
+      "done": "Votre nouvelle carte est enregistrée et sera utilisée pour le prochain prélèvement."
     }
   },
   "shell": {

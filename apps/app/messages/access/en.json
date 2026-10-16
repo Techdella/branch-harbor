@@ -132,11 +132,23 @@
         },
         "classes": {
           "name": "Classes & schedule",
-          "description": "Class timetable, rooms, bookings, attendance and cover."
+          "description": "Class timetable, bookings, check-in, attendance and cover.",
+          "schedule_builder": {
+            "name": "Schedule builder",
+            "description": "Recurring class series, class types and booking policies."
+          },
+          "rooms": {
+            "name": "Rooms",
+            "description": "Rooms per location, their capacity and features."
+          }
         },
         "memberships": {
           "name": "Members & pricing",
-          "description": "Members, memberships, class packs, offers and on-demand classes."
+          "description": "Members, memberships and on-demand classes.",
+          "packs_offers": {
+            "name": "Pricing, packs & offers",
+            "description": "Membership plans, class packs and introductory offers."
+          }
         },
         "studio_insights": {
           "name": "Studio insights",
@@ -148,7 +160,11 @@
         },
         "teams": {
           "name": "Teams & sessions",
-          "description": "Teams, schedule, attendance, announcements and guardians."
+          "description": "Teams, attendance, announcements and guardians.",
+          "schedule_builder": {
+            "name": "Schedule builder",
+            "description": "Season schedules, schedule proposals and venues."
+          }
         },
         "sports_reports": {
           "name": "Sports reports",
@@ -156,7 +172,11 @@
         },
         "appointments": {
           "name": "Appointments",
-          "description": "Calendar, practitioners and their hours."
+          "description": "The appointment calendar.",
+          "practitioners": {
+            "name": "Practitioners & hours",
+            "description": "Practitioners, their working hours, and rooms or equipment."
+          }
         },
         "services": {
           "name": "Services & packages",
@@ -180,7 +200,11 @@
         },
         "inventory": {
           "name": "Inventory",
-          "description": "Stock, transfers and purchasing."
+          "description": "Stock levels, counts and transfers between stores.",
+          "purchasing": {
+            "name": "Purchasing",
+            "description": "Purchase orders and suppliers."
+          }
         },
         "commerce_insights": {
           "name": "Commerce insights",
@@ -192,7 +216,11 @@
         },
         "food_orders": {
           "name": "Orders & kitchen",
-          "description": "Orders, kitchen display, pickup, delivery, tables, catering and meal plans."
+          "description": "Orders, kitchen display, pickup, delivery and tables.",
+          "catering": {
+            "name": "Catering & meal plans",
+            "description": "Catering menus and events, meal plans and production dates, delivery zones and providers."
+          }
         },
         "ordering_settings": {
           "name": "Ordering settings",
@@ -204,7 +232,11 @@
         },
         "listings": {
           "name": "Listings",
-          "description": "Listings, approvals and portal feeds."
+          "description": "Listings and approvals.",
+          "portals": {
+            "name": "Portal feeds",
+            "description": "Which listings go to which property portals."
+          }
         },
         "enquiries": {
           "name": "Inquiries & viewings",
@@ -212,7 +244,11 @@
         },
         "agents": {
           "name": "Agents & offices",
-          "description": "Agents, offices and lead routing."
+          "description": "Agents, their own lead settings and offices.",
+          "offices": {
+            "name": "Offices & lead routing",
+            "description": "Office settings and how enquiries are routed between agents."
+          }
         },
         "reservations": {
           "name": "Front desk & reservations",
@@ -501,7 +537,8 @@
       "addRole": "Add another role",
       "addRoleTitle": "Add another role",
       "addRoleSave": "Add role",
-      "removeRole": "Remove this role"
+      "removeRole": "Remove this role",
+      "subModule": "Screen in {parent}"
     },
     "teams": {
       "leadership": "Leadership",
@@ -647,7 +684,36 @@
         "master": "Master franchise",
         "development": "Development area",
         "support": "Support area"
-      }
+      },
+      "tab": "Portfolios & territories",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Delete for good",
+      "deleted": "{name} was deleted.",
+      "locationCount": "{count, plural, =0 {No locations} one {# location} other {# locations}}",
+      "assigned": "Assigned: {people}",
+      "noMembers": "Nobody is assigned yet.",
+      "editTitle": "Edit {name}",
+      "kind": "Kind",
+      "country": "Country",
+      "countryHint": "Two-letter code, e.g. IE. Jurisdiction rules of this country can be granted to the territory.",
+      "locationsPicked": "Locations ({count} of {total} selected)",
+      "searchLocations": "Find a location",
+      "selectAll": "Select all shown",
+      "clear": "Clear shown",
+      "movesFrom": "moves from {territory}",
+      "saved": "{name} saved.",
+      "save": "Save changes",
+      "members": "People assigned here",
+      "remove": "Remove",
+      "unassigned": "{name} no longer has this scope.",
+      "person": "Person",
+      "choosePerson": "Choose a person…",
+      "role": "Role",
+      "assign": "Assign",
+      "assignedOne": "{name} now has this scope.",
+      "membersHint": "Assigning gives the person the role for exactly these locations. You can only give access you hold yourself.",
+      "scopeType": "Scope"
     }
   },
   "demo": {

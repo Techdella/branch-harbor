@@ -132,11 +132,23 @@
         },
         "classes": {
           "name": "Cours et planning",
-          "description": "Planning des cours, salles, réservations, présences et remplacements."
+          "description": "Planning des cours, réservations, pointage, présences et remplacements.",
+          "schedule_builder": {
+            "name": "Création du planning",
+            "description": "Séries de cours récurrentes, types de cours et règles de réservation."
+          },
+          "rooms": {
+            "name": "Salles",
+            "description": "Salles par site, leur capacité et leurs équipements."
+          }
         },
         "memberships": {
           "name": "Membres et tarifs",
-          "description": "Membres, abonnements, carnets de cours, offres et cours à la demande."
+          "description": "Membres, abonnements et cours à la demande.",
+          "packs_offers": {
+            "name": "Tarifs, carnets et offres",
+            "description": "Formules d’abonnement, carnets de cours et offres de découverte."
+          }
         },
         "studio_insights": {
           "name": "Analyses du studio",
@@ -148,7 +160,11 @@
         },
         "teams": {
           "name": "Équipes et séances",
-          "description": "Équipes, calendrier, présences, annonces et responsables légaux."
+          "description": "Équipes, présences, annonces et responsables légaux.",
+          "schedule_builder": {
+            "name": "Création du calendrier",
+            "description": "Calendriers de saison, propositions de calendrier et lieux."
+          }
         },
         "sports_reports": {
           "name": "Rapports sportifs",
@@ -156,7 +172,11 @@
         },
         "appointments": {
           "name": "Rendez-vous",
-          "description": "Agenda, praticiens et leurs horaires."
+          "description": "L’agenda des rendez-vous.",
+          "practitioners": {
+            "name": "Praticiens et horaires",
+            "description": "Praticiens, leurs horaires de travail, et salles ou équipements."
+          }
         },
         "services": {
           "name": "Prestations et forfaits",
@@ -180,7 +200,11 @@
         },
         "inventory": {
           "name": "Stock",
-          "description": "Stock, transferts et achats."
+          "description": "Niveaux de stock, inventaires et transferts entre magasins.",
+          "purchasing": {
+            "name": "Achats",
+            "description": "Bons de commande et fournisseurs."
+          }
         },
         "commerce_insights": {
           "name": "Analyses commerce",
@@ -192,7 +216,11 @@
         },
         "food_orders": {
           "name": "Commandes et cuisine",
-          "description": "Commandes, écran cuisine, retrait, livraison, tables, traiteur et formules repas."
+          "description": "Commandes, écran cuisine, retrait, livraison et tables.",
+          "catering": {
+            "name": "Traiteur et formules repas",
+            "description": "Menus et événements traiteur, formules repas et dates de production, zones et prestataires de livraison."
+          }
         },
         "ordering_settings": {
           "name": "Paramètres de commande",
@@ -204,7 +232,11 @@
         },
         "listings": {
           "name": "Annonces",
-          "description": "Annonces, approbations et flux vers les portails."
+          "description": "Annonces et approbations.",
+          "portals": {
+            "name": "Flux vers les portails",
+            "description": "Quelles annonces partent vers quels portails immobiliers."
+          }
         },
         "enquiries": {
           "name": "Demandes et visites",
@@ -212,7 +244,11 @@
         },
         "agents": {
           "name": "Agents et agences",
-          "description": "Agents, agences et attribution des prospects."
+          "description": "Agents, leurs propres réglages de prospects et agences.",
+          "offices": {
+            "name": "Agences et attribution des prospects",
+            "description": "Réglages des agences et répartition des demandes entre agents."
+          }
         },
         "reservations": {
           "name": "Réception et réservations",
@@ -501,7 +537,8 @@
       "addRole": "Ajouter un autre rôle",
       "addRoleTitle": "Ajouter un autre rôle",
       "addRoleSave": "Ajouter le rôle",
-      "removeRole": "Retirer ce rôle"
+      "removeRole": "Retirer ce rôle",
+      "subModule": "Écran de {parent}"
     },
     "teams": {
       "leadership": "Direction",
@@ -647,7 +684,36 @@
         "master": "Master franchise",
         "development": "Zone de développement",
         "support": "Zone d’accompagnement"
-      }
+      },
+      "tab": "Portefeuilles et territoires",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer définitivement",
+      "deleted": "{name} a été supprimé.",
+      "locationCount": "{count, plural, =0 {Aucun site} one {# site} other {# sites}}",
+      "assigned": "Affectés : {people}",
+      "noMembers": "Personne n’est encore affecté.",
+      "editTitle": "Modifier {name}",
+      "kind": "Type",
+      "country": "Pays",
+      "countryHint": "Code à deux lettres, par ex. IE. Les règles juridiques de ce pays peuvent être confiées au territoire.",
+      "locationsPicked": "Sites ({count} sur {total} sélectionnés)",
+      "searchLocations": "Trouver un site",
+      "selectAll": "Tout sélectionner (affichés)",
+      "clear": "Tout désélectionner (affichés)",
+      "movesFrom": "quitte {territory}",
+      "saved": "{name} enregistré.",
+      "save": "Enregistrer",
+      "members": "Personnes affectées",
+      "remove": "Retirer",
+      "unassigned": "{name} n’a plus ce périmètre.",
+      "person": "Personne",
+      "choosePerson": "Choisir une personne…",
+      "role": "Rôle",
+      "assign": "Affecter",
+      "assignedOne": "{name} a maintenant ce périmètre.",
+      "membersHint": "L’affectation donne le rôle pour exactement ces sites. Vous ne pouvez donner que les accès que vous détenez.",
+      "scopeType": "Périmètre"
     }
   },
   "demo": {

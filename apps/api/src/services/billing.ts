@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, lte } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, isNull, lte } from 'drizzle-orm';
 import type Stripe from 'stripe';
 import {
   NETWORK_INCLUDED_LOCATIONS, PRICE_BOOK_VERSION, TRIAL_DAYS, TRIAL_REMINDER_DAYS, assertBillingCurrency, asBusinessModel, isPriceListKey, listPriceMinor,
@@ -14,6 +14,7 @@ import { CardDeclinedError, invoiceFromStripe, subscriptionPeriodEnd, type CardD
 import { sha256 } from '../lib/crypto.ts';
 import { AppError, badRequest, conflict, notFound } from '../lib/errors.ts';
 import { audit } from './audit.ts';
+import { sendBillingEmails } from './billing-emails.ts';
 import { stripeEventExtensions } from './payments.ts';
 
 /**
@@ -60,6 +61,12 @@ async function loadOrgRow(db: Exec, orgId: string): Promise<Org> {
   if (!o) throw notFound('Organisation');
   return o;
 }
+
+/** Settings → Billing in the app (linked from billing emails). */
+export const billingLink = (s: Services) => `${s.cfg.APP_URL.replace(/\/$/, '')}/settings#billing`;
+
+/** Product name of a plan (never translated). */
+export const planName = (plan: string) => `${plan[0]!.toUpperCase()}${plan.slice(1)}`;
 
 /** Owners' emails (organisation-scope org_owner). */
 export async function ownerEmails(db: Exec, orgId: string): Promise<{ email: string; name: string; locale: string }[]> {
@@ -360,7 +367,7 @@ export async function confirmCheckout(s: Services, orgId: string, input: { setup
       currentPeriodEnd: created.currentPeriodEnd ?? trialEndsAt, cancelAtPeriodEnd: false, canceledAt: null,
       stripeCustomerId: co.customerId, stripeSubscriptionId: created.id, stripePaymentMethodId: pm,
       card: card ? { brand: card.brand, last4: card.last4, country: card.country, expMonth: card.expMonth, expYear: card.expYear } : null,
-      taxId: input.taxId ?? null, taxIdCountry: lock.taxIdCountry, countryEvidence: lock.evidence, checkout: null, pendingChange: null, updatedAt: now,
+      taxId: input.taxId ?? null, taxIdCountry: lock.taxIdCountry, countryEvidence: lock.evidence, checkout: null, pendingChange: null, syncedLines: linesFor(quote), updatedAt: now,
     }).where(eq(subscriptions.id, sub.id));
     if (created.latestInvoice && created.latestInvoice.total > 0) {
       await upsertInvoice(tx, orgId, created.latestInvoice, {
@@ -374,16 +381,12 @@ export async function confirmCheckout(s: Services, orgId: string, input: { setup
       metadata: { plan: co.plan, interval: co.interval, billingCountry: co.billingCountry, priceList: co.priceList, evidence: lock.evidence, cardCountry: card?.country ?? null, trialRefusedReason: eligibility.reason },
     });
   });
-  const fmtAmt = (m: number) => `${quote.currency} ${(m / 10 ** (quote.currency === 'JPY' ? 0 : 2)).toFixed(quote.currency === 'JPY' ? 0 : 2)}`;
-  for (const o of await ownerEmails(s.db, orgId)) {
-    await s.mailer.send({
-      to: o.email, tag: 'billing',
-      subject: eligibility.eligible ? `Your ${TRIAL_DAYS}-day BranchHarbor trial has started` : 'Your BranchHarbor plan has started',
-      text: eligibility.eligible
-        ? `Hi ${o.name},\n\nThanks for starting your ${TRIAL_DAYS}-day trial of ${org.name} on BranchHarbor. We charged ${fmtAmt(quote.trialFeeMinor)} for the trial.\n\nYour ${co.plan} plan starts automatically on ${trialEndsAt!.toISOString().slice(0, 10)} at ${fmtAmt(quote.totalMinor)} per ${co.interval}${s.cfg.STRIPE_TAX_ENABLED ? ' plus applicable tax' : ''}, unless you cancel before then in Settings → Billing. We'll remind you 3 days and 1 day before. There is no cancellation fee, and you can export your data for free at any time.\n`
-        : `Hi ${o.name},\n\nYour ${co.plan} plan for ${org.name} has started (a trial was already used for this business, card or email domain). We charged ${fmtAmt(quote.totalMinor)} for the first ${co.interval}. Cancel any time in Settings → Billing; no cancellation fee.\n`,
-    }).catch((err) => s.log.warn({ err }, '[billing] confirmation email failed'));
-  }
+  const billingUrl = billingLink(s);
+  await sendBillingEmails(s, await ownerEmails(s.db, orgId), 'billing', eligibility.eligible
+    ? { kind: 'trial_started', business: org.name, trialFee: { amountMinor: quote.trialFeeMinor, currency: quote.currency }, planName: planName(co.plan), amount: { amountMinor: quote.totalMinor, currency: quote.currency }, interval: co.interval, startsOn: trialEndsAt!, taxAdded: s.cfg.STRIPE_TAX_ENABLED, billingUrl }
+    : { kind: 'plan_started', business: org.name, planName: planName(co.plan), amount: { amountMinor: quote.totalMinor, currency: quote.currency }, interval: co.interval, billingUrl });
+  // Payers set before checkout: HQ's items and franchisee subscriptions follow.
+  await syncBillingQuietly(s, orgId);
   return { status, trialEndsAt: iso(trialEndsAt), trialUsed: !eligibility.eligible, trialRefusedReason: eligibility.reason, evidence: lock.evidence };
 }
 
@@ -495,7 +498,7 @@ async function applyCountryChange(s: Services, sub: Sub, model: string, now: Dat
       status: created.status === 'active' ? 'active' : created.status, billingCountry: p.billingCountry, currency: quote.currency, priceList: p.priceList, priceBookVersion: PRICE_BOOK_VERSION,
       platformFeeMinor: plan === 'network' ? listPriceMinor(p.priceList, 'platform') * months : null, pricePerLocationMinor: listPriceMinor(p.priceList, plan) * months,
       stripeCustomerId: p.customerId, stripeSubscriptionId: created.id, stripePaymentMethodId: p.paymentMethodId, card: p.card ?? null, taxId: p.taxId ?? null, taxIdCountry: p.taxIdCountry ?? null,
-      countryEvidence: p.evidence, currentPeriodEnd: created.currentPeriodEnd, trialEndsAt: null, cancelAtPeriodEnd: false, pendingChange: null, updatedAt: now,
+      countryEvidence: p.evidence, currentPeriodEnd: created.currentPeriodEnd, trialEndsAt: null, cancelAtPeriodEnd: false, pendingChange: null, syncedLines: linesFor(quote), updatedAt: now,
     }).where(eq(subscriptions.id, sub.id));
     if (created.latestInvoice && created.latestInvoice.total > 0) await upsertInvoice(tx, sub.organizationId, created.latestInvoice, { kind: 'subscription', description: `${plan} plan`, lines: quote.lines.map((l) => ({ description: l.kind, quantity: l.quantity, amountMinor: l.amountMinor })) });
     await audit(tx, { organizationId: sub.organizationId, actorUserId: null, actorType: 'system', action: 'billing.country_changed', scopeKind: 'organization', scopeId: sub.organizationId, targetType: 'subscription', targetId: sub.id, metadata: { from: sub.billingCountry, to: p.billingCountry, priceList: p.priceList } });
@@ -516,6 +519,7 @@ export async function setPayer(s: Services, orgId: string, input: { scopeKind: '
   const pct = input.payer === 'split' ? input.franchiseePercent! : input.payer === 'franchisee' ? 100 : 0;
   const [row] = await s.db.insert(locationFeePayers).values({ organizationId: orgId, scopeKind: input.scopeKind, scopeId: input.scopeId, payer: input.payer, franchiseePercent: pct, updatedBy: actor.userId })
     .onConflictDoUpdate({ target: [locationFeePayers.organizationId, locationFeePayers.scopeKind, locationFeePayers.scopeId], set: { payer: input.payer, franchiseePercent: pct, updatedBy: actor.userId, updatedAt: new Date() } }).returning();
+  await syncBillingQuietly(s, orgId);
   await audit(s.db, { organizationId: orgId, actorUserId: actor.userId, ip: actor.ip ?? null, action: 'billing.payer_set', scopeKind: input.scopeKind, scopeId: input.scopeId, targetType: 'location_fee_payer', targetId: row!.id, metadata: { payer: input.payer, franchiseePercent: pct } });
   return row!;
 }
@@ -523,6 +527,7 @@ export async function setPayer(s: Services, orgId: string, input: { scopeKind: '
 export async function removePayer(s: Services, orgId: string, id: string, actor: { userId: string }) {
   const [row] = await s.db.delete(locationFeePayers).where(and(eq(locationFeePayers.id, id), eq(locationFeePayers.organizationId, orgId))).returning();
   if (!row) throw notFound('Payer setting');
+  await syncBillingQuietly(s, orgId);
   await audit(s.db, { organizationId: orgId, actorUserId: actor.userId, action: 'billing.payer_removed', scopeKind: row.scopeKind, scopeId: row.scopeId, targetType: 'location_fee_payer', targetId: row.id });
 }
 
@@ -596,6 +601,7 @@ export async function confirmFranchiseeSetup(s: Services, orgId: string, input: 
     card: card ? { brand: card.brand, last4: card.last4, country: card.country } : null, taxId: input.taxId ?? null, status: 'active', setup: null, updatedAt: new Date(),
   }).where(eq(franchiseeBillingAccounts.id, acct.id));
   await audit(s.db, { organizationId: orgId, actorUserId: actor.userId, ip: actor.ip ?? null, action: 'billing.franchisee_account_ready', scopeKind: input.scopeKind, scopeId: input.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id, metadata: { billingCountry: setup.billingCountry, evidence: lock.evidence } });
+  await syncBillingQuietly(s, orgId);
   return { accountId: acct.id, status: 'active' };
 }
 
@@ -629,7 +635,7 @@ const isSandboxSub = (sub: Sub) => !sub.stripeSubscriptionId || sub.stripeSubscr
  * cancelled), renews periods and applies scheduled billing-country changes.
  */
 export async function runBillingSweep(s: Services, now = new Date()) {
-  const result = { reminders: 0, converted: 0, canceled: 0, renewed: 0, countryChanges: 0 };
+  const result = { reminders: 0, converted: 0, canceled: 0, renewed: 0, countryChanges: 0, synced: 0 };
   const trialing = await s.db.select().from(subscriptions).where(eq(subscriptions.status, 'trialing'));
   for (const sub of trialing) {
     if (!sub.trialEndsAt) continue;
@@ -676,10 +682,13 @@ export async function runBillingSweep(s: Services, now = new Date()) {
     });
     if (sub.status === 'trialing') {
       result.converted++;
-      for (const o of await ownerEmails(s.db, sub.organizationId)) {
-        await s.mailer.send({ to: o.email, tag: 'billing', subject: 'Your BranchHarbor plan has started', text: `Hi ${o.name},\n\nYour trial has ended and your ${plan} plan for ${org.name} has started. Invoices are in Settings → Billing. Cancel any time; there is no cancellation fee.\n` }).catch(() => undefined);
-      }
+      await sendBillingEmails(s, await ownerEmails(s.db, sub.organizationId), 'billing', { kind: 'trial_converted', business: org.name, planName: planName(plan), billingUrl: billingLink(s) });
     } else result.renewed++;
+  }
+  // Reconcile quantities and franchisee subscriptions (catches anything a location or payer change missed).
+  for (const sub of await s.db.select({ organizationId: subscriptions.organizationId }).from(subscriptions).where(inArray(subscriptions.status, ['trialing', 'active', 'past_due']))) {
+    const r = await syncBillingSubscriptions(s, sub.organizationId).catch((err) => { s.log.warn({ err }, '[billing] sweep sync failed'); return null; });
+    if (r && (r.hq || r.franchisees)) result.synced++;
   }
   return result;
 }
@@ -690,16 +699,10 @@ async function sendTrialReminder(s: Services, sub: Sub, days: number) {
   const rows = await locationBilling(s.db, sub.organizationId, sub, org.model);
   const quote = planQuote({ priceList: subPriceList(sub), plan, interval: sub.billingInterval === 'year' ? 'year' : 'month', locations: rows.length });
   const amount = hqTotal(quote, rows);
-  const exp = quote.currency === 'JPY' ? 0 : 2;
-  const price = `${quote.currency} ${(amount / 10 ** exp).toFixed(exp)}`;
-  const date = sub.trialEndsAt!.toISOString().slice(0, 10);
-  for (const o of await ownerEmails(s.db, sub.organizationId)) {
-    await s.mailer.send({
-      to: o.email, tag: 'billing-trial-reminder',
-      subject: days === 1 ? `Your BranchHarbor trial ends tomorrow (${date})` : `Your BranchHarbor trial ends in ${days} days (${date})`,
-      text: `Hi ${o.name},\n\nYour ${TRIAL_DAYS}-day trial of BranchHarbor for ${org.name} ends on ${date}. Your ${plan} plan then starts automatically and we will charge ${price} per ${quote.interval}${s.cfg.STRIPE_TAX_ENABLED ? ' plus applicable tax' : ''} to the card ending ${sub.card?.last4 ?? '••••'}.\n\nDon't want to continue? Cancel before ${date} in Settings → Billing (${s.cfg.APP_URL.replace(/\/$/, '')}/settings#billing). There is no cancellation fee, and you can export your data for free.\n`,
-    }).catch((err) => s.log.warn({ err }, '[billing] trial reminder failed'));
-  }
+  await sendBillingEmails(s, await ownerEmails(s.db, sub.organizationId), 'billing-trial-reminder', {
+    kind: 'trial_reminder', business: org.name, days, planName: planName(plan), amount: { amountMinor: amount, currency: quote.currency }, interval: quote.interval, startsOn: sub.trialEndsAt!,
+    taxAdded: s.cfg.STRIPE_TAX_ENABLED, last4: sub.card?.last4 ?? null, billingUrl: billingLink(s),
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -724,8 +727,21 @@ export async function processPlatformBillingEvent(tx: Tx, event: Stripe.Event, s
   if (!sub) {
     const [fa] = await tx.select().from(franchiseeBillingAccounts).where(eq(franchiseeBillingAccounts.stripeSubscriptionId, subId));
     if (fa && event.type.startsWith('invoice.')) {
-      await upsertInvoice(tx, fa.organizationId, invoiceFromStripe(obj), { kind: 'franchisee_fee', payer: 'franchisee', franchiseeAccountId: fa.id, description: 'Location fees' });
-      return { note: 'Franchisee invoice recorded', organizationId: fa.organizationId };
+      const inv = invoiceFromStripe(obj);
+      if (inv.total > 0 || inv.amountPaid > 0) await upsertInvoice(tx, fa.organizationId, inv, { kind: 'franchisee_fee', payer: 'franchisee', franchiseeAccountId: fa.id, description: 'Location fees', lines: fa.subscriptionLines.map((l) => ({ description: l.productName, quantity: l.quantity, amountMinor: l.unitAmountMinor * l.quantity })) });
+      if (event.type === 'invoice.payment_failed') {
+        await tx.update(franchiseeBillingAccounts).set({ subscriptionStatus: 'past_due', updatedAt: new Date() }).where(eq(franchiseeBillingAccounts.id, fa.id));
+        const [org] = await tx.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, fa.organizationId));
+        const to = fa.createdBy ? await tx.select({ email: users.email, name: users.name, locale: users.locale }).from(users).where(eq(users.id, fa.createdBy)) : [];
+        await sendBillingEmails(s, to, 'billing-payment-failed', { kind: 'payment_failed', business: org?.name ?? 'BranchHarbor', amount: { amountMinor: inv.amountDue || inv.total, currency: inv.currency }, billingUrl: `${s.cfg.APP_URL.replace(/\/$/, '')}/franchisee-billing`, franchisee: true });
+      }
+      return { note: `Franchisee invoice ${inv.status}`, organizationId: fa.organizationId };
+    }
+    if (fa && event.type.startsWith('customer.subscription.')) {
+      // The franchisee's own subscription: trialing until HQ's plan starts, then active; Stripe converts it on its own.
+      const status = event.type === 'customer.subscription.deleted' ? 'canceled' : String(obj.status ?? fa.subscriptionStatus);
+      await tx.update(franchiseeBillingAccounts).set({ subscriptionStatus: status, currentPeriodEnd: subscriptionPeriodEnd(obj) ?? fa.currentPeriodEnd, updatedAt: new Date() }).where(eq(franchiseeBillingAccounts.id, fa.id));
+      return { note: `Franchisee subscription ${status}`, organizationId: fa.organizationId };
     }
     return null;
   }
@@ -736,7 +752,13 @@ export async function processPlatformBillingEvent(tx: Tx, event: Stripe.Event, s
       const trial = obj.billing_reason === 'subscription_create' && sub.trialFeeMinor != null;
       await upsertInvoice(tx, orgId, inv, { kind: trial ? 'trial_fee' : 'subscription', description: trial ? `${TRIAL_DAYS}-day trial` : `${sub.plan} plan` });
     }
-    if (event.type === 'invoice.payment_failed') await tx.update(subscriptions).set({ status: 'past_due', updatedAt: new Date() }).where(eq(subscriptions.id, sub.id));
+    if (event.type === 'invoice.payment_failed') {
+      await tx.update(subscriptions).set({ status: 'past_due', updatedAt: new Date() }).where(eq(subscriptions.id, sub.id));
+      const [org] = await tx.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, orgId));
+      await sendBillingEmails(s, await ownerEmails(tx, orgId), 'billing-payment-failed', { kind: 'payment_failed', business: org?.name ?? 'BranchHarbor', amount: { amountMinor: inv.amountDue || inv.total, currency: inv.currency }, billingUrl: billingLink(s) });
+    }
+    // A renewal invoice was drafted (live): bring quantities and franchisee shares up to date for the period.
+    if (event.type === 'invoice.created' && obj.billing_reason === 'subscription_cycle') await syncBillingSubscriptions(s, orgId, tx);
     return { note: `Platform invoice ${inv.status}`, organizationId: orgId };
   }
   // customer.subscription.*: re-check the billing country lock.
@@ -758,11 +780,262 @@ export async function processPlatformBillingEvent(tx: Tx, event: Stripe.Event, s
     return { note: 'Billing country change applied', organizationId: orgId };
   }
   const status = STRIPE_STATUS[String(obj.status)] ?? sub.status;
+  const previous = (event.data as { previous_attributes?: Record<string, unknown> }).previous_attributes;
+  const converted = event.type === 'customer.subscription.updated' && sub.status === 'trialing' && status === 'active' && (previous?.status === 'trialing' || previous?.status === undefined);
   await tx.update(subscriptions).set({
     status, trialEndsAt: typeof obj.trial_end === 'number' ? new Date(obj.trial_end * 1000) : sub.trialEndsAt, currentPeriodEnd: subscriptionPeriodEnd(obj) ?? sub.currentPeriodEnd,
     cancelAtPeriodEnd: !!obj.cancel_at_period_end && !(sub.pendingChange as Record<string, string> | null), canceledAt: status === 'canceled' ? new Date() : sub.canceledAt, updatedAt: new Date(),
   }).where(eq(subscriptions.id, sub.id));
-  return { note: `Platform subscription ${status}`, organizationId: orgId };
+  if (converted) {
+    // Live trial-to-plan conversion: Stripe starts the plan on day 15; tell the owners and line up the franchisee shares.
+    const [org] = await tx.select({ name: organizations.name, model: organizations.model }).from(organizations).where(eq(organizations.id, orgId));
+    await audit(tx, { organizationId: orgId, actorUserId: null, actorType: 'webhook', action: 'billing.trial_converted', scopeKind: 'organization', scopeId: orgId, targetType: 'subscription', targetId: sub.id, metadata: { eventId: event.id } });
+    await sendBillingEmails(s, await ownerEmails(tx, orgId), 'billing', { kind: 'trial_converted', business: org?.name ?? 'BranchHarbor', planName: planName(subPlan(sub, org?.model ?? 'network')), billingUrl: billingLink(s) });
+    await syncBillingSubscriptions(s, orgId, tx);
+  }
+  if (status === 'canceled') {
+    // HQ's plan ended: nothing more is passed on to franchisees.
+    for (const fa of await tx.select().from(franchiseeBillingAccounts).where(and(eq(franchiseeBillingAccounts.organizationId, orgId), isNotNull(franchiseeBillingAccounts.stripeSubscriptionId)))) {
+      if (fa.subscriptionStatus === 'canceled') continue;
+      await s.billing.cancelNow(fa.stripeSubscriptionId!);
+      await tx.update(franchiseeBillingAccounts).set({ subscriptionStatus: 'canceled', subscriptionLines: [], updatedAt: new Date() }).where(eq(franchiseeBillingAccounts.id, fa.id));
+    }
+  }
+  return { note: converted ? 'Platform trial converted to the plan' : `Platform subscription ${status}`, organizationId: orgId };
 }
 
 stripeEventExtensions.push(async (tx, event, s) => processPlatformBillingEvent(tx, event, s));
+
+/* ------------------------------------------------------------------ */
+/* Live franchisee charging and quantity sync                          */
+/* ------------------------------------------------------------------ */
+
+type Line = SubscriptionLine;
+const sortLines = (a: readonly Line[]) => [...a].sort((x, y) => x.lookupKey.localeCompare(y.lookupKey));
+const sameLines = (a: readonly Line[], b: readonly Line[]) => JSON.stringify(sortLines(a)) === JSON.stringify(sortLines(b));
+
+/** Groups per-location amounts into subscription lines: one line per amount (quantity = locations at that amount). */
+function groupLines(amounts: { amountMinor: number; key: string; name: string }[]): Line[] {
+  const by = new Map<string, Line>();
+  for (const a of amounts) {
+    if (a.amountMinor <= 0) continue;
+    const cur = by.get(`${a.key}:${a.amountMinor}`);
+    if (cur) cur.quantity += 1;
+    else by.set(`${a.key}:${a.amountMinor}`, { lookupKey: a.key, productName: a.name, unitAmountMinor: a.amountMinor, quantity: 1 });
+  }
+  // One Stripe item per lookup key: distinct amounts under one key get their own key.
+  const seen = new Map<string, number>();
+  return sortLines([...by.values()].map((l) => {
+    const n = (seen.get(l.lookupKey) ?? 0) + 1;
+    seen.set(l.lookupKey, n);
+    return n === 1 ? l : { ...l, lookupKey: `${l.lookupKey}_${l.unitAmountMinor}` };
+  }));
+}
+
+/**
+ * HQ's own subscription items: the plan lines, except that on Network the per-location line only counts the share HQ
+ * pays (a franchisee-paid location is billed to the franchisee; a split bills HQ its part).
+ */
+export function hqLinesFor(quote: PlanQuote, rows: LocationBillingRow[]): Line[] {
+  const plan = linesFor(quote);
+  if (quote.plan !== 'network') return plan;
+  const platform = plan.filter((l) => l.lookupKey === 'network_platform');
+  const full = plan.find((l) => l.lookupKey === 'network_location');
+  const perLocation = groupLines(rows.filter((r) => !r.included).map((r) => ({
+    amountMinor: r.hqMinor,
+    key: r.payer === 'hq' ? 'network_location' : 'network_location_hq_share',
+    name: r.payer === 'hq' ? (full?.productName ?? 'BranchHarbor Network (per location)') : 'BranchHarbor Network location fee (HQ share)',
+  })));
+  return sortLines([...platform, ...perLocation]);
+}
+
+/** A franchisee account's subscription items: its locations' shares in the account's own price list. */
+export function franchiseeLinesFor(locs: { amount: { amount: number }; franchiseePercent: number }[]): Line[] {
+  return groupLines(locs.map((l) => ({ amountMinor: l.amount.amount, key: `network_location_franchisee_${l.franchiseePercent}pct`, name: `BranchHarbor Network location fee (franchisee share ${l.franchiseePercent}%)` })));
+}
+
+/**
+ * Keeps Stripe in line with the network (called on location and payer changes, after checkout and plan changes, by
+ * the billing sweep and on `invoice.created`):
+ * - HQ's subscription items follow the billable locations and who pays them (prorated; not during the trial);
+ * - each franchisee billing account with a card gets its own subscription, in its own currency and price list, for
+ *   the location fees HQ passes on. It starts when HQ's plan starts (HQ's trial end, or HQ's next period) and is
+ *   cancelled when nothing is passed on any more.
+ * Sandbox ids go through the same path (the sandbox fakes), so tests exercise the logic without Stripe.
+ */
+export async function syncBillingSubscriptions(s: Services, orgId: string, db: Exec = s.db): Promise<{ hq: boolean; franchisees: number }> {
+  const [sub] = await db.select().from(subscriptions).where(eq(subscriptions.organizationId, orgId));
+  const out = { hq: false, franchisees: 0 };
+  if (!sub || !['trialing', 'active', 'past_due'].includes(sub.status)) return out;
+  const [org] = await db.select().from(organizations).where(eq(organizations.id, orgId));
+  if (!org) return out;
+  const plan = subPlan(sub, org.model);
+  const interval: BillingInterval = sub.billingInterval === 'year' ? 'year' : 'month';
+  const rows = await locationBilling(db, orgId, sub, org.model);
+  const quote = planQuote({ priceList: subPriceList(sub), plan, interval, locations: rows.length });
+  const lines = hqLinesFor(quote, rows);
+  if (!sameLines(lines, sub.syncedLines)) {
+    if (sub.stripeSubscriptionId) await s.billing.updateItems(sub.stripeSubscriptionId, { currency: quote.currency, interval, lines, prorate: sub.status !== 'trialing', idempotencyKey: `bh-billing-sync:${sub.id}:${sha256(JSON.stringify(lines)).slice(0, 16)}` });
+    await db.update(subscriptions).set({ syncedLines: lines, billedLocationCount: quote.locations, updatedAt: new Date() }).where(eq(subscriptions.id, sub.id));
+    await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.quantities_synced', scopeKind: 'organization', scopeId: orgId, targetType: 'subscription', targetId: sub.id, metadata: { locations: quote.locations, lines: lines.map((l) => `${l.lookupKey}×${l.quantity}`) } });
+    out.hq = true;
+  }
+  const accounts = await db.select().from(franchiseeBillingAccounts).where(and(eq(franchiseeBillingAccounts.organizationId, orgId), eq(franchiseeBillingAccounts.status, 'active')));
+  for (const acct of accounts) {
+    const view = plan === 'network' ? await franchiseeBillingView(s, orgId, [{ kind: acct.scopeKind as 'location' | 'owner_group', id: acct.scopeId }]) : { locations: [] };
+    const flines = franchiseeLinesFor(view.locations.filter((l) => l.accountId === acct.id));
+    const hasSub = !!acct.stripeSubscriptionId && acct.subscriptionStatus !== 'canceled';
+    if (sameLines(flines, acct.subscriptionLines) && (hasSub || !flines.length)) continue;
+    const now = new Date();
+    if (!flines.length) {
+      if (hasSub) await s.billing.cancelNow(acct.stripeSubscriptionId!);
+      await db.update(franchiseeBillingAccounts).set({ subscriptionLines: [], subscriptionStatus: hasSub ? 'canceled' : acct.subscriptionStatus, updatedAt: now }).where(eq(franchiseeBillingAccounts.id, acct.id));
+      if (hasSub) await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.franchisee_subscription_ended', scopeKind: acct.scopeKind, scopeId: acct.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id });
+    } else if (!hasSub) {
+      const startAt = sub.status === 'trialing' ? sub.trialEndsAt : sub.currentPeriodEnd;
+      const created = await s.billing.createSubscription({
+        customerId: acct.stripeCustomerId!, paymentMethodId: acct.stripePaymentMethodId!, currency: acct.currency, interval, lines: flines, trialDays: null, trialFee: null, trialEnd: startAt,
+        metadata: { bh_org: orgId, bh_kind: 'franchisee', bh_account: acct.id, bh_price_list: acct.priceList, bh_billing_country: acct.billingCountry, bh_price_book: PRICE_BOOK_VERSION },
+        idempotencyKey: `bh-franchisee-sub:${acct.id}:${sha256(JSON.stringify(flines)).slice(0, 16)}`,
+      });
+      await db.update(franchiseeBillingAccounts).set({ stripeSubscriptionId: created.id, subscriptionStatus: created.status, subscriptionLines: flines, currentPeriodEnd: created.currentPeriodEnd, updatedAt: now }).where(eq(franchiseeBillingAccounts.id, acct.id));
+      await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.franchisee_subscription_created', scopeKind: acct.scopeKind, scopeId: acct.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id, metadata: { currency: acct.currency, lines: flines.map((l) => `${l.lookupKey}×${l.quantity}`), startsAt: iso(created.trialEnd) } });
+    } else {
+      await s.billing.updateItems(acct.stripeSubscriptionId!, { currency: acct.currency, interval, lines: flines, prorate: acct.subscriptionStatus === 'active', idempotencyKey: `bh-franchisee-sync:${acct.id}:${sha256(JSON.stringify(flines)).slice(0, 16)}` });
+      await db.update(franchiseeBillingAccounts).set({ subscriptionLines: flines, updatedAt: now }).where(eq(franchiseeBillingAccounts.id, acct.id));
+      await audit(db, { organizationId: orgId, actorUserId: null, actorType: 'system', action: 'billing.franchisee_quantities_synced', scopeKind: acct.scopeKind, scopeId: acct.scopeId, targetType: 'franchisee_billing_account', targetId: acct.id, metadata: { lines: flines.map((l) => `${l.lookupKey}×${l.quantity}`) } });
+    }
+    out.franchisees++;
+  }
+  return out;
+}
+
+/** Location or payer changes: keep billing in line without ever failing the change itself (the sweep retries). */
+export async function syncBillingQuietly(s: Services, orgId: string) {
+  await syncBillingSubscriptions(s, orgId).catch((err) => s.log.warn({ err, orgId }, '[billing] quantity sync failed; the billing sweep retries'));
+}
+
+/* ------------------------------------------------------------------ */
+/* Change card, change plan or interval                                */
+/* ------------------------------------------------------------------ */
+
+const subscribed = (sub: Sub) => ['trialing', 'active', 'past_due'].includes(sub.status);
+
+/** Step 1 of a card change: a card setup on the existing customer (same billing country). */
+export async function startPaymentMethodChange(s: Services, orgId: string, actor: { userId: string }) {
+  const sub = await loadSub(s.db, orgId);
+  if (!subscribed(sub) || !sub.stripeCustomerId || !sub.billingCountry) throw conflict('not_subscribed', 'Start your plan first.');
+  const si = await s.billing.createSetupIntent({ customerId: sub.stripeCustomerId, metadata: { bh_org: orgId, bh_kind: 'platform_card_change', bh_by: actor.userId }, idempotencyKey: `bh-billing-card:${orgId}:${Date.now()}` });
+  await s.db.update(subscriptions).set({ checkout: { kind: 'card_change', setupIntentId: si.id, startedAt: new Date().toISOString(), startedBy: actor.userId }, updatedAt: new Date() }).where(eq(subscriptions.id, sub.id));
+  return { billingCountry: sub.billingCountry, setup: { mode: s.billing.mode, clientSecret: si.clientSecret, publishableKey: s.billing.publishableKey, setupIntentId: si.id } };
+}
+
+/**
+ * Step 2: the new card must pass the same country check as at checkout (issued in the billing country, or a business
+ * tax ID from it). It becomes the default for the customer and the subscription; a past-due invoice is retried by
+ * Stripe with it.
+ */
+export async function confirmPaymentMethodChange(s: Services, orgId: string, input: { setupIntentId?: string | null; paymentMethodId?: string | null; taxId?: string | null }, actor: { userId: string; ip?: string | null }) {
+  const sub = await loadSub(s.db, orgId);
+  const pending = sub.checkout as { kind?: string; setupIntentId?: string } | null;
+  if (!subscribed(sub) || !sub.stripeCustomerId) throw conflict('not_subscribed', 'Start your plan first.');
+  let pm: string | null = input.paymentMethodId ?? null;
+  if (s.billing.mode === 'live') {
+    if (!input.setupIntentId || pending?.kind !== 'card_change' || input.setupIntentId !== pending.setupIntentId) throw badRequest('Confirm your new card first.', { setupIntentId: 'Required' });
+    pm = await s.billing.setupIntentPaymentMethod(input.setupIntentId, sub.stripeCustomerId);
+  }
+  if (!pm) throw new AppError(402, 'payment_method_required', 'Add the new card.');
+  const card = await s.billing.retrieveCard(pm);
+  const lock = lockBillingCountry({ billingCountry: sub.billingCountry!, currency: sub.currency, card, taxId: input.taxId ?? sub.taxId });
+  if (input.taxId) await s.billing.addTaxId(sub.stripeCustomerId, sub.billingCountry!, input.taxId);
+  await s.billing.setDefaultPaymentMethod(sub.stripeCustomerId, sub.stripeSubscriptionId, pm);
+  await s.db.update(subscriptions).set({
+    stripePaymentMethodId: pm, card: card ? { brand: card.brand, last4: card.last4, country: card.country, expMonth: card.expMonth, expYear: card.expYear } : null,
+    taxId: input.taxId ?? sub.taxId, taxIdCountry: lock.taxIdCountry ?? sub.taxIdCountry, countryEvidence: lock.evidence, checkout: null, updatedAt: new Date(),
+  }).where(eq(subscriptions.id, sub.id));
+  await audit(s.db, { organizationId: orgId, actorUserId: actor.userId, ip: actor.ip ?? null, action: 'billing.card_changed', scopeKind: 'organization', scopeId: orgId, targetType: 'subscription', targetId: sub.id, metadata: { cardCountry: card?.country ?? null, last4: card?.last4 ?? null, evidence: lock.evidence } });
+  return { card: card ? { brand: card.brand, last4: card.last4, country: card.country } : null, evidence: lock.evidence };
+}
+
+/** Remaining share of the current period (0–1) for prorations. */
+function remainingShare(sub: Sub, now: Date): number {
+  const end = sub.currentPeriodEnd?.getTime();
+  if (!end || sub.status === 'trialing') return 0;
+  const len = (sub.billingInterval === 'year' ? 365 : 30) * DAY;
+  return Math.max(0, Math.min(1, (end - now.getTime()) / len));
+}
+
+/**
+ * What switching plan or interval would cost: the new quote, HQ's new amount per interval, and the prorated amount for
+ * the rest of the current period (added to the next invoice; negative = credit). During the trial nothing is
+ * prorated: the new plan simply starts on day 15. Live mode asks Stripe for the exact preview.
+ */
+export async function previewPlanChange(s: Services, orgId: string, input: { plan: PlanPriceKey; interval: BillingInterval }, now = new Date()) {
+  const org = await loadOrgRow(s.db, orgId);
+  const sub = await loadSub(s.db, orgId);
+  if (!subscribed(sub)) throw conflict('not_subscribed', 'Start your plan first.');
+  if (!plansFor(org.model).includes(input.plan)) throw badRequest(`The ${input.plan} plan is not available for this business.`, { plan: `Choose one of: ${plansFor(org.model).join(', ')}` });
+  const current = subPlan(sub, org.model);
+  const curInterval: BillingInterval = sub.billingInterval === 'year' ? 'year' : 'month';
+  const next = { ...sub, plan: input.plan, billingInterval: input.interval };
+  const [curRows, newRows] = await Promise.all([locationBilling(s.db, orgId, sub, org.model), locationBilling(s.db, orgId, next as Sub, org.model)]);
+  const curQuote = planQuote({ priceList: subPriceList(sub), plan: current, interval: curInterval, locations: curRows.length });
+  const newQuote = planQuote({ priceList: subPriceList(sub), plan: input.plan, interval: input.interval, locations: newRows.length });
+  const curHq = hqTotal(curQuote, curRows);
+  const newHq = hqTotal(newQuote, newRows);
+  const share = remainingShare(sub, now);
+  // Same interval: the difference for the rest of the period. New interval: the new period is charged now, less the
+  // unused part of the current one.
+  let proration = sub.status === 'trialing' ? 0 : input.interval === curInterval ? Math.round((newHq - curHq) * share) : newHq - Math.round(curHq * share);
+  if (sub.stripeSubscriptionId && sub.status !== 'trialing') {
+    const live = await s.billing.previewItems(sub.stripeSubscriptionId, sub.stripeCustomerId!, { currency: newQuote.currency, interval: input.interval, lines: hqLinesFor(newQuote, newRows) }).catch(() => null);
+    if (live) proration = live.prorationMinor;
+  }
+  return {
+    from: { plan: current, interval: curInterval, hqTotal: { amount: curHq, currency: curQuote.currency } },
+    to: { plan: input.plan, interval: input.interval, hqTotal: { amount: newHq, currency: newQuote.currency } },
+    quote: newQuote,
+    proration: { amount: proration, currency: newQuote.currency },
+    effective: sub.status === 'trialing' ? 'trial_end' as const : 'now' as const,
+    effectiveAt: iso(sub.status === 'trialing' ? sub.trialEndsAt : now),
+    nextChargeAt: iso(sub.status === 'trialing' ? sub.trialEndsAt : input.interval === curInterval ? sub.currentPeriodEnd : now),
+    unchanged: current === input.plan && curInterval === input.interval,
+  };
+}
+
+/** Switches plan and/or interval now (prorated), or from the trial end while trialing. */
+export async function changePlan(s: Services, orgId: string, input: { plan: PlanPriceKey; interval: BillingInterval }, actor: { userId: string; ip?: string | null }) {
+  const preview = await previewPlanChange(s, orgId, input);
+  if (preview.unchanged) throw badRequest('That is already your plan.', { plan: 'Unchanged' });
+  const org = await loadOrgRow(s.db, orgId);
+  const sub = await loadSub(s.db, orgId);
+  const next = { ...sub, plan: input.plan, billingInterval: input.interval } as Sub;
+  const rows = await locationBilling(s.db, orgId, next, org.model);
+  const quote = planQuote({ priceList: subPriceList(sub), plan: input.plan, interval: input.interval, locations: rows.length });
+  const lines = hqLinesFor(quote, rows);
+  let periodEnd = sub.currentPeriodEnd;
+  if (sub.stripeSubscriptionId) {
+    const updated = await s.billing.updateItems(sub.stripeSubscriptionId, { currency: quote.currency, interval: input.interval, lines, prorate: sub.status !== 'trialing', idempotencyKey: `bh-billing-plan:${sub.id}:${input.plan}:${input.interval}:${Date.now()}` });
+    periodEnd = updated.currentPeriodEnd ?? (sub.status !== 'trialing' && input.interval !== sub.billingInterval && isSandboxSub(sub) ? new Date(Date.now() + (input.interval === 'year' ? 365 : 30) * DAY) : periodEnd);
+  }
+  const months = input.interval === 'year' ? 10 : 1;
+  await s.db.transaction(async (tx) => {
+    await tx.update(subscriptions).set({
+      plan: input.plan, billingInterval: input.interval, platformFeeMinor: input.plan === 'network' ? listPriceMinor(subPriceList(sub), 'platform') * months : null, includedLocations: quote.includedLocations,
+      pricePerLocationMinor: listPriceMinor(subPriceList(sub), input.plan) * months, billedLocationCount: quote.locations, syncedLines: lines, currentPeriodEnd: periodEnd, updatedAt: new Date(),
+    }).where(eq(subscriptions.id, sub.id));
+    // Sandbox: record the prorated charge Stripe would add (live: Stripe's own invoice arrives by webhook).
+    if (isSandboxSub(sub) && preview.proration.amount > 0) {
+      await upsertInvoice(tx, orgId, { id: `in_sandbox_change_${sub.id.slice(0, 8)}_${Date.now()}`, number: null, status: 'paid', amountPaid: preview.proration.amount, amountDue: preview.proration.amount, tax: 0, total: preview.proration.amount, subtotal: preview.proration.amount, currency: quote.currency, hostedUrl: null, periodStart: new Date(), periodEnd: periodEnd ?? null }, {
+        kind: 'subscription', description: `${planName(input.plan)} plan (prorated change)`, lines: [{ description: 'proration', quantity: 1, amountMinor: preview.proration.amount }],
+      });
+    }
+    await audit(tx, { organizationId: orgId, actorUserId: actor.userId, ip: actor.ip ?? null, action: 'billing.plan_changed', scopeKind: 'organization', scopeId: orgId, targetType: 'subscription', targetId: sub.id, metadata: { from: preview.from, to: preview.to, proration: preview.proration.amount, effective: preview.effective } });
+  });
+  await syncBillingQuietly(s, orgId);
+  await sendBillingEmails(s, await ownerEmails(s.db, orgId), 'billing', {
+    kind: 'plan_changed', business: org.name, planName: planName(input.plan), amount: { amountMinor: preview.to.hqTotal.amount, currency: preview.to.hqTotal.currency }, interval: input.interval,
+    prorationNow: preview.proration.amount ? { amountMinor: preview.proration.amount, currency: preview.proration.currency } : null, billingUrl: billingLink(s),
+  });
+  return preview;
+}
