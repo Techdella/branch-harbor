@@ -1,11 +1,11 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { FastifyRequest } from 'fastify';
 import { capabilitiesAnywhere, type Assignment } from '../domain/scope.ts';
 import type { AccessAction } from '@bh/shared';
 import type { Services } from '../context.ts';
-import { organizations, users } from '../db/schema/index.ts';
+import { brands, organizations, users } from '../db/schema/index.ts';
 import { signAccessToken, type AuthUser } from '../plugins/auth.ts';
-import { capabilityLocations, hasCapability, loadAssignments, type ScopeTarget } from '../services/authz.ts';
+import { BRAND_FILTER_HEADER, capabilityLocations, hasCapability, loadAssignments, type ScopeTarget } from '../services/authz.ts';
 import { ToolError } from './types.ts';
 
 type Query = Record<string, string | number | boolean | null | undefined>;
@@ -28,6 +28,11 @@ export interface AssistantContext {
   user: AuthUser & { name: string };
   locale: string;
   org: { id: string; name: string; industry: string; model: string; defaultCurrency: string; defaultTimeZone: string; defaultLocale: string; slug: string };
+  /**
+   * The brand filter the person has on in the app (the top-bar switcher, `X-BH-Brand`), or null for all brands. Every
+   * REST call the tools make carries it, so reads are narrowed exactly as in the app; it never widens access.
+   */
+  brand: { id: string; name: string } | null;
   /** Capabilities the person holds anywhere in the organisation (to decide which tools to offer). */
   caps: ReadonlySet<string>;
   assignments: Assignment[];
@@ -54,12 +59,19 @@ function qs(q?: Query) {
   return str ? `?${str}` : '';
 }
 
-export async function buildAssistantContext(s: Services, orgId: string, userId: string, opts: { locale?: string } = {}): Promise<AssistantContext> {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function buildAssistantContext(s: Services, orgId: string, userId: string, opts: { locale?: string; brandId?: string | null } = {}): Promise<AssistantContext> {
   const [u] = await s.db.select({ id: users.id, email: users.email, name: users.name, emailVerifiedAt: users.emailVerifiedAt, locale: users.locale }).from(users).where(eq(users.id, userId));
   if (!u) throw new ToolError('not_found', 'User not found', 404);
   const [o] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
   if (!o) throw new ToolError('not_found', 'Organisation not found', 404);
   const assignments = await loadAssignments(s.db, userId, orgId);
+  // Brand filter: passed on to every REST call exactly as the app sends it (the API narrows reads; an id that is not a
+  // brand of this business, or one the person does not cover, gives empty lists there too).
+  const brandId = opts.brandId && UUID_RE.test(opts.brandId) ? opts.brandId.toLowerCase() : null;
+  const [brand] = brandId ? await s.db.select({ id: brands.id, name: brands.name }).from(brands).where(and(eq(brands.id, brandId), eq(brands.organizationId, orgId))) : [];
+  const brandHeader: Record<string, string> = brandId ? { [BRAND_FILTER_HEADER]: brandId } : {};
   const caps = capabilitiesAnywhere(assignments);
   const user = { id: u.id, email: u.email, emailVerified: !!u.emailVerifiedAt, name: u.name ?? u.email };
   let token: string | null = null;
@@ -69,7 +81,7 @@ export async function buildAssistantContext(s: Services, orgId: string, userId: 
     const res = await s.inject({
       method: method as 'GET',
       url: `/v1${path}`,
-      headers: { authorization: `Bearer ${token}`, 'x-bh-assistant': '1', 'x-bh-internal': s.internalKey, 'accept-language': opts.locale ?? u.locale ?? 'en', ...(body !== undefined ? { 'content-type': 'application/json' } : {}) },
+      headers: { authorization: `Bearer ${token}`, 'x-bh-assistant': '1', 'x-bh-internal': s.internalKey, 'accept-language': opts.locale ?? u.locale ?? 'en', ...brandHeader, ...(body !== undefined ? { 'content-type': 'application/json' } : {}) },
       ...(body !== undefined ? { payload: JSON.stringify(body) } : {}),
     });
     let json: any = null;
@@ -86,13 +98,14 @@ export async function buildAssistantContext(s: Services, orgId: string, userId: 
   };
   const o2 = (path: string) => `/orgs/${orgId}${path}`;
   // The same scope resolution as the REST routes (capabilityLocations / resolveScopeChain) for this person.
-  const req = { user, assignmentCache: new Map([[orgId, assignments]]), server: { ctx: s }, headers: {}, log: s.log } as unknown as FastifyRequest;
+  const req = { user, assignmentCache: new Map([[orgId, assignments]]), server: { ctx: s }, headers: { ...brandHeader }, method: 'GET', log: s.log } as unknown as FastifyRequest;
   return {
     s,
     orgId,
     user,
     locale: opts.locale ?? u.locale ?? o.defaultLocale ?? 'en',
     org: { id: o.id, name: o.name, industry: o.industry, model: o.model, defaultCurrency: o.defaultCurrency, defaultTimeZone: o.defaultTimeZone, defaultLocale: o.defaultLocale, slug: o.slug },
+    brand: brandId ? { id: brandId, name: brand?.name ?? 'a brand outside this business' } : null,
     caps,
     assignments,
     hq: assignments.some((a) => a.scopeKind === 'organization'),

@@ -107,6 +107,40 @@ export function VisitBriefScreen() {
               {!brief.tickets.length && <li className="text-stone">{t('visit.none')}</li>}
             </ul>
           </SectionCard>
+          <SectionCard title={t('visit.selfChecks')}>
+            {brief.selfChecks ? (
+              <>
+                <p className="text-sm">{t('visit.selfCheckSummary', { completion: brief.selfChecks.completionPct ?? '—', pass: brief.selfChecks.passPct ?? '—', missed: brief.selfChecks.missed, critical: brief.selfChecks.criticalFails })}</p>
+                <ul className="mt-2 flex flex-col gap-1.5 text-sm">{brief.selfChecks.recentFailures.map((x, i) => <li key={i} className="flex flex-wrap items-center gap-2"><Icon name="alert" size={13} />{f.date(x.date)} · {x.name}: {x.items}</li>)}</ul>
+              </>
+            ) : <p className="text-sm text-stone">{t('visit.notInAccess')}</p>}
+          </SectionCard>
+          <SectionCard title={t('visit.supply')}>
+            {brief.supply ? (
+              <>
+                <p className="text-sm">{t('visit.supplySummary', { open: brief.supply.open, late: brief.supply.late.length, offContract: brief.supply.offContractFlagged })}</p>
+                <ul className="mt-2 flex flex-col gap-1.5 text-sm">{brief.supply.late.map((x) => <li key={x.number}>{x.number} · {x.supplierName} · {f.date(x.expectedDeliveryDate)} <StatusPill value="overdue" /></li>)}</ul>
+              </>
+            ) : <p className="text-sm text-stone">{t('visit.notInAccess')}</p>}
+          </SectionCard>
+          <SectionCard title={t('visit.listing')}>
+            {brief.listing ? (
+              <>
+                <p className="text-sm">{t('visit.listingSummary', { score: brief.listing.score, drifts: brief.listing.openDrifts, pending: brief.listing.pendingChanges })}</p>
+                {brief.listing.missingHolidayDates.length > 0 && <p className="mt-1 text-xs text-stone">{t('visit.holidayMissing', { dates: brief.listing.missingHolidayDates.map((d) => f.date(d)).join(', ') })}</p>}
+              </>
+            ) : <p className="text-sm text-stone">{t('visit.notInAccess')}</p>}
+          </SectionCard>
+          <SectionCard title={t('visit.survey')}>
+            {brief.survey ? (
+              brief.survey.level === 'hidden' ? <p className="text-sm text-stone">{t('visit.surveyHidden', { round: brief.survey.round })}</p> : (
+                <>
+                  <p className="text-sm">{t(brief.survey.level === 'owner_group' ? 'visit.surveyOwnerGroup' : 'visit.surveyRegion', { round: brief.survey.round, nps: brief.survey.nps ?? '—' })}</p>
+                  <ul className="mt-2 flex flex-wrap gap-2 text-sm">{brief.survey.themes.map((x) => <li key={x.theme} className="rounded-full bg-canvas px-3 py-1">{x.theme} · {x.average ?? '—'}/5</li>)}</ul>
+                </>
+              )
+            ) : <p className="text-sm text-stone">{t('visit.notInAccess')}</p>}
+          </SectionCard>
           <SectionCard title={t('visit.royaltiesOverdue')}>
             <ul className="flex flex-col gap-1.5 text-sm">
               {brief.royalties.map((x) => <li key={x.number}>{x.number} · {x.outstanding} · {t('visit.daysOverdue', { days: x.daysOverdue ?? 0 })}</li>)}

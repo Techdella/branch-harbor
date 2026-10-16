@@ -38,6 +38,7 @@ function BriefingList({ items, compact }: { items: BriefingItem[]; compact?: boo
           <div className="min-w-0 flex-1">
             {i.link ? <Link href={i.link} className="text-[13px] font-bold hover:underline">{i.title}</Link> : <span className="text-[13px] font-bold">{i.title}</span>}
             {!compact && i.detail && <p className="mt-0.5 text-xs text-stone">{i.detail}</p>}
+            {!compact && i.suggestion && <p className="mt-0.5 flex items-start gap-1 text-xs text-ink"><Icon name="arrow-right" size={12} className="mt-0.5 shrink-0" />{i.suggestion}</p>}
           </div>
         </li>
       ))}

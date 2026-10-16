@@ -37,6 +37,7 @@ export function loadTools(): Promise<Map<string, MarinaTool>> {
 export function toolAvailable(t: MarinaTool, ctx: AssistantContext, settings: AiOrgSettings): boolean {
   if (t.industries && !t.industries.includes(ctx.org.industry)) return false;
   if (t.networkOnly && ctx.org.model === 'independent') return false;
+  if (t.hqOnly && !ctx.hq) return false;
   if (settings.allowedAreas && !settings.allowedAreas.includes(t.area) && t.area !== 'general') return false;
   if (t.kind === 'write' && !ctx.can('ai.assistant', 'edit')) return false;
   if (!t.modules) return true;

@@ -8,6 +8,7 @@
 import type { AiActionCard, AiBlock, AiCitation, BriefingItem, InsightEvidence, MarinaStreamEvent, SuggestedAction } from '@bh/shared';
 import { ApiError } from './errors';
 import { API_URL, getAccessToken, http, refreshAccessToken } from './http/client';
+import { brandHeaderFor } from './http/brands';
 import { orgId } from './http/workspace';
 
 export interface Screen { path: string; title?: string | null; recordType?: string | null; recordId?: string | null }
@@ -53,7 +54,8 @@ export async function streamChat(input: { message: string; conversationId?: stri
     method: 'POST',
     credentials: 'include',
     signal: input.signal,
-    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream', 'Accept-Language': input.locale, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    // The brand filter (top-bar switcher) travels with the chat like with every other request, so answers cover that brand.
+    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream', 'Accept-Language': input.locale, ...brandHeaderFor(o('/ai/chat')), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: JSON.stringify({ message: input.message, conversationId: input.conversationId ?? null, screen: input.screen ?? null, channel: 'web' }),
   });
   let token = getAccessToken() ?? (await refreshAccessToken(null));
@@ -154,6 +156,10 @@ export interface VisitBrief {
   compliance: Array<{ title: string; expiresOn: string | null; daysLeft: number | null; state: string | null }>;
   tickets: Array<{ number: number; subject: string; status: string; priority: string }>;
   royalties: Array<{ number: string; outstanding: string; state: string; daysOverdue: number | null }>;
+  selfChecks: { runs: number; completionPct: number | null; passPct: number | null; missed: number; criticalFails: number; recentFailures: Array<{ date: string; name: string; items: string }> } | null;
+  supply: { open: number; late: Array<{ number: string; supplierName: string; expectedDeliveryDate: string | null }>; offContractFlagged: number } | null;
+  listing: { score: number; failing: string[]; openDrifts: number; pendingChanges: number; missingHolidayDates: string[] } | null;
+  survey: { title: string; round: string; level: 'owner_group' | 'region' | 'hidden'; nps: number | null; themes: Array<{ theme: string; average: number | null }> } | null;
   talkingPoints: string[];
   sandbox: boolean;
 }
@@ -177,7 +183,27 @@ export function currentScreen(pathname: string): Screen {
 export function suggestionsFor(pathname: string, has: (module: string) => boolean): string[] {
   const p = pathname;
   const pick = (keys: Array<[string, string | null]>) => keys.filter(([, m]) => !m || has(m)).map(([k]) => k);
-  if (p.startsWith('/audits')) return pick([['overdueActions', 'operations.audits'], ['auditTrend', 'operations.audits'], ['scheduleReaudit', 'operations.audits']]);
+  // Screens of the modules added later (most specific paths first).
+  if (p.startsWith('/marketing/listings')) return pick([['listingsOutOfDate', 'marketing.listings'], ['listingDrift', 'marketing.listings']]);
+  if (p.startsWith('/marketing/coop')) return pick([['coopLeft', 'marketing.coop'], ['coopWaiting', 'marketing.coop']]);
+  if (p.startsWith('/marketing/calls')) return pick([['missedCalls', 'marketing.call_tracking'], ['callReport', 'marketing.call_tracking']]);
+  if (p.startsWith('/marketing/social/calendar')) return pick([['contentCalendar', 'marketing.social'], ['draftSocial', 'marketing.social']]);
+  if (p.startsWith('/sales-connectors')) return pick([['salesVariance', 'network.sales_connectors'], ['connectorHealth', 'network.sales_connectors'], ['reconciliation', 'network.sales_connectors']]);
+  if (p.startsWith('/import')) return pick([['importStatus', 'settings.import']]);
+  if (p.startsWith('/launch')) return pick([['launchBoard', 'network.bulk_launch']]);
+  if (p.startsWith('/benchmarks')) return pick([['benchmarks', 'network.benchmarks']]);
+  if (p.startsWith('/finance/supplier-rebates')) return pick([['rebates', 'finance.supplier_rebates'], ['lateDeliveries', 'operations.suppliers']]);
+  if (p.startsWith('/suppliers')) return pick([['lateDeliveries', 'operations.suppliers'], ['supplierScores', 'operations.suppliers'], ['offContract', 'operations.suppliers']]);
+  if (p.startsWith('/self-checks')) return pick([['missedSelfChecks', 'operations.self_checks']]);
+  if (p.startsWith('/surveys')) return pick([['surveyResults', 'community.surveys']]);
+  if (p.startsWith('/franchise/territories')) return pick([['territorySeattle', 'sales.territories'], ['territoriesAvailable', 'sales.territories'], ['territoryOverlaps', 'sales.territories']]);
+  if (p.startsWith('/franchise/lifecycle')) return pick([['renewalsDue', 'legal.lifecycle'], ['cureDeadlines', 'legal.lifecycle']]);
+  if (p.startsWith('/franchise/development')) return pick([['developmentSchedules', 'legal.lifecycle']]);
+  if (p.startsWith('/franchise/validation')) return pick([['validators', 'sales.franchise_pipeline']]);
+  if (p.startsWith('/franchise/master')) return pick([['splitStatement', 'finance.royalty_splits']]);
+  if (p.startsWith('/reports/brands') || p.startsWith('/settings/brands')) return pick([['compareBrands', 'network.reports'], ['brands', null]]);
+  if (p.startsWith('/settings/billing') || p.startsWith('/franchisee-billing')) return pick([['planStatus', null]]);
+  if (p.startsWith('/audits')) return pick([['overdueActions', 'operations.audits'], ['auditTrend', 'operations.audits'], ['mostFailed', 'operations.audits'], ['planVisits', 'operations.audits'], ['scheduleReaudit', 'operations.audits']]);
   if (p.startsWith('/compliance')) return pick([['expiringDocs', 'legal.compliance_documents'], ['complianceGaps', 'legal.compliance_documents']]);
   if (p.startsWith('/league-table') || p.startsWith('/reports')) return pick([['revenueQuarter', 'network.league_table'], ['bottomLocations', 'network.league_table'], ['missedRoyalties', 'finance.invoices']]);
   if (p.startsWith('/finance')) return pick([['missedRoyalties', 'finance.invoices'], ['fundSummary', 'finance.marketing_fund'], ['statements', 'finance.invoices']]);
@@ -190,7 +216,7 @@ export function suggestionsFor(pathname: string, has: (module: string) => boolea
   if (p.startsWith('/training')) return pick([['trainingOverdue', 'training.assignments'], ['courses', 'training.academy']]);
   if (p.startsWith('/community')) return pick([['requiredReads', 'community.announcements'], ['howTo', null]]);
   if (p.startsWith('/locations')) return pick([['visitBrief', 'network.locations'], ['locations', 'network.locations']]);
-  return pick([['missedRoyalties', 'finance.invoices'], ['revenueQuarter', 'network.league_table'], ['overdueActions', 'operations.audits'], ['badReviews', 'marketing.reviews'], ['leadsFollowUp', 'sales.customer_pipeline'], ['howTo', null], ['remind', null]]).slice(0, 5);
+  return pick([['missedRoyalties', 'finance.invoices'], ['revenueQuarter', 'network.league_table'], ['overdueActions', 'operations.audits'], ['badReviews', 'marketing.reviews'], ['leadsFollowUp', 'sales.customer_pipeline'], ['listingsOutOfDate', 'marketing.listings'], ['missedCalls', 'marketing.call_tracking'], ['lateDeliveries', 'operations.suppliers'], ['howTo', null], ['remind', null]]).slice(0, 5);
 }
 
 /** Reads a File as base64 (no data: prefix). */

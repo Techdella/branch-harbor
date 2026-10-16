@@ -119,13 +119,68 @@ interface Rule {
   input: (q: string, raw: string, timeZone: string) => Record<string, unknown>;
 }
 
+/** A place named in the question ("in Seattle", "à Lyon", "en Madrid", "in München"), keeping its capitals. */
+const placeIn = (raw: string) => quoted(raw) ?? raw.match(/(?:^|\s)(?:in|à|a|en|em|im|near|around|près de|cerca de|perto de|bei)\s+(\p{Lu}[\p{L}'.-]*(?:\s+\p{Lu}[\p{L}'.-]*){0,3})/u)?.[1]?.trim() ?? undefined;
+/** The person or record named after "for"/"to" ("for Sofia Marquez", "to Atlantic Hot Yoga"). */
+const namedAfter = (raw: string) => quoted(raw) ?? raw.match(/(?:^|\s)(?:for|to|pour|à|para|für|an)\s+(\p{Lu}[\p{L}'&. -]{1,80}?)\s*(?:[?.!,:]|\s(?:about|because|for|pour|por|wegen|sobre)\b|$)/u)?.[1]?.trim() ?? undefined;
+const daysOf = (q: string) => (/today|aujourd|hoy|heute|hoje/.test(q) ? 1 : /month|mois|mes\b|monat|mês/.test(q) ? 30 : 7);
+const noticeReason = (q: string) => (/insurance|assurance|seguro|versicherung/.test(q) ? 'insurance' : /pay|royalt|paiement|pago|zahlung|pagamento/.test(q) ? 'non_payment' : /report|déclar|informe|bericht|relat/.test(q) ? 'reporting' : /standard|norme|estándar|standards|padr/.test(q) ? 'brand_standards' : 'other');
+
+/**
+ * Rules for the modules added after the first release (local marketing, data platform, supply, audits phase 2,
+ * franchise development, brands, billing). They sit before the general rules so that, for example, "sales variance"
+ * reaches the reconciliation and not revenue, and "missed calls" reaches call tracking and not the inbox.
+ */
+const MODULE_RULES: Rule[] = [
+  // Franchise development (legal drafts first: they are the most specific).
+  { test: /(draft|prepare|write).*(notice of default|default notice)|rédige.*mise en demeure|(redacta|prepara).*(aviso|notificación) de incumplimiento|(entwirf|erstelle).*(abmahnung|verzugsmitteilung)|(redija|prepare).*notificação de inadimplemento/, tool: 'draft_notice_of_default', input: (q, raw) => ({ franchisee: namedAfter(raw) ?? raw.slice(0, 120), reason: noticeReason(q), details: raw.slice(0, 1000) }) },
+  { test: /renewal|renouvel|renovaci|verlängerung|renova[çc]|cure period|délais? de (correction|remédiation)|períodos? de (subsanación|cura)|prazos? de (correção|saneamento)|heilungsfrist|notices? of default|mise en demeure|incumplimiento|abmahnung|inadimplemento/, tool: 'due_renewals_and_cures', input: () => ({}) },
+  { test: /development (schedule|agreement)|area develop|calendriers? de développement|calendarios? de desarrollo|entwicklungs(pl|vertr)|cronogramas? de desenvolvimento/, tool: 'development_schedule_status', input: () => ({}) },
+  { test: /validator|validation call|appels? de validation|llamadas? de validación|validierungs|chamadas? de validação/, tool: 'suggest_validators', input: (_q, raw) => ({ candidate: [namedAfter(raw)].find((n) => n && !/valid/i.test(n)) }) },
+  { test: /split statement|master (franchise|statement)|répartition|reparto de regal|aufteilung|divisão de royalt|master-?franchis/, tool: 'explain_split_statement', input: (_q, raw) => ({ statement: raw.match(/\bMS-[\w-]+/)?.[0] }) },
+  { test: /territ(or|oir|ór)/, tool: 'territory_overlaps_and_scores', input: (q, raw) => ({ search: placeIn(raw), status: /available|disponible|verfügbar|dispon[íi]ve|libre|frei/.test(q) ? 'available' : 'all', overlapsOnly: /overlap|chevauch|solap|überschneid|sobrepo/.test(q) }) },
+  { test: /survey|sondage|enquête|encuesta|umfrage|pesquisa|\benps\b|satisfaction des franchisés|zufriedenheit/, tool: 'survey_summary', input: () => ({}) },
+  // Brands and billing.
+  { test: /compar\w* (the |our |les |nos |las |los |nuestras |nuestros |nossas |nossos |unsere )?(brands|marques|marcas|marken)|brand comparison|(brands|marques|marcas|marken)\s+(vs|versus|compar|vergleich)|markenvergleich/, tool: 'brand_comparison', input: () => ({}) },
+  { test: /\b(brands|marques|marcas|marken)\b/, tool: 'list_brands', input: () => ({}) },
+  { test: /billing|subscription|(our|my|which|current|what) plan\b|plan (are|is) (we|it) on|plan status|qué plan|qual (é o nosso )?plano|free trial|trial (days|ends)|who pays|facturation|abonnement|forfait|qui paie|facturación|suscripción|período de prueba|quién paga|testphase|wer zahlt|cobrança|assinatura|período de teste|quem paga/, tool: 'plan_status', input: () => ({}) },
+  // Local marketing.
+  { test: /drift|edited (outside|on google)|modifiée?s? hors|modific\w* fuera|außerhalb .{0,40}geändert|alterad[oa]s? fora/, tool: 'listing_drifts', input: () => ({}) },
+  { test: /listing|\bfiches?\b(?! de visite)|\bfichas?\b(?! de visita)|brancheneintr|einträge|eintrag|listagens?|out of date|holiday hours|horaires? (des )?jours fériés|horario(s)? festivo|feiertagsöffnungszeiten|horário de feriado/, tool: 'listing_health', input: () => ({}) },
+  { test: /co-?op.*(claim|réclamation|remboursement|reclamaci|anspr|erstattung|reembolso)|(claim|réclamation|remboursement|reclamaci|anspr|erstattung|reembolso).*co-?op/, tool: 'explain_coop_claim', input: () => ({}) },
+  { test: /co-?op|coopérati|cooperativ|kooperativ|werbekostenzuschuss/, tool: 'coop_burn_down', input: () => ({}) },
+  { test: /missed calls?|unanswered calls?|appels? (manqués|en absence)|llamadas? perdidas|verpasste anrufe|chamadas? perdidas/, tool: 'missed_calls_without_follow_up', input: (q) => ({ days: daysOf(q) }) },
+  { test: /\bcalls?\b|call tracking|appels?\b|llamadas?|anrufe|chamadas?/, tool: 'call_report', input: (q) => ({ period: /week|semaine|semana|woche/.test(q) ? 'last_7_days' : 'last_30_days' }) },
+  { test: /(content|social|posting|editorial) calendar|calendrier (éditorial|social|de contenu)|calendario (de contenidos|social|editorial)|redaktionsplan|content-?kalender|calendário (de conteúdo|editorial)/, tool: 'social_calendar_preview', input: () => ({}) },
+  // Data platform.
+  { test: /variance|écarts? (de|des|sur les) (ventes|chiffre)|varianza|desviaci|abweichung|divergênc|variação de vendas/, tool: 'list_variance_flags', input: () => ({}) },
+  { test: /reconcil|rapprochement|conciliaci|abgleich|concilia[çc]/, tool: 'get_reconciliation', input: () => ({}) },
+  { test: /connector|\bpos\b sync|sync(hronisation)? (fail|error)|connecteur|conector|konnektor|synchroni[sz]/, tool: 'get_sales_connector_health', input: () => ({}) },
+  { test: /\bimports?\b|importations?|importaci[oó]n(es)?|importa[çc](ão|ões)/, tool: 'get_import_status', input: () => ({}) },
+  { test: /bulk launch|launch board|launches|lancements?|lanzamientos?|massenstart|lançamentos?/, tool: 'get_launch_board', input: () => ({}) },
+  { test: /benchmark|percentile|percentil|perzentil|réseaux similaires|redes similares|ähnliche netzwerke/, tool: 'get_benchmarks', input: () => ({}) },
+  // Supply.
+  { test: /late deliver|supplier deliver|purchase orders?|livraisons? (en retard|fournisseur)|bons? de commande|entregas? (atrasadas|retrasadas|de proveedor|de fornecedor)|órdenes de compra|ordens? de compra|pedidos? de compra|(verspätete|ausstehende) lieferungen|lieferungen.*verspätet|bestellungen? (beim|an) lieferant/, tool: 'list_purchase_orders', input: (q) => ({ lateOnly: /late|retard|atras|retras|verspät|tard/.test(q) }) },
+  { test: /scorecard|on-?time|fill rate|taux de service|tasa de cumplimiento|liefertreue|pontualidade/, tool: 'supplier_scorecards', input: () => ({}) },
+  { test: /rebate|ristourne|remise fournisseur|bonificaci|rückvergütung|bonifica[çc]/, tool: 'rebate_status', input: () => ({}) },
+  { test: /off-?contract|hors contrat|fuera de contrato|außerhalb des vertrags|fora do contrato/, tool: 'off_contract_summary', input: () => ({}) },
+  { test: /supplier|supply|fournisseur|approvisionnement|proveedor|suministro|lieferant|fornecedor|suprimento/, tool: 'supply_overview', input: () => ({}) },
+  // Audits phase 2.
+  { test: /most failed|failed items|failing items|(items?|points?) (les plus )?(souvent )?échoués|más fallad|am häufigsten (nicht bestanden|durchgefallen)|mais (reprovad|falhad)/, tool: 'most_failed_items', input: () => ({}) },
+  { test: /plan (my |the )?visits|visit plan|my visits|tournée|planificar (mis )?visitas|besuchsplan|besuche planen|planejar (minhas )?visitas|plano de visitas/, tool: 'plan_visits', input: () => ({}) },
+  { test: /self-?checks?|temperature log|opening checklist|auto-?contr[ôo]les?|autocontrol(es)?|selbstkontroll|autoavalia[çc]|autoverifica/, tool: 'self_check_status', input: () => ({}) },
+];
+
 /** Keyword rules, most specific first. Inputs are only taken from the question itself. */
 const RULES: Rule[] = [
+  // Audit trends first: “Comment évoluent…”, “Wie entwickeln sich…” would otherwise read as how-to questions.
+  { test: /audit.*(trend|tendance|tendencia|entwicklung|tendência)|(trend|tendance|tendencia|tendência|évolu|evolucion|entwickel|evolu[íi]n?do).*audit/, tool: 'audit_trends', input: () => ({}) },
   { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|what does (our|the) (manual|handbook|policy|guide)|where do (we|i)|comment |cómo |wie |como |que dit |qué dice |was sagt |o que diz )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
   { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw, tz) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q, tz) }) },
   { test: /(create|add|new) (a )?(task|to-?do)|crée une tâche|crear tarea|aufgabe/, tool: 'create_task', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 120) }) },
+  ...MODULE_RULES,
   { test: /(draft|write|create|prepare).*(email|newsletter)|(email|newsletter).*(draft|campaign)|rédige.*e-?mail|redacta.*correo/, tool: 'create_email_campaign_draft', input: (_q, raw) => ({ name: quoted(raw) ?? raw.slice(0, 80), subject: quoted(raw) ?? raw.slice(0, 80) }) },
-  { test: /(draft|write|create|prepare).*(social|post|instagram|facebook)/, tool: 'create_social_post_draft', input: (_q, raw) => ({ text: quoted(raw) ?? raw.slice(0, 280) }) },
+  { test: /(draft|write|create|prepare).*(social|post|instagram|facebook)|(rédige|écris|prépare).*(publication|post)|(redacta|escribe|prepara).*(publicación|post)|(entwirf|schreib|erstelle).*(beitrag|post)|(escreva|redija|prepare).*(publicação|post)/, tool: 'create_social_post_draft', input: (_q, raw) => ({ text: quoted(raw) ?? raw.slice(0, 280) }) },
   { test: /(draft|write|create).*announcement|annonce/, tool: 'create_announcement_draft', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 80), body: raw }) },
   { test: /visit brief|brief for|before my visit|préparer (ma )?visite|visita/, tool: 'prepare_visit_brief', input: (_q, raw) => ({ location: quoted(raw) ?? raw.replace(/^.*?(brief|visit|visite|visita)( for| de| para| für)?\s*/i, '').replace(/[?.!]+$/, '').trim() }) },
   { test: /statement|relevé|estado de cuenta|abrechnung|extrato/, tool: 'list_royalty_statements', input: () => ({}) },
@@ -160,6 +215,10 @@ const RULES: Rule[] = [
 ];
 
 const NAV: Array<[RegExp, string]> = [
+  [/listing/, '/marketing/listings'], [/co-?op/, '/marketing/coop'], [/call/, '/marketing/calls'], [/calendar/, '/marketing/social/calendar'], [/reconcil/, '/sales-connectors/reconciliation'],
+  [/connector/, '/sales-connectors'], [/import/, '/import'], [/launch/, '/launch'], [/benchmark/, '/benchmarks'], [/rebate/, '/finance/supplier-rebates'], [/supplier|purchase order/, '/suppliers'],
+  [/self-?check/, '/self-checks'], [/survey/, '/surveys'], [/territ(or|oir|ór)/, '/franchise/territories'], [/lifecycle|renewal|notice/, '/franchise/lifecycle'], [/validation/, '/franchise/validation'],
+  [/development/, '/franchise/development'], [/master/, '/franchise/master'], [/brand comparison|compare brands/, '/reports/brands'], [/brands/, '/settings/brands'], [/billing|plan/, '/settings/billing'],
   [/visit brief|visite|visita|besuch/, '/marina/visit-brief'], [/studio|content/, '/marina/studio'], [/league/, '/league-table'], [/audit/, '/audits'], [/complian/, '/compliance'], [/review/, '/marketing/reviews'], [/inbox/, '/marketing/inbox'],
   [/email/, '/marketing/email'], [/automation/, '/marketing/automations'], [/social/, '/marketing/social'], [/website/, '/marketing/websites'],
   [/royalt/, '/finance/royalties'], [/statement/, '/finance/statements'], [/fund/, '/finance/marketing-fund'], [/help|ticket/, '/help'],
@@ -239,8 +298,8 @@ export function createSandboxLlm(): MarinaLlm {
         return done([textBlock(answer)], 'end_turn');
       }
 
-      const q = text.toLocaleLowerCase();
-      if (/^(go to|open the|take me to|navigate to|show me the .*(page|screen)|ouvre|abre|öffne|ir para)\b/.test(q) && offered.has('navigate')) {
+      const q = text.toLocaleLowerCase().replace(/^[¿¡\s]+/, '');
+      if (/^(go to|open the|take me to|navigate to|show me the .*(page|screen)|ouvre|abre|abra|ve a|öffne|ir para)\b/.test(q) && offered.has('navigate')) {
         const path = NAV.find(([re]) => re.test(q))?.[1];
         if (path) {
           return done([{ type: 'tool_use', id: `toolu_${randomUUID().replace(/-/g, '')}`, name: 'navigate', input: { path }, caller: { type: 'direct' } } as unknown as LlmContentBlock], 'tool_use');

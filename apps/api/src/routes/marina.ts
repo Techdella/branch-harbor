@@ -6,7 +6,7 @@ import { AI_ACTION_RISKS, AI_TOOL_AREAS, ASSISTANT_NAME, BRIEFING_SECTIONS, aiOr
 import { aiBriefings, aiConversations, aiKnowledgeSources, aiTasks, aiToolCalls, aiUserPrefs } from '../db/schema/index.ts';
 import { AppError, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
-import { requireMember } from '../services/authz.ts';
+import { BRAND_FILTER_HEADER, requireMember } from '../services/authz.ts';
 import { buildAssistantContext, type AssistantContext } from '../ai/context.ts';
 import { assertAssistantAvailable, cancelAction, confirmAction, decideHeldAction, listActions, runTurn, type Emit } from '../ai/engine.ts';
 import { indexUpload, searchKnowledge, citationsFrom, syncOrgKnowledge } from '../ai/knowledge.ts';
@@ -35,7 +35,8 @@ async function assistantFor(req: FastifyRequest, orgId: string, opts: { action?:
   const user = requireUser(req);
   await requireMember(req, req.server.ctx.db, orgId);
   const lang = String(req.headers['accept-language'] ?? '').split(',')[0]?.trim() || undefined;
-  const ctx = await buildAssistantContext(req.server.ctx, orgId, user.id, { locale: lang && /^[a-z]{2}(-[A-Z]{2})?$/.test(lang) ? lang : undefined });
+  const brand = req.headers[BRAND_FILTER_HEADER];
+  const ctx = await buildAssistantContext(req.server.ctx, orgId, user.id, { locale: lang && /^[a-z]{2}(-[A-Z]{2})?$/.test(lang) ? lang : undefined, brandId: (Array.isArray(brand) ? brand[0] : brand) ?? null });
   if (!ctx.can('ai.assistant', opts.action ?? 'view')) throw forbidden(`${ASSISTANT_NAME} ${opts.action && opts.action !== 'view' ? `(${opts.action}) ` : ''}is not part of your access`);
   if (opts.hq && !ctx.hq) throw forbidden('This needs organisation-wide access');
   return ctx;

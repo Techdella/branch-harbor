@@ -6,6 +6,7 @@ import { buildAssistantContext, type AssistantContext } from '../context.ts';
 import { itemsOf } from '../present.ts';
 import { sandboxPhrases } from '../sandbox.ts';
 import { listInsights } from './insights.ts';
+import { moduleBriefingItems } from './briefing-modules.ts';
 import { isSandbox, languageName, oneShot } from './_llm.ts';
 
 /**
@@ -75,6 +76,8 @@ export async function buildBriefingItems(ctx: AssistantContext, sections: Briefi
       if (overdue) items.push({ section: 'training', severity: 'info', title: `${overdue} overdue training assignment${overdue === 1 ? '' : 's'}`, detail: rep.filter((x) => x.overdue).slice(0, 3).map((x) => `${x.locationName}: ${x.overdue}`).join(' · '), link: '/training', count: overdue });
     }
   }
+  // Local marketing, sales data, supply, self-checks and agreement deadlines.
+  items.push(...(await moduleBriefingItems(ctx, want)));
   // Personal tasks due today or overdue.
   const tasks = await ctx.s.db.select().from(aiTasks).where(and(eq(aiTasks.organizationId, ctx.orgId), eq(aiTasks.userId, ctx.user.id), eq(aiTasks.status, 'open'), or(lte(aiTasks.dueAt, new Date(Date.now() + DAY)), lte(aiTasks.remindAt, new Date(Date.now() + DAY))))).orderBy(asc(aiTasks.dueAt)).limit(5);
   if (tasks.length) items.push({ section: 'overdue_actions', severity: 'info', title: `${tasks.length} of your tasks due today`, detail: tasks.map((t) => t.title).join(' · '), link: '/marina', count: tasks.length });
@@ -89,7 +92,7 @@ export async function briefingSummary(ctx: AssistantContext, items: BriefingItem
   const r = await oneShot(ctx.s, ctx.orgId, 'briefing', {
     tier: 'fast', effort: 'low', locale: ctx.locale,
     system: `You are ${ASSISTANT_NAME}. Write a 2–3 sentence morning briefing from the items given: what matters most first, then what can wait. Use only the items; no new facts.`,
-    messages: [{ role: 'user', content: `Language: ${languageName(ctx.locale)}. Person: ${ctx.user.name}.\nItems:\n${items.map((i) => `- [${i.severity}] ${i.title}: ${i.detail}`).join('\n')}` }],
+    messages: [{ role: 'user', content: `Language: ${languageName(ctx.locale)}. Person: ${ctx.user.name}.\nItems:\n${items.map((i) => `- [${i.severity}] ${i.title}: ${i.detail}${i.suggestion ? ` (suggested: ${i.suggestion})` : ''}`).join('\n')}` }],
     maxTokens: 600,
   }).catch(() => null);
   return r?.text || `${p.found} ${items.slice(0, 4).map((i) => i.title).join('; ')}.`;
@@ -120,7 +123,7 @@ export async function generateBriefing(s: Services, orgId: string, userId: strin
     if (prefs?.briefingEmail !== false && items.length) {
       const [u] = await s.db.select({ email: users.email }).from(users).where(eq(users.id, userId));
       if (u) {
-        const lines = items.map((i) => `• ${i.title}${i.detail ? `\n  ${i.detail}` : ''}`).join('\n');
+        const lines = items.map((i) => `• ${i.title}${i.detail ? `\n  ${i.detail}` : ''}${i.suggestion ? `\n  → ${i.suggestion}` : ''}`).join('\n');
         await s.jobs.enqueue('email.send', { to: u.email, subject: `${ASSISTANT_NAME}: ${items.length} thing${items.length === 1 ? '' : 's'} for ${ctx.org.name} today`, text: `${summary}\n\n${lines}\n\n${s.cfg.APP_URL}/marina\n\nChange how often you get this in ${ASSISTANT_NAME} → Briefing settings.`, tag: 'marina-briefing' });
         await s.db.update(aiBriefings).set({ emailedAt: new Date() }).where(eq(aiBriefings.id, row!.id));
       }

@@ -252,7 +252,12 @@ export type MarinaStreamEvent =
 /* Briefings and insights                                              */
 /* ------------------------------------------------------------------ */
 
-export const BRIEFING_SECTIONS = ['overdue_actions', 'expiring_documents', 'reviews', 'kpis', 'leads', 'tickets', 'royalties', 'training'] as const;
+export const BRIEFING_SECTIONS = [
+  'overdue_actions', 'expiring_documents', 'reviews', 'kpis', 'leads', 'tickets', 'royalties', 'training',
+  // Modules added later: local marketing (listing drift, co-op claims, missed calls), sales data (sync failures and
+  // variance), supply (late purchase orders), self-checks (missed checks) and agreements (cure periods, renewal windows).
+  'local_marketing', 'sales_data', 'supply', 'self_checks', 'agreements',
+] as const;
 export type BriefingSection = (typeof BRIEFING_SECTIONS)[number];
 
 export interface BriefingItem {
@@ -262,9 +267,14 @@ export interface BriefingItem {
   detail: string;
   link: string | null;
   count?: number;
+  /** What to do about it, in one line (the briefing's suggested action). */
+  suggestion?: string;
 }
 
-export const INSIGHT_KINDS = ['revenue_drop', 'activity_drop', 'royalty_overdue', 'rating_drop', 'audit_decline', 'churn_risk', 'compliance_gap'] as const;
+export const INSIGHT_KINDS = [
+  'revenue_drop', 'activity_drop', 'royalty_overdue', 'rating_drop', 'audit_decline', 'churn_risk', 'compliance_gap',
+  'listing_drift', 'coop_claims_waiting', 'missed_calls', 'sales_variance', 'late_deliveries', 'missed_self_checks', 'agreement_deadline', 'survey_drop', 'benchmark_change',
+] as const;
 export type InsightKind = (typeof INSIGHT_KINDS)[number];
 
 export interface InsightEvidence {
