@@ -8,6 +8,7 @@ import { parseCsv } from '../lib/csv.ts';
 import { notFound, validationError } from '../lib/errors.ts';
 import { slugify } from '../lib/slug.ts';
 import { authenticate } from '../plugins/auth.ts';
+import { syncBillingQuietly } from '../services/billing.ts';
 import { actor, audit } from '../services/audit.ts';
 import { authorisedLocations, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { serializeLocation } from '../services/serializers.ts';
@@ -41,6 +42,13 @@ const IMPORT_COLUMNS = ['name', 'code', 'address_line1', 'address_line2', 'city'
 export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
   const s = app.ctx;
   app.addHook('preHandler', authenticate);
+  // Billing follows the network: a location added, archived, paused or moved between owner groups changes the
+  // subscription quantities and franchisee shares (services/billing.ts syncBillingSubscriptions).
+  app.addHook('onSend', async (req, reply, payload) => {
+    const orgId = (req.params as { orgId?: string } | undefined)?.orgId;
+    if (orgId && req.method !== 'GET' && reply.statusCode < 300) await syncBillingQuietly(s, orgId);
+    return payload;
+  });
 
   app.get('/orgs/:orgId/locations', {
     schema: {

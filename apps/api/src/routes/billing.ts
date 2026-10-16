@@ -7,7 +7,7 @@ import { forbidden } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { hasPerm, requireMember, requirePerm } from '../services/authz.ts';
 import {
-  billingTerms, billingView, cancelCountryChange, confirmCheckout, confirmCountryChange, confirmFranchiseeSetup, franchiseeBillingView, removePayer, setCancellation,
+  billingTerms, billingView, cancelCountryChange, changePlan, confirmCheckout, confirmPaymentMethodChange, previewPlanChange, startPaymentMethodChange, confirmCountryChange, confirmFranchiseeSetup, franchiseeBillingView, removePayer, setCancellation,
   setPayer, startCheckout, startCountryChange, startFranchiseeSetup, trialEligibility,
 } from '../services/billing.ts';
 import { buildExport, exportBytes, listExports, requestExport, serializeExport } from '../services/data-export.ts';
@@ -102,6 +102,41 @@ export const billingRoutes: FastifyPluginAsyncZod = async (app) => {
     }, async (req) => {
       await manage(req, req.params.orgId);
       return setCancellation(s, req.params.orgId, false, await me(req));
+    });
+
+    // ── Change card, plan or interval ──
+    r.post('/orgs/:orgId/billing/payment-method', {
+      schema: { tags: ['billing'], security: secured, params: orgParams, summary: 'Change the card: opens a card setup (Stripe SetupIntent) on your billing customer' },
+    }, async (req) => {
+      await manage(req, req.params.orgId);
+      return startPaymentMethodChange(s, req.params.orgId, await me(req));
+    });
+
+    r.post('/orgs/:orgId/billing/payment-method/confirm', {
+      schema: {
+        tags: ['billing'], security: secured, params: orgParams, summary: 'Confirm the new card: issued in your billing country (or give a business tax ID from it); becomes the default for the plan',
+        body: z.object({ setupIntentId: z.string().optional(), paymentMethodId: z.string().optional(), taxId: z.string().max(40).optional() }),
+      },
+    }, async (req) => {
+      await manage(req, req.params.orgId);
+      const out = await confirmPaymentMethodChange(s, req.params.orgId, { ...req.body, taxId: req.body.taxId?.trim() || null }, await me(req));
+      return { ...out, billing: await billingView(s, req.params.orgId) };
+    });
+
+    const changeBody = z.object({ plan: z.enum(PLAN_PRICE_KEYS), interval: z.enum(BILLING_INTERVALS) });
+    r.get('/orgs/:orgId/billing/change/preview', {
+      schema: { tags: ['billing'], security: secured, params: orgParams, querystring: changeBody, summary: 'Preview a plan or interval switch: the new price and the prorated amount for the rest of this period' },
+    }, async (req) => {
+      await manage(req, req.params.orgId);
+      return previewPlanChange(s, req.params.orgId, req.query);
+    });
+
+    r.post('/orgs/:orgId/billing/change', {
+      schema: { tags: ['billing'], security: secured, params: orgParams, body: changeBody, summary: 'Switch plan (Solo / Connector / Hosted / Network) or monthly/annual; prorated now, or from the trial end while trialing' },
+    }, async (req) => {
+      await manage(req, req.params.orgId);
+      const preview = await changePlan(s, req.params.orgId, req.body, await me(req));
+      return { ...preview, billing: await billingView(s, req.params.orgId) };
     });
 
     r.post('/orgs/:orgId/billing/country', {

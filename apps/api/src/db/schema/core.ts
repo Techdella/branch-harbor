@@ -233,6 +233,11 @@ export const subscriptions = pgTable('subscriptions', {
    */
   status: text('status').notNull().default('checkout_required'),
   billedLocationCount: integer('billed_location_count').notNull().default(0),
+  /**
+   * Subscription items last synced to Stripe (HQ's own share: platform fee, plan lines and the location fees HQ pays).
+   * Compared on every location or payer change, so quantities follow the network (live franchisee charging).
+   */
+  syncedLines: jsonb('synced_lines').$type<{ lookupKey: string; productName: string; unitAmountMinor: number; quantity: number }[]>().notNull().default([]),
   currency: currencyCol().notNull(),
   /** BranchHarbor plan price per billed location per interval, minor units in `currency`. null = not priced (trial). */
   pricePerLocationMinor: bigint('price_per_location_minor', { mode: 'number' }),
