@@ -54,7 +54,7 @@ export const launchRoutes: FastifyPluginAsyncZod = async (app) => {
       tags, security: secured, params: orgParams,
       body: z.object({
         name: z.string().min(1).max(120), templateId: z.uuid().nullable().optional(), siteMode: z.enum(['publish', 'draft']).default('draft'), locationStatus: z.enum(['onboarding', 'opening_soon', 'operating']).default('opening_soon'),
-        inviteStaff: z.boolean().default(true), staffRole: z.enum(['staff', 'location_manager', 'marketing_contributor']).default('staff'), rows: z.array(rowSchema).min(1).max(200), importBatchId: z.uuid().nullable().optional(),
+        inviteStaff: z.boolean().default(true), staffRole: z.enum(['staff', 'location_manager', 'content_social']).default('staff'), rows: z.array(rowSchema).min(1).max(200), importBatchId: z.uuid().nullable().optional(),
       }),
       summary: 'Launch many locations at once (background): location, site from the brand template, listings data, staff invitations',
     },

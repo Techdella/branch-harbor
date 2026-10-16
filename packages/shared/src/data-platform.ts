@@ -361,11 +361,11 @@ export function parseDateish(v: string | null | undefined, order: 'ymd' | 'mdy' 
 /** Common staff titles in other systems → BranchHarbor role templates (the wizard shows this for review). */
 const ROLE_WORDS: Array<[RegExp, Role]> = [
   [/\b(owner|franchisee|proprietor)\b/i, 'franchise_owner'],
-  [/\b(regional|area|district)\b/i, 'regional_manager'],
   [/\b(general manager|gm|store manager|studio manager|location manager|manager|supervisor|lead)\b/i, 'location_manager'],
-  [/\b(market|social|brand)\w*/i, 'marketing_contributor'],
+  [/\b(market|social|brand)\w*/i, 'content_social'],
   [/\b(admin|administrator|hq)\b/i, 'hq_admin'],
-  [/\b(finance|accountant|bookkeeper)\b/i, 'finance'],
+  [/\b(accountant|bookkeeper)\b/i, 'accountant'],
+  [/\bfinance\b/i, 'finance_lead'],
 ];
 export function suggestRole(label: string | null | undefined): Role {
   const s = (label ?? '').trim();
@@ -374,7 +374,7 @@ export function suggestRole(label: string | null | undefined): Role {
 }
 
 /** Roles an import may assign (never the owner role: ownership is transferred deliberately, not by spreadsheet). */
-export const IMPORTABLE_ROLES: readonly Role[] = ['hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'staff', 'marketing_contributor', 'finance', 'operations_manager'];
+export const IMPORTABLE_ROLES: readonly Role[] = ['hq_admin', 'operations_lead', 'marketing_lead', 'finance_lead', 'accountant', 'franchise_owner', 'location_manager', 'staff', 'content_social'];
 
 /** Undo window for an import batch. */
 export const IMPORT_UNDO_HOURS = 24;

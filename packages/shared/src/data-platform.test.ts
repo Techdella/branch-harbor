@@ -65,7 +65,7 @@ test('import: role suggestions and entities per industry', () => {
   assert.equal(suggestRole('Front desk'), 'staff');
   assert.equal(suggestRole('Instructor'), 'staff');
   assert.equal(suggestRole('Franchisee'), 'franchise_owner');
-  assert.equal(suggestRole('Area manager'), 'regional_manager');
+  assert.equal(suggestRole('Social media'), 'content_social');
   assert.ok(importEntitiesFor('studios').includes('memberships'));
   assert.ok(!importEntitiesFor('foods').includes('memberships'));
   assert.ok(importEntitiesFor('foods').includes('products'));

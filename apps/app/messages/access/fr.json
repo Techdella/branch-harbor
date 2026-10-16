@@ -68,7 +68,13 @@
       "navLabel": "Accueil {workspace}",
       "modules": "Dans cet espace",
       "emptyTitle": "Rien à afficher pour l’instant",
-      "emptyBody": "Vos accès chez {business} ne comprennent encore aucun écran. Demandez à un propriétaire ou un administrateur de vous donner les modules nécessaires."
+      "emptyBody": "Vos accès chez {business} ne comprennent encore aucun écran. Demandez à un propriétaire ou un administrateur de vous donner les modules nécessaires.",
+      "linkDescriptions": {
+        "websites": "Domaines, publication et état du site de chaque établissement.",
+        "territories": "Territoires de franchise : disponibles, réservés ou vendus.",
+        "financeReports": "Rapports de redevances, du fonds et des versements à télécharger.",
+        "rules": "Règles par juridiction : information précontractuelle, délais d’attente et de rétractation."
+      }
     },
     "actions": {
       "view": {
@@ -91,7 +97,10 @@
     "scope": {
       "region": "Région",
       "owner_group": "Groupe de propriétaires",
-      "location": "Établissement"
+      "location": "Établissement",
+      "territory": "Territoire",
+      "portfolio": "Portefeuille",
+      "brand": "Marque"
     },
     "modules": {
       "network": {
@@ -325,63 +334,103 @@
       "custom": "Rôle personnalisé",
       "org_owner": {
         "name": "Propriétaire",
-        "description": "Tout, y compris la facturation, la propriété et la gestion des accès."
+        "description": "Tout, y compris la facturation, la propriété et les accès."
       },
       "hq_admin": {
         "name": "Administrateur du siège",
-        "description": "Pilote le réseau : établissements, modèles de marque, sites, marketing, approbations, rapports, équipe et connexions. Sans fiches clients ni paiements."
+        "description": "Pilote le réseau : établissements, modèles de marque, sites, marketing, validations, rapports, équipe et connexions. Ni fiches clients ni paiements."
       },
-      "vp_franchise": {
-        "name": "VP Franchise",
-        "description": "Développement de la franchise : pipeline, documents d’information et contrats, nouveaux établissements et formation des franchisés."
+      "development_lead": {
+        "name": "Responsable développement",
+        "description": "Développement de la franchise : pipeline et territoires, documents d’information et contrats, nouveaux établissements. Pas de vente aux clients."
       },
-      "cmo": {
-        "name": "Directeur marketing",
-        "description": "Tout le marketing du réseau, modèles de marque, rapports marketing et accompagnement des franchisés en marketing local."
+      "development_rep": {
+        "name": "Chargé de développement",
+        "description": "Fait avancer les demandes de franchise dans le pipeline et envoie le document d’information. Les contrats et validations restent au responsable."
       },
-      "brand_lead": {
+      "sales_lead": {
+        "name": "Responsable commercial",
+        "description": "Ventes aux clients : prospects et affaires, règles de répartition, clients, abonnements et forfaits, prospects de formation."
+      },
+      "sales_rep": {
+        "name": "Commercial",
+        "description": "Traite les prospects et les affaires, relance les clients et les prospects de formation, vend abonnements et forfaits."
+      },
+      "marketing_lead": {
+        "name": "Responsable marketing",
+        "description": "Tout le marketing du réseau, modèles de marque, annonces, rapports marketing et rapport du fonds marketing."
+      },
+      "brand_manager": {
         "name": "Responsable de marque",
-        "description": "Ressources de marque, modèles et champs verrouillés, sites web et contenus sociaux."
+        "description": "Ressources de marque, modèles et champs verrouillés, sites et contenus sociaux."
       },
       "digital_marketer": {
         "name": "Marketeur digital",
-        "description": "Sites web, réseaux sociaux, publicités, e-mails et campagnes réseau. Sans opérations, clients ni finance."
+        "description": "Sites, réseaux sociaux, publicités, e-mails et campagnes réseau. Ni opérations, ni clients, ni finance."
       },
-      "instructor_trainer": {
-        "name": "Formateur d’instructeurs",
-        "description": "Formations des enseignants et prospects des cours, plus les opérations en lecture seule pour voir les cours."
+      "content_social": {
+        "name": "Contenus & réseaux sociaux",
+        "description": "Rédige publications, e-mails, pages et campagnes ; la publication revient à quelqu’un qui en a le droit."
       },
-      "operations_manager": {
+      "operations_lead": {
         "name": "Responsable des opérations",
-        "description": "Paiements et finance, sites web, connexions, clients et opérations au quotidien."
+        "description": "Les opérations du réseau au quotidien : établissements, validations, ouvertures, audits, accompagnement et support. Pas de finance."
       },
-      "finance": {
-        "name": "Finance",
-        "description": "Paiements, remboursements, rapprochement et rapports financiers. Redevances et versements au niveau du siège."
+      "field_consultant": {
+        "name": "Consultant terrain",
+        "description": "Coach d’un portefeuille d’établissements : les consulte et les accompagne, mène les audits et le coaching. Ni finances des propriétaires ni données clients."
       },
-      "legal": {
-        "name": "Juridique",
-        "description": "Contrats de franchise, documents d’information et conformité dans tout le réseau."
+      "finance_lead": {
+        "name": "Responsable financier",
+        "description": "Paiements, remboursements, rapprochement, redevances, factures, fonds marketing, versements et rapports financiers."
       },
-      "regional_manager": {
-        "name": "Responsable régional",
-        "description": "Supervision des établissements d’une région : opérations, rapports, approbations de site et brouillons de campagnes."
+      "accountant": {
+        "name": "Comptable",
+        "description": "Consulte et exporte paiements, relevés, redevances, versements et rapports du fonds pour la comptabilité. Ne modifie rien."
+      },
+      "legal_lead": {
+        "name": "Responsable juridique",
+        "description": "Contrats de franchise, documents d’information, enregistrements et règles par juridiction pour tout le réseau."
+      },
+      "training_lead": {
+        "name": "Responsable formation",
+        "description": "L’académie : tous les cours, parcours et certificats, les assignations et les rapports de formation."
+      },
+      "trainer": {
+        "name": "Formateur",
+        "description": "Rédige et anime des cours, les assigne et suit la progression des apprenants."
+      },
+      "master_franchisee": {
+        "name": "Master franchisé",
+        "description": "Pilote un territoire (par exemple un pays) comme le siège : ses établissements, son pipeline de franchise, ses ouvertures, sa communauté, sa formation, son équipe et ses finances."
+      },
+      "area_developer": {
+        "name": "Développeur de zone",
+        "description": "Détient les unités d’un calendrier de développement : le tableau de bord complet de ses unités et le pipeline de franchise de son territoire."
+      },
+      "area_representative": {
+        "name": "Représentant de zone",
+        "description": "Accompagne les franchisés d’un territoire qu’il ne possède pas : consulte, accompagne et audite leurs établissements. Pas de finances des propriétaires sauf autorisation."
+      },
+      "multi_unit_operator": {
+        "name": "Opérateur multi-unités",
+        "description": "Dirige un groupe de propriétaires de plusieurs unités : le tableau de bord complet de chaque unité, son équipe et ses finances."
       },
       "franchise_owner": {
         "name": "Franchisé",
-        "description": "Le tableau de bord complet pour ses propres établissements : opérations, marketing, clients, paiements et équipe. Rien des autres franchisés ni des espaces privés du siège."
+        "description": "Le tableau de bord complet de ses propres établissements : opérations, marketing, clients, paiements et équipe. Rien des autres franchisés ni des espaces privés du siège."
       },
       "location_manager": {
         "name": "Responsable d’établissement",
         "description": "Gère un établissement au quotidien : opérations, clients, site local et brouillons de campagnes."
       },
       "staff": {
-        "name": "Personnel",
-        "description": "Son travail assigné : plannings, présences et commandes dans son établissement."
+        "name": "Équipe",
+        "description": "Ses propres créneaux, cours et rendez-vous, demandes de remplacement et accueil dans son établissement, plus la communauté et la formation."
       },
-      "marketing_contributor": {
-        "name": "Contributeur marketing",
-        "description": "Rédige des modifications de site et de campagne ; la publication nécessite une personne autorisée."
+      "auditor": {
+        "name": "Auditeur",
+        "description": "Consultation des établissements et des opérations, et réalisation d’audits. Ni finance, ni documents juridiques, ni données clients."
       },
       "customer": {
         "name": "Client",
@@ -390,7 +439,7 @@
     },
     "roleAdmin": {
       "tab": "Rôles",
-      "intro": "Partez d’un modèle de rôle ou créez le vôtre en cochant des modules et des actions. Chacun ne voit que ce que son rôle lui donne.",
+      "intro": "Partez d’un modèle de rôle ou créez le vôtre en cochant des modules et des actions. Chacun ne voit que ce que ses rôles lui donnent.",
       "create": "Créer un rôle",
       "createTitle": "Nouveau rôle",
       "editTitle": "Modifier {name}",
@@ -406,7 +455,15 @@
       "appliesNow": "{count, plural, one {L’enregistrement modifie immédiatement l’accès de # personne.} other {L’enregistrement modifie immédiatement l’accès de # personnes.}}",
       "save": "Enregistrer le rôle",
       "delete": "Supprimer le rôle",
-      "scopeNote": "Le périmètre d’un rôle (toute l’entreprise, une région, un groupe de propriétaires ou un établissement) se choisit quand vous l’attribuez. Les modules réservés au siège ne fonctionnent qu’avec un rôle sur toute l’entreprise."
+      "scopeNote": "Le périmètre d’un rôle (toute l’entreprise, marque, territoire, région, portefeuille, groupe de propriétaires ou établissement) se choisit quand vous l’attribuez. Les modules réservés au siège ne fonctionnent qu’avec un rôle sur toute l’entreprise ; un territoire gère aussi son propre pipeline de franchise.",
+      "templatesIntro": "Les modèles sont des points de départ, pas un organigramme. Renommez-les selon vos intitulés de poste, donnez plusieurs rôles à une personne ou créez les vôtres.",
+      "templateWas": "Modèle : {name}",
+      "rename": "Renommer",
+      "renameLabel": "Nom dans votre entreprise",
+      "renameSave": "Enregistrer le nom",
+      "renameReset": "Reprendre le nom du modèle",
+      "usualScope": "En général : {scope}",
+      "emptyStart": "Les nouveaux rôles partent de zéro : cochez uniquement ce dont ce rôle a besoin."
     },
     "editor": {
       "column": "Accès",
@@ -431,7 +488,166 @@
       "previewTitle": "Ce que la personne verra",
       "previewSwitcher": "Un sélecteur avec {count} espaces de travail.",
       "previewSingle": "Un seul espace de travail, sans sélecteur.",
-      "previewNothing": "Rien pour l’instant : cochez au moins un module."
+      "previewNothing": "Rien pour l’instant : cochez au moins un module.",
+      "unionNote": "Cette personne a plusieurs rôles. Elle obtient tout ce que l’un de ses rôles donne (l’union) ; les limites « Ne jamais afficher » s’appliquent à tous.",
+      "reaches": "{count, plural, =0 {Aucun établissement pour l’instant} one {Couvre # établissement : {names}} other {Couvre # établissements : {names}…}}",
+      "review": "Vérifier et enregistrer",
+      "confirmSave": "Confirmer et enregistrer",
+      "backToEdit": "Revenir à la modification",
+      "saveAsTemplate": "Enregistrer comme modèle",
+      "templateName": "Nom du modèle",
+      "templateSave": "Enregistrer le modèle",
+      "templateSaved": "Enregistré comme rôle « {name} ». Vous le trouverez dans Rôles.",
+      "addRole": "Ajouter un autre rôle",
+      "addRoleTitle": "Ajouter un autre rôle",
+      "addRoleSave": "Ajouter le rôle",
+      "removeRole": "Retirer ce rôle"
+    },
+    "teams": {
+      "leadership": "Direction",
+      "development": "Développement de la franchise",
+      "sales": "Ventes",
+      "marketing": "Marketing",
+      "operations": "Opérations",
+      "finance": "Finance",
+      "legal": "Juridique et conformité",
+      "training": "Formation",
+      "partners": "Partenaires de franchise",
+      "locations": "Établissements",
+      "other": "Autres"
+    },
+    "scopeKind": {
+      "organization": "Toute l’entreprise",
+      "brand": "Marque",
+      "territory": "Territoire",
+      "region": "Région",
+      "portfolio": "Portefeuille",
+      "owner_group": "Groupe de propriétaires",
+      "location": "Établissement"
+    },
+    "sensitive": {
+      "finance": "Finance",
+      "legal": "Documents juridiques",
+      "personal_data": "Données personnelles des clients"
+    },
+    "roleTags": {
+      "support": "Rôle d’accompagnement"
+    },
+    "preview": {
+      "title": "Accès effectif",
+      "intro": "Exactement ce que cette personne obtiendra à l’enregistrement, tel que le serveur le calcule. Tout ce qui n’est pas listé reste masqué.",
+      "workspaces": "Espaces, modules et actions",
+      "locations": "Établissements",
+      "allLocations": "Tous les établissements de l’entreprise",
+      "noLocations": "Aucun établissement pour l’instant",
+      "sensitiveTitle": "Données sensibles",
+      "sensitiveNone": "Aucune : ni finance, ni documents juridiques, ni données personnelles des clients.",
+      "hidden": "Masqué pour cette personne",
+      "hiddenNone": "Rien : elle voit tous les modules."
+    },
+    "profile": {
+      "jobTitle": "Intitulé de poste",
+      "jobTitleHint": "Texte libre, affiché à côté du nom. Ne change pas ce que la personne voit.",
+      "denyTitle": "Ne jamais afficher",
+      "denyHint": "Retire ce type de données de tous les rôles de la personne, même si un rôle l’inclut.",
+      "deny": "Pas de {kind}",
+      "save": "Enregistrer le poste et les limites",
+      "saved": "Enregistré. S’applique dès son prochain clic."
+    },
+    "shape": {
+      "tab": "Organisation de l’équipe",
+      "title": "Organisation de l’équipe",
+      "intro": "Comment votre équipe du siège est organisée. Cela ne fait que suggérer des rôles de départ ; vous pouvez la changer à tout moment.",
+      "onboardingTitle": "Comment votre équipe est-elle organisée ?",
+      "onboardingIntro": "Nous suggérerons des rôles adaptés. Les modèles de rôle sont des points de départ, pas un organigramme : renommez-les, combinez-les ou modifiez-les plus tard dans Équipe et accès.",
+      "smallNote": "Nous créerons des rôles combinés comme « Marketing et ventes » et « Opérations et finance » pour les personnes qui couvrent plusieurs domaines.",
+      "current": "Organisation actuelle : {shape}",
+      "suggested": "Rôles suggérés",
+      "templates": "Modèles pour inviter des personnes : {roles}",
+      "created": "Créé",
+      "willCreate": "Sera créé",
+      "nothingLocked": "Rien n’est figé : changer d’organisation ne retire jamais de rôle ni d’accès.",
+      "save": "Utiliser cette organisation",
+      "saved": "Organisation de l’équipe enregistrée.",
+      "options": {
+        "full": {
+          "title": "Équipe complète",
+          "body": "Des équipes distinctes pour les ventes, le marketing, les opérations, la finance et le développement."
+        },
+        "small": {
+          "title": "Petite équipe",
+          "body": "Chacun couvre plusieurs domaines : des rôles combinés comme « Marketing et ventes »."
+        },
+        "solo": {
+          "title": "Juste moi pour l’instant",
+          "body": "Vous gérez tout. Ajoutez des personnes quand vous serez prêt."
+        },
+        "custom": {
+          "title": "Sur mesure",
+          "body": "Créez vos propres rôles à partir de modules et d’actions."
+        }
+      },
+      "combined": {
+        "marketing_sales": {
+          "name": "Marketing et ventes",
+          "description": "Le marketing du réseau et les ventes aux clients : prospects, affaires et abonnements."
+        },
+        "operations_finance": {
+          "name": "Opérations et finance",
+          "description": "Les opérations au quotidien plus les paiements, redevances, factures et versements."
+        },
+        "development_training": {
+          "name": "Développement et formation",
+          "description": "Le pipeline de franchise, l’information précontractuelle, les contrats et les ouvertures, plus l’académie."
+        }
+      }
+    },
+    "coverage": {
+      "title": "Domaines non couverts",
+      "countOpen": "{count, plural, one {# domaine n’a encore personne} other {# domaines n’ont encore personne}}",
+      "allCovered": "Chaque domaine a quelqu’un.",
+      "fallback": "Tant que personne n’est désigné, les validations et notifications de ces domaines vont au propriétaire.",
+      "nobody": "Personne ne s’occupe encore de {area}",
+      "assignTo": "Confier à…",
+      "choose": "Choisir une personne",
+      "assign": "Confier",
+      "cancel": "Annuler",
+      "assigned": "{name} s’occupe désormais de {area}.",
+      "areas": {
+        "franchise_pipeline": "le pipeline de franchise",
+        "customer_sales": "les ventes aux clients",
+        "marketing": "les campagnes marketing",
+        "websites": "la publication des sites",
+        "approvals": "les validations",
+        "new_locations": "les nouveaux établissements",
+        "help_desk": "le support",
+        "payments": "les paiements et remboursements",
+        "royalties": "les redevances",
+        "agreements": "les contrats de franchise",
+        "disclosure": "l’information précontractuelle",
+        "training": "la formation"
+      }
+    },
+    "scopes": {
+      "title": "Portefeuilles et territoires",
+      "intro": "Des périmètres au-delà des régions et des groupes de propriétaires. Un portefeuille est un ensemble libre d’établissements (pour un consultant terrain). Un territoire est un sous-réseau, comme un pays dirigé par un master franchisé, avec ses établissements et son pipeline de franchise.",
+      "territories": "Territoires",
+      "portfolios": "Portefeuilles",
+      "noTerritories": "Aucun territoire pour l’instant.",
+      "noPortfolios": "Aucun portefeuille pour l’instant.",
+      "noLocations": "aucun établissement",
+      "newPortfolio": "Nouveau portefeuille",
+      "newTerritory": "Nouveau territoire",
+      "portfolioName": "Nom du portefeuille",
+      "territoryName": "Nom du territoire",
+      "locations": "Établissements",
+      "create": "Créer",
+      "cancel": "Annuler",
+      "kinds": {
+        "master": "Master franchise",
+        "development": "Zone de développement",
+        "support": "Zone d’accompagnement"
+      }
     }
   },
   "demo": {

@@ -214,13 +214,12 @@ function plan(ctx: Ctx, entity: ImportEntity, rowNo: number, v: Record<string, s
       const role = mapped ?? suggestRole(v.role);
       if (!IMPORTABLE_ROLES.includes(role)) err('role', 'role_not_importable', `Role "${role}" cannot be assigned by import`);
       const l = loc();
-      const needsLocation = ['location_manager', 'staff', 'marketing_contributor', 'franchise_owner', 'regional_manager'].includes(role);
+      const needsLocation = ['location_manager', 'staff', 'content_social', 'franchise_owner'].includes(role);
       let scopeKind = 'organization';
       let scopeId: string | null = ctx.organizationId;
       if (needsLocation) {
         if (!l) err('location_code', 'location_required', 'This role needs a location');
         else if (role === 'franchise_owner') { scopeKind = 'owner_group'; scopeId = l.ownerGroupId; if (!scopeId) err('location_code', 'no_owner_group', 'The location has no owner group'); }
-        else if (role === 'regional_manager') { scopeKind = 'region'; scopeId = l.regionId; if (!scopeId) err('location_code', 'no_region', 'The location has no region'); }
         else { scopeKind = 'location'; scopeId = l.id; }
       }
       scope(scopeKind === 'organization' ? null : l?.id ?? null);

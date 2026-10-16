@@ -12,7 +12,7 @@ import { http } from './client';
 /* ---------------- API shapes (subset of /docs/json) ---------------- */
 
 export interface ApiScope {
-  kind: 'organization' | 'region' | 'owner_group' | 'location';
+  kind: 'organization' | 'brand' | 'territory' | 'region' | 'portfolio' | 'owner_group' | 'location';
   id: string;
 }
 export interface ApiUser {
@@ -31,7 +31,7 @@ export interface ApiMeOrg {
   model?: 'independent' | 'network';
   isSingleLocation?: boolean;
   primaryLocationId?: string | null;
-  roles: { id: string; role: string; customRoleId?: string | null; name?: string; scope: ApiScope }[];
+  roles: { id: string; role: string; customRoleId?: string | null; name?: string; label?: string | null; scope: ApiScope }[];
   /** What this person sees in the organisation (workspaces, landing workspace, capabilities). */
   access?: AccessSummary;
 }
@@ -247,7 +247,7 @@ export async function refreshWorkspace(): Promise<Workspace | null> {
 
 /* ---------------- roles, sessions and scopes ---------------- */
 
-const LOCAL_ROLES: Role[] = ['hq_admin', 'regional_manager', 'franchise_owner', 'location_manager', 'marketing_contributor', 'finance'];
+const LOCAL_ROLES: Role[] = ['hq_admin', 'field_consultant', 'area_representative', 'master_franchisee', 'area_developer', 'multi_unit_operator', 'franchise_owner', 'location_manager', 'content_social', 'finance_lead', 'accountant', 'sales_lead', 'sales_rep', 'auditor'];
 
 export function viewRoleOf(a: RoleAssignment): ViewRole {
   if (a.scope.kind === 'organization') return 'hq';
@@ -274,6 +274,9 @@ export function orgAccess(w: Workspace | null = ws): AccessSummary {
 
 function coveredLocationIds(assignments: RoleAssignment[], w: Workspace): string[] {
   if (assignments.some((a) => a.scope.kind === 'organization')) return w.locations.map((l) => l.id);
+  // Brand, territory and portfolio scopes are resolved by the API: the location directory it returns is already
+  // limited to the locations this person may see.
+  if (assignments.some((a) => a.scope.kind === 'brand' || a.scope.kind === 'territory' || a.scope.kind === 'portfolio')) return w.locations.map((l) => l.id);
   const ids = new Set<string>();
   for (const a of assignments)
     for (const l of w.locations)
@@ -344,6 +347,7 @@ export function apiScope(scopeId: string, role: ViewRole = activeRole): ApiScope
   if (kind === 'region' && value) return { kind: 'region', id: value };
   if (kind === 'group' && value) return { kind: 'owner_group', id: value };
   if (kind === 'loc' && value) return { kind: 'location', id: value };
+  if ((kind === 'territory' || kind === 'portfolio' || kind === 'brand') && value) return { kind, id: value };
   // "All authorised locations": the org for org-wide roles, otherwise the persona's own assignment.
   const own = ws ? assignmentsFor(role, ws) : [];
   if (!own.length || own.some((a) => a.scope.kind === 'organization')) return { kind: 'organization', id };

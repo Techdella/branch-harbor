@@ -180,8 +180,22 @@
     {
       "idx": 25,
       "version": "7",
-      "when": 1792100804830,
-      "tag": "0025_data_platform",
+      "when": 1792099826441,
+      "tag": "0025_team_templates_scopes",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792099828745,
+      "tag": "0026_migrate_legacy_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792107808713,
+      "tag": "0027_data_platform",
       "breakpoints": true
     }
   ]

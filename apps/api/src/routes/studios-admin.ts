@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { currency } from '@bh/shared';
 import type { FastifyPluginAsyncZod, ZodTypeProvider } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
-import type { Permission } from '@bh/shared';
+import type { Permission, ScopeKind } from '@bh/shared';
 import {
   classBookings, classOccurrences, classSeries, classTypes, consentRecords, customers, instructorAvailability, locations, memberships, membershipInvoices, onlineAccessGrants, onlineContent,
   packs, roleAssignments, studioAiProposals, studioCustomerNotifications, studioFees, studioMembershipPlans, studioPackProducts, studioPolicies, studioPurchases, studioRooms, users, waitlistEntries,
@@ -11,7 +11,8 @@ import {
 import { AppError, conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, hasPerm, requireLocationPerm, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, financeVisible, hasPerm, requireLocationPerm, requirePerm, scopedLocations } from '../services/authz.ts';
+import { coversLocation } from '../domain/scope.ts';
 import { recordAttendance } from '../services/studios.ts';
 import {
   cancelMembership, chargeRenewalSandbox, createPurchase, grantCredits, invoicesFor, pauseMembership, resumeMembership, serializeMembership, serializePack, serializePurchase,
@@ -123,8 +124,9 @@ export const studioAdminRoutes: FastifyPluginAsyncZod = async (_app) => {
     const ids = await scopeLocs(req, req.params.orgId, 'operations.read', req.query.locationId);
     const rows = await s.db.select({ userId: roleAssignments.userId, role: roleAssignments.role, scopeKind: roleAssignments.scopeKind, scopeId: roleAssignments.scopeId, name: users.name, email: users.email })
       .from(roleAssignments).innerJoin(users, eq(users.id, roleAssignments.userId)).where(and(eq(roleAssignments.organizationId, req.params.orgId), isNull(users.deletedAt)));
-    const locs = await s.db.select({ id: locations.id, regionId: locations.regionId, ownerGroupId: locations.ownerGroupId }).from(locations).where(inArray(locations.id, ids.length ? ids : ['00000000-0000-0000-0000-000000000000']));
-    const covers = (r: typeof rows[number]) => r.scopeKind === 'organization' || locs.some((l) => (r.scopeKind === 'location' && l.id === r.scopeId) || (r.scopeKind === 'region' && l.regionId === r.scopeId) || (r.scopeKind === 'owner_group' && l.ownerGroupId === r.scopeId));
+    const want = new Set(ids);
+    const locs = (await scopedLocations(s.db, req.params.orgId)).filter((l) => want.has(l.id));
+    const covers = (r: typeof rows[number]) => r.scopeKind === 'organization' || locs.some((l) => coversLocation({ role: 'custom', scopeKind: r.scopeKind as ScopeKind, scopeId: r.scopeId }, req.params.orgId, l));
     const teach = new Map<string, { userId: string; name: string; roles: string[] }>();
     for (const r of rows.filter((x) => ['staff', 'location_manager', 'franchise_owner', 'org_owner'].includes(x.role) && covers(x))) {
       const t = teach.get(r.userId) ?? { userId: r.userId, name: r.name, roles: [] };
@@ -564,7 +566,11 @@ export const studioAdminRoutes: FastifyPluginAsyncZod = async (_app) => {
     const to = req.query.to ? new Date(req.query.to) : new Date(Date.now() + 7 * 86400_000);
     const from = req.query.from ? new Date(req.query.from) : new Date(to.getTime() - 63 * 86400_000);
     if (from >= to) throw validationError('`from` must be before `to`');
-    return studioReports(s.db, req.params.orgId, ids, { from, to });
+    const r = await studioReports(s.db, req.params.orgId, ids, { from, to });
+    // Revenue is the owner's financial data: only for locations where the person holds Payments (view).
+    const fin = await financeVisible(req, s.db, req.params.orgId, ids);
+    if (fin.all) return { ...r, revenueRestricted: false };
+    return { ...r, revenue: fin.ids.length ? (await studioReports(s.db, req.params.orgId, fin.ids, { from, to })).revenue : [], revenueRestricted: true };
   });
   app.get('/orgs/:orgId/studios/pulse', { schema: { tags, security: secured, params: orgParams, summary: 'Owner pulse: today and the next 7 days of occupancy per location' } }, async (req) => {
     const ids = await scopeLocs(req, req.params.orgId, 'reports.read');
@@ -572,7 +578,9 @@ export const studioAdminRoutes: FastifyPluginAsyncZod = async (_app) => {
     const r = await studioReports(s.db, req.params.orgId, ids, { from: new Date(now.getTime() - 7 * 86400_000), to: now });
     const next = await studioReports(s.db, req.params.orgId, ids, { from: now, to: new Date(now.getTime() + 7 * 86400_000) });
     const grace = ids.length ? await s.db.select({ n: sql<number>`count(*)::int` }).from(memberships).where(and(eq(memberships.organizationId, req.params.orgId), inArray(memberships.locationId, ids), inArray(memberships.status, ['grace', 'suspended']))) : [{ n: 0 }];
-    return { generatedAt: r.generatedAt, last7: r.occupancy.byLocation, next7: next.occupancy.byLocation, revenueLast7: r.revenue, membershipsNeedingAttention: grace[0]?.n ?? 0, definitions: r.definitions };
+    const fin = await financeVisible(req, s.db, req.params.orgId, ids);
+    const revenueLast7 = fin.all ? r.revenue : fin.ids.length ? (await studioReports(s.db, req.params.orgId, fin.ids, { from: new Date(now.getTime() - 7 * 86400_000), to: now })).revenue : [];
+    return { generatedAt: r.generatedAt, last7: r.occupancy.byLocation, next7: next.occupancy.byLocation, revenueLast7, revenueRestricted: !fin.all, membershipsNeedingAttention: grace[0]?.n ?? 0, definitions: r.definitions };
   });
 
   // ───────── AI (read-only / proposals) ─────────

@@ -38,6 +38,44 @@ async function upsertUser(email: string, name: string, locale = 'en') {
   return u!;
 }
 
+/**
+ * Stillwater: a small team where people cover several areas (team shape "small"). The combined roles are the
+ * business's own roles built from the templates; Owen Reid holds two roles (access is the union). Nobody approves
+ * disclosure yet, so Team & access shows it as an uncovered area (it goes to the owner meanwhile).
+ */
+async function seedSmallTeam(swId: string, ownerId: string, luciaId: string) {
+  const { COMBINED_ROLES, combinedRoleCapabilities } = await import('@bh/shared');
+  const created: Record<string, string> = {};
+  for (const c of COMBINED_ROLES) {
+    const [role] = await db.insert(t.customRoles).values({ organizationId: swId, name: c.name, description: c.description, primaryWorkspace: c.primaryWorkspace, createdBy: ownerId }).returning();
+    await db.insert(t.roleCapabilities).values([...combinedRoleCapabilities(c.key, 'studios')].map((capability) => ({ roleId: role!.id, organizationId: swId, capability })));
+    created[c.key] = role!.id;
+  }
+  const [org] = await db.select({ settings: t.organizations.settings }).from(t.organizations).where(sql`${t.organizations.id} = ${swId}`);
+  await db.update(t.organizations).set({ settings: { ...(org?.settings ?? {}), teamShape: 'small', teamShapeRoles: created } }).where(sql`${t.organizations.id} = ${swId}`);
+  const byEmail = async (email: string) => (await db.select().from(t.users).where(sql`lower(${t.users.email}) = ${email}`))[0]!;
+  const elena = await byEmail('elena.costa@demo.branchharbor.com');
+  const lena = await byEmail('lena.okafor@demo.branchharbor.com');
+  const owen = await upsertUser('owen.reid@demo.branchharbor.com', 'Owen Reid');
+  const asCustom = (userId: string, key: string) => db.update(t.roleAssignments).set({ role: 'custom', customRoleId: created[key]! })
+    .where(sql`${t.roleAssignments.organizationId} = ${swId} and ${t.roleAssignments.userId} = ${userId} and ${t.roleAssignments.scopeKind} = 'organization'`);
+  await asCustom(elena.id, 'marketing_sales');
+  await asCustom(luciaId, 'development_training');
+  await db.insert(t.roleAssignments).values([
+    { organizationId: swId, userId: owen.id, role: 'custom', customRoleId: created.operations_finance!, scopeKind: 'organization', scopeId: swId, createdBy: ownerId },
+    { organizationId: swId, userId: owen.id, role: 'trainer', scopeKind: 'organization', scopeId: swId, createdBy: ownerId },
+  ]);
+  // Lena teaches and follows up course leads at Queen West (a trainer with one extra module).
+  const [lenaA] = await db.select().from(t.roleAssignments).where(sql`${t.roleAssignments.organizationId} = ${swId} and ${t.roleAssignments.userId} = ${lena.id}`);
+  if (lenaA) await db.insert(t.memberAccessOverrides).values(['sales.course_leads:view', 'sales.course_leads:edit'].map((capability) => ({ organizationId: swId, assignmentId: lenaA.id, capability, effect: 'grant', createdBy: ownerId })));
+  await db.insert(t.memberProfiles).values([
+    { organizationId: swId, userId: elena.id, jobTitle: 'Head of growth' },
+    { organizationId: swId, userId: owen.id, jobTitle: 'Operations, finance & teacher training' },
+    { organizationId: swId, userId: luciaId, jobTitle: 'Franchise development & teacher training' },
+  ]);
+  return { combined: Object.keys(created), owen: owen.email };
+}
+
 async function main() {
   const slugs = ['stillwater-yoga', 'maple-and-ember', NORTHLIGHT_SLUG, ...OPERATIONS_DEMO_SLUGS];
   const old = await db.select({ id: t.organizations.id }).from(t.organizations).where(inArray(t.organizations.slug, slugs));
@@ -83,7 +121,7 @@ async function main() {
 
   await db.insert(t.roleAssignments).values([
     { organizationId: swId, userId: demo.id, role: 'org_owner', scopeKind: 'organization', scopeId: swId },
-    { organizationId: swId, userId: priya.id, role: 'regional_manager', scopeKind: 'region', scopeId: eu!.id },
+    { organizationId: swId, userId: priya.id, role: 'field_consultant', scopeKind: 'region', scopeId: eu!.id },
     { organizationId: swId, userId: maya.id, role: 'location_manager', scopeKind: 'location', scopeId: swByCode['TOR-QW']!.id },
   ]);
   await db.insert(t.subscriptions).values({ organizationId: swId, plan: 'network', status: 'active', billedLocationCount: 5, currency: 'CAD' });
@@ -220,13 +258,15 @@ async function main() {
   console.log('Studios:', await (await import('./seed-studios.ts')).seedStudios({ db, today, swId, demo, maya }));
   await (await import('./seed-commerce.ts')).seedCommerce({ db, orgId: ops.orgs.fieldnote, demo, upsertUser });
   const foods = await seedFoods({ db, today, meId, demo, carlos, upsertUser });
-  // Franchise development (Stillwater): Lucia Reyes is VP Franchise.
+  // Franchise development (Stillwater): Lucia Reyes leads franchise development.
   const lucia = await upsertUser('lucia.reyes@demo.branchharbor.com', 'Lucia Reyes');
-  await db.insert(t.roleAssignments).values({ organizationId: swId, userId: lucia.id, role: 'vp_franchise', scopeKind: 'organization', scopeId: swId });
+  await db.insert(t.roleAssignments).values({ organizationId: swId, userId: lucia.id, role: 'development_lead', scopeKind: 'organization', scopeId: swId });
   const franchise = await (await import('./seed-franchise.ts')).seedFranchise({ db, orgId: swId, demo, lead: lucia, brand: 'Stillwater', collectLocationCode: 'TOR-QW' });
   // Network workspaces (Community, Help desk, Training academy) for Stillwater and Maple & Ember.
   const network = await (await import('./seed-community.ts')).seedCommunity({ db, swId, meId, demo, maya, priya, upsertUser });
   const training = await (await import('./seed-training.ts')).seedTraining({ db, swId, meId, demo, maya, ...network });
+  // Stillwater is a small team where people wear several hats (team shape "small"): combined roles.
+  const smallTeam = await seedSmallTeam(swId, demo.id, lucia.id);
   // Hospitality (Tidewater Stays): front-desk manager and staff logins appear in the demo picker.
   const hospitality = await (await import('./seed-hospitality.ts')).seedHospitality({ db, upsertUser, demo });
 
@@ -235,7 +275,8 @@ async function main() {
   console.log(` Demo login:    demo@branchharbor.com`);
   console.log(` Password:      ${password}`);
   console.log(` Also:          maya.rao@demo.branchharbor.com (location manager, Queen West)`);
-  console.log(`                priya.anand@demo.branchharbor.com (regional manager, Europe)`);
+  console.log(`                priya.anand@demo.branchharbor.com (field consultant, Europe)`);
+  console.log(`                ${smallTeam.owen} (Stillwater small team: Operations & finance + Trainer) — combined roles: ${smallTeam.combined.join(', ')}`);
   console.log(`                carlos.ortega@demo.branchharbor.com (staff, Ballard) — same password`);
   console.log(` Organisations: Stillwater Yoga Collective (${swId}) — Toronto CAD, Seattle USD, London GBP, Berlin EUR, Sydney AUD`);
   console.log(`                Maple & Ember Restaurants (${meId}) — Seattle USD, Vancouver CAD, London GBP, Lisbon EUR`);
@@ -245,7 +286,7 @@ async function main() {
   console.log(`                Fieldnote Goods (${ops.orgs.fieldnote}) — Portland USD, Montréal CAD, Amsterdam EUR`);
   console.log(` Staff/managers (same password): ${ops.users.join(', ')}`);
   console.log(` Real Estate:   Keystone Realty Network (${realty.orgId}) — Toronto/Vancouver CAD, London GBP, Madrid EUR, Dubai AED, Sydney AUD; ${realty.listings} listings · ${realty.users.join(', ')}`);
-  console.log(` Franchise:     Stillwater pipeline (${franchise.prospects} prospects; ${franchise.blocked.waitingPeriod} waiting period, ${franchise.blocked.registration} registration pending, ${franchise.readyToSign} ready to sign, ${franchise.onboarding} onboarding) · ${franchise.lead} (VP Franchise)`);
+  console.log(` Franchise:     Stillwater pipeline (${franchise.prospects} prospects; ${franchise.blocked.waitingPeriod} waiting period, ${franchise.blocked.registration} registration pending, ${franchise.readyToSign} ready to sign, ${franchise.onboarding} onboarding) · ${franchise.lead} (Franchise development & training)`);
   console.log(` Hospitality:   Tidewater Stays (${hospitality.orgId}) — Lisbon EUR (hotel + outlet), Vancouver CAD, London GBP, Sydney AUD (hostel); ${hospitality.rooms} rooms · ${hospitality.users.join(', ')}`);
   console.log(` Location finder: GET /v1/public/locations/stillwater-yoga`);
   console.log(` Network:       Community, Training and Help desk for Stillwater · ${network.users.join(', ')} (same password)`);

@@ -1,36 +1,78 @@
 /**
  * Roles and permissions. Enforced server-side; the client uses these only to hide controls.
- * Scope hierarchy: organisation → region → owner group → location.
+ * Scopes: organisation (the whole network) → brand → territory (a sub-network) → region → portfolio (any named set of
+ * locations) → owner group → location. Every scope below the organisation resolves to a set of locations.
  *
  * `PERMISSIONS` are the fine-grained checks every endpoint makes. They are derived from capabilities
  * (workspaces → modules → actions, see access.ts), so custom roles and per-person overrides apply everywhere.
  */
 
 /**
- * System roles (role templates). Each is a set of capabilities defined in `access.ts` (ROLE_TEMPLATES);
- * organisations can also create custom roles (stored as role `custom` + a custom role id).
+ * System roles (role templates), grouped by team in `access.ts` (ROLE_TEAMS). Each is a set of capabilities defined
+ * in `access.ts` (ROLE_TEMPLATES). Templates are starting points, not an org chart: organisations rename them, combine
+ * them (a person can hold several), and create their own custom roles (stored as role `custom` + a custom role id).
  */
 export const ROLES = [
+  // Leadership
   'org_owner',
   'hq_admin',
-  'vp_franchise',
-  'cmo',
-  'brand_lead',
+  // Franchise development
+  'development_lead',
+  'development_rep',
+  // Sales
+  'sales_lead',
+  'sales_rep',
+  // Marketing
+  'marketing_lead',
+  'brand_manager',
   'digital_marketer',
-  'instructor_trainer',
-  'operations_manager',
-  'finance',
-  'legal',
-  'regional_manager',
+  'content_social',
+  // Operations
+  'operations_lead',
+  'field_consultant',
+  // Finance
+  'finance_lead',
+  'accountant',
+  // Legal & compliance
+  'legal_lead',
+  // Training
+  'training_lead',
+  'trainer',
+  // Franchise partners
+  'master_franchisee',
+  'area_developer',
+  'area_representative',
+  'multi_unit_operator',
+  // Locations
   'franchise_owner',
   'location_manager',
   'staff',
-  'marketing_contributor',
+  // Other
+  'auditor',
   'customer',
-  /** Network instructor-trainer: authors courses (HQ approves publishing) and follows up course leads. */
-  'instructor_trainer',
 ] as const;
 export type Role = (typeof ROLES)[number];
+
+/**
+ * Role keys from before the team-based templates (they copied one franchisor's team). Stored assignments were migrated
+ * to the nearest template (migration "team templates"); any key still found in old data resolves through this map.
+ */
+export const LEGACY_ROLE_MAP: Readonly<Record<string, Role>> = {
+  vp_franchise: 'development_lead',
+  cmo: 'marketing_lead',
+  brand_lead: 'brand_manager',
+  instructor_trainer: 'trainer',
+  operations_manager: 'operations_lead',
+  finance: 'finance_lead',
+  legal: 'legal_lead',
+  regional_manager: 'field_consultant',
+  marketing_contributor: 'content_social',
+};
+
+/** A current role key for a stored key (legacy keys map to their nearest template). */
+export function canonicalRole(role: string): string {
+  return LEGACY_ROLE_MAP[role] ?? role;
+}
 
 export const PERMISSIONS = [
   'org.manage', 'billing.manage', 'members.manage',
@@ -57,7 +99,16 @@ export const PERMISSIONS = [
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
-export type ScopeKind = 'organization' | 'region' | 'owner_group' | 'location';
+export const SCOPE_KINDS = ['organization', 'brand', 'territory', 'region', 'portfolio', 'owner_group', 'location'] as const;
+export type ScopeKind = (typeof SCOPE_KINDS)[number];
+
+/**
+ * Sensitive data classes. Seeing a location never implies seeing its owner's finances, legal files or customers'
+ * personal data: those need a module that carries the class (granted by an ownership template or explicitly).
+ * A person-level deny on a class removes it from every role they hold.
+ */
+export const SENSITIVE_CLASSES = ['finance', 'legal', 'personal_data'] as const;
+export type SensitiveClass = (typeof SENSITIVE_CLASSES)[number];
 export interface Scope {
   kind: ScopeKind;
   id: string;

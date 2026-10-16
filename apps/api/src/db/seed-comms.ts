@@ -96,7 +96,7 @@ export async function seedComms({ db, orgId }: { db: Db; orgId: string }) {
 
   // ── Ad campaigns ──
   const operating = locs.filter((l) => l.status === 'operating').sort((a, b) => a.name.localeCompare(b.name));
-  const totals = { CAD: 450000, USD: 150000, GBP: 120000 };
+  const totals = { CAD: 450000, USD: 150000, GBP: 120000, EUR: 90000 };
   const split = splitBudget(operating, totals);
   const [network] = await db.insert(t.adCampaigns).values({ organizationId: orgId, kind: 'network', name: 'Intro month — autumn', objective: 'leads', platforms: ['meta', 'google'], status: 'active', startsOn: dayStr(-14), endsOn: dayStr(16), creative: { headline: 'Intro month: 30 days unlimited', body: 'Hot yoga for a brighter you. Start any day.', cta: 'Sign up', imageUrl: null }, budgetTotals: totals, createdBy: U['priyanka.shah']!.id }).returning();
   await db.insert(t.adCampaignLocations).values(operating.map((l) => ({ organizationId: orgId, campaignId: network!.id, locationId: l.id, budgetMinor: split.get(l.id)!.budgetMinor, currency: l.currency, radiusKm: 6, geo: l.geo ?? null })));

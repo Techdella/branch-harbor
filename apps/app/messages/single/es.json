@@ -61,7 +61,7 @@
       "Tu sede, tus clientes, tu web, tu equipo y tu historial de pagos siguen igual.",
       "El selector de ámbito, el directorio de sedes, las regiones y los grupos de propietarios pasan a estar disponibles.",
       "Las plantillas web pueden bloquear campos o requerir aprobación, y las páginas pueden publicarse en varias sedes a la vez.",
-      "Se pueden invitar los roles de sede central, gerente regional y franquiciado.",
+      "Se pueden invitar roles de sede, consultor de campo, socio de franquicia y franquiciado.",
       "La facturación pasa del plan Solo al precio por sede cuando una segunda sede esté en funcionamiento.",
       "Tu web de clientes tiene un buscador de sedes en tu dirección actual y cada sede tiene su propia página."
     ],
@@ -137,15 +137,19 @@
       "org_owner": "Propietario",
       "location_manager": "Gerente",
       "staff": "Personal / instructor / entrenador",
-      "marketing_contributor": "Colaborador de marketing",
-      "finance": "Finanzas"
+      "content_social": "Contenido y redes sociales",
+      "finance_lead": "Finanzas",
+      "accountant": "Contable",
+      "sales_rep": "Ventas"
     },
     "roleHelp": {
       "org_owner": "Acceso completo, incluida la facturación, el equipo y la configuración del negocio.",
-      "location_manager": "Lleva el día a día: horarios, clientes, pedidos y publicación de la web.",
-      "staff": "Solo su horario, asistencia o pedidos.",
-      "marketing_contributor": "Redacta contenidos de la web y de marketing; publica solo si lo permites.",
-      "finance": "Pagos, conciliación y reembolsos permitidos."
+      "location_manager": "Lleva el día a día: horarios, clientes, pedidos y publicación del sitio web.",
+      "staff": "Solo su propio horario, asistencia o pedidos.",
+      "content_social": "Redacta contenido del sitio y de marketing; publica solo si lo permites.",
+      "finance_lead": "Pagos, conciliación y reembolsos permitidos.",
+      "accountant": "Consulta y exporta los pagos para la contabilidad.",
+      "sales_rep": "Oportunidades, clientes y membresías."
     }
   },
   "payments": {

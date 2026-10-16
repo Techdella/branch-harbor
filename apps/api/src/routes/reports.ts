@@ -4,7 +4,8 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { appointments, classBookings, classOccurrences, connections, foodOrders, leads, locations, menus, organizations, paymentReferences, registrations, webhookEvents } from '../db/schema/index.ts';
 import { metric, revenueByCurrency, type Freshness } from '../domain/reports.ts';
 import { authenticate } from '../plugins/auth.ts';
-import { authorisedLocations, capabilityLocations, requirePerm } from '../services/authz.ts';
+import { authorisedLocations, capabilityLocations, locationsInScope, requirePerm } from '../services/authz.ts';
+import { SCOPE_KINDS } from '@bh/shared';
 import { orgParams, secured } from './_common.ts';
 
 export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -16,7 +17,7 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
       tags: ['reports'], security: secured, params: orgParams,
       summary: 'Overview metrics with definitions, data source and freshness. Revenue is per currency and never combined. Unavailable data is null, not 0.',
       querystring: z.object({
-        scopeKind: z.enum(['organization', 'region', 'owner_group', 'location']).default('organization'),
+        scopeKind: z.enum(SCOPE_KINDS).default('organization'),
         scopeId: z.uuid().optional(),
         from: z.iso.datetime({ offset: true }).optional(),
         to: z.iso.datetime({ offset: true }).optional(),
@@ -35,8 +36,8 @@ export const reportRoutes: FastifyPluginAsyncZod = async (app) => {
     const allLocs = await s.db.select().from(locations).where(eq(locations.organizationId, orgId));
     const [orgRow] = await s.db.select({ model: organizations.model }).from(organizations).where(eq(organizations.id, orgId));
     const independent = orgRow?.model === 'independent';
-    const scoped = allLocs.filter((l) =>
-      (q.scopeKind === 'organization') || (q.scopeKind === 'region' && l.regionId === scopeId) || (q.scopeKind === 'owner_group' && l.ownerGroupId === scopeId) || (q.scopeKind === 'location' && l.id === scopeId))
+    const inScope = await locationsInScope(s.db, orgId, q.scopeKind, scopeId);
+    const scoped = allLocs.filter((l) => inScope === 'all' || inScope.has(l.id))
       .filter((l) => allowed === 'all' || allowed.has(l.id) || q.scopeKind !== 'organization');
     const locIds = scoped.map((l) => l.id);
     const now = new Date().toISOString();
