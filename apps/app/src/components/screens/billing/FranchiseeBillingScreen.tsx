@@ -68,6 +68,37 @@ function Body({ v, reload }: { v: FranchiseeView; reload: () => void }) {
   );
 }
 
+const SUB_TONE: Record<string, 'success' | 'warning' | 'danger' | 'neutral' | 'info'> = { active: 'success', trialing: 'info', scheduled: 'info', past_due: 'danger', canceled: 'neutral', none: 'neutral' };
+
+/** The franchisee's own subscription for the fees passed on: its status, the next charge (date and amount) and period. */
+function SubscriptionStatus({ acct }: { acct: FranchiseeView['accounts'][number] }) {
+  const t = useTranslations('billing.franchisee.subscription');
+  const locale = useLocale();
+  const sub = acct.subscription;
+  if (!sub) return null;
+  const known = ['active', 'trialing', 'scheduled', 'past_due', 'canceled', 'none'].includes(sub.status) ? sub.status : 'active';
+  const date = sub.nextChargeAt ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(sub.nextChargeAt)) : null;
+  return (
+    <div className="grid gap-3 rounded-md bg-canvas-raised p-4 text-sm sm:grid-cols-3" data-testid="franchisee-subscription">
+      <div>
+        <div className="text-xs font-bold text-stone">{t('status')}</div>
+        <div className="mt-1"><Badge tone={SUB_TONE[known] ?? 'neutral'}>{t(`statuses.${known}` as 'statuses.active')}</Badge></div>
+      </div>
+      <div>
+        <div className="text-xs font-bold text-stone">{t('nextCharge')}</div>
+        <div className="tabular mt-1 text-lg font-extrabold">{sub.nextCharge.amount > 0 ? moneyWithCode(sub.nextCharge, locale) : '—'}</div>
+        {sub.nextCharge.amount > 0 && <div className="text-xs text-stone">{t(`per.${sub.interval}` as 'per.month')}</div>}
+      </div>
+      <div>
+        <div className="text-xs font-bold text-stone">{t('on')}</div>
+        <div className="mt-1 font-semibold">{date ?? '—'}</div>
+        {sub.startsWithHqPlan && date && <div className="text-xs text-stone">{t('startsWithHq')}</div>}
+      </div>
+      {sub.status === 'past_due' && <p className="text-xs font-semibold text-danger sm:col-span-3">{t('pastDueHint')}</p>}
+    </div>
+  );
+}
+
 function AccountCard({ scope, acct, onDone }: { scope: { kind: 'location' | 'owner_group'; id: string }; acct: FranchiseeView['accounts'][number] | undefined; onDone: () => void }) {
   const t = useTranslations('billing.franchisee');
   const tb = useTranslations('billing');
@@ -84,7 +115,10 @@ function AccountCard({ scope, acct, onDone }: { scope: { kind: 'location' | 'own
     <SectionCard title={name} aside={acct?.status === 'active' ? <Badge tone="success">{t('active')}</Badge> : <Badge tone="warning">{t('needsCard')}</Badge>}>
       <div className="flex flex-col gap-3" data-testid="franchisee-account">
         {acct?.status === 'active' && acct.card ? (
-          <p className="text-sm">{t('cardOnFile', { brand: (acct.card.brand ?? '').toUpperCase(), last4: acct.card.last4 ?? '••••', currency: acct.currency })}</p>
+          <>
+            <SubscriptionStatus acct={acct} />
+            <p className="text-sm">{t('cardOnFile', { brand: (acct.card.brand ?? '').toUpperCase(), last4: acct.card.last4 ?? '••••', currency: acct.currency })}</p>
+          </>
         ) : (
           <>
             <div className="grid gap-3 md:grid-cols-2">

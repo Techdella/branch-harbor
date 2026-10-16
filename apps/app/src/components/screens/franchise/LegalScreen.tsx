@@ -11,6 +11,7 @@ import { Banner, Empty, SectionCard } from '../../ui/States';
 import { NotAvailable } from '../NotAvailable';
 import { FAsync, NetworkOnly, useFmt } from './common';
 import { ComplianceExpiring } from '../../quality/ComplianceScreen';
+import { BrandSelect } from '../../brands/BrandLinks';
 
 export function LegalScreen() {
   return <NetworkOnly><Legal /></NetworkOnly>;
@@ -102,13 +103,17 @@ function Agreements() {
 
 function Documents() {
   const t = useTranslations('franchise');
+  const tb = useTranslations('brands');
   const f = useFmt();
   const app = useApp();
   const res = useFranchise(() => franchiseApi.documents(), [app.org.id]);
   const act = useFranchiseAction();
   // Disclosure documents are Disclosure; agreement templates, executed agreements and the vault are Franchise agreements.
   const kinds: FranchiseDocument['kind'][] = [...(app.can('disclosure.edit') ? (['disclosure'] as const) : []), ...(app.can('legal.edit') ? (['agreement_template', 'executed_agreement', 'vault'] as const) : [])];
-  const [v, setV] = useState<{ kind: FranchiseDocument['kind']; title: string; version: string; jurisdictions: string; file: File | null }>({ kind: kinds[0] ?? 'disclosure', title: '', version: '', jurisdictions: '', file: null });
+  const [v, setV] = useState<{ kind: FranchiseDocument['kind']; title: string; version: string; jurisdictions: string; file: File | null; brandId: string | null }>({ kind: kinds[0] ?? 'disclosure', title: '', version: '', jurisdictions: '', file: null, brandId: app.brandId });
+  // Multi-brand HQ: disclosure documents and agreement templates are attached to a brand, or shared by every brand.
+  const branded = v.kind === 'disclosure' || v.kind === 'agreement_template';
+  const brandName = (id: string | null | undefined) => (id ? app.brands.find((b) => b.id === id)?.name ?? '' : tb('docs.allBrands'));
   return (
     <div className="flex flex-col gap-3">
       {act.error && <Banner tone="danger">{act.error.message}</Banner>}
@@ -124,6 +129,7 @@ function Documents() {
                 { key: 'kind', header: t('legal.kind'), render: (r) => t(`docKind.${r.kind}`) },
                 { key: 'version', header: t('legal.version'), render: (r) => r.version },
                 { key: 'jur', header: t('legal.jurisdictions'), render: (r) => r.jurisdictions.join(', ') || '—' },
+                ...(app.multiBrand ? [{ key: 'brand', header: tb('docs.brand'), render: (r: FranchiseDocument) => (r.kind === 'disclosure' || r.kind === 'agreement_template' ? brandName(r.brandId) : '—') }] : []),
                 { key: 'status', header: t('legal.status'), render: (r) => <Badge tone={r.status === 'current' ? 'success' : 'neutral'}>{t(`docStatus.${r.status}` as 'docStatus.current')}</Badge> },
                 { key: 'date', header: t('legal.uploaded'), render: (r) => f.date(r.createdAt) },
                 { key: 'dl', header: '', align: 'right', render: (r) => <Button size="sm" variant="ghost" icon="download" aria-label={t('legal.download', { title: r.title })} onClick={() => act.run(() => downloadDocument(r))} /> },
@@ -139,13 +145,14 @@ function Documents() {
             <Field label={t('legal.docTitle')}>{(x) => <Input id={x.id} value={v.title} onChange={(e) => setV((s) => ({ ...s, title: e.target.value }))} />}</Field>
             <Field label={t('legal.version')}>{(x) => <Input id={x.id} value={v.version} onChange={(e) => setV((s) => ({ ...s, version: e.target.value }))} />}</Field>
             <Field label={t('legal.jurisdictions')} hint={t('legal.jurisdictionsHint')} optional={v.kind !== 'disclosure'}>{(x) => <Input id={x.id} value={v.jurisdictions} onChange={(e) => setV((s) => ({ ...s, jurisdictions: e.target.value.toUpperCase() }))} />}</Field>
+            {branded && <BrandSelect value={v.brandId} onChange={(brandId) => setV((s) => ({ ...s, brandId }))} label={tb('docs.brand')} hint={tb('docs.brandHint')} allLabel={tb('docs.allBrands')} testId="document-brand" />}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <input type="file" aria-label={t('legal.file')} accept="application/pdf,.pdf,.doc,.docx" onChange={(e) => setV((s) => ({ ...s, file: e.target.files?.[0] ?? null }))} className="text-[13px]" />
             <Button icon="plus" disabled={!v.title || !v.file} loading={act.pending} onClick={async () => {
               const file = v.file!;
               const contentBase64 = await fileToBase64(file);
-              const r = await act.run(() => franchiseApi.uploadDocument({ kind: v.kind, title: v.title, version: v.version || '1', jurisdictions: v.jurisdictions.split(/[,\s]+/).filter(Boolean), fileName: file.name, contentType: file.type || 'application/octet-stream', contentBase64 }));
+              const r = await act.run(() => franchiseApi.uploadDocument({ kind: v.kind, title: v.title, version: v.version || '1', jurisdictions: v.jurisdictions.split(/[,\s]+/).filter(Boolean), fileName: file.name, contentType: file.type || 'application/octet-stream', contentBase64, ...(branded && v.brandId ? { brandId: v.brandId } : {}) }));
               if (r) { setV((s) => ({ ...s, title: '', version: '', file: null })); res.reload(); }
             }}>{t('legal.upload')}</Button>
           </div>

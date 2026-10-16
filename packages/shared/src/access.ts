@@ -81,6 +81,12 @@ export interface ModuleDef {
    * not in any partner template: HQ grants them to a territory explicitly (its prospects, owner groups and country).
    */
   territoryOk?: boolean;
+  /**
+   * HQ-private module that a brand (multi-brand HQ) also runs for itself: effective on brand assignments too, filtered
+   * to the brand's records (its prospects, disclosure documents, agreement templates and agreements). Granted by HQ to a
+   * person scoped to one brand (a brand's development team), never implied by any location or owner-group role.
+   */
+  brandOk?: boolean;
   /** Franchise / multi-location only: independent businesses never see it. */
   networkOnly?: boolean;
   /** Sensitive data the module exposes; the API filters these fields by capability. */
@@ -345,7 +351,7 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   // Sales
   { key: 'sales.customers', area: 'sales', name: 'Customers', description: 'Customer records with contact details and history (personal data).', actions: VEX, status: 'available', sensitive: 'personal_data' },
   { key: 'sales.customer_pipeline', area: 'sales', name: 'Leads & enquiries', description: 'New enquiries, the customer sales pipeline (deals, tasks, activities) and lead routing.', actions: ALL, actionNotes: { publish: 'Change lead routing rules and pipeline stages.' }, status: 'available', sensitive: 'personal_data' },
-  { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, sensitive: 'personal_data' },
+  { key: 'sales.franchise_pipeline', area: 'sales', name: 'Franchise pipeline', description: 'Franchise enquiries, qualification, disclosure and agreement steps, territories and new-location deals.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, brandOk: true, sensitive: 'personal_data' },
   { key: 'sales.course_leads', area: 'sales', name: 'Course leads', description: 'People interested in teacher training and public courses. Routed to the course’s trainers or by lead-routing rules; trainers see the leads at their locations and those assigned to them.', actions: VEX, status: 'available', sensitive: 'personal_data' },
   // Marketing
   { key: 'marketing.website_builder', area: 'marketing', name: 'Websites', description: 'Location websites: pages, approvals, publishing and domains.', actions: VEP, status: 'available' },
@@ -371,8 +377,8 @@ export const CORE_MODULES: readonly ModuleDef[] = [
   { key: 'finance.marketing_fund', area: 'finance', name: 'Marketing fund', description: 'Fund contributions, spend on network campaigns with receipts, balance per currency and the transparency report.', actions: VEX, actionNotes: { view: 'See the transparency report and the contributions of the locations in scope.', edit: 'Record fund spend and campaigns (organisation-wide access only).' }, status: 'available', sensitive: 'finance' },
   { key: 'finance.payouts', area: 'finance', name: 'Payouts', description: 'Payouts, fees, refunds and chargebacks per location, reconciliation and accounting exports.', actions: ALL, status: 'available', hqOnly: true, sensitive: 'finance' },
   // Legal & compliance
-  { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'The agreements register, executed agreements, the legal document vault, renewals and expiries.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, sensitive: 'legal' },
-  { key: 'legal.disclosure', area: 'legal', name: 'Disclosure & jurisdiction rules', description: 'Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction.', actions: ALL, actionNotes: { publish: 'Record franchise counsel’s review of a jurisdiction rule.' }, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, sensitive: 'legal' },
+  { key: 'legal.agreements', area: 'legal', name: 'Franchise agreements', description: 'The agreements register, executed agreements, the legal document vault, renewals and expiries.', actions: ALL, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, brandOk: true, sensitive: 'legal' },
+  { key: 'legal.disclosure', area: 'legal', name: 'Disclosure & jurisdiction rules', description: 'Disclosure documents, registrations and the jurisdiction rules (waiting and cooling-off periods) per jurisdiction.', actions: ALL, actionNotes: { publish: 'Record franchise counsel’s review of a jurisdiction rule.' }, networkOnly: true, status: 'available', hqOnly: true, territoryOk: true, brandOk: true, sensitive: 'legal' },
   // Training
   { key: 'training.academy', area: 'training', name: 'Academy', description: 'Courses, lessons, quizzes and certificates for staff and franchisees, and public courses sold on the brand site.', actions: ALL, actionNotes: { view: 'Take courses and earn certificates.', edit: 'Write courses (your own and co-taught).', publish: 'Manage every course, learning path and certificate.', export: 'Training reports.' }, status: 'available' },
   { key: 'training.assignments', area: 'training', name: 'Assignments & progress', description: 'Assign courses to the people in your scope and follow their progress.', actions: VE, status: 'available' },
@@ -558,12 +564,21 @@ export function normalizeCapabilities(caps: Iterable<string>, industry: Industry
 }
 
 /**
+ * Is a module HQ-private for an assignment of this scope kind: HQ-private modules are only effective organisation-wide,
+ * except the ones a territory (`territoryOk`) or a brand (`brandOk`) runs for itself.
+ */
+export function hqOnlyAt(m: Pick<ModuleDef, 'hqOnly' | 'territoryOk' | 'brandOk'>, scopeKind: ScopeKind): boolean {
+  if (scopeKind === 'organization' || !m.hqOnly) return false;
+  return !(scopeKind === 'territory' && m.territoryOk) && !(scopeKind === 'brand' && m.brandOk);
+}
+
+/**
  * Drops HQ-private modules unless the assignment covers the whole organisation; a territory (sub-network) keeps the
- * HQ-private modules it runs for itself (`territoryOk`).
+ * HQ-private modules it runs for itself (`territoryOk`), a brand the ones it runs for itself (`brandOk`).
  */
 export function scopeFilter(caps: Set<Capability>, scopeKind: ScopeKind, industry: Industry | string): Set<Capability> {
   if (scopeKind === 'organization') return caps;
-  const hq = new Set(modulesFor(industry).filter((m) => m.hqOnly && !(scopeKind === 'territory' && m.territoryOk)).map((m) => m.key));
+  const hq = new Set(modulesFor(industry).filter((m) => hqOnlyAt(m, scopeKind)).map((m) => m.key));
   return new Set([...caps].filter((c) => !hq.has(parseCapability(c)!.module)));
 }
 

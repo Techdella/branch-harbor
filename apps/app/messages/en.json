@@ -1457,7 +1457,81 @@
     "templateStandard": "Standard location · v15",
     "templateFlagship": "Flagship location · v3",
     "templatePopup": "Pop-up / seasonal · v2",
-    "hoursPh": "Mon–Fri 07:00–21:00"
+    "hoursPh": "Mon–Fri 07:00–21:00",
+    "live": {
+      "brand": "Brand",
+      "brandHint": "The location belongs to one brand: its site, templates and team follow it.",
+      "template": "Brand template",
+      "templateHint": "Locked and approval fields come from this template.",
+      "noTemplates": "No template for this brand yet. You can apply one later.",
+      "noTemplate": "No template",
+      "templateOption": "{name} · v{version}",
+      "ownerGroup": "Owner group",
+      "ownerGroupHint": "The franchisee company that runs it. Leave company-owned for HQ’s own locations.",
+      "companyOwned": "Company-owned (no owner group)",
+      "networkRegion": "Region",
+      "noRegion": "No region",
+      "territory": "Territory",
+      "territoryHint": "A master franchisee’s country or a development area. Only territories of the chosen brand are listed.",
+      "noTerritory": "No territory",
+      "industryDetails": "Industry details",
+      "industryHint": "Optional. They become the starting values of this location’s own setup.",
+      "choose": "Choose…",
+      "code": "Internal code",
+      "yes": "Yes",
+      "no": "No",
+      "notVisible": "It is a draft: not published and not shown to customers. Publish its website from Websites when it’s ready.",
+      "addAnother": "Add another location",
+      "status": {
+        "draft": "Draft",
+        "onboarding": "Onboarding",
+        "opening_soon": "Opening soon",
+        "operating": "Operating"
+      },
+      "industryField": {
+        "studioRooms": "Studio rooms",
+        "maxClassSize": "Largest class size",
+        "showers": "Showers",
+        "pitches": "Pitches or courts",
+        "surface": "Surface",
+        "minAge": "Youngest age",
+        "treatmentRooms": "Treatment rooms",
+        "clinicRegistration": "Clinic registration number",
+        "stepFreeAccess": "Step-free access",
+        "storeType": "Store type",
+        "salesFloorM2": "Sales floor (m²)",
+        "clickAndCollect": "Click and collect",
+        "serviceStyle": "Service style",
+        "seats": "Seats",
+        "alcoholLicence": "Alcohol licence",
+        "officeLicence": "Office licence number",
+        "agents": "Agents",
+        "serviceArea": "Service area",
+        "guestRooms": "Guest rooms",
+        "checkInTime": "Check-in from (HH:MM)",
+        "checkOutTime": "Check-out by (HH:MM)"
+      },
+      "industryOption": {
+        "surface": {
+          "grass": "Grass",
+          "artificial": "Artificial turf",
+          "indoor": "Indoor",
+          "mixed": "Mixed"
+        },
+        "storeType": {
+          "store": "Store",
+          "outlet": "Outlet",
+          "popup": "Pop-up",
+          "warehouse": "Warehouse"
+        },
+        "serviceStyle": {
+          "counter": "Counter service",
+          "table": "Table service",
+          "takeaway": "Takeaway only",
+          "ghost_kitchen": "Delivery kitchen"
+        }
+      }
+    }
   },
   "websites": {
     "title": "Websites",

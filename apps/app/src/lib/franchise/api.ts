@@ -38,7 +38,7 @@ export interface ProspectDetail extends Prospect {
 }
 
 export interface Territory { id: string; name: string; country: string; region: string | null; jurisdiction: string; description: string | null; status: 'available' | 'reserved' | 'sold' | 'unavailable'; showOnSite: boolean; activeProspects: number }
-export interface FranchiseDocument { id: string; kind: 'disclosure' | 'agreement_template' | 'executed_agreement' | 'vault'; title: string; version: string; jurisdictions: string[]; status: string; issuedOn: string | null; fileName: string; contentType: string; sizeBytes: number; createdAt: string }
+export interface FranchiseDocument { id: string; kind: 'disclosure' | 'agreement_template' | 'executed_agreement' | 'vault'; title: string; version: string; jurisdictions: string[]; status: string; issuedOn: string | null; fileName: string; contentType: string; sizeBytes: number; createdAt: string; brandId?: string | null }
 export interface Project {
   id: string; name: string; status: 'active' | 'go_live_requested' | 'opened' | 'cancelled'; prospectId: string | null; prospectName: string | null; ownerGroupId: string | null; ownerEmail: string | null; ownerInvitationId: string | null;
   location: { id: string; name: string; status: string; publiclyVisible: boolean; slug: string } | null; targetOpenDate: string | null; startedAt: string; openedAt: string | null;

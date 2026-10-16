@@ -139,4 +139,11 @@ test('multi-brand HQ: each brand beyond the first adds the extra-brand fee (USD 
   assert.deepEqual(extraBrandFee('USD', 1), { perBrandMinor: 9_900, extraBrands: 0, chargedMinor: 0 });
   assert.deepEqual(extraBrandFee('USD', 3), { perBrandMinor: 9_900, extraBrands: 2, chargedMinor: 19_800 });
   assert.equal(extraBrandFee('JPY', 2).chargedMinor, 13_500);
+  // In the plan quote: one `brand` line per extra brand (annual = 10 months), never on Solo.
+  const q = planQuote({ priceList: 'USD', plan: 'network', locations: 5, brands: 3 });
+  assert.deepEqual(q.lines.find((l) => l.kind === 'brand'), { kind: 'brand', quantity: 2, unitMinor: 9_900, amountMinor: 19_800 });
+  assert.equal(q.totalMinor, planQuote({ priceList: 'USD', plan: 'network', locations: 5 }).totalMinor + 19_800);
+  assert.equal(planQuote({ priceList: 'USD', plan: 'network', locations: 5, brands: 2, interval: 'year' }).lines.find((l) => l.kind === 'brand')!.amountMinor, 99_000);
+  assert.equal(planQuote({ priceList: 'USD', plan: 'hosted', locations: 2, brands: 1 }).lines.some((l) => l.kind === 'brand'), false);
+  assert.equal(planQuote({ priceList: 'USD', plan: 'solo', brands: 4 }).lines.some((l) => l.kind === 'brand'), false);
 });

@@ -1457,7 +1457,81 @@
     "templateStandard": "Standardstandort · v15",
     "templateFlagship": "Flagship-Standort · v3",
     "templatePopup": "Pop-up / saisonal · v2",
-    "hoursPh": "Mo–Fr 07:00–21:00"
+    "hoursPh": "Mo–Fr 07:00–21:00",
+    "live": {
+      "brand": "Marke",
+      "brandHint": "Der Standort gehört zu einer Marke: Website, Vorlagen und Team richten sich danach.",
+      "template": "Markenvorlage",
+      "templateHint": "Gesperrte und freigabepflichtige Felder kommen aus dieser Vorlage.",
+      "noTemplates": "Noch keine Vorlage für diese Marke. Sie können später eine anwenden.",
+      "noTemplate": "Keine Vorlage",
+      "templateOption": "{name} · v{version}",
+      "ownerGroup": "Eigentümergruppe",
+      "ownerGroupHint": "Das Franchisenehmer-Unternehmen, das ihn betreibt. Für eigene Standorte der Zentrale „eigener Standort“ lassen.",
+      "companyOwned": "Eigener Standort (keine Eigentümergruppe)",
+      "networkRegion": "Region",
+      "noRegion": "Keine Region",
+      "territory": "Gebiet",
+      "territoryHint": "Das Land eines Master-Franchisenehmers oder ein Entwicklungsgebiet. Nur Gebiete der gewählten Marke werden angezeigt.",
+      "noTerritory": "Kein Gebiet",
+      "industryDetails": "Branchendetails",
+      "industryHint": "Optional. Sie werden die Startwerte der Einrichtung dieses Standorts.",
+      "choose": "Auswählen…",
+      "code": "Interner Code",
+      "yes": "Ja",
+      "no": "Nein",
+      "notVisible": "Es ist ein Entwurf: nicht veröffentlicht und für Kunden nicht sichtbar. Veröffentlichen Sie die Website unter Websites, wenn sie bereit ist.",
+      "addAnother": "Weiteren Standort hinzufügen",
+      "status": {
+        "draft": "Entwurf",
+        "onboarding": "Onboarding",
+        "opening_soon": "Eröffnet bald",
+        "operating": "In Betrieb"
+      },
+      "industryField": {
+        "studioRooms": "Studioräume",
+        "maxClassSize": "Größte Kursgröße",
+        "showers": "Duschen",
+        "pitches": "Plätze",
+        "surface": "Belag",
+        "minAge": "Mindestalter",
+        "treatmentRooms": "Behandlungsräume",
+        "clinicRegistration": "Registrierungsnummer der Praxis",
+        "stepFreeAccess": "Stufenloser Zugang",
+        "storeType": "Ladentyp",
+        "salesFloorM2": "Verkaufsfläche (m²)",
+        "clickAndCollect": "Click & Collect",
+        "serviceStyle": "Serviceart",
+        "seats": "Sitzplätze",
+        "alcoholLicence": "Alkohollizenz",
+        "officeLicence": "Lizenznummer des Büros",
+        "agents": "Makler",
+        "serviceArea": "Einzugsgebiet",
+        "guestRooms": "Gästezimmer",
+        "checkInTime": "Check-in ab (HH:MM)",
+        "checkOutTime": "Check-out bis (HH:MM)"
+      },
+      "industryOption": {
+        "surface": {
+          "grass": "Naturrasen",
+          "artificial": "Kunstrasen",
+          "indoor": "Halle",
+          "mixed": "Gemischt"
+        },
+        "storeType": {
+          "store": "Laden",
+          "outlet": "Outlet",
+          "popup": "Pop-up-Store",
+          "warehouse": "Lager"
+        },
+        "serviceStyle": {
+          "counter": "Theke",
+          "table": "Tischservice",
+          "takeaway": "Nur zum Mitnehmen",
+          "ghost_kitchen": "Lieferküche"
+        }
+      }
+    }
   },
   "websites": {
     "title": "Websites",

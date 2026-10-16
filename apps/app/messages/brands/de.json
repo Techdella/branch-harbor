@@ -105,6 +105,15 @@
       "noTerms": "Noch keine Bedingungen",
       "link": "Marken vergleichen"
     },
-    "buying": "Gekaufte Marke"
+    "buying": "Gekaufte Marke",
+    "docs": {
+      "brand": "Marke",
+      "brandHint": "Nur Interessenten, die diese Marke kaufen, erhalten es.",
+      "allBrands": "Alle Marken (gemeinsam)"
+    },
+    "territory": {
+      "brand": "Marke",
+      "brandHint": "Das Gebiet erscheint auf der Verfügbarkeitskarte dieser Marke. Exklusivität wird innerhalb der Marke geprüft."
+    }
   }
 }

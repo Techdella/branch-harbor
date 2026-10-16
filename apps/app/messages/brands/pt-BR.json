@@ -105,6 +105,15 @@
       "noTerms": "Ainda sem condições",
       "link": "Comparar marcas"
     },
-    "buying": "Marca adquirida"
+    "buying": "Marca adquirida",
+    "docs": {
+      "brand": "Marca",
+      "brandHint": "Só os candidatos que compram esta marca o recebem.",
+      "allBrands": "Todas as marcas (compartilhado)"
+    },
+    "territory": {
+      "brand": "Marca",
+      "brandHint": "O território aparece no mapa de disponibilidade desta marca. A exclusividade é verificada dentro da marca."
+    }
   }
 }

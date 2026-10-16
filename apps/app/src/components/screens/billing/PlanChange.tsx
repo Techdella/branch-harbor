@@ -30,6 +30,8 @@ export function ChangePlanCard({ b, onChange }: { b: BillingView; onChange: (v?:
   const [done, setDone] = useState<string | null>(null);
   const apply = useMutation(() => billingApi.change({ plan, interval }));
   const same = plan === b.plan && interval === b.interval;
+  // Monthly ↔ annual starts a new billing period: the difference is charged now, not added to the next invoice.
+  const chargedNow = !!preview && preview.effective === 'now' && (preview.charge ? preview.charge === 'now' : preview.from.interval !== preview.to.interval) && preview.proration.amount >= 0;
 
   useEffect(() => {
     let alive = true;
@@ -83,14 +85,14 @@ export function ChangePlanCard({ b, onChange }: { b: BillingView; onChange: (v?:
                 <div className="tabular font-semibold">{tb(`plans.${preview.to.plan}`)} · {amt(preview.to.hqTotal.amount, preview.to.hqTotal.currency, locale)} {tb(`per.${preview.to.interval}`)}</div>
               </div>
               <div>
-                <div className="text-xs font-bold text-stone">{preview.effective === 'trial_end' ? t('dueAtTrialEnd') : preview.proration.amount < 0 ? t('credit') : t('dueNow')}</div>
+                <div className="text-xs font-bold text-stone" data-testid="change-charge-label">{preview.effective === 'trial_end' ? t('dueAtTrialEnd') : chargedNow ? t('chargedNow') : preview.proration.amount < 0 ? t('credit') : t('dueNow')}</div>
                 <div className="tabular text-lg font-extrabold">{amt(Math.abs(preview.proration.amount), preview.proration.currency, locale)}</div>
               </div>
             </div>
             <p className="text-xs text-stone">
               {preview.effective === 'trial_end'
                 ? t('trialNote', { date: fmtDate(preview.effectiveAt, locale) })
-                : preview.proration.amount < 0 ? t('creditNote') : t('prorationNote', { date: fmtDate(preview.nextChargeAt, locale) })}
+                : chargedNow ? t('chargedNowNote') : preview.proration.amount < 0 ? t('creditNote') : t('prorationNote', { date: fmtDate(preview.nextChargeAt, locale) })}
               {' '}{tb('current.taxNote')}
             </p>
           </div>

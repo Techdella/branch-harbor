@@ -20,7 +20,9 @@ export interface Amount { amount: number; currency: Currency }
 
 export interface Quote {
   priceList: string; currency: Currency; tier: string; plan: PlanKey; interval: Interval; locations: number; includedLocations: number;
-  lines: { kind: 'plan' | 'platform' | 'location'; quantity: number; unitMinor: number; amountMinor: number }[];
+  /** Brands the business runs: each brand beyond the first is a `brand` line (extra brand fee). */
+  brands?: number;
+  lines: { kind: 'plan' | 'platform' | 'location' | 'brand'; quantity: number; unitMinor: number; amountMinor: number }[];
   totalMinor: number; trialFeeMinor: number; trialDays: number;
 }
 
@@ -60,6 +62,8 @@ export interface ChangePreview {
   quote: Quote;
   proration: Amount;
   effective: 'now' | 'trial_end';
+  /** When the prorated amount is charged: now (monthly ↔ annual starts a new period), on the next invoice, or nothing (trial). */
+  charge?: 'now' | 'next_invoice' | 'none';
   effectiveAt: string | null;
   nextChargeAt: string | null;
   unchanged: boolean;
@@ -70,7 +74,11 @@ export interface SetupInfo { mode: 'live' | 'sandbox'; clientSecret: string | nu
 export interface FranchiseeView {
   plan: PlanKey; interval: Interval; hqStatus: string;
   locations: { locationId: string; name: string; payer: Payer; franchiseePercent: number; included: boolean; amount: Amount; accountId: string | null }[];
-  accounts: { id: string; scopeKind: 'location' | 'owner_group'; scopeId: string; billingCountry: string; currency: Currency; status: string; card: { brand: string | null; last4: string | null; country: string | null } | null }[];
+  accounts: {
+    id: string; scopeKind: 'location' | 'owner_group'; scopeId: string; billingCountry: string; currency: Currency; status: string; card: { brand: string | null; last4: string | null; country: string | null } | null;
+    /** The franchisee's own subscription: status, next charge (date and amount, in the account's currency). */
+    subscription?: { status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'scheduled' | 'none' | string; interval: Interval; nextChargeAt: string | null; nextCharge: Amount; startsWithHqPlan: boolean };
+  }[];
   scopes: { kind: 'location' | 'owner_group'; id: string }[];
   invoices: Invoice[];
   provider: 'stripe' | 'sandbox'; publishableKey: string | null;

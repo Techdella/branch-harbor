@@ -11,6 +11,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { Banner, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { download, fdevApi, useAction, useLoad, type Overlap, type TerritoryListVM, type TerritoryVM } from './api';
 import { ActionError, Bar, COUNTRY_RE, KeyValue, TerritoryStatus, useFmt } from './ui';
+import { BrandSelect } from '../brands/BrandLinks';
 
 type Panel = { kind: 'detail'; id: string } | { kind: 'new' } | { kind: 'none' };
 
@@ -152,16 +153,21 @@ function NewTerritory({ d, draft, setDraft, drawing, setDrawing, onCancel, onCre
   const app = useApp();
   const act = useAction();
   const [mode, setMode] = useState<'draw' | 'postcodes'>('draw');
+  const tb = useTranslations('brands');
   const [v, setV] = useState({ name: '', country: d.homeCountry, region: '', exclusivity: 'exclusive', postcodes: '', description: '', showOnSite: true });
+  // Multi-brand HQ: the brand whose availability map the territory is on (hidden for single-brand businesses).
+  const [brandId, setBrandId] = useState<string | null>(app.brandId);
+  // Territories of the main brand carry no brand (the main brand's map), like every other franchise record.
+  const ownBrand = brandId && brandId !== app.brands.find((b) => b.isDefault)?.id ? brandId : null;
   const [overlaps, setOverlaps] = useState<Overlap[]>([]);
   const geometry: TerritoryGeometry | null = mode === 'draw' && draft.length >= 3 ? { type: 'Polygon', coordinates: [[...draft, draft[0]!]] } : null;
   const postcodes = mode === 'postcodes' ? v.postcodes.split(/[\n,;]+/).map((x) => x.trim()).filter(Boolean) : [];
   useEffect(() => {
     if (!geometry && !postcodes.length) { setOverlaps([]); return; }
-    const h = setTimeout(() => { void fdevApi.checkTerritory({ geometry, postcodes, exclusivity: v.exclusivity }).then((r) => setOverlaps(r.overlaps)).catch(() => {}); }, 350);
+    const h = setTimeout(() => { void fdevApi.checkTerritory({ geometry, postcodes, exclusivity: v.exclusivity, ...(ownBrand ? { brandId: ownBrand } : {}) }).then((r) => setOverlaps(r.overlaps)).catch(() => {}); }, 350);
     return () => clearTimeout(h);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(geometry), v.postcodes, v.exclusivity, mode]);
+  }, [JSON.stringify(geometry), v.postcodes, v.exclusivity, mode, ownBrand]);
   const ok = v.name.trim() && COUNTRY_RE.test(v.country) && (geometry || postcodes.length);
   void d;
   return (
@@ -177,6 +183,7 @@ function NewTerritory({ d, draft, setDraft, drawing, setDrawing, onCancel, onCre
           <Field label={t('territories.country')}>{(x) => <Input id={x.id} maxLength={2} value={v.country} onChange={(e) => setV((s) => ({ ...s, country: e.target.value.toUpperCase() }))} />}</Field>
           <Field label={t('territories.region')} optional>{(x) => <Input id={x.id} maxLength={6} value={v.region} onChange={(e) => setV((s) => ({ ...s, region: e.target.value.toUpperCase() }))} />}</Field>
         </div>
+        <BrandSelect value={brandId} onChange={setBrandId} label={tb('territory.brand')} hint={tb('territory.brandHint')} testId="territory-brand" />
         <Field label={t('territories.exclusivity')} hint={t(`exclusivityHint.${v.exclusivity}` as 'exclusivityHint.exclusive')}>{(x) => (
           <Select id={x.id} value={v.exclusivity} onChange={(e) => setV((s) => ({ ...s, exclusivity: e.target.value }))}>
             {TERRITORY_EXCLUSIVITY.map((k) => <option key={k} value={k}>{t(`exclusivity.${k}`)}</option>)}
@@ -203,7 +210,7 @@ function NewTerritory({ d, draft, setDraft, drawing, setDrawing, onCancel, onCre
         <ActionError error={act.error} />
         <div className="flex gap-2">
           <Button icon="check" disabled={!ok || overlaps.some((o) => o.conflict)} loading={act.pending} onClick={async () => {
-            const r = await act.run(() => fdevApi.createTerritory({ name: v.name.trim(), country: v.country, region: v.region || null, exclusivity: v.exclusivity, description: v.description || null, showOnSite: v.showOnSite, ...(mode === 'draw' ? { geometry } : { postcodesText: v.postcodes }) }));
+            const r = await act.run(() => fdevApi.createTerritory({ name: v.name.trim(), country: v.country, region: v.region || null, exclusivity: v.exclusivity, description: v.description || null, showOnSite: v.showOnSite, ...(ownBrand ? { brandId: ownBrand } : {}), ...(mode === 'draw' ? { geometry } : { postcodesText: v.postcodes }) }));
             if (r) onCreated(r);
           }}>{t('territories.save')}</Button>
           <Button variant="ghost" onClick={onCancel}>{t('common.cancel')}</Button>
@@ -215,6 +222,8 @@ function NewTerritory({ d, draft, setDraft, drawing, setDrawing, onCancel, onCre
 
 function Detail({ x, d, onChanged, onDeleted }: { x: TerritoryVM; d: TerritoryListVM; onChanged: () => void; onDeleted: () => void }) {
   const t = useTranslations('fdev');
+  const tb = useTranslations('brands');
+  const app = useApp();
   const f = useFmt();
   const act = useAction();
   const dm = x.demographics;
@@ -232,6 +241,7 @@ function Detail({ x, d, onChanged, onDeleted }: { x: TerritoryVM; d: TerritoryLi
           ...(x.areaKm2 !== null ? [[t('territories.area'), t('territories.km2', { value: f.num(x.areaKm2) })] as [string, string]] : []),
           ...(x.postcodes.length ? [[t('territories.postcodes'), x.postcodes.slice(0, 12).join(', ') + (x.postcodes.length > 12 ? ` +${x.postcodes.length - 12}` : '')] as [string, string]] : []),
           ...(x.ownerGroupName ? [[t('territories.owner'), x.ownerGroupName] as [string, string]] : []),
+          ...(app.multiBrand ? [[tb('territory.brand'), app.brands.find((b) => b.id === x.brandId)?.name ?? (app.brands.find((b) => b.isDefault) ?? app.brands[0])?.name ?? ''] as [string, string]] : []),
         ]} />
         {x.description && <p className="text-[13px] text-graphite">{x.description}</p>}
 
@@ -300,6 +310,11 @@ function Detail({ x, d, onChanged, onDeleted }: { x: TerritoryVM; d: TerritoryLi
                   {d.scopeTerritories.map((st) => <option key={st.id} value={st.id}>{st.name}</option>)}
                 </Select>
               )}</Field></div>
+            )}
+            {app.multiBrand && (
+              <div className="col-span-2">
+                <BrandSelect value={x.brandId ?? null} onChange={async (brandId) => { if (await act.run(() => fdevApi.updateTerritory(x.id, { brandId: brandId && brandId !== app.brands.find((b) => b.isDefault)?.id ? brandId : null }))) onChanged(); }} label={tb('territory.brand')} hint={tb('territory.brandHint')} testId="territory-brand-edit" />
+              </div>
             )}
             <label className="col-span-2 flex items-center gap-2 text-[13px]"><Toggle checked={x.showOnSite} onChange={async (b) => { if (await act.run(() => fdevApi.updateTerritory(x.id, { showOnSite: b }))) onChanged(); }} label={t('territories.showOnSite')} /><span aria-hidden="true">{t('territories.showOnSite')}</span></label>
           </div>

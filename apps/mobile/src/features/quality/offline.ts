@@ -2,12 +2,17 @@
  * Offline audits: every change is written to the phone first (a draft per audit), then a sync queue pushes it to the
  * API whenever the device is online — photos first (local ids are swapped for server ids), then the changed answers
  * (merged per question on the server), then a queued completion. Nothing is lost when the connection drops mid-visit.
+ *
+ * The same queue carries self-check runs (opening, closing and temperature checks: answers, photos and the submit)
+ * and corrective-action evidence (photos of the fix and the "fixed" submission), stored next to the audit drafts
+ * under their own key prefix.
  */
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { AuditAnswer } from '@bh/shared';
 import { network } from '@/lib/network';
 import { ApiError } from '@/lib/errors';
-import { qualityApi, type AuditDetail } from './api';
+import { supplyApi, type RunDetail } from '../supply/api';
+import { qualityApi, type AuditDetail, type FileRef } from './api';
 import { draftStore } from './store';
 
 export interface PendingPhoto { localId: string; questionId: string; base64: string; mime: string }
@@ -36,7 +41,13 @@ const setState = (s: SyncState) => { syncState = s; emit(); };
 const key = (auditId: string) => auditId;
 const cache = new Map<string, Draft>();
 
+/** Self-check runs and corrective-action evidence share the store under these key prefixes (audits use their id). */
+const SC = 'sc_';
+const EV = 'ev_';
+const isAuditKey = (k: string) => !k.startsWith(SC) && !k.startsWith(EV);
+
 export async function loadDraft(auditId: string): Promise<Draft | null> {
+  if (!isAuditKey(auditId)) return null;
   if (cache.has(auditId)) return cache.get(auditId)!;
   const raw = await draftStore.read(key(auditId));
   if (!raw) return null;
@@ -141,6 +152,20 @@ export function syncAll(): Promise<void> {
     setState('syncing');
     let failed = false;
     for (const k of await draftStore.keys()) {
+      if (k.startsWith(SC) || k.startsWith(EV)) {
+        const r = await loadExtra(k);
+        if (!r || !hasWork(r)) continue;
+        try {
+          if (r.kind === 'self_check') await syncSelfCheck(r);
+          else await syncEvidence(r);
+        } catch (e) {
+          if (isNetwork(e)) { setState('offline'); return; }
+          failed = true;
+          const cur = (await loadExtra(k)) ?? r;
+          await persistExtra(cur.kind === 'self_check' ? { ...cur, lastError: e instanceof Error ? e.message : String(e), complete: null } : { ...cur, lastError: e instanceof Error ? e.message : String(e), submit: false });
+        }
+        continue;
+      }
       const d = await loadDraft(k);
       if (!d || (!d.dirty.length && !d.photos.length && !d.complete)) continue;
       try {
@@ -186,7 +211,7 @@ export function useDraft(auditId: string | null) {
 /** Every audit kept on this phone (opened or prepared for offline use). */
 export async function listDrafts(): Promise<Draft[]> {
   const out: Draft[] = [];
-  for (const k of await draftStore.keys()) { const d = await loadDraft(k); if (d) out.push(d); }
+  for (const k of await draftStore.keys()) { if (!isAuditKey(k)) continue; const d = await loadDraft(k); if (d) out.push(d); }
   return out;
 }
 
@@ -202,12 +227,212 @@ export async function prepareOffline(orgId: string, auditIds: string[]) {
   }
 }
 
-/** Number of unsynced changes across this phone (questions, photos, completions). */
+/** Number of unsynced changes across this phone (questions, photos, completions, self-checks and evidence). */
 export async function pendingCount(): Promise<number> {
   let n = 0;
   for (const k of await draftStore.keys()) {
+    if (!isAuditKey(k)) { const r = await loadExtra(k); if (r) n += pendingOf(r); continue; }
     const d = await loadDraft(k);
     if (d) n += d.dirty.length + d.photos.length + (d.complete ? 1 : 0);
   }
   return n;
 }
+
+/* ------------------------------------------------------------------ */
+/* Self-check runs and corrective-action evidence (same queue)         */
+/* ------------------------------------------------------------------ */
+
+/** A self-check run kept on the phone: the run as last loaded, local answers and photos, and a queued submit. */
+export interface SelfCheckDraft {
+  kind: 'self_check';
+  orgId: string;
+  runId: string;
+  run: RunDetail;
+  answers: Record<string, AuditAnswer>;
+  dirty: string[];
+  photos: PendingPhoto[];
+  uploaded: Record<string, string>;
+  /** Server copies of photos uploaded from this phone (for showing them again offline). */
+  photoUrls: Record<string, string>;
+  complete: { note: string | null } | null;
+  /** The run as the server returned it once submitted (kept until the screen reloads it). */
+  done: RunDetail | null;
+  savedAt: string | null;
+  lastError: string | null;
+}
+
+/** Evidence for a corrective action: photos of the fix taken on the phone, and a queued "fixed" submission. */
+export interface EvidenceJob {
+  kind: 'evidence';
+  orgId: string;
+  auditId: string;
+  actionId: string;
+  photos: PendingPhoto[];
+  uploaded: FileRef[];
+  note: string;
+  submit: boolean;
+  submitted: boolean;
+  lastError: string | null;
+}
+
+type Extra = SelfCheckDraft | EvidenceJob;
+const extras = new Map<string, Extra>();
+const keyOf = (r: Extra) => (r.kind === 'self_check' ? `${SC}${r.runId}` : `${EV}${r.actionId}`);
+const hasWork = (r: Extra) => (r.kind === 'self_check' ? r.dirty.length > 0 || r.photos.length > 0 || !!r.complete : r.photos.length > 0 || r.submit);
+const pendingOf = (r: Extra) => (r.kind === 'self_check' ? r.dirty.length + r.photos.length + (r.complete ? 1 : 0) : r.photos.length + (r.submit ? 1 : 0));
+const localId = () => `local-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
+async function loadExtra(key: string): Promise<Extra | null> {
+  if (extras.has(key)) return extras.get(key)!;
+  const raw = await draftStore.read(key);
+  if (!raw) return null;
+  try {
+    const r = JSON.parse(raw) as Extra;
+    extras.set(key, r);
+    return r;
+  } catch {
+    return null;
+  }
+}
+
+async function persistExtra(r: Extra) {
+  extras.set(keyOf(r), r);
+  await draftStore.write(keyOf(r), JSON.stringify(r));
+  emit();
+}
+
+async function removeExtra(key: string) {
+  extras.delete(key);
+  await draftStore.remove(key);
+  emit();
+}
+
+export const loadSelfCheck = async (runId: string) => (await loadExtra(`${SC}${runId}`)) as SelfCheckDraft | null;
+
+/** Keeps a self-check run on the phone (or refreshes it from the server, keeping unsynced local answers). */
+export async function openSelfCheck(orgId: string, run: RunDetail): Promise<SelfCheckDraft> {
+  const existing = await loadSelfCheck(run.id);
+  const d: SelfCheckDraft = existing
+    ? { ...existing, run, answers: { ...run.answers, ...Object.fromEntries(existing.dirty.map((q) => [q, existing.answers[q]!])) }, done: run.status === 'completed' ? run : existing.done }
+    : { kind: 'self_check', orgId, runId: run.id, run, answers: { ...run.answers }, dirty: [], photos: [], uploaded: {}, photoUrls: {}, complete: null, done: null, savedAt: null, lastError: null };
+  await persistExtra(d);
+  return d;
+}
+
+export async function setSelfCheckAnswer(runId: string, questionId: string, answer: AuditAnswer) {
+  const d = await loadSelfCheck(runId);
+  if (!d) return;
+  await persistExtra({ ...d, answers: { ...d.answers, [questionId]: answer }, dirty: [...new Set([...d.dirty, questionId])] });
+  void syncAll();
+}
+
+/** A photo for a self-check item, taken on the phone; it gets a local id until it uploads. */
+export async function addSelfCheckPhoto(runId: string, questionId: string, base64: string, mime: string) {
+  const d = await loadSelfCheck(runId);
+  if (!d) return;
+  const id = localId();
+  const a = d.answers[questionId] ?? {};
+  await persistExtra({ ...d, photos: [...d.photos, { localId: id, questionId, base64, mime }], answers: { ...d.answers, [questionId]: { ...a, photoIds: [...(a.photoIds ?? []), id] } }, dirty: [...new Set([...d.dirty, questionId])] });
+  void syncAll();
+}
+
+export async function queueSelfCheckComplete(runId: string, note: string | null) {
+  const d = await loadSelfCheck(runId);
+  if (!d) return;
+  await persistExtra({ ...d, complete: { note }, lastError: null });
+  await syncAll();
+}
+
+/** Forgets a finished self-check (after the screen showed the result). */
+export const discardSelfCheck = (runId: string) => removeExtra(`${SC}${runId}`);
+
+async function syncSelfCheck(d0: SelfCheckDraft) {
+  let d = d0;
+  for (const p of [...d.photos]) {
+    const up = await supplyApi.uploadRunPhoto(d.orgId, d.runId, { filename: `${p.questionId}.jpg`, contentType: p.mime, dataBase64: p.base64 });
+    const swap = (ids?: string[]) => ids?.map((x) => (x === p.localId ? up.id : x));
+    d = {
+      ...d, photos: d.photos.filter((x) => x.localId !== p.localId), uploaded: { ...d.uploaded, [p.localId]: up.id }, photoUrls: { ...d.photoUrls, [up.id]: up.url },
+      answers: Object.fromEntries(Object.entries(d.answers).map(([k, v]) => [k, v.photoIds ? { ...v, photoIds: swap(v.photoIds) } : v])),
+    };
+    await persistExtra(d);
+  }
+  if (d.dirty.length && !d.complete) {
+    const batch = Object.fromEntries(d.dirty.map((q) => [q, d.answers[q]!]));
+    const r = await supplyApi.saveRun(d.orgId, d.runId, batch);
+    const latest = (await loadSelfCheck(d.runId)) ?? d;
+    const still = latest.dirty.filter((q) => JSON.stringify(latest.answers[q]) !== JSON.stringify(batch[q]));
+    d = { ...latest, dirty: still, savedAt: r.savedAt, lastError: null };
+    await persistExtra(d);
+  }
+  if (d.complete) {
+    const done = await supplyApi.completeRun(d.orgId, d.runId, d.answers, d.complete.note ?? undefined);
+    await persistExtra({ ...d, dirty: [], complete: null, done, run: done, lastError: null });
+  }
+}
+
+/** Self-check runs kept on this phone (for opening them without a connection). */
+export async function listSelfChecks(): Promise<SelfCheckDraft[]> {
+  const out: SelfCheckDraft[] = [];
+  for (const k of await draftStore.keys()) if (k.startsWith(SC)) { const r = await loadExtra(k); if (r?.kind === 'self_check') out.push(r); }
+  return out;
+}
+
+/** Keeps today's runs that this person fills in on the phone, so they open at the location without a connection. */
+export async function prepareSelfChecksOffline(orgId: string, runIds: string[]) {
+  for (const id of runIds) {
+    try {
+      const run = await supplyApi.run(orgId, id);
+      if (run.canFill && run.status !== 'completed' && run.status !== 'missed') await openSelfCheck(orgId, run);
+    } catch {
+      /* try again next time */
+    }
+  }
+}
+
+export const loadEvidence = async (actionId: string) => (await loadExtra(`${EV}${actionId}`)) as EvidenceJob | null;
+
+/** A photo of the fix for a corrective action, kept on the phone until it uploads. */
+export async function addEvidencePhoto(orgId: string, auditId: string, actionId: string, base64: string, mime: string) {
+  const j = (await loadEvidence(actionId)) ?? { kind: 'evidence' as const, orgId, auditId, actionId, photos: [], uploaded: [], note: '', submit: false, submitted: false, lastError: null };
+  await persistExtra({ ...j, photos: [...j.photos, { localId: localId(), questionId: '', base64, mime }], lastError: null });
+  void syncAll();
+}
+
+/** Marks the action fixed with the note: sent with the photos as soon as they are uploaded (now, or when back online). */
+export async function queueEvidenceSubmit(orgId: string, auditId: string, actionId: string, note: string) {
+  const j = (await loadEvidence(actionId)) ?? { kind: 'evidence' as const, orgId, auditId, actionId, photos: [], uploaded: [], note: '', submit: false, submitted: false, lastError: null };
+  await persistExtra({ ...j, note, submit: true, lastError: null });
+  await syncAll();
+}
+
+export const discardEvidence = (actionId: string) => removeExtra(`${EV}${actionId}`);
+
+async function syncEvidence(j0: EvidenceJob) {
+  let j = j0;
+  for (const p of [...j.photos]) {
+    const up = await qualityApi.uploadEvidence(j.orgId, j.actionId, { filename: `evidence-${p.localId}.jpg`, contentType: p.mime, dataBase64: p.base64 });
+    j = { ...j, photos: j.photos.filter((x) => x.localId !== p.localId), uploaded: [...j.uploaded, up] };
+    await persistExtra(j);
+  }
+  if (j.submit && j.uploaded.length) {
+    await qualityApi.submitAction(j.orgId, j.actionId, j.note, j.uploaded.map((u) => u.id));
+    await persistExtra({ ...j, submit: false, submitted: true, lastError: null });
+  }
+}
+
+/** A self-check run or evidence job kept on this phone, kept up to date as it changes and syncs. */
+function useExtra<T extends Extra>(key: string | null) {
+  const v = useSyncExternalStore((l) => { listeners.add(l); return () => listeners.delete(l); }, () => version, () => version);
+  const [r, setR] = useState<T | null>(null);
+  useEffect(() => {
+    if (!key) return;
+    let live = true;
+    void loadExtra(key).then((x) => live && setR(x as T | null));
+    return () => { live = false; };
+  }, [key, v]);
+  return r;
+}
+
+export const useSelfCheckDraft = (runId: string | null) => useExtra<SelfCheckDraft>(runId ? `${SC}${runId}` : null);
+export const useEvidenceJob = (actionId: string | null) => useExtra<EvidenceJob>(actionId ? `${EV}${actionId}` : null);

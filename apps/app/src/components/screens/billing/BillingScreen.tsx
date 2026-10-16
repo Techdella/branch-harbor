@@ -75,7 +75,7 @@ function QuoteLines({ q }: { q: Quote }) {
       {q.lines.map((l) => (
         <li key={l.kind} className="flex justify-between gap-3">
           <span className="text-graphite">
-            {l.kind === 'platform' ? t('linePlatform', { count: q.includedLocations }) : l.kind === 'plan' ? t('linePlan') : t('lineLocations', { count: l.quantity, price: amt(l.unitMinor, q.currency, locale) })}
+            {l.kind === 'platform' ? t('linePlatform', { count: q.includedLocations }) : l.kind === 'plan' ? t('linePlan') : l.kind === 'brand' ? t('lineBrands', { count: l.quantity, price: amt(l.unitMinor, q.currency, locale) }) : t('lineLocations', { count: l.quantity, price: amt(l.unitMinor, q.currency, locale) })}
           </span>
           <span className="tabular font-semibold">{amt(l.amountMinor, q.currency, locale)}</span>
         </li>

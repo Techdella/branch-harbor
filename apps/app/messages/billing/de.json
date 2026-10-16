@@ -71,7 +71,8 @@
       "payPlan": "{amount} zahlen und Tarif starten",
       "linePlatform": "Plattformgebühr (enthält {count} Standorte)",
       "linePlan": "Solo, ein Standort",
-      "lineLocations": "{count, plural, one {# Standort} other {# Standorte}} × {price}"
+      "lineLocations": "{count, plural, one {# Standort} other {# Standorte}} × {price}",
+      "lineBrands": "{count, plural, one {# zusätzliche Marke} other {# zusätzliche Marken}} × {price}"
     },
     "card": {
       "title": "Karte",
@@ -200,7 +201,26 @@
       "needsCard": "Karte erforderlich",
       "cardOnFile": "{brand} •••• {last4} · Abrechnung in {currency}",
       "setup": "Abrechnung einrichten",
-      "saveCard": "Karte speichern"
+      "saveCard": "Karte speichern",
+      "subscription": {
+        "status": "Abonnement",
+        "nextCharge": "Nächste Abbuchung",
+        "on": "Am",
+        "per": {
+          "month": "pro Monat",
+          "year": "pro Jahr"
+        },
+        "startsWithHq": "Beginnt, wenn der Tarif der Zentrale beginnt.",
+        "pastDueHint": "Die letzte Abbuchung ist fehlgeschlagen. Aktualisieren Sie Ihre Karte; wir versuchen es automatisch erneut.",
+        "statuses": {
+          "active": "Aktiv",
+          "trialing": "Startet mit dem Tarif der Zentrale",
+          "scheduled": "Geplant",
+          "past_due": "Zahlung fehlgeschlagen",
+          "canceled": "Beendet",
+          "none": "Nichts zu zahlen"
+        }
+      }
     },
     "change": {
       "title": "Tarif wechseln",
@@ -222,7 +242,9 @@
       "prorationNote": "Anteilig für den Rest dieses Zeitraums; der neue Preis gilt ab dem {date}.",
       "creditNote": "Der nicht genutzte Teil Ihres aktuellen Tarifs wird gutgeschrieben.",
       "confirm": "Tarif wechseln",
-      "done": "Sie nutzen jetzt den Tarif {plan}."
+      "done": "Sie nutzen jetzt den Tarif {plan}.",
+      "chargedNow": "Wird jetzt abgebucht",
+      "chargedNowNote": "Heute beginnt ein neuer Abrechnungszeitraum; er wird jetzt abgebucht, abzüglich des nicht genutzten Teils Ihres aktuellen Zeitraums."
     },
     "cardChange": {
       "open": "Karte ändern",

@@ -18,7 +18,8 @@ import { hasCapabilityInScope, type Assignment } from '../../domain/scope.ts';
 import { addDays, localDateParts } from '../../lib/tz.ts';
 import { notFound } from '../../lib/errors.ts';
 import { loadOrgAssignments } from '../authz.ts';
-import { networkNotify } from '../network-notify.ts';
+import { networkNotify, prefsFor } from '../network-notify.ts';
+import { recipientsOf, sendNetworkEmails } from '../network-emails.ts';
 
 export const SURVEY_MODULE = 'community.surveys';
 export type Survey = typeof franchiseSurveys.$inferSelect;
@@ -67,8 +68,26 @@ export async function openRound(s: Services, survey: Survey, today: string, acto
   const [round] = await s.db.insert(franchiseSurveyRounds).values({ organizationId: survey.organizationId, surveyId: survey.id, label, opensOn: today, closesOn: addDays(today, survey.openDays), invitedCount: invited.length })
     .onConflictDoNothing().returning();
   await s.db.update(franchiseSurveys).set({ status: 'active', nextRunOn: nextRoundDate(today, survey.recurrence as 'once'), updatedAt: new Date() }).where(eq(franchiseSurveys.id, survey.id));
-  if (round) await networkNotify(s, { organizationId: survey.organizationId, userIds: invited, kind: 'survey', title: survey.title, body: survey.anonymous ? 'Your answers are anonymous. It takes about three minutes.' : 'It takes about three minutes.', link: `/surveys/${survey.id}/respond`, data: { surveyId: survey.id, roundId: round.id }, exclude: actorUserId ? [actorUserId] : [] });
+  if (round) {
+    await networkNotify(s, { organizationId: survey.organizationId, userIds: invited, kind: 'survey', title: survey.title, body: survey.anonymous ? 'Your answers are anonymous. It takes about three minutes.' : 'It takes about three minutes.', link: `/surveys/${survey.id}/respond`, data: { surveyId: survey.id, roundId: round.id }, exclude: actorUserId ? [actorUserId] : [] });
+    await emailInvitations(s, survey, round, invited.filter((id) => id !== actorUserId));
+  }
   return round ?? null;
+}
+
+/**
+ * Survey invitations by email as well as in the app: one email per person in their own language, with the link to
+ * answer. People who switched off survey notifications get neither.
+ */
+async function emailInvitations(s: Services, survey: Survey, round: Round, userIds: string[]) {
+  if (!userIds.length) return 0;
+  const prefs = await prefsFor(s.db, survey.organizationId, userIds);
+  const to = userIds.filter((id) => !prefs.get(id)?.mutedKinds.includes('survey'));
+  const [org] = await s.db.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, survey.organizationId));
+  return sendNetworkEmails(s, await recipientsOf(s.db, to), 'survey_invite', {
+    kind: 'survey_invite', business: org?.name ?? '', title: survey.title, closesOn: round.closesOn, anonymous: survey.anonymous,
+    url: `${s.cfg.APP_URL.replace(/\/$/, '')}/surveys/${survey.id}/respond`,
+  });
 }
 
 /** Opens scheduled rounds and closes finished ones (hourly job; idempotent). */

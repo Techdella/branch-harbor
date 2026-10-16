@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Button, Field, Icon, Input, Select, cx } from '@bh/ui';
 import {
-  ACCESS_ACTIONS, SENSITIVE_CLASSES, WORKSPACES, capability, effectiveCapabilities, moduleDef, modulesFor, parseCapability, type AccessAction, type ModuleArea, type ModuleDef, type ScopeKind,
+  ACCESS_ACTIONS, SENSITIVE_CLASSES, WORKSPACES, capability, effectiveCapabilities, hqOnlyAt, moduleDef, modulesFor, parseCapability, type AccessAction, type ModuleArea, type ModuleDef, type ScopeKind,
   type WorkspaceKey,
 } from '@bh/shared';
 import { WORKSPACE_ICON, settingsNav, visibleWorkspaces, workspaceNav } from '@/lib/access';
@@ -361,7 +361,7 @@ function AssignmentEditor({ a, roles, me, deniedClasses, onSaved }: { a: Assignm
   const customOf = (key: string) => (key.startsWith('custom:') ? roles.custom.find((c) => c.id === key.slice(7)) : undefined);
   const base: ReadonlySet<string> = useMemo(() => baseCaps(app.industry, role.startsWith('custom:') ? 'custom' : role, a.scope.kind, customOf(role)), [role, app.industry, a.scope.kind]); // eslint-disable-line react-hooks/exhaustive-deps
   const held = heldAt(a.scope);
-  const hqOnly = new Set(modulesFor(app.industry).filter((m) => m.hqOnly && !(a.scope.kind === 'territory' && m.territoryOk)).map((m) => m.key));
+  const hqOnly = new Set(modulesFor(app.industry).filter((m) => hqOnlyAt(m, a.scope.kind)).map((m) => m.key));
   const disabledReason = (cap: string) => {
     if (!a.editable) return t('editor.notEditable');
     if (a.scope.kind !== 'organization' && hqOnly.has(parseCapability(cap)!.module)) return t('editor.hqOnly');

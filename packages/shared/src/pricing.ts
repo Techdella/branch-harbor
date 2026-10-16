@@ -228,7 +228,7 @@ export function annualMonthlyPrice(monthlyMajor: number): number {
 export const BILLING_INTERVALS = ['month', 'year'] as const;
 export type BillingInterval = (typeof BILLING_INTERVALS)[number];
 
-export interface QuoteLine { kind: 'plan' | 'platform' | 'location'; quantity: number; unitMinor: number; amountMinor: number }
+export interface QuoteLine { kind: 'plan' | 'platform' | 'location' | 'brand'; quantity: number; unitMinor: number; amountMinor: number }
 export interface PlanQuote {
   priceList: PriceListKey;
   currency: PricedCurrency;
@@ -237,6 +237,8 @@ export interface PlanQuote {
   interval: BillingInterval;
   locations: number;
   includedLocations: number;
+  /** Brands the business runs (multi-brand HQ): each brand beyond the first is a `brand` line at the extraBrand fee. */
+  brands: number;
   lines: QuoteLine[];
   /** Total per billing interval (a year = 10 months), minor units, before tax. */
   totalMinor: number;
@@ -247,9 +249,10 @@ export interface PlanQuote {
 /**
  * The plan price for a number of billed locations. Network: the platform fee (includes 3 locations) + the Network
  * per-location fee for each location beyond them. Solo: one flat price. Connector/Hosted: per location (min 1).
+ * Multi-brand HQ (any plan but Solo): each brand beyond the first adds the extraBrand fee (see extraBrandFee).
  * Annual: 10 × the monthly amount (two months included).
  */
-export function planQuote(input: { priceList: PriceListKey; plan: PlanPriceKey; interval?: BillingInterval; locations?: number }): PlanQuote {
+export function planQuote(input: { priceList: PriceListKey; plan: PlanPriceKey; interval?: BillingInterval; locations?: number; brands?: number }): PlanQuote {
   const { priceList, plan } = input;
   const interval = input.interval ?? 'month';
   const months = interval === 'year' ? 10 : 1;
@@ -267,8 +270,11 @@ export function planQuote(input: { priceList: PriceListKey; plan: PlanPriceKey; 
   } else {
     lines.push(line('location', n, listPriceMinor(priceList, plan)));
   }
+  const brands = plan === 'solo' ? 1 : Math.max(1, Math.floor(input.brands ?? 1));
+  const extra = extraBrandFee(priceList, brands);
+  if (extra.extraBrands > 0) lines.push(line('brand', extra.extraBrands, extra.perBrandMinor));
   return {
-    priceList, currency: priceListCurrency(priceList), tier: priceListTier(priceList), plan, interval, locations: plan === 'solo' ? 1 : n, includedLocations: included,
+    priceList, currency: priceListCurrency(priceList), tier: priceListTier(priceList), plan, interval, locations: plan === 'solo' ? 1 : n, includedLocations: included, brands,
     lines, totalMinor: lines.reduce((s, l) => s + l.amountMinor, 0), trialFeeMinor: listPriceMinor(priceList, 'trial'), trialDays: TRIAL_DAYS,
   };
 }

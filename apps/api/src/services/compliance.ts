@@ -18,6 +18,7 @@ import { notFound } from '../lib/errors.ts';
 import { capabilityLocations, hasCapability, requireMember } from './authz.ts';
 import { usersWithCapability } from './audits.ts';
 import { signedFileUrl } from './ops-files.ts';
+import { recipientsOf, sendNetworkEmails } from './network-emails.ts';
 
 export const COMPLIANCE_MODULE = 'legal.compliance_documents';
 export type Requirement = typeof complianceRequirements.$inferSelect;
@@ -143,6 +144,12 @@ async function documentContacts(db: Exec, d: Pick<ComplianceDoc, 'organizationId
   return [...out];
 }
 
+const complianceUrl = (s: Services) => `${s.cfg.APP_URL.replace(/\/$/, '')}/compliance`;
+async function orgName(s: Services, organizationId: string) {
+  const [o] = await s.db.select({ name: organizations.name }).from(organizations).where(eq(organizations.id, organizationId));
+  return o?.name ?? '';
+}
+
 /**
  * Expiry reminders, at most one email per step and document: 60, 30 and 7 days before, and on the day it expires.
  * On expiry the people with publish on Compliance documents organisation-wide (HQ, the owner) are told as well.
@@ -165,19 +172,16 @@ export async function runComplianceJobs(s: Services, now = new Date(), organizat
       : await s.db.select({ name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.id, d.ownerGroupId!));
     const label = `${d.title}${where ? ` (${where.name})` : ''}`;
     const ids = await documentContacts(s.db, d);
-    const emails = ids.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, ids)) : [];
-    const subject = step === 0 ? `Expired: ${label}` : `Expires in ${daysLeft} days: ${label}`;
-    for (const e of emails) {
-      await s.jobs.enqueue('email.send', { to: e.email, subject, text: `${label} ${step === 0 ? 'has expired' : `expires on ${d.expiresOn}`}.\nUpload the renewed document: ${s.cfg.APP_URL}/compliance`, tag: 'compliance_expiry' });
-    }
+    const business = await orgName(s, d.organizationId);
+    // Each person in their own language (services/network-emails.ts).
+    await sendNetworkEmails(s, await recipientsOf(s.db, ids), 'compliance_expiry', step === 0
+      ? { kind: 'compliance_expired', business, label, expiresOn: d.expiresOn!, url: complianceUrl(s) }
+      : { kind: 'compliance_expiring', business, label, expiresOn: d.expiresOn!, daysLeft, url: complianceUrl(s) });
     const sent = [...new Set([...d.remindersSent, ...[60, 30, 7, 0].filter((x) => x >= step)])].sort((a, b) => b - a);
     let escalatedAt = d.escalatedAt;
     if (step === 0 && !d.escalatedAt) {
       const hq = await usersWithCapability(s.db, d.organizationId, null, COMPLIANCE_MODULE, 'publish');
-      const hqEmails = hq.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, hq)) : [];
-      for (const e of hqEmails) {
-        await s.jobs.enqueue('email.send', { to: e.email, subject: `Compliance: ${label} has expired`, text: `${label} expired on ${d.expiresOn} and no renewed document has been approved.\nReview the compliance matrix: ${s.cfg.APP_URL}/compliance`, tag: 'compliance_escalation' });
-      }
+      await sendNetworkEmails(s, await recipientsOf(s.db, hq), 'compliance_escalation', { kind: 'compliance_expired_escalation', business: await orgName(s, d.organizationId), label, expiresOn: d.expiresOn!, url: complianceUrl(s) });
       escalatedAt = now;
       escalations++;
     }
@@ -245,19 +249,13 @@ export async function runMissingDocumentReminders(s: Services, now = new Date(),
         // The location's own uploaders; HQ only when nobody else can upload there (HQ gets the 30-day escalation).
         const local = ids.filter((id) => !hq.includes(id));
         const uploaders = local.length ? local : ids;
-        const emails = uploaders.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, uploaders)) : [];
-        for (const e of emails) {
-          await s.jobs.enqueue('email.send', { to: e.email, subject: `Missing: ${t.label}`, text: `HQ requires ${t.label} and nothing has been uploaded yet.\nUpload it here: ${s.cfg.APP_URL}/compliance`, tag: 'compliance_missing' });
-        }
+        await sendNetworkEmails(s, await recipientsOf(s.db, uploaders), 'compliance_missing', { kind: 'compliance_missing', business: await orgName(s, orgId), label: t.label, url: complianceUrl(s) });
         Object.assign(set, { lastRemindedAt: now, reminderCount: row!.reminderCount + 1 });
         reminders++;
       }
       const days = Math.floor((now.getTime() - row!.missingSince.getTime()) / 86_400_000);
       if (!row!.escalatedAt && days >= MISSING_ESCALATE_DAYS) {
-        const hqEmails = hq.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, hq)) : [];
-        for (const e of hqEmails) {
-          await s.jobs.enqueue('email.send', { to: e.email, subject: `Compliance: ${t.label} missing for ${days} days`, text: `${t.label} is required and has been missing for ${days} days.\nReview the compliance matrix: ${s.cfg.APP_URL}/compliance`, tag: 'compliance_missing_escalation' });
-        }
+        await sendNetworkEmails(s, await recipientsOf(s.db, hq), 'compliance_missing_escalation', { kind: 'compliance_missing_escalation', business: await orgName(s, orgId), label: t.label, days, url: complianceUrl(s) });
         set.escalatedAt = now;
         escalations++;
       }

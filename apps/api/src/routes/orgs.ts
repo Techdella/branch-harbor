@@ -13,7 +13,7 @@ import { actor, audit } from '../services/audit.ts';
 import { requireMember, requirePerm, permissionsAt } from '../services/authz.ts';
 import { onboardingState } from '../services/onboarding.ts';
 import { activeLocations, businessModeView, isIndependent, loadOrg, networkPrice, planView, requireNetwork, upgradeToNetwork } from '../services/businessMode.ts';
-import { hqTotal, locationBilling, quoteFor, subPlan, subPriceList } from '../services/billing.ts';
+import { brandCount, hqTotal, locationBilling, quoteFor, subPlan, subPriceList } from '../services/billing.ts';
 import { CUSTOMER_DATA_SHARING } from '../services/orgSettings.ts';
 import { serializeLocation, serializeOrg } from '../services/serializers.ts';
 import { orgParams, secured } from './_common.ts';
@@ -214,7 +214,7 @@ export const orgRoutes: FastifyPluginAsyncZod = async (app) => {
     }
     // Network: the HQ platform fee (includes 3 locations) + the per-location fee beyond; other plans per location.
     const rows = await locationBilling(s.db, orgId, sub, model);
-    const quote = quoteFor(sub, subPlan(sub, model), sub.billingInterval === 'year' ? 'year' : 'month', rows.length);
+    const quote = quoteFor(sub, subPlan(sub, model), sub.billingInterval === 'year' ? 'year' : 'month', rows.length, await brandCount(s.db, orgId));
     const perLoc = plan.price;
     return {
       ...sub, businessModel: model, planDetails: plan, activeLocationCount: c, billingProvider: s.payments.mode === 'live' ? 'stripe' : 'sandbox',

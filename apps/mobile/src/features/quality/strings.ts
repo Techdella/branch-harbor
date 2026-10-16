@@ -20,6 +20,7 @@ const en = {
   docTitle: 'Title', expiresOn: 'Expiry date (YYYY-MM-DD)', issuer: 'Insurer or issuer', amount: 'Amount', pickFile: 'Choose PDF or photo', takePhoto: 'Photograph the document',
   fileChosen: 'File: {name}', send: 'Send to HQ', sent: 'Sent. HQ will review it.', noRequirements: 'HQ has not set any requirements yet.', error: 'Something went wrong', retry: 'Retry',
   needsConnection: 'Uploading needs a connection.', noAccess: 'Audits are not part of your access.',
+  evidenceQueued: 'Saved on this phone: it will be sent as soon as you’re back online', evidenceWaiting: '{n} photo(s) waiting to upload',
 };
 export type QKey = keyof typeof en;
 const fr: typeof en = {
@@ -41,6 +42,7 @@ const fr: typeof en = {
   docTitle: 'Titre', expiresOn: 'Date d’échéance (AAAA-MM-JJ)', issuer: 'Assureur ou émetteur', amount: 'Montant', pickFile: 'Choisir un PDF ou une photo', takePhoto: 'Photographier le document',
   fileChosen: 'Fichier : {name}', send: 'Envoyer au siège', sent: 'Envoyé. Le siège va le vérifier.', noRequirements: 'Le siège n’a encore défini aucune exigence.', error: 'Un problème est survenu', retry: 'Réessayer',
   needsConnection: 'Le dépôt nécessite une connexion.', noAccess: 'Les audits ne font pas partie de vos accès.',
+  evidenceQueued: 'Enregistré sur ce téléphone : ce sera envoyé dès le retour du réseau', evidenceWaiting: '{n} photo(s) en attente d’envoi',
 };
 const es: typeof en = {
   entry: 'Auditorías y cumplimiento', entrySub: 'Realiza auditorías, corrige acciones y sube certificados',
@@ -61,6 +63,7 @@ const es: typeof en = {
   docTitle: 'Título', expiresOn: 'Fecha de vencimiento (AAAA-MM-DD)', issuer: 'Aseguradora o emisor', amount: 'Importe', pickFile: 'Elegir PDF o foto', takePhoto: 'Fotografiar el documento',
   fileChosen: 'Archivo: {name}', send: 'Enviar a la central', sent: 'Enviado. La central lo revisará.', noRequirements: 'La central todavía no ha definido requisitos.', error: 'Algo salió mal', retry: 'Reintentar',
   needsConnection: 'Para subir hace falta conexión.', noAccess: 'Las auditorías no forman parte de tu acceso.',
+  evidenceQueued: 'Guardado en este teléfono: se enviará en cuanto vuelvas a tener conexión', evidenceWaiting: '{n} foto(s) pendientes de subir',
 };
 const de: typeof en = {
   entry: 'Audits & Compliance', entrySub: 'Audits durchführen, Korrekturmaßnahmen erledigen, Nachweise hochladen',
@@ -81,6 +84,7 @@ const de: typeof en = {
   docTitle: 'Titel', expiresOn: 'Ablaufdatum (JJJJ-MM-TT)', issuer: 'Versicherer oder Aussteller', amount: 'Betrag', pickFile: 'PDF oder Foto auswählen', takePhoto: 'Dokument fotografieren',
   fileChosen: 'Datei: {name}', send: 'An die Zentrale senden', sent: 'Gesendet. Die Zentrale prüft es.', noRequirements: 'Die Zentrale hat noch keine Anforderungen festgelegt.', error: 'Etwas ist schiefgelaufen', retry: 'Erneut versuchen',
   needsConnection: 'Zum Hochladen brauchen Sie eine Verbindung.', noAccess: 'Audits gehören nicht zu Ihrem Zugriff.',
+  evidenceQueued: 'Auf diesem Telefon gespeichert: wird gesendet, sobald Sie wieder online sind', evidenceWaiting: '{n} Foto(s) warten auf das Hochladen',
 };
 const ptBR: typeof en = {
   entry: 'Auditorias e conformidade', entrySub: 'Faça auditorias, resolva ações corretivas, envie certificados',
@@ -101,6 +105,7 @@ const ptBR: typeof en = {
   docTitle: 'Título', expiresOn: 'Data de vencimento (AAAA-MM-DD)', issuer: 'Seguradora ou emissor', amount: 'Valor', pickFile: 'Escolher PDF ou foto', takePhoto: 'Fotografar o documento',
   fileChosen: 'Arquivo: {name}', send: 'Enviar para a franqueadora', sent: 'Enviado. A franqueadora vai revisar.', noRequirements: 'A franqueadora ainda não definiu exigências.', error: 'Algo deu errado', retry: 'Tentar de novo',
   needsConnection: 'Para enviar é preciso ter conexão.', noAccess: 'Auditorias não fazem parte do seu acesso.',
+  evidenceQueued: 'Salvo neste celular: será enviado assim que a conexão voltar', evidenceWaiting: '{n} foto(s) aguardando envio',
 };
 export const STRINGS: Record<string, typeof en> = { en, fr, es, de, 'pt-BR': ptBR };
 

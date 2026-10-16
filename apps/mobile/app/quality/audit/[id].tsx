@@ -5,7 +5,9 @@ import { scoreAudit, type AuditAnswer, type AuditQuestion } from '@bh/shared';
 import { Badge, Banner, Button, Card, EmptyState, Screen, ScreenHeader, SectionHeader, SkeletonCard, Text, TextField } from '@/components';
 import { qualityApi, type ActionItem, type AuditDetail, type FileRef } from '@/features/quality/api';
 import { takePhoto } from '@/features/quality/capture';
-import { addPhoto, discardDraft, loadDraft, openDraft, queueComplete, setAnswer, useDraft, useSyncState, type Draft } from '@/features/quality/offline';
+import {
+  addEvidencePhoto, addPhoto, discardDraft, discardEvidence, loadDraft, openDraft, queueComplete, queueEvidenceSubmit, setAnswer, useDraft, useEvidenceJob, useSyncState, type Draft,
+} from '@/features/quality/offline';
 import { useQT } from '@/features/quality/strings';
 import { useOnline } from '@/lib/network';
 import { color, radius, status as S } from '@/theme';
@@ -177,10 +179,16 @@ function ActionCard({ x, audit, orgId, onChanged }: { x: ActionItem; audit: Audi
   const { t, locale } = useQT();
   const online = useOnline();
   const [note, setNote] = useState('');
-  const [evidence, setEvidence] = useState<FileRef[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const run = async (fn: () => Promise<unknown>) => { setBusy(true); setErr(null); try { await fn(); onChanged(); } catch (e) { setErr(e instanceof Error ? e.message : String(e)); } finally { setBusy(false); } };
+  // Evidence photos and the "fixed" submission go through the offline queue: taken without a connection, they upload
+  // (and the action is submitted) as soon as the phone is back online.
+  const job = useEvidenceJob(x.status === 'open' ? x.id : null);
+  const evidence: FileRef[] = job?.uploaded ?? [];
+  const local = job?.photos ?? [];
+  useEffect(() => { if (job?.submitted) { void discardEvidence(x.id).then(onChanged); } }, [job?.submitted, x.id, onChanged]);
+  useEffect(() => { if (job?.note && !note) setNote(job.note); }, [job?.note]); // eslint-disable-line react-hooks/exhaustive-deps
+  const run = async (fn: () => Promise<unknown>, reload = true) => { setBusy(true); setErr(null); try { await fn(); if (reload) onChanged(); } catch (e) { setErr(e instanceof Error ? e.message : String(e)); } finally { setBusy(false); } };
   const canRespond = audit.permissions.respond && x.status === 'open';
   const canVerify = audit.permissions.verify && x.status === 'submitted';
   return (
@@ -197,21 +205,22 @@ function ActionCard({ x, audit, orgId, onChanged }: { x: ActionItem; audit: Audi
       {x.responseNote ? <Text variant="small">{x.responseNote}</Text> : null}
       {x.evidence.length ? <View style={{ flexDirection: 'row', gap: 8 }}>{x.evidence.map((p) => <Image key={p.id} source={{ uri: p.url }} accessibilityLabel={x.title} style={{ width: 64, height: 64, borderRadius: radius.sm }} />)}</View> : null}
       {err ? <Banner tone="danger" title={err} /> : null}
+      {job?.lastError ? <Banner tone="danger" title={t('syncError')} body={job.lastError} /> : null}
       {canRespond ? (
         <View style={{ gap: 8 }}>
-          {!online ? <Text variant="small" tone="muted">{t('needsConnection')}</Text> : null}
-          <TextField label={t('whatFixed')} value={note} onChangeText={setNote} multiline />
-          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+          {job?.submit ? <Banner tone="info" title={t('evidenceQueued')} /> : null}
+          <TextField label={t('whatFixed')} value={note} onChangeText={setNote} multiline editable={!job?.submit} />
+          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             {evidence.map((p) => <Image key={p.id} source={{ uri: p.url }} accessibilityLabel={x.title} style={{ width: 56, height: 56, borderRadius: radius.sm }} />)}
-            <Button label={t('addEvidence')} icon="image" size="sm" variant="secondary" disabled={!online} loading={busy} onPress={() => run(async () => {
+            {local.map((p) => <Image key={p.localId} source={{ uri: `data:${p.mime};base64,${p.base64}` }} accessibilityLabel={x.title} style={{ width: 56, height: 56, borderRadius: radius.sm, opacity: 0.7 }} />)}
+            {local.length ? <Badge label={t('evidenceWaiting', { n: local.length })} tone="info" /> : null}
+            <Button label={t('addEvidence')} icon="image" size="sm" variant="secondary" disabled={!!job?.submit} loading={busy} onPress={() => run(async () => {
               const ph = await takePhoto();
-              if (!ph) return;
-              const up = await qualityApi.uploadEvidence(orgId, x.id, { filename: ph.name, contentType: ph.mime, dataBase64: ph.base64 });
-              setEvidence((e) => [...e, up]);
-            })} />
+              if (ph) await addEvidencePhoto(orgId, audit.id, x.id, ph.base64, ph.mime);
+            }, false)} />
           </View>
-          <Button label={t('markDone')} icon="check" disabled={!evidence.length || !online} loading={busy} onPress={() => run(() => qualityApi.submitAction(orgId, x.id, note, evidence.map((p) => p.id)))} />
-          {!evidence.length ? <Text variant="small" tone="muted">{t('evidenceNeeded')}</Text> : null}
+          <Button label={t('markDone')} icon="check" disabled={(!evidence.length && !local.length) || !!job?.submit} loading={busy} onPress={() => run(() => queueEvidenceSubmit(orgId, audit.id, x.id, note), online)} />
+          {!evidence.length && !local.length ? <Text variant="small" tone="muted">{t('evidenceNeeded')}</Text> : null}
         </View>
       ) : null}
       {canVerify ? (

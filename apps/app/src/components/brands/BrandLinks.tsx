@@ -48,16 +48,20 @@ export function BrandsCard() {
   );
 }
 
-/** Multi-brand HQ: the brand a franchise prospect is buying. Hidden for single-brand businesses. */
-export function BrandSelect({ value, onChange }: { value: string | null; onChange: (id: string | null) => void }) {
+/**
+ * Multi-brand HQ: a brand picker (by default the brand a franchise prospect is buying). Hidden unless the person covers
+ * more than one brand. `allLabel` adds an option for "every brand" (value null), e.g. a document shared by all brands.
+ */
+export function BrandSelect({ value, onChange, label, hint, allLabel, testId = 'brand-select' }: { value: string | null; onChange: (id: string | null) => void; label?: string; hint?: string; allLabel?: string; testId?: string }) {
   const t = useTranslations('brands');
   const app = useApp();
   if (!app.multiBrand) return null;
   const main = app.brands.find((b) => b.isDefault) ?? app.brands[0];
   return (
-    <Field label={t('buying')}>
+    <Field label={label ?? t('buying')} hint={hint}>
       {(p) => (
-        <Select id={p.id} value={value ?? main?.id ?? ''} onChange={(e) => onChange(e.target.value || null)} data-testid="brand-select">
+        <Select id={p.id} aria-describedby={p.describedBy} value={value ?? (allLabel ? '' : main?.id ?? '')} onChange={(e) => onChange(e.target.value || null)} data-testid={testId}>
+          {allLabel && <option value="">{allLabel}</option>}
           {app.brands.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}

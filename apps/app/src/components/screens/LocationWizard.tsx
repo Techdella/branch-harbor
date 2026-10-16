@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button, Field, Icon, Input, Select, cx } from '@bh/ui';
-import { LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES } from '@bh/shared';
+import { LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES, type LocationIndustryField } from '@bh/shared';
 import { countryName, currencyName, fmtTime, zoneLabel } from '@/lib/format';
 
 export const COUNTRY_ZONES: Record<string, string[]> = {
@@ -33,6 +33,34 @@ export interface LocationDraft {
   hours: string;
   template: string;
   overrides: Record<string, boolean>;
+  /** Network → Add location (live form): ids from the form options, and the industry details. */
+  brandId?: string | null;
+  templateId?: string;
+  ownerGroupId?: string;
+  regionId?: string;
+  territoryId?: string;
+  industry?: Record<string, string | number | boolean>;
+}
+
+/** What the Add location form offers the person (`GET /orgs/:orgId/locations/form-options`). */
+export interface LocationFormOptions {
+  industry: string;
+  defaults: { country: string; currency: string; timeZone: string; locale: string };
+  organizationWide: boolean;
+  /** Several brands to choose from (the picker is hidden otherwise). */
+  brandPicker: boolean;
+  brands: { id: string; name: string; isDefault: boolean; defaultCurrency: string | null; primaryColor: string | null }[];
+  templates: { id: string; name: string; industry: string | null; brandId: string | null; version: number }[];
+  ownerGroups: { id: string; name: string }[];
+  regions: { id: string; name: string }[];
+  territories: { id: string; name: string; kind: string; country: string | null; brandId: string | null }[];
+  industryFields: LocationIndustryField[];
+}
+
+/** Templates and territories a location of this brand can use (none = the main brand; brandless ones fit every brand). */
+export function fitsBrand(o: LocationFormOptions, recordBrand: string | null, chosen: string | null | undefined) {
+  const main = o.brands.find((b) => b.isDefault)?.id ?? null;
+  return !recordBrand || recordBrand === (chosen ?? main);
 }
 
 export const EMPTY_LOCATION: LocationDraft = {
@@ -53,8 +81,9 @@ export function validateLocation(d: LocationDraft, t: (k: string) => string) {
 }
 
 /** Location wizard fields + shared-vs-local preview. Used in onboarding and Locations › Add. */
-export function LocationWizard({ value, onChange, errors, ownerGroups, compact }: { value: LocationDraft; onChange: (d: LocationDraft) => void; errors: Record<string, string>; ownerGroups: string[]; compact?: boolean }) {
+export function LocationWizard({ value, onChange, errors, ownerGroups, compact, options }: { value: LocationDraft; onChange: (d: LocationDraft) => void; errors: Record<string, string>; ownerGroups: string[]; compact?: boolean; options?: LocationFormOptions }) {
   const t = useTranslations('wizard');
+  const tl = useTranslations('wizard.live');
   const locale = useLocale();
   const set = <K extends keyof LocationDraft>(k: K, v: LocationDraft[K]) => onChange({ ...value, [k]: v });
   const allZones = useMemo(() => {
@@ -89,24 +118,30 @@ export function LocationWizard({ value, onChange, errors, ownerGroups, compact }
         <legend className="mb-2 text-sm font-bold">{t('identity')}</legend>
         <Field label={t('name')} error={errors.name}>{(p) => <Input id={p.id} aria-describedby={p.describedBy} aria-invalid={p.invalid} value={value.name} onChange={(e) => set('name', e.target.value)} placeholder={t('namePh')} />}</Field>
         <Field label={t('code')} hint={t('codeHint')} error={errors.code}>{(p) => <Input id={p.id} aria-describedby={p.describedBy} aria-invalid={p.invalid} value={value.code} onChange={(e) => set('code', e.target.value.toUpperCase())} placeholder="LDN-SH" />}</Field>
-        <Field label={t('ownerGroup')}>
-          {(p) => (
-            <Select id={p.id} value={value.ownerGroup} onChange={(e) => set('ownerGroup', e.target.value)}>
-              {ownerGroups.map((g) => (
-                <option key={g}>{g}</option>
-              ))}
-            </Select>
-          )}
-        </Field>
-        <Field label={t('template')}>
-          {(p) => (
-            <Select id={p.id} value={value.template} onChange={(e) => set('template', e.target.value)}>
-              <option value="Standard location · v15">{t('templateStandard')}</option>
-              <option value="Flagship location · v3">{t('templateFlagship')}</option>
-              <option value="Pop-up / seasonal · v2">{t('templatePopup')}</option>
-            </Select>
-          )}
-        </Field>
+        {options ? (
+          <LiveScopeFields value={value} onChange={onChange} options={options} errors={errors} />
+        ) : (
+          <>
+            <Field label={t('ownerGroup')}>
+              {(p) => (
+                <Select id={p.id} value={value.ownerGroup} onChange={(e) => set('ownerGroup', e.target.value)}>
+                  {ownerGroups.map((g) => (
+                    <option key={g}>{g}</option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            <Field label={t('template')}>
+              {(p) => (
+                <Select id={p.id} value={value.template} onChange={(e) => set('template', e.target.value)}>
+                  <option value="Standard location · v15">{t('templateStandard')}</option>
+                  <option value="Flagship location · v3">{t('templateFlagship')}</option>
+                  <option value="Pop-up / seasonal · v2">{t('templatePopup')}</option>
+                </Select>
+              )}
+            </Field>
+          </>
+        )}
       </fieldset>
 
       <fieldset className="grid gap-3.5 md:grid-cols-2">
@@ -169,6 +204,21 @@ export function LocationWizard({ value, onChange, errors, ownerGroups, compact }
         <Field label={t('hours')} optional hint={t('hoursHint')}>{(p) => <Input id={p.id} aria-describedby={p.describedBy} value={value.hours} onChange={(e) => set('hours', e.target.value)} placeholder={t('hoursPh')} />}</Field>
       </fieldset>
 
+      {options && options.industryFields.length > 0 && (
+        <fieldset className="grid gap-3.5 md:grid-cols-3" data-testid="industry-fields">
+          <legend className="mb-1 text-sm font-bold">{tl('industryDetails')}</legend>
+          <p className="text-xs text-stone md:col-span-3">{tl('industryHint')}</p>
+          {options.industryFields.map((f) => (
+            <IndustryField key={f.key} f={f} value={value.industry?.[f.key]} error={errors[`ind.${f.key}`]} onChange={(v) => {
+              const next = { ...(value.industry ?? {}) };
+              if (v === '' || v === undefined) delete next[f.key];
+              else next[f.key] = v;
+              onChange({ ...value, industry: next });
+            }} />
+          ))}
+        </fieldset>
+      )}
+
       <fieldset>
         <legend className="mb-1 text-sm font-bold">{t('overrides')}</legend>
         <p className="mb-2.5 text-xs text-stone">{t('overridesHint')}</p>
@@ -220,6 +270,112 @@ export function LocationWizard({ value, onChange, errors, ownerGroups, compact }
         {t('notPublished')}
       </p>
     </div>
+  );
+}
+
+/** Brand, brand template, owner group, region and territory from the business's own records (live form). */
+function LiveScopeFields({ value, onChange, options: o, errors }: { value: LocationDraft; onChange: (d: LocationDraft) => void; options: LocationFormOptions; errors: Record<string, string> }) {
+  const tl = useTranslations('wizard.live');
+  const templates = o.templates.filter((x) => fitsBrand(o, x.brandId, value.brandId));
+  const territories = o.territories.filter((x) => fitsBrand(o, x.brandId, value.brandId));
+  const onBrand = (brandId: string) => {
+    const b = o.brands.find((x) => x.id === brandId);
+    const next: LocationDraft = { ...value, brandId, currency: b?.defaultCurrency ?? value.currency };
+    // A template or territory of another brand no longer fits.
+    if (next.templateId && !o.templates.some((x) => x.id === next.templateId && fitsBrand(o, x.brandId, brandId))) next.templateId = '';
+    if (next.territoryId && !o.territories.some((x) => x.id === next.territoryId && fitsBrand(o, x.brandId, brandId))) next.territoryId = '';
+    onChange(next);
+  };
+  const sel = (key: 'templateId' | 'ownerGroupId' | 'regionId' | 'territoryId', v: string) => onChange({ ...value, [key]: v });
+  return (
+    <>
+      {o.brandPicker && (
+        <Field label={tl('brand')} hint={tl('brandHint')} error={errors.brandId}>
+          {(p) => (
+            <Select id={p.id} aria-describedby={p.describedBy} value={value.brandId ?? o.brands.find((b) => b.isDefault)?.id ?? o.brands[0]?.id ?? ''} onChange={(e) => onBrand(e.target.value)} data-testid="location-brand">
+              {o.brands.map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </Select>
+          )}
+        </Field>
+      )}
+      <Field label={tl('template')} hint={templates.length ? tl('templateHint') : tl('noTemplates')} error={errors.templateId}>
+        {(p) => (
+          <Select id={p.id} aria-describedby={p.describedBy} value={value.templateId ?? ''} onChange={(e) => sel('templateId', e.target.value)} data-testid="location-template">
+            <option value="">{tl('noTemplate')}</option>
+            {templates.map((x) => (
+              <option key={x.id} value={x.id}>{tl('templateOption', { name: x.name, version: x.version })}</option>
+            ))}
+          </Select>
+        )}
+      </Field>
+      {(o.organizationWide || o.ownerGroups.length > 0) && (
+        <Field label={tl('ownerGroup')} hint={tl('ownerGroupHint')} error={errors.ownerGroupId}>
+          {(p) => (
+            <Select id={p.id} aria-describedby={p.describedBy} value={value.ownerGroupId ?? ''} onChange={(e) => sel('ownerGroupId', e.target.value)} data-testid="location-owner-group">
+              <option value="">{tl('companyOwned')}</option>
+              {o.ownerGroups.map((g) => (
+                <option key={g.id} value={g.id}>{g.name}</option>
+              ))}
+            </Select>
+          )}
+        </Field>
+      )}
+      {o.regions.length > 0 && (
+        <Field label={tl('networkRegion')} error={errors.regionId}>
+          {(p) => (
+            <Select id={p.id} value={value.regionId ?? ''} onChange={(e) => sel('regionId', e.target.value)} data-testid="location-region">
+              {o.organizationWide && <option value="">{tl('noRegion')}</option>}
+              {o.regions.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </Select>
+          )}
+        </Field>
+      )}
+      {territories.length > 0 && (
+        <Field label={tl('territory')} hint={tl('territoryHint')} error={errors.territoryId}>
+          {(p) => (
+            <Select id={p.id} aria-describedby={p.describedBy} value={value.territoryId ?? ''} onChange={(e) => sel('territoryId', e.target.value)} data-testid="location-territory">
+              {(o.organizationWide || o.regions.length > 0) && <option value="">{tl('noTerritory')}</option>}
+              {territories.map((x) => (
+                <option key={x.id} value={x.id}>{x.name}</option>
+              ))}
+            </Select>
+          )}
+        </Field>
+      )}
+    </>
+  );
+}
+
+function IndustryField({ f, value, error, onChange }: { f: LocationIndustryField; value: string | number | boolean | undefined; error?: string; onChange: (v: string | number | boolean | undefined) => void }) {
+  const tl = useTranslations('wizard.live');
+  const label = tl(`industryField.${f.key}` as 'industryField.seats');
+  if (f.type === 'boolean') {
+    return (
+      <label className="flex min-h-11 items-center gap-2 self-end text-sm font-semibold">
+        <input type="checkbox" className="h-4 w-4 accent-ink" checked={value === true} onChange={(e) => onChange(e.target.checked)} />
+        {label}
+      </label>
+    );
+  }
+  return (
+    <Field label={label} optional error={error}>
+      {(p) => f.type === 'select' ? (
+        <Select id={p.id} aria-describedby={p.describedBy} aria-invalid={p.invalid} value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+          <option value="">{tl('choose')}</option>
+          {f.options.map((opt) => (
+            <option key={opt} value={opt}>{tl(`industryOption.${f.key}.${opt}` as 'industryOption.surface.grass')}</option>
+          ))}
+        </Select>
+      ) : f.type === 'number' ? (
+        <Input id={p.id} aria-describedby={p.describedBy} aria-invalid={p.invalid} type="number" inputMode="numeric" min={f.min} max={f.max} value={typeof value === 'number' ? String(value) : ''} onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))} />
+      ) : (
+        <Input id={p.id} aria-describedby={p.describedBy} aria-invalid={p.invalid} maxLength={f.maxLength} placeholder={f.pattern ? '15:00' : undefined} value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value)} />
+      )}
+    </Field>
   );
 }
 

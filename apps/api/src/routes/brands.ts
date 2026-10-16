@@ -25,6 +25,7 @@ import { capabilityLocationIds } from '../domain/scope.ts';
 import { defaultBrandId, hasCapability, requireCapability, requireMember, scopedLocations } from '../services/authz.ts';
 import { brandFilterIds, brandInOrg, coveredBrandIds, orgBrands, serializeBrand } from '../services/brands.ts';
 import { serializeTerms } from '../services/finance/terms.ts';
+import { syncBillingQuietly } from '../services/billing.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Use a 6-digit hex colour like #2F6B3A');
@@ -121,6 +122,8 @@ export const brandRoutes: FastifyPluginAsyncZod = async (app) => {
     const { cols, settings } = columns(req.body);
     const [row] = await db.insert(brands).values({ ...cols, organizationId: orgId, name: req.body.name, slug: s, isDefault: false, settings }).returning();
     await audit(db, { organizationId: orgId, ...actor(req), action: 'brand.created', scopeKind: 'brand', scopeId: row!.id, targetType: 'brand', targetId: row!.id, metadata: { name: row!.name, slug: s } });
+    // Each brand beyond the first is a subscription item (extraBrand): billing follows.
+    await syncBillingQuietly(app.ctx, orgId);
     return reply.code(201).send(serializeBrand(row!));
   });
 
@@ -158,6 +161,7 @@ export const brandRoutes: FastifyPluginAsyncZod = async (app) => {
     if ((await locationCounts(orgId)).get(id)) throw conflict('brand_has_locations', 'Move or archive this brand’s locations first.');
     await db.update(brands).set({ archivedAt: new Date(), updatedAt: new Date() }).where(eq(brands.id, id));
     await audit(db, { organizationId: orgId, ...actor(req), action: 'brand.archived', scopeKind: 'brand', scopeId: id, targetType: 'brand', targetId: id });
+    await syncBillingQuietly(app.ctx, orgId);
     return { ok: true };
   });
 

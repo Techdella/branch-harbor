@@ -8,7 +8,7 @@ import { authenticate, requireUser } from '../plugins/auth.ts';
 import { hasPerm, requireMember, requirePerm } from '../services/authz.ts';
 import {
   billingTerms, billingView, cancelCountryChange, changePlan, confirmCheckout, confirmPaymentMethodChange, previewPlanChange, startPaymentMethodChange, confirmCountryChange, confirmFranchiseeSetup, franchiseeBillingView, removePayer, setCancellation,
-  setPayer, startCheckout, startCountryChange, startFranchiseeSetup, trialEligibility,
+  setPayer, startCheckout, startCountryChange, startFranchiseeSetup, trialEligibility, brandCount,
 } from '../services/billing.ts';
 import { buildExport, exportBytes, listExports, requestExport, serializeExport } from '../services/data-export.ts';
 import { orgParams, secured } from './_common.ts';
@@ -62,7 +62,8 @@ export const billingRoutes: FastifyPluginAsyncZod = async (app) => {
     }, async (req) => {
       await manage(req, req.params.orgId);
       const list = priceListForCountry(req.query.billingCountry);
-      return { quote: planQuote({ priceList: list.key, plan: req.query.plan, interval: req.query.interval, locations: req.query.locations ?? 1 }), billingCountry: req.query.billingCountry, terms: { ...billingTerms(req.query.billingCountry), taxCollected: s.cfg.STRIPE_TAX_ENABLED } };
+      // Multi-brand HQ: each brand beyond the first is part of the quote (extraBrand).
+      return { quote: planQuote({ priceList: list.key, plan: req.query.plan, interval: req.query.interval, locations: req.query.locations ?? 1, brands: await brandCount(s.db, req.params.orgId) }), billingCountry: req.query.billingCountry, terms: { ...billingTerms(req.query.billingCountry), taxCollected: s.cfg.STRIPE_TAX_ENABLED } };
     });
 
     r.post('/orgs/:orgId/billing/checkout', {

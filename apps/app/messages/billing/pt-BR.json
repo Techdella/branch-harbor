@@ -71,7 +71,8 @@
       "payPlan": "Pagar {amount} e começar o plano",
       "linePlatform": "Taxa de plataforma (inclui {count} unidades)",
       "linePlan": "Solo, uma unidade",
-      "lineLocations": "{count, plural, one {# unidade} other {# unidades}} × {price}"
+      "lineLocations": "{count, plural, one {# unidade} other {# unidades}} × {price}",
+      "lineBrands": "{count, plural, one {# marca adicional} other {# marcas adicionais}} × {price}"
     },
     "card": {
       "title": "Cartão",
@@ -200,7 +201,26 @@
       "needsCard": "Cartão necessário",
       "cardOnFile": "{brand} •••• {last4} · cobrado em {currency}",
       "setup": "Configurar a cobrança",
-      "saveCard": "Salvar cartão"
+      "saveCard": "Salvar cartão",
+      "subscription": {
+        "status": "Assinatura",
+        "nextCharge": "Próxima cobrança",
+        "on": "Em",
+        "per": {
+          "month": "por mês",
+          "year": "por ano"
+        },
+        "startsWithHq": "Começa quando o plano da matriz começar.",
+        "pastDueHint": "A última cobrança falhou. Atualize seu cartão; tentaremos de novo automaticamente.",
+        "statuses": {
+          "active": "Ativa",
+          "trialing": "Começa com o plano da matriz",
+          "scheduled": "Agendada",
+          "past_due": "Pagamento falhou",
+          "canceled": "Encerrada",
+          "none": "Nada a pagar"
+        }
+      }
     },
     "change": {
       "title": "Mudar de plano",
@@ -222,7 +242,9 @@
       "prorationNote": "Proporcional ao restante deste período; o novo preço vale a partir de {date}.",
       "creditNote": "A parte não usada do seu plano atual é creditada.",
       "confirm": "Mudar de plano",
-      "done": "Agora você está no plano {plan}."
+      "done": "Agora você está no plano {plan}.",
+      "chargedNow": "Cobrado agora",
+      "chargedNowNote": "Um novo período de cobrança começa hoje e é cobrado agora, descontada a parte não usada do período atual."
     },
     "cardChange": {
       "open": "Trocar cartão",

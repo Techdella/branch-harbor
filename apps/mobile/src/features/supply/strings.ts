@@ -12,6 +12,9 @@ const en = {
   yes: 'Yes', no: 'No', na: 'N/A', range: '{min} to {max}', max: 'max {max}', min: 'min {min}', critical: 'Critical', criticalLive: 'A critical item is failing. Fix it now and tell your manager.',
   submit: 'Submit check', answerAll: 'Answer every item (or N/A) to submit.', submitted: 'Check submitted', failedItems: 'Failed: {items}', addNote: 'Add note',
   error: 'Something went wrong', retry: 'Retry', back: 'Back', noAccess: 'Deliveries and daily checks are not part of your access.', needsConnection: 'This needs a connection.',
+  offline: 'Offline: your answers are kept on this phone and sync when you’re back online', savedHere: 'Saved on this phone', syncing: 'Syncing…', synced: 'All answers synced',
+  pendingSync: '{n} change(s) waiting to sync', syncError: 'Could not sync yet. We’ll try again.', submitQueued: 'Will be submitted as soon as you’re back online',
+  addPhoto: 'Take photo', photoRequired: 'Photo required', photoPending: 'Will upload when online',
 };
 export type SKey = keyof typeof en;
 const fr: typeof en = {
@@ -25,6 +28,9 @@ const fr: typeof en = {
   yes: 'Oui', no: 'Non', na: 'N/A', range: 'de {min} à {max}', max: 'max. {max}', min: 'min. {min}', critical: 'Critique', criticalLive: 'Un point critique n’est pas conforme. Corrigez-le maintenant et prévenez votre responsable.',
   submit: 'Envoyer le contrôle', answerAll: 'Répondez à chaque point (ou N/A) pour envoyer.', submitted: 'Contrôle envoyé', failedItems: 'Non conforme : {items}', addNote: 'Ajouter une remarque',
   error: 'Une erreur s’est produite', retry: 'Réessayer', back: 'Retour', noAccess: 'Les livraisons et contrôles du jour ne font pas partie de votre accès.', needsConnection: 'Une connexion est nécessaire.',
+  offline: 'Hors ligne : vos réponses sont gardées sur ce téléphone et synchronisées dès le retour du réseau', savedHere: 'Enregistré sur ce téléphone', syncing: 'Synchronisation…', synced: 'Toutes les réponses sont synchronisées',
+  pendingSync: '{n} modification(s) en attente de synchronisation', syncError: 'Synchronisation impossible pour l’instant. Nouvel essai bientôt.', submitQueued: 'Sera envoyé dès le retour du réseau',
+  addPhoto: 'Prendre une photo', photoRequired: 'Photo obligatoire', photoPending: 'Sera envoyée une fois en ligne',
 };
 const es: typeof en = {
   entry: 'Entregas y controles del día', entrySub: 'Recibir entregas de proveedores y hacer los controles de apertura, cierre y temperatura',
@@ -37,6 +43,9 @@ const es: typeof en = {
   yes: 'Sí', no: 'No', na: 'N/A', range: 'de {min} a {max}', max: 'máx. {max}', min: 'mín. {min}', critical: 'Crítico', criticalLive: 'Un punto crítico está fallando. Corrígelo ahora y avisa a tu responsable.',
   submit: 'Enviar control', answerAll: 'Responde a cada punto (o N/A) para enviar.', submitted: 'Control enviado', failedItems: 'Con fallos: {items}', addNote: 'Añadir nota',
   error: 'Algo salió mal', retry: 'Reintentar', back: 'Volver', noAccess: 'Las entregas y los controles del día no forman parte de tu acceso.', needsConnection: 'Hace falta conexión.',
+  offline: 'Sin conexión: tus respuestas se guardan en este teléfono y se sincronizan al volver la conexión', savedHere: 'Guardado en este teléfono', syncing: 'Sincronizando…', synced: 'Todas las respuestas sincronizadas',
+  pendingSync: '{n} cambio(s) pendientes de sincronizar', syncError: 'Aún no se pudo sincronizar. Lo intentaremos de nuevo.', submitQueued: 'Se enviará en cuanto vuelvas a tener conexión',
+  addPhoto: 'Hacer foto', photoRequired: 'Foto obligatoria', photoPending: 'Se subirá con conexión',
 };
 const de: typeof en = {
   entry: 'Lieferungen & Tageskontrollen', entrySub: 'Lieferungen annehmen, Öffnungs-, Schließ- und Temperaturkontrollen durchführen',
@@ -49,6 +58,9 @@ const de: typeof en = {
   yes: 'Ja', no: 'Nein', na: 'N/A', range: '{min} bis {max}', max: 'max. {max}', min: 'min. {min}', critical: 'Kritisch', criticalLive: 'Ein kritischer Punkt ist nicht erfüllt. Beheben Sie ihn sofort und informieren Sie Ihre Leitung.',
   submit: 'Kontrolle absenden', answerAll: 'Beantworten Sie jeden Punkt (oder N/A), um abzusenden.', submitted: 'Kontrolle abgesendet', failedItems: 'Nicht erfüllt: {items}', addNote: 'Notiz hinzufügen',
   error: 'Etwas ist schiefgelaufen', retry: 'Erneut versuchen', back: 'Zurück', noAccess: 'Lieferungen und Tageskontrollen gehören nicht zu Ihrem Zugriff.', needsConnection: 'Dafür ist eine Verbindung nötig.',
+  offline: 'Offline: Ihre Antworten bleiben auf diesem Telefon und werden synchronisiert, sobald Sie wieder online sind', savedHere: 'Auf diesem Telefon gespeichert', syncing: 'Wird synchronisiert…', synced: 'Alle Antworten synchronisiert',
+  pendingSync: '{n} Änderung(en) warten auf Synchronisierung', syncError: 'Noch keine Synchronisierung möglich. Wir versuchen es erneut.', submitQueued: 'Wird gesendet, sobald Sie wieder online sind',
+  addPhoto: 'Foto aufnehmen', photoRequired: 'Foto erforderlich', photoPending: 'Wird online hochgeladen',
 };
 const ptBR: typeof en = {
   entry: 'Entregas e verificações do dia', entrySub: 'Receber entregas de fornecedores e fazer as verificações de abertura, fechamento e temperatura',
@@ -61,6 +73,9 @@ const ptBR: typeof en = {
   yes: 'Sim', no: 'Não', na: 'N/A', range: 'de {min} a {max}', max: 'máx. {max}', min: 'mín. {min}', critical: 'Crítico', criticalLive: 'Um item crítico está falhando. Corrija agora e avise seu gerente.',
   submit: 'Enviar verificação', answerAll: 'Responda a todos os itens (ou N/A) para enviar.', submitted: 'Verificação enviada', failedItems: 'Com falha: {items}', addNote: 'Adicionar observação',
   error: 'Algo deu errado', retry: 'Tentar de novo', back: 'Voltar', noAccess: 'Entregas e verificações do dia não fazem parte do seu acesso.', needsConnection: 'É preciso ter conexão.',
+  offline: 'Sem conexão: suas respostas ficam neste celular e sincronizam quando a conexão voltar', savedHere: 'Salvo neste celular', syncing: 'Sincronizando…', synced: 'Todas as respostas sincronizadas',
+  pendingSync: '{n} alteração(ões) aguardando sincronização', syncError: 'Ainda não foi possível sincronizar. Vamos tentar de novo.', submitQueued: 'Será enviada assim que a conexão voltar',
+  addPhoto: 'Tirar foto', photoRequired: 'Foto obrigatória', photoPending: 'Será enviada quando houver conexão',
 };
 export const STRINGS: Record<string, typeof en> = { en, fr, es, de, 'pt-BR': ptBR };
 

@@ -154,6 +154,29 @@ describe.skipIf(!hasDb)('multi-brand HQ (DB)', () => {
     expect(ft.body.royaltyTerms[0].royaltyBps).toBe(700);
   });
 
+  it('the territory map takes a brand: the main brand is stored as none, overlaps only count within a brand', async () => {
+    const sq = (x: number, y: number, s: number) => ({ type: 'Polygon', coordinates: [[[x, y], [x + s, y], [x + s, y + s], [x, y + s], [x, y]]] });
+    const T = (p = '') => `/v1/orgs/${org.id}/territories${p}`;
+    const main = await call(app, 'POST', T(), { token: owner.token, body: { name: `Main ${uid()}`, country: 'US', region: 'OR', geometry: sq(-122.8, 45.4, 0.2), brandId: yogaBrandId } });
+    expect(main.status, JSON.stringify(main.body)).toBe(201);
+    expect(main.body.brandId).toBeNull();
+    // The same area for another brand is no conflict; for the same brand it is.
+    const check = await call(app, 'POST', T('/check'), { token: owner.token, body: { geometry: sq(-122.75, 45.45, 0.1), brandId: barre.id } });
+    expect(check.status).toBe(200);
+    expect(check.body.overlaps).toEqual([]);
+    const sameBrand = await call(app, 'POST', T('/check'), { token: owner.token, body: { geometry: sq(-122.75, 45.45, 0.1) } });
+    expect(sameBrand.body.overlaps.map((o: any) => o.id)).toContain(main.body.id);
+    const b = await call(app, 'POST', T(), { token: owner.token, body: { name: `Barre ${uid()}`, country: 'US', region: 'OR', geometry: sq(-122.75, 45.45, 0.1), brandId: barre.id } });
+    expect(b.status, JSON.stringify(b.body)).toBe(201);
+    expect(b.body.brandId).toBe(barre.id);
+    // A brand of another business is refused; moving a territory to the main brand clears it.
+    const foreign = await call(app, 'POST', T(), { token: owner.token, body: { name: `X ${uid()}`, country: 'US', geometry: sq(-100, 40, 0.1), brandId: '00000000-0000-4000-8000-000000000000' } });
+    expect(foreign.status).toBe(404);
+    const moved = await call(app, 'PATCH', T(`/${b.body.id}`), { token: owner.token, body: { geometry: sq(-121, 44, 0.1), brandId: yogaBrandId } });
+    expect(moved.status, JSON.stringify(moved.body)).toBe(200);
+    expect(moved.body.brandId).toBeNull();
+  });
+
   it('the brand comparison and network summary never add currencies together', async () => {
     const r = await call(app, 'GET', `/v1/orgs/${org.id}/brands/comparison`, { token: owner.token });
     expect(r.status).toBe(200);

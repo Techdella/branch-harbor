@@ -23,7 +23,7 @@ export type BillingEmail =
   | { kind: 'trial_reminder'; business: string; days: number; planName: string; amount: Money; interval: Interval; startsOn: Date; taxAdded: boolean; last4: string | null; billingUrl: string }
   | { kind: 'trial_converted'; business: string; planName: string; billingUrl: string }
   | { kind: 'payment_failed'; business: string; amount: Money; billingUrl: string; franchisee?: boolean }
-  | { kind: 'plan_changed'; business: string; planName: string; amount: Money; interval: Interval; prorationNow: Money | null; billingUrl: string }
+  | { kind: 'plan_changed'; business: string; planName: string; amount: Money; interval: Interval; prorationNow: Money | null; billingUrl: string; chargedNow?: boolean }
   | { kind: 'export_ready'; business: string; files: number; sizeKb: number; expiresOn: Date; link: string };
 
 interface Money { amountMinor: number; currency: string }
@@ -88,7 +88,8 @@ const COPY: Record<BillingEmailLocale, Copy> = {
       subject: (p) => `Your BranchHarbor plan is now ${p}`,
       body: (e, f) => [
         `${e.business} is now on the ${e.planName} plan at ${f.money(e.amount)} per ${COPY.en.interval[e.interval]}.`,
-        e.prorationNow && e.prorationNow.amountMinor > 0 ? `The difference for the rest of this period, ${f.money(e.prorationNow)}, is added to your next invoice.` : 'Any unused time on your previous plan is credited to your next invoice.',
+        e.chargedNow && e.prorationNow && e.prorationNow.amountMinor > 0 ? `Your new billing period starts today: we charged ${f.money(e.prorationNow)} now, less the unused part of your previous period.`
+          : e.prorationNow && e.prorationNow.amountMinor > 0 ? `The difference for the rest of this period, ${f.money(e.prorationNow)}, is added to your next invoice.` : 'Any unused time on your previous plan is credited to your next invoice.',
       ],
     },
     exportReady: {
@@ -141,7 +142,8 @@ const COPY: Record<BillingEmailLocale, Copy> = {
       subject: (p) => `Votre formule BranchHarbor est maintenant ${p}`,
       body: (e, f) => [
         `${e.business} est maintenant en formule ${e.planName} à ${f.money(e.amount)} par ${COPY.fr.interval[e.interval]}.`,
-        e.prorationNow && e.prorationNow.amountMinor > 0 ? `La différence pour le reste de cette période, ${f.money(e.prorationNow)}, est ajoutée à votre prochaine facture.` : 'Le temps non utilisé de votre formule précédente est crédité sur votre prochaine facture.',
+        e.chargedNow && e.prorationNow && e.prorationNow.amountMinor > 0 ? `Votre nouvelle période de facturation commence aujourd’hui : nous avons prélevé ${f.money(e.prorationNow)} maintenant, déduction faite de la partie non utilisée de votre période précédente.`
+          : e.prorationNow && e.prorationNow.amountMinor > 0 ? `La différence pour le reste de cette période, ${f.money(e.prorationNow)}, est ajoutée à votre prochaine facture.` : 'Le temps non utilisé de votre formule précédente est crédité sur votre prochaine facture.',
       ],
     },
     exportReady: {
@@ -194,7 +196,8 @@ const COPY: Record<BillingEmailLocale, Copy> = {
       subject: (p) => `Tu plan de BranchHarbor ahora es ${p}`,
       body: (e, f) => [
         `${e.business} está ahora en el plan ${e.planName} por ${f.money(e.amount)} al ${COPY.es.interval[e.interval]}.`,
-        e.prorationNow && e.prorationNow.amountMinor > 0 ? `La diferencia por el resto de este periodo, ${f.money(e.prorationNow)}, se añade a tu próxima factura.` : 'El tiempo no usado de tu plan anterior se abona en tu próxima factura.',
+        e.chargedNow && e.prorationNow && e.prorationNow.amountMinor > 0 ? `Tu nuevo periodo de facturación empieza hoy: hemos cobrado ${f.money(e.prorationNow)} ahora, descontando la parte no usada de tu periodo anterior.`
+          : e.prorationNow && e.prorationNow.amountMinor > 0 ? `La diferencia por el resto de este periodo, ${f.money(e.prorationNow)}, se añade a tu próxima factura.` : 'El tiempo no usado de tu plan anterior se abona en tu próxima factura.',
       ],
     },
     exportReady: {
@@ -247,7 +250,8 @@ const COPY: Record<BillingEmailLocale, Copy> = {
       subject: (p) => `Ihr BranchHarbor-Tarif ist jetzt ${p}`,
       body: (e, f) => [
         `${e.business} nutzt jetzt den Tarif ${e.planName} für ${f.money(e.amount)} pro ${COPY.de.interval[e.interval]}.`,
-        e.prorationNow && e.prorationNow.amountMinor > 0 ? `Die Differenz für den Rest dieses Zeitraums, ${f.money(e.prorationNow)}, kommt auf Ihre nächste Rechnung.` : 'Nicht genutzte Zeit Ihres bisherigen Tarifs wird Ihrer nächsten Rechnung gutgeschrieben.',
+        e.chargedNow && e.prorationNow && e.prorationNow.amountMinor > 0 ? `Ihr neuer Abrechnungszeitraum beginnt heute: Wir haben jetzt ${f.money(e.prorationNow)} abgebucht, abzüglich des nicht genutzten Teils Ihres bisherigen Zeitraums.`
+          : e.prorationNow && e.prorationNow.amountMinor > 0 ? `Die Differenz für den Rest dieses Zeitraums, ${f.money(e.prorationNow)}, kommt auf Ihre nächste Rechnung.` : 'Nicht genutzte Zeit Ihres bisherigen Tarifs wird Ihrer nächsten Rechnung gutgeschrieben.',
       ],
     },
     exportReady: {
@@ -300,7 +304,8 @@ const COPY: Record<BillingEmailLocale, Copy> = {
       subject: (p) => `Seu plano da BranchHarbor agora é ${p}`,
       body: (e, f) => [
         `${e.business} agora está no plano ${e.planName} por ${f.money(e.amount)} por ${COPY['pt-BR'].interval[e.interval]}.`,
-        e.prorationNow && e.prorationNow.amountMinor > 0 ? `A diferença pelo restante deste período, ${f.money(e.prorationNow)}, entra na sua próxima fatura.` : 'O tempo não usado do seu plano anterior é creditado na sua próxima fatura.',
+        e.chargedNow && e.prorationNow && e.prorationNow.amountMinor > 0 ? `Seu novo período de cobrança começa hoje: cobramos ${f.money(e.prorationNow)} agora, descontada a parte não usada do período anterior.`
+          : e.prorationNow && e.prorationNow.amountMinor > 0 ? `A diferença pelo restante deste período, ${f.money(e.prorationNow)}, entra na sua próxima fatura.` : 'O tempo não usado do seu plano anterior é creditado na sua próxima fatura.',
       ],
     },
     exportReady: {
@@ -337,18 +342,27 @@ export async function renderBillingEmail(e: BillingEmail, to: { name: string; lo
     case 'plan_changed': subject = c.changed.subject(e.planName); paras = c.changed.body(e, f); cta = { label: c.button.billing, url: e.billingUrl }; break;
     case 'export_ready': subject = c.exportReady.subject; paras = c.exportReady.body(e, f); cta = { label: c.button.download, url: e.link }; break;
   }
-  const footer = c.footer(e.business);
-  const text = [c.hi(to.name), '', ...paras.flatMap((p) => [p, '']), ...(cta ? [`${cta.label}: ${cta.url}`, ''] : []), '— BranchHarbor', '', footer, ''].join('\n');
-  const mjml = `<mjml lang="${locale}"><mj-head><mj-title>${esc(subject)}</mj-title><mj-attributes><mj-all font-family="Helvetica, Arial, sans-serif" /><mj-text font-size="15px" line-height="1.55" color="#1c1c1a" /></mj-attributes></mj-head>
+  const out = await renderSimpleEmail({ locale, subject, greeting: c.hi(to.name), paragraphs: paras, cta, footer: c.footer(e.business) });
+  return { ...out, locale };
+}
+
+/**
+ * The BranchHarbor email layout (MJML, the same look as the billing emails) with a plain-text part: a greeting, the
+ * paragraphs, an optional button and a footer. Text is escaped; callers pass it already in the recipient's language.
+ */
+export async function renderSimpleEmail(m: { locale: string; subject: string; greeting: string; paragraphs: string[]; cta: { label: string; url: string } | null; footer: string }): Promise<{ subject: string; text: string; html: string }> {
+  const { locale, subject, paragraphs: paras, cta, footer } = m;
+  const text = [m.greeting, '', ...paras.flatMap((p) => [p, '']), ...(cta ? [`${cta.label}: ${cta.url}`, ''] : []), '— BranchHarbor', '', footer, ''].join('\n');
+  const mjml = `<mjml lang="${esc(locale)}"><mj-head><mj-title>${esc(subject)}</mj-title><mj-attributes><mj-all font-family="Helvetica, Arial, sans-serif" /><mj-text font-size="15px" line-height="1.55" color="#1c1c1a" /></mj-attributes></mj-head>
 <mj-body background-color="#f4f2ec"><mj-section padding="24px 0 8px"><mj-column><mj-text font-size="18px" font-weight="700">BranchHarbor</mj-text></mj-column></mj-section>
 <mj-section background-color="#ffffff" border-radius="16px" padding="20px 8px"><mj-column>
-<mj-text>${esc(c.hi(to.name))}</mj-text>
+<mj-text>${esc(m.greeting)}</mj-text>
 ${paras.map((p) => `<mj-text>${esc(p)}</mj-text>`).join('\n')}
 ${cta ? `<mj-button href="${esc(cta.url)}" background-color="#1c1c1a" color="#ffffff" border-radius="999px" font-weight="700" align="left">${esc(cta.label)}</mj-button>` : ''}
 </mj-column></mj-section>
 <mj-section padding="12px 0 24px"><mj-column><mj-text font-size="12px" color="#6b6a64">${esc(footer)}</mj-text></mj-column></mj-section></mj-body></mjml>`;
   const html = (await mjml2html(mjml, { validationLevel: 'soft' })).html;
-  return { subject, text, html, locale };
+  return { subject, text, html };
 }
 
 /** Sends a billing email to each recipient in their own language. Never throws (billing must not fail on email). */

@@ -1,6 +1,6 @@
 import { and, count, eq, inArray } from 'drizzle-orm';
 import {
-  ACCESS_ACTIONS, ACTION_META, ROLE_TEMPLATES, ROLE_TEAMS, TEAM_ROLE_ORDER, WORKSPACES, WORKSPACE_META, asBusinessModel, canonicalRole, effectiveCapabilities, inviteRolesFor, modulesFor,
+  ACCESS_ACTIONS, ACTION_META, hqOnlyAt, ROLE_TEMPLATES, ROLE_TEAMS, TEAM_ROLE_ORDER, WORKSPACES, WORKSPACE_META, asBusinessModel, canonicalRole, effectiveCapabilities, inviteRolesFor, modulesFor,
   normalizeCapabilities, parseCapability, permissionsFromCapabilities, scopeKindsFor, sensitiveClassesIn, workspacesFor, settingsModulesFor, type Capability, type Role, type ScopeKind,
 } from '@bh/shared';
 import type { Exec } from '../db/client.ts';
@@ -64,10 +64,10 @@ export function validateCapabilities(list: readonly string[], industry: string, 
   return normalizeCapabilities(list, industry);
 }
 
-/** HQ-private modules can only be granted on organisation-wide assignments (a territory also takes the ones it runs for itself, `territoryOk`). */
+/** HQ-private modules can only be granted on organisation-wide assignments (a territory or a brand also takes the ones it runs for itself, `territoryOk` / `brandOk`). */
 export function assertScopeAllows(caps: Iterable<string>, scopeKind: ScopeKind, industry: string) {
   if (scopeKind === 'organization') return;
-  const hq = new Set(modulesFor(industry).filter((m) => m.hqOnly && !(scopeKind === 'territory' && m.territoryOk)).map((m) => m.key));
+  const hq = new Set(modulesFor(industry).filter((m) => hqOnlyAt(m, scopeKind)).map((m) => m.key));
   const bad = [...new Set([...caps].map((c) => parseCapability(c)?.module).filter((m): m is string => !!m && hq.has(m)))];
   if (bad.length) {
     throw new AppError(400, 'hq_only_module', `${bad.join(', ')} ${bad.length === 1 ? 'is' : 'are'} only available to people with organisation-wide access (HQ).`, { grants: 'HQ-private modules need an organisation-wide assignment' }, { modules: bad });

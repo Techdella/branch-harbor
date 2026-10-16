@@ -1457,7 +1457,81 @@
     "templateStandard": "Unidade padrão · v15",
     "templateFlagship": "Unidade principal · v3",
     "templatePopup": "Pop-up / sazonal · v2",
-    "hoursPh": "Seg–Sex 07:00–21:00"
+    "hoursPh": "Seg–Sex 07:00–21:00",
+    "live": {
+      "brand": "Marca",
+      "brandHint": "A unidade pertence a uma marca: o site, os modelos e a equipe seguem essa marca.",
+      "template": "Modelo da marca",
+      "templateHint": "Os campos bloqueados e com aprovação vêm deste modelo.",
+      "noTemplates": "Ainda não há modelo para esta marca. Você pode aplicar um depois.",
+      "noTemplate": "Sem modelo",
+      "templateOption": "{name} · v{version}",
+      "ownerGroup": "Grupo proprietário",
+      "ownerGroupHint": "A empresa franqueada que opera a unidade. Deixe “própria” para as unidades da matriz.",
+      "companyOwned": "Própria (sem grupo proprietário)",
+      "networkRegion": "Região",
+      "noRegion": "Sem região",
+      "territory": "Território",
+      "territoryHint": "O país de um master franqueado ou uma área de desenvolvimento. Só aparecem os territórios da marca escolhida.",
+      "noTerritory": "Sem território",
+      "industryDetails": "Detalhes do setor",
+      "industryHint": "Opcional. Eles viram os valores iniciais da configuração desta unidade.",
+      "choose": "Escolher…",
+      "code": "Código interno",
+      "yes": "Sim",
+      "no": "Não",
+      "notVisible": "É um rascunho: não está publicada nem visível para clientes. Publique o site em Sites quando estiver pronta.",
+      "addAnother": "Adicionar outra unidade",
+      "status": {
+        "draft": "Rascunho",
+        "onboarding": "Integração",
+        "opening_soon": "Abre em breve",
+        "operating": "Em funcionamento"
+      },
+      "industryField": {
+        "studioRooms": "Salas",
+        "maxClassSize": "Tamanho máximo da turma",
+        "showers": "Chuveiros",
+        "pitches": "Campos ou quadras",
+        "surface": "Piso",
+        "minAge": "Idade mínima",
+        "treatmentRooms": "Salas de atendimento",
+        "clinicRegistration": "Número de registro da clínica",
+        "stepFreeAccess": "Acesso sem degraus",
+        "storeType": "Tipo de loja",
+        "salesFloorM2": "Área de vendas (m²)",
+        "clickAndCollect": "Retirada na loja",
+        "serviceStyle": "Tipo de serviço",
+        "seats": "Lugares",
+        "alcoholLicence": "Licença para bebidas alcoólicas",
+        "officeLicence": "Número do registro (CRECI)",
+        "agents": "Corretores",
+        "serviceArea": "Área de atuação",
+        "guestRooms": "Quartos",
+        "checkInTime": "Check-in a partir de (HH:MM)",
+        "checkOutTime": "Check-out até (HH:MM)"
+      },
+      "industryOption": {
+        "surface": {
+          "grass": "Grama natural",
+          "artificial": "Grama sintética",
+          "indoor": "Coberto",
+          "mixed": "Misto"
+        },
+        "storeType": {
+          "store": "Loja",
+          "outlet": "Outlet",
+          "popup": "Loja temporária",
+          "warehouse": "Depósito"
+        },
+        "serviceStyle": {
+          "counter": "Balcão",
+          "table": "Serviço à mesa",
+          "takeaway": "Só para viagem",
+          "ghost_kitchen": "Cozinha de delivery"
+        }
+      }
+    }
   },
   "websites": {
     "title": "Sites",
