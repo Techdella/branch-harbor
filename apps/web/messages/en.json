@@ -238,7 +238,7 @@
           "desc": "Through a connected payment account for each business or location."
         },
         {
-          "name": "BranchHarbor AI",
+          "name": "{name}",
           "desc": "Drafts and summaries within your permissions. Changes need approval."
         },
         {
@@ -2564,6 +2564,96 @@
       "registration": "Registration",
       "pricing": "Pricing",
       "leads": "Leads"
+    }
+  },
+  "marina": {
+    "metaTitle": "{name}, the AI assistant for multi-location businesses",
+    "intro": "{name} answers questions about your locations, prepares the work and briefs you every morning. It only sees what you can see, and nothing changes until you confirm.",
+    "headline": "Meet {name}",
+    "kicker": "AI assistant",
+    "title": "Meet {name}, your assistant across every location",
+    "lead": "Ask in plain words, in your language. {name} reads your live data with your own access, shows the answer as a table or chart, and prepares changes as cards you confirm.",
+    "ctaDemo": "See {name} in the demo",
+    "ctaPricing": "AI credits by plan",
+    "askTitle": "Ask anything you can see",
+    "askExamples": [
+      "Which locations missed royalties last month?",
+      "Revenue by location this quarter vs last",
+      "Which compliance documents expire in the next 60 days?",
+      "Draft a coming-soon email for our next opening"
+    ],
+    "featuresTitle": "What {name} does",
+    "features": [
+      {
+        "name": "Answers with your numbers",
+        "desc": "Revenue, bookings, royalties, reviews, audits and leads, as tables and charts. Each currency stays separate."
+      },
+      {
+        "name": "Daily or weekly briefing",
+        "desc": "Overdue actions, expiring documents, bad reviews, KPI drops and leads to follow up, in the app and by email."
+      },
+      {
+        "name": "Insights that explain themselves",
+        "desc": "Unusual changes on your locations, with the numbers behind them and a suggested next step."
+      },
+      {
+        "name": "Visit briefs",
+        "desc": "One page before a location visit: KPIs, last audit, open actions, reviews, compliance and talking points."
+      },
+      {
+        "name": "Content in your brand voice",
+        "desc": "Emails, posts, ads and website sections, with HQ’s banned claims removed and required disclaimers added, then translated."
+      },
+      {
+        "name": "Answers from your manual",
+        "desc": "Your operations manual, library, courses and help-desk answers, with links to the sources. Franchisees only see what is shared with them."
+      }
+    ],
+    "safetyTitle": "Built to be trusted",
+    "safety": [
+      {
+        "name": "Your access, never more",
+        "desc": "{name} works through the same permission checks as the app. A franchisee never sees another franchisee’s data."
+      },
+      {
+        "name": "You confirm every change",
+        "desc": "Drafts, emails, posts and updates are prepared as cards. Nothing is sent, published or paid until you confirm, and HQ can require an approver."
+      },
+      {
+        "name": "Careful with what others wrote",
+        "desc": "Reviews, messages and documents are treated as information, not instructions, and actions that follow them are flagged."
+      },
+      {
+        "name": "Your data stays yours",
+        "desc": "Every question and action is logged for your audit trail, with personal data masked. Your data is not used to train AI models."
+      }
+    ],
+    "usageTitle": "Included in every plan",
+    "usageBody": "Each plan includes monthly AI credits, shown in Settings, with a fair-use limit above them. HQ chooses where {name} can work and how long conversations are kept.",
+    "faqTitle": "Questions about {name}",
+    "faq": [
+      {
+        "q": "Can {name} change things on its own?",
+        "a": "No. Reading is instant; every change is prepared as a card you confirm, and your organisation can require an HQ approver for sending, publishing or money."
+      },
+      {
+        "q": "What can franchisees ask?",
+        "a": "Anything within their own access: their locations, their customers, their royalties and what HQ shares with them."
+      },
+      {
+        "q": "Is it legal advice?",
+        "a": "No. Answers about franchise law and agreements come from your own records and rules, and carry a note to check with your counsel."
+      },
+      {
+        "q": "Which languages?",
+        "a": "{name} replies in the language you write in. The app is available in English, French, Spanish, German and Brazilian Portuguese."
+      }
+    ],
+    "home": {
+      "kicker": "AI assistant",
+      "title": "{name} works alongside your team",
+      "body": "Ask about any location, get a morning briefing, and let {name} prepare the work. You confirm every change.",
+      "cta": "Meet {name}"
     }
   }
 }

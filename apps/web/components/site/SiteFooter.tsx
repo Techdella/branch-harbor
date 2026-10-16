@@ -1,3 +1,4 @@
+import { ASSISTANT_NAME } from '@bh/shared';
 import { getTranslations } from 'next-intl/server';
 import { Icon, Logo } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
@@ -29,6 +30,7 @@ export async function SiteFooter() {
         { href: '/solutions/independent-businesses', label: t('independent') },
         { href: '/wordpress', label: t('wordpress') },
         { href: '/integrations', label: t('integrations') },
+        { href: '/marina', label: ASSISTANT_NAME },
         { href: '/pricing', label: t('pricing') },
         { href: DEMO_URL, label: tc('tryDemo'), external: true },
         { href: '/demo', label: t('demo') },

@@ -238,7 +238,7 @@
           "desc": "Via een gekoppeld betaalaccount per bedrijf of vestiging."
         },
         {
-          "name": "BranchHarbor AI",
+          "name": "{name}",
           "desc": "Concepten en samenvattingen binnen jouw bevoegdheden. Wijzigingen vragen goedkeuring."
         },
         {
@@ -2564,6 +2564,96 @@
       "registration": "Inschrijvingen",
       "pricing": "Prijzen",
       "leads": "Aanvragen"
+    }
+  },
+  "marina": {
+    "metaTitle": "{name}, de AI-assistent voor bedrijven met meerdere vestigingen",
+    "intro": "{name} beantwoordt vragen over je vestigingen, bereidt het werk voor en geeft je elke ochtend een briefing. Ze ziet alleen wat jij ziet, en er verandert niets tot jij het bevestigt.",
+    "headline": "Maak kennis met {name}",
+    "kicker": "AI-assistent",
+    "title": "Maak kennis met {name}, je assistent voor alle vestigingen",
+    "lead": "Vraag het in je eigen woorden en in je eigen taal. {name} leest je actuele gegevens met jouw eigen toegang, toont het antwoord als tabel of grafiek en bereidt wijzigingen voor als kaarten die jij bevestigt.",
+    "ctaDemo": "Bekijk {name} in de demo",
+    "ctaPricing": "AI-credits per abonnement",
+    "askTitle": "Vraag alles wat je kunt zien",
+    "askExamples": [
+      "Welke vestigingen hebben vorige maand geen royalty’s betaald?",
+      "Omzet per vestiging dit kwartaal versus vorig kwartaal",
+      "Welke compliancedocumenten verlopen in de komende 60 dagen?",
+      "Schrijf een opening-binnenkort-e-mail voor onze volgende vestiging"
+    ],
+    "featuresTitle": "Wat {name} doet",
+    "features": [
+      {
+        "name": "Antwoorden met je eigen cijfers",
+        "desc": "Omzet, boekingen, royalty’s, reviews, audits en leads, als tabellen en grafieken. Elke valuta blijft apart."
+      },
+      {
+        "name": "Dagelijkse of wekelijkse briefing",
+        "desc": "Achterstallige acties, verlopende documenten, slechte reviews, dalende kpi’s en leads om op te volgen, in de app en per e-mail."
+      },
+      {
+        "name": "Inzichten die zichzelf uitleggen",
+        "desc": "Ongewone veranderingen bij je vestigingen, met de cijfers erachter en een voorgestelde volgende stap."
+      },
+      {
+        "name": "Bezoekbriefings",
+        "desc": "Eén pagina voor een vestigingsbezoek: kpi’s, laatste audit, open acties, reviews, compliance en gesprekspunten."
+      },
+      {
+        "name": "Content in de stem van je merk",
+        "desc": "E-mails, posts, advertenties en websitesecties, zonder de claims die het hoofdkantoor verbiedt en met verplichte disclaimers, daarna vertaald."
+      },
+      {
+        "name": "Antwoorden uit je handboek",
+        "desc": "Je operationele handboek, de bibliotheek, cursussen en helpdeskantwoorden, met links naar de bronnen. Franchisenemers zien alleen wat met hen gedeeld is."
+      }
+    ],
+    "safetyTitle": "Gebouwd op vertrouwen",
+    "safety": [
+      {
+        "name": "Jouw toegang, nooit meer",
+        "desc": "{name} gaat door dezelfde toegangscontroles als de app. Een franchisenemer ziet nooit de gegevens van een andere."
+      },
+      {
+        "name": "Jij bevestigt elke wijziging",
+        "desc": "Concepten, e-mails, posts en wijzigingen worden als kaarten voorbereid. Er wordt niets verstuurd, gepubliceerd of betaald zonder jouw bevestiging, en het hoofdkantoor kan een goedkeurder verplichten."
+      },
+      {
+        "name": "Voorzichtig met wat anderen schreven",
+        "desc": "Reviews, berichten en documenten worden behandeld als informatie, niet als instructies, en acties die daaruit volgen worden gemarkeerd."
+      },
+      {
+        "name": "Jouw gegevens blijven van jou",
+        "desc": "Elke vraag en actie wordt gelogd voor je audittrail, met persoonsgegevens afgeschermd. Je gegevens worden niet gebruikt om AI-modellen te trainen."
+      }
+    ],
+    "usageTitle": "Inbegrepen in elk abonnement",
+    "usageBody": "Elk abonnement bevat maandelijkse AI-credits, zichtbaar in Instellingen, met een redelijk-gebruikslimiet daarboven. Het hoofdkantoor kiest waar {name} mag werken en hoe lang gesprekken bewaard worden.",
+    "faqTitle": "Vragen over {name}",
+    "faq": [
+      {
+        "q": "Kan {name} zelf iets veranderen?",
+        "a": "Nee. Lezen gaat direct; elke wijziging wordt voorbereid als kaart die jij bevestigt, en je organisatie kan een goedkeurder van het hoofdkantoor verplichten voor verzenden, publiceren of betalingen."
+      },
+      {
+        "q": "Wat kunnen franchisenemers vragen?",
+        "a": "Alles binnen hun eigen toegang: hun vestigingen, hun klanten, hun royalty’s en wat het hoofdkantoor met hen deelt."
+      },
+      {
+        "q": "Is het juridisch advies?",
+        "a": "Nee. Antwoorden over franchiserecht en overeenkomsten komen uit je eigen gegevens en regels, met een opmerking om het met je advocaat te controleren."
+      },
+      {
+        "q": "Welke talen?",
+        "a": "{name} antwoordt in de taal waarin je schrijft. De app is beschikbaar in het Engels, Frans, Spaans, Duits en Braziliaans-Portugees."
+      }
+    ],
+    "home": {
+      "kicker": "AI-assistent",
+      "title": "{name} werkt naast je team",
+      "body": "Stel een vraag over elke vestiging, krijg elke ochtend een briefing en laat {name} het werk voorbereiden. Jij bevestigt elke wijziging.",
+      "cta": "Maak kennis met {name}"
     }
   }
 }

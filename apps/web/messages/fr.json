@@ -238,7 +238,7 @@
           "desc": "Via un compte de paiement connecté pour chaque entreprise ou établissement."
         },
         {
-          "name": "BranchHarbor AI",
+          "name": "{name}",
           "desc": "Brouillons et résumés dans la limite de vos autorisations. Les modifications nécessitent une approbation."
         },
         {
@@ -2564,6 +2564,96 @@
       "registration": "Inscriptions",
       "pricing": "Prix",
       "leads": "Demandes"
+    }
+  },
+  "marina": {
+    "metaTitle": "{name}, l’assistante IA des entreprises multi-sites",
+    "intro": "{name} répond à vos questions sur vos sites, prépare le travail et vous fait un point chaque matin. Elle ne voit que ce que vous voyez, et rien ne change sans votre confirmation.",
+    "headline": "Découvrez {name}",
+    "kicker": "Assistante IA",
+    "title": "Découvrez {name}, votre assistante sur tous vos sites",
+    "lead": "Demandez avec vos mots, dans votre langue. {name} lit vos données en direct avec vos propres accès, affiche la réponse en tableau ou en graphique et prépare les modifications sous forme de cartes à confirmer.",
+    "ctaDemo": "Voir {name} dans la démo",
+    "ctaPricing": "Crédits IA par offre",
+    "askTitle": "Demandez tout ce que vous pouvez voir",
+    "askExamples": [
+      "Quels sites n’ont pas payé leurs redevances le mois dernier ?",
+      "Chiffre d’affaires par site ce trimestre vs le précédent",
+      "Quels documents de conformité expirent dans les 60 prochains jours ?",
+      "Rédige un e-mail d’ouverture prochaine pour notre nouveau site"
+    ],
+    "featuresTitle": "Ce que fait {name}",
+    "features": [
+      {
+        "name": "Des réponses avec vos chiffres",
+        "desc": "Chiffre d’affaires, réservations, redevances, avis, audits et prospects, en tableaux et graphiques. Chaque devise reste séparée."
+      },
+      {
+        "name": "Un point quotidien ou hebdomadaire",
+        "desc": "Actions en retard, documents qui expirent, avis négatifs, baisses d’indicateurs et prospects à relancer, dans l’application et par e-mail."
+      },
+      {
+        "name": "Des analyses qui s’expliquent",
+        "desc": "Les changements inhabituels sur vos sites, avec les chiffres et une prochaine étape suggérée."
+      },
+      {
+        "name": "Des fiches de visite",
+        "desc": "Une page avant chaque visite : indicateurs, dernier audit, actions ouvertes, avis, conformité et points à aborder."
+      },
+      {
+        "name": "Des contenus à la voix de votre marque",
+        "desc": "E-mails, publications, annonces et sections de site, sans les affirmations interdites par le siège et avec les mentions obligatoires, puis traduits."
+      },
+      {
+        "name": "Des réponses tirées de votre manuel",
+        "desc": "Votre manuel opérationnel, la bibliothèque, les cours et les réponses de l’assistance, avec les sources. Les franchisés ne voient que ce qui est partagé avec eux."
+      }
+    ],
+    "safetyTitle": "Conçue pour inspirer confiance",
+    "safety": [
+      {
+        "name": "Vos accès, jamais plus",
+        "desc": "{name} passe par les mêmes contrôles d’accès que l’application. Un franchisé ne voit jamais les données d’un autre."
+      },
+      {
+        "name": "Vous confirmez chaque changement",
+        "desc": "Brouillons, e-mails, publications et mises à jour sont préparés sous forme de cartes. Rien n’est envoyé, publié ou payé sans votre confirmation, et le siège peut exiger un approbateur."
+      },
+      {
+        "name": "Prudente avec ce que d’autres ont écrit",
+        "desc": "Les avis, messages et documents sont traités comme des informations, pas comme des instructions, et les actions qui en découlent sont signalées."
+      },
+      {
+        "name": "Vos données restent les vôtres",
+        "desc": "Chaque question et action est journalisée pour votre traçabilité, avec les données personnelles masquées. Vos données ne servent pas à entraîner des modèles d’IA."
+      }
+    ],
+    "usageTitle": "Inclus dans chaque offre",
+    "usageBody": "Chaque offre inclut des crédits IA mensuels, visibles dans les réglages, avec une limite d’usage raisonnable au-delà. Le siège choisit où {name} intervient et combien de temps les conversations sont conservées.",
+    "faqTitle": "Questions sur {name}",
+    "faq": [
+      {
+        "q": "{name} peut-elle modifier des choses seule ?",
+        "a": "Non. La lecture est immédiate ; chaque modification est préparée sous forme de carte à confirmer, et votre organisation peut exiger un approbateur du siège pour les envois, publications ou paiements."
+      },
+      {
+        "q": "Que peuvent demander les franchisés ?",
+        "a": "Tout ce qui relève de leurs accès : leurs sites, leurs clients, leurs redevances et ce que le siège partage avec eux."
+      },
+      {
+        "q": "Est-ce un conseil juridique ?",
+        "a": "Non. Les réponses sur le droit de la franchise et les contrats viennent de vos propres données et règles, avec un rappel de vérifier auprès de votre avocat."
+      },
+      {
+        "q": "Dans quelles langues ?",
+        "a": "{name} répond dans la langue de votre question. L’application existe en anglais, français, espagnol, allemand et portugais du Brésil."
+      }
+    ],
+    "home": {
+      "kicker": "Assistante IA",
+      "title": "{name} travaille aux côtés de votre équipe",
+      "body": "Posez une question sur n’importe quel site, recevez un point chaque matin et laissez {name} préparer le travail. Vous confirmez chaque changement.",
+      "cta": "Découvrir {name}"
     }
   }
 }
