@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { Icon } from '@bh/ui';
+import { Field, Icon, Select } from '@bh/ui';
 import { useApp } from '../shell/AppContext';
 import { SectionCard } from '../ui/States';
 import { BrandMark } from './BrandsScreen';
@@ -45,5 +45,26 @@ export function BrandsCard() {
         ))}
       </ul>
     </SectionCard>
+  );
+}
+
+/** Multi-brand HQ: the brand a franchise prospect is buying. Hidden for single-brand businesses. */
+export function BrandSelect({ value, onChange }: { value: string | null; onChange: (id: string | null) => void }) {
+  const t = useTranslations('brands');
+  const app = useApp();
+  if (!app.multiBrand) return null;
+  const main = app.brands.find((b) => b.isDefault) ?? app.brands[0];
+  return (
+    <Field label={t('buying')}>
+      {(p) => (
+        <Select id={p.id} value={value ?? main?.id ?? ''} onChange={(e) => onChange(e.target.value || null)} data-testid="brand-select">
+          {app.brands.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.name}
+            </option>
+          ))}
+        </Select>
+      )}
+    </Field>
   );
 }
