@@ -204,6 +204,13 @@
       "when": 1792109476335,
       "tag": "0028_franchisee_subscriptions",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792110254099,
+      "tag": "0029_compliance_missing_reminders",
+      "breakpoints": true
     }
   ]
 }

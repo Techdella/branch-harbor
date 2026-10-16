@@ -187,3 +187,25 @@ export const complianceDocuments = pgTable('compliance_documents', {
   index('compliance_documents_group_idx').on(t.ownerGroupId),
   index('compliance_documents_expiry_idx').on(t.organizationId, t.expiresOn),
 ]);
+
+/**
+ * Required documents nobody has uploaded yet (the matrix shows "missing"): one row per requirement and location (or
+ * owner group for owner-group requirements) while it stays missing. Reminders go to the uploaders weekly; after 30
+ * days missing, HQ is told once. The row is removed as soon as a document is uploaded.
+ */
+export const complianceMissingReminders = pgTable('compliance_missing_reminders', {
+  id: pk(),
+  organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
+  requirementId: uuid('requirement_id').notNull().references(() => complianceRequirements.id, { onDelete: 'cascade' }),
+  locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
+  ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'cascade' }),
+  /** When the document became required and missing (the later of the requirement and the location). */
+  missingSince: ts('missing_since').notNull(),
+  lastRemindedAt: ts('last_reminded_at'),
+  reminderCount: integer('reminder_count').notNull().default(0),
+  escalatedAt: ts('escalated_at'),
+  createdAt: createdAt(),
+}, (t) => [
+  uniqueIndex('compliance_missing_target_uq').on(t.requirementId, t.locationId, t.ownerGroupId),
+  index('compliance_missing_org_idx').on(t.organizationId),
+]);

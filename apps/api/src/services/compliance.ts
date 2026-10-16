@@ -12,7 +12,7 @@ import type { FastifyRequest } from 'fastify';
 import { complianceState, daysUntil, dueReminderStep, type AccessAction, type ComplianceState } from '@bh/shared';
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
-import { complianceDocuments, complianceRequirements, locations, organizations, ownerGroups, users } from '../db/schema/index.ts';
+import { complianceDocuments, complianceMissingReminders, complianceRequirements, locations, organizations, ownerGroups, users } from '../db/schema/index.ts';
 import { localDateParts } from '../lib/tz.ts';
 import { notFound } from '../lib/errors.ts';
 import { capabilityLocations, hasCapability, requireMember } from './authz.ts';
@@ -135,7 +135,7 @@ export async function supersedeOlder(db: Exec, d: ComplianceDoc, now = new Date(
 }
 
 /** People to remind about a document: those who can upload for its location (or for the group's locations). */
-async function documentContacts(db: Exec, d: ComplianceDoc): Promise<string[]> {
+async function documentContacts(db: Exec, d: Pick<ComplianceDoc, 'organizationId' | 'locationId' | 'ownerGroupId'>): Promise<string[]> {
   if (d.locationId) return usersWithCapability(db, d.organizationId, d.locationId, COMPLIANCE_MODULE, 'edit');
   const locs = await db.select({ id: locations.id }).from(locations).where(eq(locations.ownerGroupId, d.ownerGroupId!));
   const out = new Set<string>();
@@ -184,5 +184,85 @@ export async function runComplianceJobs(s: Services, now = new Date(), organizat
     await s.db.update(complianceDocuments).set({ remindersSent: sent, escalatedAt, updatedAt: now }).where(eq(complianceDocuments.id, d.id));
     reminders++;
   }
-  return { checked: docs.length, reminders, escalations };
+  // Required documents that were never uploaded: weekly reminders, HQ after 30 days.
+  const missing = await runMissingDocumentReminders(s, now, organizationId);
+  return { checked: docs.length, reminders, escalations, missing };
+}
+
+/* ------------------------------------------------------------------ */
+/* Required documents that are missing                                 */
+/* ------------------------------------------------------------------ */
+
+const WEEK = 7 * 86_400_000;
+export const MISSING_ESCALATE_DAYS = 30;
+
+/**
+ * Required but missing documents (nothing uploaded for a requirement that applies): the uploaders for the location
+ * (or owner group) are reminded weekly; once a document has been missing for 30 days, the people with publish on
+ * Compliance documents organisation-wide (HQ, the owner) are told once. A document waiting for review counts as
+ * uploaded. Tracking rows are removed as soon as a document arrives.
+ */
+export async function runMissingDocumentReminders(s: Services, now = new Date(), organizationId?: string) {
+  const reqConds = [eq(complianceRequirements.active, true)];
+  if (organizationId) reqConds.push(eq(complianceRequirements.organizationId, organizationId));
+  const orgIds = [...new Set((await s.db.select({ o: complianceRequirements.organizationId }).from(complianceRequirements).where(and(...reqConds))).map((r) => r.o))];
+  let reminders = 0;
+  let escalations = 0;
+  let missing = 0;
+  for (const orgId of orgIds) {
+    const matrix = await complianceMatrix(s.db, orgId, 'all', {}, now);
+    const reqs = await s.db.select().from(complianceRequirements).where(eq(complianceRequirements.organizationId, orgId));
+    const locRows = await s.db.select({ id: locations.id, createdAt: locations.createdAt, archivedAt: locations.archivedAt }).from(locations).where(eq(locations.organizationId, orgId));
+    // Missing targets: a location, or an owner group for owner-group requirements (once per group).
+    const targets = new Map<string, { requirementId: string; locationId: string | null; ownerGroupId: string | null; since: Date; label: string }>();
+    for (const row of matrix.rows) {
+      const loc = locRows.find((l) => l.id === row.location.id);
+      if (!loc || loc.archivedAt || !['operating', 'opening_soon', 'onboarding'].includes(row.location.status)) continue;
+      for (const c of row.cells) {
+        if (c.state !== 'missing') continue;
+        const r = reqs.find((x) => x.id === c.requirementId)!;
+        const group = r.appliesTo === 'owner_group' ? row.location.ownerGroupId : null;
+        if (r.appliesTo === 'owner_group' && !group) continue;
+        const key = group ? `${r.id}:g:${group}` : `${r.id}:l:${row.location.id}`;
+        if (targets.has(key)) continue;
+        const since = new Date(Math.max(r.createdAt.getTime(), group ? 0 : loc.createdAt.getTime()));
+        targets.set(key, { requirementId: r.id, locationId: group ? null : row.location.id, ownerGroupId: group, since, label: `${r.name} (${group ? row.location.ownerGroupName ?? '' : row.location.name})` });
+      }
+    }
+    const tracked = await s.db.select().from(complianceMissingReminders).where(eq(complianceMissingReminders.organizationId, orgId));
+    const keyOf = (t: { requirementId: string; locationId: string | null; ownerGroupId: string | null }) => (t.ownerGroupId ? `${t.requirementId}:g:${t.ownerGroupId}` : `${t.requirementId}:l:${t.locationId}`);
+    // Resolved: a document arrived (or the requirement no longer applies).
+    const resolved = tracked.filter((t) => !targets.has(keyOf(t)));
+    if (resolved.length) await s.db.delete(complianceMissingReminders).where(inArray(complianceMissingReminders.id, resolved.map((t) => t.id)));
+    const hq = await usersWithCapability(s.db, orgId, null, COMPLIANCE_MODULE, 'publish');
+    for (const [key, t] of targets) {
+      missing++;
+      let row = tracked.find((x) => keyOf(x) === key);
+      if (!row) [row] = await s.db.insert(complianceMissingReminders).values({ organizationId: orgId, requirementId: t.requirementId, locationId: t.locationId, ownerGroupId: t.ownerGroupId, missingSince: t.since }).returning();
+      const set: Partial<typeof complianceMissingReminders.$inferInsert> = {};
+      if (!row!.lastRemindedAt || now.getTime() - row!.lastRemindedAt.getTime() >= WEEK) {
+        const ids = await documentContacts(s.db, { organizationId: orgId, locationId: t.locationId, ownerGroupId: t.ownerGroupId });
+        // The location's own uploaders; HQ only when nobody else can upload there (HQ gets the 30-day escalation).
+        const local = ids.filter((id) => !hq.includes(id));
+        const uploaders = local.length ? local : ids;
+        const emails = uploaders.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, uploaders)) : [];
+        for (const e of emails) {
+          await s.jobs.enqueue('email.send', { to: e.email, subject: `Missing: ${t.label}`, text: `HQ requires ${t.label} and nothing has been uploaded yet.\nUpload it here: ${s.cfg.APP_URL}/compliance`, tag: 'compliance_missing' });
+        }
+        Object.assign(set, { lastRemindedAt: now, reminderCount: row!.reminderCount + 1 });
+        reminders++;
+      }
+      const days = Math.floor((now.getTime() - row!.missingSince.getTime()) / 86_400_000);
+      if (!row!.escalatedAt && days >= MISSING_ESCALATE_DAYS) {
+        const hqEmails = hq.length ? await s.db.select({ email: users.email }).from(users).where(inArray(users.id, hq)) : [];
+        for (const e of hqEmails) {
+          await s.jobs.enqueue('email.send', { to: e.email, subject: `Compliance: ${t.label} missing for ${days} days`, text: `${t.label} is required and has been missing for ${days} days.\nReview the compliance matrix: ${s.cfg.APP_URL}/compliance`, tag: 'compliance_missing_escalation' });
+        }
+        set.escalatedAt = now;
+        escalations++;
+      }
+      if (Object.keys(set).length) await s.db.update(complianceMissingReminders).set(set).where(eq(complianceMissingReminders.id, row!.id));
+    }
+  }
+  return { missing, reminders, escalations };
 }

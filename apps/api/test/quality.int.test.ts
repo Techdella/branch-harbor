@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
-import { complianceDocuments, financeInvoices, franchiseProjects, locations, paymentReferences, royaltyPeriods, royaltyStatements } from '../src/db/schema/index.ts';
+import { complianceDocuments, complianceMissingReminders, financeInvoices, franchiseProjects, locations, paymentReferences, royaltyPeriods, royaltyStatements } from '../src/db/schema/index.ts';
 import { runComplianceJobs } from '../src/services/compliance.ts';
 import { runAuditJobs } from '../src/services/audits.ts';
 import { call, createLocation, createOrg, hasDb, makeApp, memberWithRole, uid, verifiedUser } from './helpers.ts';
@@ -322,13 +322,45 @@ describe.skipIf(!hasDb)('audits, compliance documents and league table (DB)', ()
     app.ctx.jobs.enqueue = async (name: string, data: any, o?: any) => { if (name === 'email.send') sent.push({ to: data.to, subject: data.subject }); return orig(name, data, o); };
     const r1 = await runComplianceJobs(app.ctx, new Date(), orgId);
     expect(r1.reminders).toBe(1); // the licence expiring in 10 days (the 7-day step not yet)
-    expect(sent.some((x) => x.subject.startsWith('Expires in 10 days: Business licence (Toronto Annex)') && x.to === lm.email)).toBe(true);
-    expect(sent.some((x) => x.to === fo2.email)).toBe(false);
+    expect(sent.some((x) => /^Expires in 1[01] days: Business licence \(Toronto Annex\)/.test(x.subject) /* 10 or 11: UTC vs Toronto day */ && x.to === lm.email)).toBe(true);
+    expect(sent.some((x) => x.to === fo2.email && !x.subject.startsWith('Missing:'))).toBe(false);
     expect((await runComplianceJobs(app.ctx, new Date(), orgId)).reminders).toBe(0);
     sent.length = 0;
     const r3 = await runComplianceJobs(app.ctx, new Date(Date.now() + 11 * 86_400_000), orgId);
     expect(r3.escalations).toBe(1);
     expect(sent.some((x) => x.subject.startsWith('Compliance: Business licence (Toronto Annex) has expired') && x.to === hqAdmin.email)).toBe(true);
+    app.ctx.jobs.enqueue = orig;
+  });
+
+  it('required but missing documents: weekly reminders to the uploaders, HQ after 30 days, stopped by an upload', async () => {
+    const sent: Array<{ to: string; subject: string }> = [];
+    const orig = app.ctx.jobs.enqueue.bind(app.ctx.jobs);
+    app.ctx.jobs.enqueue = async (name: string, data: any, o?: any) => { if (name === 'email.send') sent.push({ to: data.to, subject: data.subject }); return orig(name, data, o); };
+    // The expiry test above already ran the jobs (and so these reminders) eleven days ahead: start from a clean slate.
+    await app.ctx.db.delete(complianceMissingReminders).where(eq(complianceMissingReminders.organizationId, orgId));
+    const day = (n: number) => new Date(Date.now() + n * 86_400_000);
+    const missingFor = (to: string) => sent.filter((x) => x.to === to && x.subject === 'Missing: Business licence (London Hackney)');
+    const first = await runComplianceJobs(app.ctx, day(0), orgId);
+    expect(first.missing.missing).toBeGreaterThanOrEqual(1);
+    expect(missingFor(fo2.email)).toHaveLength(1);
+    expect(missingFor(hqAdmin.email)).toHaveLength(0); // HQ is not nagged weekly
+    await runComplianceJobs(app.ctx, day(3), orgId);
+    expect(missingFor(fo2.email)).toHaveLength(1); // weekly, not daily
+    await runComplianceJobs(app.ctx, day(8), orgId);
+    expect(missingFor(fo2.email)).toHaveLength(2);
+    expect(sent.some((x) => x.to === hqAdmin.email && x.subject.startsWith('Compliance: Business licence (London Hackney) missing for'))).toBe(false);
+    const late = await runComplianceJobs(app.ctx, day(31), orgId);
+    expect(late.missing.escalations).toBeGreaterThanOrEqual(1);
+    expect(sent.filter((x) => x.to === hqAdmin.email && x.subject.startsWith('Compliance: Business licence (London Hackney) missing for 3'))).toHaveLength(1);
+    await runComplianceJobs(app.ctx, day(40), orgId);
+    expect(sent.filter((x) => x.to === hqAdmin.email && x.subject.startsWith('Compliance: Business licence (London Hackney) missing for'))).toHaveLength(1); // once
+    // An upload (even before review) ends the reminders.
+    await call(app, 'POST', `${C()}/documents`, { token: fo2.token, body: { requirementId: lic, locationId: lon, category: 'licence', title: 'Hackney licence', expiresOn: '2028-01-01', file: pdf } });
+    sent.length = 0;
+    await runComplianceJobs(app.ctx, day(50), orgId);
+    expect(missingFor(fo2.email)).toHaveLength(0);
+    const rows = await app.ctx.db.select().from(complianceMissingReminders).where(and(eq(complianceMissingReminders.requirementId, lic), eq(complianceMissingReminders.locationId, lon)));
+    expect(rows).toHaveLength(0);
     app.ctx.jobs.enqueue = orig;
   });
 
