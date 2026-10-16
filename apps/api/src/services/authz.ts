@@ -6,7 +6,7 @@ import {
   brands, customRoles, locations, memberAccessOverrides, memberProfiles, organizations, ownerGroups, portfolioLocations, portfolios, regions, roleAssignments, roleCapabilities, territories,
 } from '../db/schema/index.ts';
 import {
-  authorisedLocationIds, capabilitiesAnywhere, capabilitiesInScope, capabilityLocationIds, capabilityTerritoryIds, coversLocation, hasCapabilityInScope, hasPermissionInScope, permissionsInScope, withAccess,
+  authorisedLocationIds, capabilitiesAnywhere, capabilityBrandIds, capabilitiesInScope, capabilityLocationIds, capabilityTerritoryIds, coversLocation, hasCapabilityInScope, hasPermissionInScope, permissionsInScope, withAccess,
   type Assignment, type LocationRef, type ScopeChain,
 } from '../domain/scope.ts';
 import { opsModuleFor } from './module-guard.ts';
@@ -291,6 +291,37 @@ export async function capabilityLocations(req: FastifyRequest, db: Exec, organiz
 export async function capabilityTerritories(req: FastifyRequest, db: Exec, organizationId: string, module: string, action: AccessAction): Promise<'all' | Set<string>> {
   return capabilityTerritoryIds(await requireMember(req, db, organizationId), module, action, organizationId);
 }
+
+/** Brands where the user holds a module action through a brand assignment ('all' for organisation-wide grants). */
+export async function capabilityBrands(req: FastifyRequest, db: Exec, organizationId: string, module: string, action: AccessAction): Promise<'all' | Set<string>> {
+  return capabilityBrandIds(await requireMember(req, db, organizationId), module, action, organizationId);
+}
+
+/**
+ * Where a person runs an HQ-private module that a territory or a brand may run for itself (franchise pipeline,
+ * disclosure, agreements): organisation-wide (`all`), or the territories and brands their assignments grant it on.
+ * `defaultBrandId` resolves records without a brand (they belong to the main brand).
+ */
+export interface FranchiseScope { all: boolean; territoryIds: Set<string>; brandIds: Set<string>; defaultBrandId: string | null }
+
+export async function franchiseScope(req: FastifyRequest, db: Exec, organizationId: string, module: string, action: AccessAction): Promise<FranchiseScope> {
+  const assignments = await requireMember(req, db, organizationId);
+  const t = capabilityTerritoryIds(assignments, module, action, organizationId);
+  if (t === 'all') return { all: true, territoryIds: new Set(), brandIds: new Set(), defaultBrandId: null };
+  const b = capabilityBrandIds(assignments, module, action, organizationId);
+  const brandIds = b === 'all' ? new Set<string>() : b;
+  return { all: false, territoryIds: t, brandIds, defaultBrandId: brandIds.size ? await defaultBrandId(db, organizationId) : null };
+}
+
+/** Does the scope cover a franchise record (a prospect, territory, agreement): its territory, or its brand. */
+export function franchiseCovers(s: FranchiseScope, rec: { scopeTerritoryId?: string | null; brandId?: string | null }): boolean {
+  if (s.all) return true;
+  if (rec.scopeTerritoryId && s.territoryIds.has(rec.scopeTerritoryId)) return true;
+  const brand = rec.brandId ?? s.defaultBrandId;
+  return !!brand && s.brandIds.has(brand);
+}
+
+export const franchiseScopeEmpty = (s: FranchiseScope) => !s.all && !s.territoryIds.size && !s.brandIds.size;
 
 /** The set of location ids in the organisation where the user holds `permission`. */
 export async function authorisedLocations(req: FastifyRequest, db: Exec, organizationId: string, permission: Permission): Promise<'all' | Set<string>> {

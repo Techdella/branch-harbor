@@ -154,6 +154,14 @@ export function capabilityTerritoryIds(assignments: Assignment[], module: string
   return new Set(rel.filter((a) => a.scopeKind === 'territory').map((a) => a.scopeId));
 }
 
+/** Brands where the user holds a module action through a brand assignment (multi-brand HQ); 'all' for organisation-wide. */
+export function capabilityBrandIds(assignments: Assignment[], module: string, action: AccessAction, organizationId: string, now = new Date()): 'all' | Set<string> {
+  const c = capability(module, action);
+  const rel = assignments.filter((a) => capabilitiesOf(a).has(c) && !(a.expiresAt && a.expiresAt <= now));
+  if (rel.some((a) => a.scopeKind === 'organization' && a.scopeId === organizationId)) return 'all';
+  return new Set(rel.filter((a) => a.scopeKind === 'brand').map((a) => a.scopeId));
+}
+
 /** Locations (from the given list) where the user holds `permission`. Returns 'all' for org-wide grants. */
 export function authorisedLocationIds(
   assignments: Assignment[],

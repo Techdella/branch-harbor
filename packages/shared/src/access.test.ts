@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   COMBINED_ROLES, COVERAGE_AREAS, PENDING_MODULES, ROLE_PERMISSIONS, ROLE_TEMPLATES, SCREEN_MODULES, industryModules, TEAM_ROLE_ORDER, TEAM_SHAPE_SUGGESTIONS, applyDenies, combinedRoleCapabilities, coverageAreasFor,
-  effectiveCapabilities, expandGrants, modulesFor, parseCapability, permissionsFromCapabilities, primaryWorkspace, rolesByTeam, sensitiveClassesIn, templateCapabilities, workspacesFor,
+  effectiveCapabilities, expandGrants, hqOnlyAt, modulesFor, parseCapability, permissionsFromCapabilities, primaryWorkspace, rolesByTeam, sensitiveClassesIn, templateCapabilities, workspacesFor,
 } from './access.ts';
 import { INDUSTRIES } from './industries.ts';
 import { LEGACY_ROLE_MAP, PERMISSIONS, ROLES, canonicalRole, type Permission, type Role } from './permissions.ts';
@@ -88,6 +88,21 @@ test('territories run their own franchise pipeline; other HQ-private modules sta
   assert.ok(ad.has('sales.franchise_pipeline:view') && ad.has('operations.classes:edit') && ad.has('finance.payments:view'));
   // The same template at a region does not get the pipeline (it is not a sub-network).
   assert.ok(!caps('area_developer', 'region').has('sales.franchise_pipeline:view'));
+});
+
+test('a brand runs its own franchise pipeline, disclosure and agreements; other HQ-private modules stay at HQ', () => {
+  const lead = caps('development_lead', 'brand');
+  assert.ok(lead.has('sales.franchise_pipeline:publish') && lead.has('legal.disclosure:edit') && lead.has('legal.agreements:edit'));
+  const rep = caps('development_rep', 'brand');
+  assert.ok(rep.has('sales.franchise_pipeline:edit') && rep.has('legal.disclosure:view') && !rep.has('legal.disclosure:edit'));
+  const granted = effectiveCapabilities({ role: 'development_rep', scopeKind: 'brand', grants: ['legal.disclosure:edit', 'finance.royalties:view'] }, 'studios');
+  assert.ok(granted.has('legal.disclosure:edit') && !granted.has('finance.royalties:view'));
+  // Not on a region, owner group or location.
+  assert.ok(!caps('development_lead', 'region').has('sales.franchise_pipeline:view'));
+  const m = modulesFor('studios').find((x) => x.key === 'legal.agreements')!;
+  assert.equal(hqOnlyAt(m, 'brand'), false);
+  assert.equal(hqOnlyAt(m, 'owner_group'), true);
+  assert.equal(hqOnlyAt(modulesFor('studios').find((x) => x.key === 'finance.royalties')!, 'brand'), true);
 });
 
 test('support roles never include a sensitive data class; ownership roles do', () => {
