@@ -126,7 +126,7 @@ function Thread({ id, onBack, onChanged }: { id: string; onBack: () => void; onC
             <button type="button" onClick={onBack} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-canvas lg:hidden" aria-label={t('back')}><Icon name="arrow-left" /></button>
             <div className="min-w-0 flex-1">
               <h2 className="truncate text-lg font-bold">{d.conversation.contactName ?? d.conversation.handle}</h2>
-              <p className="text-[13px] text-stone">{t(`channel.${d.conversation.channel}`)} · {d.conversation.handle} · {locName(d.conversation.locationId)}</p>
+              <p className="text-[13px] text-stone">{t(`channel.${d.conversation.channel}`)}{d.conversation.channel !== 'review' ? ` · ${d.conversation.handle}` : ''} · {locName(d.conversation.locationId)}</p>
               {d.conversation.subject && <p className="text-[13px] font-semibold">{d.conversation.subject}</p>}
             </div>
             <ThreadControls d={d} onChanged={() => { res.reload(); onChanged(); }} />

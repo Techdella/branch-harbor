@@ -12,7 +12,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { NotAvailable } from '../screens/NotAvailable';
 import { Async, Banner, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { listingsApi, settingsApi, type DriftVM, type ListingDetailVM, type ListingRow } from './api';
-import { HealthBar, Kpi, KpiRow, SyncBadge, useListingValue, weekdayName } from './ui';
+import { HealthBar, Kpi, KpiRow, LabeledToggle, SyncBadge, useListingValue, weekdayName } from './ui';
 
 type Tab = 'overview' | 'drift' | 'holidays' | 'changes' | 'connections' | 'settings';
 const M = 'marketing.listings';
@@ -373,7 +373,7 @@ function Holidays() {
             ))}
           </div>
         </fieldset>
-        <div className="mt-3"><Toggle checked={overwrite} onChange={setOverwrite} label={t('holidays.overwrite')} /></div>
+        <div className="mt-3"><LabeledToggle checked={overwrite} onChange={setOverwrite} label={t('holidays.overwrite')} /></div>
         {apply.error && <Banner tone="danger" live="assertive">{apply.error.message}</Banner>}
         {done && <Banner tone="success" live="polite" title={t('holidays.done', { applied: done.applied })}>{done.skipped ? t('holidays.skipped', { n: done.skipped }) : t('holidays.pushed', { n: done.pushed })}</Banner>}
         <div className="mt-3"><Button icon="calendar" loading={apply.pending} disabled={!name.trim() || !entries.length || !picked.length} onClick={async () => { const r = await apply.run({ name: name.trim(), entries, locationIds: picked, overwrite }); if (r) { setDone({ applied: r.applied.length, skipped: r.skipped.length, pushed: r.pushed }); sets.reload(); } }}>{t('holidays.apply')}</Button></div>
@@ -451,7 +451,7 @@ function PolicySettings() {
               </div>
             ))}
           </div>
-          <div className="mt-4"><Toggle checked={d.settings.autoPush} onChange={async (v) => { if (await save.run({ autoPush: v })) res.reload(); }} label={t('policy.autoPush')} /></div>
+          <div className="mt-4"><LabeledToggle checked={d.settings.autoPush} onChange={async (v) => { if (await save.run({ autoPush: v })) res.reload(); }} label={t('policy.autoPush')} /></div>
           {save.error && <Banner tone="danger" live="assertive">{save.error.message}</Banner>}
         </SectionCard>
       )}

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Badge, cx, type Tone } from '@bh/ui';
+import { Badge, Toggle, cx, type Tone } from '@bh/ui';
 import type { Currency, ListingField, SpecialHour, WeeklyHour } from '@bh/shared';
 import { fmtWall, fmtYmd, moneyWithCode } from '@/lib/format';
 import type { SyncStatus } from './api';
@@ -83,4 +83,9 @@ export function BurnBar({ allowance, paid, claimed, committed, label }: { allowa
       <span className="bg-lime" style={{ width: `${pct(committed)}%` }} />
     </span>
   );
+}
+
+/** A switch with its label visible next to it. */
+export function LabeledToggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  return <span className="flex items-center gap-3 text-sm font-semibold"><Toggle checked={checked} onChange={onChange} label={label} />{label}</span>;
 }

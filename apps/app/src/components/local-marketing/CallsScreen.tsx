@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { Badge, Button, DataTable, Drawer, Field, Input, Select, Tabs, Toggle, type Tone } from '@bh/ui';
+import { Badge, Button, DataTable, Drawer, Field, Input, Select, Tabs, type Tone } from '@bh/ui';
 import { DEFAULT_RECORDING_DISCLOSURE, formatE164, type Locale } from '@bh/shared';
 import { fmtDateTime } from '@/lib/format';
 import { useApi, useMutation } from '@/lib/useApi';
@@ -12,7 +12,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { NotAvailable } from '../screens/NotAvailable';
 import { Async, Banner, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { callsApi, settingsApi, type CallVM, type NumberVM, type ReportGroup } from './api';
-import { Kpi, KpiRow } from './ui';
+import { Kpi, KpiRow, LabeledToggle } from './ui';
 
 type Tab = 'log' | 'numbers' | 'report' | 'recording';
 const M = 'marketing.call_tracking';
@@ -166,8 +166,8 @@ function AddNumberDrawer({ open, onClose, onDone }: { open: boolean; onClose: ()
         <Field label={t('col.source')}>{(f) => <Select id={f.id} value={source} onChange={(e) => setSource(e.target.value)}>{SOURCES.map((s) => <option key={s} value={s}>{t(`source.${s}`)}</option>)}</Select>}</Field>
         <Field label={t('campaign')} optional>{(f) => <Select id={f.id} value={campaignId} onChange={(e) => setCampaignId(e.target.value)}><option value="">{t('noCampaign')}</option>{(campaigns.data?.items ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>}</Field>
         <Field label={t('utmSource')} hint={t('utmHint')} optional>{(f) => <Input id={f.id} value={utm} onChange={(e) => setUtm(e.target.value)} />}</Field>
-        <Toggle checked={isDefault} onChange={setIsDefault} label={t('makeDefault')} />
-        <Toggle checked={record} onChange={setRecord} label={t('recordCalls')} />
+        <LabeledToggle checked={isDefault} onChange={setIsDefault} label={t('makeDefault')} />
+        <LabeledToggle checked={record} onChange={setRecord} label={t('recordCalls')} />
         {record && <Banner tone="warning">{t('recordWarning')}</Banner>}
         {add.error && <Banner tone="danger" live="assertive">{add.error.message}</Banner>}
       </div>
@@ -241,7 +241,7 @@ function Recording() {
         <>
           <Banner tone="warning" title={t('rec.warningTitle')}>{t('rec.warning', { states: d.allPartyConsentUsStates.join(', ') })}</Banner>
           <SectionCard title={t('rec.title')}>
-            <Toggle checked={d.enabled} onChange={async (v) => { if (canEdit && (await save.run({ enabled: v, jurisdictions: d.jurisdictions }))) res.reload(); }} label={t('rec.enabled')} />
+            <LabeledToggle checked={d.enabled} onChange={async (v) => { if (canEdit && (await save.run({ enabled: v, jurisdictions: d.jurisdictions }))) res.reload(); }} label={t('rec.enabled')} />
             <ul className="mt-3 flex flex-col gap-2 text-sm">
               {Object.entries(d.jurisdictions).map(([k, v]) => (
                 <li key={k} className="flex flex-wrap items-center gap-2 rounded-lg border border-line-soft p-2"><Badge>{k}</Badge><span className="flex-1">{v.message}</span>

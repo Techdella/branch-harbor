@@ -13,7 +13,7 @@ export interface MoneyV { amount: number; currency: string }
 
 export interface ChannelAccount { id: string; locationId: string | null; channel: InboxChannelKey; address: string; displayName: string; mode: 'live' | 'sandbox'; active: boolean }
 export interface Conversation {
-  id: string; locationId: string | null; channel: InboxChannelKey; channelAccountId: string; handle: string; contactName: string | null; customerId: string | null; leadId: string | null; subject: string | null;
+  id: string; locationId: string | null; channel: InboxChannelKey | 'review'; channelAccountId: string; handle: string; contactName: string | null; customerId: string | null; leadId: string | null; subject: string | null;
   status: 'open' | 'pending' | 'closed'; assignedUser: Person | null; lastMessageAt: string; lastInboundAt: string | null; lastMessagePreview: string | null; unread: number;
   replyDueAt: string | null; slaBreached: boolean; window: { open: boolean; closesAt: string | null };
 }

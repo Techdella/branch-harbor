@@ -473,12 +473,13 @@ async function seedLocalMarketingDemo(orgId: string, today: string) {
   for (const l of locs) await pushLocation(s, orgId, l.id, { actorUserId: digital.id });
   // Edited outside BranchHarbor: Apple Maps shows other Monday hours for Hackney; someone changed Kitsilano's phone on Google.
   const syncOf = async (code: string, provider: string) => (await db.select().from(t.listingSyncs).where(sql`${t.listingSyncs.locationId} = ${L[code]!.id} and ${t.listingSyncs.provider} = ${provider}`))[0]!;
-  if (L['LON-HK']) await simulateDirectoryEdit(s, orgId, (await syncOf('LON-HK', 'apple')).id, { hours: [{ day: 1, opens: '09:00', closes: '17:00' }, ...weekly('06:30', '21:00').filter((h) => h.day !== 1)] });
+  const freshHours = async (code: string) => (((await db.select({ hours: t.locations.hours }).from(t.locations).where(sql`${t.locations.id} = ${L[code]!.id}`))[0]!.hours ?? {}) as { weekly?: Array<{ day: number; opens: string; closes: string }>; special?: unknown[] });
+  if (L['LON-HK']) await simulateDirectoryEdit(s, orgId, (await syncOf('LON-HK', 'apple')).id, { hours: [{ day: 1, opens: '09:00', closes: '17:00' }, ...((await freshHours('LON-HK')).weekly ?? []).filter((h) => h.day !== 1)] });
   if (L['YVR-KT']) await simulateDirectoryEdit(s, orgId, (await syncOf('YVR-KT', 'google')).id, { phone: '+1 604 555 0199' });
   // A location change waiting for HQ (descriptions need approval).
   if (L['LON-HK']) await updateListing(s, orgId, L['LON-HK'].id, { description: 'Hackney’s friendliest hot yoga studio: 40 classes a week, a sauna-warm room and a community that keeps you coming back.' }, { userId: noah.id, hq: false, note: 'New studio description for the autumn season' });
   // Network holiday hours (Hackney had already set its own Boxing Day hours, so it keeps them).
-  if (L['LON-HK']) await db.update(t.locations).set({ hours: { ...(L['LON-HK'].hours ?? {}), weekly: weekly('06:30', '21:00'), special: [{ date: `${year}-12-26`, closed: false, opens: '10:00', closes: '14:00', label: 'Boxing Day' }] } }).where(sql`${t.locations.id} = ${L['LON-HK'].id}`);
+  if (L['LON-HK']) await db.update(t.locations).set({ hours: { ...(await freshHours('LON-HK')), special: [{ date: `${year}-12-26`, closed: false, opens: '10:00', closes: '14:00', label: 'Boxing Day' }] } }).where(sql`${t.locations.id} = ${L['LON-HK'].id}`);
   const hol = await applyHolidayHours(s, orgId, { name: `Winter holidays ${year}`, entries: [{ date: `${year}-12-25`, closed: true, label: 'Christmas Day' }, { date: `${year}-12-26`, closed: false, opens: '09:00', closes: '13:00', label: 'Boxing Day' }, { date: `${year + 1}-01-01`, closed: false, opens: '10:00', closes: '16:00', label: 'New Year’s Day' }], locationIds: locs.map((l) => l.id), overwrite: false }, cmo.id);
 
   // Reviews in the inbox: reply templates, and every Google review becomes a conversation.
@@ -488,7 +489,12 @@ async function seedLocalMarketingDemo(orgId: string, today: string) {
     { organizationId: orgId, name: 'Mixed visit (3★)', minRating: 3, maxRating: 3, locale: 'en', body: 'Thanks for the honest feedback, {first_name}. We’ve shared it with the {location} team.', createdBy: cmo.id },
   ]);
   const inboxConversations = await backfillReviewConversations(s, orgId);
+  // Older unanswered reviews were already dealt with before the inbox existed: only the last three weeks are open.
+  await db.execute(sql`update comms_conversations set status = 'closed', reply_due_at = null, unread = 0 where organization_id = ${orgId} and channel = 'review' and last_inbound_at < now() - interval '21 days'`);
 
+  // This quarter's marketing fund contributions per location (sample), so reimbursements have a balance to come from.
+  const qStart = (await import('@bh/shared')).coopPeriodBounds('quarter', today).start;
+  await db.insert(t.marketingFundEntries).values(locs.map((l) => ({ organizationId: orgId, kind: 'contribution', currency: l.currency, amountMinor: 400_000, occurredOn: qStart, description: 'Marketing fund contribution (sample)', locationId: l.id, ownerGroupId: l.ownerGroupId })));
   // Co-op fund: 1,500 per quarter in each location's currency, HQ matches 50%.
   await db.insert(t.coopAllowances).values({ organizationId: orgId, locationId: null, period: 'quarter', basis: 'fixed', fixedMinor: 150_000, matchRatioBps: 5000, updatedBy: cmo.id });
   const q = (await import('@bh/shared')).coopPeriodBounds('quarter', today);

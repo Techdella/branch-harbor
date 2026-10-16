@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Badge, Button, Drawer, Field, Icon, Input, Select, Textarea, Toggle, cx } from '@bh/ui';
+import { Badge, Button, Drawer, Field, Icon, Input, Select, Textarea, cx } from '@bh/ui';
 import { SOCIAL_NETWORKS, SOCIAL_TEMPLATE_TOKENS } from '@bh/shared';
 import { addDays, dateInZone, fmtYmd, weekStart } from '@/lib/format';
 import { useApi, useMutation } from '@/lib/useApi';
@@ -11,6 +11,7 @@ import { PageHeader } from '../shell/PageHeader';
 import { NotAvailable } from '../screens/NotAvailable';
 import { Async, Banner, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { calendarApi, type CalendarItemVM } from './api';
+import { LabeledToggle } from './ui';
 
 const M = 'marketing.social';
 
@@ -170,7 +171,7 @@ function NewItemDrawer({ open, onClose, onCreated }: { open: boolean; onClose: (
         <fieldset><legend className="text-sm font-bold">{t('networks')}</legend>
           <div className="mt-1 flex flex-wrap gap-3">{SOCIAL_NETWORKS.map((n) => <label key={n} className="flex items-center gap-1.5 text-sm"><input type="checkbox" checked={networks.includes(n)} onChange={(e) => setNetworks((x) => (e.target.checked ? [...x, n] : x.filter((y) => y !== n)))} />{t(`network.${n}`)}</label>)}</div>
         </fieldset>
-        <Toggle checked={allowEdits} onChange={setAllowEdits} label={t('allowEdits')} />
+        <LabeledToggle checked={allowEdits} onChange={setAllowEdits} label={t('allowEdits')} />
         {create.error && <Banner tone="danger" live="assertive">{create.error.message}</Banner>}
       </div>
     </Drawer>
