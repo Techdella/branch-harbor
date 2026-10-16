@@ -79,6 +79,10 @@ const MODULE_LINKS: Record<string, Omit<NavLink, 'module'>[]> = {
   'network.bulk_launch': [{ key: 'bulkLaunch', href: '/launch', icon: 'zap' }],
   'network.benchmarks': [{ key: 'benchmarks', href: '/benchmarks', icon: 'activity' }],
   'settings.import': [{ key: 'importData', href: '/import', icon: 'file' }],
+  // Suppliers (Operations), supplier rebates (Finance) and self-checks (Operations).
+  'operations.suppliers': [{ key: 'suppliers', href: '/suppliers', icon: 'truck' }],
+  'finance.supplier_rebates': [{ key: 'supplierRebates', href: '/finance/supplier-rebates', icon: 'receipt' }],
+  'operations.self_checks': [{ key: 'selfChecks', href: '/self-checks', icon: 'list' }],
   'settings.team': [{ key: 'team', href: '/team', icon: 'user' }],
   'settings.connections': [{ key: 'connections', href: '/connections', icon: 'plug' }],
   'settings.business': [{ key: 'settings', href: '/settings', icon: 'settings' }],

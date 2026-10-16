@@ -12,7 +12,9 @@ import { validationError } from '../lib/errors.ts';
  * get short-lived signed links, issued only after the record holding the file was checked against the viewer's scope.
  */
 
-export type FilePurpose = 'audit_photo' | 'corrective_evidence' | 'compliance_document';
+export type FilePurpose = 'audit_photo' | 'corrective_evidence' | 'compliance_document' | 'supplier_certificate' | 'purchase_receipt';
+/** Purposes that accept PDFs as well as photos. */
+const DOCUMENT_PURPOSES: readonly FilePurpose[] = ['compliance_document', 'supplier_certificate', 'purchase_receipt'];
 export type OpsFile = typeof opsFiles.$inferSelect;
 
 export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
@@ -28,8 +30,8 @@ export async function storeFile(
   f: { organizationId: string; locationId?: string | null; ownerGroupId?: string | null; purpose: FilePurpose; upload: UploadInput; uploadedBy: string | null },
 ): Promise<OpsFile> {
   const mime = f.upload.contentType.split(';')[0]!.trim().toLowerCase();
-  const allowed = f.purpose === 'compliance_document' ? DOCUMENT_TYPES : PHOTO_TYPES;
-  if (!allowed.includes(mime)) throw validationError(f.purpose === 'compliance_document' ? 'Upload a PDF or a photo' : 'Upload a photo (JPEG, PNG, WebP or HEIC)', { file: 'Unsupported type' });
+  const allowed = DOCUMENT_PURPOSES.includes(f.purpose) ? DOCUMENT_TYPES : PHOTO_TYPES;
+  if (!allowed.includes(mime)) throw validationError(DOCUMENT_PURPOSES.includes(f.purpose) ? 'Upload a PDF or a photo' : 'Upload a photo (JPEG, PNG, WebP or HEIC)', { file: 'Unsupported type' });
   const body = Buffer.from(f.upload.dataBase64, 'base64');
   if (!body.length) throw validationError('The file is empty', { file: 'Empty' });
   if (body.length > MAX_FILE_BYTES) throw validationError('The file is larger than 10 MB', { file: 'Max 10 MB' });

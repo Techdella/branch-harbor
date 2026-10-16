@@ -24,6 +24,8 @@ export interface ActionVM {
   id: string; auditId: string; locationId: string; locationName: string | null; questionId: string; sectionTitle: string; title: string; reason: string; critical: boolean; auditorNote: string | null;
   dueDate: string; status: 'open' | 'submitted' | 'verified'; overdue: boolean; responseNote: string | null; evidence: FileRef[]; submittedBy: { id: string; name: string | null } | null; submittedAt: string | null;
   verifiedBy: { id: string; name: string | null } | null; verifiedAt: string | null; reviewNote: string | null; reopenedCount: number;
+  /** Retraining loop (audits phase 2): the recommended academy course and the location team's progress. */
+  training?: { courseId: string; courseTitle: string | null; assigned: boolean; enrolled: number; completed: number } | null;
 }
 export interface AnswerVM extends AuditAnswer { photos?: FileRef[] }
 export interface AuditDetailVM extends AuditVM {

@@ -103,4 +103,9 @@ export const registerRoutes: FastifyPluginAsyncZod = async (app) => {
   await app.register((await import('./imports.ts')).importRoutes);
   await app.register((await import('./launches.ts')).launchRoutes);
   await app.register((await import('./benchmarks.ts')).benchmarkRoutes);
+  // Suppliers (catalogue, purchase orders, receiving, rebates, off-contract spend) and the supplier's magic-link pages.
+  await app.register((await import('./supply.ts')).supplyRoutes);
+  await app.register((await import('./supply.ts')).supplyPublicRoutes);
+  // Audits phase 2 (recurring schedules, trends, visit planner, retraining) and self-checks.
+  await app.register((await import('./audit-programmes.ts')).auditProgrammeRoutes);
 };

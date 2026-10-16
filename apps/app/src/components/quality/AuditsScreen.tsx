@@ -10,8 +10,9 @@ import { PageHeader } from '../shell/PageHeader';
 import { Async, Banner, DeniedState, Empty, LoadingBlock, SectionCard } from '../ui/States';
 import { downloadCsv, qualityApi, useQuality, useQualityAction, type ActionVM, type AuditVM, type TemplateVM } from './api';
 import { ActionError, PillTabs, ScoreBadge, StatusBadge, Tiles, Trend, useQFmt } from './ui';
+import { AuditSchedules, AuditTrends, VisitPlanner } from '../supply/AuditProgrammes';
 
-type Tab = 'overview' | 'audits' | 'actions' | 'templates';
+type Tab = 'overview' | 'audits' | 'actions' | 'templates' | 'trends' | 'visits' | 'schedules';
 
 /**
  * Operations → Audits. HQ: the dashboard (scores by location over time, overdue corrective actions), scheduling and
@@ -19,18 +20,24 @@ type Tab = 'overview' | 'audits' | 'actions' | 'templates';
  */
 export function AuditsScreen() {
   const t = useTranslations('quality');
+  const tp = useTranslations('auditsPlus');
   const app = useApp();
   const router = useRouter();
   const params = useSearchParams();
   const manage = app.capabilities.has('operations.audits:publish');
   const tab = (params.get('tab') as Tab) || 'overview';
   if (!app.hasModule('operations.audits')) return <DeniedState />;
-  const tabs: Array<[Tab, string]> = [['overview', t('audits.tab.overview')], ['audits', t('audits.tab.audits')], ['actions', t('audits.tab.actions')], ...(manage ? ([['templates', t('audits.tab.templates')]] as Array<[Tab, string]>) : [])];
+  const tabs: Array<[Tab, string]> = [
+    ['overview', t('audits.tab.overview')], ['audits', t('audits.tab.audits')], ['actions', t('audits.tab.actions')],
+    // Audits phase 2: trends, the consultant's visit planner and (HQ) recurring schedules.
+    ['trends', tp('tab.trends')], ['visits', tp('tab.visits')],
+    ...(manage ? ([['schedules', tp('tab.schedules')], ['templates', t('audits.tab.templates')]] as Array<[Tab, string]>) : []),
+  ];
   return (
     <>
       <PageHeader icon="check-circle" title={t('audits.title')} description={t('audits.description')} scope={false} />
       <PillTabs items={tabs} value={tab} onChange={(k) => router.replace(`?tab=${k}`, { scroll: false })} />
-      {tab === 'audits' ? <AuditList /> : tab === 'actions' ? <ActionList /> : tab === 'templates' && manage ? <Templates /> : <Overview />}
+      {tab === 'audits' ? <AuditList /> : tab === 'actions' ? <ActionList /> : tab === 'templates' && manage ? <Templates /> : tab === 'trends' ? <AuditTrends /> : tab === 'visits' ? <VisitPlanner /> : tab === 'schedules' && manage ? <AuditSchedules /> : <Overview />}
     </>
   );
 }
