@@ -7,6 +7,7 @@ import { activityCounts, revenueByLocation } from '../../services/league-table.t
 import type { AssistantContext } from '../context.ts';
 import { proposeAction } from '../engine.ts';
 import { fmtMoney } from '../present.ts';
+import { detectModuleInsights } from './insights-modules.ts';
 
 /**
  * Proactive insights: anomaly detection on KPIs, run per organisation by the scheduler (a system job; nothing is shown
@@ -182,6 +183,8 @@ export async function detectInsights(s: Services, orgId: string, now = new Date(
       fingerprint: `compliance_gap:${d.id}`,
     });
   }
+  // Local marketing, data platform, supply, self-checks, franchise development and benchmarks.
+  out.push(...(await detectModuleInsights(s, orgId, now)));
   return out;
 }
 
