@@ -225,7 +225,7 @@ function NewOrderDrawer({ onClose, onDone }: { onClose: () => void; onDone: (id:
             {items.map((i) => (
               <li key={i.id} className="flex items-center gap-2 rounded-md bg-canvas-raised px-3 py-2 text-[13px]">
                 <span className="min-w-0 flex-1"><strong>{i.name}</strong><span className="block text-xs text-stone">{i.sku} · {i.packLabel} · {f.money(i.price!.amountMinor, i.price!.currency)} · {t('catalogue.moq', { n: i.moq })}</span></span>
-                <Input aria-label={t('orders.qtyFor', { item: i.name })} type="number" min={0} className={cx('w-20', (qty[i.id] ?? 0) > 0 && (qty[i.id] ?? 0) < i.moq && 'border-danger')} value={qty[i.id] ?? ''} onChange={(e) => setQty({ ...qty, [i.id]: Math.max(0, Math.floor(Number(e.target.value) || 0)) })} />
+                <div className="w-20 shrink-0"><Input aria-label={t('orders.qtyFor', { item: i.name })} type="number" min={0} className={cx((qty[i.id] ?? 0) > 0 && (qty[i.id] ?? 0) < i.moq && 'border-danger')} value={qty[i.id] ?? ''} onChange={(e) => setQty({ ...qty, [i.id]: Math.max(0, Math.floor(Number(e.target.value) || 0)) })} /></div>
               </li>
             ))}
             {!items.length && <li className="text-sm text-stone">{t('orders.noItems')}</li>}
@@ -421,7 +421,7 @@ function ItemDrawer({ supplierId, item, onClose, onDone }: { supplierId: string;
         <span className="text-[13px] font-bold">{t('catalogue.prices')}</span>
         {prices.map(([c, p], i) => (
           <div key={i} className="flex items-end gap-2">
-            <Select aria-label={t('suppliers.currency')} className="w-28" value={c} onChange={(e) => setPrices(prices.map((x, k) => (k === i ? [e.target.value, x[1]] : x)))}>{SUPPORTED_CURRENCIES.map((cc) => <option key={cc} value={cc}>{cc}</option>)}</Select>
+            <div className="w-28 shrink-0"><Select aria-label={t('suppliers.currency')} value={c} onChange={(e) => setPrices(prices.map((x, k) => (k === i ? [e.target.value, x[1]] : x)))}>{SUPPORTED_CURRENCIES.map((cc) => <option key={cc} value={cc}>{cc}</option>)}</Select></div>
             <Input aria-label={t('catalogue.priceIn', { currency: c })} type="number" min={0} step="0.01" value={p} onChange={(e) => setPrices(prices.map((x, k) => (k === i ? [x[0], e.target.value] : x)))} />
           </div>
         ))}

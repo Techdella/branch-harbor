@@ -35,7 +35,7 @@ export function AuditTrends() {
             <div className="flex flex-wrap items-center gap-2">
               <PillTabs items={[['sections', t('trends.bySection')], ['locations', t('trends.byLocation')], ['regions', t('trends.byRegion')]]} value={view} onChange={setView} />
               <span className="flex-1" />
-              <Select aria-label={t('trends.period')} className="w-40" value={months} onChange={(e) => setMonths(Number(e.target.value))}>{[3, 6, 12].map((m) => <option key={m} value={m}>{t('trends.months', { count: m })}</option>)}</Select>
+              <div className="w-44"><Select aria-label={t('trends.period')} value={months} onChange={(e) => setMonths(Number(e.target.value))}>{[3, 6, 12].map((m) => <option key={m} value={m}>{t('trends.months', { count: m })}</option>)}</Select></div>
             </div>
             <Tiles items={[
               { label: t('trends.average'), value: f.pct(d.totals.averageScorePct), sub: t('trends.audits', { count: d.totals.audits }) },
@@ -115,10 +115,10 @@ export function VisitPlanner() {
         <div className="flex flex-col gap-3" data-testid="visit-planner">
           <div className="flex flex-wrap items-center gap-2">
             {d.auditors && (
-              <Select aria-label={t('visits.consultant')} className="w-56" value={who || d.auditorUserId} onChange={(e) => setWho(e.target.value)}>
+              <div className="w-60"><Select aria-label={t('visits.consultant')} value={who || d.auditorUserId} onChange={(e) => setWho(e.target.value)}>
                 {!d.auditors.some((a) => a.id === d.auditorUserId) && <option value={d.auditorUserId}>{t('visits.me')}</option>}
                 {d.auditors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </Select>
+              </Select></div>
             )}
             <Button variant="secondary" size="sm" icon="pin" loading={locating} onClick={useMyLocation}>{start ? t('visits.fromHere') : t('visits.useLocation')}</Button>
             <span className="flex-1" />

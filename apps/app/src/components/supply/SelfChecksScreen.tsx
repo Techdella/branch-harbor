@@ -80,7 +80,7 @@ function Results() {
       {(d) => (
         <div className="flex flex-col gap-3" data-testid="self-results">
           <div className="flex flex-wrap items-center gap-2">
-            <Select aria-label={t('trends.period')} className="w-40" value={days} onChange={(e) => setDays(Number(e.target.value))}>{[7, 14, 30].map((n) => <option key={n} value={n}>{t('self.lastDays', { count: n })}</option>)}</Select>
+            <div className="w-44"><Select aria-label={t('trends.period')} value={days} onChange={(e) => setDays(Number(e.target.value))}>{[7, 14, 30].map((n) => <option key={n} value={n}>{t('self.lastDays', { count: n })}</option>)}</Select></div>
             <span className="flex-1" />
             {d.can.export && <Button variant="ghost" size="sm" icon="download" onClick={() => void downloadFile('/self-checks/export', 'self-checks.csv', { from: d.since })}>{t('common.exportCsv')}</Button>}
           </div>

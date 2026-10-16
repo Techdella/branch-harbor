@@ -119,7 +119,7 @@ function Claim({ c, canEdit, canExport, reload }: { c: ClaimVM; canEdit: boolean
       </span>
       {amount !== null && (
         <span className="flex flex-wrap items-end gap-2">
-          <Input aria-label={t('rebates.amountReceived', { currency: c.currency })} type="number" min={0} step="0.01" className="w-36" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          <div className="w-36 shrink-0"><Input aria-label={t('rebates.amountReceived', { currency: c.currency })} type="number" min={0} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
           <Button size="sm" icon="check" loading={act.pending} onClick={async () => { if (await act.run(() => supplyApi.claimReceived(c.id, fromMajor(Number(amount), c.currency as Currency).amount, new Date().toISOString().slice(0, 10)))) { setAmount(null); reload(); } }}>{t('common.save')}</Button>
         </span>
       )}

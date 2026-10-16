@@ -30,7 +30,7 @@ export interface SupplySeedInput { db: Db; today: string; upsertUser: (email: st
 const sha = (v: string) => createHash('sha256').update(v).digest('hex');
 const ev = (at: string, event: string, by?: string | null, note?: string | null) => ({ at, event, by: by ?? null, note: note ?? null });
 
-export async function seedSupply({ db, today, appUrl }: SupplySeedInput) {
+export async function seedSupply({ db, today, appUrl, upsertUser }: SupplySeedInput) {
   const out = { suppliers: 0, orders: 0, selfChecks: 0, visits: 0, confirmLink: '', logins: [] as string[] };
   const s = { db, jobs: { enqueue: async () => {} }, cfg: { APP_URL: appUrl } } as unknown as Services;
   const d = (n: number) => addDays(today, n);
@@ -164,12 +164,14 @@ export async function seedSupply({ db, today, appUrl }: SupplySeedInput) {
     }
 
     // Open orders for the demo.
+    // Gastown's manager orders above the CAD threshold, so HQ approves it.
+    const noor = await upsertUser('noor.haddad@demo.branchharbor.com', 'Noor Haddad');
+    await db.insert(t.roleAssignments).values({ organizationId: orgId, userId: noor.id, role: 'location_manager', scopeKind: 'location', scopeId: L['YVR-GT']!.id }).onConflictDoNothing();
     const big = await mkPo({
-      loc: 'YVR-GT', supplierId: cascadia!.id, status: 'pending_approval', spec: [['CASC-BRK-10', 8], ['CASC-CHK-10', 10], ['CASC-MOZ-6', 6], ['CASC-DGH-60', 6], ['CASC-BOX-200', 4], ['CASC-GLV-1000', 2]], created: d(-1), expected: d(4), createdBy: by,
+      loc: 'YVR-GT', supplierId: cascadia!.id, status: 'pending_approval', spec: [['CASC-BRK-10', 8], ['CASC-CHK-10', 10], ['CASC-MOZ-6', 6], ['CASC-DGH-60', 6], ['CASC-BOX-200', 4], ['CASC-GLV-1000', 2]], created: d(-1), expected: d(4), createdBy: noor.id,
       approval: { required: true, thresholdMinor: 200_000, decision: null }, notes: 'Stock-up for the Gastown street festival weekend.',
-      history: [ev(at(d(-1), '15:00').toISOString(), 'created', by), ev(at(d(-1), '15:02').toISOString(), 'submitted_for_approval', by)],
+      history: [ev(at(d(-1), '15:00').toISOString(), 'created', noor.id), ev(at(d(-1), '15:02').toISOString(), 'submitted_for_approval', noor.id)],
     });
-    // The Vancouver order was raised by the location; record it under the general manager for the demo picker.
     void big;
     const token = `demo-${randomBytes(18).toString('base64url')}`;
     await mkPo({ loc: 'SEA-FR', supplierId: cascadia!.id, status: 'sent', spec: [['CASC-BRK-10', 3], ['CASC-CHK-10', 3], ['CASC-LEM-115', 1], ['CASC-TRT-48', 2]], created: today, expected: d(3), createdBy: by, token, notes: 'Back door delivery before 9am please.' });
@@ -218,7 +220,7 @@ export async function seedSupply({ db, today, appUrl }: SupplySeedInput) {
         out.selfChecks++;
       }
     }
-    out.logins.push('ren.ito@demo.branchharbor.com (receives deliveries at Ballard)', 'dee.walker@demo.branchharbor.com (temperature log at Ballard)');
+    out.logins.push('noor.haddad@demo.branchharbor.com (Gastown manager, order waiting for HQ approval)', 'ren.ito@demo.branchharbor.com (receives deliveries at Ballard)', 'dee.walker@demo.branchharbor.com (temperature log at Ballard)');
   }
 
   /* ================================================================== */

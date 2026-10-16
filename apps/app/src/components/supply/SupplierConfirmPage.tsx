@@ -77,7 +77,7 @@ export function SupplierConfirmPage({ token }: { token: string }) {
                   <span className="min-w-0 flex-1"><strong>{l.name}</strong><span className="block text-xs text-stone">{l.sku} · {l.packLabel} · {money(l.unitPriceMinor)}</span></span>
                   <span>{t('ordered', { n: l.quantity })}</span>
                   {po.canConfirm && !done ? (
-                    <Input aria-label={t('confirmQty', { item: l.name })} type="number" min={0} className="w-20" value={qty[l.itemId] ?? l.quantity} onChange={(e) => setQty({ ...qty, [l.itemId]: Math.max(0, Math.floor(Number(e.target.value) || 0)) })} />
+                    <div className="w-20 shrink-0"><Input aria-label={t('confirmQty', { item: l.name })} type="number" min={0} value={qty[l.itemId] ?? l.quantity} onChange={(e) => setQty({ ...qty, [l.itemId]: Math.max(0, Math.floor(Number(e.target.value) || 0)) })} /></div>
                   ) : l.confirmedQuantity !== null && <Badge tone={l.confirmedQuantity < l.quantity ? 'warning' : 'success'}>{t('confirmed', { n: l.confirmedQuantity })}</Badge>}
                   <strong className="tabular w-24 text-right">{money(l.totalMinor)}</strong>
                 </li>
