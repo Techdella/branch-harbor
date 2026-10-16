@@ -90,7 +90,7 @@ export default async function MarinaPage({ params }: Props) {
         <H2 id="marina-safety">{t('safetyTitle')}</H2>
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
           {safety.map((f, i) => (
-            <li key={f.name} className="flex items-start gap-4 rounded-[24px] bg-surface p-6">
+            <li key={f.name} className="flex items-start gap-4 rounded-[24px] bg-surface p-6 text-ink">
               <PastelIcon name={SAFETY[i] ?? 'check'} bg={PASTEL.canvas} />
               <div className="flex flex-col gap-1.5">
                 <h3 className="text-lg font-extrabold tracking-[-0.02em]">{named(f.name)}</h3>

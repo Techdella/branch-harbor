@@ -85,7 +85,7 @@ export function MarinaScreen({ tabs = true }: { tabs?: boolean }) {
     <Screen tabs={tabs} onRefresh={briefing.refresh} refreshing={briefing.refreshing}
       footer={
         <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', backgroundColor: color.surface, borderRadius: radius.pill, padding: 6 }}>
-          <TextInput value={q} onChangeText={setQ} placeholder={t('askPlaceholder')} accessibilityLabel={t('askLabel')} onSubmitEditing={() => ask(q)} returnKeyType="send" style={{ flex: 1, minHeight: 44, paddingHorizontal: space[3], fontSize: 15 }} />
+          <TextInput value={q} onChangeText={setQ} placeholder={t('askPlaceholder')} accessibilityLabel={t('askLabel')} onSubmitEditing={() => ask(q)} returnKeyType="send" style={{ flex: 1, minWidth: 0, minHeight: 44, paddingHorizontal: space[3], fontSize: 15 }} />
           <Pressable accessibilityRole="button" accessibilityLabel={t('send')} onPress={() => ask(q)} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: color.ink, alignItems: 'center', justifyContent: 'center', opacity: q.trim() ? 1 : 0.4 }}>
             <Icon name="send" size={18} color={color.surface} />
           </Pressable>
