@@ -40,4 +40,5 @@ export const supplyApi = {
   run: (orgId: string, id: string) => http<RunDetail>('GET', `${o(orgId)}/self-checks/runs/${id}`),
   saveRun: (orgId: string, id: string, answers: Record<string, AuditAnswer>) => http<{ savedAt: string }>('PUT', `${o(orgId)}/self-checks/runs/${id}/answers`, { answers }),
   completeRun: (orgId: string, id: string, answers: Record<string, AuditAnswer>, note?: string) => http<RunDetail>('POST', `${o(orgId)}/self-checks/runs/${id}/complete`, { answers, note }),
+  uploadRunPhoto: (orgId: string, id: string, file: { filename: string; contentType: string; dataBase64: string }) => http<{ id: string; url: string }>('POST', `${o(orgId)}/self-checks/runs/${id}/photos`, file),
 };
