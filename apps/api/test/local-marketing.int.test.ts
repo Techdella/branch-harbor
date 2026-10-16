@@ -313,6 +313,10 @@ describe.skipIf(!hasDb)('local marketing (DB)', () => {
     const dni = (q: string) => call(app, 'GET', `/v1/public/call-tracking/${orgSlug}/${tor.slug}${q}`);
     expect((await dni('?utm_source=google')).body.number).toBe(n1.body.number);
     expect((await dni('')).body).toEqual({ number: n2.body.number, replaces: '+1 416 555 0100' });
+    // The DNI script for external sites is valid JavaScript.
+    const script = await app.inject({ method: 'GET', url: '/v1/public/call-tracking/dni.js' });
+    expect(script.headers['content-type']).toContain('javascript');
+    expect(() => new Function(script.body)).not.toThrow();
     // Releasing stops forwarding.
     expect((await call(app, 'POST', o(`/call-tracking/numbers/${n1.body.id}/release`), { token: cmo.token })).body.status).toBe('released');
     expect((await dni('?utm_source=google')).body.number).toBe(n2.body.number);
