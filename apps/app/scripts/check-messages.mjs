@@ -12,7 +12,7 @@ import { icuArgs, report } from '../../../scripts/i18n/catalog.mjs';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'messages');
 /** Kept in sync with src/i18n/config.ts APP_LOCALES. */
 const LOCALES = ['en', 'fr', 'es', 'de', 'pt-BR'];
-const SETS = ['', 'single', 'foods', 'partners', 'payments', 'data', 'access', 'franchise', 'network', 'comms', 'mkt', 'finance', 'reviews', 'billing', 'quality', 'scale', 'supply', 'localmkt'];
+const SETS = ['', 'single', 'foods', 'partners', 'payments', 'data', 'access', 'franchise', 'network', 'comms', 'mkt', 'finance', 'reviews', 'billing', 'quality', 'scale', 'supply', 'localmkt', 'brands'];
 
 const read = (dir, l) => {
   const f = path.join(root, dir, `${l}.json`);

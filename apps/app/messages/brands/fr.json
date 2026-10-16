@@ -1,0 +1,110 @@
+{
+  "brands": {
+    "brand": "Marque",
+    "meta": {
+      "settings": "Marques",
+      "compare": "Comparaison des marques"
+    },
+    "switcher": {
+      "label": "Marque",
+      "all": "Toutes les marques ({count})"
+    },
+    "settings": {
+      "title": "Marques",
+      "description": "Chaque marque de votre entreprise : son style, son adresse web, ses langues, son expéditeur et ses conditions de franchise.",
+      "add": "Ajouter une marque",
+      "list": "Vos marques",
+      "locationCount": "{count, plural, =0 {Aucun établissement} one {# établissement} other {# établissements}}",
+      "main": "Marque principale",
+      "denied": "Les marques sont gérées par le siège.",
+      "addTitle": "Ajouter une marque",
+      "addHint": "Une nouvelle marque du même secteur sous ce siège, avec son propre style, ses sites, son expéditeur et ses conditions de franchise. Votre équipe, la finance et le juridique restent partagés.",
+      "create": "Créer la marque",
+      "cancel": "Annuler",
+      "error": "Une erreur s’est produite. Réessayez.",
+      "saved": "Marque enregistrée.",
+      "save": "Enregistrer la marque",
+      "singleHint": "Vous exploitez plusieurs marques de ce secteur ?",
+      "manage": "Gérer les marques"
+    },
+    "fields": {
+      "name": "Nom de la marque",
+      "slug": "Adresse du site",
+      "slugHint": "Les sites de votre marque sont à /adresse/établissement.",
+      "logoUrl": "Logo (lien https)",
+      "tagline": "Slogan",
+      "primaryColor": "Couleur principale",
+      "accentColor": "Couleur d’accent",
+      "headingFont": "Police des titres",
+      "bodyFont": "Police du texte",
+      "inherit": "Comme l’entreprise",
+      "theme": "Thème de site par défaut",
+      "themeHint": "Les nouvelles pages des sites de cette marque l’utilisent.",
+      "domain": "Adresse web de la marque",
+      "domainHint": "Connectez-la dans Sites web → Domaines ; elle est active une fois le DNS vérifié.",
+      "currency": "Devise par défaut",
+      "locales": "Langues",
+      "senderHint": "Les e-mails des établissements de cette marque partent avec ce nom et cette adresse de réponse.",
+      "fromName": "Nom de l’expéditeur",
+      "replyTo": "Adresse de réponse"
+    },
+    "sections": {
+      "identity": "Style et adresse",
+      "email": "Expéditeur des e-mails",
+      "templates": "Modèles de la marque",
+      "franchise": "Conditions de franchise de cette marque"
+    },
+    "templates": {
+      "site": "Modèles et thèmes de sites",
+      "email": "Thèmes d’e-mail",
+      "assets": "Médiathèque de la marque",
+      "open": "Ouvrir",
+      "hint": "Les modèles, thèmes d’e-mail et ressources peuvent être réservés à une marque ou partagés par toutes. Le filtre de marque affiche ceux de chaque marque et les partagés."
+    },
+    "preview": {
+      "label": "Aperçu de la marque",
+      "tagline": "Votre slogan apparaît ici.",
+      "button": "Réserver un cours"
+    },
+    "franchise": {
+      "hint": "Les documents partagés s’appliquent à toutes les marques.",
+      "disclosure": "Documents d’information",
+      "agreements": "Modèles de contrat",
+      "royalties": "Taux de redevance et de fonds",
+      "rate": "{currency} : redevance {royalty}, fonds {fund}",
+      "networkTerms": "Utilise les conditions standard du réseau.",
+      "onboarding": "Liste d’ouverture des nouveaux établissements : {key}",
+      "none": "Aucun pour l’instant.",
+      "shared": "Partagé"
+    },
+    "compare": {
+      "title": "Comparaison des marques",
+      "description": "Vos marques côte à côte et le réseau dans son ensemble. Chaque montant reste dans sa devise.",
+      "period": "Période",
+      "days": "{count, plural, one {Dernier jour} other {# derniers jours}}",
+      "singleBrand": "La comparaison des marques concerne les entreprises qui en ont plusieurs.",
+      "noFinance": "Nécessite l’accès aux paiements",
+      "noRevenue": "Aucun paiement pour l’instant",
+      "network": "Synthèse du réseau",
+      "neverSummed": "Les montants dans des devises différentes ne sont jamais additionnés.",
+      "brands": "Marques",
+      "locations": "Établissements",
+      "locationsValue": "{total} ({operating} ouverts)",
+      "revenue": "Chiffre d’affaires (net)",
+      "openProspects": "Candidats franchisés en cours",
+      "byBrand": "Par marque",
+      "brand": "Marque",
+      "pipeline": "Développement de la franchise",
+      "terms": "Redevance et fonds",
+      "opening": "{count, plural, one {# ouvre bientôt} other {# ouvrent bientôt}}",
+      "openCount": "{count, plural, =0 {Aucun candidat en cours} one {# candidat en cours} other {# candidats en cours}}",
+      "signedCount": "{count} signés",
+      "territories": "{count, plural, one {# territoire disponible} other {# territoires disponibles}}",
+      "hidden": "Hors de votre accès",
+      "networkDefault": "standard du réseau",
+      "noTerms": "Pas encore de conditions",
+      "link": "Comparer les marques"
+    },
+    "buying": "Marque achetée"
+  }
+}

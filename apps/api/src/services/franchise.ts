@@ -15,14 +15,14 @@ import {
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import {
-  campaigns, fieldOverrides, franchiseActivities, franchiseAgreements, franchiseCadences, franchiseDeliveries, franchiseDocuments, franchiseEmailTemplates,
+  brands, campaigns, fieldOverrides, franchiseActivities, franchiseAgreements, franchiseCadences, franchiseDeliveries, franchiseDocuments, franchiseEmailTemplates,
   franchiseFeeInvoices, franchiseJurisdictionRules, franchiseProjects, franchiseProspects, franchiseRegistrations, franchiseSignatures, franchiseTasks,
   franchiseTerritories, invitations, locations, organizations, ownerGroups, pages, templates, users, websites,
 } from '../db/schema/index.ts';
 import { randomToken, sha256 } from '../lib/crypto.ts';
 import { AppError, conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { audit } from './audit.ts';
-import { hasPerm, requireMember, requirePerm } from './authz.ts';
+import { defaultBrandId, hasPerm, requireMember, requirePerm } from './authz.ts';
 import { approvalExtensions, insertApproval, notifyApprovers } from './approvals.ts';
 import { responsibleUsersAt, usersWithPermissionAt } from './notifications.ts';
 import { createPaymentForTarget, paymentTargetExtensions, type TargetType } from './payments.ts';
@@ -257,7 +257,7 @@ export function decodeUpload(contentBase64: string) {
 export function serializeDocument(d: typeof franchiseDocuments.$inferSelect) {
   return {
     id: d.id, kind: d.kind, title: d.title, version: d.version, jurisdictions: d.jurisdictions, status: d.status, issuedOn: d.issuedOn,
-    fileName: d.fileName, contentType: d.contentType, sizeBytes: d.sizeBytes, sha256: d.sha256, prospectId: d.prospectId, ownerGroupId: d.ownerGroupId, agreementId: d.agreementId,
+    fileName: d.fileName, contentType: d.contentType, sizeBytes: d.sizeBytes, sha256: d.sha256, prospectId: d.prospectId, ownerGroupId: d.ownerGroupId, agreementId: d.agreementId, brandId: d.brandId,
     createdAt: d.createdAt.toISOString(),
   };
 }
@@ -280,9 +280,17 @@ export const documentEditPerm = (kind: string): Permission => (kind === 'disclos
 
 const siteUrl = (s: Services, slug: string, path: string) => `${s.cfg.SITES_BASE_URL}/${slug}${path}`;
 
+/** Multi-brand HQ: a brand's disclosure document or agreement template is only given to prospects buying that brand. */
+export async function assertDocumentBrand(db: Exec, p: Prospect, doc: { brandId: string | null }) {
+  if (!doc.brandId) return;
+  const prospectBrand = p.brandId ?? (await defaultBrandId(db, p.organizationId));
+  if (doc.brandId !== prospectBrand) throw validationError('This document is for another brand', { documentId: 'Choose a document for the brand this prospect is buying' });
+}
+
 export async function sendDisclosure(s: Services, req: FastifyRequest, p: Prospect, documentId: string) {
   const [doc] = await s.db.select().from(franchiseDocuments).where(and(eq(franchiseDocuments.id, documentId), eq(franchiseDocuments.organizationId, p.organizationId)));
   if (!doc || doc.kind !== 'disclosure') throw validationError('Choose a disclosure document', { documentId: 'Not a disclosure document' });
+  await assertDocumentBrand(s.db, p, doc);
   if (doc.status !== 'current') throw conflict('document_not_current', 'This disclosure document is not the current version');
   if (p.stage === 'lost' || stageIndex(p.stage as FranchiseStage) >= stageIndex('signed')) throw conflict('invalid_stage', 'The prospect is past disclosure');
   const before = await prospectCompliance(s.db, p);
@@ -348,6 +356,7 @@ export interface AgreementTerms {
 export async function sendAgreement(s: Services, req: FastifyRequest, p: Prospect, b: { documentId: string; provider: ESignProviderKey; materialChange: boolean; terms: AgreementTerms }) {
   const [doc] = await s.db.select().from(franchiseDocuments).where(and(eq(franchiseDocuments.id, b.documentId), eq(franchiseDocuments.organizationId, p.organizationId)));
   if (!doc || doc.kind !== 'agreement_template') throw validationError('Choose an agreement document', { documentId: 'Not an agreement document' });
+  await assertDocumentBrand(s.db, p, doc);
   if (p.stage === 'lost' || stageIndex(p.stage as FranchiseStage) >= stageIndex('signed')) throw conflict('invalid_stage', 'The agreement is already signed or the prospect is lost');
   const c = await prospectCompliance(s.db, p);
   // Sending the agreement is part of the offer: registration must already be in effect.
@@ -429,7 +438,7 @@ export async function completeSignature(s: Services, sigId: string, signer: { na
     const [ag] = await tx.insert(franchiseAgreements).values({
       organizationId: p.organizationId, ownerGroupId: group!.id, prospectId: p.id, territoryId: p.territoryId, territory: territoryName, jurisdiction: jurisdictionCode(p.country, p.region),
       startDate: start, endDate: end.toISOString().slice(0, 10), termYears: years, renewalOption: terms.renewalOption ?? null,
-      royaltyBps: terms.royaltyBps ?? null, marketingFundBps: terms.marketingFundBps ?? null, terms: { ...terms, signatureId: sig.id }, documentId: sig.documentId, createdBy: signer.actorUserId,
+      royaltyBps: terms.royaltyBps ?? null, marketingFundBps: terms.marketingFundBps ?? null, terms: { ...terms, signatureId: sig.id }, documentId: sig.documentId, brandId: p.brandId, createdBy: signer.actorUserId,
     }).returning();
     await addActivity(tx, p, 'agreement_signed', signer.name, signer.actorUserId, { signatureId: sig.id, agreementId: ag!.id, ip: signer.ip });
     await audit(tx, { organizationId: p.organizationId, actorUserId: signer.actorUserId, actorType: signer.actorUserId ? 'user' : 'system', action: 'franchise.agreement_signed', targetType: 'franchise_prospect', targetId: p.id, metadata: { signatureId: sig.id, agreementId: ag!.id }, ip: signer.ip });
@@ -491,9 +500,11 @@ export async function startOnboarding(db: Exec, p: Prospect, brand: string) {
   const [existing] = await db.select().from(franchiseProjects).where(and(eq(franchiseProjects.prospectId, p.id), sql`${franchiseProjects.status} <> 'cancelled'`));
   if (existing) return existing;
   const start = new Date();
+  // Multi-brand HQ: the project is for the brand the prospect bought (its name and its onboarding checklist key).
+  const [b] = p.brandId ? await db.select().from(brands).where(eq(brands.id, p.brandId)) : [];
   const [proj] = await db.insert(franchiseProjects).values({
-    organizationId: p.organizationId, prospectId: p.id, ownerGroupId: p.ownerGroupId, templateKey: ONBOARDING_TEMPLATE.key,
-    name: `${brand} ${p.city ?? p.desiredTerritory ?? p.name}`, hqOwnerUserId: p.ownerUserId, ownerEmail: p.email,
+    organizationId: p.organizationId, prospectId: p.id, ownerGroupId: p.ownerGroupId, templateKey: b?.onboardingTemplateKey ?? ONBOARDING_TEMPLATE.key, brandId: p.brandId,
+    name: `${b?.name ?? brand} ${p.city ?? p.desiredTerritory ?? p.name}`, hqOwnerUserId: p.ownerUserId, ownerEmail: p.email,
     targetOpenDate: new Date(start.getTime() + 120 * DAY).toISOString().slice(0, 10), startedAt: start,
   }).returning();
   await db.insert(franchiseTasks).values(ONBOARDING_TEMPLATE.tasks.map((t) => ({
@@ -533,8 +544,11 @@ export async function provisionLocation(s: Services, req: FastifyRequest, proj: 
   const org = await orgRow(s.db, proj.organizationId);
   const [dupe] = await s.db.select({ id: locations.id }).from(locations).where(and(eq(locations.organizationId, org.id), eq(locations.code, b.code)));
   if (dupe) throw validationError('Location code already in use', { code: 'Each location needs a unique internal code' });
-  const [tpl] = b.templateId
-    ? await s.db.select().from(templates).where(and(eq(templates.id, b.templateId), eq(templates.organizationId, org.id)))
+  // Multi-brand HQ: the location belongs to the project's brand and starts from that brand's site template.
+  const [brand] = proj.brandId ? await s.db.select().from(brands).where(eq(brands.id, proj.brandId)) : [];
+  const templateId = b.templateId ?? brand?.settings.siteTemplateId ?? null;
+  const [tpl] = templateId
+    ? await s.db.select().from(templates).where(and(eq(templates.id, templateId), eq(templates.organizationId, org.id)))
     : await s.db.select().from(templates).where(eq(templates.organizationId, org.id)).orderBy(asc(templates.createdAt)).limit(1);
   if (b.templateId && !tpl) throw notFound('Template');
   const geo = await s.geocoder.geocode(`${b.address.line1}, ${b.address.city}, ${b.address.country}`);
@@ -544,10 +558,10 @@ export async function provisionLocation(s: Services, req: FastifyRequest, proj: 
     const [loc] = await tx.insert(locations).values({
       organizationId: org.id, regionId: b.regionId ?? null, ownerGroupId: proj.ownerGroupId, name: b.name, code: b.code, slug: await uniqueSlug(tx, org.id, b.name),
       address: b.address, country: b.address.country, timeZone: b.timeZone, currency: b.currency, locale: b.locale ?? org.defaultLocale, templateId: tpl?.id ?? null,
-      status: 'onboarding', publiclyVisible: false, geo,
+      status: 'onboarding', publiclyVisible: false, geo, brandId: brand && !brand.isDefault ? brand.id : null,
     }).returning();
     await audit(tx, { organizationId: org.id, actorUserId: req.user!.id, action: 'location.created', scopeKind: 'location', scopeId: loc!.id, targetType: 'location', targetId: loc!.id, metadata: { via: 'franchise_project', projectId: proj.id }, ip: req.ip });
-    const [site] = await tx.insert(websites).values({ organizationId: org.id, locationId: loc!.id, kind: 'hosted', templateId: tpl?.id ?? null, includedAddress: `${s.cfg.SITES_BASE_URL}/${org.slug}/${loc!.slug}` }).returning();
+    const [site] = await tx.insert(websites).values({ organizationId: org.id, locationId: loc!.id, kind: 'hosted', templateId: tpl?.id ?? null, includedAddress: `${s.cfg.SITES_BASE_URL}/${brand?.slug ?? org.slug}/${loc!.slug}` }).returning();
     const [page] = await tx.insert(pages).values({ organizationId: org.id, websiteId: site!.id, locationId: loc!.id, templateId: tpl?.id ?? null, slug: slugify('home'), title: 'Home' }).returning();
     if (tpl?.fields.length) {
       await tx.insert(fieldOverrides).values(tpl.fields.map((f) => ({ organizationId: org.id, pageId: page!.id, fieldKey: f.key, origin: originFor(f.policy), value: f.defaultValue ?? null, hqValue: f.defaultValue ?? null })));
@@ -689,7 +703,7 @@ const money = (amount: number | null, currency: string | null) => (amount != nul
 export function serializeProspect(p: Prospect, extra: { territoryName?: string | null; ownerName?: string | null; compliance?: ComplianceResult | null } = {}) {
   return {
     id: p.id, name: p.name, email: p.email, phone: p.phone, country: p.country, region: p.region, city: p.city, jurisdiction: jurisdictionCode(p.country, p.region),
-    territoryId: p.territoryId, territoryName: extra.territoryName ?? null, desiredTerritory: p.desiredTerritory, scopeTerritoryId: p.scopeTerritoryId,
+    territoryId: p.territoryId, territoryName: extra.territoryName ?? null, desiredTerritory: p.desiredTerritory, scopeTerritoryId: p.scopeTerritoryId, brandId: p.brandId,
     liquidCapital: money(p.liquidCapitalMinor, p.currency), netWorth: money(p.netWorthMinor, p.currency), selfDeclared: true, units: p.units,
     source: p.source, campaignId: p.campaignId, attribution: p.attribution, message: p.message, stage: p.stage, stageEnteredAt: p.stageEnteredAt.toISOString(),
     ownerUserId: p.ownerUserId, ownerName: extra.ownerName ?? null, lostReason: p.lostReason, ownerGroupId: p.ownerGroupId, locale: p.locale,

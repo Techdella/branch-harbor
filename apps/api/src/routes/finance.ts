@@ -27,6 +27,7 @@ import {
   submitExternalSales,
 } from '../services/finance/statements.ts';
 import { getFinanceSettings, resolveTerms, serializeSettings, serializeTerms } from '../services/finance/terms.ts';
+import { brandInOrg, brandSharedCond } from '../services/brands.ts';
 import { idParams, orgParams, secured } from './_common.ts';
 
 const ymd = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD');
@@ -41,6 +42,8 @@ const basisSchema = z.object({
 });
 const termsBody = z.object({
   ownerGroupId: z.uuid().nullable().default(null),
+  /** Brand default terms (multi-brand HQ): set with ownerGroupId null. */
+  brandId: z.uuid().nullable().default(null),
   currency,
   effectiveFrom: ymd,
   effectiveTo: ymd.nullable().default(null),
@@ -162,7 +165,7 @@ export const financeRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get('/orgs/:orgId/finance/terms', { schema: { tags: ['finance'], security: secured, params: orgParams } }, async (req) => {
     await hq(req, req.params.orgId, 'finance.royalties', 'view');
-    const rows = await db.select().from(royaltyTerms).where(eq(royaltyTerms.organizationId, req.params.orgId)).orderBy(asc(royaltyTerms.currency), desc(royaltyTerms.effectiveFrom));
+    const rows = await db.select().from(royaltyTerms).where(and(eq(royaltyTerms.organizationId, req.params.orgId), await brandSharedCond(req, db, req.params.orgId, royaltyTerms.brandId))).orderBy(asc(royaltyTerms.currency), desc(royaltyTerms.effectiveFrom));
     const groups = await db.select({ id: ownerGroups.id, name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.organizationId, req.params.orgId));
     return { items: rows.map(serializeTerms), ownerGroups: groups };
   });
@@ -171,6 +174,10 @@ export const financeRoutes: FastifyPluginAsyncZod = async (app) => {
     if (b.ownerGroupId) {
       const [g] = await db.select({ id: ownerGroups.id }).from(ownerGroups).where(and(eq(ownerGroups.id, b.ownerGroupId), eq(ownerGroups.organizationId, orgId)));
       if (!g) throw notFound('Owner group');
+    }
+    if (b.brandId) {
+      if (b.ownerGroupId) throw validationError('Brand terms are the brand’s default: leave the owner group empty', { brandId: 'Brand defaults have no owner group' });
+      if (!(await brandInOrg(db, orgId, b.brandId))) throw notFound('Brand');
     }
     if (b.effectiveTo && b.effectiveTo <= b.effectiveFrom) throw validationError('The end date must be after the start date', { effectiveTo: 'After the start date' });
     if (b.lateFee.kind === 'flat' && !b.lateFee.flatMinor) throw validationError('Set the flat late fee amount', { flatMinor: 'Required' });

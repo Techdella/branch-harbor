@@ -143,6 +143,8 @@ const EXTRA_ROUTE_MODULES: Record<string, readonly string[]> = {
   '/franchise/prospect': ['sales.franchise_pipeline'],
   '/franchise/agreements': ['sales.franchise_pipeline', 'network.onboarding'],
   '/franchise/rules': ['sales.franchise_pipeline'],
+  // Multi-brand HQ: brand identity is edited by HQ or by the brand's template editors.
+  '/settings/brands': ['settings.business', 'network.templates'],
 };
 
 /**

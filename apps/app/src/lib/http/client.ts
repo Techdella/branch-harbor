@@ -12,6 +12,7 @@
  *    to /sign-in before rendering. It is a UX hint only; the API enforces every permission.
  */
 import { ApiError } from '../errors';
+import { brandHeaderFor } from './brands';
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000').replace(/\/$/, '');
 
@@ -95,7 +96,8 @@ interface ErrorBody {
 async function rawFetch(method: string, path: string, opts: { query?: Query; body?: unknown; token?: string | null; headers?: Record<string, string> }): Promise<Response> {
   const url = new URL(`${API_URL}/v1${path}`);
   for (const [k, v] of Object.entries(opts.query ?? {})) if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v));
-  const headers: Record<string, string> = { Accept: 'application/json', ...opts.headers };
+  // Multi-brand HQ: requests for the filtered business carry the top-bar brand filter.
+  const headers: Record<string, string> = { Accept: 'application/json', ...brandHeaderFor(path), ...opts.headers };
   if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
   try {

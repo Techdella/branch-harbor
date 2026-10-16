@@ -2029,6 +2029,10 @@
         "title": "Cobrança de royalties e fundo de marketing",
         "body": "{fee} por cobrança, limitado a {cap} por unidade por mês. Um valor fixo, nunca uma porcentagem dos seus royalties."
       },
+      "extraBrand": {
+        "title": "Marcas adicionais",
+        "body": "Gerencie várias marcas do mesmo setor a partir de uma única sede: {fee} por mês para cada marca além da primeira. A primeira marca está incluída na taxa de plataforma de {platform}."
+      },
       "payments": {
         "title": "Pagamentos on-line de clientes",
         "body": "Uma taxa de aplicação de {percent} sobre os pagamentos on-line dos seus clientes, mais a taxa de processamento do provedor de pagamento. As duas aparecem em cada repasse."

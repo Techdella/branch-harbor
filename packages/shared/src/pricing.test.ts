@@ -4,7 +4,7 @@ import { SUPPORTED_CURRENCIES, minorUnitExponent } from './money.ts';
 import {
   COUNTRY_TIER, FEE_PRICE_KEYS, LIST_PRICES_MINOR, NETWORK_INCLUDED_LOCATIONS, PLAN_PRICE_KEYS, PRICE_BOOK, PRICE_LISTS, PRICE_LIST_KEYS, PRICED_CURRENCIES,
   REFERENCE_USD_RATES, SOLO_PLAN, TIER_MULTIPLIERS, annualMonthlyPrice, assertBillingCurrency, collectionFee, countryFromHeaders, currencyForCountry,
-  listPriceMinor, planQuote, priceListCurrency, priceListForCountry, priceListTier, regionFromAcceptLanguage, soloPrice, splitLocationFee, taxIdCountry,
+  extraBrandFee, listPriceMinor, planQuote, priceListCurrency, priceListForCountry, priceListTier, regionFromAcceptLanguage, soloPrice, splitLocationFee, taxIdCountry,
   tierForCountry, trialPrice,
 } from './pricing.ts';
 
@@ -34,7 +34,7 @@ test('each price list stays within its regional tier multiplier band (proposal, 
   for (const k of PRICE_LIST_KEYS) {
     const rate = REFERENCE_USD_RATES[priceListCurrency(k)]!;
     const band = TIER_MULTIPLIERS[priceListTier(k)];
-    for (const item of [...PLAN_PRICE_KEYS, 'platform', 'collection', 'collectionCap'] as const) {
+    for (const item of [...PLAN_PRICE_KEYS, 'platform', 'collection', 'collectionCap', 'extraBrand'] as const) {
       const ratio = PRICE_LISTS[k][item] / rate / usd[item];
       if (ratio < band.min || ratio > band.max) outside.push(`${k}.${item} ${ratio.toFixed(3)} (tier ${priceListTier(k)} ${band.min}–${band.max})`);
     }
@@ -131,4 +131,12 @@ test('tax ID country', () => {
   assert.equal(taxIdCountry('12345678-0001', 'NG'), 'NG');
   assert.equal(taxIdCountry('xx', 'US'), null);
   assert.equal(taxIdCountry('123456789', 'DE'), null);
+});
+
+test('multi-brand HQ: each brand beyond the first adds the extra-brand fee (USD 99), below the platform fee in every list', () => {
+  assert.equal(LIST_PRICES_MINOR.USD.extraBrand, 9_900);
+  for (const k of PRICE_LIST_KEYS) assert.ok(PRICE_LISTS[k].extraBrand < PRICE_LISTS[k].platform, `${k} extra brand below platform`);
+  assert.deepEqual(extraBrandFee('USD', 1), { perBrandMinor: 9_900, extraBrands: 0, chargedMinor: 0 });
+  assert.deepEqual(extraBrandFee('USD', 3), { perBrandMinor: 9_900, extraBrands: 2, chargedMinor: 19_800 });
+  assert.equal(extraBrandFee('JPY', 2).chargedMinor, 13_500);
 });

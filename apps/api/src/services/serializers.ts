@@ -21,6 +21,8 @@ export function serializeLocation(l: typeof locations.$inferSelect) {
     currency: l.currency, locale: l.locale, phone: l.phone, email: l.email, status: l.status,
     publiclyVisible: l.publiclyVisible, hours: l.hours, templateId: l.templateId,
     paymentsEnabled: l.paymentsEnabled, paymentsConnected: !!l.stripeAccountId, geo: l.geo,
+    /** Brand (null = the main brand) and sub-network the location belongs to. */
+    brandId: l.brandId, territoryId: l.territoryId,
     createdAt: iso(l.createdAt), updatedAt: iso(l.updatedAt), archivedAt: iso(l.archivedAt),
   };
 }

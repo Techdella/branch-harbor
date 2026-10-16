@@ -1,4 +1,4 @@
-import { and, arrayContained, arrayContains, asc, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm';
+import { and, arrayContained, arrayContains, asc, desc, eq, ilike, inArray, isNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { FastifyRequest } from 'fastify';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
@@ -13,6 +13,7 @@ import {
 import { conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { audit } from '../services/audit.ts';
+import { brandInOrg, brandOwnedCond, brandSharedCond } from '../services/brands.ts';
 import { authorisedLocations, capabilityTerritories, requireMember, resolveScopeChain } from '../services/authz.ts';
 import { esignStatus, ESIGN_DISCLAIMER } from '../integrations/esign.ts';
 import {
@@ -182,28 +183,36 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
 
   /* ------------------------------ territories ----------------------------- */
 
-  const territoryOut = (t: typeof franchiseTerritories.$inferSelect) => ({ id: t.id, name: t.name, country: t.country, region: t.region, jurisdiction: jurisdictionCode(t.country, t.region), description: t.description, status: t.status, showOnSite: t.showOnSite, reservedForProspectId: t.reservedForProspectId, ownerGroupId: t.ownerGroupId, scopeTerritoryId: t.scopeTerritoryId });
+  const territoryOut = (t: typeof franchiseTerritories.$inferSelect) => ({ id: t.id, name: t.name, country: t.country, region: t.region, jurisdiction: jurisdictionCode(t.country, t.region), description: t.description, status: t.status, showOnSite: t.showOnSite, reservedForProspectId: t.reservedForProspectId, ownerGroupId: t.ownerGroupId, scopeTerritoryId: t.scopeTerritoryId, brandId: t.brandId });
+
+  /** A brand chosen for a prospect, territory or document must belong to this business. */
+  const assertBrand = async (orgId: string, brandId: string | null | undefined) => {
+    if (brandId && !(await brandInOrg(s.db, orgId, brandId))) throw notFound('Brand');
+  };
 
   app.get('/orgs/:orgId/franchise/territories', { schema: { tags, security: secured, params: orgParams } }, async (req) => {
     const { orgId } = req.params;
     const scope = await pipeline(req, orgId, 'view');
-    const rows = (await s.db.select().from(franchiseTerritories).where(eq(franchiseTerritories.organizationId, orgId)).orderBy(asc(franchiseTerritories.country), asc(franchiseTerritories.name)))
+    // Availability map per brand: the brand filter (switcher) narrows it to one brand.
+    const rows = (await s.db.select().from(franchiseTerritories).where(and(eq(franchiseTerritories.organizationId, orgId), await brandOwnedCond(req, s.db, orgId, franchiseTerritories.brandId))).orderBy(asc(franchiseTerritories.country), asc(franchiseTerritories.name)))
       .filter((t) => inPipeline(scope, t.scopeTerritoryId));
     const counts = await s.db.select({ territoryId: franchiseProspects.territoryId, n: sql<number>`count(*)::int` }).from(franchiseProspects)
       .where(and(eq(franchiseProspects.organizationId, orgId), sql`${franchiseProspects.stage} not in ('lost','opened')`)).groupBy(franchiseProspects.territoryId);
     return { items: rows.map((t) => ({ ...territoryOut(t), activeProspects: counts.find((c) => c.territoryId === t.id)?.n ?? 0 })) };
   });
 
-  const territoryBody = z.object({ name: z.string().min(1).max(120), country, region: region.nullable().optional(), description: z.string().max(2000).nullable().optional(), status: z.enum(TERRITORY_STATUSES).default('available'), showOnSite: z.boolean().default(true) });
+  const territoryBody = z.object({ name: z.string().min(1).max(120), country, region: region.nullable().optional(), description: z.string().max(2000).nullable().optional(), status: z.enum(TERRITORY_STATUSES).default('available'), showOnSite: z.boolean().default(true), brandId: z.uuid().nullable().optional() });
   app.post('/orgs/:orgId/franchise/territories', { schema: { tags, security: secured, params: orgParams, body: territoryBody } }, async (req, reply) => {
     const { orgId } = req.params;
     await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
+    await assertBrand(orgId, req.body.brandId);
     const [t] = await s.db.insert(franchiseTerritories).values({ organizationId: orgId, ...req.body, region: req.body.region ?? null, description: req.body.description ?? null }).returning();
     return reply.code(201).send(territoryOut(t!));
   });
   app.patch('/orgs/:orgId/franchise/territories/:id', { schema: { tags, security: secured, params: idParams, body: territoryBody.partial() } }, async (req) => {
     const { orgId, id } = req.params;
     await requireOrgPerm(req, s.db, orgId, 'franchise.pipeline.edit');
+    await assertBrand(orgId, req.body.brandId);
     const [t] = await s.db.update(franchiseTerritories).set({ ...req.body, updatedAt: new Date() }).where(and(eq(franchiseTerritories.id, id), eq(franchiseTerritories.organizationId, orgId))).returning();
     if (!t) throw notFound('Territory');
     return territoryOut(t);
@@ -219,6 +228,8 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     await ensureFranchiseDefaults(s.db, orgId);
     const conds = [eq(franchiseProspects.organizationId, orgId)];
     if (scope !== 'all') conds.push(inArray(franchiseProspects.scopeTerritoryId, [...scope]));
+    const byBrand = await brandOwnedCond(req, s.db, orgId, franchiseProspects.brandId);
+    if (byBrand) conds.push(byBrand);
     if (req.query.stage) conds.push(eq(franchiseProspects.stage, req.query.stage));
     if (req.query.ownerUserId) conds.push(eq(franchiseProspects.ownerUserId, req.query.ownerUserId));
     if (req.query.q) conds.push(or(ilike(franchiseProspects.name, `%${req.query.q}%`), ilike(franchiseProspects.email, `%${req.query.q}%`), ilike(franchiseProspects.city, `%${req.query.q}%`))!);
@@ -248,6 +259,8 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     units: z.number().int().min(1).max(100).optional(), source: z.enum(PROSPECT_SOURCES).default('other'), campaignId: z.uuid().nullable().optional(), message: z.string().max(4000).nullable().optional(), ownerUserId: z.uuid().nullable().optional(),
     /** The sub-network (access territory) whose pipeline holds the prospect; null = HQ's own pipeline. */
     scopeTerritoryId: z.uuid().nullable().optional(),
+    /** The brand the prospect is buying (multi-brand HQ); null = the main brand. */
+    brandId: z.uuid().nullable().optional(),
   });
 
   app.post('/orgs/:orgId/franchise/prospects', { schema: { tags, security: secured, params: orgParams, body: prospectBody } }, async (req, reply) => {
@@ -261,6 +274,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!scope.has(b.scopeTerritoryId)) throw forbidden('You can only add prospects to your own territory');
     }
     if (b.scopeTerritoryId) await resolveScopeChain(s.db, { organizationId: orgId, kind: 'territory', id: b.scopeTerritoryId });
+    await assertBrand(orgId, b.brandId);
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     const p = await s.db.transaction(async (tx) => {
       const [p] = await tx.insert(franchiseProspects).values({ ...b, organizationId: orgId, email: b.email.toLowerCase(), currency: b.currency ?? org!.defaultCurrency, ownerUserId: b.ownerUserId ?? req.user!.id, region: b.region ?? null }).returning();
@@ -301,6 +315,7 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
   app.patch('/orgs/:orgId/franchise/prospects/:id', { schema: { tags, security: secured, params: idParams, body: prospectBody.partial() } }, async (req) => {
     const { orgId, id } = req.params;
     const p = await prospectIn(req, orgId, id, 'edit');
+    await assertBrand(orgId, req.body.brandId);
     if (req.body.scopeTerritoryId !== undefined) {
       const scope = await pipeline(req, orgId, 'edit');
       if (scope !== 'all' && !(req.body.scopeTerritoryId && scope.has(req.body.scopeTerritoryId))) throw forbidden('You can only keep prospects in your own territory');
@@ -506,6 +521,9 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
     if (req.query.kind) conds.push(eq(franchiseDocuments.kind, req.query.kind));
     if (!legal) conds.push(inArray(franchiseDocuments.kind, ['disclosure', 'agreement_template']));
     if (req.query.ownerGroupId) conds.push(eq(franchiseDocuments.ownerGroupId, req.query.ownerGroupId));
+    // Disclosure documents and agreement templates are attached per brand (none = shared by every brand).
+    const byBrand = await brandSharedCond(req, s.db, orgId, franchiseDocuments.brandId);
+    if (byBrand) conds.push(byBrand);
     const rows = await s.db.select().from(franchiseDocuments).where(and(...conds)).orderBy(desc(franchiseDocuments.createdAt));
     return { items: rows.map(serializeDocument) };
   });
@@ -519,6 +537,8 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
         jurisdictions: z.array(z.string().regex(/^[A-Z]{2}(-[A-Z0-9]{1,3})?$/)).max(80).default([]), issuedOn: z.iso.date().optional(),
         fileName: z.string().min(1).max(200), contentType: z.string().min(1).max(100), contentBase64: z.string().min(4),
         ownerGroupId: z.uuid().optional(), agreementId: z.uuid().optional(), prospectId: z.uuid().optional(), supersedePrevious: z.boolean().default(true),
+        /** Multi-brand HQ: the brand this disclosure document / agreement template is for (omit = every brand). */
+        brandId: z.uuid().optional(),
       }),
       summary: 'Upload a document (disclosure documents: legal.disclosure edit; agreements and the vault: legal.agreements edit). A new disclosure version supersedes the previous one for the same jurisdictions.',
     },
@@ -531,14 +551,15 @@ export const franchiseRoutes: FastifyPluginAsyncZod = async (app) => {
       const [g] = await s.db.select({ id: ownerGroups.id }).from(ownerGroups).where(and(eq(ownerGroups.id, b.ownerGroupId), eq(ownerGroups.organizationId, orgId)));
       if (!g) throw notFound('Owner group');
     }
+    await assertBrand(orgId, b.brandId);
     const f = decodeUpload(b.contentBase64);
     const row = await s.db.transaction(async (tx) => {
       if (b.supersedePrevious && (b.kind === 'disclosure' || b.kind === 'agreement_template')) {
-        await tx.update(franchiseDocuments).set({ status: 'superseded' }).where(and(eq(franchiseDocuments.organizationId, orgId), eq(franchiseDocuments.kind, b.kind), eq(franchiseDocuments.status, 'current'), arrayContains(franchiseDocuments.jurisdictions, b.jurisdictions), arrayContained(franchiseDocuments.jurisdictions, b.jurisdictions)));
+        await tx.update(franchiseDocuments).set({ status: 'superseded' }).where(and(eq(franchiseDocuments.organizationId, orgId), eq(franchiseDocuments.kind, b.kind), eq(franchiseDocuments.status, 'current'), b.brandId ? eq(franchiseDocuments.brandId, b.brandId) : isNull(franchiseDocuments.brandId), arrayContains(franchiseDocuments.jurisdictions, b.jurisdictions), arrayContained(franchiseDocuments.jurisdictions, b.jurisdictions)));
       }
       const [row] = await tx.insert(franchiseDocuments).values({
         organizationId: orgId, kind: b.kind, title: b.title, version: b.version, jurisdictions: b.jurisdictions, issuedOn: b.issuedOn ?? null, fileName: b.fileName, contentType: b.contentType,
-        sizeBytes: f.size, sha256: f.sha, contentBase64: f.buf.toString('base64'), ownerGroupId: b.ownerGroupId ?? null, agreementId: b.agreementId ?? null, prospectId: b.prospectId ?? null, uploadedBy: req.user!.id,
+        sizeBytes: f.size, sha256: f.sha, contentBase64: f.buf.toString('base64'), ownerGroupId: b.ownerGroupId ?? null, agreementId: b.agreementId ?? null, prospectId: b.prospectId ?? null, brandId: b.brandId ?? null, uploadedBy: req.user!.id,
       }).returning();
       await audit(tx, { organizationId: orgId, actorUserId: req.user!.id, action: 'franchise.document_uploaded', targetType: 'franchise_document', targetId: row!.id, metadata: { kind: b.kind, title: b.title, version: b.version }, ip: req.ip });
       return row!;

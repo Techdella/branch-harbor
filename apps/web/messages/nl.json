@@ -2029,6 +2029,10 @@
         "title": "Inning van royalty's en marketingfonds",
         "body": "{fee} per inning, met een maximum van {cap} per vestiging per maand. Een vast bedrag, nooit een percentage van je royalty's."
       },
+      "extraBrand": {
+        "title": "Extra merken",
+        "body": "Beheer meerdere merken uit dezelfde branche vanuit één hoofdkantoor: {fee} per maand voor elk merk na het eerste. Het eerste merk zit in de platformvergoeding van {platform}."
+      },
       "payments": {
         "title": "Online betalingen van klanten",
         "body": "Een applicatievergoeding van {percent} op online betalingen van je klanten, plus de verwerkingskosten van de betaalprovider. Beide staan op elke uitbetaling."

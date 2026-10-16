@@ -1,0 +1,110 @@
+{
+  "brands": {
+    "brand": "Brand",
+    "meta": {
+      "settings": "Brands",
+      "compare": "Brand comparison"
+    },
+    "switcher": {
+      "label": "Brand",
+      "all": "All brands ({count})"
+    },
+    "settings": {
+      "title": "Brands",
+      "description": "Each brand of your business: its look, web address, languages, sender and franchise terms.",
+      "add": "Add a brand",
+      "list": "Your brands",
+      "locationCount": "{count, plural, =0 {No locations} one {# location} other {# locations}}",
+      "main": "Main brand",
+      "denied": "Brands are managed by HQ.",
+      "addTitle": "Add a brand",
+      "addHint": "A new brand of the same industry under this HQ, with its own look, sites, sender and franchise terms. Your team, finance and legal set-up are shared.",
+      "create": "Create brand",
+      "cancel": "Cancel",
+      "error": "Something went wrong. Try again.",
+      "saved": "Brand saved.",
+      "save": "Save brand",
+      "singleHint": "Running more than one brand of this industry?",
+      "manage": "Manage brands"
+    },
+    "fields": {
+      "name": "Brand name",
+      "slug": "Site address",
+      "slugHint": "Your brand’s sites live at /address/location.",
+      "logoUrl": "Logo (https link)",
+      "tagline": "Tagline",
+      "primaryColor": "Main colour",
+      "accentColor": "Accent colour",
+      "headingFont": "Heading font",
+      "bodyFont": "Text font",
+      "inherit": "Same as the business",
+      "theme": "Default website theme",
+      "themeHint": "New pages of this brand’s sites start with it.",
+      "domain": "Brand web address",
+      "domainHint": "Connect it in Websites → Domains; it serves once its DNS is verified.",
+      "currency": "Default currency",
+      "locales": "Languages",
+      "senderHint": "Email from this brand’s locations goes out with this name and reply address.",
+      "fromName": "Sender name",
+      "replyTo": "Reply-to address"
+    },
+    "sections": {
+      "identity": "Look and address",
+      "email": "Email sender",
+      "templates": "Brand templates",
+      "franchise": "Franchise terms for this brand"
+    },
+    "templates": {
+      "site": "Website templates and themes",
+      "email": "Email themes",
+      "assets": "Brand asset library",
+      "open": "Open",
+      "hint": "Templates, email themes and assets can be kept for one brand or shared by all. The brand filter shows each brand’s own and the shared ones."
+    },
+    "preview": {
+      "label": "Preview of the brand",
+      "tagline": "Your tagline appears here.",
+      "button": "Book a class"
+    },
+    "franchise": {
+      "hint": "Shared documents apply to every brand.",
+      "disclosure": "Disclosure documents",
+      "agreements": "Agreement templates",
+      "royalties": "Royalty and fund rates",
+      "rate": "{currency}: royalty {royalty}, fund {fund}",
+      "networkTerms": "Uses the network’s standard terms.",
+      "onboarding": "Onboarding checklist for new locations: {key}",
+      "none": "None yet.",
+      "shared": "Shared"
+    },
+    "compare": {
+      "title": "Brand comparison",
+      "description": "Your brands side by side and the network as a whole. Money stays in its own currency.",
+      "period": "Period",
+      "days": "{count, plural, one {Last day} other {Last # days}}",
+      "singleBrand": "Brand comparison is for businesses with several brands.",
+      "noFinance": "Needs access to payments",
+      "noRevenue": "No payments yet",
+      "network": "Network summary",
+      "neverSummed": "Amounts in different currencies are never added together.",
+      "brands": "Brands",
+      "locations": "Locations",
+      "locationsValue": "{total} ({operating} open)",
+      "revenue": "Revenue (net)",
+      "openProspects": "Open franchise prospects",
+      "byBrand": "By brand",
+      "brand": "Brand",
+      "pipeline": "Franchise pipeline",
+      "terms": "Royalty and fund",
+      "opening": "{count, plural, one {# opening soon} other {# opening soon}}",
+      "openCount": "{count, plural, =0 {No open prospects} one {# open prospect} other {# open prospects}}",
+      "signedCount": "{count} signed",
+      "territories": "{count, plural, one {# territory available} other {# territories available}}",
+      "hidden": "Not in your access",
+      "networkDefault": "network default",
+      "noTerms": "No terms yet",
+      "link": "Compare brands"
+    },
+    "buying": "Brand being bought"
+  }
+}

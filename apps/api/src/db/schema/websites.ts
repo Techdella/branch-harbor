@@ -1,7 +1,7 @@
 import { index, integer, jsonb, pgTable, text, uniqueIndex, uuid, boolean } from 'drizzle-orm/pg-core';
 import type { PageDocument } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations } from './core.ts';
+import { brands, locations, organizations } from './core.ts';
 
 /** Field origin: hq = HQ default, editable locally; local = local override; locked = brand-locked; approval = change needs approval. */
 export type FieldOrigin = 'hq' | 'local' | 'locked' | 'approval';
@@ -17,6 +17,8 @@ export const templates = pgTable('templates', {
   document: jsonb('document').$type<PageDocument>(),
   /** Page slug the master applies to on location sites (builder templates). */
   pageSlug: text('page_slug'),
+  /** Brand template: only for this brand's locations (null = every brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   version: integer('version').notNull().default(1),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -27,6 +29,8 @@ export const websites = pgTable('websites', {
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   /** null = network/HQ site */
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'cascade' }),
+  /** Brand site (location null): the site of this brand (null = the default brand's site). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   kind: text('kind').notNull().default('hosted'), // hosted | wordpress
   templateId: uuid('template_id').references(() => templates.id, { onDelete: 'set null' }),
   includedAddress: text('included_address').notNull(),

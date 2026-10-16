@@ -19,6 +19,7 @@ import qualityEn from '../../messages/quality/en.json';
 import scaleEn from '../../messages/scale/en.json';
 import supplyEn from '../../messages/supply/en.json';
 import localMktEn from '../../messages/localmkt/en.json';
+import brandsEn from '../../messages/brands/en.json';
 
 type Messages = Record<string, unknown>;
 
@@ -70,6 +71,8 @@ export default getRequestConfig(async () => {
   messages = merge(messages, supplyEn as Messages);
   // Local marketing (listings, co-op fund, call tracking, content calendar, reviews in the inbox): namespace "lmk" plus nav, module and error keys.
   messages = merge(messages, localMktEn as Messages);
+  // Multi-brand HQ (brand switcher, Settings → Brands, brand comparison): namespace "brands".
+  messages = merge(messages, brandsEn as Messages);
   if (locale !== 'en') {
     const translated = (await import(`../../messages/${locale}.json`)).default as Messages;
     const single = (await import(`../../messages/single/${locale}.json`)).default as Messages;
@@ -90,6 +93,7 @@ export default getRequestConfig(async () => {
     messages = merge(messages, (await import(`../../messages/scale/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/supply/${locale}.json`)).default as Messages);
     messages = merge(messages, (await import(`../../messages/localmkt/${locale}.json`)).default as Messages);
+    messages = merge(messages, (await import(`../../messages/brands/${locale}.json`)).default as Messages);
   }
   return { locale, messages, timeZone: 'UTC' };
 });

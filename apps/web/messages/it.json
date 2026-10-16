@@ -2029,6 +2029,10 @@
         "title": "Incasso di royalty e fondo marketing",
         "body": "{fee} per incasso, con un tetto di {cap} per sede al mese. Un importo fisso, mai una percentuale delle tue royalty."
       },
+      "extraBrand": {
+        "title": "Marchi aggiuntivi",
+        "body": "Gestite più marchi dello stesso settore da un'unica sede centrale: {fee} al mese per ogni marchio oltre il primo. Il primo marchio è incluso nel canone di piattaforma di {platform}."
+      },
       "payments": {
         "title": "Pagamenti online dei clienti",
         "body": "Una commissione applicativa del {percent} sui pagamenti online dei tuoi clienti, più la commissione di elaborazione del fornitore di pagamento. Entrambe compaiono su ogni accredito."

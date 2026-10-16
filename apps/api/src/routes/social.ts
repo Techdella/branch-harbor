@@ -11,6 +11,7 @@ import { actor, audit } from '../services/audit.ts';
 import { hasAt, requireAt, scopeFor } from '../services/comms-scope.ts';
 import { locationMayPost, locationRow, postableAccounts, publishDuePosts, publishPost, revokeLocationSocialAccess, tierOf, type SocialAccountRow, type SocialPostRow } from '../services/social.ts';
 import { idParams, orgParams, secured } from './_common.ts';
+import { brandInOrg, brandOfLocation, brandOwnedCond } from '../services/brands.ts';
 
 const M = 'marketing.social';
 const network = z.enum(SOCIAL_NETWORKS);
@@ -92,7 +93,8 @@ export const socialRoutes: FastifyPluginAsyncZod = async (app) => {
     r.get('/orgs/:orgId/social/accounts', { schema: { tags: ['social'], security: secured, params: orgParams, summary: 'Accounts you can see: HQ sees every account; a location sees its own accounts and HQ accounts handed over to it' } }, async (req) => {
       const { orgId } = req.params;
       const scope = await scopeFor(req, s.db, orgId, M);
-      const all = await s.db.select().from(socialAccounts).where(eq(socialAccounts.organizationId, orgId)).orderBy(asc(socialAccounts.network), asc(socialAccounts.handle));
+      // Multi-brand HQ: social accounts speak for one brand; the brand switcher narrows the list.
+      const all = await s.db.select().from(socialAccounts).where(and(eq(socialAccounts.organizationId, orgId), await brandOwnedCond(req, s.db, orgId, socialAccounts.brandId))).orderBy(asc(socialAccounts.network), asc(socialAccounts.handle));
       const grants = all.length ? await s.db.select().from(socialAccountGrants).where(inArray(socialAccountGrants.accountId, all.map((a) => a.id))).orderBy(desc(socialAccountGrants.grantedAt)) : [];
       if (scope.all) return { items: all.map((a) => serializeAccount(a, grants)), hq: true };
       const mine = new Set(scope.locationIds);
@@ -103,14 +105,17 @@ export const socialRoutes: FastifyPluginAsyncZod = async (app) => {
     r.post('/orgs/:orgId/social/accounts', {
       schema: {
         tags: ['social'], security: secured, params: orgParams, summary: 'Add an account in sandbox (posts are simulated). Connect through OAuth to publish live.',
-        body: z.object({ network, handle: z.string().trim().min(1).max(120), ownerKind: z.enum(['hq', 'location']).default('hq'), locationId: z.uuid().nullable().default(null) }).refine((b) => b.ownerKind === 'hq' || !!b.locationId, { message: 'Choose the location that owns it', path: ['locationId'] }),
+        body: z.object({ network, handle: z.string().trim().min(1).max(120), ownerKind: z.enum(['hq', 'location']).default('hq'), locationId: z.uuid().nullable().default(null), brandId: z.uuid().nullable().optional() }).refine((b) => b.ownerKind === 'hq' || !!b.locationId, { message: 'Choose the location that owns it', path: ['locationId'] }),
       },
     }, async (req, reply) => {
       const { orgId } = req.params;
       const b = req.body;
       if (b.locationId && !(await locationRow(s.db, orgId, b.locationId))) throw notFound('Location');
       await requireAt(req, s.db, orgId, b.ownerKind === 'hq' ? null : b.locationId, M, 'publish');
-      const [a] = await s.db.insert(socialAccounts).values({ organizationId: orgId, ownerKind: b.ownerKind, locationId: b.locationId, network: b.network, handle: b.handle, mode: 'sandbox', connectedBy: req.user!.id }).returning();
+      // A location's own account belongs to the location's brand; an HQ account to the brand chosen.
+      const brandId = b.locationId ? (await brandOfLocation(s.db, orgId, b.locationId))?.id ?? null : b.brandId ?? null;
+      if (b.brandId && !(await brandInOrg(s.db, orgId, b.brandId))) throw notFound('Brand');
+      const [a] = await s.db.insert(socialAccounts).values({ organizationId: orgId, ownerKind: b.ownerKind, locationId: b.locationId, brandId, network: b.network, handle: b.handle, mode: 'sandbox', connectedBy: req.user!.id }).returning();
       await audit(s.db, { organizationId: orgId, ...actor(req), action: 'social.account_added', scopeKind: b.ownerKind === 'hq' ? 'organization' : 'location', scopeId: b.ownerKind === 'hq' ? orgId : b.locationId, targetType: 'social_account', targetId: a!.id, metadata: { network: b.network, mode: 'sandbox' } });
       return reply.code(201).send(serializeAccount(a!));
     });

@@ -2029,6 +2029,10 @@
         "title": "Einzug von Lizenzgebühren und Marketingfonds",
         "body": "{fee} pro Einzug, höchstens {cap} pro Standort und Monat. Ein fester Betrag, nie ein Prozentsatz Ihrer Lizenzgebühren."
       },
+      "extraBrand": {
+        "title": "Weitere Marken",
+        "body": "Führen Sie mehrere Marken derselben Branche unter einer Zentrale: {fee} pro Monat für jede Marke nach der ersten. Die erste Marke ist in der Plattformgebühr von {platform} enthalten."
+      },
       "payments": {
         "title": "Online-Zahlungen Ihrer Kunden",
         "body": "Eine Anwendungsgebühr von {percent} auf Online-Zahlungen Ihrer Kunden, plus die Bearbeitungsgebühr des Zahlungsanbieters. Beides steht auf jeder Auszahlung."

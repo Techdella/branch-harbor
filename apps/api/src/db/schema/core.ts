@@ -43,17 +43,56 @@ export const ownerGroups = pgTable('owner_groups', {
   createdAt: createdAt(),
 }, (t) => [index('owner_groups_org_idx').on(t.organizationId)]);
 
+/** Brand-level settings that sit between the organisation default and a location. */
+export type BrandSettings = {
+  /** Review-request overrides (merged: organisation default → brand → location). */
+  reviews?: Record<string, unknown>;
+  /** Brand templates: website builder template, email theme and asset-library folder of the brand. */
+  siteTemplateId?: string | null;
+  emailTemplateId?: string | null;
+  assetFolder?: string | null;
+};
+
 /**
- * Brands (access scope `brand`). Single-brand today: every business has one default brand and locations without a
- * brand belong to it. Modelled so a multi-brand franchisor can scope people to one brand later.
+ * Brands (access scope `brand`). Every business has one default brand; locations without a brand belong to it.
+ * A franchisor HQ can run several brands of the SAME industry (one industry per business account). Each brand has its
+ * own identity (logo, colours, fonts, theme, domain, languages, currency), email sender, hosted site, franchise terms
+ * and onboarding checklist. Identity fields left empty fall back to the business's site settings.
  */
 export const brands = pgTable('brands', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   isDefault: boolean('is_default').notNull().default(false),
+  /** Address segment of the hosted sites (/{slug}/{location}); the default brand answers on the business slug too. */
+  slug: text('slug'),
+  logoUrl: text('logo_url'),
+  primaryColor: text('primary_color'),
+  accentColor: text('accent_color'),
+  headingFont: text('heading_font'),
+  bodyFont: text('body_font'),
+  /** Website builder theme (SITE_THEMES id) of the brand's sites. */
+  themeId: text('theme_id'),
+  tagline: text('tagline'),
+  /** The brand's own web address (e.g. barre.example.com), verified through the domains flow before it serves. */
+  domain: text('domain'),
+  /** Languages the brand's sites and emails offer. */
+  locales: text('locales').array().notNull().default(sql`'{}'::text[]`),
+  defaultCurrency: currencyCol('default_currency'),
+  /** Email sender identity for email sent on behalf of the brand's locations. */
+  emailFromName: text('email_from_name'),
+  emailReplyTo: text('email_reply_to'),
+  /** Onboarding checklist template (franchise project template key) for the brand's new locations. */
+  onboardingTemplateKey: text('onboarding_template_key'),
+  settings: jsonb('settings').$type<BrandSettings>().notNull().default({}),
   createdAt: createdAt(),
-}, (t) => [index('brands_org_idx').on(t.organizationId), uniqueIndex('brands_default_uq').on(t.organizationId).where(sql`${t.isDefault}`)]);
+  updatedAt: updatedAt(),
+  archivedAt: ts('archived_at'),
+}, (t) => [
+  index('brands_org_idx').on(t.organizationId),
+  uniqueIndex('brands_default_uq').on(t.organizationId).where(sql`${t.isDefault}`),
+  uniqueIndex('brands_slug_uq').on(t.slug),
+]);
 
 /**
  * Territories (access scope `territory`): a sub-network that holds locations and franchise pipeline entries — a

@@ -58,6 +58,25 @@ So:
 - **No padlocks.** Anything a person can't access is not shown at all, and the API refuses it, module by module (each Operations screen checks its own module). Sensitive fields (finance, legal, customer personal data) are filtered server-side.
 - **Workspace switcher.** People with more than one workspace get one. A person with one workspace sees just that.
 
+## Multi-brand HQ
+
+One industry per business account still holds: multi-brand means **several brands of the same industry** under one
+franchisor HQ (for example a fitness franchisor with two yoga concepts).
+
+- **Brands** (Settings → Brands): name, site address, logo, colours, fonts, default theme, web address, languages,
+  default currency, email sender, review settings and brand templates (site template, email theme, asset folder).
+  Every location belongs to one brand; the first brand is the business's main brand.
+- **Brand switcher.** People who cover several brands get "All brands" or one brand in the top bar; lists, reports,
+  KPIs, the league table and campaigns follow it. People with a brand scope only ever see their brand.
+- **Franchise terms per brand:** disclosure documents and agreement templates (or shared by all brands), royalty and
+  fund rates (owner group → brand → network), onboarding checklist and site template for new locations; prospects
+  record the brand they are buying and the availability map is per brand.
+- **Marketing per brand:** hosted sites at `/{brand}/{location}` with the brand's theme, email sent as the brand,
+  social accounts and review settings per brand.
+- **Reporting:** a network summary across brands and a brand comparison; money is never summed across currencies.
+- **Pricing (proposal):** one platform fee per HQ, plus a small fee per extra brand (docs/PRICING.md).
+- A single-brand business sees no brand UI.
+
 ## Workspaces in one app
 
 There is a single app. Each workspace has its own home and navigation so nobody is overwhelmed. Marketing and sales are workspaces inside the app, not separate suites.

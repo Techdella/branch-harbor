@@ -7,6 +7,16 @@ export interface EmailMessage {
   text: string;
   html?: string;
   tag?: string;
+  /** Sender display name (e.g. the brand); the address stays the verified EMAIL_FROM. */
+  fromName?: string | null;
+  replyTo?: string | null;
+}
+
+/** `"Name" <address>` with the display name made safe for the header; the bare address when no name is given. */
+export function fromHeader(address: string, name?: string | null): string {
+  const bare = address.replace(/^.*<([^>]+)>.*$/, '$1').trim();
+  const clean = name?.replace(/["\r\n<>]/g, '').trim();
+  return clean ? `"${clean}" <${bare}>` : address;
 }
 
 export interface Mailer {
@@ -30,7 +40,7 @@ export function createMailer(cfg: Config, log: FastifyBaseLogger): Mailer {
         const res = await fetch('https://api.postmarkapp.com/email', {
           method: 'POST',
           headers: { 'X-Postmark-Server-Token': cfg.POSTMARK_SERVER_TOKEN, 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ From: cfg.EMAIL_FROM, To: msg.to, Subject: msg.subject, TextBody: msg.text, HtmlBody: msg.html, Tag: msg.tag, MessageStream: 'outbound' }),
+          body: JSON.stringify({ From: fromHeader(cfg.EMAIL_FROM, msg.fromName), ReplyTo: msg.replyTo ?? undefined, To: msg.to, Subject: msg.subject, TextBody: msg.text, HtmlBody: msg.html, Tag: msg.tag, MessageStream: 'outbound' }),
         });
         if (!res.ok) throw new Error(`Postmark send failed: ${res.status}`);
         const body = (await res.json()) as { MessageID?: string };
@@ -40,7 +50,7 @@ export function createMailer(cfg: Config, log: FastifyBaseLogger): Mailer {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { Authorization: `Bearer ${cfg.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from: cfg.EMAIL_FROM, to: [msg.to], subject: msg.subject, text: msg.text, html: msg.html, tags: msg.tag ? [{ name: 'category', value: msg.tag }] : undefined }),
+          body: JSON.stringify({ from: fromHeader(cfg.EMAIL_FROM, msg.fromName), reply_to: msg.replyTo ?? undefined, to: [msg.to], subject: msg.subject, text: msg.text, html: msg.html, tags: msg.tag ? [{ name: 'category', value: msg.tag }] : undefined }),
         });
         if (!res.ok) throw new Error(`Resend send failed: ${res.status}`);
         const body = (await res.json()) as { id?: string };

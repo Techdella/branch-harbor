@@ -2029,6 +2029,10 @@
         "title": "Collecte des redevances et du fonds marketing",
         "body": "{fee} par prélèvement, plafonné à {cap} par établissement et par mois. Un montant fixe, jamais un pourcentage de vos redevances."
       },
+      "extraBrand": {
+        "title": "Marques supplémentaires",
+        "body": "Gérez plusieurs marques du même secteur depuis un seul siège : {fee} par mois pour chaque marque au-delà de la première. La première marque est incluse dans les frais de plateforme de {platform}."
+      },
       "payments": {
         "title": "Paiements clients en ligne",
         "body": "Des frais d’application de {percent} sur les paiements en ligne de vos clients, plus les frais de traitement du prestataire de paiement. Les deux figurent sur chaque virement."

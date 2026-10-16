@@ -24,6 +24,7 @@ import { advanceRun, recordAutomationAudit, testRun } from '../services/automati
 import { renderEmail } from '../services/email-render.ts';
 import { addTag, campaignContent, campaignStats, consentedCustomerIds, emailBrandFor, marketingSettingsOf, parseRules, personalValues, removeTag, segmentMembers, sendMarketingEmail } from '../services/marketing.ts';
 import { iso, isoDateTime, orgParams, secured } from './_common.ts';
+import { brandInOrg, brandSharedCond } from '../services/brands.ts';
 
 const idp = z.object({ orgId: z.uuid(), id: z.uuid() });
 const scopeSchema = z.object({ kind: z.enum(SCOPE_KINDS), id: z.uuid() });
@@ -69,17 +70,18 @@ export const marketingRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   // ── Email templates ──
-  const tplBody = z.object({ name: z.string().trim().min(1).max(120), subject: z.string().max(200).default(''), preheader: z.string().max(200).default(''), document: emailDocumentSchema, category: z.string().max(40).default('campaign'), locationId: z.uuid().nullable().default(null) });
+  const tplBody = z.object({ name: z.string().trim().min(1).max(120), subject: z.string().max(200).default(''), preheader: z.string().max(200).default(''), document: emailDocumentSchema, category: z.string().max(40).default('campaign'), locationId: z.uuid().nullable().default(null), brandId: z.uuid().nullable().default(null) });
   const tplView = (t: typeof emailTemplates.$inferSelect) => ({ ...t, createdAt: t.createdAt.toISOString(), updatedAt: t.updatedAt.toISOString(), archivedAt: iso(t.archivedAt), warnings: unknownTokens(t.document, t.subject).map((x) => `unknown_token:${x}`) });
 
   app.get('/orgs/:orgId/email/templates', { schema: { tags: ['marketing'], security: secured, params: orgParams } }, async (req) => {
     const a = await anywhere(req, req.params.orgId, 'email.draft');
-    const rows = await s.db.select().from(emailTemplates).where(and(eq(emailTemplates.organizationId, req.params.orgId), isNull(emailTemplates.archivedAt))).orderBy(desc(emailTemplates.updatedAt));
+    const rows = await s.db.select().from(emailTemplates).where(and(eq(emailTemplates.organizationId, req.params.orgId), isNull(emailTemplates.archivedAt), await brandSharedCond(req, s.db, req.params.orgId, emailTemplates.brandId))).orderBy(desc(emailTemplates.updatedAt));
     return { items: rows.filter((t) => !t.locationId || inAllowed(a, t.locationId)).map(tplView) };
   });
   app.post('/orgs/:orgId/email/templates', { schema: { tags: ['marketing'], security: secured, params: orgParams, body: tplBody } }, async (req, reply) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'email.draft', scopeOf(orgId, req.body.locationId));
+    if (req.body.brandId && !(await brandInOrg(s.db, orgId, req.body.brandId))) throw notFound('Brand');
     const [t] = await s.db.insert(emailTemplates).values({ ...req.body, organizationId: orgId, createdBy: req.user!.id }).returning();
     await audit(s.db, { organizationId: orgId, ...actor(req), action: 'email_template.created', targetType: 'email_template', targetId: t!.id });
     return reply.code(201).send(tplView(t!));
@@ -395,7 +397,8 @@ export const marketingRoutes: FastifyPluginAsyncZod = async (app) => {
   app.get('/orgs/:orgId/assets', { schema: { tags: ['marketing'], security: secured, params: orgParams, querystring: z.object({ folder: z.string().max(120).optional(), q: z.string().max(80).optional(), type: z.enum(['image', 'video', 'document', 'any']).default('any') }) } }, async (req) => {
     const { orgId } = req.params;
     const reach = await anywhere(req, orgId, 'website.edit').catch(() => anywhere(req, orgId, 'assets.manage'));
-    const rows = await s.db.select().from(brandAssets).where(and(eq(brandAssets.organizationId, orgId), isNull(brandAssets.archivedAt))).orderBy(desc(brandAssets.createdAt)).limit(1000);
+    // Brand libraries: the brand switcher shows that brand's assets plus the shared ones.
+    const rows = await s.db.select().from(brandAssets).where(and(eq(brandAssets.organizationId, orgId), isNull(brandAssets.archivedAt), await brandSharedCond(req, s.db, orgId, brandAssets.brandId))).orderBy(desc(brandAssets.createdAt)).limit(1000);
     const visible = rows.filter((a) => canSee(a, reach))
       .filter((a) => req.query.folder === undefined || a.folder === req.query.folder)
       .filter((a) => !req.query.q || a.name.toLowerCase().includes(req.query.q.toLowerCase()))
@@ -404,7 +407,7 @@ export const marketingRoutes: FastifyPluginAsyncZod = async (app) => {
     return { items: visible.map(assetView), folders, storageMode: s.assets.mode };
   });
   app.post('/orgs/:orgId/assets/upload', {
-    schema: { tags: ['marketing'], security: secured, params: orgParams, summary: 'Upload a file (raw body with its Content-Type, max 10 MB)', querystring: z.object({ name: z.string().trim().min(1).max(160), folder: z.string().max(120).default(''), locationId: z.uuid().optional() }) },
+    schema: { tags: ['marketing'], security: secured, params: orgParams, summary: 'Upload a file (raw body with its Content-Type, max 10 MB)', querystring: z.object({ name: z.string().trim().min(1).max(160), folder: z.string().max(120).default(''), locationId: z.uuid().optional(), brandId: z.uuid().optional() }) },
     bodyLimit: MAX_UPLOAD,
   }, async (req, reply) => {
     const { orgId } = req.params;
@@ -415,10 +418,11 @@ export const marketingRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!UPLOAD_TYPES.includes(mime) || !Buffer.isBuffer(body)) throw validationError('Upload an image, video, PDF or font file', { file: 'Unsupported type' });
     if (!body.length) throw validationError('The file is empty', { file: 'Empty' });
     if (mime === 'image/svg+xml' && /<script|on\w+=|javascript:/i.test(body.toString('utf8'))) throw validationError('This SVG contains scripts', { file: 'Unsafe SVG' });
+    if (req.query.brandId && !(await brandInOrg(s.db, orgId, req.query.brandId))) throw notFound('Brand');
     const ext = mime.split('/')[1]!.replace('svg+xml', 'svg').replace('jpeg', 'jpg');
     const safeName = req.query.name.replace(/[^\p{L}\p{N}._ -]/gu, '').slice(0, 120) || `file.${ext}`;
     const out = await s.db.transaction(async (tx) => {
-      const [a] = await tx.insert(brandAssets).values({ organizationId: orgId, locationId, folder: req.query.folder.trim(), name: safeName, mime, size: body.length, storage: s.assets.mode, storageKey: '', url: '', createdBy: req.user!.id }).returning();
+      const [a] = await tx.insert(brandAssets).values({ organizationId: orgId, locationId, brandId: req.query.brandId ?? null, folder: req.query.folder.trim(), name: safeName, mime, size: body.length, storage: s.assets.mode, storageKey: '', url: '', createdBy: req.user!.id }).returning();
       const key = `${orgId}/${a!.id}/${randomToken(6)}.${ext}`;
       let url = `${s.cfg.PUBLIC_API_URL.replace(/\/$/, '')}/v1/public/assets/${a!.id}/${encodeURIComponent(`${a!.id}.${ext}`)}`;
       if (s.assets.mode === 's3') {

@@ -124,6 +124,10 @@ export default async function PricingPage({ params }: Props) {
             <h3 className="text-base font-extrabold">{t('fees.collection.title')}</h3>
             <p className="text-sm leading-relaxed">{t('fees.collection.body', { fee: fmtFee(listPrice(priceList, 'collection')), cap: fmtFee(listPrice(priceList, 'collectionCap')) })}</p>
           </div>
+          <div className="flex flex-col gap-1.5 rounded-[24px] bg-canvas p-5" data-testid="extra-brand-fee">
+            <h3 className="text-base font-extrabold">{t('fees.extraBrand.title')}</h3>
+            <p className="text-sm leading-relaxed">{t('fees.extraBrand.body', { fee: fmt(listPrice(priceList, 'extraBrand')), platform: fmt(listPrice(priceList, 'platform')) })}</p>
+          </div>
           <div className="flex flex-col gap-1.5 rounded-[24px] bg-canvas p-5" data-testid="payment-fee">
             <h3 className="text-base font-extrabold">{t('fees.payments.title')}</h3>
             <p className="text-sm leading-relaxed">{t('fees.payments.body', { percent })}</p>

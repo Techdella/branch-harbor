@@ -243,6 +243,7 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
         <Notifications />
         <ProfileMenu />
       </div>
+      <BrandSwitcher className="w-full md:w-auto" />
       <ScopePicker className="w-full md:w-auto" compact />
       <Search />
       <div className="hidden items-center gap-2 md:ml-auto md:flex">
@@ -268,5 +269,31 @@ function AiButton({ compact }: { compact?: boolean }) {
       <Icon name="sparkles" size={16} />
       <span className={compact ? 'sr-only min-[400px]:not-sr-only' : undefined}>{t('button')}</span>
     </button>
+  );
+}
+
+/**
+ * Multi-brand HQ: "All brands" or one brand. Every list, report, KPI, league table and campaign follows it. Shown only
+ * to people who cover several brands (single-brand businesses and brand-scoped people never see it).
+ */
+export function BrandSwitcher({ className }: { className?: string }) {
+  const t = useTranslations('brands');
+  const app = useApp();
+  if (!app.multiBrand) return null;
+  const active = app.brands.find((b) => b.id === app.brandId);
+  return (
+    <label className={cx('relative flex h-11 min-w-0 items-center gap-2 rounded-full bg-ink pl-3.5 pr-9 text-sm font-bold text-white', className)} data-testid="brand-switcher">
+      <span aria-hidden="true" className="h-3.5 w-3.5 shrink-0 rounded-full border border-white/60" style={{ background: active?.primaryColor ?? 'transparent' }} />
+      <span className="sr-only">{t('switcher.label')}</span>
+      <select value={app.brandId ?? ''} onChange={(e) => app.setBrandId(e.target.value || null)} className="h-10 min-w-0 max-w-[220px] flex-1 appearance-none truncate bg-transparent font-bold text-white focus:outline-none [&>option]:text-ink">
+        <option value="">{t('switcher.all', { count: app.brands.length })}</option>
+        {app.brands.map((b) => (
+          <option key={b.id} value={b.id}>
+            {b.name}
+          </option>
+        ))}
+      </select>
+      <Icon name="chevron-down" size={14} className="pointer-events-none absolute right-3.5" />
+    </label>
   );
 }

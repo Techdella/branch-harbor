@@ -10,6 +10,7 @@ import { useApp } from '../../shell/AppContext';
 import { PageHeader } from '../../shell/PageHeader';
 import { Banner, Empty } from '../../ui/States';
 import { FAsync, NetworkOnly, STAGE_UI, useFmt } from './common';
+import { BrandSelect } from '../../brands/BrandLinks';
 
 const BOARD: FranchiseStage[] = FRANCHISE_STAGES.filter((s) => s !== 'lost');
 
@@ -144,12 +145,14 @@ function NewProspect({ open, onClose, onCreated }: { open: boolean; onClose: () 
   const t = useTranslations('franchise');
   const app = useApp();
   const act = useFranchiseAction();
+  const [brandId, setBrandId] = useState<string | null>(app.brandId);
   const [v, setV] = useState({ name: '', email: '', phone: '', country: 'US', region: '', city: '', desiredTerritory: '', source: 'referral', liquid: '', netWorth: '', currency: String(app.org.defaultCurrency ?? 'USD'), message: '' });
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
   const submit = async () => {
     const r = await act.run(() => franchiseApi.createProspect({
       name: v.name, email: v.email, phone: v.phone || null, country: v.country, region: v.region || null, city: v.city || null, desiredTerritory: v.desiredTerritory || null, source: v.source,
       liquidCapitalMinor: v.liquid ? Math.round(Number(v.liquid) * 100) : null, netWorthMinor: v.netWorth ? Math.round(Number(v.netWorth) * 100) : null, currency: v.currency, message: v.message || null,
+      ...(brandId ? { brandId } : {}),
     }));
     if (r) onCreated();
   };
@@ -157,6 +160,7 @@ function NewProspect({ open, onClose, onCreated }: { open: boolean; onClose: () 
     <Drawer open={open} onClose={onClose} title={t('pipeline.add')} footer={<Button onClick={submit} loading={act.pending} disabled={!v.name || !v.email || v.country.length !== 2}>{t('common.save')}</Button>}>
       <div className="flex flex-col gap-3">
         {act.error && <Banner tone="danger">{act.error.message}</Banner>}
+        <BrandSelect value={brandId} onChange={setBrandId} />
         <Field label={t('prospect.name')}>{(p) => <Input id={p.id} value={v.name} onChange={set('name')} />}</Field>
         <Field label={t('prospect.email')}>{(p) => <Input id={p.id} type="email" value={v.email} onChange={set('email')} />}</Field>
         <Field label={t('prospect.phone')} optional>{(p) => <Input id={p.id} value={v.phone} onChange={set('phone')} />}</Field>

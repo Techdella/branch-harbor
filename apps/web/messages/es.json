@@ -2029,6 +2029,10 @@
         "title": "Cobro de royalties y fondo de marketing",
         "body": "{fee} por cobro, con un máximo de {cap} por local y mes. Una tarifa fija, nunca un porcentaje de tus royalties."
       },
+      "extraBrand": {
+        "title": "Marcas adicionales",
+        "body": "Gestione varias marcas del mismo sector desde una sola central: {fee} al mes por cada marca a partir de la segunda. La primera marca está incluida en la tarifa de plataforma de {platform}."
+      },
       "payments": {
         "title": "Pagos online de clientes",
         "body": "Una comisión de aplicación del {percent} sobre los pagos online de tus clientes, más la comisión de procesamiento del proveedor de pagos. Ambas aparecen en cada liquidación."

@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { JurisdictionRule } from '@bh/shared';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations, ownerGroups, territories } from './core.ts';
+import { brands, locations, organizations, ownerGroups, territories } from './core.ts';
 
 /**
  * Jurisdiction rules. Platform rows (organization_id null) ship with BranchHarbor; an organisation can add its own
@@ -59,6 +59,8 @@ export const franchiseTerritories = pgTable('franchise_territories', {
   showOnSite: boolean('show_on_site').notNull().default(true),
   /** Sub-network (access scope territory) this sales territory belongs to. */
   scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
+  /** Brand whose availability map the territory is on (null = the default brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [index('franchise_territories_org_idx').on(t.organizationId)]);
@@ -76,6 +78,8 @@ export const franchiseProspects = pgTable('franchise_prospects', {
   territoryId: uuid('territory_id').references(() => franchiseTerritories.id, { onDelete: 'set null' }),
   /** Sub-network (access scope territory) whose pipeline this prospect is in: a master franchisee or area developer works it. */
   scopeTerritoryId: uuid('scope_territory_id').references(() => territories.id, { onDelete: 'set null' }),
+  /** The brand the prospect is buying (null = the default brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   desiredTerritory: text('desired_territory'),
   /** Self-declared, minor units in `currency`. Never verified by BranchHarbor. */
   liquidCapitalMinor: minor('liquid_capital_minor'),
@@ -140,6 +144,8 @@ export const franchiseProjects = pgTable('franchise_projects', {
   ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'set null' }),
   locationId: uuid('location_id').references(() => locations.id, { onDelete: 'set null' }),
   templateKey: text('template_key').notNull(),
+  /** Brand of the new location (its checklist template and brand templates). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   name: text('name').notNull(),
   /** active | go_live_requested | opened | cancelled */
   status: text('status').notNull().default('active'),
@@ -205,6 +211,8 @@ export const franchiseDocuments = pgTable('franchise_documents', {
   prospectId: uuid('prospect_id'),
   ownerGroupId: uuid('owner_group_id'),
   agreementId: uuid('agreement_id'),
+  /** Brand the disclosure document / agreement template belongs to (null = every brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   uploadedBy: uuid('uploaded_by'),
   createdAt: createdAt(),
 }, (t) => [index('franchise_documents_org_kind_idx').on(t.organizationId, t.kind)]);
@@ -287,6 +295,8 @@ export const franchiseAgreements = pgTable('franchise_agreements', {
   terms: jsonb('terms').$type<Record<string, unknown>>().notNull().default({}),
   status: text('status').notNull().default('active'), // active | expired | terminated | renewed
   documentId: uuid('document_id'),
+  /** Brand the agreement is for (null = the default brand). */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'set null' }),
   /** Days-before-expiry reminders already sent (e.g. [180, 90]). */
   remindersSent: integer('reminders_sent').array().notNull().default(sql`'{}'::int[]`),
   createdBy: uuid('created_by'),

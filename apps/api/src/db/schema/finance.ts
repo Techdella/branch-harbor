@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { boolean, check, date, index, integer, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { createdAt, currencyCol, minor, orgId, pk, ts, updatedAt } from './_shared.ts';
-import { locations, organizations, ownerGroups } from './core.ts';
+import { brands, locations, organizations, ownerGroups } from './core.ts';
 
 /**
  * Finance workspace: royalties and marketing fund, invoices and collection, the fund ledger, payouts and
@@ -84,6 +84,8 @@ export const royaltyTerms = pgTable('royalty_terms', {
   id: pk(),
   organizationId: orgId().references(() => organizations.id, { onDelete: 'cascade' }),
   ownerGroupId: uuid('owner_group_id').references(() => ownerGroups.id, { onDelete: 'cascade' }),
+  /** Brand default terms (owner group null, brand set): between the owner group's terms and the organisation default. */
+  brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'cascade' }),
   currency: currencyCol().notNull(),
   effectiveFrom: date('effective_from').notNull(),
   effectiveTo: date('effective_to'),

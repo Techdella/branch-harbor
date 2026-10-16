@@ -18,6 +18,7 @@ import {
   DEFAULT_REVIEW_TEMPLATES, NEGATIVE_REVIEW_MAX_RATING, REVIEW_SMS_OPT_OUT, REVIEW_TRIGGER_SOURCES, averageRating, fillReviewTemplate, resolveReviewTemplate, reviewSettingsSchema,
   type Industry, type Locale, type ReviewChannel, type ReviewSettings, type ReviewSource,
 } from '@bh/shared';
+import { brandOfLocation } from './brands.ts';
 import type { Services } from '../context.ts';
 import type { Exec } from '../db/client.ts';
 import {
@@ -86,8 +87,13 @@ export async function locationSettingsRow(db: Exec, locationId: string) {
 /** The organisation default (full) merged with the location's overrides (only keys set there). */
 export async function effectiveSettings(db: Exec, orgId: string, locationId: string | null): Promise<ReviewSettings> {
   const org = await orgSettingsRow(db, orgId);
-  const base = reviewSettingsSchema.parse(org?.settings ?? {});
-  if (!locationId) return base;
+  const orgBase = reviewSettingsSchema.parse(org?.settings ?? {});
+  if (!locationId) return orgBase;
+  // Multi-brand HQ: the location's brand can override the network default (links, templates, timing).
+  const brand = await brandOfLocation(db, orgId, locationId);
+  const brandOver = (brand?.settings.reviews ?? {}) as Partial<ReviewSettings>;
+  const merged = reviewSettingsSchema.safeParse({ ...orgBase, ...brandOver, templates: { ...orgBase.templates, ...(brandOver.templates ?? {}) }, replyApproval: orgBase.replyApproval });
+  const base = merged.success ? merged.data : orgBase;
   const loc = await locationSettingsRow(db, locationId);
   if (!loc) return base;
   const over = loc.settings ?? {};
