@@ -7,6 +7,7 @@ import { INDUSTRIES, INDUSTRY_KEYS } from '@/content/industries';
 import { INTEGRATIONS, CATEGORY_PASTEL } from '@/content/integrations';
 import { PASTEL } from '@/content/images';
 import { ProductPreview } from '@/components/home/ProductPreview';
+import { TrialLine } from '@/components/home/TrialLine';
 import { FaqList, H2, Kicker, Lead, Panel, PastelIcon, StatusPill } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
 import { buildMetadata } from '@/lib/seo';
@@ -68,6 +69,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {tc('startPlan')}
           </LinkButton>
         </div>
+        {/* The local trial price comes from a client island (cached geo route), so this page stays static. */}
+        <TrialLine />
         <p className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-bold">
           <a href="#industries" className="inline-flex items-center gap-1.5 rounded-full underline-offset-4 hover:underline">
             {t('hero.primary')}
