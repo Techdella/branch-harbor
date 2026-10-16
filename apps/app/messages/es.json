@@ -1457,7 +1457,81 @@
     "templateStandard": "Sede estándar · v15",
     "templateFlagship": "Sede insignia · v3",
     "templatePopup": "Temporal / de temporada · v2",
-    "hoursPh": "Lun–Vie 07:00–21:00"
+    "hoursPh": "Lun–Vie 07:00–21:00",
+    "live": {
+      "brand": "Marca",
+      "brandHint": "La ubicación pertenece a una marca: su web, sus plantillas y su equipo dependen de ella.",
+      "template": "Plantilla de marca",
+      "templateHint": "Los campos bloqueados y con aprobación vienen de esta plantilla.",
+      "noTemplates": "Aún no hay plantillas para esta marca. Puedes aplicar una más tarde.",
+      "noTemplate": "Sin plantilla",
+      "templateOption": "{name} · v{version}",
+      "ownerGroup": "Grupo propietario",
+      "ownerGroupHint": "La empresa franquiciada que la gestiona. Deja «propia» para las ubicaciones de la central.",
+      "companyOwned": "Propia (sin grupo propietario)",
+      "networkRegion": "Región",
+      "noRegion": "Sin región",
+      "territory": "Territorio",
+      "territoryHint": "El país de un máster franquiciado o un área de desarrollo. Solo se muestran los territorios de la marca elegida.",
+      "noTerritory": "Sin territorio",
+      "industryDetails": "Detalles del sector",
+      "industryHint": "Opcional. Serán los valores iniciales de la configuración de esta ubicación.",
+      "choose": "Elegir…",
+      "code": "Código interno",
+      "yes": "Sí",
+      "no": "No",
+      "notVisible": "Es un borrador: no está publicada ni visible para los clientes. Publica su web desde Sitios web cuando esté lista.",
+      "addAnother": "Añadir otra ubicación",
+      "status": {
+        "draft": "Borrador",
+        "onboarding": "Incorporación",
+        "opening_soon": "Próxima apertura",
+        "operating": "En funcionamiento"
+      },
+      "industryField": {
+        "studioRooms": "Salas",
+        "maxClassSize": "Aforo máximo por clase",
+        "showers": "Duchas",
+        "pitches": "Campos o pistas",
+        "surface": "Superficie",
+        "minAge": "Edad mínima",
+        "treatmentRooms": "Salas de tratamiento",
+        "clinicRegistration": "Número de registro sanitario",
+        "stepFreeAccess": "Acceso sin escalones",
+        "storeType": "Tipo de tienda",
+        "salesFloorM2": "Superficie de venta (m²)",
+        "clickAndCollect": "Recogida en tienda",
+        "serviceStyle": "Tipo de servicio",
+        "seats": "Plazas",
+        "alcoholLicence": "Licencia de alcohol",
+        "officeLicence": "Número de licencia de la oficina",
+        "agents": "Agentes",
+        "serviceArea": "Zona de servicio",
+        "guestRooms": "Habitaciones",
+        "checkInTime": "Entrada desde (HH:MM)",
+        "checkOutTime": "Salida hasta (HH:MM)"
+      },
+      "industryOption": {
+        "surface": {
+          "grass": "Césped natural",
+          "artificial": "Césped artificial",
+          "indoor": "Cubierto",
+          "mixed": "Mixto"
+        },
+        "storeType": {
+          "store": "Tienda",
+          "outlet": "Outlet",
+          "popup": "Tienda efímera",
+          "warehouse": "Almacén"
+        },
+        "serviceStyle": {
+          "counter": "Servicio en barra",
+          "table": "Servicio en mesa",
+          "takeaway": "Solo para llevar",
+          "ghost_kitchen": "Cocina de reparto"
+        }
+      }
+    }
   },
   "websites": {
     "title": "Sitios web",

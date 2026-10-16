@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { FastifyRequest } from 'fastify';
 import {
-  approvals, fieldOverrides, locations, organizations, pageVersions, pages, publishJobResults, publishJobs, templates, websites, type FieldOrigin, type TemplateField,
+  approvals, brands, fieldOverrides, locations, organizations, pageVersions, pages, publishJobResults, publishJobs, templates, websites, type FieldOrigin, type TemplateField,
 } from '../db/schema/index.ts';
 import { AppError, conflict, forbidden, notFound, validationError } from '../lib/errors.ts';
 import { authenticate, requireUser } from '../plugins/auth.ts';
@@ -81,11 +81,15 @@ export const websiteRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   app.post('/orgs/:orgId/templates', {
-    schema: { tags: ['websites'], security: secured, params: orgParams, body: z.object({ name: z.string().min(1), industry: z.string().optional(), fields: z.array(templateField).min(1) }) },
+    schema: { tags: ['websites'], security: secured, params: orgParams, body: z.object({ name: z.string().min(1), industry: z.string().optional(), fields: z.array(templateField).min(1), brandId: z.uuid().optional().describe('Brand template: only for this brand\'s locations (multi-brand HQ); omit for every brand') }) },
   }, async (req, reply) => {
     const { orgId } = req.params;
     await requirePerm(req, s.db, 'templates.write', { organizationId: orgId, kind: 'organization', id: orgId });
-    const [t] = await s.db.insert(templates).values({ organizationId: orgId, name: req.body.name, industry: req.body.industry ?? null, fields: req.body.fields as TemplateField[] }).returning();
+    if (req.body.brandId) {
+      const [b] = await s.db.select({ id: brands.id }).from(brands).where(and(eq(brands.id, req.body.brandId), eq(brands.organizationId, orgId)));
+      if (!b) throw notFound('Brand');
+    }
+    const [t] = await s.db.insert(templates).values({ organizationId: orgId, name: req.body.name, industry: req.body.industry ?? null, fields: req.body.fields as TemplateField[], brandId: req.body.brandId ?? null }).returning();
     await audit(s.db, { organizationId: orgId, ...actor(req), action: 'template.created', targetType: 'template', targetId: t!.id });
     return reply.code(201).send(t);
   });

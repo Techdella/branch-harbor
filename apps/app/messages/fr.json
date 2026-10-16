@@ -1457,7 +1457,81 @@
     "templateStandard": "Établissement standard · v15",
     "templateFlagship": "Établissement phare · v3",
     "templatePopup": "Éphémère / saisonnier · v2",
-    "hoursPh": "Lun–Ven 07:00–21:00"
+    "hoursPh": "Lun–Ven 07:00–21:00",
+    "live": {
+      "brand": "Marque",
+      "brandHint": "Le site appartient à une marque : son site web, ses modèles et son équipe en dépendent.",
+      "template": "Modèle de marque",
+      "templateHint": "Les champs verrouillés et soumis à validation viennent de ce modèle.",
+      "noTemplates": "Aucun modèle pour cette marque pour l’instant. Vous pourrez en appliquer un plus tard.",
+      "noTemplate": "Aucun modèle",
+      "templateOption": "{name} · v{version}",
+      "ownerGroup": "Groupe propriétaire",
+      "ownerGroupHint": "La société franchisée qui l’exploite. Laissez « détenu par l’entreprise » pour les sites du siège.",
+      "companyOwned": "Détenu par l’entreprise (aucun groupe)",
+      "networkRegion": "Région",
+      "noRegion": "Aucune région",
+      "territory": "Territoire",
+      "territoryHint": "Le pays d’un master franchisé ou une zone de développement. Seuls les territoires de la marque choisie sont listés.",
+      "noTerritory": "Aucun territoire",
+      "industryDetails": "Détails du secteur",
+      "industryHint": "Facultatif. Ils servent de valeurs de départ pour la configuration de ce site.",
+      "choose": "Choisir…",
+      "code": "Code interne",
+      "yes": "Oui",
+      "no": "Non",
+      "notVisible": "C’est un brouillon : il n’est ni publié ni visible des clients. Publiez son site depuis Sites web quand il est prêt.",
+      "addAnother": "Ajouter un autre site",
+      "status": {
+        "draft": "Brouillon",
+        "onboarding": "Intégration",
+        "opening_soon": "Ouverture prochaine",
+        "operating": "En activité"
+      },
+      "industryField": {
+        "studioRooms": "Salles",
+        "maxClassSize": "Taille maximale d’un cours",
+        "showers": "Douches",
+        "pitches": "Terrains",
+        "surface": "Surface",
+        "minAge": "Âge minimum",
+        "treatmentRooms": "Salles de soin",
+        "clinicRegistration": "Numéro d’enregistrement du cabinet",
+        "stepFreeAccess": "Accès de plain-pied",
+        "storeType": "Type de magasin",
+        "salesFloorM2": "Surface de vente (m²)",
+        "clickAndCollect": "Retrait en magasin",
+        "serviceStyle": "Type de service",
+        "seats": "Places assises",
+        "alcoholLicence": "Licence d’alcool",
+        "officeLicence": "Numéro de carte professionnelle",
+        "agents": "Agents",
+        "serviceArea": "Secteur couvert",
+        "guestRooms": "Chambres",
+        "checkInTime": "Arrivée à partir de (HH:MM)",
+        "checkOutTime": "Départ avant (HH:MM)"
+      },
+      "industryOption": {
+        "surface": {
+          "grass": "Gazon naturel",
+          "artificial": "Gazon synthétique",
+          "indoor": "Couvert",
+          "mixed": "Mixte"
+        },
+        "storeType": {
+          "store": "Magasin",
+          "outlet": "Magasin d’usine",
+          "popup": "Boutique éphémère",
+          "warehouse": "Entrepôt"
+        },
+        "serviceStyle": {
+          "counter": "Service au comptoir",
+          "table": "Service à table",
+          "takeaway": "À emporter uniquement",
+          "ghost_kitchen": "Cuisine de livraison"
+        }
+      }
+    }
   },
   "websites": {
     "title": "Sites web",

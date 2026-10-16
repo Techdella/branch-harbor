@@ -23,6 +23,8 @@ export function serializeLocation(l: typeof locations.$inferSelect) {
     paymentsEnabled: l.paymentsEnabled, paymentsConnected: !!l.stripeAccountId, geo: l.geo,
     /** Brand (null = the main brand) and sub-network the location belongs to. */
     brandId: l.brandId, territoryId: l.territoryId,
+    /** Industry details given when the location was added (rooms, seats, pitches…). */
+    industryDetails: ((l.settings ?? {}) as { industry?: Record<string, unknown> }).industry ?? {},
     createdAt: iso(l.createdAt), updatedAt: iso(l.updatedAt), archivedAt: iso(l.archivedAt),
   };
 }

@@ -1,18 +1,18 @@
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
-import { createLocationSchema, currency, locale, timeZone, isValidTimeZone, locationStatuses, addressSchema, isBrandReservedPath } from '@bh/shared';
+import { createLocationSchema, currency, locale, timeZone, isValidTimeZone, locationStatuses, addressSchema, isBrandReservedPath, LOCATION_INDUSTRY_FIELDS, validateLocationIndustryFields, type Industry } from '@bh/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import type { Exec } from '../db/client.ts';
-import { locations, organizations, ownerGroups, regions } from '../db/schema/index.ts';
+import { locations, organizations, ownerGroups, regions, templates, territories } from '../db/schema/index.ts';
 import { parseCsv } from '../lib/csv.ts';
 import { notFound, validationError } from '../lib/errors.ts';
 import { slugify } from '../lib/slug.ts';
 import { authenticate } from '../plugins/auth.ts';
 import { syncBillingQuietly } from '../services/billing.ts';
 import { actor, audit } from '../services/audit.ts';
-import { authorisedLocations, requirePerm, type ScopeTarget } from '../services/authz.ts';
+import { authorisedLocations, hasPerm, requirePerm, type ScopeTarget } from '../services/authz.ts';
 import { serializeLocation } from '../services/serializers.ts';
-import { brandInOrg } from '../services/brands.ts';
+import { brandInOrg, coveredBrandIds, orgBrands } from '../services/brands.ts';
 import { activeLocations, isIndependent, requireNetwork, upgradeRequired, upgradeToNetwork } from '../services/businessMode.ts';
 import { AppError } from '../lib/errors.ts';
 import { requireMember } from '../services/authz.ts';
@@ -73,6 +73,49 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
     return { items: rows.map(serializeLocation), scope: allowed === 'all' ? 'organization' : 'assigned' };
   });
 
+  app.get('/orgs/:orgId/locations/form-options', {
+    schema: {
+      tags: ['locations'], security: secured, params: orgParams,
+      summary: 'What the Add location form offers this person: brands, brand templates, owner groups, regions, territories and the industry details (locations.write)',
+      description: 'Only what the person may file a new location under: brands they cover, regions and territories where they hold locations.write (HQ: all). `brandPicker` is true when the business runs more than one brand and the person covers several.',
+    },
+  }, async (req) => {
+    const { orgId } = req.params;
+    const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
+    if (!org) throw notFound('Organisation');
+    const orgTarget: ScopeTarget = { organizationId: orgId, kind: 'organization', id: orgId };
+    const hq = await hasPerm(req, s.db, 'locations.write', orgTarget);
+    const [allBrands, covered, regionRows, groupRows, territoryRows, templateRows] = await Promise.all([
+      orgBrands(s.db, orgId), coveredBrandIds(req, s.db, orgId),
+      s.db.select({ id: regions.id, name: regions.name }).from(regions).where(eq(regions.organizationId, orgId)).orderBy(regions.name),
+      s.db.select({ id: ownerGroups.id, name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.organizationId, orgId)).orderBy(ownerGroups.name),
+      s.db.select({ id: territories.id, name: territories.name, kind: territories.kind, country: territories.country, brandId: territories.brandId }).from(territories).where(eq(territories.organizationId, orgId)).orderBy(territories.name),
+      s.db.select({ id: templates.id, name: templates.name, industry: templates.industry, brandId: templates.brandId, version: templates.version, pageSlug: templates.pageSlug }).from(templates).where(eq(templates.organizationId, orgId)).orderBy(templates.name),
+    ]);
+    const can = async (kind: ScopeTarget['kind'], id: string) => hq || (await hasPerm(req, s.db, 'locations.write', { organizationId: orgId, kind, id }));
+    const brandsOut = [];
+    for (const b of allBrands) if ((covered === 'all' || covered.has(b.id)) && (await can('brand', b.id))) brandsOut.push({ id: b.id, name: b.name, isDefault: b.isDefault, defaultCurrency: b.defaultCurrency, primaryColor: b.primaryColor });
+    const regionsOut = [];
+    for (const r of regionRows) if (await can('region', r.id)) regionsOut.push(r);
+    const territoriesOut = [];
+    for (const t of territoryRows) if (await can('territory', t.id)) territoriesOut.push(t);
+    if (!hq && !brandsOut.length && !regionsOut.length && !territoriesOut.length) throw new AppError(403, 'forbidden', 'Missing permission locations.write');
+    const industry = (org.industry ?? 'studios') as Industry;
+    return {
+      industry,
+      defaults: { country: org.country, currency: org.defaultCurrency, timeZone: org.defaultTimeZone, locale: org.defaultLocale },
+      organizationWide: hq,
+      brandPicker: allBrands.length > 1 && brandsOut.length > 1,
+      brands: brandsOut,
+      // Brand templates: site templates for one brand (or every brand). Builder masters for one page are not location templates.
+      templates: templateRows.filter((t) => !t.pageSlug && (!t.industry || t.industry === industry)).map(({ pageSlug: _p, ...t }) => t),
+      ownerGroups: hq ? groupRows : [],
+      regions: regionsOut,
+      territories: territoriesOut,
+      industryFields: LOCATION_INDUSTRY_FIELDS[industry] ?? [],
+    };
+  });
+
   app.get('/orgs/:orgId/locations/:id', { schema: { tags: ['locations'], security: secured, params: idParams } }, async (req) => {
     const { orgId, id } = req.params;
     await requirePerm(req, s.db, 'locations.read', { organizationId: orgId, kind: 'location', id });
@@ -87,6 +130,10 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
       body: createLocationSchema.extend({
         status: z.enum(locationStatuses).default('draft'),
         brandId: z.uuid().optional().describe('Brand the location belongs to (multi-brand HQ); default = the main brand'),
+        territoryId: z.uuid().optional().describe('Territory (sub-network, e.g. a master franchisee\'s country) the location belongs to'),
+        hours: z.string().trim().max(200).optional().describe('Opening hours as shown to customers (a summary line)'),
+        industryFields: z.record(z.string().max(40), z.union([z.string().max(200), z.number(), z.boolean(), z.null()])).optional()
+          .describe('Industry details of the location (GET /locations/form-options lists them), e.g. rooms, seats or pitches'),
         upgradeToNetwork: z.boolean().default(false).describe('Independent businesses only: adding a second location requires upgrading to a network. Set true (owner only) to upgrade in the same step.'),
       }),
       summary: 'Add a location. Never auto-publishes or makes it visible to customers.',
@@ -95,7 +142,7 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
   }, async (req, reply) => {
     const { orgId } = req.params;
     const { upgradeToNetwork: wantsUpgrade, ...b } = req.body;
-    const target: ScopeTarget = b.regionId ? { organizationId: orgId, kind: 'region', id: b.regionId } : b.brandId ? { organizationId: orgId, kind: 'brand', id: b.brandId } : { organizationId: orgId, kind: 'organization', id: orgId };
+    const target: ScopeTarget = b.regionId ? { organizationId: orgId, kind: 'region', id: b.regionId } : b.territoryId ? { organizationId: orgId, kind: 'territory', id: b.territoryId } : b.brandId ? { organizationId: orgId, kind: 'brand', id: b.brandId } : { organizationId: orgId, kind: 'organization', id: orgId };
     await requirePerm(req, s.db, 'locations.write', target);
     const [orgRow] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
     let upgrade = false;
@@ -124,6 +171,23 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!brand || brand.archivedAt) throw notFound('Brand');
       brandId = brand.isDefault ? null : brand.id;
     }
+    if (b.territoryId) {
+      // A territory holds locations of its own brand only.
+      await requirePerm(req, s.db, 'locations.write', { organizationId: orgId, kind: 'territory', id: b.territoryId });
+      const [t] = await s.db.select().from(territories).where(and(eq(territories.id, b.territoryId), eq(territories.organizationId, orgId)));
+      if (!t) throw validationError('Unknown territory', { territoryId: 'Territory not found in this organisation' });
+      const def = (await orgBrands(s.db, orgId)).find((x) => x.isDefault)?.id ?? null;
+      if (t.brandId && (brandId ?? def) !== t.brandId) throw validationError('This territory belongs to another brand', { territoryId: 'Choose a territory of the location\'s brand' });
+    }
+    if (b.templateId) {
+      const [tpl] = await s.db.select().from(templates).where(and(eq(templates.id, b.templateId), eq(templates.organizationId, orgId)));
+      if (!tpl) throw validationError('Unknown template', { templateId: 'Template not found in this organisation' });
+      const def = (await orgBrands(s.db, orgId)).find((x) => x.isDefault)?.id ?? null;
+      if (tpl.brandId && tpl.brandId !== (brandId ?? def)) throw validationError('This template belongs to another brand', { templateId: 'Choose a template of the location\'s brand' });
+    }
+    const [orgForIndustry] = await s.db.select({ industry: organizations.industry }).from(organizations).where(eq(organizations.id, orgId));
+    const details = validateLocationIndustryFields(orgForIndustry?.industry ?? 'studios', b.industryFields ?? {});
+    if (Object.keys(details.errors).length) throw validationError('Check the industry details', Object.fromEntries(Object.entries(details.errors).map(([k, v]) => [`industryFields.${k}`, v])));
     const [dupe] = await s.db.select({ id: locations.id }).from(locations).where(and(eq(locations.organizationId, orgId), eq(locations.code, b.code)));
     if (dupe) throw validationError('Location code already in use', { code: 'Each location needs a unique internal code' });
     const [org] = await s.db.select().from(organizations).where(eq(organizations.id, orgId));
@@ -134,7 +198,8 @@ export const locationRoutes: FastifyPluginAsyncZod = async (app) => {
         organizationId: orgId, regionId: b.regionId ?? null, ownerGroupId: b.ownerGroupId ?? null, name: b.name, code: b.code,
         slug: await uniqueSlug(tx, orgId, b.name), address: b.address, country: b.address.country, timeZone: b.timeZone,
         currency: b.currency, locale: b.locale ?? org?.defaultLocale ?? 'en', phone: b.phone ?? null, email: b.email ?? null,
-        templateId: b.templateId ?? null, status: b.status, geo, brandId,
+        templateId: b.templateId ?? null, status: b.status, geo, brandId, territoryId: b.territoryId ?? null,
+        hours: b.hours ? { summary: b.hours } : null, settings: Object.keys(details.values).length ? { industry: details.values } : {},
       }).returning();
       await audit(tx, { organizationId: orgId, ...actor(req), action: 'location.created', scopeKind: 'location', scopeId: row!.id, targetType: 'location', targetId: row!.id });
       return row!;
