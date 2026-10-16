@@ -81,6 +81,8 @@ export function sandboxPhrases(locale: string | undefined): Phrases {
 type Period = 'this_month' | 'last_month' | 'this_quarter' | 'last_quarter' | 'year_to_date' | 'last_30_days';
 
 function periodOf(q: string): Period {
+  // "this quarter vs last quarter" asks about this quarter (the tool always compares with the previous period).
+  if (/this quarter|ce trimestre|este trimestre|dieses quartal|diesem quartal|neste trimestre/.test(q)) return 'this_quarter';
   if (/last quarter|previous quarter|trimestre dernier|dernier trimestre|trimestre pasado|letztes quartal|último trimestre|trimestre passado/.test(q)) return 'last_quarter';
   if (/quarter|trimestre|quartal/.test(q)) return 'this_quarter';
   if (/last month|previous month|mois dernier|mes pasado|letzten monat|letzter monat|mês passado/.test(q)) return 'last_month';
