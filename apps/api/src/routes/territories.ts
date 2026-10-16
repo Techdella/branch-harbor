@@ -58,6 +58,14 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     if (!x) throw notFound('Territory scope');
   };
 
+  /** A brand chosen for a territory: it must belong to this business; the main brand is stored as none (its map). */
+  const ownBrand = async (orgId: string, brandId: string | null | undefined) => {
+    if (!brandId) return brandId;
+    const brand = await brandInOrg(db, orgId, brandId);
+    if (!brand) throw notFound('Brand');
+    return brand.isDefault ? null : brand.id;
+  };
+
   const listOut = async (orgId: string, rows: Territory[]) => {
     const links = await territoryLinks(db, orgId, rows.map((r) => r.id));
     const groups = await db.select({ id: ownerGroups.id, name: ownerGroups.name }).from(ownerGroups).where(eq(ownerGroups.organizationId, orgId));
@@ -85,12 +93,12 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
   });
 
   app.post('/orgs/:orgId/territories/check', {
-    schema: { tags, security: secured, params: orgParams, body: z.object({ id: z.uuid().optional(), geometry: territoryGeometrySchema.nullable().optional(), postcodes: z.array(z.string().max(12)).max(2000).default([]), exclusivity: z.enum(TERRITORY_EXCLUSIVITY).default('exclusive'), status: z.enum(TERRITORY_STATUSES).default('available') }), summary: 'Overlaps of a territory being drawn with the existing ones (conflict = refused by the exclusivity rules)' },
+    schema: { tags, security: secured, params: orgParams, body: z.object({ id: z.uuid().optional(), geometry: territoryGeometrySchema.nullable().optional(), postcodes: z.array(z.string().max(12)).max(2000).default([]), exclusivity: z.enum(TERRITORY_EXCLUSIVITY).default('exclusive'), status: z.enum(TERRITORY_STATUSES).default('available'), brandId: z.uuid().nullable().optional() }), summary: 'Overlaps of a territory being drawn with the existing ones of the same brand (conflict = refused by the exclusivity rules)' },
   }, async (req) => {
     const { orgId } = req.params;
     await requireTerritories(req, db, orgId, 'view');
     const all = await orgTerritories(db, orgId);
-    const shape = { id: req.body.id ?? 'new', name: '', status: req.body.status, exclusivity: req.body.exclusivity as TerritoryExclusivity, geometry: (req.body.geometry ?? null) as TerritoryGeometry | null, postcodes: parsePostcodeList(req.body.postcodes.join('\n')) };
+    const shape = { id: req.body.id ?? 'new', name: '', status: req.body.status, exclusivity: req.body.exclusivity as TerritoryExclusivity, geometry: (req.body.geometry ?? null) as TerritoryGeometry | null, postcodes: parsePostcodeList(req.body.postcodes.join('\n')), brandId: await ownBrand(orgId, req.body.brandId) ?? null };
     return { overlaps: findOverlaps(shape, all.map(shapeOf)) };
   });
 
@@ -101,7 +109,7 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     await requireTerritories(req, db, orgId, 'edit');
     const b = req.body;
     await assertScopeTerritory(orgId, b.scopeTerritoryId);
-    if (b.brandId && !(await brandInOrg(db, orgId, b.brandId))) throw notFound('Brand');
+    b.brandId = await ownBrand(orgId, b.brandId);
     const postcodes = postcodesOf(b) ?? [];
     const all = await orgTerritories(db, orgId);
     assertNoConflict({ id: 'new', name: b.name, status: b.status, exclusivity: b.exclusivity, geometry: (b.geometry ?? null) as TerritoryGeometry | null, postcodes, brandId: b.brandId ?? null }, all);
@@ -126,7 +134,7 @@ export const territoryRoutes: FastifyPluginAsyncZod = async (app) => {
     const cur = await loadTerritory(db, orgId, id);
     const b = req.body;
     await assertScopeTerritory(orgId, b.scopeTerritoryId);
-    if (b.brandId && !(await brandInOrg(db, orgId, b.brandId))) throw notFound('Brand');
+    if (b.brandId !== undefined) b.brandId = await ownBrand(orgId, b.brandId);
     const postcodes = postcodesOf(b);
     const all = await orgTerritories(db, orgId);
     const next = { ...shapeOf(cur), ...(b.brandId !== undefined ? { brandId: b.brandId } : {}), ...(b.status ? { status: b.status } : {}), ...(b.exclusivity ? { exclusivity: b.exclusivity } : {}), ...(b.geometry !== undefined ? { geometry: (b.geometry ?? null) as TerritoryGeometry | null } : {}), ...(postcodes ? { postcodes } : {}) };

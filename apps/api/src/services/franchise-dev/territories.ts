@@ -120,7 +120,7 @@ export function serializeTerritory(t: Territory, extra: { links?: TerritoryLinks
     derivedStatus: derivedStatus(t, extra.links), exclusivity: t.exclusivity, showOnSite: t.showOnSite, geometry: t.geometry ?? null, postcodes: t.postcodes,
     areaKm2: t.geometry ? areaKm2(t.geometry) : null, centroid: t.centroid ?? (t.geometry ? centroidOf(t.geometry) : null),
     demographics: t.demographics ?? null, score: t.score, scoreParts: t.scoreParts ?? null, reservedForProspectId: t.reservedForProspectId, ownerGroupId: t.ownerGroupId, ownerGroupName: extra.ownerGroupName ?? null,
-    agreementId: t.agreementId, masterAgreementId: t.masterAgreementId, scopeTerritoryId: t.scopeTerritoryId, statusChangedAt: t.statusChangedAt?.toISOString() ?? null, updatedAt: t.updatedAt.toISOString(),
+    agreementId: t.agreementId, masterAgreementId: t.masterAgreementId, scopeTerritoryId: t.scopeTerritoryId, brandId: t.brandId, statusChangedAt: t.statusChangedAt?.toISOString() ?? null, updatedAt: t.updatedAt.toISOString(),
     links: extra.links ?? null, overlaps: extra.overlaps ?? [],
   };
 }

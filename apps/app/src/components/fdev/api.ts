@@ -21,11 +21,13 @@ export interface TerritoryVM {
   id: string; name: string; country: string; region: string | null; jurisdiction: string; description: string | null; status: string; derivedStatus: string; exclusivity: 'exclusive' | 'protected' | 'non_exclusive';
   showOnSite: boolean; geometry: TerritoryGeometry | null; postcodes: string[]; areaKm2: number | null; centroid: { lat: number; lng: number } | null; demographics: Demographics | null; score: number | null; scoreParts: ScorePart[] | null;
   ownerGroupId: string | null; ownerGroupName: string | null; agreementId: string | null; masterAgreementId: string | null; scopeTerritoryId: string | null; statusChangedAt: string | null; updatedAt: string; overlaps: Overlap[];
+  /** Multi-brand HQ: the brand whose availability map the territory is on (null = the main brand). */
+  brandId: string | null;
   links: { prospects: Array<{ id: string; name: string; stage: string }>; agreement: { id: string; ownerGroupName: string | null; startDate: string; endDate: string } | null; project: { id: string; status: string; targetOpenDate: string | null } | null; openLocations: Array<{ id: string; name: string }> } | null;
 }
 export interface TerritorySettingsVM { publicMap: boolean; showTaken: boolean; targets: { population: number; households: number; incomeMinor: number } }
 export interface TerritoryListVM { items: TerritoryVM[]; settings: TerritorySettingsVM; map: MapConfig; brandSlug: string; homeCountry: string; scopeTerritories: Array<{ id: string; name: string; kind: string; country: string | null }>; locations: Array<{ id: string; name: string; status: string; lat: number; lng: number }>; demographics: { census: boolean }; can: { edit: boolean; publish: boolean; export: boolean } }
-export interface TerritoryInput { name: string; country: string; region?: string | null; description?: string | null; status?: string; exclusivity?: string; showOnSite?: boolean; geometry?: TerritoryGeometry | null; postcodesText?: string; scopeTerritoryId?: string | null }
+export interface TerritoryInput { name: string; country: string; region?: string | null; description?: string | null; status?: string; exclusivity?: string; showOnSite?: boolean; geometry?: TerritoryGeometry | null; postcodesText?: string; scopeTerritoryId?: string | null; brandId?: string | null }
 
 /* -------------------------------- surveys ------------------------------- */
 
@@ -78,7 +80,7 @@ export const fdevApi = {
   createTerritory: (b: TerritoryInput) => http.post<TerritoryVM>(o('/territories'), b),
   updateTerritory: (id: string, b: Partial<TerritoryInput>) => http.patch<TerritoryVM>(o(`/territories/${id}`), b),
   deleteTerritory: (id: string) => http.del<void>(o(`/territories/${id}`)),
-  checkTerritory: (b: { id?: string; geometry?: TerritoryGeometry | null; postcodes?: string[]; exclusivity?: string; status?: string }) => http.post<{ overlaps: Overlap[] }>(o('/territories/check'), b),
+  checkTerritory: (b: { id?: string; geometry?: TerritoryGeometry | null; postcodes?: string[]; exclusivity?: string; status?: string; brandId?: string | null }) => http.post<{ overlaps: Overlap[] }>(o('/territories/check'), b),
   syncStatus: (ids?: string[]) => http.post<{ changed: Array<{ id: string; from: string; to: string }> }>(o('/territories/sync-status'), ids ? { ids } : {}),
   refreshDemographics: (id: string) => http.post<TerritoryVM & { performance: { nearbyLocations: number; nearbyRevenueMinor: number | null; networkMedianRevenueMinor: number | null; currency: string | null } }>(o(`/territories/${id}/demographics`)),
   territorySettings: (b: Partial<TerritorySettingsVM>) => http.put<TerritorySettingsVM>(o('/territories/settings'), b),
