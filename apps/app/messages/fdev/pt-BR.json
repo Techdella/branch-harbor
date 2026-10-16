@@ -386,7 +386,7 @@
       "tile": {
         "transfers": "Transferências em andamento",
         "notices": "Notificações abertas",
-        "ending": "{count} prazos terminam esta semana",
+        "ending": "{count, plural, one {# prazo termina esta semana} other {# prazos terminam esta semana}}",
         "overdue": "Prazos de saneamento vencidos",
         "renewals": "Janelas de renovação abertas",
         "behind": "Desenvolvedores atrasados"

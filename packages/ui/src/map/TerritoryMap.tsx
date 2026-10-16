@@ -58,8 +58,20 @@ const bboxOf = (ts: MapTerritory[], pts: MapPoint[]): [[number, number], [number
   return [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]];
 };
 
+/** Zoomed out, territories are coloured dots (names would pile up); from city level they are name labels. */
+const LABEL_ZOOM = 5;
+function styleLabel(node: HTMLElement, zoom: number) {
+  const sel = node.dataset.selected === '1';
+  const color = node.dataset.color ?? '#6B7280';
+  if (zoom < LABEL_ZOOM && !sel) {
+    node.style.cssText = `width: 14px; height: 14px; padding: 0; border-radius: 999px; border: 2px solid #fff; background: ${color}; color: transparent; font-size: 0; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.3);`;
+    return;
+  }
+  node.style.cssText = `font: 700 11px/1.2 system-ui, sans-serif; padding: 2px 6px; border-radius: 999px; border: 2px solid ${color}; background: ${sel ? '#141414' : 'rgba(255,255,255,0.92)'}; color: ${sel ? '#fff' : '#141414'}; white-space: nowrap; cursor: pointer; max-width: 160px; overflow: hidden; text-overflow: ellipsis;`;
+}
+
 export function TerritoryMap({
-  config, territories, points = [], selectedId = null, onSelect, drawing = false, draft = [], onDraftChange, fitKey, label, outlineNote, className, colors = STATUS_COLORS,
+  config, territories, points = [], selectedId = null, onSelect, drawing = false, draft = [], onDraftChange, fitKey, label, outlineNote, className, colors = STATUS_COLORS, labelStatuses, fitStatuses,
 }: {
   config: MapConfig;
   territories: MapTerritory[];
@@ -76,6 +88,10 @@ export function TerritoryMap({
   outlineNote?: string;
   className?: string;
   colors?: Record<string, string>;
+  /** Only territories in these statuses get a name label (all when omitted). */
+  labelStatuses?: string[];
+  /** Fit the view to territories in these statuses (all when omitted), e.g. the available ones on the public map. */
+  fitStatuses?: string[];
 }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MlMap | null>(null);
@@ -122,6 +138,7 @@ export function TerritoryMap({
             if (!cb.current.drawing) return;
             cb.current.onDraftChange?.([...cb.current.draft, [Math.round(e.lngLat.lng * 1e6) / 1e6, Math.round(e.lngLat.lat * 1e6) / 1e6]]);
           });
+          m.on('zoomend', () => { for (const x of markers.current) { const el = x.getElement(); if (el.dataset.color) styleLabel(el, m.getZoom()); } });
           setReady(true);
         });
         map.current = m;
@@ -151,12 +168,14 @@ export function TerritoryMap({
     markers.current.forEach((x) => x.remove());
     markers.current = [];
     for (const t of territories) {
-      if (!t.centroid) continue;
+      if (!t.centroid || (labelStatuses && !labelStatuses.includes(t.status) && t.id !== selectedId)) continue;
       const node = document.createElement('button');
       node.type = 'button';
       node.textContent = t.name;
       node.setAttribute('aria-label', t.name);
-      node.style.cssText = `font: 700 11px/1.2 system-ui, sans-serif; padding: 2px 6px; border-radius: 999px; border: 2px solid ${colors[t.status] ?? '#6B7280'}; background: ${t.id === selectedId ? '#141414' : 'rgba(255,255,255,0.92)'}; color: ${t.id === selectedId ? '#fff' : '#141414'}; white-space: nowrap; cursor: pointer; max-width: 160px; overflow: hidden; text-overflow: ellipsis;`;
+      node.dataset.selected = t.id === selectedId ? '1' : '';
+      node.dataset.color = colors[t.status] ?? '#6B7280';
+      styleLabel(node, m.getZoom());
       node.addEventListener('click', (ev) => { ev.stopPropagation(); if (!cb.current.drawing) cb.current.onSelect?.(t.id); });
       markers.current.push(new ml.Marker({ element: node }).setLngLat([t.centroid.lng, t.centroid.lat]).addTo(m));
     }
@@ -168,7 +187,7 @@ export function TerritoryMap({
       node.style.cssText = 'width: 14px; height: 14px; border-radius: 999px; background: #141414; border: 3px solid #E2F5A6; box-shadow: 0 1px 3px rgba(0,0,0,.35);';
       markers.current.push(new ml.Marker({ element: node }).setLngLat([p.lng, p.lat]).addTo(m));
     }
-  }, [ready, territories, points, selectedId, colors]);
+  }, [ready, territories, points, selectedId, colors, labelStatuses]);
 
   // Fit to the territories when they first arrive (and when fitKey changes).
   const fitted = useRef<string | null>(null);
@@ -178,10 +197,12 @@ export function TerritoryMap({
     const key = fitKey ?? 'initial';
     if (fitted.current === key) return;
     const sel = selectedId ? territories.filter((t) => t.id === selectedId) : [];
-    const b = bboxOf(sel.length && fitKey?.startsWith('sel:') ? sel : territories, sel.length && fitKey?.startsWith('sel:') ? [] : points);
+    const pool = fitStatuses ? territories.filter((t) => fitStatuses.includes(t.status)) : territories;
+    const b = bboxOf(sel.length && fitKey?.startsWith('sel:') ? sel : pool.length ? pool : territories, sel.length && fitKey?.startsWith('sel:') ? [] : points);
     if (!b) return;
     fitted.current = key;
-    m.fitBounds(b, { padding: 48, maxZoom: 11, duration: 0 });
+    // Extra side padding keeps the name labels (HTML markers centred on each territory) inside the frame.
+    m.fitBounds(b, { padding: { top: 48, bottom: 48, left: 90, right: 90 }, maxZoom: 11, duration: 0 });
   }, [ready, territories, points, fitKey, selectedId]);
 
   // The polygon being drawn.

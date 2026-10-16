@@ -258,7 +258,7 @@ function ActionPlans({ d, id, onChanged }: { d: ResultsVM; id: string; onChanged
           {d.actions.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-[13px]">
               <span><strong>{a.title}</strong><span className="block text-xs text-stone">{[a.theme ? t(`theme.${a.theme}` as 'theme.support') : null, a.dueOn ? t('surveys.due', { date: f.date(a.dueOn) }) : null, a.ownerName].filter(Boolean).join(' · ')}</span></span>
-              <Select aria-label={t('surveys.actionStatusOf', { title: a.title })} className="h-9 w-40" value={a.status} onChange={async (e) => { if (await act.run(() => fdevApi.updateAction(id, a.id, { status: e.target.value as 'open' }))) onChanged(); }}>
+              <Select aria-label={t('surveys.actionStatusOf', { title: a.title })} className="h-9 w-40!" value={a.status} onChange={async (e) => { if (await act.run(() => fdevApi.updateAction(id, a.id, { status: e.target.value as 'open' }))) onChanged(); }}>
                 {(['open', 'in_progress', 'done'] as const).map((s) => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
               </Select>
             </li>

@@ -386,7 +386,7 @@
       "tile": {
         "transfers": "Laufende Übertragungen",
         "notices": "Offene Mitteilungen",
-        "ending": "{count} Fristen enden diese Woche",
+        "ending": "{count, plural, one {# Frist endet diese Woche} other {# Fristen enden diese Woche}}",
         "overdue": "Abgelaufene Abhilfefristen",
         "renewals": "Offene Verlängerungsfenster",
         "behind": "Entwickler im Verzug"

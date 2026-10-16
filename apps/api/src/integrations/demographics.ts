@@ -41,7 +41,7 @@ function combine(rows: Array<{ population: number | null; households: number | n
   return {
     population: rows.length ? pop : null,
     households: rows.length ? hh : null,
-    medianHouseholdIncomeMinor: w ? Math.round(weighted.reduce((s, r) => s + r.incomeMinor! * r.households!, 0) / w) : null,
+    medianHouseholdIncomeMinor: w ? Math.round(weighted.reduce((s, r) => s + r.incomeMinor! * r.households!, 0) / w / 100) * 100 : null,
   };
 }
 

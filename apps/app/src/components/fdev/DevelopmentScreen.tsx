@@ -69,6 +69,7 @@ export function Schedule({ x, canEdit, canPublish, onChanged, today }: { x: Deve
       </div>
       {/* Timeline: each unit's sign-by (hollow) and open-by (filled) deadlines, today as a line. */}
       <div className="relative mt-4 h-[calc(28px*var(--n))] rounded-md bg-canvas" style={{ ['--n' as string]: x.items.length }} role="img" aria-label={t('development.timeline')}>
+        <div className="absolute inset-y-0 start-3 end-5">
         {today && <span className="absolute inset-y-0 w-0.5 bg-danger" style={{ left: pos(today) }} title={t('development.today')} />}
         {x.items.map((i, k) => (
           <span key={i.id} className="absolute flex items-center" style={{ top: 6 + k * 28, left: i.signByDate ? pos(i.signByDate) : pos(i.openByDate), width: `calc(${pos(i.openByDate)} - ${i.signByDate ? pos(i.signByDate) : pos(i.openByDate)})` }}>
@@ -76,6 +77,7 @@ export function Schedule({ x, canEdit, canPublish, onChanged, today }: { x: Deve
             <span className={cx('absolute -end-2 h-4 w-4 rounded-full border-2 border-white', i.status === 'opened' ? 'bg-[#2E9E5B]' : i.overdue ? 'bg-danger' : 'bg-ink')} />
           </span>
         ))}
+        </div>
       </div>
       <table className="mt-3 w-full text-[13px]">
         <thead><tr className="text-left text-xs text-stone">{[t('development.unit'), t('development.signBy'), t('development.openBy'), t('development.status'), t('development.location')].map((h) => <th key={h} scope="col" className="py-1.5 pe-2">{h}</th>)}</tr></thead>
@@ -87,7 +89,7 @@ export function Schedule({ x, canEdit, canPublish, onChanged, today }: { x: Deve
               <td className="tabular py-2 pe-2">{f.date(i.openByDate)}{i.openedOn ? <span className="block text-xs text-stone">{t('development.openedOn', { date: f.date(i.openedOn) })}</span> : null}</td>
               <td className="py-2 pe-2">
                 {canEdit ? (
-                  <Select aria-label={t('development.statusOf', { unit: i.label })} className="h-9 w-36" value={i.status} onChange={async (e) => { if (await act.run(() => fdevApi.updateDevItem(x.id, i.id, { status: e.target.value }))) onChanged(); }}>
+                  <Select aria-label={t('development.statusOf', { unit: i.label })} className="h-9 w-36!" value={i.status} onChange={async (e) => { if (await act.run(() => fdevApi.updateDevItem(x.id, i.id, { status: e.target.value }))) onChanged(); }}>
                     {DEVELOPMENT_ITEM_STATUSES.filter((s) => canPublish || s !== 'waived' || i.status === 'waived').map((s) => <option key={s} value={s}>{t(`status.${s}`)}</option>)}
                   </Select>
                 ) : <StatusBadge status={i.status} />}

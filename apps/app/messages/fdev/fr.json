@@ -386,7 +386,7 @@
       "tile": {
         "transfers": "Cessions en cours",
         "notices": "Avis ouverts",
-        "ending": "{count} délais se terminent cette semaine",
+        "ending": "{count, plural, one {# délai se termine cette semaine} other {# délais se terminent cette semaine}}",
         "overdue": "Délais de régularisation échus",
         "renewals": "Fenêtres de renouvellement ouvertes",
         "behind": "Développeurs en retard"

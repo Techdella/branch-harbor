@@ -386,7 +386,7 @@
       "tile": {
         "transfers": "Transfers in progress",
         "notices": "Open notices",
-        "ending": "{count} cure periods end this week",
+        "ending": "{count, plural, one {# cure period ends this week} other {# cure periods end this week}}",
         "overdue": "Cure periods ended",
         "renewals": "Renewal windows open",
         "behind": "Developers behind schedule"

@@ -181,14 +181,14 @@ export async function seedFranchiseDev({ db, today }: { db: Db; today: string })
       reason: 'Ava is relocating; the buyer runs two wellness clinics in Portland.', steps: TRANSFER_STEPS.map((key) => ({ key, done: done.has(key), doneAt: done.has(key) ? new Date(Date.now() - 12 * DAY).toISOString() : null, doneBy: done.has(key) ? legal.id : null, note: null })), createdBy: legal.id,
     });
   }
-  const pacific = agreementOf(G('Pacific').id);
+  const pacific = agreements.find((a) => a.ownerGroupId === G('Pacific').id && a.status === 'active' && a.endDate > today) ?? agreements.find((a) => a.status === 'active' && a.endDate > today && a.ownerGroupId !== G('Rose').id);
   if (pacific) {
     const issued = addDaysYmd(today, -6);
-    const r = renderNotice('default', { franchisee: G('Pacific').name, brand: org.name, agreementDate: pacific.startDate, reason: 'insurance', details: 'the general liability certificate for Kitsilano expired on 30 September 2026 and no renewal has been provided', cureDays: 10, cureDeadline: addDaysYmd(issued, 10), date: issued });
+    const r = renderNotice('default', { franchisee: groups.find((g) => g.id === pacific.ownerGroupId)?.name ?? 'Franchisee', brand: org.name, agreementDate: pacific.startDate, reason: 'insurance', details: 'the general liability certificate expired on 30 September 2026 and no renewal has been provided', cureDays: 10, cureDeadline: addDaysYmd(issued, 10), date: issued });
     await db.insert(t.agreementNotices).values({
-      organizationId: orgId, agreementId: pacific.id, ownerGroupId: pacific.ownerGroupId, kind: 'default', reason: 'insurance', details: 'the general liability certificate for Kitsilano expired on 30 September 2026 and no renewal has been provided',
+      organizationId: orgId, agreementId: pacific.id, ownerGroupId: pacific.ownerGroupId, kind: 'default', reason: 'insurance', details: 'the general liability certificate expired on 30 September 2026 and no renewal has been provided',
       subject: r.subject, body: r.body, cureDays: 10, cureDeadline: addDaysYmd(issued, 10), status: 'issued', counselReviewed: true, counselReviewedBy: legal.id, counselReviewedAt: new Date(Date.now() - 7 * DAY), counselNote: 'Reviewed by Harlow & Finch LLP',
-      issuedAt: new Date(Date.parse(`${issued}T15:00:00Z`)), issuedBy: legal.id, deliveredTo: 'liam.oconnor@northlight.demo.branchharbor.com', createdBy: legal.id,
+      issuedAt: new Date(Date.parse(`${issued}T15:00:00Z`)), issuedBy: legal.id, deliveredTo: 'registered mail and email to the franchisee', createdBy: legal.id,
     });
   }
   const thames = agreementOf(G('Thames').id);
@@ -214,6 +214,15 @@ export async function seedFranchiseDev({ db, today }: { db: Db; today: string })
     }).returning();
     await db.update(t.franchiseTerritories).set({ masterAgreementId: m!.id }).where(and(eq(t.franchiseTerritories.organizationId, orgId), eq(t.franchiseTerritories.scopeTerritoryId, ireland.id)));
     const periods = await db.select().from(t.royaltyPeriods).where(and(eq(t.royaltyPeriods.organizationId, orgId), eq(t.royaltyPeriods.status, 'closed'))).orderBy(asc(t.royaltyPeriods.startDate));
+    // Demo: the oldest month at Galway Docks was collected, so the first split statement can be paid out.
+    const galway = L['GWY-DK'];
+    if (galway && periods[0]) {
+      const [st] = await db.select().from(t.royaltyStatements).where(and(eq(t.royaltyStatements.periodId, periods[0].id), eq(t.royaltyStatements.locationId, galway.id)));
+      if (st?.invoiceId) {
+        const [inv] = await db.select().from(t.financeInvoices).where(eq(t.financeInvoices.id, st.invoiceId));
+        if (inv && inv.status !== 'paid') await db.update(t.financeInvoices).set({ status: 'paid', paidMinor: inv.totalMinor, paidAt: new Date(Date.now() - 45 * DAY) }).where(eq(t.financeInvoices.id, inv.id));
+      }
+    }
     for (const [i, p] of periods.entries()) {
       const { out } = await generateSplitStatements(db, orgId, p.id, m!.id);
       statements += out.length;

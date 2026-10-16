@@ -134,7 +134,7 @@ function Pipeline({ m }: { m: MasterVM }) {
                       <span><strong>{p.name}</strong><span className="block text-xs text-stone">{[p.city, p.country].filter(Boolean).join(', ')} · {t(`stage.${p.stage}` as 'stage.enquiry')} · {f.date(p.createdAt)}</span></span>
                       {d.can.disclose && d.documents.length > 0 && ['enquiry', 'qualified', 'discovery_call'].includes(p.stage) && (
                         <span className="flex items-center gap-2">
-                          <Select aria-label={t('master.docFor', { name: p.name })} className="h-9 w-48" value={doc[p.id] ?? ''} onChange={(e) => setDoc((s) => ({ ...s, [p.id]: e.target.value }))}><option value="">{t('master.chooseDoc')}</option>{d.documents.map((x) => <option key={x.id} value={x.id}>{x.title} v{x.version}</option>)}</Select>
+                          <Select aria-label={t('master.docFor', { name: p.name })} className="h-9 w-48!" value={doc[p.id] ?? ''} onChange={(e) => setDoc((s) => ({ ...s, [p.id]: e.target.value }))}><option value="">{t('master.chooseDoc')}</option>{d.documents.map((x) => <option key={x.id} value={x.id}>{x.title} v{x.version}</option>)}</Select>
                           <Button size="sm" variant="secondary" icon="send" disabled={!doc[p.id]} onClick={async () => { if (await act.run(() => fdevApi.masterDisclose(m.id, p.id, doc[p.id]!))) res.reload(); }}>{t('master.disclose')}</Button>
                         </span>
                       )}
@@ -203,7 +203,7 @@ function Statements() {
                     {d.can.approve && s.status === 'approved' && (
                       <>
                         <Button size="sm" icon="send" disabled={!s.payableMinor} onClick={async () => { if (await act.run(() => fdevApi.payStatement(s.id, { method: 'stripe_transfer' }))) res.reload(); }}>{t('master.payStripe')}</Button>
-                        <Input aria-label={t('master.reference')} placeholder={t('master.reference')} className="h-9 w-44" value={ref[s.id] ?? ''} onChange={(e) => setRef((x) => ({ ...x, [s.id]: e.target.value }))} />
+                        <Input aria-label={t('master.reference')} placeholder={t('master.reference')} className="h-9 w-44!" value={ref[s.id] ?? ''} onChange={(e) => setRef((x) => ({ ...x, [s.id]: e.target.value }))} />
                         <Button size="sm" variant="secondary" disabled={!s.payableMinor || !ref[s.id]} onClick={async () => { if (await act.run(() => fdevApi.payStatement(s.id, { method: 'manual', reference: ref[s.id] }))) res.reload(); }}>{t('master.payManual')}</Button>
                       </>
                     )}

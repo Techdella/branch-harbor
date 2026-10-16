@@ -6,6 +6,9 @@ import { Icon } from '@bh/ui';
 import { TerritoryMap } from '@bh/ui/map';
 import type { TerritoryMapConfig } from '@/lib/franchise';
 
+/** Only available territories are named, and the view fits them (taken ones stay as grey shapes). */
+const LABELLED = ['available'];
+
 /**
  * "Available territories" on the brand's franchise recruitment section (the franchisor opted in). Available areas are
  * green, taken ones grey when the franchisor shows them. The list below the map is the accessible equivalent and
@@ -25,7 +28,7 @@ export function AvailableTerritories({ data, formAnchor }: { data: TerritoryMapC
         <h3 id="territories-h" className="text-xl font-extrabold tracking-tight">{t('mapTitle')}</h3>
         <p className="mt-1 text-graphite">{t('mapIntro', { count: available.length })}</p>
       </div>
-      <TerritoryMap className="h-[320px] w-full sm:h-[420px]" config={data.map} territories={territories} selectedId={selected} onSelect={setSelected} label={t('mapLabel')} outlineNote={t('mapOutline')} fitKey={selected ? `sel:${selected}` : 'all'} />
+      <TerritoryMap className="h-[320px] w-full sm:h-[420px]" config={data.map} territories={territories} selectedId={selected} onSelect={setSelected} label={t('mapLabel')} outlineNote={t('mapOutline')} fitKey={selected ? `sel:${selected}` : 'all'} labelStatuses={LABELLED} fitStatuses={LABELLED} />
       <p className="flex flex-wrap gap-4 text-sm">
         <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-[#2E9E5B]" />{t('legendAvailable')}</span>
         {features.some((f) => f.properties.availability === 'taken') && <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-[#9CA3AF]" />{t('legendTaken')}</span>}
