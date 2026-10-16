@@ -170,6 +170,8 @@ const OPS_SCREEN_ROUTES: Record<string, Record<string, string>> = {
 };
 
 const READS = new Set(['GET', 'HEAD', 'OPTIONS']);
+/** Front-line actions on a management screen's records (staff receive the goods of a purchase order at their store). */
+const FRONTLINE_ACTIONS = /\/receive$/;
 
 /**
  * The Operations module an industry route belongs to (null when it belongs to any, or isn't an Operations route).
@@ -179,7 +181,7 @@ export function opsModuleForRoute(routeUrl: string | undefined, method?: string)
   const m = routeUrl ? ORG_ROUTE.exec(routeUrl) : null;
   const subs = m ? OPS_SUB_ROUTES[m[1]!] : undefined;
   if (!subs) return null;
-  if (method && !READS.has(method.toUpperCase())) {
+  if (method && !READS.has(method.toUpperCase()) && !FRONTLINE_ACTIONS.test(routeUrl!)) {
     const screenModule = OPS_SCREEN_ROUTES[m![1]!]?.[m![2] ?? ''];
     if (screenModule) return screenModule;
   }
