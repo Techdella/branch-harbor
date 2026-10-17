@@ -1,4 +1,5 @@
 export * from './paths';
+export * from './marina';
 
 /** The harbour mark: two posts (HQ and location) joined by one line; the lime hub is the platform. */
 export function logoSvg({ size = 40, dark = false, stem = true }: { size?: number; dark?: boolean; stem?: boolean } = {}) {

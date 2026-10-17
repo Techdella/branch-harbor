@@ -10,4 +10,4 @@ export { Icon } from '../../../packages/ui/src/components/Icon';
 export { Logo, LogoMark } from '../../../packages/ui/src/components/Logo';
 export { Badge, Tag } from '../../../packages/ui/src/components/Badge';
 export { Card, Section, Eyebrow, IconTile } from '../../../packages/ui/src/components/Card';
-export { MarinaMark } from '../../../packages/ui/src/components/MarinaMark';
+export { MarinaAvatar, MarinaFigure, MarinaMark } from '../../../packages/ui/src/components/MarinaMark';

@@ -219,14 +219,13 @@
   }
 }
 
-/* Marina's mark: the guiding light breathes while she works. */
-@keyframes bh-marina-breathe {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .35; }
-}
-.bh-marina-thinking .bh-marina-glow {
-  animation: bh-marina-breathe 1.6s ease-in-out infinite;
-}
+/* Marina (the otter): she bobs gently while she works, her star twinkles, and she waves on welcome screens. */
+@keyframes bh-marina-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6%); } }
+@keyframes bh-marina-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes bh-marina-wave { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(10deg); } }
+.bh-marina-working > svg { animation: bh-marina-bob 1.4s ease-in-out infinite; }
+.bh-marina-working .bh-marina-dots { animation: bh-marina-twinkle 1s ease-in-out infinite; }
+.bh-marina-waving .bh-marina-paw { transform-box: fill-box; transform-origin: 50% 100%; animation: bh-marina-wave 1.6s ease-in-out 2; }
 @media (prefers-reduced-motion: reduce) {
-  .bh-marina-thinking .bh-marina-glow { animation: none; }
+  .bh-marina-working > svg, .bh-marina-working .bh-marina-dots, .bh-marina-waving .bh-marina-paw { animation: none; }
 }
