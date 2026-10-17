@@ -189,7 +189,7 @@ const RULES: Rule[] = [
   // Audit trends first: “Comment évoluent…”, “Wie entwickeln sich…” would otherwise read as how-to questions.
   { test: /audit.*(trend|tendance|tendencia|entwicklung|tendência)|(trend|tendance|tendencia|tendência|évolu|evolucion|entwickel|evolu[íi]n?do).*audit/, tool: 'audit_trends', input: () => ({}) },
   { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|what does (our|the) (manual|handbook|policy|guide)|where do (we|i)|comment |cómo |wie |como |que dit |qué dice |was sagt |o que diz )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
-  { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw, tz) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q, tz) }) },
+  { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw, tz) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to\b)?|rappelle-moi( de\b)?|recuérdame|erinnere mich( an\b)?|lembre-me( de\b)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q, tz) }) },
   { test: /(create|add|new) (a )?(task|to-?do)|crée une tâche|crear tarea|aufgabe/, tool: 'create_task', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 120) }) },
   ...MODULE_RULES,
   { test: /(draft|write|create|prepare).*(email|newsletter)|(email|newsletter).*(draft|campaign)|rédige.*e-?mail|redacta.*correo/, tool: 'create_email_campaign_draft', input: (_q, raw) => ({ name: quoted(raw) ?? raw.slice(0, 80), subject: quoted(raw) ?? raw.slice(0, 80) }) },
