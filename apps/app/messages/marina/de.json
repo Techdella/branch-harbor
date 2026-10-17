@@ -15,13 +15,13 @@
     "asYou": "Sieht nur, was Sie sehen",
     "confirmFirst": "Sie bestätigen jede Änderung",
     "credits": "{used} von {limit} Credits",
-    "intro": "Fragen Sie {name} zu allem, was Sie in BranchHarbor sehen, oder lassen Sie etwas vorbereiten. Nichts wird geändert, bevor Sie es bestätigen.",
-    "thinking": "{name} prüft…",
+    "intro": "Ich beantworte Fragen zu allem, was Sie in BranchHarbor sehen, und bereite Arbeit zur Prüfung vor. Nichts ändert sich, bevor Sie bestätigen.",
+    "thinking": "{name} kümmert sich darum…",
     "askLabel": "{name} fragen",
     "askPlaceholder": "{name} fragen oder eine Aufgabe beschreiben…",
     "send": "Senden",
     "stop": "Stoppen",
-    "disclaimer": "{name} kann sich irren. Prüfen Sie wichtige Zahlen in den jeweiligen Ansichten.",
+    "disclaimer": "Ich kann mich irren. Prüfen Sie wichtige Zahlen in den jeweiligen Ansichten.",
     "opened": "{screen} geöffnet",
     "sources": "Quellen",
     "loading": "Wird geladen…",
@@ -29,7 +29,7 @@
     "location": "Standort",
     "history": {
       "title": "Verlauf",
-      "empty": "Noch keine Unterhaltungen.",
+      "empty": "Noch keine Unterhaltungen. Fragen Sie mich etwas, dann erscheint es hier.",
       "untitled": "Unbenannte Unterhaltung",
       "archive": "Unterhaltung archivieren"
     },
@@ -47,7 +47,8 @@
       "open": "Öffnen",
       "failed": "Das hat nicht geklappt: {reason}",
       "cancelled": "Abgebrochen. Nichts wurde geändert.",
-      "rejected": "Von einer freigebenden Person abgelehnt. Nichts wurde geändert."
+      "rejected": "Von einer freigebenden Person abgelehnt. Nichts wurde geändert.",
+      "celebrate": "Erledigt. Eine Sache weniger auf Ihrer Liste."
     },
     "risk": {
       "change": "Änderung",
@@ -80,7 +81,7 @@
     },
     "briefing": {
       "today": "Briefing für heute",
-      "nothing": "Gerade braucht nichts Ihre Aufmerksamkeit.",
+      "nothing": "Genießen Sie die Ruhe, oder bitten Sie mich, etwas zu prüfen.",
       "refresh": "Aktualisieren",
       "prepared": "Erstellt {when}",
       "settings": "Briefing-Einstellungen",
@@ -108,7 +109,8 @@
         "supply": "Beschaffung",
         "self_checks": "Selbstkontrollen",
         "agreements": "Vertragsfristen"
-      }
+      },
+      "nothingTitle": "Heute braucht Sie nichts."
     },
     "severity": {
       "critical": "Dringend",
@@ -117,7 +119,7 @@
     },
     "insights": {
       "title": "Erkenntnisse",
-      "none": "Keine ungewöhnlichen Veränderungen an Ihren Standorten.",
+      "none": "Nichts Ungewöhnliches an Ihren Standorten. Ich melde es hier, wenn sich das ändert.",
       "showEvidence": "Zahlen anzeigen",
       "hideEvidence": "Zahlen ausblenden",
       "dismiss": "Verwerfen",
@@ -146,12 +148,14 @@
       "ask": "{name} fragen",
       "actions": "Wartet auf Sie",
       "tasks": "Meine Aufgaben und Erinnerungen",
-      "noTasks": "Keine Aufgaben. Bitten Sie {name}, Sie an etwas zu erinnern.",
-      "done": "Als erledigt markieren"
+      "noTasks": "Noch keine Aufgaben. Bitten Sie mich, Sie an etwas zu erinnern, dann behalte ich es hier.",
+      "done": "Als erledigt markieren",
+      "intro": "Hier sind Ihr Briefing, was mir an Ihren Standorten aufgefallen ist, und alles, was ich für Sie vorbereitet habe.",
+      "count": "{count, plural, one {Heute braucht Sie eine Sache. Sie steht oben im Briefing.} other {Heute brauchen Sie # Dinge. Das Wichtigste steht oben.}}"
     },
     "setup": {
       "title": "Mit {name} einrichten",
-      "body": "Beschreiben Sie Ihr Unternehmen in einem Satz und erhalten Sie einen Plan: Standorte, Team, Website-Design und erste Kampagnen, jeweils zum Bestätigen.",
+      "body": "Beschreiben Sie Ihr Unternehmen in einem Satz, und ich schlage einen Plan vor: Standorte, Team, Website-Design und erste Kampagnen, jeweils bereit zur Bestätigung.",
       "placeholder": "Ich betreibe 12 Yogastudios in Kanada und Großbritannien…",
       "plan": "Plan erstellen",
       "team": "Vorgeschlagenes Team",
@@ -162,7 +166,7 @@
       "description": "Eine Seite für einen Standortbesuch: Kennzahlen, Audits, offene Maßnahmen, Bewertungen, Compliance, Tickets und Gesprächspunkte von {name}.",
       "location": "Standort",
       "choose": "Standort wählen…",
-      "pick": "Wählen Sie einen Standort für das Briefing.",
+      "pick": "Wählen Sie einen Standort, und ich bereite das Briefing vor.",
       "print": "Drucken",
       "talkingPoints": "Gesprächspunkte",
       "kpis": "Kennzahlen ({period})",
@@ -207,7 +211,7 @@
       "briefPlaceholder": "Worum geht es? Nennen Sie die Fakten (Termine, Angebote): Es wird nichts erfunden.",
       "generate": "Schreiben",
       "result": "Entwurf",
-      "empty": "Ihr Entwurf erscheint hier.",
+      "empty": "Ihr Entwurf erscheint hier, sobald ich ihn geschrieben habe.",
       "guardrailsApplied": "Regeln angewendet. Entfernt: {removed}. Ergänzt: {added}",
       "translateInto": "Übersetzen in",
       "translate": "Übersetzen",
@@ -219,7 +223,8 @@
         "ad": "Anzeige",
         "website_section": "Website-Abschnitt",
         "coming_soon": "Kampagne zur baldigen Eröffnung"
-      }
+      },
+      "writing": "{name} schreibt Ihren Entwurf…"
     },
     "settings": {
       "title": "{name}",
@@ -448,6 +453,20 @@
       "list_brands": "Marken",
       "brand_comparison": "Markenvergleich",
       "plan_status": "Abo und Abrechnung"
+    },
+    "hello": "Hallo {first}, ich bin {name}.",
+    "helloAnon": "Hallo, ich bin {name}.",
+    "introTry": "Probieren Sie zum Beispiel",
+    "errorLead": "Das hat nicht geklappt.",
+    "sleep": {
+      "offTitle": "{name} ist ausgeschaltet",
+      "offBody": "Ihre Organisation hat mich vorerst ausgeschaltet. Eine KI-Administration in der Zentrale kann mich in den Einstellungen wieder einschalten. Alles andere funktioniert weiter.",
+      "offAdmin": "{name} in den Einstellungen einschalten",
+      "pausedTitle": "{name} ruht bis zum {date}",
+      "pausedBody": "Ihre Organisation hat das KI-Kontingent für diesen Monat aufgebraucht, deshalb mache ich eine Pause. Ab dem {date} bin ich wieder da, wenn es sich erneuert. Alles andere funktioniert weiter.",
+      "pausedAdmin": "KI-Credits in den Einstellungen ansehen",
+      "placeholder": "{name} ruht gerade",
+      "briefing": "Briefings pausieren, solange {name} ruht."
     }
   }
 }

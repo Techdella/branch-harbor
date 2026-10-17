@@ -2637,7 +2637,7 @@
     "faqTitle": "Questions about {name}",
     "faq": [
       {
-        "q": "Can {name} change things on its own?",
+        "q": "Can {name} change things on her own?",
         "a": "No. Reading is instant; every change is prepared as a card you confirm, and your organisation can require an HQ approver for sending, publishing or money."
       },
       {
@@ -2657,7 +2657,29 @@
       "kicker": "AI assistant",
       "title": "{name} works alongside your team",
       "body": "Ask about any location, get a morning briefing, and let {name} prepare the work. You confirm every change.",
-      "cta": "Meet {name}"
+      "cta": "Meet {name}",
+      "meet": "“Hello, I’m {name}. I stay calm, do the legwork and tell you plainly what needs you.”",
+      "traitsLabel": "What {name} is like"
+    },
+    "meet": {
+      "title": "Meet {name}",
+      "body": "“Hello, I’m {name}. Think of me as the harbour’s friendliest local. I look at what you’re allowed to see, tell you plainly what needs you today, and do the legwork: drafts, checks and briefs. You decide what happens next.”",
+      "note": "{name} is an AI assistant, not a person. She’s drawn as a sea otter: clever, good with tools, and calm in choppy water.",
+      "figureAlt": "{name}, the BranchHarbor assistant, drawn as a sea otter waving from the harbour",
+      "traits": [
+        {
+          "name": "Calm",
+          "desc": "No panic about an overdue royalty or a bad review. She says what happened and what to do next."
+        },
+        {
+          "name": "Capable",
+          "desc": "She drafts, checks and prepares the work instead of pointing you at screens, and you confirm every change."
+        },
+        {
+          "name": "Honest",
+          "desc": "When data is missing or she isn’t sure, she says so. She never invents figures, and tells you when something needs a person or a lawyer."
+        }
+      ]
     }
   }
 }

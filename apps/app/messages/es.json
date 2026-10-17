@@ -2249,6 +2249,10 @@
       "location": "Guarda tu primera sede",
       "website": "Elige un sitio web y una dirección",
       "items": "Añade al menos un elemento"
+    },
+    "marina": {
+      "title": "Soy {name}, tu asistente",
+      "body": "Cuando termines la configuración, cuéntame tu negocio en una frase en la página de {name} y te propondré ubicaciones, un equipo y primeras campañas para confirmar."
     }
   },
   "approvals": {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Button } from '@bh/ui';
+import { Button, MarinaAvatar } from '@bh/ui';
 import { ASSISTANT_NAME } from '@bh/shared';
 import { marina } from '@/lib/marina';
 import { useErrorText } from '@/lib/useErrorText';
@@ -76,10 +76,15 @@ export function ContentStudio() {
                 </div>
               )}
             </div>
-          ) : <p className="text-sm text-stone">{t('studio.empty')}</p>}
+          ) : (
+            <p className="flex items-center gap-2.5 text-sm text-stone" role={busy === 'gen' ? 'status' : undefined}>
+              <MarinaAvatar size={28} mood={busy === 'gen' ? 'thinking' : 'happy'} thinking={busy === 'gen'} />
+              {busy === 'gen' ? t('studio.writing', { name: ASSISTANT_NAME }) : t('studio.empty')}
+            </p>
+          )}
         </SectionCard>
       </div>
-      {error && <SectionCard><p role="alert" className="text-sm text-danger">{error}</p></SectionCard>}
+      {error && <SectionCard><p role="alert" className="flex items-center gap-2.5 text-sm text-danger"><MarinaAvatar size={28} mood="concerned" />{error}</p></SectionCard>}
     </>
   );
 }

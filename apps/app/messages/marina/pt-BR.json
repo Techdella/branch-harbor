@@ -15,13 +15,13 @@
     "asYou": "Só vê o que você vê",
     "confirmFirst": "Você confirma cada mudança",
     "credits": "{used} de {limit} créditos",
-    "intro": "Pergunte à {name} sobre tudo o que você vê no BranchHarbor ou peça para ela preparar algo. Nada muda até você confirmar.",
-    "thinking": "{name} está verificando…",
+    "intro": "Respondo perguntas sobre tudo o que você vê no BranchHarbor e preparo o trabalho para você conferir. Nada muda até você confirmar.",
+    "thinking": "A {name} está cuidando disso…",
     "askLabel": "Perguntar à {name}",
     "askPlaceholder": "Pergunte à {name} ou descreva uma tarefa…",
     "send": "Enviar",
     "stop": "Parar",
-    "disclaimer": "{name} pode errar. Confira números importantes nas telas correspondentes.",
+    "disclaimer": "Posso errar, então confira os números importantes nas telas correspondentes.",
     "opened": "{screen} aberto",
     "sources": "Fontes",
     "loading": "Carregando…",
@@ -29,7 +29,7 @@
     "location": "Unidade",
     "history": {
       "title": "Histórico",
-      "empty": "Nenhuma conversa ainda.",
+      "empty": "Nenhuma conversa ainda. Me pergunte algo e ela aparecerá aqui.",
       "untitled": "Conversa sem título",
       "archive": "Arquivar conversa"
     },
@@ -45,9 +45,10 @@
       "pendingApproval": "Aguardando um aprovador da sede.",
       "done": "Feito.",
       "open": "Abrir",
-      "failed": "Não funcionou: {reason}",
+      "failed": "Isso não deu certo: {reason}",
       "cancelled": "Cancelado. Nada foi alterado.",
-      "rejected": "Rejeitado por um aprovador. Nada foi alterado."
+      "rejected": "Rejeitado por um aprovador. Nada foi alterado.",
+      "celebrate": "Feito. Uma coisa a menos na sua lista."
     },
     "risk": {
       "change": "Alteração",
@@ -80,7 +81,7 @@
     },
     "briefing": {
       "today": "Resumo de hoje",
-      "nothing": "Nada precisa da sua atenção agora.",
+      "nothing": "Aproveite a calma, ou me peça para verificar algo.",
       "refresh": "Atualizar",
       "prepared": "Preparado {when}",
       "settings": "Configurações do resumo",
@@ -108,7 +109,8 @@
         "supply": "Suprimentos",
         "self_checks": "Autoavaliações",
         "agreements": "Prazos de contratos"
-      }
+      },
+      "nothingTitle": "Nada precisa de você hoje."
     },
     "severity": {
       "critical": "Urgente",
@@ -117,7 +119,7 @@
     },
     "insights": {
       "title": "Análises",
-      "none": "Nenhuma mudança incomum nas suas unidades.",
+      "none": "Nada fora do comum nas suas unidades. Aviso aqui se isso mudar.",
       "showEvidence": "Ver os números",
       "hideEvidence": "Ocultar os números",
       "dismiss": "Dispensar",
@@ -146,12 +148,14 @@
       "ask": "Perguntar à {name}",
       "actions": "Aguardando você",
       "tasks": "Minhas tarefas e lembretes",
-      "noTasks": "Nenhuma tarefa. Peça à {name} para lembrar você de algo.",
-      "done": "Marcar como feito"
+      "noTasks": "Nenhuma tarefa ainda. Me peça para lembrar você de algo e eu guardo aqui.",
+      "done": "Marcar como feito",
+      "intro": "Aqui estão seu resumo, o que notei nas suas unidades e tudo o que preparei para você.",
+      "count": "{count, plural, one {Uma coisa precisa de você hoje. Ela está no topo do seu resumo.} other {# coisas precisam de você hoje. A mais importante está no topo.}}"
     },
     "setup": {
       "title": "Configurar com a {name}",
-      "body": "Descreva seu negócio em uma frase e receba um plano: unidades, equipe, tema do site e primeiras campanhas, prontos para confirmar.",
+      "body": "Descreva seu negócio em uma frase e eu sugiro um plano: unidades, equipe, tema do site e primeiras campanhas, tudo pronto para você confirmar.",
       "placeholder": "Tenho 12 estúdios de ioga no Canadá e no Reino Unido…",
       "plan": "Criar um plano",
       "team": "Equipe sugerida",
@@ -162,7 +166,7 @@
       "description": "Uma página para visitar uma unidade: indicadores, auditorias, ações abertas, avaliações, conformidade, chamados e pontos de conversa da {name}.",
       "location": "Unidade",
       "choose": "Escolha uma unidade…",
-      "pick": "Escolha uma unidade para preparar o roteiro.",
+      "pick": "Escolha uma unidade e eu preparo o resumo.",
       "print": "Imprimir",
       "talkingPoints": "Pontos de conversa",
       "kpis": "Indicadores ({period})",
@@ -207,7 +211,7 @@
       "briefPlaceholder": "Do que se trata? Inclua os fatos a usar (datas, ofertas): nada é inventado.",
       "generate": "Escrever",
       "result": "Rascunho",
-      "empty": "Seu rascunho aparece aqui.",
+      "empty": "Seu rascunho aparecerá aqui quando eu terminar de escrevê-lo.",
       "guardrailsApplied": "Regras aplicadas. Removido: {removed}. Adicionado: {added}",
       "translateInto": "Traduzir para",
       "translate": "Traduzir",
@@ -219,7 +223,8 @@
         "ad": "Anúncio",
         "website_section": "Seção do site",
         "coming_soon": "Campanha de inauguração"
-      }
+      },
+      "writing": "A {name} está escrevendo seu rascunho…"
     },
     "settings": {
       "title": "{name}",
@@ -448,6 +453,20 @@
       "list_brands": "Marcas",
       "brand_comparison": "Comparação de marcas",
       "plan_status": "Plano e cobrança"
+    },
+    "hello": "Olá, {first}. Eu sou a {name}.",
+    "helloAnon": "Olá, eu sou a {name}.",
+    "introTry": "Experimente uma destas",
+    "errorLead": "Isso não deu certo.",
+    "sleep": {
+      "offTitle": "A {name} está desativada",
+      "offBody": "Sua organização me desativou por enquanto. Um administrador de IA da sede pode me reativar nas Configurações. Todo o resto continua funcionando.",
+      "offAdmin": "Ativar a {name} nas Configurações",
+      "pausedTitle": "A {name} está descansando até {date}",
+      "pausedBody": "Sua organização usou a cota de IA deste mês, então estou fazendo uma pausa. Volto em {date}, quando ela é renovada. Todo o resto continua funcionando.",
+      "pausedAdmin": "Ver os créditos de IA nas Configurações",
+      "placeholder": "A {name} está descansando",
+      "briefing": "Os resumos ficam pausados enquanto a {name} descansa."
     }
   }
 }

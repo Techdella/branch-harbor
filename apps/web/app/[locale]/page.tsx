@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { IconName } from '@bh/icons';
-import { Icon, MarinaMark } from '@/components/ui';
+import { Icon, MarinaFigure } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { INDUSTRIES, INDUSTRY_KEYS } from '@/content/industries';
 import { INTEGRATIONS, CATEGORY_PASTEL } from '@/content/integrations';
@@ -222,10 +222,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* 7b. The assistant */}
       <Panel labelledBy="marina-home-title" tone="lilac" className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
         <div className="flex flex-col items-start gap-4">
-          <MarinaMark size={64} label={ASSISTANT_NAME} />
+          <MarinaFigure width={220} pose="wave" label={tmar('meet.figureAlt', { name: ASSISTANT_NAME })} className="max-w-full" />
           <Kicker icon="marina">{tmar('home.kicker')}</Kicker>
           <H2 id="marina-home-title">{tmar('home.title', { name: ASSISTANT_NAME })}</H2>
           <Lead>{tmar('home.body', { name: ASSISTANT_NAME })}</Lead>
+          <p className="text-[15px] leading-relaxed">{tmar('home.meet', { name: ASSISTANT_NAME })}</p>
+          <ul className="flex flex-wrap gap-2" aria-label={tmar('home.traitsLabel', { name: ASSISTANT_NAME })}>
+            {(tmar.raw('meet.traits') as { name: string }[]).map((x) => (
+              <li key={x.name} className="rounded-full bg-surface px-3.5 py-1.5 text-sm font-bold">{x.name}</li>
+            ))}
+          </ul>
           <LinkButton href="/marina" iconRight="arrow-right">
             {tmar('home.cta', { name: ASSISTANT_NAME })}
           </LinkButton>

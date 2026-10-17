@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { IconName } from '@bh/icons';
 import { ASSISTANT_NAME } from '@bh/shared';
-import { Icon, MarinaMark } from '@/components/ui';
+import { Icon, MarinaFigure } from '@/components/ui';
 import { PASTEL } from '@/content/images';
 import { FaqList, H2, Lead, PageHero, Panel, PastelIcon, SampleBadge } from '@/components/site/Blocks';
 import { LinkButton } from '@/components/site/LinkButton';
@@ -21,6 +21,12 @@ const FEATURES: { icon: IconName; bg: string }[] = [
   { icon: 'book', bg: PASTEL.lime },
 ];
 const SAFETY: IconName[] = ['lock', 'check-circle', 'shield', 'file'];
+/** Calm, capable, honest (docs/MARINA.md). */
+const TRAITS: { icon: IconName; bg: string }[] = [
+  { icon: 'leaf', bg: PASTEL.sage },
+  { icon: 'check-circle', bg: PASTEL.butter },
+  { icon: 'eye', bg: PASTEL.aqua },
+];
 
 /** Raw (array) messages are not ICU-formatted, so the assistant's name is filled in here. */
 const named = (s: string) => s.replaceAll('{name}', ASSISTANT_NAME);
@@ -34,6 +40,7 @@ export default async function MarinaPage({ params }: Props) {
   const examples = (t.raw('askExamples') as string[]).map(named);
   const features = t.raw('features') as { name: string; desc: string }[];
   const safety = t.raw('safety') as { name: string; desc: string }[];
+  const traits = t.raw('meet.traits') as { name: string; desc: string }[];
   const faq = (t.raw('faq') as { q: string; a: string }[]).map((f) => ({ q: named(f.q), a: named(f.a) }));
 
   return (
@@ -45,13 +52,12 @@ export default async function MarinaPage({ params }: Props) {
         intro={t('lead', v)}
         aside={
           <div className="rounded-[24px] bg-lilac p-3 sm:p-4">
-            <div className="flex items-center gap-3 px-2 pb-3 pt-1">
-              <MarinaMark size={56} label={ASSISTANT_NAME} />
-              <span className="text-lg font-extrabold tracking-tight">{ASSISTANT_NAME}</span>
+            <div className="flex justify-center px-2 pt-4" data-testid="marina-hero-figure">
+              <MarinaFigure width={300} pose="wave" label={t('meet.figureAlt', v)} className="max-w-full" />
             </div>
             <div className="rounded-[18px] bg-surface">
               <div className="flex items-center gap-2 border-b border-line-soft px-4 py-3">
-                <MarinaMark size={28} />
+                <Icon name="marina" size={18} />
                 <span className="text-sm font-bold">{t('askTitle')}</span>
                 <SampleBadge className="ms-auto">{tc('sampleData')}</SampleBadge>
               </div>
@@ -76,6 +82,23 @@ export default async function MarinaPage({ params }: Props) {
           </LinkButton>
         </div>
       </PageHero>
+
+      <Panel labelledBy="marina-meet" tone="lilac" className="grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:items-center">
+        <div className="flex flex-col items-start gap-4">
+          <H2 id="marina-meet">{t('meet.title', v)}</H2>
+          <p className="text-lg leading-relaxed md:text-xl">{t('meet.body', v)}</p>
+          <p className="text-sm text-stone">{t('meet.note', v)}</p>
+        </div>
+        <ul className="grid gap-3 sm:grid-cols-3">
+          {traits.map((x, i) => (
+            <li key={x.name} className="flex flex-col gap-3 rounded-[24px] bg-surface p-6">
+              <PastelIcon name={TRAITS[i]?.icon ?? 'marina'} bg={TRAITS[i]?.bg ?? PASTEL.lilac} />
+              <h3 className="text-xl font-extrabold tracking-[-0.02em]">{x.name}</h3>
+              <p className="text-[15px] leading-relaxed text-stone">{named(x.desc)}</p>
+            </li>
+          ))}
+        </ul>
+      </Panel>
 
       <Panel labelledBy="marina-features">
         <H2 id="marina-features">{t('featuresTitle', v)}</H2>

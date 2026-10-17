@@ -4,14 +4,15 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Icon, cx, MarinaMark } from '@bh/ui';
+import { Icon, cx, MarinaAvatar, MarinaFigure } from '@bh/ui';
 import { ASSISTANT_NAME } from '@bh/shared';
 import { marina, suggestionsFor, type ConversationSummary, type Turn } from '@/lib/marina';
 import { useErrorText } from '@/lib/useErrorText';
 import { useApp } from '../shell/AppContext';
 import { ActionCard } from './ActionCard';
-import { Citations, MarinaChart, MarinaTable, Notices, RichText } from './Blocks';
+import { Citations, MarinaChart, MarinaTable, Notices, RichText, useFormatters } from './Blocks';
 import { useMarina } from './MarinaProvider';
+import { MarinaSleep, allowanceResetsOn, sleepReason } from './mood';
 
 export { MarinaMark } from '@bh/ui';
 
@@ -19,9 +20,15 @@ function AssistantTurn({ turn }: { turn: Turn }) {
   const t = useTranslations('marina');
   const errText = useErrorText();
   const app = useApp();
+  const m = useMarina();
+  const f = useFormatters();
+  const resting = turn.error ? sleepReason(null, turn.error.code) : null;
+  const denied = turn.tools.some((x) => x.status === 'denied');
+  // Thinking while she works, asleep when switched off or out of allowance, concerned for errors and "outside your access".
+  const mood = turn.pending ? 'thinking' : resting ? 'sleep' : turn.error || denied ? 'concerned' : 'happy';
   return (
-    <div className="flex gap-2.5" data-testid="marina-answer">
-      <MarinaMark size={26} thinking={turn.pending && !turn.text} />
+    <div className="flex gap-2.5" data-testid="marina-answer" data-mood={mood}>
+      <MarinaAvatar size={26} mood={mood} thinking={turn.pending} />
       <div className="flex min-w-0 flex-1 flex-col gap-2.5 rounded-[18px] bg-canvas-raised p-3.5 text-[13px] leading-relaxed">
         {turn.tools.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -45,7 +52,9 @@ function AssistantTurn({ turn }: { turn: Turn }) {
         )}
         <Citations citations={turn.citations} />
         <Notices notices={turn.notices} />
-        {turn.error && <p role="alert" className="text-xs font-semibold text-danger">{errText(turn.error)}</p>}
+        {turn.error && (resting
+          ? <p role="status" className="text-xs text-graphite">{t(resting === 'off' ? 'sleep.offTitle' : 'sleep.pausedTitle', { name: ASSISTANT_NAME, date: f.date(allowanceResetsOn(m.info?.usage.month)) })}</p>
+          : <p role="alert" className="text-xs font-semibold text-danger">{t('errorLead')} {errText(turn.error)}</p>)}
       </div>
     </div>
   );
@@ -110,12 +119,14 @@ export function MarinaPanel({ onClose, fullScreen }: { onClose: () => void; full
     setQ('');
   };
   const usage = m.info?.usage;
+  const asleep = sleepReason(m.info);
+  const first = app.session.user.name.trim().split(/\s+/)[0] ?? '';
   return (
     <aside aria-label={t('panel', { name: ASSISTANT_NAME })} role={fullScreen ? 'dialog' : undefined} aria-modal={fullScreen || undefined} data-testid="marina-panel" className={cx('flex flex-col overflow-hidden bg-surface', fullScreen ? 'h-full' : 'h-full rounded-xl')}>
       <div className="flex flex-col gap-2 bg-[linear-gradient(135deg,#E6EEFC,#EEE7FB_55%,#E2F4F0)] p-4">
         <div className="flex items-center justify-between gap-2">
           <span className="flex min-w-0 items-center gap-2.5 text-base font-bold">
-            <MarinaMark />
+            <MarinaAvatar mood={asleep ? 'sleep' : 'happy'} thinking={m.streaming} />
             <span className="truncate">{ASSISTANT_NAME}</span>
             {m.info?.mode === 'sandbox' && <span className="rounded-full bg-surface/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-stone" title={t('sandboxHint')}>{t('sandbox')}</span>}
           </span>
@@ -141,9 +152,15 @@ export function MarinaPanel({ onClose, fullScreen }: { onClose: () => void; full
         <div className="flex-1 overflow-y-auto"><History onPick={() => setView('chat')} /></div>
       ) : (
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4 text-sm" aria-live="polite">
-          {m.turns.length === 0 && (
+          {m.turns.length === 0 && asleep && <MarinaSleep reason={asleep} info={m.info} figure className="py-6" />}
+          {m.turns.length === 0 && !asleep && (
             <>
-              <p className="text-stone">{t('intro', { name: ASSISTANT_NAME })}</p>
+              <div className="flex flex-col items-center gap-2 pb-1 pt-2 text-center" data-testid="marina-welcome">
+                <MarinaFigure width={180} pose="wave" />
+                <h2 className="text-base font-bold">{first ? t('hello', { first, name: ASSISTANT_NAME }) : t('helloAnon', { name: ASSISTANT_NAME })}</h2>
+                <p className="max-w-sm text-[13px] leading-relaxed text-stone">{t('intro', { name: ASSISTANT_NAME })}</p>
+              </div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-stone">{t('introTry')}</p>
               <div className="flex flex-col gap-2" data-testid="marina-suggestions">
                 {suggestions.map((k) => (
                   <button key={k} type="button" onClick={() => submit(t(`suggest.${k}`))} className="flex items-center gap-2 rounded-md border border-line-soft bg-surface px-3.5 py-2.5 text-left text-[13px] font-semibold hover:border-ink">
@@ -157,6 +174,7 @@ export function MarinaPanel({ onClose, fullScreen }: { onClose: () => void; full
           {m.turns.map((turn) => (turn.role === 'user'
             ? <div key={turn.id} className="max-w-[88%] self-end whitespace-pre-line rounded-[20px_20px_6px_20px] bg-ink px-3.5 py-2.5 text-[13px] text-white">{turn.text}</div>
             : <AssistantTurn key={turn.id} turn={turn} />))}
+          {m.turns.length > 0 && asleep && !m.streaming && <MarinaSleep reason={asleep} info={m.info} className="rounded-[18px] bg-canvas-raised p-3.5" />}
           <div ref={endRef} />
         </div>
       )}
@@ -171,7 +189,8 @@ export function MarinaPanel({ onClose, fullScreen }: { onClose: () => void; full
               rows={1}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(q); } }}
-              placeholder={t('askPlaceholder', { name: ASSISTANT_NAME })}
+              placeholder={asleep ? t('sleep.placeholder', { name: ASSISTANT_NAME }) : t('askPlaceholder', { name: ASSISTANT_NAME })}
+              disabled={!!asleep}
               className="max-h-40 min-h-11 w-full resize-none rounded-[22px] bg-canvas px-4 py-3 text-sm outline-none focus-visible:outline-3 focus-visible:outline-focus"
               data-testid="marina-input"
             />

@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Badge, Button, Field, Icon, Input, Logo, Select, Textarea, cx } from '@bh/ui';
-import { LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES } from '@bh/shared';
+import { Badge, Button, Field, Icon, Input, Logo, MarinaFigure, Select, Textarea, cx } from '@bh/ui';
+import { ASSISTANT_NAME, LAUNCH_COUNTRIES, SUPPORTED_CURRENCIES } from '@bh/shared';
 import type { IconName } from '@bh/icons';
 import { TEAM_SHAPE_SUGGESTIONS } from '@bh/shared';
 import { accessApi } from '@/lib/http/access';
@@ -250,6 +250,12 @@ export function Onboarding() {
             })}
           </ol>
           <p className="mt-3 hidden px-1 text-xs text-stone lg:block">{t('checklistHint')}</p>
+          {/* Marina introduces herself once, holding her tablet: the setup assistant waits on her page after setup. */}
+          <div className="mt-4 hidden flex-col items-center gap-2 rounded-lg bg-[linear-gradient(135deg,#EEF3FD,#F3EEFC_55%,#ECF7F4)] p-4 text-center lg:flex" data-testid="onboarding-marina">
+            <MarinaFigure width={140} pose="hold" />
+            <p className="text-sm font-bold">{t('marina.title', { name: ASSISTANT_NAME })}</p>
+            <p className="text-xs leading-relaxed text-graphite">{t('marina.body', { name: ASSISTANT_NAME })}</p>
+          </div>
         </nav>
 
         <main className="flex min-w-0 flex-1 flex-col gap-3">

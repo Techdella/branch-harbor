@@ -2657,7 +2657,29 @@
       "kicker": "KI-Assistentin",
       "title": "{name} arbeitet an der Seite Ihres Teams",
       "body": "Fragen Sie zu jedem Standort, erhalten Sie jeden Morgen ein Briefing und lassen Sie {name} die Arbeit vorbereiten. Sie bestätigen jede Änderung.",
-      "cta": "{name} kennenlernen"
+      "cta": "{name} kennenlernen",
+      "meet": "„Hallo, ich bin {name}. Ich bleibe ruhig, erledige die Vorarbeit und sage Ihnen klar, was Sie braucht.“",
+      "traitsLabel": "So ist {name}"
+    },
+    "meet": {
+      "title": "Lernen Sie {name} kennen",
+      "body": "„Hallo, ich bin {name}. Stellen Sie sich mich als die freundlichste Einheimische im Hafen vor. Ich schaue mir an, was Sie sehen dürfen, sage Ihnen klar, was heute Ihre Aufmerksamkeit braucht, und erledige die Vorarbeit: Entwürfe, Prüfungen und Briefings. Was dann passiert, entscheiden Sie.“",
+      "note": "{name} ist eine KI-Assistentin, kein Mensch. Sie ist als Seeotter gezeichnet: klug, geschickt mit Werkzeugen und ruhig, wenn das Wasser unruhig wird.",
+      "figureAlt": "{name}, die BranchHarbor-Assistentin, als Seeotter gezeichnet, der aus dem Hafen winkt",
+      "traits": [
+        {
+          "name": "Ruhig",
+          "desc": "Keine Panik wegen einer überfälligen Lizenzgebühr oder einer schlechten Bewertung. Sie sagt, was passiert ist und was als Nächstes zu tun ist."
+        },
+        {
+          "name": "Fähig",
+          "desc": "Sie entwirft, prüft und bereitet die Arbeit vor, statt Sie nur auf Ansichten zu verweisen, und Sie bestätigen jede Änderung."
+        },
+        {
+          "name": "Ehrlich",
+          "desc": "Fehlen Daten oder ist sie unsicher, sagt sie es. Sie erfindet nie Zahlen und sagt Ihnen, wann etwas einen Menschen oder eine Anwältin braucht."
+        }
+      ]
     }
   }
 }

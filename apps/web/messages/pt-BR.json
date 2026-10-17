@@ -2657,7 +2657,29 @@
       "kicker": "Assistente de IA",
       "title": "A {name} trabalha ao lado da sua equipe",
       "body": "Pergunte sobre qualquer unidade, receba um resumo todas as manhãs e deixe a {name} preparar o trabalho. Você confirma cada mudança.",
-      "cta": "Conhecer a {name}"
+      "cta": "Conhecer a {name}",
+      "meet": "“Olá, eu sou a {name}. Fico calma, faço o trabalho pesado e digo com clareza o que precisa de você.”",
+      "traitsLabel": "Como a {name} é"
+    },
+    "meet": {
+      "title": "Conheça a {name}",
+      "body": "“Olá, eu sou a {name}. Pense em mim como a moradora mais simpática do porto. Eu olho o que você tem permissão para ver, digo com clareza o que precisa de você hoje e faço o trabalho pesado: rascunhos, verificações e resumos. Você decide o que acontece depois.”",
+      "note": "A {name} é uma assistente de IA, não uma pessoa. Ela é desenhada como uma lontra-marinha: esperta, boa com ferramentas e calma quando a maré fica agitada.",
+      "figureAlt": "{name}, a assistente do BranchHarbor, desenhada como uma lontra-marinha acenando do porto",
+      "traits": [
+        {
+          "name": "Calma",
+          "desc": "Sem pânico por um royalty atrasado ou uma avaliação ruim. Ela diz o que aconteceu e o que fazer em seguida."
+        },
+        {
+          "name": "Capaz",
+          "desc": "Ela redige, verifica e prepara o trabalho em vez de mandar você para outras telas, e você confirma cada alteração."
+        },
+        {
+          "name": "Honesta",
+          "desc": "Quando faltam dados ou ela não tem certeza, ela diz. Nunca inventa números e avisa quando algo precisa de uma pessoa ou de um advogado."
+        }
+      ]
     }
   }
 }

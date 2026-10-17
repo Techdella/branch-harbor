@@ -2249,6 +2249,10 @@
       "location": "Enregistrez votre premier établissement",
       "website": "Choisissez un site et une adresse",
       "items": "Ajoutez au moins un élément"
+    },
+    "marina": {
+      "title": "Je suis {name}, votre assistante",
+      "body": "Une fois la configuration terminée, décrivez votre entreprise en une phrase sur la page {name} et je vous proposerai des sites, une équipe et des premières campagnes à confirmer."
     }
   },
   "approvals": {

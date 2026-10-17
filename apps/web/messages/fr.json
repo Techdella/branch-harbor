@@ -2657,7 +2657,29 @@
       "kicker": "Assistante IA",
       "title": "{name} travaille aux côtés de votre équipe",
       "body": "Posez une question sur n’importe quel site, recevez un point chaque matin et laissez {name} préparer le travail. Vous confirmez chaque changement.",
-      "cta": "Découvrir {name}"
+      "cta": "Découvrir {name}",
+      "meet": "« Bonjour, je suis {name}. Je reste calme, je fais le travail de fond et je vous dis simplement ce qui vous attend. »",
+      "traitsLabel": "Le caractère de {name}"
+    },
+    "meet": {
+      "title": "Découvrez {name}",
+      "body": "« Bonjour, je suis {name}. Voyez-moi comme l’habitante la plus serviable du port. Je regarde ce que vous avez le droit de voir, je vous dis simplement ce qui vous attend aujourd’hui et je fais le travail de fond : brouillons, vérifications et fiches. C’est vous qui décidez de la suite. »",
+      "note": "{name} est une assistante IA, pas une personne. Elle a les traits d’une loutre de mer : maligne, douée avec les outils et calme quand la mer s’agite.",
+      "figureAlt": "{name}, l’assistante BranchHarbor, dessinée en loutre de mer qui salue depuis le port",
+      "traits": [
+        {
+          "name": "Calme",
+          "desc": "Pas de panique pour une redevance en retard ou un mauvais avis. Elle dit ce qui s’est passé et ce qu’il faut faire ensuite."
+        },
+        {
+          "name": "Efficace",
+          "desc": "Elle rédige, vérifie et prépare le travail au lieu de vous renvoyer vers des écrans, et vous confirmez chaque modification."
+        },
+        {
+          "name": "Honnête",
+          "desc": "Quand une donnée manque ou qu’elle n’est pas sûre, elle le dit. Elle n’invente jamais de chiffres et vous signale quand il faut une personne ou un avocat."
+        }
+      ]
     }
   }
 }

@@ -2657,7 +2657,29 @@
       "kicker": "AI-assistent",
       "title": "{name} werkt naast je team",
       "body": "Stel een vraag over elke vestiging, krijg elke ochtend een briefing en laat {name} het werk voorbereiden. Jij bevestigt elke wijziging.",
-      "cta": "Maak kennis met {name}"
+      "cta": "Maak kennis met {name}",
+      "meet": "‘Hallo, ik ben {name}. Ik blijf kalm, doe het voorwerk en vertel je duidelijk wat jouw aandacht nodig heeft.’",
+      "traitsLabel": "Zo is {name}"
+    },
+    "meet": {
+      "title": "Maak kennis met {name}",
+      "body": "‘Hallo, ik ben {name}. Zie me als de vriendelijkste local van de haven. Ik kijk naar wat jij mag zien, vertel je duidelijk wat vandaag jouw aandacht nodig heeft en doe het voorwerk: concepten, controles en briefings. Wat er daarna gebeurt, beslis jij.’",
+      "note": "{name} is een AI-assistent, geen mens. Ze is getekend als zeeotter: slim, handig met gereedschap en kalm als het water woelig wordt.",
+      "figureAlt": "{name}, de assistent van BranchHarbor, getekend als zeeotter die vanuit de haven zwaait",
+      "traits": [
+        {
+          "name": "Kalm",
+          "desc": "Geen paniek over een achterstallige royalty of een slechte review. Ze zegt wat er is gebeurd en wat de volgende stap is."
+        },
+        {
+          "name": "Bekwaam",
+          "desc": "Ze schrijft, controleert en bereidt het werk voor in plaats van je naar schermen te verwijzen, en jij bevestigt elke wijziging."
+        },
+        {
+          "name": "Eerlijk",
+          "desc": "Als er gegevens ontbreken of ze het niet zeker weet, zegt ze dat. Ze verzint nooit cijfers en zegt wanneer iets een mens of een advocaat nodig heeft."
+        }
+      ]
     }
   }
 }

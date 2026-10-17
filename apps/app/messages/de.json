@@ -2249,6 +2249,10 @@
       "location": "Speichern Sie Ihren ersten Standort",
       "website": "Wählen Sie eine Website und eine Adresse",
       "items": "Fügen Sie mindestens einen Eintrag hinzu"
+    },
+    "marina": {
+      "title": "Ich bin {name}, Ihre Assistentin",
+      "body": "Wenn die Einrichtung fertig ist, beschreiben Sie mir Ihr Unternehmen auf der {name}-Seite in einem Satz, und ich schlage Standorte, ein Team und erste Kampagnen zur Bestätigung vor."
     }
   },
   "approvals": {
