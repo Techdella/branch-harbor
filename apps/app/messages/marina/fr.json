@@ -15,13 +15,13 @@
     "asYou": "Ne voit que ce que vous voyez",
     "confirmFirst": "Vous confirmez chaque changement",
     "credits": "{used} crédits sur {limit}",
-    "intro": "Posez à {name} une question sur tout ce que vous voyez dans BranchHarbor, ou demandez-lui de préparer quelque chose. Rien n’est modifié sans votre confirmation.",
-    "thinking": "{name} vérifie…",
+    "intro": "Je réponds à vos questions sur tout ce que vous voyez dans BranchHarbor et je prépare le travail pour que vous le vérifiiez. Rien ne change sans votre confirmation.",
+    "thinking": "{name} s’en occupe…",
     "askLabel": "Demander à {name}",
     "askPlaceholder": "Demandez à {name} ou décrivez une tâche…",
     "send": "Envoyer",
     "stop": "Arrêter",
-    "disclaimer": "{name} peut se tromper. Vérifiez les chiffres importants dans leurs écrans.",
+    "disclaimer": "Je peux me tromper : vérifiez les chiffres importants dans leurs écrans.",
     "opened": "{screen} ouvert",
     "sources": "Sources",
     "loading": "Chargement…",
@@ -29,7 +29,7 @@
     "location": "Site",
     "history": {
       "title": "Historique",
-      "empty": "Aucune conversation pour l’instant.",
+      "empty": "Aucune conversation pour l’instant. Posez-moi une question et elle apparaîtra ici.",
       "untitled": "Conversation sans titre",
       "archive": "Archiver la conversation"
     },
@@ -45,9 +45,10 @@
       "pendingApproval": "En attente d’un approbateur du siège.",
       "done": "Fait.",
       "open": "Ouvrir",
-      "failed": "Échec : {reason}",
+      "failed": "Cela n’a pas abouti : {reason}",
       "cancelled": "Annulé. Rien n’a été modifié.",
-      "rejected": "Refusé par un approbateur. Rien n’a été modifié."
+      "rejected": "Refusé par un approbateur. Rien n’a été modifié.",
+      "celebrate": "C’est fait. Une chose de moins sur votre liste."
     },
     "risk": {
       "change": "Modification",
@@ -80,7 +81,7 @@
     },
     "briefing": {
       "today": "Le point du jour",
-      "nothing": "Rien ne demande votre attention pour l’instant.",
+      "nothing": "Profitez du calme, ou demandez-moi de regarder quelque chose.",
       "refresh": "Actualiser",
       "prepared": "Préparé {when}",
       "settings": "Réglages du point",
@@ -108,7 +109,8 @@
         "supply": "Approvisionnement",
         "self_checks": "Autocontrôles",
         "agreements": "Échéances des contrats"
-      }
+      },
+      "nothingTitle": "Rien ne vous attend aujourd’hui."
     },
     "severity": {
       "critical": "Urgent",
@@ -117,7 +119,7 @@
     },
     "insights": {
       "title": "Analyses",
-      "none": "Aucun changement inhabituel sur vos sites.",
+      "none": "Rien d’inhabituel sur vos sites. Je le signalerai ici si cela change.",
       "showEvidence": "Voir les chiffres",
       "hideEvidence": "Masquer les chiffres",
       "dismiss": "Ignorer",
@@ -146,12 +148,14 @@
       "ask": "Demander à {name}",
       "actions": "En attente de votre part",
       "tasks": "Mes tâches et rappels",
-      "noTasks": "Aucune tâche. Demandez à {name} de vous rappeler quelque chose.",
-      "done": "Marquer comme fait"
+      "noTasks": "Aucune tâche pour l’instant. Demandez-moi de vous rappeler quelque chose et je la garderai ici.",
+      "done": "Marquer comme fait",
+      "intro": "Voici votre point du jour, ce que j’ai remarqué sur vos sites et tout ce que j’ai préparé pour vous.",
+      "count": "{count, plural, one {Une chose vous attend aujourd’hui. Elle est en haut de votre point du jour.} other {# choses vous attendent aujourd’hui. La plus importante est en haut.}}"
     },
     "setup": {
       "title": "Démarrer avec {name}",
-      "body": "Décrivez votre entreprise en une phrase et obtenez un plan : sites, équipe, thème du site web et premières campagnes, chacun prêt à confirmer.",
+      "body": "Décrivez votre entreprise en une phrase et je vous propose un plan : sites, équipe, thème du site web et premières campagnes, chacun prêt à confirmer.",
       "placeholder": "J’ai 12 studios de yoga au Canada et au Royaume-Uni…",
       "plan": "Établir un plan",
       "team": "Équipe suggérée",
@@ -162,7 +166,7 @@
       "description": "Une page pour une visite de site : indicateurs, audits, actions ouvertes, avis, conformité, tickets et points à aborder proposés par {name}.",
       "location": "Site",
       "choose": "Choisir un site…",
-      "pick": "Choisissez un site pour préparer la fiche.",
+      "pick": "Choisissez un site et je prépare la fiche.",
       "print": "Imprimer",
       "talkingPoints": "Points à aborder",
       "kpis": "Indicateurs ({period})",
@@ -207,7 +211,7 @@
       "briefPlaceholder": "De quoi s’agit-il ? Indiquez les faits à utiliser (dates, offres) : rien n’est inventé.",
       "generate": "Rédiger",
       "result": "Brouillon",
-      "empty": "Votre brouillon apparaît ici.",
+      "empty": "Votre brouillon apparaîtra ici une fois rédigé.",
       "guardrailsApplied": "Règles appliquées. Retiré : {removed}. Ajouté : {added}",
       "translateInto": "Traduire en",
       "translate": "Traduire",
@@ -219,7 +223,8 @@
         "ad": "Annonce",
         "website_section": "Section de site web",
         "coming_soon": "Campagne d’ouverture prochaine"
-      }
+      },
+      "writing": "{name} rédige votre brouillon…"
     },
     "settings": {
       "title": "{name}",
@@ -448,6 +453,20 @@
       "list_brands": "Marques",
       "brand_comparison": "Comparaison des marques",
       "plan_status": "Forfait et facturation"
+    },
+    "hello": "Bonjour {first}, je suis {name}.",
+    "helloAnon": "Bonjour, je suis {name}.",
+    "introTry": "Essayez par exemple",
+    "errorLead": "Cela n’a pas abouti.",
+    "sleep": {
+      "offTitle": "{name} est désactivée",
+      "offBody": "Votre organisation m’a désactivée pour le moment. Un administrateur IA du siège peut me réactiver dans les paramètres. Tout le reste continue de fonctionner.",
+      "offAdmin": "Activer {name} dans les paramètres",
+      "pausedTitle": "{name} se repose jusqu’au {date}",
+      "pausedBody": "Votre organisation a utilisé l’allocation IA de ce mois, alors je fais une pause. Je reviens le {date}, quand elle se renouvelle. Tout le reste continue de fonctionner.",
+      "pausedAdmin": "Voir les crédits IA dans les paramètres",
+      "placeholder": "{name} se repose",
+      "briefing": "Les points du jour sont en pause pendant que {name} se repose."
     }
   }
 }

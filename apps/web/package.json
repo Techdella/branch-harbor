@@ -9,6 +9,7 @@
     "start": "next start --port 3000",
     "typecheck": "tsc --noEmit",
     "check:messages": "node scripts/check-messages.mjs",
+    "marina:art": "node --experimental-strip-types scripts/export-marina-art.mjs",
     "lint": "pnpm run check:messages"
   },
   "dependencies": {

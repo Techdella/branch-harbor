@@ -376,6 +376,9 @@ importers:
 
   packages/icons:
     devDependencies:
+      '@types/node':
+        specifier: 22.19.1
+        version: 22.19.1
       typescript:
         specifier: 5.9.3
         version: 5.9.3

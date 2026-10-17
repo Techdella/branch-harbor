@@ -87,15 +87,15 @@ export async function buildBriefingItems(ctx: AssistantContext, sections: Briefi
 
 export async function briefingSummary(ctx: AssistantContext, items: BriefingItem[]): Promise<string> {
   const p = sandboxPhrases(ctx.locale);
-  if (!items.length) return ctx.locale.startsWith('fr') ? 'Rien d’urgent aujourd’hui.' : ctx.locale.startsWith('es') ? 'Nada urgente hoy.' : ctx.locale.startsWith('de') ? 'Heute nichts Dringendes.' : ctx.locale.startsWith('pt') ? 'Nada urgente hoje.' : 'Nothing urgent today.';
-  if (isSandbox(ctx.s)) return `${p.found} ${items.slice(0, 4).map((i) => i.title).join('; ')}.`;
+  if (!items.length) return p.quiet;
+  if (isSandbox(ctx.s)) return `${p.briefing} ${items.slice(0, 4).map((i) => i.title).join('; ')}.`;
   const r = await oneShot(ctx.s, ctx.orgId, 'briefing', {
     tier: 'fast', effort: 'low', locale: ctx.locale,
-    system: `You are ${ASSISTANT_NAME}. Write a 2–3 sentence morning briefing from the items given: what matters most first, then what can wait. Use only the items; no new facts.`,
+    system: `You are ${ASSISTANT_NAME}. Write a 2–3 sentence morning briefing from the items given: what matters most first, then what can wait. Use only the items; no new facts. Sound calm and plain-spoken: short sentences, amounts with their currency, no exclamation marks about problems, and never claim to be human.`,
     messages: [{ role: 'user', content: `Language: ${languageName(ctx.locale)}. Person: ${ctx.user.name}.\nItems:\n${items.map((i) => `- [${i.severity}] ${i.title}: ${i.detail}${i.suggestion ? ` (suggested: ${i.suggestion})` : ''}`).join('\n')}` }],
     maxTokens: 600,
   }).catch(() => null);
-  return r?.text || `${p.found} ${items.slice(0, 4).map((i) => i.title).join('; ')}.`;
+  return r?.text || `${p.briefing} ${items.slice(0, 4).map((i) => i.title).join('; ')}.`;
 }
 
 function localParts(now: Date, timeZone: string) {

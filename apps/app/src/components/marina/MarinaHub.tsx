@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon, cx } from '@bh/ui';
+import { Button, Icon, MarinaAvatar, MarinaFigure, cx } from '@bh/ui';
 import { ASSISTANT_NAME, BRIEFING_SECTIONS, type AiActionCard, type BriefingItem } from '@bh/shared';
 import { marina, type Briefing, type Insight } from '@/lib/marina';
 import { useErrorText } from '@/lib/useErrorText';
@@ -13,8 +13,8 @@ import { PageHeader } from '../shell/PageHeader';
 import { LoadingBlock, SectionCard } from '../ui/States';
 import { ActionCard } from './ActionCard';
 import { useFormatters } from './Blocks';
-import { MarinaMark } from './MarinaPanel';
 import { useMarina } from './MarinaProvider';
+import { MarinaSleep, briefingMood, insightMood, sleepReason } from './mood';
 
 const SEV: Record<string, string> = { critical: 'bg-[#FCE3E1] text-[#8A1F17]', warning: 'bg-[#FFF1C9] text-[#6B4A00]', info: 'bg-[#E4EEFF] text-[#1D3F7A]' };
 
@@ -27,9 +27,19 @@ function useLoad<T>(fn: () => Promise<T>, deps: unknown[]) {
   return { data, error, reload, setData };
 }
 
-function BriefingList({ items, compact }: { items: BriefingItem[]; compact?: boolean }) {
+function BriefingList({ items, compact, figure }: { items: BriefingItem[]; compact?: boolean; figure?: boolean }) {
   const t = useTranslations('marina');
-  if (!items.length) return <p className="text-sm text-stone">{t('briefing.nothing')}</p>;
+  if (!items.length) {
+    return figure ? (
+      <div className="flex flex-col items-center gap-2 py-2 text-center" data-testid="marina-briefing-empty">
+        <MarinaFigure width={150} mood="celebrate" pose="wave" />
+        <p className="text-sm font-bold">{t('briefing.nothingTitle')}</p>
+        <p className="max-w-xs text-xs text-stone">{t('briefing.nothing')}</p>
+      </div>
+    ) : (
+      <p className="text-sm text-stone" data-testid="marina-briefing-empty"><strong className="text-ink">{t('briefing.nothingTitle')}</strong> {t('briefing.nothing')}</p>
+    );
+  }
   return (
     <ul className="flex flex-col gap-2" data-testid="marina-briefing-items">
       {items.slice(0, compact ? 4 : 50).map((i, n) => (
@@ -46,6 +56,16 @@ function BriefingList({ items, compact }: { items: BriefingItem[]; compact?: boo
   );
 }
 
+/** Something went wrong loading what Marina prepared: she says so, calmly. */
+function ConcernedLine({ text }: { text: string }) {
+  return (
+    <p role="alert" className="flex items-start gap-2.5 text-sm text-graphite">
+      <MarinaAvatar size={26} mood="concerned" />
+      <span className="pt-0.5">{text}</span>
+    </p>
+  );
+}
+
 /** The home card on every workspace home: today's briefing, insights and a quick question. */
 export function MarinaHomeCard() {
   const t = useTranslations('marina');
@@ -55,11 +75,12 @@ export function MarinaHomeCard() {
   const insights = useLoad(() => marina.insights(), [app.org.id]);
   const [q, setQ] = useState('');
   if (!m.available) return null;
+  const asleep = sleepReason(m.info, briefing.error?.code);
   return (
     <section aria-label={t('home.title', { name: ASSISTANT_NAME })} className="flex flex-col gap-4 rounded-xl bg-[linear-gradient(135deg,#EEF3FD,#F3EEFC_55%,#ECF7F4)] p-5 md:p-6" data-testid="marina-home">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <MarinaMark size={40} />
+          <MarinaAvatar size={40} mood={asleep ? 'sleep' : briefingMood(briefing.data?.items)} />
           <div>
             <h2 className="text-lg font-bold">{t('home.title', { name: ASSISTANT_NAME })}</h2>
             <p className="text-xs text-stone">{t('home.subtitle')}</p>
@@ -70,12 +91,12 @@ export function MarinaHomeCard() {
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex flex-col gap-2.5 rounded-lg bg-surface p-4">
           <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-stone">{t('briefing.today')}</div>
-          {briefing.data ? (
+          {asleep ? <MarinaSleep reason={asleep} info={m.info} /> : briefing.data ? (
             <>
-              {briefing.data.summary && <p className="text-sm">{briefing.data.summary}</p>}
-              <BriefingList items={briefing.data.items} compact />
+              {briefing.data.summary && briefing.data.items.length > 0 && <p className="text-sm">{briefing.data.summary}</p>}
+              <BriefingList items={briefing.data.items} compact figure />
             </>
-          ) : briefing.error ? <p className="text-sm text-stone">{briefing.error.message}</p> : <LoadingBlock variant="table" rows={3} />}
+          ) : briefing.error ? <ConcernedLine text={briefing.error.message} /> : <LoadingBlock variant="table" rows={3} />}
         </div>
         <div className="flex flex-col gap-2.5 rounded-lg bg-surface p-4">
           <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-stone">{t('insights.title')}</div>
@@ -85,12 +106,12 @@ export function MarinaHomeCard() {
                 <li key={i.id}><Link href={`/marina?insight=${i.id}`} className="flex items-start gap-2 text-[13px] hover:underline"><span className={cx('mt-1 h-2 w-2 shrink-0 rounded-full', i.severity === 'critical' ? 'bg-danger' : i.severity === 'warning' ? 'bg-[#C9A227]' : 'bg-[#2E6FD8]')} />{i.title}</Link></li>
               ))}
             </ul>
-          ) : <p className="text-sm text-stone">{t('insights.none')}</p>) : <LoadingBlock variant="table" rows={2} />}
+          ) : <p className="text-sm text-stone">{t('insights.none')}</p>) : insights.error ? null : <LoadingBlock variant="table" rows={2} />}
           <form className="mt-auto flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); if (q.trim()) { m.ask(q); setQ(''); } }}>
             <label className="flex-1"><span className="sr-only">{t('askLabel', { name: ASSISTANT_NAME })}</span>
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('askPlaceholder', { name: ASSISTANT_NAME })} className="h-10 w-full rounded-full bg-canvas px-4 text-sm outline-none" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} disabled={!!asleep} placeholder={asleep ? t('sleep.placeholder', { name: ASSISTANT_NAME }) : t('askPlaceholder', { name: ASSISTANT_NAME })} className="h-10 w-full rounded-full bg-canvas px-4 text-sm outline-none" />
             </label>
-            <button type="submit" aria-label={t('send')} className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white"><Icon name="send" size={14} /></button>
+            <button type="submit" disabled={!!asleep} aria-label={t('send')} className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white disabled:opacity-40"><Icon name="send" size={14} /></button>
           </form>
         </div>
       </div>
@@ -105,8 +126,9 @@ function InsightCard({ insight, onDone }: { insight: Insight; onDone: () => void
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   return (
-    <article className="flex flex-col gap-2.5 rounded-lg border border-line-soft bg-surface p-4" data-testid="marina-insight">
+    <article className="flex flex-col gap-2.5 rounded-lg border border-line-soft bg-surface p-4" data-testid="marina-insight" data-mood={insightMood(insight.severity)}>
       <div className="flex flex-wrap items-center gap-2">
+        <MarinaAvatar size={26} mood={insightMood(insight.severity)} />
         <span className={cx('rounded-full px-2 py-0.5 text-[10px] font-bold uppercase', SEV[insight.severity])}>{t(`severity.${insight.severity}`)}</span>
         <span className="text-[11px] font-semibold text-stone">{t.has(`insightKind.${insight.kind}`) ? t(`insightKind.${insight.kind}`) : insight.kind}</span>
       </div>
@@ -188,7 +210,10 @@ function SetupAssistant() {
   const [error, setError] = useState<string | null>(null);
   return (
     <SectionCard title={t('setup.title', { name: ASSISTANT_NAME })}>
-      <p className="mb-3 text-sm text-stone">{t('setup.body')}</p>
+      <div className="mb-3 flex items-start gap-2.5">
+        <MarinaAvatar size={30} mood={busy ? 'thinking' : 'happy'} thinking={busy} />
+        <p className="text-sm text-stone">{t('setup.body')}</p>
+      </div>
       <form className="flex flex-col gap-2 md:flex-row" onSubmit={async (e) => { e.preventDefault(); setBusy(true); setError(null); try { setRes(await marina.setup(msg)); } catch (err) { setError(errText(err as ApiError)); } finally { setBusy(false); } }}>
         <input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder={t('setup.placeholder')} className="h-11 flex-1 rounded-full bg-canvas px-4 text-sm outline-none" aria-label={t('setup.title', { name: ASSISTANT_NAME })} />
         <Button type="submit" icon="marina" loading={busy} disabled={msg.trim().length < 5}>{t('setup.plan')}</Button>
@@ -223,6 +248,9 @@ export function MarinaHub() {
   const tasks = useLoad(() => marina.tasks(), [app.org.id]);
   const [refreshing, setRefreshing] = useState(false);
   const admin = !!m.info?.can.admin;
+  const asleep = sleepReason(m.info, briefing.error?.code);
+  const first = app.session.user.name.trim().split(/\s+/)[0] ?? '';
+  const items = briefing.data?.items;
   return (
     <>
       <PageHeader icon="marina" title={ASSISTANT_NAME} description={t('hub.description', { name: ASSISTANT_NAME })} scope={false}
@@ -231,16 +259,32 @@ export function MarinaHub() {
           <Link href="/marina/visit-brief" className="inline-flex h-11 items-center gap-2 rounded-full bg-canvas px-4 text-sm font-bold"><Icon name="pin" size={15} />{t('visit.title')}</Link>
           <Link href="/marina/studio" className="inline-flex h-11 items-center gap-2 rounded-full bg-canvas px-4 text-sm font-bold"><Icon name="edit" size={15} />{t('studio.title')}</Link>
         </>} />
+      <section aria-label={ASSISTANT_NAME} data-testid="marina-hub-hero" className="flex flex-col items-center gap-4 rounded-xl bg-[linear-gradient(135deg,#EEF3FD,#F3EEFC_55%,#ECF7F4)] p-4 text-center sm:flex-row sm:text-start md:p-5">
+        <MarinaFigure width={150} mood={asleep ? 'sleep' : refreshing ? 'thinking' : briefingMood(items)} pose={asleep ? 'hold' : 'wave'} />
+        {asleep ? <MarinaSleep reason={asleep} info={m.info} /> : (
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-bold tracking-tight">{first ? t('hello', { first, name: ASSISTANT_NAME }) : t('helloAnon', { name: ASSISTANT_NAME })}</h2>
+            <p className="max-w-xl text-sm text-graphite">
+              {!items ? t('hub.intro') : items.length ? t('hub.count', { count: items.length }) : `${t('briefing.nothingTitle')} ${t('briefing.nothing')}`}
+            </p>
+          </div>
+        )}
+      </section>
       <div className="grid gap-3 xl:grid-cols-[1.3fr_1fr]">
         <SectionCard title={t('briefing.today')} aside={<Button size="sm" variant="ghost" icon="refresh" loading={refreshing} onClick={async () => { setRefreshing(true); briefing.setData(await marina.briefing(true)); setRefreshing(false); }}>{t('briefing.refresh')}</Button>}>
           <div className="flex flex-col gap-3" data-testid="marina-briefing">
-            {briefing.data ? (
+            {asleep ? <p className="text-sm text-stone">{t('sleep.briefing', { name: ASSISTANT_NAME })}</p> : briefing.data ? (
               <>
-                {briefing.data.summary && <p className="text-[15px]">{briefing.data.summary}</p>}
+                {briefing.data.summary && briefing.data.items.length > 0 && (
+                  <div className="flex items-start gap-2.5">
+                    <MarinaAvatar size={30} mood={briefingMood(briefing.data.items)} />
+                    <p className="text-[15px]">{briefing.data.summary}</p>
+                  </div>
+                )}
                 <BriefingList items={briefing.data.items} />
                 <p className="text-[11px] text-stone">{t('briefing.prepared', { when: f.date(briefing.data.createdAt) })}</p>
               </>
-            ) : briefing.error ? <p className="text-sm text-stone">{briefing.error.message}</p> : <LoadingBlock variant="table" rows={4} />}
+            ) : briefing.error ? <ConcernedLine text={briefing.error.message} /> : <LoadingBlock variant="table" rows={4} />}
             <BriefingSettings />
           </div>
         </SectionCard>
@@ -270,7 +314,7 @@ export function MarinaHub() {
       </div>
       <SectionCard title={t('insights.title')} aside={admin ? <Button size="sm" variant="ghost" icon="refresh" onClick={async () => { await marina.runInsights(); insights.reload(); }}>{t('insights.run')}</Button> : undefined}>
         <div className="grid gap-3 md:grid-cols-2" data-testid="marina-insights">
-          {insights.data ? (insights.data.length ? insights.data.map((i) => <InsightCard key={i.id} insight={i} onDone={() => insights.reload()} />) : <p className="text-sm text-stone">{t('insights.none')}</p>) : <LoadingBlock variant="cards" rows={2} />}
+          {insights.data ? (insights.data.length ? insights.data.map((i) => <InsightCard key={i.id} insight={i} onDone={() => insights.reload()} />) : <p className="text-sm text-stone">{t('insights.none')}</p>) : insights.error ? (asleep ? null : <ConcernedLine text={insights.error.message} />) : <LoadingBlock variant="cards" rows={2} />}
         </div>
       </SectionCard>
       {admin && <SetupAssistant />}

@@ -2657,7 +2657,29 @@
       "kicker": "Asistente de IA",
       "title": "{name} trabaja junto a tu equipo",
       "body": "Pregunta sobre cualquier ubicación, recibe un resumen cada mañana y deja que {name} prepare el trabajo. Tú confirmas cada cambio.",
-      "cta": "Conocer a {name}"
+      "cta": "Conocer a {name}",
+      "meet": "«Hola, soy {name}. Mantengo la calma, me encargo del trabajo pesado y te digo con claridad qué te necesita.»",
+      "traitsLabel": "Cómo es {name}"
+    },
+    "meet": {
+      "title": "Conoce a {name}",
+      "body": "«Hola, soy {name}. Piensa en mí como la vecina más amable del puerto. Miro lo que tienes permiso para ver, te digo con claridad qué te necesita hoy y me encargo del trabajo pesado: borradores, comprobaciones y resúmenes. Tú decides qué pasa después.»",
+      "note": "{name} es una asistente de IA, no una persona. Está dibujada como una nutria marina: lista, hábil con las herramientas y tranquila cuando el mar se agita.",
+      "figureAlt": "{name}, la asistente de BranchHarbor, dibujada como una nutria marina que saluda desde el puerto",
+      "traits": [
+        {
+          "name": "Tranquila",
+          "desc": "Sin alarmas por una regalía vencida o una mala reseña. Dice qué ha pasado y qué hacer a continuación."
+        },
+        {
+          "name": "Capaz",
+          "desc": "Redacta, comprueba y prepara el trabajo en lugar de mandarte a otras pantallas, y tú confirmas cada cambio."
+        },
+        {
+          "name": "Honesta",
+          "desc": "Si faltan datos o no está segura, lo dice. Nunca inventa cifras y te avisa cuando algo necesita a una persona o a un abogado."
+        }
+      ]
     }
   }
 }

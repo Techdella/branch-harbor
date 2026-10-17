@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { ASSISTANT_NAME } from '@bh/shared';
 import { addDays, localDateParts, weekdayOf, zonedToUtc } from '../lib/tz.ts';
 import type { LlmCall, LlmContentBlock, LlmMessage, LlmResult, MarinaLlm } from './llm.ts';
 
@@ -9,74 +10,86 @@ import type { LlmCall, LlmContentBlock, LlmMessage, LlmResult, MarinaLlm } from 
  * back (their `summary` lines). It never states a business fact of its own. Phrases are localised for the app locales.
  */
 
-type Phrases = Record<'found' | 'none' | 'proposed' | 'denied' | 'error' | 'help' | 'outside' | 'opening' | 'noData' | 'checking', string>;
+type Phrases = Record<'found' | 'none' | 'proposed' | 'denied' | 'error' | 'help' | 'outside' | 'opening' | 'noData' | 'checking' | 'briefing' | 'quiet', string>;
 
+/** Marina's voice (docs/MARINA.md): calm, plain-spoken, warm not cute; no exclamation marks in bad news. */
 const PHRASES: Record<string, Phrases> = {
   en: {
-    found: 'Here is what I found:',
-    none: 'I found nothing matching that.',
-    proposed: 'I have prepared this for you to review. Nothing has been changed or sent yet: confirm it on the card when you are ready.',
-    denied: 'You don’t have access to that, so I can’t do it for you.',
-    error: 'I couldn’t complete that:',
-    help: 'I can answer questions about the data you can see (locations, performance, reviews, audits, compliance, royalties, leads, tickets, training) and prepare changes for you to confirm. Try “Which locations missed royalties last month?” or “Revenue by location this quarter vs last”.',
-    outside: 'That isn’t something I can look up with your access. Try asking about the areas you work in.',
+    found: 'Here’s what I found:',
+    none: 'I looked, and nothing matches that. Try different words, or ask me about another area.',
+    proposed: 'I’ve prepared this for you to check. Nothing has been changed or sent yet: confirm it on the card when you’re happy with it.',
+    denied: 'That’s outside what you can see, so I can’t do it for you. Your head office can help.',
+    error: 'I couldn’t finish that:',
+    help: 'I’m {name}. I can answer questions about the data you can see (locations, performance, reviews, audits, compliance, royalties, leads, tickets, training) and prepare changes for you to confirm. Try “Which locations missed royalties last month?” or “Revenue by location this quarter vs last”.',
+    outside: 'That’s outside what you can see. Ask me about the areas you work in, or your head office can help.',
     opening: 'Opening',
-    noData: 'There is no data for that yet.',
-    checking: 'Let me check.',
+    noData: 'There’s no data for that yet.',
+    checking: 'On it.',
+    briefing: 'Here’s what needs you today:',
+    quiet: 'Nothing needs you today.',
   },
   fr: {
     found: 'Voici ce que j’ai trouvé :',
-    none: 'Je n’ai rien trouvé de correspondant.',
-    proposed: 'J’ai préparé ceci pour que vous le vérifiiez. Rien n’a encore été modifié ni envoyé : confirmez sur la carte quand vous êtes prêt.',
-    denied: 'Vous n’avez pas accès à cela, je ne peux donc pas le faire pour vous.',
+    none: 'J’ai regardé, et rien ne correspond. Essayez d’autres mots, ou posez-moi une question sur un autre domaine.',
+    proposed: 'J’ai préparé ceci pour que vous le vérifiiez. Rien n’a encore été modifié ni envoyé : confirmez sur la carte quand cela vous convient.',
+    denied: 'Cela dépasse ce que vous pouvez voir, je ne peux donc pas le faire pour vous. Votre siège peut vous aider.',
     error: 'Je n’ai pas pu terminer :',
-    help: 'Je réponds aux questions sur les données que vous pouvez voir (sites, performance, avis, audits, conformité, redevances, prospects, tickets, formation) et je prépare des modifications que vous confirmez. Essayez « Quels sites n’ont pas payé leurs redevances le mois dernier ? ».',
-    outside: 'Je ne peux pas consulter cela avec vos accès. Posez une question sur vos domaines de travail.',
+    help: 'Je suis {name}. Je réponds aux questions sur les données que vous pouvez voir (sites, performance, avis, audits, conformité, redevances, prospects, tickets, formation) et je prépare des modifications que vous confirmez. Essayez « Quels sites n’ont pas payé leurs redevances le mois dernier ? ».',
+    outside: 'Cela dépasse ce que vous pouvez voir. Posez-moi une question sur vos domaines de travail, ou demandez à votre siège.',
     opening: 'Ouverture de',
     noData: 'Il n’y a pas encore de données pour cela.',
-    checking: 'Je vérifie.',
+    checking: 'Je m’en occupe.',
+    briefing: 'Voici ce qui vous attend aujourd’hui :',
+    quiet: 'Rien ne vous attend aujourd’hui.',
   },
   es: {
     found: 'Esto es lo que encontré:',
-    none: 'No encontré nada que coincida.',
-    proposed: 'Lo he preparado para que lo revises. Aún no se ha cambiado ni enviado nada: confírmalo en la tarjeta cuando quieras.',
-    denied: 'No tienes acceso a eso, así que no puedo hacerlo por ti.',
-    error: 'No pude completarlo:',
-    help: 'Respondo preguntas sobre los datos que puedes ver (ubicaciones, rendimiento, reseñas, auditorías, cumplimiento, regalías, leads, tickets, formación) y preparo cambios para que los confirmes. Prueba «¿Qué ubicaciones no pagaron regalías el mes pasado?».',
-    outside: 'No puedo consultar eso con tu acceso. Pregunta sobre las áreas en las que trabajas.',
+    none: 'He mirado y no hay nada que coincida. Prueba con otras palabras o pregúntame por otra área.',
+    proposed: 'Lo he preparado para que lo revises. Aún no se ha cambiado ni enviado nada: confírmalo en la tarjeta cuando te parezca bien.',
+    denied: 'Eso está fuera de lo que puedes ver, así que no puedo hacerlo por ti. Tu central puede ayudarte.',
+    error: 'No pude terminarlo:',
+    help: 'Soy {name}. Respondo preguntas sobre los datos que puedes ver (ubicaciones, rendimiento, reseñas, auditorías, cumplimiento, regalías, leads, tickets, formación) y preparo cambios para que los confirmes. Prueba «¿Qué ubicaciones no pagaron regalías el mes pasado?».',
+    outside: 'Eso está fuera de lo que puedes ver. Pregúntame por las áreas en las que trabajas, o tu central puede ayudarte.',
     opening: 'Abriendo',
     noData: 'Todavía no hay datos para eso.',
-    checking: 'Lo compruebo.',
+    checking: 'Me pongo con ello.',
+    briefing: 'Esto es lo que te necesita hoy:',
+    quiet: 'Hoy no hay nada que te necesite.',
   },
   de: {
     found: 'Das habe ich gefunden:',
-    none: 'Dazu habe ich nichts gefunden.',
-    proposed: 'Ich habe das zur Prüfung vorbereitet. Es wurde noch nichts geändert oder gesendet: Bestätigen Sie es auf der Karte, wenn Sie bereit sind.',
-    denied: 'Darauf haben Sie keinen Zugriff, deshalb kann ich das nicht für Sie erledigen.',
+    none: 'Ich habe nachgesehen, aber nichts passt dazu. Versuchen Sie andere Worte oder fragen Sie mich zu einem anderen Bereich.',
+    proposed: 'Ich habe das zur Prüfung vorbereitet. Es wurde noch nichts geändert oder gesendet: Bestätigen Sie es auf der Karte, wenn es für Sie passt.',
+    denied: 'Das liegt außerhalb dessen, was Sie sehen können, deshalb kann ich das nicht für Sie erledigen. Ihre Zentrale kann helfen.',
     error: 'Das konnte ich nicht abschließen:',
-    help: 'Ich beantworte Fragen zu den Daten, die Sie sehen können (Standorte, Leistung, Bewertungen, Audits, Compliance, Lizenzgebühren, Leads, Tickets, Schulungen), und bereite Änderungen zur Bestätigung vor. Fragen Sie z. B. „Welche Standorte haben letzten Monat keine Lizenzgebühren gezahlt?“.',
-    outside: 'Das kann ich mit Ihrem Zugriff nicht abrufen. Fragen Sie zu Ihren Arbeitsbereichen.',
+    help: 'Ich bin {name}. Ich beantworte Fragen zu den Daten, die Sie sehen können (Standorte, Leistung, Bewertungen, Audits, Compliance, Lizenzgebühren, Leads, Tickets, Schulungen), und bereite Änderungen zur Bestätigung vor. Fragen Sie z. B. „Welche Standorte haben letzten Monat keine Lizenzgebühren gezahlt?“.',
+    outside: 'Das liegt außerhalb dessen, was Sie sehen können. Fragen Sie mich zu Ihren Arbeitsbereichen, oder wenden Sie sich an Ihre Zentrale.',
     opening: 'Öffne',
     noData: 'Dazu gibt es noch keine Daten.',
-    checking: 'Ich sehe nach.',
+    checking: 'Ich kümmere mich darum.',
+    briefing: 'Das braucht Sie heute:',
+    quiet: 'Heute braucht Sie nichts.',
   },
   'pt-BR': {
     found: 'Veja o que encontrei:',
-    none: 'Não encontrei nada correspondente.',
-    proposed: 'Preparei isto para você revisar. Nada foi alterado ou enviado ainda: confirme no cartão quando quiser.',
-    denied: 'Você não tem acesso a isso, então não posso fazer por você.',
-    error: 'Não consegui concluir:',
-    help: 'Respondo perguntas sobre os dados que você pode ver (unidades, desempenho, avaliações, auditorias, conformidade, royalties, leads, chamados, treinamento) e preparo alterações para você confirmar. Experimente “Quais unidades não pagaram royalties no mês passado?”.',
-    outside: 'Não consigo consultar isso com o seu acesso. Pergunte sobre as áreas em que você trabalha.',
+    none: 'Procurei e nada corresponde a isso. Tente outras palavras ou me pergunte sobre outra área.',
+    proposed: 'Preparei isto para você conferir. Nada foi alterado ou enviado ainda: confirme no cartão quando estiver tudo certo.',
+    denied: 'Isso está fora do que você pode ver, então não posso fazer por você. A sua sede pode ajudar.',
+    error: 'Não consegui terminar:',
+    help: 'Sou a {name}. Respondo perguntas sobre os dados que você pode ver (unidades, desempenho, avaliações, auditorias, conformidade, royalties, leads, chamados, treinamento) e preparo alterações para você confirmar. Experimente “Quais unidades não pagaram royalties no mês passado?”.',
+    outside: 'Isso está fora do que você pode ver. Pergunte sobre as áreas em que você trabalha, ou a sua sede pode ajudar.',
     opening: 'Abrindo',
     noData: 'Ainda não há dados para isso.',
-    checking: 'Vou verificar.',
+    checking: 'Deixa comigo.',
+    briefing: 'Veja o que precisa de você hoje:',
+    quiet: 'Nada precisa de você hoje.',
   },
 };
 
 export function sandboxPhrases(locale: string | undefined): Phrases {
   const l = locale ?? 'en';
-  return PHRASES[l] ?? PHRASES[l.split('-')[0]!] ?? PHRASES.en!;
+  const p = PHRASES[l] ?? PHRASES[l.split('-')[0]!] ?? PHRASES.en!;
+  return { ...p, help: p.help.replace('{name}', ASSISTANT_NAME) };
 }
 
 type Period = 'this_month' | 'last_month' | 'this_quarter' | 'last_quarter' | 'year_to_date' | 'last_30_days';
@@ -176,7 +189,7 @@ const RULES: Rule[] = [
   // Audit trends first: “Comment évoluent…”, “Wie entwickeln sich…” would otherwise read as how-to questions.
   { test: /audit.*(trend|tendance|tendencia|entwicklung|tendência)|(trend|tendance|tendencia|tendência|évolu|evolucion|entwickel|evolu[íi]n?do).*audit/, tool: 'audit_trends', input: () => ({}) },
   { test: /^(how (do|should|can) (we|i)|how to|what('s| is) (our|the) (policy|procedure|process|rule)|what does (our|the) (manual|handbook|policy|guide)|where do (we|i)|comment |cómo |wie |como |que dit |qué dice |was sagt |o que diz )/, tool: 'search_knowledge', input: (_q, raw) => ({ query: raw.slice(0, 300) }) },
-  { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw, tz) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to)?|rappelle-moi( de)?|recuérdame|erinnere mich( an)?|lembre-me( de)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q, tz) }) },
+  { test: /remind me|reminder|rappelle|recuérdame|erinnere|lembre/, tool: 'remind_me', input: (q, raw, tz) => ({ title: quoted(raw) ?? (raw.replace(/^.*?(remind me( to\b)?|rappelle-moi( de\b)?|recuérdame|erinnere mich( an\b)?|lembre-me( de\b)?)\s*/i, '').slice(0, 120) || raw.slice(0, 120)), remindAt: whenOf(q, tz) }) },
   { test: /(create|add|new) (a )?(task|to-?do)|crée une tâche|crear tarea|aufgabe/, tool: 'create_task', input: (_q, raw) => ({ title: quoted(raw) ?? raw.slice(0, 120) }) },
   ...MODULE_RULES,
   { test: /(draft|write|create|prepare).*(email|newsletter)|(email|newsletter).*(draft|campaign)|rédige.*e-?mail|redacta.*correo/, tool: 'create_email_campaign_draft', input: (_q, raw) => ({ name: quoted(raw) ?? raw.slice(0, 80), subject: quoted(raw) ?? raw.slice(0, 80) }) },

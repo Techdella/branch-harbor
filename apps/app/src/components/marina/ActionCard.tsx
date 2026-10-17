@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon, cx } from '@bh/ui';
+import { Button, Icon, MarinaAvatar, cx } from '@bh/ui';
 import type { AiActionCard } from '@bh/shared';
 import { marina } from '@/lib/marina';
 import { useErrorText } from '@/lib/useErrorText';
@@ -102,12 +102,20 @@ export function ActionCard({ action, onChange, approver }: { action: AiActionCar
         </div>
       )}
       {a.status === 'executed' && (
-        <p className="flex flex-wrap items-center gap-2 text-xs font-semibold text-success" role="status">
-          <Icon name="check-circle" size={12} />{t('action.done')}
-          {a.link && <Link href={a.link} className="underline">{t('action.open')}</Link>}
-        </p>
+        <div className="flex items-center gap-2.5 rounded-md bg-[#EEF8E4] px-2.5 py-2" role="status" data-testid="marina-celebrate">
+          <MarinaAvatar size={30} mood="celebrate" />
+          <p className="flex flex-1 flex-wrap items-center gap-x-2 text-xs font-semibold text-ink">
+            {t('action.celebrate')}
+            {a.link && <Link href={a.link} className="underline">{t('action.open')}</Link>}
+          </p>
+        </div>
       )}
-      {a.status === 'failed' && <p className="text-xs font-semibold text-danger" role="alert">{t('action.failed', { reason: String(a.result?.error ?? '') })}</p>}
+      {a.status === 'failed' && (
+        <div className="flex items-center gap-2.5" role="alert">
+          <MarinaAvatar size={26} mood="concerned" />
+          <p className="text-xs font-semibold text-danger">{t('action.failed', { reason: String(a.result?.error ?? '') })}</p>
+        </div>
+      )}
       {(a.status === 'cancelled' || a.status === 'rejected') && <p className="text-xs text-stone">{t(a.status === 'cancelled' ? 'action.cancelled' : 'action.rejected')}</p>}
     </div>
   );

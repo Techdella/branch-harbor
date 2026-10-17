@@ -2249,6 +2249,10 @@
       "location": "Salve sua primeira unidade",
       "website": "Escolha um site e um endereço",
       "items": "Adicione pelo menos um item"
+    },
+    "marina": {
+      "title": "Eu sou a {name}, sua assistente",
+      "body": "Quando terminar a configuração, descreva seu negócio em uma frase na página da {name} e eu sugiro unidades, uma equipe e primeiras campanhas para você confirmar."
     }
   },
   "approvals": {

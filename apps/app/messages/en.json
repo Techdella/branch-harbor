@@ -2249,6 +2249,10 @@
       "location": "Save your first location",
       "website": "Choose a website and address",
       "items": "Add at least one item"
+    },
+    "marina": {
+      "title": "I’m {name}, your assistant",
+      "body": "Once you’ve finished setting up, tell me about your business in a sentence on the {name} page and I’ll suggest locations, a team and first campaigns for you to confirm."
     }
   },
   "approvals": {

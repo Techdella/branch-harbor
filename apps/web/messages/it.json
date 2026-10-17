@@ -2657,7 +2657,29 @@
       "kicker": "Assistente AI",
       "title": "{name} lavora accanto al tuo team",
       "body": "Chiedi di qualsiasi sede, ricevi un riepilogo ogni mattina e lascia che {name} prepari il lavoro. Confermi ogni modifica.",
-      "cta": "Scopri {name}"
+      "cta": "Scopri {name}",
+      "meet": "«Ciao, sono {name}. Resto calma, mi occupo del lavoro di base e ti dico con chiarezza cosa ti aspetta.»",
+      "traitsLabel": "Com’è {name}"
+    },
+    "meet": {
+      "title": "Conosci {name}",
+      "body": "«Ciao, sono {name}. Pensami come la vicina più gentile del porto. Guardo ciò che hai il permesso di vedere, ti dico con chiarezza cosa ti aspetta oggi e mi occupo del lavoro di base: bozze, controlli e brief. Sei tu a decidere cosa succede dopo.»",
+      "note": "{name} è un’assistente AI, non una persona. È disegnata come una lontra marina: sveglia, abile con gli strumenti e calma quando il mare si agita.",
+      "figureAlt": "{name}, l’assistente di BranchHarbor, disegnata come una lontra marina che saluta dal porto",
+      "traits": [
+        {
+          "name": "Calma",
+          "desc": "Niente panico per una royalty in ritardo o una recensione negativa. Dice cosa è successo e cosa fare dopo."
+        },
+        {
+          "name": "Capace",
+          "desc": "Scrive, controlla e prepara il lavoro invece di rimandarti ad altre schermate, e tu confermi ogni modifica."
+        },
+        {
+          "name": "Onesta",
+          "desc": "Se mancano dati o non è sicura, lo dice. Non inventa mai cifre e ti avvisa quando serve una persona o un avvocato."
+        }
+      ]
     }
   }
 }

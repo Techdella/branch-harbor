@@ -53,9 +53,9 @@ const MAX_TOOL_RESULT_CHARS = 24_000;
 export async function assertAssistantAvailable(s: Services, ctx: AssistantContext) {
   if (!ctx.can('ai.assistant', 'view')) throw forbidden(`${ASSISTANT_NAME} is not part of your access`);
   const settings = await loadAiSettings(s.db, ctx.orgId);
-  if (!settings.enabled) throw new AppError(403, 'ai_disabled', `${ASSISTANT_NAME} is switched off for this organisation.`);
+  if (!settings.enabled) throw new AppError(403, 'ai_disabled', `${ASSISTANT_NAME} is switched off for this organisation. An AI admin at head office can switch her back on in Settings.`);
   const usage = await usageView(s, ctx.orgId);
-  if (usage.state === 'paused') throw new AppError(429, 'ai_credit_limit', `${ASSISTANT_NAME} has reached this month’s fair-use limit for your organisation. It resumes next month; everything else keeps working.`);
+  if (usage.state === 'paused') throw new AppError(429, 'ai_credit_limit', `${ASSISTANT_NAME} has reached this month’s fair-use limit for your organisation. She is back when the allowance resets at the start of next month; everything else keeps working.`);
   return { settings, usage };
 }
 
@@ -303,7 +303,7 @@ export async function confirmAction(s: Services, ctx: AssistantContext, id: stri
   const parsed = tool.input.safeParse(merged);
   if (!parsed.success) throw new AppError(400, 'validation_failed', 'Some fields need attention', Object.fromEntries(parsed.error.issues.map((i) => [i.path.join('.') || '_', i.message])));
   const settings = await loadAiSettings(s.db, ctx.orgId);
-  if (!settings.enabled) throw new AppError(403, 'ai_disabled', `${ASSISTANT_NAME} is switched off for this organisation.`);
+  if (!settings.enabled) throw new AppError(403, 'ai_disabled', `${ASSISTANT_NAME} is switched off for this organisation. An AI admin at head office can switch her back on in Settings.`);
   const [row] = await s.db.update(aiProposedActions).set({ payload: parsed.data as Record<string, unknown>, confirmedAt: new Date() }).where(eq(aiProposedActions.id, a.id)).returning();
   if (settings.approvalRequiredFor.includes(a.risk as AiActionRisk) && !ctx.can('ai.assistant', 'publish')) {
     const [held] = await s.db.update(aiProposedActions).set({ status: 'pending_approval' }).where(eq(aiProposedActions.id, a.id)).returning();
@@ -352,7 +352,7 @@ export async function proposeAction(s: Services, ctx: AssistantContext, toolName
   const tool = (await loadTools()).get(toolName);
   if (!tool || tool.kind !== 'write') throw new AppError(400, 'unsupported_action', 'Unknown action');
   const settings = await loadAiSettings(s.db, ctx.orgId);
-  if (!settings.enabled) throw new AppError(403, 'ai_disabled', `${ASSISTANT_NAME} is switched off for this organisation.`);
+  if (!settings.enabled) throw new AppError(403, 'ai_disabled', `${ASSISTANT_NAME} is switched off for this organisation. An AI admin at head office can switch her back on in Settings.`);
   const st: TurnState = { untrusted: !!opts.untrusted, blocks: [], citations: [], actionIds: [], navigate: null };
   const r = await runTool(s, ctx, null, tool, toolName, input, st, () => {}, source);
   if (!st.actionIds.length) {

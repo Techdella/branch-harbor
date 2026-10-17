@@ -15,13 +15,13 @@
     "asYou": "Sees only what you can",
     "confirmFirst": "You confirm every change",
     "credits": "{used} of {limit} credits",
-    "intro": "Ask {name} about anything you can see in BranchHarbor, or to prepare something for you. Nothing is changed until you confirm it.",
-    "thinking": "{name} is checking…",
+    "intro": "I can answer questions about anything you can see in BranchHarbor and prepare work for you to check. Nothing changes until you confirm it.",
+    "thinking": "{name} is on it…",
     "askLabel": "Ask {name}",
     "askPlaceholder": "Ask {name} or describe a task…",
     "send": "Send",
     "stop": "Stop",
-    "disclaimer": "{name} can make mistakes. Check important figures in their screens.",
+    "disclaimer": "I can make mistakes, so check important figures on their screens.",
     "opened": "Opened {screen}",
     "sources": "Sources",
     "loading": "Loading…",
@@ -29,7 +29,7 @@
     "location": "Location",
     "history": {
       "title": "History",
-      "empty": "No conversations yet.",
+      "empty": "No conversations yet. Ask me something and it will show up here.",
       "untitled": "Untitled conversation",
       "archive": "Archive conversation"
     },
@@ -45,9 +45,10 @@
       "pendingApproval": "Waiting for an HQ approver.",
       "done": "Done.",
       "open": "Open",
-      "failed": "It didn’t work: {reason}",
+      "failed": "That didn’t go through: {reason}",
       "cancelled": "Cancelled. Nothing was changed.",
-      "rejected": "Rejected by an approver. Nothing was changed."
+      "rejected": "Rejected by an approver. Nothing was changed.",
+      "celebrate": "Done. That’s one less thing on your list."
     },
     "risk": {
       "change": "Change",
@@ -80,7 +81,7 @@
     },
     "briefing": {
       "today": "Today’s briefing",
-      "nothing": "Nothing needs your attention right now.",
+      "nothing": "Enjoy the quiet, or ask me to look into something.",
       "refresh": "Refresh",
       "prepared": "Prepared {when}",
       "settings": "Briefing settings",
@@ -108,7 +109,8 @@
         "supply": "Supply",
         "self_checks": "Self-checks",
         "agreements": "Agreement deadlines"
-      }
+      },
+      "nothingTitle": "Nothing needs you today."
     },
     "severity": {
       "critical": "Urgent",
@@ -117,7 +119,7 @@
     },
     "insights": {
       "title": "Insights",
-      "none": "No unusual changes found on your locations.",
+      "none": "Nothing unusual on your locations. I’ll flag it here if that changes.",
       "showEvidence": "Show the numbers",
       "hideEvidence": "Hide the numbers",
       "dismiss": "Dismiss",
@@ -146,12 +148,14 @@
       "ask": "Ask {name}",
       "actions": "Waiting for you",
       "tasks": "My tasks and reminders",
-      "noTasks": "No tasks. Ask {name} to remind you of something.",
-      "done": "Mark done"
+      "noTasks": "No tasks yet. Ask me to remind you of something and I’ll keep it here.",
+      "done": "Mark done",
+      "intro": "Here’s your briefing, what I’ve noticed on your locations, and everything I’ve prepared for you.",
+      "count": "{count, plural, one {One thing needs you today. It’s at the top of your briefing.} other {# things need you today. The most important is at the top.}}"
     },
     "setup": {
       "title": "Set up with {name}",
-      "body": "Describe your business in a sentence and get a plan: locations, team, website theme and first campaigns, each ready to confirm.",
+      "body": "Tell me about your business in a sentence and I’ll suggest a plan: locations, team, website theme and first campaigns, each ready for you to confirm.",
       "placeholder": "I run 12 yoga studios in Canada and the UK…",
       "plan": "Make a plan",
       "team": "Suggested team",
@@ -162,7 +166,7 @@
       "description": "One page for a location visit: KPIs, audits, open actions, reviews, compliance, tickets and talking points from {name}.",
       "location": "Location",
       "choose": "Choose a location…",
-      "pick": "Choose a location to prepare the brief.",
+      "pick": "Choose a location and I’ll prepare the brief.",
       "print": "Print",
       "talkingPoints": "Talking points",
       "kpis": "KPIs ({period})",
@@ -207,7 +211,7 @@
       "briefPlaceholder": "What is it about? Include the facts to use (dates, offers): nothing is invented.",
       "generate": "Write it",
       "result": "Draft",
-      "empty": "Your draft appears here.",
+      "empty": "Your draft will appear here once I’ve written it.",
       "guardrailsApplied": "Guardrails applied. Removed: {removed}. Added: {added}",
       "translateInto": "Translate into",
       "translate": "Translate",
@@ -219,7 +223,8 @@
         "ad": "Ad",
         "website_section": "Website section",
         "coming_soon": "Coming-soon campaign"
-      }
+      },
+      "writing": "{name} is writing your draft…"
     },
     "settings": {
       "title": "{name}",
@@ -448,6 +453,20 @@
       "list_brands": "Brands",
       "brand_comparison": "Brand comparison",
       "plan_status": "Plan and billing"
+    },
+    "hello": "Hello, {first}. I’m {name}.",
+    "helloAnon": "Hello, I’m {name}.",
+    "introTry": "Try one of these",
+    "errorLead": "That didn’t go through.",
+    "sleep": {
+      "offTitle": "{name} is switched off",
+      "offBody": "Your organisation has switched me off for now. An AI admin at head office can switch me back on in Settings. Everything else keeps working.",
+      "offAdmin": "Switch {name} on in Settings",
+      "pausedTitle": "{name} is resting until {date}",
+      "pausedBody": "Your organisation has used this month’s AI allowance, so I’m taking a break. I’ll be back on {date}, when it resets. Everything else keeps working.",
+      "pausedAdmin": "See AI credits in Settings",
+      "placeholder": "{name} is resting",
+      "briefing": "Briefings pause while {name} is resting."
     }
   }
 }
